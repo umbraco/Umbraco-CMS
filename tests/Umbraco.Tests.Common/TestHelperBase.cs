@@ -48,7 +48,7 @@ public abstract class TestHelperBase
     protected TestHelperBase(Assembly entryAssembly)
     {
         MainDom = new SimpleMainDom();
-        _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly, NullLoggerFactory.Instance));
+        _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly, NullLoggerFactory.Instance), null);
     }
 
     /// <summary>
@@ -96,8 +96,7 @@ public abstract class TestHelperBase
                 Mock.Of<IMediaPathScheme>(),
                 loggerFactory.CreateLogger<MediaFileManager>(),
                 Mock.Of<IShortStringHelper>(),
-                Mock.Of<IServiceProvider>(),
-                Options.Create(new ContentSettings()));
+                Mock.Of<IServiceProvider>());
             var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
             var database = new Mock<IUmbracoDatabase>();
             var sqlContext = new Mock<ISqlContext>();
@@ -137,7 +136,7 @@ public abstract class TestHelperBase
         }
     }
 
-    public IJsonSerializer JsonSerializer { get; } = new JsonNetSerializer();
+    public IJsonSerializer JsonSerializer { get; } = new SystemTextJsonSerializer();
 
     public IVariationContextAccessor VariationContextAccessor { get; } = new TestVariationContextAccessor();
 
@@ -183,10 +182,7 @@ public abstract class TestHelperBase
     {
         get
         {
-            if (_uriUtility == null)
-            {
-                _uriUtility = new UriUtility(GetHostingEnvironment());
-            }
+            _uriUtility ??= new UriUtility(GetHostingEnvironment());
 
             return _uriUtility;
         }
@@ -197,12 +193,7 @@ public abstract class TestHelperBase
     public TypeLoader GetMockedTypeLoader() =>
         new(
             Mock.Of<ITypeFinder>(),
-            new VaryingRuntimeHash(),
-            Mock.Of<IAppPolicyCache>(),
-            new DirectoryInfo(GetHostingEnvironment()
-                .MapPathContentRoot(Constants.SystemDirectories.TempData)),
-            Mock.Of<ILogger<TypeLoader>>(),
-            Mock.Of<IProfiler>());
+            Mock.Of<ILogger<TypeLoader>>());
 
     /// <summary>
     ///     Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based
@@ -215,7 +206,7 @@ public abstract class TestHelperBase
             throw new ArgumentException("relativePath must start with '~/'", nameof(relativePath));
         }
 
-        var codeBase = typeof(TestHelperBase).Assembly.CodeBase;
+        var codeBase = typeof(TestHelperBase).Assembly.Location;
         var uri = new Uri(codeBase);
         var path = uri.LocalPath;
         var bin = Path.GetDirectoryName(path);
@@ -246,6 +237,6 @@ public abstract class TestHelperBase
     {
         hostingEnv ??= GetHostingEnvironment();
         return new LoggingConfiguration(
-            Path.Combine(hostingEnv.ApplicationPhysicalPath, "umbraco", "logs"));
+            Path.Combine(hostingEnv.ApplicationPhysicalPath, "umbraco", "Logs"));
     }
 }

@@ -3,6 +3,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Strings.Css;
 
+// FIXME: remove this class and all usage of it (moved to the client in V14)
 public class StylesheetHelper
 {
     private const string RuleRegexFormat =

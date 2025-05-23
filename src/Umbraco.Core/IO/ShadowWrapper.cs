@@ -7,19 +7,21 @@ namespace Umbraco.Cms.Core.IO;
 
 internal class ShadowWrapper : IFileSystem, IFileProviderFactory
 {
-    private static readonly string ShadowFsPath = Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs";
-    private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly IIOHelper _ioHelper;
+    private const string ShadowFsPath = "ShadowFs";
 
-    private readonly Func<bool?>? _isScoped;
+    private readonly IIOHelper _ioHelper;
+    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILoggerFactory _loggerFactory;
     private readonly string _shadowPath;
+    private readonly Func<bool?>? _isScoped;
+
     private string? _shadowDir;
     private ShadowFileSystem? _shadowFileSystem;
 
     public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, string shadowPath, Func<bool?>? isScoped = null)
     {
         InnerFileSystem = innerFileSystem;
+
         _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         _loggerFactory = loggerFactory;
@@ -35,18 +37,19 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
     {
         get
         {
-            if (_isScoped is not null && _shadowFileSystem is not null)
+            Func<bool?>? isScoped = _isScoped;
+            if (isScoped is not null && _shadowFileSystem is not null)
             {
-                var isScoped = _isScoped!();
+                bool? scoped = isScoped();
 
                 // if the filesystem is created *after* shadowing starts, it won't be shadowing
-                // better not ignore that situation and raised a meaningful (?) exception
-                if (isScoped.HasValue && isScoped.Value && _shadowFileSystem == null)
+                // better not ignore that situation and raise a meaningful (?) exception
+                if (scoped.HasValue && scoped.Value && _shadowFileSystem == null)
                 {
                     throw new Exception("The filesystems are shadowing, but this filesystem is not.");
                 }
 
-                return isScoped.HasValue && isScoped.Value
+                return scoped.HasValue && scoped.Value
                     ? _shadowFileSystem
                     : InnerFileSystem;
             }
@@ -56,8 +59,7 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
     }
 
     /// <inheritdoc />
-    public IFileProvider? Create() =>
-        InnerFileSystem.TryCreateFileProvider(out IFileProvider? fileProvider) ? fileProvider : null;
+    public IFileProvider? Create() => InnerFileSystem.TryCreateFileProvider(out IFileProvider? fileProvider) ? fileProvider : null;
 
     public IEnumerable<string> GetDirectories(string path) => FileSystem.GetDirectories(path);
 
@@ -69,8 +71,7 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
 
     public void AddFile(string path, Stream stream) => FileSystem.AddFile(path, stream);
 
-    public void AddFile(string path, Stream stream, bool overrideExisting) =>
-        FileSystem.AddFile(path, stream, overrideExisting);
+    public void AddFile(string path, Stream stream, bool overrideExisting) => FileSystem.AddFile(path, stream, overrideExisting);
 
     public IEnumerable<string> GetFiles(string path) => FileSystem.GetFiles(path);
 
@@ -107,8 +108,7 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
         {
             var id = GuidUtils.ToBase32String(Guid.NewGuid(), idLength);
 
-            var virt = ShadowFsPath + "/" + id;
-            var shadowDir = hostingEnvironment.MapPathContentRoot(virt);
+            var shadowDir = Path.Combine(hostingEnvironment.LocalTempPath, ShadowFsPath, id);
             if (Directory.Exists(shadowDir))
             {
                 continue;
@@ -129,10 +129,10 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
         // note: no thread-safety here, because ShadowFs is thread-safe due to the check
         // on ShadowFileSystemsScope.None - and if None is false then we should be running
         // in a single thread anyways
-        var virt = Path.Combine(ShadowFsPath, id, _shadowPath);
-        _shadowDir = _hostingEnvironment.MapPathContentRoot(virt);
+        var rootUrl = Path.Combine(ShadowFsPath, id, _shadowPath);
+        _shadowDir = Path.Combine(_hostingEnvironment.LocalTempPath, rootUrl);
         Directory.CreateDirectory(_shadowDir);
-        var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), _shadowDir, _hostingEnvironment.ToAbsolute(virt));
+        var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), _shadowDir, rootUrl);
         _shadowFileSystem = new ShadowFileSystem(InnerFileSystem, tempfs);
     }
 
@@ -160,7 +160,7 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
 
                 // shadowPath make be path/to/dir, remove each
                 dir = dir!.Replace('/', Path.DirectorySeparatorChar);
-                var min = _hostingEnvironment.MapPathContentRoot(ShadowFsPath).Length;
+                var min = Path.Combine(_hostingEnvironment.LocalTempPath, ShadowFsPath).Length;
                 var pos = dir.LastIndexOf(Path.DirectorySeparatorChar);
                 while (pos > min)
                 {

@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -12,13 +13,21 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 /// <inheritdoc />
 internal sealed class ApiMediaQueryService : IApiMediaQueryService
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly ILogger<ApiMediaQueryService> _logger;
+    private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
+    private readonly IPublishedMediaStatusFilteringService _publishedMediaStatusFilteringService;
 
-    public ApiMediaQueryService(IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger<ApiMediaQueryService> logger)
+    public ApiMediaQueryService(
+        IPublishedMediaCache publishedMediaCache,
+        ILogger<ApiMediaQueryService> logger,
+        IMediaNavigationQueryService mediaNavigationQueryService,
+        IPublishedMediaStatusFilteringService publishedMediaStatusFilteringService)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _publishedMediaCache = publishedMediaCache;
         _logger = logger;
+        _mediaNavigationQueryService = mediaNavigationQueryService;
+        _publishedMediaStatusFilteringService = publishedMediaStatusFilteringService;
     }
 
     /// <inheritdoc/>
@@ -52,8 +61,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
         => TryGetByPath(path, GetRequiredPublishedMediaCache());
 
     private IPublishedMediaCache GetRequiredPublishedMediaCache()
-        => _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Media
-           ?? throw new InvalidOperationException("Could not obtain the published media cache");
+        => _publishedMediaCache;
 
     private IPublishedContent? TryGetByPath(string path, IPublishedMediaCache mediaCache)
     {
@@ -69,7 +77,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                 break;
             }
 
-            currentChildren = resolvedMedia.Children;
+            currentChildren = resolvedMedia.Children(_mediaNavigationQueryService, _publishedMediaStatusFilteringService);
         }
 
         return resolvedMedia;
@@ -102,7 +110,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             ? mediaCache.GetById(parentKey)
             : TryGetByPath(childrenOf, mediaCache);
 
-        return parent?.Children ?? Array.Empty<IPublishedContent>();
+        return parent?.Children(_mediaNavigationQueryService, _publishedMediaStatusFilteringService) ?? Array.Empty<IPublishedContent>();
     }
 
     private IEnumerable<IPublishedContent>? ApplyFilters(IEnumerable<IPublishedContent> source, IEnumerable<string> filters)
@@ -113,7 +121,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             if (parts.Length != 2)
             {
                 // invalid filter
-                _logger.LogInformation($"The \"{nameof(filters)}\" query option \"{filter}\" is not valid");
+                _logger.LogInformation("An invalid filter option was encountered. Please ensure that supplied filter options are two-part, separated by ':'.");
                 return null;
             }
 
@@ -127,7 +135,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                     break;
                 default:
                     // unknown filter
-                    _logger.LogInformation($"The \"{nameof(filters)}\" query option \"{filter}\" is not supported");
+                    _logger.LogInformation("An unsupported filter option was supplied for the query. Please use only valid filter options. See the documentation for details.");
                     return null;
             }
         }
@@ -143,7 +151,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             if (parts.Length != 2)
             {
                 // invalid sort
-                _logger.LogInformation($"The \"{nameof(sorts)}\" query option \"{sort}\" is not valid");
+                _logger.LogInformation("An invalid sort option was encountered. Please ensure that the supplied sort options are two-part, separated by ':'.");
                 return null;
             }
 
@@ -164,7 +172,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                     break;
                 default:
                     // unknown sort
-                    _logger.LogInformation($"The \"{nameof(sorts)}\" query option \"{sort}\" is not supported");
+                    _logger.LogInformation("An unsupported sort option was supplied for the query. Please use only valid sort options. See the documentation for details.");
                     return null;
             }
 
@@ -177,7 +185,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     }
 
 
-    private Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> PagedResult(IEnumerable<IPublishedContent> children, int skip, int take)
+    private static Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> PagedResult(IEnumerable<IPublishedContent> children, int skip, int take)
     {
         IPublishedContent[] childrenAsArray = children as IPublishedContent[] ?? children.ToArray();
         var result = new PagedModel<Guid>

@@ -30,13 +30,20 @@ public class Upgrader
     /// </summary>
     public virtual string StateValueKey => Constants.Conventions.Migrations.KeyValuePrefix + Name;
 
+    [Obsolete("Use ExecuteAsync instead. Scheduled for removal in Umbraco 18.")]
+    public ExecutedMigrationPlan Execute(
+        IMigrationPlanExecutor migrationPlanExecutor,
+        ICoreScopeProvider scopeProvider,
+        IKeyValueService keyValueService)
+        => ExecuteAsync(migrationPlanExecutor, scopeProvider, keyValueService).GetAwaiter().GetResult();
+
     /// <summary>
     ///     Executes.
     /// </summary>
     /// <param name="migrationPlanExecutor"></param>
     /// <param name="scopeProvider">A scope provider.</param>
     /// <param name="keyValueService">A key-value service.</param>
-    public ExecutedMigrationPlan Execute(
+    public async Task<ExecutedMigrationPlan> ExecuteAsync(
         IMigrationPlanExecutor migrationPlanExecutor,
         ICoreScopeProvider scopeProvider,
         IKeyValueService keyValueService)
@@ -53,7 +60,7 @@ public class Upgrader
 
         string initialState = GetInitialState(scopeProvider, keyValueService);
 
-        ExecutedMigrationPlan result = migrationPlanExecutor.ExecutePlan(Plan, initialState);
+        ExecutedMigrationPlan result = await migrationPlanExecutor.ExecutePlanAsync(Plan, initialState).ConfigureAwait(false);
 
         // This should never happen, if the final state comes back as null or equal to the initial state
         // it means that no transitions was successful, which means it cannot be a successful migration
@@ -70,10 +77,6 @@ public class Upgrader
             return result;
         }
 
-        // We always save the final state of the migration plan, this is because a partial success is possible
-        // So we still want to save the place we got to in the database-
-        SetState(result.FinalState, scopeProvider, keyValueService);
-
         return result;
     }
 
@@ -89,12 +92,5 @@ public class Upgrader
         }
 
         return currentState;
-    }
-
-    private void SetState(string state, ICoreScopeProvider scopeProvider, IKeyValueService keyValueService)
-    {
-        using ICoreScope scope = scopeProvider.CreateCoreScope();
-        keyValueService.SetValue(StateValueKey, state);
-        scope.Complete();
     }
 }

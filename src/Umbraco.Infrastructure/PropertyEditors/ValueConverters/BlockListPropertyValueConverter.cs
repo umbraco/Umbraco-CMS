@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -10,38 +8,43 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Extensions;
-using static Umbraco.Cms.Core.PropertyEditors.BlockListConfiguration;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockConfiguration>, IDeliveryApiPropertyValueConverter
+public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IProfilingLogger _proflog;
+    private readonly BlockEditorConverter _blockConverter;
     private readonly IApiElementBuilder _apiElementBuilder;
+    private readonly IJsonSerializer _jsonSerializer;
+    private readonly BlockListPropertyValueConstructorCache _constructorCache;
+    private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
 
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
-        : this(proflog, blockConverter, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
-    {
-    }
-
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService)
-        : this(proflog, blockConverter, contentTypeService, StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>())
-    {
-    }
-
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder)
-        : base(blockConverter)
+    public BlockListPropertyValueConverter(
+        IProfilingLogger proflog,
+        BlockEditorConverter blockConverter,
+        IContentTypeService contentTypeService,
+        IApiElementBuilder apiElementBuilder,
+        IJsonSerializer jsonSerializer,
+        BlockListPropertyValueConstructorCache constructorCache,
+        IVariationContextAccessor variationContextAccessor,
+        BlockEditorVarianceHandler blockEditorVarianceHandler)
     {
         _proflog = proflog;
+        _blockConverter = blockConverter;
         _contentTypeService = contentTypeService;
         _apiElementBuilder = apiElementBuilder;
+        _jsonSerializer = jsonSerializer;
+        _constructorCache = constructorCache;
+        _variationContextAccessor = variationContextAccessor;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
     }
 
     /// <inheritdoc />
@@ -55,7 +58,7 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
         if (isSingleBlockMode)
         {
             BlockListConfiguration.BlockConfiguration? block =
-                ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(propertyType.DataType.Configuration)?.Blocks.FirstOrDefault();
+                ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(propertyType.DataType.ConfigurationObject)?.Blocks.FirstOrDefault();
 
             ModelType? contentElementType = block?.ContentElementTypeKey is Guid contentElementTypeKey && _contentTypeService.Get(contentElementTypeKey) is IContentType contentType ? ModelType.For(contentType.Alias) : null;
             ModelType? settingsElementType = block?.SettingsElementTypeKey is Guid settingsElementTypeKey && _contentTypeService.Get(settingsElementTypeKey) is IContentType settingsType ? ModelType.For(settingsType.Alias) : null;
@@ -79,7 +82,7 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
     private bool IsSingleBlockMode(PublishedDataType dataType)
     {
         BlockListConfiguration? config =
-            ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(dataType.Configuration);
+            ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(dataType.ConfigurationObject);
         return (config?.UseSingleBlockMode ?? false) && config?.Blocks.Length == 1 && config?.ValidationLimit?.Min == 1 && config?.ValidationLimit?.Max == 1;
     }
 
@@ -112,6 +115,9 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
     /// <inheritdoc />
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
+
+    /// <inheritdoc />
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(ApiBlockListModel);
 
@@ -122,20 +128,27 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
 
         return new ApiBlockListModel(
             model != null
-                ? model
-                    .Select(item => new ApiBlockItem(
-                        _apiElementBuilder.Build(item.Content),
-                        item.Settings != null ? _apiElementBuilder.Build(item.Settings) : null))
-                    .ToArray()
+                ? model.Select(item => item.CreateApiBlockItem(_apiElementBuilder)).ToArray()
                 : Array.Empty<ApiBlockItem>());
     }
 
     private BlockListModel? ConvertIntermediateToBlockListModel(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
         using (!_proflog.IsEnabled(LogLevel.Debug) ? null : _proflog.DebugDuration<BlockListPropertyValueConverter>(
                    $"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
         {
+            // NOTE: this is to retain backwards compatability
+            if (inter is null)
+            {
+                return BlockListModel.Empty;
+            }
+
+            // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
+            if (inter is not string intermediateBlockModelValue)
+            {
+                return null;
+            }
+
             // Get configuration
             BlockListConfiguration? configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
             if (configuration is null)
@@ -143,26 +156,8 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
                 return null;
             }
 
-            BlockListModel CreateEmptyModel() => BlockListModel.Empty;
-
-            BlockListModel CreateModel(IList<BlockListItem> items) => new BlockListModel(items);
-
-            BlockListModel blockModel = UnwrapBlockModel(referenceCacheLevel, inter, preview, configuration.Blocks, CreateEmptyModel, CreateModel);
-
-            return blockModel;
+            var creator = new BlockListPropertyValueCreator(_blockConverter, _variationContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache);
+            return creator.CreateBlockModel(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks);
         }
-    }
-
-    protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockListEditorDataConverter();
-
-    protected override BlockItemActivator<BlockListItem> CreateBlockItemActivator() => new BlockListItemActivator(BlockEditorConverter);
-
-    private class BlockListItemActivator : BlockItemActivator<BlockListItem>
-    {
-        public BlockListItemActivator(BlockEditorConverter blockConverter) : base(blockConverter)
-        {
-        }
-
-        protected override Type GenericItemType => typeof(BlockListItem<,>);
     }
 }

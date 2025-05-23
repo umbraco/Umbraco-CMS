@@ -11,26 +11,17 @@ public class IntegerConfigurationEditor : ConfigurationEditor
     {
         Fields.Add(new ConfigurationField(new IntegerValidator())
         {
-            Description = "Enter the minimum amount of number to be entered",
             Key = "min",
-            View = "number",
-            Name = "Minimum",
         });
 
         Fields.Add(new ConfigurationField(new IntegerValidator())
         {
-            Description = "Enter the intervals amount between each step of number to be entered",
             Key = "step",
-            View = "number",
-            Name = "Step Size",
         });
 
         Fields.Add(new ConfigurationField(new IntegerValidator())
         {
-            Description = "Enter the maximum amount of number to be entered",
             Key = "max",
-            View = "number",
-            Name = "Maximum",
         });
     }
 }

@@ -1,10 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
@@ -22,16 +21,20 @@ public class UserGroupBuilder : UserGroupBuilder<object>
 public class UserGroupBuilder<TParent>
     : ChildBuilderBase<TParent, IUserGroup>,
         IWithIdBuilder,
+        IWithKeyBuilder,
         IWithIconBuilder,
         IWithAliasBuilder,
         IWithNameBuilder
 {
     private string _alias;
     private IEnumerable<string> _allowedSections = Enumerable.Empty<string>();
+    private IEnumerable<int> _allowedLanguages = Enumerable.Empty<int>();
+    private IEnumerable<IGranularPermission> _granularPermissions = Enumerable.Empty<IGranularPermission>();
     private string _icon;
     private int? _id;
+    private Guid? _key;
     private string _name;
-    private IEnumerable<string> _permissions = Enumerable.Empty<string>();
+    private ISet<string> _permissions = new HashSet<string>();
     private int? _startContentId;
     private int? _startMediaId;
     private string _suffix;
@@ -60,6 +63,12 @@ public class UserGroupBuilder<TParent>
         set => _id = value;
     }
 
+    Guid? IWithKeyBuilder.Key
+    {
+        get => _key;
+        set => _key = value;
+    }
+
     string IWithNameBuilder.Name
     {
         get => _name;
@@ -83,13 +92,7 @@ public class UserGroupBuilder<TParent>
         return this;
     }
 
-    public UserGroupBuilder<TParent> WithPermissions(string permissions)
-    {
-        _permissions = permissions.ToCharArray().Select(x => x.ToString());
-        return this;
-    }
-
-    public UserGroupBuilder<TParent> WithPermissions(IList<string> permissions)
+    public UserGroupBuilder<TParent> WithPermissions(ISet<string> permissions)
     {
         _permissions = permissions;
         return this;
@@ -98,6 +101,18 @@ public class UserGroupBuilder<TParent>
     public UserGroupBuilder<TParent> WithAllowedSections(IList<string> allowedSections)
     {
         _allowedSections = allowedSections;
+        return this;
+    }
+
+    public UserGroupBuilder<TParent> WithAllowedLanguages(IList<int> allowedLanguages)
+    {
+        _allowedLanguages = allowedLanguages;
+        return this;
+    }
+
+    public UserGroupBuilder<TParent> WithGranularPermissions(IList<IGranularPermission> granularPermissions)
+    {
+        _granularPermissions = granularPermissions;
         return this;
     }
 
@@ -122,11 +137,13 @@ public class UserGroupBuilder<TParent>
             x.StartContentId == userGroup.StartContentId &&
             x.StartMediaId == userGroup.StartMediaId &&
             x.AllowedSections == userGroup.AllowedSections &&
-            x.Id == userGroup.Id);
+            x.Id == userGroup.Id &&
+            x.Key == userGroup.Key);
 
     public override IUserGroup Build()
     {
         var id = _id ?? 0;
+        var key = _key ?? Guid.NewGuid();
         var name = _name ?? "TestUserGroup" + _suffix;
         var alias = _alias ?? "testUserGroup" + _suffix;
         var userCount = _userCount ?? 0;
@@ -136,31 +153,57 @@ public class UserGroupBuilder<TParent>
 
         var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
-        var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, _permissions, icon)
+        var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, icon)
         {
             Id = id,
+            Key = key,
             StartContentId = startContentId,
-            StartMediaId = startMediaId
+            StartMediaId = startMediaId,
+            Permissions = _permissions,
         };
 
+        BuildAllowedSections(userGroup);
+        BuildAllowedLanguages(userGroup);
+        BuildGranularPermissions(userGroup);
+
+        return userGroup;
+    }
+
+
+    private void BuildAllowedSections(UserGroup userGroup)
+    {
         foreach (var section in _allowedSections)
         {
             userGroup.AddAllowedSection(section);
         }
+    }
 
-        return userGroup;
+    private void BuildAllowedLanguages(UserGroup userGroup)
+    {
+        foreach (var language in _allowedLanguages)
+        {
+            userGroup.AddAllowedLanguage(language);
+        }
+    }
+
+    private void BuildGranularPermissions(UserGroup userGroup)
+    {
+        foreach (var permission in _granularPermissions)
+        {
+            userGroup.GranularPermissions.Add(permission);
+        }
     }
 
     public static UserGroup CreateUserGroup(
         string alias = "testGroup",
         string name = "Test Group",
         string suffix = "",
-        string[] permissions = null,
+        ISet<string>? permissions = null,
         string[] allowedSections = null) =>
         (UserGroup)new UserGroupBuilder()
             .WithAlias(alias + suffix)
             .WithName(name + suffix)
-            .WithPermissions(permissions ?? new[] { "A", "B", "C" })
-            .WithAllowedSections(allowedSections ?? new[] { "content", "media" })
+            .WithPermissions(permissions ?? new[] { "A", "B", "C" }.ToHashSet())
+            .WithAllowedSections(allowedSections ?? ["content", "media"])
             .Build();
 }

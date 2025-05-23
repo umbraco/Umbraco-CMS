@@ -2,7 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -55,7 +55,7 @@ public class PropertyGroupTests
     {
         var pg = BuildPropertyGroup();
 
-        var json = JsonConvert.SerializeObject(pg);
+        var json = JsonSerializer.Serialize(pg);
         Debug.Print(json);
     }
 

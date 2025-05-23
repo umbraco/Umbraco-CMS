@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO;
 
 [TestFixture]
 [UmbracoTest]
-public class FileSystemsTests : UmbracoIntegrationTest
+internal sealed class FileSystemsTests : UmbracoIntegrationTest
 {
     [Test]
     public void Can_Get_MediaFileManager()
@@ -69,7 +69,7 @@ public class FileSystemsTests : UmbracoIntegrationTest
         Assert.IsTrue(Directory.Exists(physPath));
     }
 
-    // FIXME: don't make sense anymore
+    // TODO: don't make sense anymore
     /*
     [Test]
     public void Cannot_Get_InvalidFileSystem()

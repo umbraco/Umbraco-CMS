@@ -68,72 +68,6 @@ public class RuntimeState : IRuntimeState
         _runtimeModeValidationService = runtimeModeValidationService;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
-    /// </summary>
-    [Obsolete("Use ctor with all params. This will be removed in Umbraco 12.")]
-    public RuntimeState(
-        IOptions<GlobalSettings> globalSettings,
-        IOptions<UnattendedSettings> unattendedSettings,
-        IUmbracoVersion umbracoVersion,
-        IUmbracoDatabaseFactory databaseFactory,
-        ILogger<RuntimeState> logger,
-        PendingPackageMigrations packageMigrationState,
-        IConflictingRouteService conflictingRouteService,
-        IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
-        : this(
-            globalSettings,
-            unattendedSettings,
-            umbracoVersion,
-            databaseFactory,
-            logger,
-            packageMigrationState,
-            conflictingRouteService,
-            databaseProviderMetadata,
-            StaticServiceProvider.Instance.GetRequiredService<IRuntimeModeValidationService>())
-    { }
-
-    [Obsolete("Use ctor with all params. This will be removed in Umbraco 12.")]
-    public RuntimeState(
-        IOptions<GlobalSettings> globalSettings,
-        IOptions<UnattendedSettings> unattendedSettings,
-        IUmbracoVersion umbracoVersion,
-        IUmbracoDatabaseFactory databaseFactory,
-        ILogger<RuntimeState> logger,
-        PendingPackageMigrations packageMigrationState,
-        IConflictingRouteService conflictingRouteService)
-        : this(
-            globalSettings,
-            unattendedSettings,
-            umbracoVersion,
-            databaseFactory,
-            logger,
-            packageMigrationState,
-            StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>(),
-            StaticServiceProvider.Instance.GetServices<IDatabaseProviderMetadata>())
-    { }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
-    /// </summary>
-    [Obsolete("Use ctor with all params. This will be removed in Umbraco 12.")]
-    public RuntimeState(
-        IOptions<GlobalSettings> globalSettings,
-        IOptions<UnattendedSettings> unattendedSettings,
-        IUmbracoVersion umbracoVersion,
-        IUmbracoDatabaseFactory databaseFactory,
-        ILogger<RuntimeState> logger,
-        PendingPackageMigrations packageMigrationState)
-        : this(
-            globalSettings,
-            unattendedSettings,
-            umbracoVersion,
-            databaseFactory,
-            logger,
-            packageMigrationState,
-            StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>())
-    { }
-
     /// <inheritdoc />
     public Version Version => _umbracoVersion.Version;
 
@@ -215,7 +149,7 @@ public class RuntimeState : IRuntimeState
                         _logger.LogDebug("Could not connect to database.");
                     }
 
-                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
+                    if (_databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
                     {
                         // ok to install on a configured but missing database
                         Level = RuntimeLevel.BootFailed;
@@ -325,18 +259,17 @@ public class RuntimeState : IRuntimeState
                 // All will be prefixed with the same key.
                 IReadOnlyDictionary<string, string?>? keyValues = database.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
 
-                // This could need both an upgrade AND package migrations to execute but
-                // we will process them one at a time, first the upgrade, then the package migrations.
+                // This could need both an upgrade AND package migrations to execute, so always add any pending package migrations
+                IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetPendingPackageMigrations(keyValues);
+                _startupState[PendingPackageMigrationsStateKey] = packagesRequiringMigration;
+
                 if (DoesUmbracoRequireUpgrade(keyValues))
                 {
                     return UmbracoDatabaseState.NeedsUpgrade;
                 }
 
-                IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetPendingPackageMigrations(keyValues);
                 if (packagesRequiringMigration.Count > 0)
                 {
-                    _startupState[PendingPackageMigrationsStateKey] = packagesRequiringMigration;
-
                     return UmbracoDatabaseState.NeedsPackageMigration;
                 }
             }
@@ -378,7 +311,7 @@ public class RuntimeState : IRuntimeState
         // anything other than install wants a database - see if we can connect
         // (since this is an already existing database, assume localdb is ready)
         bool canConnect;
-        var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
+        var tries = 5;
         for (var i = 0; ;)
         {
             canConnect = databaseFactory.CanConnect;

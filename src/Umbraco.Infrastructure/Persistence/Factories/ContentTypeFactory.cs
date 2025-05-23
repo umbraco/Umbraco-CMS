@@ -127,7 +127,7 @@ internal static class ContentTypeFactory
             Thumbnail = entity.Thumbnail,
             NodeId = entity.Id,
             AllowAtRoot = entity.AllowedAsRoot,
-            IsContainer = entity.IsContainer,
+            ListView = entity.ListView,
             IsElement = entity.IsElement,
             Variations = (byte)entity.Variations,
             NodeDto = BuildNodeDto(entity, nodeObjectType),
@@ -155,7 +155,7 @@ internal static class ContentTypeFactory
         entity.Level = dto.NodeDto.Level;
         entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
         entity.AllowedAsRoot = dto.AllowAtRoot;
-        entity.IsContainer = dto.IsContainer;
+        entity.ListView = dto.ListView;
         entity.IsElement = dto.IsElement;
         entity.Trashed = dto.NodeDto.Trashed;
 

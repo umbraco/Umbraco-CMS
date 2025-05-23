@@ -21,6 +21,7 @@ public static class DataTableExtensions
     ///     This has been migrated from the Node class and uses proper locking now. It is now used by the Node class and the
     ///     DynamicPublishedContent extensions for legacy reasons.
     /// </remarks>
+    [Obsolete("This no longer has a use in Umbraco and so will be removed in Umbraco 17.")]
     public static DataTable GenerateDataTable(
         string tableAlias,
         Func<string, IEnumerable<KeyValuePair<string, string>>> getHeaders,
@@ -60,6 +61,7 @@ public static class DataTableExtensions
     /// <remarks>
     ///     This is for legacy code, I didn't want to go creating custom classes for these
     /// </remarks>
+    [Obsolete("This no longer has a use in Umbraco and so will be removed in Umbraco 17.")]
     public static List<Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>>
         CreateTableData() =>
         new List<Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>>();
@@ -73,6 +75,7 @@ public static class DataTableExtensions
     /// <remarks>
     ///     This is for legacy code, I didn't want to go creating custom classes for these
     /// </remarks>
+    [Obsolete("This no longer has a use in Umbraco and so will be removed in Umbraco 17.")]
     public static void AddRowData(
         List<Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>> rowData,
         IEnumerable<KeyValuePair<string, object?>> standardVals,

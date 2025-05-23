@@ -2,9 +2,9 @@ using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Serilog;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -14,47 +14,50 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
-using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
-using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Models.Context;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
-using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Configuration;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
+using Umbraco.Cms.Infrastructure.Mail.Interfaces;
+using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Routing;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
@@ -76,14 +79,15 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDistributedLockingMechanismFactory, DefaultDistributedLockingMechanismFactory>();
         builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
         builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
-        builder.NPocoMappers()?.Add<NullableDateMapper>();
-        builder.PackageMigrationPlans()?.Add(() => builder.TypeLoader.GetPackageMigrationPlans());
+        builder.NPocoMappers().Add<NullableDateMapper>();
+        builder.PackageMigrationPlans().Add(builder.TypeLoader.GetPackageMigrationPlans());
 
         builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
         builder.Services.AddSingleton<IRuntime, CoreRuntime>();
         builder.Services.AddSingleton<PendingPackageMigrations>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
+        builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
 
         // Add runtime mode validation
         builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
@@ -91,7 +95,6 @@ public static partial class UmbracoBuilderExtensions
             .Add<JITOptimizerValidator>()
             .Add<UmbracoApplicationUrlValidator>()
             .Add<UseHttpsValidator>()
-            .Add<RuntimeMinificationValidator>()
             .Add<ModelsBuilderModeValidator>();
 
         // composers
@@ -99,13 +102,12 @@ public static partial class UmbracoBuilderExtensions
             .AddRepositories()
             .AddServices()
             .AddCoreMappingProfiles()
-            .AddFileSystems()
-            .AddWebAssets();
+            .AddFileSystems();
 
         // register persistence mappers - required by database factory so needs to be done here
         // means the only place the collection can be modified is in a runtime - afterwards it
         // has been frozen and it is too late
-        builder.Mappers()?.AddCoreMappers();
+        builder.Mappers().AddCoreMappers();
 
         // register the scope provider
         builder.Services.AddSingleton<ScopeProvider>(sp => ActivatorUtilities.CreateInstance<ScopeProvider>(sp, sp.GetRequiredService<IAmbientScopeStack>())); // implements IScopeProvider, IScopeAccessor
@@ -119,19 +121,18 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
-        builder.Services.AddSingleton<IJsonSerializer, JsonNetSerializer>();
-        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
-        builder.Services.AddSingleton<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
+        builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
+        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, SystemTextConfigurationEditorJsonSerializer>();
+        builder.Services.AddUnique<IWebhookJsonSerializer, SystemTextWebhookJsonSerializer>();
 
         // register database builder
         // *not* a singleton, don't want to keep it around
         builder.Services.AddTransient<DatabaseBuilder>();
 
         // register manifest parser, will be injected in collection builders where needed
-        builder.Services.AddSingleton<IManifestParser, ManifestParser>();
-
-        // register the manifest filter collection builder (collection is empty by default)
-        builder.ManifestFilters();
+        builder.Services.AddSingleton<IPackageManifestReader, BackOfficePackageManifestReader>();
+        builder.Services.AddSingleton<IPackageManifestReader, AppPluginsPackageManifestReader>();
+        builder.Services.AddSingleton<IPackageManifestService, PackageManifestService>();
 
         builder.MediaUrlGenerators()
             .Add<FileUploadPropertyEditor>()
@@ -146,33 +147,31 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
         builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
-        builder.AddPreValueMigrators();
-
-        builder.Services.AddSingleton<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
-
-        // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
-        builder.Services.AddSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
-
         builder.Services.AddSingleton<IVariationContextAccessor, HybridVariationContextAccessor>();
+        builder.Services.AddSingleton<IBackOfficeVariationContextAccessor, HttpContextBackOfficeVariationContextAccessor>();
 
         // Config manipulator
         builder.Services.AddSingleton<IConfigManipulator, JsonConfigManipulator>();
 
         builder.Services.AddSingleton<RichTextEditorPastedImages>();
         builder.Services.AddSingleton<BlockEditorConverter>();
+        builder.Services.AddSingleton<BlockListPropertyValueConstructorCache>();
+        builder.Services.AddSingleton<BlockGridPropertyValueConstructorCache>();
+        builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
+        builder.Services.AddSingleton<BlockEditorVarianceHandler>();
 
-        // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
+        // both SimpleTinyMceValueConverter (in Core) and RteBlockRenderingValueConverter (in Infrastructure) will be
         // discovered when CoreBootManager configures the converters. We will remove the basic one defined
         // in core so that the more enhanced version is active.
         builder.PropertyValueConverters()
-            .Remove<SimpleTinyMceValueConverter>();
+            .Remove<SimpleRichTextValueConverter>();
 
         // register *all* checks, except those marked [HideFromTypeFinder] of course
         builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
-        builder.Services.AddScoped<UmbracoTreeSearcher>();
+        builder.Services.AddTransient<IEmailSenderClient, BasicSmtpEmailSenderClient>();
 
         // replace
         builder.Services.AddSingleton<IEmailSender, EmailSender>(
@@ -180,10 +179,15 @@ public static partial class UmbracoBuilderExtensions
                 services.GetRequiredService<ILogger<EmailSender>>(),
                 services.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
                 services.GetRequiredService<IEventAggregator>(),
+                services.GetRequiredService<IEmailSenderClient>(),
                 services.GetService<INotificationHandler<SendEmailNotification>>(),
                 services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
 
-        builder.Services.AddSingleton<IExamineManager, ExamineManager>();
+        builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
+        builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
+
+        builder.Services.AddSingleton<IExamineManager, NoopExamineManager>();
+        builder.Services.AddSingleton<IIndexRebuilder, NoopIndexRebuilder>();
 
         builder.Services.AddScoped<ITagQuery, TagQuery>();
 
@@ -193,10 +197,11 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddScoped<IPublishedContentQuery>(factory =>
         {
             IUmbracoContextAccessor umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
-            IUmbracoContext umbracoContext = umbCtx.GetRequiredUmbracoContext();
             return new PublishedContentQuery(
-                umbracoContext.PublishedSnapshot,
-                factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
+                factory.GetRequiredService<IVariationContextAccessor>(),
+                factory.GetRequiredService<IExamineManager>(),
+                factory.GetRequiredService<IPublishedContentCache>(),
+                factory.GetRequiredService<IPublishedMediaCache>());
         });
 
         // register accessors for cultures
@@ -215,16 +220,35 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<ICronTabParser, NCronTabParser>();
 
         builder.Services.AddTransient<INodeCountService, NodeCountService>();
+
+        builder.Services.AddSingleton<IRedirectTracker, RedirectTracker>();
+
         builder.AddInstaller();
 
-        // Services required to run background jobs (with out the handler)
-        builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+        // Services required to run background jobs
+        // We can simplify this registration once the obsolete IBackgroundTaskQueue is removed.
+        builder.Services.AddSingleton<HostedServices.BackgroundTaskQueue>();
+        builder.Services.AddSingleton<IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
+#pragma warning disable CS0618 // Type or member is obsolete
+        builder.Services.AddSingleton<HostedServices.IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
+#pragma warning restore CS0618 // Type or member is obsolete
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 
         builder.AddPropertyIndexValueFactories();
 
         builder.AddDeliveryApiCoreServices();
+        builder.Services.AddTransient<IWebhookFiringService, WebhookFiringService>();
+
+        builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
+        builder.Services.AddUnique<IPasswordChanger<MemberIdentityUser>, PasswordChanger<MemberIdentityUser>>();
+        builder.Services.AddTransient<IMemberEditingService, MemberEditingService>();
+
+        builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
+
+        builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
+
+        builder.Services.AddSingleton<IRichTextRegexValidator, RichTextRegexValidator>();
 
         return builder;
     }
@@ -232,23 +256,8 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
-        builder.Services.AddSingleton<INestedContentPropertyIndexValueFactory, NestedContentPropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
-
-        return builder;
-    }
-
-    public static IUmbracoBuilder AddLogViewer(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddSingleton<ILogViewerConfig, LogViewerConfig>();
-        builder.Services.AddSingleton<ILogLevelLoader, LogLevelLoader>();
-        builder.SetLogViewer<SerilogJsonLogViewer>();
-        builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(
-            factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
-            factory.GetRequiredService<ILogViewerConfig>(),
-            factory.GetRequiredService<ILoggingConfiguration>(),
-            factory.GetRequiredService<ILogLevelLoader>(),
-            Log.Logger));
+        builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
 
         return builder;
     }
@@ -311,13 +320,6 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static IUmbracoBuilder AddPreValueMigrators(this IUmbracoBuilder builder)
-    {
-        builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>();
-
-        return builder;
-    }
-
     public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
     {
         // add handlers for sending user notifications (i.e. emails)
@@ -330,7 +332,6 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentMovedToRecycleBinNotification, UserNotificationsHandler>()
             .AddNotificationHandler<ContentCopiedNotification, UserNotificationsHandler>()
             .AddNotificationHandler<ContentRolledBackNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<ContentSentToPublishNotification, UserNotificationsHandler>()
             .AddNotificationHandler<ContentUnpublishedNotification, UserNotificationsHandler>()
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, UserNotificationsHandler>()
             .AddNotificationHandler<PublicAccessEntrySavedNotification, UserNotificationsHandler>();
@@ -347,10 +348,10 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddNotificationHandler<ContentSavingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockListPropertyNotificationHandler>()
+            .AddNotificationHandler<ContentScaffoldedNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockGridPropertyNotificationHandler>()
-            .AddNotificationHandler<ContentSavingNotification, NestedContentPropertyHandler>()
-            .AddNotificationHandler<ContentCopyingNotification, NestedContentPropertyHandler>()
+            .AddNotificationHandler<ContentScaffoldedNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, FileUploadPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, FileUploadPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, FileUploadPropertyEditor>()
@@ -360,7 +361,9 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()
-            .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>();
+            .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>()
+            .AddNotificationHandler<ContentTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>()
+            .AddNotificationHandler<DataTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>();
 
         // add notification handlers for redirect tracking
         builder
@@ -393,8 +396,6 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<RelationTypeSavedNotification, RelationTypeSavedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<DomainDeletedNotification, DomainDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<DomainSavedNotification, DomainSavedDistributedCacheNotificationHandler>()
-            .AddNotificationHandler<MacroSavedNotification, MacroSavedDistributedCacheNotificationHandler>()
-            .AddNotificationHandler<MacroDeletedNotification, MacroDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>()
             .AddNotificationHandler<ContentTypeChangedNotification, ContentTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MediaTypeChangedNotification, MediaTypeChangedDistributedCacheNotificationHandler>()
@@ -413,6 +414,15 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+
+        // Handlers for publish warnings
+        builder.AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ContentPublishedNotification, AddUnroutableContentWarningsWhenPublishingNotificationHandler>();
+
+        // Handlers for save warnings
+        builder
+            .AddNotificationAsyncHandler<ContentTypeSavingNotification, WarnDocumentTypeElementSwitchNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentTypeSavedNotification, WarnDocumentTypeElementSwitchNotificationHandler>();
 
         return builder;
     }
@@ -433,15 +443,20 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestRedirectService, NoopRequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, NoopRequestPreviewService>();
         builder.Services.AddSingleton<IRequestMemberAccessService, NoopRequestMemberAccessService>();
+        builder.Services.AddTransient<ICurrentMemberClaimsProvider, NoopCurrentMemberClaimsProvider>();
         builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, NoopApiContentQueryService>();
         builder.Services.AddSingleton<IApiMediaQueryService, NoopApiMediaQueryService>();
         builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
         builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
+        builder.Services.AddSingleton<IApiContentPathProvider, ApiContentPathProvider>();
+        builder.Services.AddSingleton<IApiContentPathResolver, ApiContentPathResolver>();
         builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
         builder.Services.AddSingleton<IApiRichTextElementParser, ApiRichTextElementParser>();
         builder.Services.AddSingleton<IApiRichTextMarkupParser, ApiRichTextMarkupParser>();
         builder.Services.AddSingleton<IApiPropertyRenderer, ApiPropertyRenderer>();
+        builder.Services.AddSingleton<IApiDocumentUrlService, ApiDocumentUrlService>();
+        builder.Services.AddScoped<IMemberClientCredentialsManager, MemberClientCredentialsManager>();
 
         return builder;
     }

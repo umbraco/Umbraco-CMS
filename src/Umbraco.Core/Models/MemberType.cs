@@ -53,7 +53,15 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
         // and therefore are disabled - they are fully supported at service level, though,
         // but not at published snapshot level.
         get => base.Variations;
-        set => throw new NotSupportedException("Variations are not supported on members.");
+        set
+        {
+            if (value is not ContentVariation.Nothing)
+            {
+                throw new NotSupportedException("Variations are not supported on members.");
+            }
+
+            base.Variations = value;
+        }
     }
 
     /// <inheritdoc />

@@ -39,8 +39,8 @@ public class ContentTypeBuilderTests
             new PropertyTypeDetail { Alias = "bodyText", Name = "Body Text", SortOrder = 2, DataTypeId = -87 };
         var testTemplate1 = new TemplateDetail { Id = 200, Alias = "template1", Name = "Template 1" };
         var testTemplate2 = new TemplateDetail { Id = 201, Alias = "template2", Name = "Template 2" };
-        var testAllowedContentType1 = new AllowedContentTypeDetail { Id = 300, Alias = "subType1", SortOrder = 1 };
-        var testAllowedContentType2 = new AllowedContentTypeDetail { Id = 301, Alias = "subType2", SortOrder = 2 };
+        var testAllowedContentType1 = new AllowedContentTypeDetail { Key = new Guid("72EC4F7B-ACF0-43AA-AD92-0EC878223485"), Alias = "subType1", SortOrder = 1 };
+        var testAllowedContentType2 = new AllowedContentTypeDetail { Key = new Guid("68FE62F0-95A9-471E-839F-F5A6B9CCA7A9"), Alias = "subType2", SortOrder = 2 };
 
         var builder = new ContentTypeBuilder();
 
@@ -91,12 +91,12 @@ public class ContentTypeBuilderTests
             .Done()
             .WithDefaultTemplateId(testTemplate1.Id)
             .AddAllowedContentType()
-            .WithId(testAllowedContentType1.Id)
+            .WithKey(testAllowedContentType1.Key)
             .WithAlias(testAllowedContentType1.Alias)
             .WithSortOrder(testAllowedContentType1.SortOrder)
             .Done()
             .AddAllowedContentType()
-            .WithId(testAllowedContentType2.Id)
+            .WithKey(testAllowedContentType2.Key)
             .WithAlias(testAllowedContentType2.Alias)
             .WithSortOrder(testAllowedContentType2.SortOrder)
             .Done()
@@ -118,7 +118,7 @@ public class ContentTypeBuilderTests
         Assert.AreEqual(testIcon, contentType.Icon);
         Assert.AreEqual(testThumbnail, contentType.Thumbnail);
         Assert.AreEqual(testTrashed, contentType.Trashed);
-        Assert.IsFalse(contentType.IsContainer);
+        Assert.IsNull(contentType.ListView);
         Assert.AreEqual(2, contentType.PropertyTypes.Count());
 
         var propertyTypeIds = contentType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();
@@ -134,7 +134,7 @@ public class ContentTypeBuilderTests
 
         var allowedContentTypes = contentType.AllowedContentTypes.ToList();
         Assert.AreEqual(2, allowedContentTypes.Count);
-        Assert.AreEqual(testAllowedContentType1.Id, allowedContentTypes[0].Id.Value);
+        Assert.AreEqual(testAllowedContentType1.Key, allowedContentTypes[0].Key);
         Assert.AreEqual(testAllowedContentType1.Alias, allowedContentTypes[0].Alias);
         Assert.AreEqual(testAllowedContentType1.SortOrder, allowedContentTypes[0].SortOrder);
     }

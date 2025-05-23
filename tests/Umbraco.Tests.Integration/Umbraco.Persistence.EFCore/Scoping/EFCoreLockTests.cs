@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DistributedLocking;
@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 [TestFixture]
 [Timeout(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class EFCoreLockTests : UmbracoIntegrationTest
+internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 {
     private IEFCoreScopeProvider<TestUmbracoDbContext> EFScopeProvider =>
         GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
@@ -23,7 +23,7 @@ public class EFCoreLockTests : UmbracoIntegrationTest
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         // SQLite + retry policy makes tests fail, we retry before throwing distributed locking timeout.
-        services.RemoveAll(x => x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
+        services.RemoveAll(x => !x.IsKeyedService && x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
 
         // Remove all locking implementations to ensure we only use EFCoreDistributedLockingMechanisms
         services.RemoveAll(x => x.ServiceType == typeof(IDistributedLockingMechanism));
@@ -125,7 +125,7 @@ public class EFCoreLockTests : UmbracoIntegrationTest
         const int threadCount = 8;
         var threads = new Thread[threadCount];
         var exceptions = new Exception[threadCount];
-        var locker = new object();
+        Lock locker = new();
         var acquired = 0;
         var m2 = new ManualResetEventSlim(false);
         var m1 = new ManualResetEventSlim(false);

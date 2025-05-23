@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Mapping;
 
@@ -43,8 +43,8 @@ public class UmbracoMapper : IUmbracoMapper
     // note
     //
     // the outer dictionary *can* be modified, see GetCtor and GetMap, hence have to be ConcurrentDictionary
-    // the inner dictionaries are never modified and therefore can be simple Dictionary
-    private readonly ConcurrentDictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors =
+    // the inner dictionaries can also be modified, see GetCtor and therefore also needs to be a ConcurrentDictionary
+    private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, MapperContext, object>>> _ctors =
         new();
 
     private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Action<object, object, MapperContext>>> _maps =
@@ -52,16 +52,6 @@ public class UmbracoMapper : IUmbracoMapper
 
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILogger<UmbracoMapper> _logger;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoMapper" /> class.
-    /// </summary>
-    /// <param name="profiles"></param>
-    /// <param name="scopeProvider"></param>
-    [Obsolete("Please use ctor that takes an ILogger")]
-    public UmbracoMapper(MapDefinitionCollection profiles, ICoreScopeProvider scopeProvider) : this(profiles, scopeProvider, StaticServiceProvider.Instance.GetRequiredService<ILogger<UmbracoMapper>>())
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoMapper" /> class.
@@ -129,7 +119,7 @@ public class UmbracoMapper : IUmbracoMapper
         Type sourceType = typeof(TSource);
         Type targetType = typeof(TTarget);
 
-        Dictionary<Type, Func<object, MapperContext, object>> sourceCtors = DefineCtors(sourceType);
+        ConcurrentDictionary<Type, Func<object, MapperContext, object>> sourceCtors = DefineCtors(sourceType);
         if (ctor != null)
         {
             sourceCtors[targetType] = (source, context) => ctor((TSource)source, context)!;
@@ -139,8 +129,8 @@ public class UmbracoMapper : IUmbracoMapper
         sourceMaps[targetType] = (source, target, context) => map((TSource)source, (TTarget)target, context);
     }
 
-    private Dictionary<Type, Func<object, MapperContext, object>> DefineCtors(Type sourceType) =>
-        _ctors.GetOrAdd(sourceType, _ => new Dictionary<Type, Func<object, MapperContext, object>>());
+    private ConcurrentDictionary<Type, Func<object, MapperContext, object>> DefineCtors(Type sourceType) =>
+        _ctors.GetOrAdd(sourceType, _ => new ConcurrentDictionary<Type, Func<object, MapperContext, object>>());
 
     private ConcurrentDictionary<Type, Action<object, object, MapperContext>> DefineMaps(Type sourceType) =>
         _maps.GetOrAdd(sourceType, _ => new ConcurrentDictionary<Type, Action<object, object, MapperContext>>());
@@ -391,7 +381,7 @@ public class UmbracoMapper : IUmbracoMapper
             return null;
         }
 
-        if (_ctors.TryGetValue(sourceType, out Dictionary<Type, Func<object, MapperContext, object>>? sourceCtor) &&
+        if (_ctors.TryGetValue(sourceType, out ConcurrentDictionary<Type, Func<object, MapperContext, object>>? sourceCtor) &&
             sourceCtor.TryGetValue(targetType, out Func<object, MapperContext, object>? ctor))
         {
             return ctor;
@@ -399,7 +389,7 @@ public class UmbracoMapper : IUmbracoMapper
 
         // we *may* run this more than once but it does not matter
         ctor = null;
-        foreach ((Type stype, Dictionary<Type, Func<object, MapperContext, object>> sctors) in _ctors)
+        foreach ((Type stype, ConcurrentDictionary<Type, Func<object, MapperContext, object>> sctors) in _ctors)
         {
             if (!stype.IsAssignableFrom(sourceType))
             {
@@ -427,7 +417,7 @@ public class UmbracoMapper : IUmbracoMapper
             {
                 if (!v.ContainsKey(c.Key))
                 {
-                    v.Add(c.Key, c.Value);
+                    v.TryAdd(c.Key, c.Value);
                 }
             }
 

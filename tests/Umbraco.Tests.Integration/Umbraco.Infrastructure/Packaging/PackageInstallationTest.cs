@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class PackageInstallationTest : UmbracoIntegrationTest
+internal sealed class PackageInstallationTest : UmbracoIntegrationTest
 {
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
@@ -78,7 +78,6 @@ public class PackageInstallationTest : UmbracoIntegrationTest
             Assert.AreEqual("3593d8e7-8b35-47b9-beda-5e830ca8c93c", dataType.LastAttribute?.Value);
             Assert.AreEqual("Document Type Picker", dataType.FirstAttribute?.Value);
             Assert.IsNotNull(preInstallWarnings);
-            Assert.AreEqual(0, preInstallWarnings.ConflictingMacros.Count());
             Assert.AreEqual(0, preInstallWarnings.ConflictingStylesheets.Count());
             Assert.AreEqual(0, preInstallWarnings.ConflictingTemplates.Count());
         });

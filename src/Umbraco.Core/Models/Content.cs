@@ -197,7 +197,7 @@ public class Content : ContentBase, IContent
 
     /// <inheritdoc />
     [IgnoreDataMember]
-    public IEnumerable<string> PublishedCultures => _publishInfos?.Keys ?? Enumerable.Empty<string>();
+    public IEnumerable<string> PublishedCultures => _publishInfos?.Keys ?? [];
 
     /// <inheritdoc />
     public bool IsCulturePublished(string culture)
@@ -529,7 +529,7 @@ public class Content : ContentBase, IContent
 
         var clonedContent = (Content)clone;
 
-        // fixme - need to reset change tracking bits
+        // TODO: need to reset change tracking bits
 
         // if culture infos exist then deal with event bindings
         if (clonedContent._publishInfos != null)

@@ -2,9 +2,8 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -65,7 +64,7 @@ public class PropertyTypeTests
     {
         var pt = BuildPropertyType();
 
-        var json = JsonConvert.SerializeObject(pt);
+        var json = JsonSerializer.Serialize(pt);
         Debug.Print(json);
     }
 

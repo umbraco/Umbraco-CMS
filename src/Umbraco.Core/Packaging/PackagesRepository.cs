@@ -28,7 +28,6 @@ public class PackagesRepository : ICreatedPackagesRepository
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizationService _languageService;
-    private readonly IMacroService _macroService;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IMediaService _mediaService;
     private readonly IMediaTypeService _mediaTypeService;
@@ -45,7 +44,6 @@ public class PackagesRepository : ICreatedPackagesRepository
     /// <param name="contentTypeService"></param>
     /// <param name="dataTypeService"></param>
     /// <param name="fileService"></param>
-    /// <param name="macroService"></param>
     /// <param name="languageService"></param>
     /// <param name="hostingEnvironment"></param>
     /// <param name="serializer"></param>
@@ -65,7 +63,6 @@ public class PackagesRepository : ICreatedPackagesRepository
         IContentTypeService contentTypeService,
         IDataTypeService dataTypeService,
         IFileService fileService,
-        IMacroService macroService,
         ILocalizationService languageService,
         IHostingEnvironment hostingEnvironment,
         IEntityXmlSerializer serializer,
@@ -88,7 +85,6 @@ public class PackagesRepository : ICreatedPackagesRepository
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
         _fileService = fileService;
-        _macroService = macroService;
         _languageService = languageService;
         _serializer = serializer;
         _hostingEnvironment = hostingEnvironment;
@@ -128,6 +124,9 @@ public class PackagesRepository : ICreatedPackagesRepository
             .FirstOrDefault(x => x.AttributeValue<int>("id") == id);
         return packageXml == null ? null : _parser.ToPackageDefinition(packageXml);
     }
+
+    // Default implementation as the class is obsolete
+    public PackageDefinition? GetByKey(Guid key) => null;
 
     public void Delete(int id)
     {
@@ -231,7 +230,6 @@ public class PackagesRepository : ICreatedPackagesRepository
             PackageStylesheets(definition, root);
             PackageStaticFiles(definition.Scripts, root, "Scripts", "Script", _fileSystems.ScriptsFileSystem);
             PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View", _fileSystems.PartialViewsFileSystem);
-            PackageMacros(definition, root);
             PackageDictionaryItems(definition, root);
             PackageLanguages(definition, root);
             PackageDataTypes(definition, root);
@@ -424,10 +422,10 @@ public class PackagesRepository : ICreatedPackagesRepository
                 }
                 else
                 {
-                    if (processed.ContainsKey(dictionaryItem.ParentId.Value))
+                    if (processed.TryGetValue(dictionaryItem.ParentId.Value, out XElement? processedParent))
                     {
                         // we've processed this parent element already so we can just append this xml child to it
-                        AppendDictionaryElement(processed[dictionaryItem.ParentId.Value], items, processed, key, serializedDictionaryValue);
+                        AppendDictionaryElement(processedParent, items, processed, key, serializedDictionaryValue);
                     }
                     else if (items.ContainsKey(dictionaryItem.ParentId.Value))
                     {
@@ -462,39 +460,6 @@ public class PackagesRepository : ICreatedPackagesRepository
             // remove it so its not re-processed
             items.Remove(key);
         }
-    }
-
-    private void PackageMacros(PackageDefinition definition, XContainer root)
-    {
-        var packagedMacros = new List<IMacro>();
-        var macros = new XElement("Macros");
-        foreach (var macroId in definition.Macros)
-        {
-            if (!int.TryParse(macroId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
-            {
-                continue;
-            }
-
-            XElement? macroXml = GetMacroXml(outInt, out IMacro? macro);
-            if (macroXml == null)
-            {
-                continue;
-            }
-
-            macros.Add(macroXml);
-            if (macro is not null)
-            {
-                packagedMacros.Add(macro);
-            }
-        }
-
-        root.Add(macros);
-
-        // Get the partial views for macros and package those (exclude views outside of the default directory, e.g. App_Plugins\*\Views)
-        IEnumerable<string> views = packagedMacros.Where(x => x.MacroSource is not null)
-            .Where(x => x.MacroSource!.StartsWith(Constants.SystemDirectories.MacroPartials))
-            .Select(x => x.MacroSource![Constants.SystemDirectories.MacroPartials.Length..].Replace('/', '\\'));
-        PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem);
     }
 
     private void PackageStylesheets(PackageDefinition definition, XContainer root)
@@ -756,19 +721,6 @@ public class PackagesRepository : ICreatedPackagesRepository
         root.Add(mediaXml);
 
         return mediaStreams;
-    }
-
-    // TODO: Delete this
-    private XElement? GetMacroXml(int macroId, out IMacro? macro)
-    {
-        macro = _macroService.GetById(macroId);
-        if (macro == null)
-        {
-            return null;
-        }
-
-        XElement xml = _serializer.Serialize(macro);
-        return xml;
     }
 
     /// <summary>

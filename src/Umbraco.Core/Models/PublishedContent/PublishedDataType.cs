@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
@@ -20,12 +21,13 @@ public class PublishedDataType
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedDataType" /> class.
     /// </summary>
-    public PublishedDataType(int id, string editorAlias, Lazy<object?> lazyConfiguration)
+    public PublishedDataType(int id, string editorAlias, string? editorUiAlias, Lazy<object?> lazyConfiguration)
     {
         _lazyConfiguration = lazyConfiguration;
 
         Id = id;
         EditorAlias = editorAlias;
+        EditorUiAlias = editorUiAlias ?? editorAlias;
     }
 
     /// <summary>
@@ -39,9 +41,15 @@ public class PublishedDataType
     public string EditorAlias { get; }
 
     /// <summary>
-    ///     Gets the data type configuration.
+    ///     Gets the data type editor UI alias.
     /// </summary>
-    public object? Configuration => _lazyConfiguration?.Value;
+    public string EditorUiAlias { get; }
+
+    /// <summary>
+    ///     Gets the data type configuration object.
+    /// </summary>
+    /// <seealso cref="IDataType.ConfigurationObject"/>
+    public object? ConfigurationObject => _lazyConfiguration?.Value;
 
     /// <summary>
     ///     Gets the configuration object.
@@ -51,7 +59,7 @@ public class PublishedDataType
     public T? ConfigurationAs<T>()
         where T : class
     {
-        switch (Configuration)
+        switch (ConfigurationObject)
         {
             case null:
                 return null;
@@ -60,6 +68,6 @@ public class PublishedDataType
         }
 
         throw new InvalidCastException(
-            $"Cannot cast dataType configuration, of type {Configuration.GetType().Name}, to {typeof(T).Name}.");
+            $"Cannot cast dataType configuration, of type {ConfigurationObject.GetType().Name}, to {typeof(T).Name}.");
     }
 }

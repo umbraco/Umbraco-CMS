@@ -30,6 +30,7 @@ public enum PropertyCacheLevel
     ///     In most cases, a snapshot is created per request, and therefore this is
     ///     equivalent to cache the value for the duration of the request.
     /// </remarks>
+    [Obsolete("Caching no longer supports snapshotting")]
     Snapshot = 3,
 
     /// <summary>

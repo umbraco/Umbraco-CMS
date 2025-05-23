@@ -27,7 +27,7 @@ public class CreatedPackageSchemaDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string Value { get; set; } = null!;
 
-    [Column("updateDate")]
+    [Column("updateDate", ForceToUtc = false)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime UpdateDate { get; set; }
 

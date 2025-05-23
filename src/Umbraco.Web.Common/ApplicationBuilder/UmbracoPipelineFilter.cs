@@ -18,22 +18,6 @@ public class UmbracoPipelineFilter : IUmbracoPipelineFilter
     /// </summary>
     /// <param name="name">The name.</param>
     /// <param name="prePipeline">The pre pipeline callback.</param>
-    /// <param name="postPipeline">The post pipeline callback.</param>
-    /// <param name="endpointCallback">The endpoint callback.</param>
-    [Obsolete("Use the constructor with named parameters or set the callback properties instead. This constructor will be removed in Umbraco 13.")]
-    public UmbracoPipelineFilter(
-        string name,
-        Action<IApplicationBuilder>? prePipeline,
-        Action<IApplicationBuilder>? postPipeline,
-        Action<IApplicationBuilder>? endpointCallback)
-        : this(name, prePipeline, null, null, postPipeline, endpointCallback)
-    { }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UmbracoPipelineFilter" /> class.
-    /// </summary>
-    /// <param name="name">The name.</param>
-    /// <param name="prePipeline">The pre pipeline callback.</param> 
     /// <param name="preRouting">The pre routing callback.</param>
     /// <param name="postRouting">The post routing callback.</param>
     /// <param name="postPipeline">The post pipeline callback.</param>

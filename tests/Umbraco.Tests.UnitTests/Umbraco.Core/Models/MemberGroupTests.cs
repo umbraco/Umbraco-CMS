@@ -2,7 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -31,8 +31,6 @@ public class MemberGroupTests
         Assert.AreNotSame(clone, group);
         Assert.AreEqual(clone, group);
         Assert.AreEqual(clone.Id, group.Id);
-        Assert.AreEqual(clone.AdditionalData, group.AdditionalData);
-        Assert.AreEqual(clone.AdditionalData.Count, group.AdditionalData.Count);
         Assert.AreEqual(clone.CreateDate, group.CreateDate);
         Assert.AreEqual(clone.CreatorId, group.CreatorId);
         Assert.AreEqual(clone.Key, group.Key);
@@ -52,7 +50,7 @@ public class MemberGroupTests
     {
         var group = BuildMemberGroup();
 
-        var json = JsonConvert.SerializeObject(group);
+        var json = JsonSerializer.Serialize(group);
         Debug.Print(json);
     }
 
@@ -64,9 +62,5 @@ public class MemberGroupTests
             .WithCreatorId(4)
             .WithCreateDate(DateTime.Now)
             .WithUpdateDate(DateTime.Now)
-            .AddAdditionalData()
-            .WithKeyValue("test1", 123)
-            .WithKeyValue("test2", "hello")
-            .Done()
             .Build();
 }

@@ -27,6 +27,7 @@ public class ScheduledPublishingJob : IRecurringBackgroundJob
     private readonly IContentService _contentService;
     private readonly ILogger<ScheduledPublishingJob> _logger;
     private readonly ICoreScopeProvider _scopeProvider;
+    private readonly TimeProvider _timeProvider;
     private readonly IServerMessenger _serverMessenger;
     private readonly IUmbracoContextFactory _umbracoContextFactory;
 
@@ -38,13 +39,15 @@ public class ScheduledPublishingJob : IRecurringBackgroundJob
         IUmbracoContextFactory umbracoContextFactory,
         ILogger<ScheduledPublishingJob> logger,
         IServerMessenger serverMessenger,
-        ICoreScopeProvider scopeProvider)
+        ICoreScopeProvider scopeProvider,
+        TimeProvider timeProvider)
     {
         _contentService = contentService;
         _umbracoContextFactory = umbracoContextFactory;
         _logger = logger;
         _serverMessenger = serverMessenger;
         _scopeProvider = scopeProvider;
+        _timeProvider = timeProvider;
     }
 
     public Task RunJobAsync()
@@ -76,7 +79,7 @@ public class ScheduledPublishingJob : IRecurringBackgroundJob
             try
             {
                 // Run
-                IEnumerable<PublishResult> result = _contentService.PerformScheduledPublish(DateTime.Now);
+                IEnumerable<PublishResult> result = _contentService.PerformScheduledPublish(_timeProvider.GetUtcNow().UtcDateTime);
                 foreach (IGrouping<PublishResultType, PublishResult> grouped in result.GroupBy(x => x.Result))
                 {
                     _logger.LogInformation(

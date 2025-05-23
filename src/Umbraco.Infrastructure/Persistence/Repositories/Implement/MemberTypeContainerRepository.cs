@@ -21,6 +21,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public IEnumerable<EntityContainer> Get(string name, int level) => Enumerable.Empty<EntityContainer>();
 
+        public bool HasDuplicateName(Guid parentKey, string name) => false;
+
+        public bool HasDuplicateName(int parentId, string name) => false;
+
         public EntityContainer? Get(int id) => null;
 
         public IEnumerable<EntityContainer> GetMany(params int[]? ids) => Enumerable.Empty<EntityContainer>();

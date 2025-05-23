@@ -1,6 +1,7 @@
 using Dazinator.Extensions.FileProviders.PrependBasePath;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
@@ -9,11 +10,14 @@ using Serilog.Context;
 using StackExchange.Profiling;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Web.Common.Media;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Plugins;
@@ -30,7 +34,21 @@ public static class ApplicationBuilderExtensions
     ///     Configures and use services required for using Umbraco
     /// </summary>
     public static IUmbracoApplicationBuilder UseUmbraco(this IApplicationBuilder app)
-        => new UmbracoApplicationBuilder(app);
+    {
+        // Ensure Umbraco is booted and StaticServiceProvider.Instance is set before continuing
+        IRuntimeState runtimeState = app.ApplicationServices.GetRequiredService<IRuntimeState>();
+        if (runtimeState.Level == RuntimeLevel.Unknown)
+        {
+            throw new BootFailedException("The runtime level is unknown, please make sure Umbraco is booted by adding `await app.BootUmbracoAsync();` just after `WebApplication app = builder.Build();` in your Program.cs file.");
+        }
+
+        if (StaticServiceProvider.Instance is null)
+        {
+            throw new BootFailedException("StaticServiceProvider.Instance is not set, please make sure ConfigureUmbracoDefaults() is added in your Program.cs file.");
+        }
+
+        return new UmbracoApplicationBuilder(app);
+    }
 
     /// <summary>
     ///     Returns true if Umbraco <see cref="IRuntimeState" /> is greater than <see cref="RuntimeLevel.BootFailed" />
@@ -165,5 +183,21 @@ public static class ApplicationBuilderExtensions
         }
 
         return app;
+    }
+
+    /// <summary>
+    ///     Configure a virtual path with IApplicationBuilder.UseRewriter for BackOffice assets to allow cache-busting using the url
+    ///     /umbraco/backoffice/!cache-busting-id!/assets/index.js => /umbraco/backoffice/assets/index.js.
+    /// </summary>
+    public static IApplicationBuilder UseUmbracoBackOfficeRewrites(this IApplicationBuilder builder)
+    {
+        IBackOfficePathGenerator backOfficePathGenerator = builder.ApplicationServices.GetRequiredService<IBackOfficePathGenerator>();
+        var backOfficeAssetsPath = backOfficePathGenerator.BackOfficeAssetsPath.TrimStart("/").EnsureEndsWith("/");
+
+        builder.UseRewriter(new RewriteOptions()
+            // The destination needs to be hardcoded to "/umbraco/backoffice" because this is where they are located in the Umbraco.Cms.StaticAssets RCL
+            .AddRewrite(@"^" + backOfficeAssetsPath + "(.+)",  "/umbraco/backoffice/$1", true));
+
+        return builder;
     }
 }

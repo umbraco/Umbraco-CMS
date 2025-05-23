@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -30,8 +29,6 @@ public class DocumentEntitySlimBuilderTests
         var testKey = Guid.NewGuid();
         var testCreateDate = DateTime.Now.AddHours(-1);
         var testUpdateDate = DateTime.Now;
-        var testAdditionalData1 = new KeyValuePair<string, object>("test1", 123);
-        var testAdditionalData2 = new KeyValuePair<string, object>("test2", "hello");
 
         var builder = new DocumentEntitySlimBuilder();
 
@@ -52,10 +49,6 @@ public class DocumentEntitySlimBuilderTests
             .WithContentTypeThumbnail(testContentTypeThumbnail)
             .WithHasChildren(testHasChildren)
             .WithPublished(testPublished)
-            .AddAdditionalData()
-            .WithKeyValue(testAdditionalData1.Key, testAdditionalData1.Value)
-            .WithKeyValue(testAdditionalData2.Key, testAdditionalData2.Value)
-            .Done()
             .Build();
 
         // Assert
@@ -74,8 +67,5 @@ public class DocumentEntitySlimBuilderTests
         Assert.AreEqual(testContentTypeThumbnail, item.ContentTypeThumbnail);
         Assert.AreEqual(testHasChildren, item.HasChildren);
         Assert.AreEqual(testPublished, item.Published);
-        Assert.AreEqual(2, item.AdditionalData.Count);
-        Assert.AreEqual(testAdditionalData1.Value, item.AdditionalData[testAdditionalData1.Key]);
-        Assert.AreEqual(testAdditionalData2.Value, item.AdditionalData[testAdditionalData2.Key]);
     }
 }

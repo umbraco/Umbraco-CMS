@@ -107,13 +107,7 @@ public class ValueEditorCacheTests
 
         public string Alias { get; }
 
-        public EditorType Type { get; }
-
         public string Name { get; }
-
-        public string Icon { get; }
-
-        public string Group { get; }
 
         public bool IsDeprecated { get; }
 
@@ -123,7 +117,7 @@ public class ValueEditorCacheTests
             return Mock.Of<IDataValueEditor>();
         }
 
-        public IDataValueEditor GetValueEditor(object configuration) => GetValueEditor();
+        public IDataValueEditor GetValueEditor(object configurationObject) => GetValueEditor();
 
         public IDictionary<string, object> DefaultConfiguration { get; }
 

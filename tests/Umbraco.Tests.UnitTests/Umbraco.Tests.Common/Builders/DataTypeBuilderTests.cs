@@ -17,7 +17,6 @@ public class DataTypeBuilderTests
         // Arrange
         const int testId = 3123;
         const string testEditorAlias = "testAlias";
-        const string testEditorName = "Test Name";
 
         var builder = new DataTypeBuilder();
 
@@ -26,7 +25,6 @@ public class DataTypeBuilderTests
             .WithId(testId)
             .AddEditor()
             .WithAlias(testEditorAlias)
-            .WithName(testEditorName)
             .WithDefaultConfiguration(new Dictionary<string, object> { { "value1", "value1" }, { "value2", "value2" } })
             .Done()
             .Build();
@@ -34,7 +32,6 @@ public class DataTypeBuilderTests
         // Assert
         Assert.AreEqual(testId, dataType.Id);
         Assert.AreEqual(testEditorAlias, dataType.Editor.Alias);
-        Assert.AreEqual(testEditorName, dataType.Editor.Name);
         Assert.AreEqual(2, dataType.Editor.DefaultConfiguration.Count);
         Assert.AreEqual("value1", dataType.Editor.DefaultConfiguration["value1"]);
     }

@@ -138,20 +138,23 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual string GetIndexType(IndexTypes indexTypes)
     {
-        string indexType;
+        var indexType = string.Empty;
 
-        if (indexTypes == IndexTypes.Clustered)
+        if (indexTypes == IndexTypes.UniqueClustered || indexTypes == IndexTypes.UniqueNonClustered)
         {
-            indexType = "CLUSTERED";
+            indexType += " UNIQUE";
+        }
+
+        if (indexTypes == IndexTypes.UniqueClustered || indexTypes == IndexTypes.Clustered)
+        {
+            indexType += " CLUSTERED";
         }
         else
         {
-            indexType = indexTypes == IndexTypes.NonClustered
-                ? "NONCLUSTERED"
-                : "UNIQUE NONCLUSTERED";
+            indexType += " NONCLUSTERED";
         }
 
-        return indexType;
+        return indexType.Trim();
     }
 
     public virtual string GetSpecialDbType(SpecialDbType dbType)
@@ -420,6 +423,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual string DeleteDefaultConstraint =>
         throw new NotSupportedException("Default constraints are not supported");
+
+    public virtual string Length => "LEN";
+    public virtual string Substring => "SUBSTRING";
 
     public virtual string CreateTable => "CREATE TABLE {0} ({1})";
 

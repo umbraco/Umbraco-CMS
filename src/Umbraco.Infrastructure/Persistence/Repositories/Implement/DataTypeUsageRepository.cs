@@ -15,7 +15,7 @@ public class DataTypeUsageRepository : IDataTypeUsageRepository
         _scopeAccessor = scopeAccessor;
     }
 
-    public bool HasSavedValues(int dataTypeId)
+    public Task<bool> HasSavedValuesAsync(Guid dataTypeKey)
     {
         IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
 
@@ -29,11 +29,13 @@ public class DataTypeUsageRepository : IDataTypeUsageRepository
             .From<PropertyTypeDto>("pt")
             .InnerJoin<PropertyDataDto>("pd")
             .On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id, "pd", "pt")
-            .Where<PropertyTypeDto>(pt => pt.DataTypeId == dataTypeId, "pt");
+            .InnerJoin<NodeDto>("n")
+            .On<PropertyTypeDto, NodeDto>((pt, n) => pt.DataTypeId == n.NodeId, "pt", "n")
+            .Where<NodeDto>(n => n.UniqueId == dataTypeKey, "n");
 
         Sql<ISqlContext> hasValueQuery = database.SqlContext.Sql()
             .SelectAnyIfExists(selectQuery);
 
-        return database.ExecuteScalar<bool>(hasValueQuery);
+        return Task.FromResult(database.ExecuteScalar<bool>(hasValueQuery));
     }
 }

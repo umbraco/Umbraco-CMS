@@ -6,5 +6,5 @@ public interface IMetricsConsentService
 {
     TelemetryLevel GetConsentLevel();
 
-    void SetConsentLevel(TelemetryLevel telemetryLevel);
+    Task SetConsentLevelAsync(TelemetryLevel telemetryLevel);
 }

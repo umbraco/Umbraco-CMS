@@ -1,10 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -14,8 +11,7 @@ using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using File = System.IO.File;
@@ -235,8 +231,7 @@ public class LogviewerTests
 internal class TestLogViewerQueryRepository : ILogViewerQueryRepository
 {
     public TestLogViewerQueryRepository() =>
-        Store = new List<ILogViewerQuery>(MigrateLogViewerQueriesFromFileToDb._defaultLogQueries
-            .Select(LogViewerQueryModelFactory.BuildEntity));
+        Store = new List<ILogViewerQuery>(DatabaseDataCreator._defaultLogQueries.Select(LogViewerQueryModelFactory.BuildEntity));
 
     private IList<ILogViewerQuery> Store { get; }
 

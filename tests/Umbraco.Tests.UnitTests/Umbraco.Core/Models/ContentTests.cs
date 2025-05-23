@@ -1,20 +1,18 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -29,8 +27,11 @@ public class ContentTests
 {
     private readonly IContentTypeService _contentTypeService = Mock.Of<IContentTypeService>();
 
-    [Test]
-    public void Variant_Culture_Names_Track_Dirty_Changes()
+    private readonly PropertyEditorCollection _propertyEditorCollection = new (new DataEditorCollection(() => []));
+
+    [TestCase("name-fr", false)]
+    [TestCase("name-fr-updated", true)]
+    public void Variant_Culture_Names_Track_Dirty_Changes(string newName, bool expectedDirty)
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias("contentType")
@@ -58,14 +59,17 @@ public class ContentTests
         Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
 
         content.ResetDirtyProperties();
+        frCultureName.ResetDirtyProperties();
 
         Assert.IsFalse(content.IsPropertyDirty("CultureInfos")); // it's been reset
         Assert.IsTrue(content.WasPropertyDirty("CultureInfos"));
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
-        content.SetCultureName("name-fr", langFr);
-        Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
-        Assert.IsTrue(content.IsPropertyDirty("CultureInfos")); // it's true now since we've updated a name
+        content.SetCultureName(newName, langFr);
+
+        // dirty is only true if we updated the name
+        Assert.AreEqual(expectedDirty, frCultureName.IsPropertyDirty("Date"));
+        Assert.AreEqual(expectedDirty, content.IsPropertyDirty("CultureInfos"));
     }
 
     [Test]
@@ -90,20 +94,21 @@ public class ContentTests
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
-        content.PublishCulture(CultureImpact.Explicit(langFr, false)); // we've set the name, now we're publishing it
+        content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection); // we've set the name, now we're publishing it
         Assert.IsTrue(
             content.IsPropertyDirty("PublishCultureInfos")); // now it will be changed since the collection has changed
         var frCultureName = content.PublishCultureInfos[langFr];
         Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
 
         content.ResetDirtyProperties();
+        frCultureName.ResetDirtyProperties();
 
         Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos")); // it's been reset
         Assert.IsTrue(content.WasPropertyDirty("PublishCultureInfos"));
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
         content.SetCultureName("name-fr", langFr);
-        content.PublishCulture(CultureImpact.Explicit(langFr, false)); // we've set the name, now we're publishing it
+        content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection); // we've set the name, now we're publishing it
         Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
         Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos")); // it's true now since we've updated a name
     }
@@ -241,7 +246,7 @@ public class ContentTests
         return new ProfilingLogger(logger, profiler);
     }
 
-    [Ignore("fixme - ignored test")]
+    [Ignore("TODO - ignored test")]
     [Test]
     public void Can_Deep_Clone_Perf_Test()
     {
@@ -303,7 +308,7 @@ public class ContentTests
 
         content.SetCultureName("Hello", "en-US");
         content.SetCultureName("World", "es-ES");
-        content.PublishCulture(CultureImpact.All);
+        content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection);
 
         // should not try to clone something that's not Published or Unpublished
         // (and in fact it will not work)
@@ -416,7 +421,7 @@ public class ContentTests
 
         content.SetCultureName("Hello", "en-US");
         content.SetCultureName("World", "es-ES");
-        content.PublishCulture(CultureImpact.All);
+        content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection);
 
         var i = 200;
         foreach (var property in content.Properties)
@@ -503,7 +508,7 @@ public class ContentTests
         content.UpdateDate = DateTime.Now;
         content.WriterId = 23;
 
-        var json = JsonConvert.SerializeObject(content);
+        var json = JsonSerializer.Serialize(content);
         Debug.Print(json);
     }
 

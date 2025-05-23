@@ -17,7 +17,6 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var requestHandlerSettings = new RequestHandlerSettings
         {
-            UserDefinedCharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
             ConvertUrlsToAscii = "false",
         };
@@ -46,7 +45,6 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var requestHandlerSettings = new RequestHandlerSettings
         {
-            UserDefinedCharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
             ConvertUrlsToAscii = "false",
         };
@@ -303,8 +301,8 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 }));
         Assert.AreEqual("house*2", helper.CleanString("house (2)", CleanStringType.Alias));
 
-        // FIXME: but for a filename we want to keep them!
-        // FIXME: and what about a URL?
+        // TODO: but for a filename we want to keep them!
+        // TODO: and what about a URL?
     }
 
     [Test]
@@ -382,7 +380,6 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var requestHandlerSettings = new RequestHandlerSettings
         {
-            UserDefinedCharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
             ConvertUrlsToAscii = "false",
         };
@@ -423,8 +420,8 @@ public class DefaultShortStringHelperTestsWithoutSetup
         // E is a word (too short to be an acronym)
         // FF is an acronym
 
-        // FIXME: "C" can't be an acronym
-        // FIXME: "DBXreview" = acronym?!
+        // TODO: "C" can't be an acronym
+        // TODO: "DBXreview" = acronym?!
         Assert.AreEqual(
             "aaa BBB CCc Ddd E FF",
             helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias)); // unchanged

@@ -43,13 +43,7 @@ public class TypeLoaderTests
         };
         _typeLoader = new TypeLoader(
             typeFinder,
-            new VaryingRuntimeHash(),
-            NoAppCache.Instance,
-            new DirectoryInfo(TestHelper.GetHostingEnvironment()
-                .MapPathContentRoot(Constants.SystemDirectories.TempData)),
             Mock.Of<ILogger<TypeLoader>>(),
-            Mock.Of<IProfiler>(),
-            false,
             assemblies);
     }
 
@@ -78,41 +72,6 @@ public class TypeLoaderTests
         var dir = Directory.CreateDirectory(Path.Combine(tlDir, Guid.NewGuid().ToString("N")));
         return dir;
     }
-
-    ////[Test]
-    ////public void Scan_Vs_Load_Benchmark()
-    ////{
-    ////    var typeLoader = new TypeLoader(false);
-    ////    var watch = new Stopwatch();
-    ////    watch.Start();
-    ////    for (var i = 0; i < 1000; i++)
-    ////    {
-    ////        var type2 = Type.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-    ////        var type3 = Type.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-    ////        var type4 = Type.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-    ////        var type5 = Type.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
-    ////    }
-    ////    watch.Stop();
-    ////    Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
-    ////    watch.Start();
-    ////    for (var i = 0; i < 1000; i++)
-    ////    {
-    ////        var type2 = BuildManager.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-    ////        var type3 = BuildManager.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-    ////        var type4 = BuildManager.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-    ////        var type5 = BuildManager.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
-    ////    }
-    ////    watch.Stop();
-    ////    Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
-    ////    watch.Reset();
-    ////    watch.Start();
-    ////    for (var i = 0; i < 1000; i++)
-    ////    {
-    ////        var refreshers = typeLoader.GetTypes<ICacheRefresher>(false);
-    ////    }
-    ////    watch.Stop();
-    ////    Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
-    ////}
 
     [Test]
     public void Get_Plugins_Hash_With_Hash_Generator()
@@ -173,7 +132,7 @@ public class TypeLoaderTests
     public void GetDataEditors()
     {
         var types = _typeLoader.GetDataEditors();
-        Assert.AreEqual(42, types.Count());
+        Assert.AreEqual(36, types.Count());
     }
 
     /// <summary>

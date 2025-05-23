@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
@@ -8,21 +10,19 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /// </summary>
 internal class MigrationContext : IMigrationContext
 {
+    private readonly Action? _onCompleteAction;
     private readonly List<Type> _postMigrations = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MigrationContext" /> class.
     /// </summary>
-    public MigrationContext(MigrationPlan plan, IUmbracoDatabase? database, ILogger<MigrationContext> logger)
+    public MigrationContext(MigrationPlan plan, IUmbracoDatabase? database, ILogger<MigrationContext> logger, Action? onCompleteAction = null)
     {
+        _onCompleteAction = onCompleteAction;
         Plan = plan;
         Database = database ?? throw new ArgumentNullException(nameof(database));
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-
-    // this is only internally exposed
-    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
-    internal IReadOnlyList<Type> PostMigrations => _postMigrations;
 
     /// <inheritdoc />
     public ILogger<IMigrationContext> Logger { get; }
@@ -30,7 +30,7 @@ internal class MigrationContext : IMigrationContext
     public MigrationPlan Plan { get; }
 
     /// <inheritdoc />
-    public IUmbracoDatabase Database { get; }
+    public IUmbracoDatabase Database { get; internal set; }
 
     /// <inheritdoc />
     public ISqlContext SqlContext => Database.SqlContext;
@@ -41,12 +41,17 @@ internal class MigrationContext : IMigrationContext
     /// <inheritdoc />
     public bool BuildingExpression { get; set; }
 
+    public bool IsCompleted { get; private set; } = false;
 
-    /// <inheritdoc />
-    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase, and a UmbracoPlanExecutedNotification.")]
-    public void AddPostMigration<TMigration>()
-        where TMigration : MigrationBase =>
+    public void Complete()
+    {
+        if (IsCompleted)
+        {
+            return;
+        }
 
-        // just adding - will be de-duplicated when executing
-        _postMigrations.Add(typeof(TMigration));
+        _onCompleteAction?.Invoke();
+
+        IsCompleted = true;
+    }
 }

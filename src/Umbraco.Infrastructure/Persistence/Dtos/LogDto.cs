@@ -35,7 +35,7 @@ internal class LogDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? EntityType { get; set; }
 
-    [Column("Datestamp")]
+    [Column("Datestamp", ForceToUtc = false)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_datestamp", ForColumns = "Datestamp,userId,NodeId")]
     public DateTime Datestamp { get; set; }
@@ -55,6 +55,6 @@ internal class LogDto
     /// </summary>
     [Column("parameters")]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [Length(500)]
+    [Length(4000)]
     public string? Parameters { get; set; }
 }

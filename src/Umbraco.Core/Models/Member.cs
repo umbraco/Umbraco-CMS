@@ -11,7 +11,6 @@ namespace Umbraco.Cms.Core.Models;
 [DataContract(IsReference = true)]
 public class Member : ContentBase, IMember
 {
-    private IDictionary<string, object?>? _additionalData;
     private string _email;
     private DateTime? _emailConfirmedDate;
     private int _failedPasswordAttempts;
@@ -507,15 +506,6 @@ public class Member : ContentBase, IMember
     [IgnoreDataMember]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public string? PropertyTypeAlias { get; set; }
-
-    /// <inheritdoc />
-    [DataMember]
-    [DoNotClone]
-    public IDictionary<string, object?> AdditionalData => _additionalData ??= new Dictionary<string, object?>();
-
-    /// <inheritdoc />
-    [IgnoreDataMember]
-    public bool HasAdditionalData => _additionalData != null;
 
     private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
     {

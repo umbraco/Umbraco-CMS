@@ -88,6 +88,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
         // prepare
         // note: same alias could be used for media, content... but always different ids = ok
         var aliases = contentTypeDtos.ToDictionary(x => x.NodeId, x => x.Alias);
+        var keys = contentTypeDtos.ToDictionary(x => x.NodeId, x => x.NodeDto.UniqueId);
 
         // create
         var allowedDtoIx = 0;
@@ -120,14 +121,16 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             while (allowedDtoIx < allowedDtos?.Count && allowedDtos[allowedDtoIx].Id == contentTypeDto.NodeId)
             {
                 ContentTypeAllowedContentTypeDto allowedDto = allowedDtos[allowedDtoIx];
-                if (!aliases.TryGetValue(allowedDto.AllowedId, out var alias))
+                if (!aliases.TryGetValue(allowedDto.AllowedId, out var alias)
+                    || !keys.TryGetValue(allowedDto.AllowedId, out Guid key))
                 {
                     continue;
                 }
 
                 allowedContentTypes.Add(new ContentTypeSort(
-                    new Lazy<int>(() => allowedDto.AllowedId),
-                    allowedDto.SortOrder, alias!));
+                    key,
+                    allowedDto.SortOrder,
+                    alias!));
                 allowedDtoIx++;
             }
 

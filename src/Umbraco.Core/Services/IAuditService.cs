@@ -75,6 +75,58 @@ public interface IAuditService : IService
         IQuery<IAuditItem>? customFilter = null);
 
     /// <summary>
+    ///     Returns paged items in the audit trail for a given entity
+    /// </summary>
+    /// <param name="entityKey">The key of the entity</param>
+    /// <param name="entityType">The entity type</param>
+    /// <param name="skip">The amount of audit trail entries to skip</param>
+    /// <param name="take">The amount of audit trail entries to take</param>
+    /// <param name="orderDirection">
+    ///     By default this will always be ordered descending (newest first)
+    /// </param>
+    /// <param name="auditTypeFilter">
+    ///     Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query
+    ///     or the custom filter
+    ///     so we need to do that here
+    /// </param>
+    /// <param name="sinceDate">
+    ///     If populated, will only return entries after this time.
+    /// </param>
+    /// <returns></returns>
+    Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
+        Guid entityKey,
+        UmbracoObjectTypes entityType,
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        DateTimeOffset? sinceDate = null,
+        AuditType[]? auditTypeFilter = null) => throw new NotImplementedException();
+
+    /// <summary>
+    ///     Returns paged items in the audit trail for a given user
+    /// </summary>
+    /// <param name="userKey"></param>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
+    /// <param name="orderDirection">
+    ///     By default this will always be ordered descending (newest first)
+    /// </param>
+    /// <param name="auditTypeFilter">
+    ///     Since we currently do not have enum support with our expression parser, we cannot query on AuditType in the query
+    ///     or the custom filter
+    ///     so we need to do that here
+    /// </param>
+    /// <param name="sinceDate"></param>
+    /// <returns></returns>
+    Task<PagedModel<IAuditItem>> GetPagedItemsByUserAsync(
+        Guid userKey,
+        int skip,
+        int take,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
+        DateTime? sinceDate = null) => throw new NotImplementedException();
+
+    /// <summary>
     ///     Writes an audit entry for an audited event.
     /// </summary>
     /// <param name="performingUserId">The identifier of the user triggering the audited event.</param>
@@ -92,6 +144,7 @@ public interface IAuditService : IService
     ///     </example>
     /// </param>
     /// <param name="eventDetails">Free-form details about the audited event.</param>
+    [Obsolete("Will be moved to a new service in V17. Scheduled for removal in V18.")]
     IAuditEntry Write(
         int performingUserId,
         string perfomingDetails,

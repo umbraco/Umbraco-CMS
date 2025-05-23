@@ -26,7 +26,7 @@ public class HealthCheckResults
             {
                 try
                 {
-                    return await t.GetStatus();
+                    return await t.GetStatusAsync();
                 }
                 catch (Exception ex)
                 {
@@ -52,6 +52,8 @@ public class HealthCheckResults
 
         return new HealthCheckResults(results, allChecksSuccessful);
     }
+
+    public static async Task<HealthCheckResults> Create(HealthCheck check) => await Create(new List<HealthCheck>() { check });
 
     public void LogResults()
     {

@@ -2,8 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -33,7 +32,6 @@ public class MemberTests
         Assert.AreEqual(clone, member);
         Assert.AreEqual(clone.Id, member.Id);
         Assert.AreEqual(clone.VersionId, member.VersionId);
-        Assert.AreEqual(clone.AdditionalData, member.AdditionalData);
         Assert.AreEqual(clone.ContentType, member.ContentType);
         Assert.AreEqual(clone.ContentTypeId, member.ContentTypeId);
         Assert.AreEqual(clone.CreateDate, member.CreateDate);
@@ -79,7 +77,7 @@ public class MemberTests
     {
         var member = BuildMember();
 
-        var json = JsonConvert.SerializeObject(member);
+        var json = JsonSerializer.Serialize(member);
         Debug.Print(json);
     }
 
@@ -123,10 +121,6 @@ public class MemberTests
             .AddMemberGroups()
             .WithValue("Group 1")
             .WithValue("Group 2")
-            .Done()
-            .AddAdditionalData()
-            .WithKeyValue("test1", 123)
-            .WithKeyValue("test2", "hello")
             .Done()
             .WithPropertyIdsIncrementingFrom(200)
             .AddPropertyData()

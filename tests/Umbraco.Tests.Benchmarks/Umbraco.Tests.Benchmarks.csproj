@@ -1,14 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <IsPackable>false</IsPackable>
+    <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [SYSLIB0021] API supports obsolete serialization
+      [IDE0060] removed unused parameters
+      [CS0618] update obsolete references
+      [CS0649] field not assigned too
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SYSLIB0021,IDE0060,CS0618,CS0649</WarningsNotAsErrors>
+  </PropertyGroup>
+  
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
-    <PackageReference Include="Moq" Version="4.18.4" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+    <PackageReference Include="BenchmarkDotNet" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
+    <PackageReference Include="Moq"  />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,11 +11,13 @@ namespace Umbraco.Cms.Core.Strings;
 /// </remarks>
 public static class Utf8ToAsciiConverter
 {
-    [Obsolete("Use ToAsciiString(ReadOnlySpan<char>..) instead")]
-    public static string ToAsciiString(string text, char fail = '?')
-    {
-        return ToAsciiString(text.AsSpan(), fail);
-    }
+    /// <summary>
+    ///     Converts an Utf8 string into an Ascii string.
+    /// </summary>
+    /// <param name="text">The text to convert.</param>
+    /// <param name="fail">The character to use to replace characters that cannot properly be converted.</param>
+    /// <returns>The converted text.</returns>
+    public static string ToAsciiString(string text, char fail = '?') => ToAsciiString(text.AsSpan(), fail);
 
     /// <summary>
     ///     Converts an Utf8 string into an Ascii string.
@@ -50,11 +52,10 @@ public static class Utf8ToAsciiConverter
 
         // this is faster although it uses more memory
         // but... we should be filtering short strings only...
-        var output = new char[input.Length * 3]; // *3 because of things such as OE
+        int outputLength = input.Length * 3; // *3 because of things such as OE
+        Span<char> output = outputLength <= 1024 ? stackalloc char[outputLength] : new char[outputLength];
         var len = ToAscii(input, output, fail);
-        var array = new char[len];
-        Array.Copy(output, array, len);
-        return array;
+        return output[..len].ToArray();
 
         // var temp = new StringBuilder(input.Length + 16); // default is 16, start with at least input length + little extra
         // ToAscii(input, temp);

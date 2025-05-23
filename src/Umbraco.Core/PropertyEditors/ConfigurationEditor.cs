@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -44,15 +47,58 @@ public class ConfigurationEditor : IConfigurationEditor
     }
 
     /// <inheritdoc />
-    public virtual object? DefaultConfigurationObject => DefaultConfiguration;
+    public virtual IDictionary<string, object> ToConfigurationEditor(IDictionary<string, object> configuration)
+        => configuration;
+
+    /// <inheritdoc />
+    public virtual IDictionary<string, object> FromConfigurationEditor(IDictionary<string, object> configuration)
+        => configuration;
+
+    /// <inheritdoc />
+    public virtual IDictionary<string, object> ToValueEditor(IDictionary<string, object> configuration)
+        => ToConfigurationEditor(configuration);
+
+    /// <inheritdoc />
+    public virtual object ToConfigurationObject(
+        IDictionary<string, object> configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer) => configuration;
+
+    /// <inheritdoc />
+    public virtual IDictionary<string, object> FromConfigurationObject(
+        object configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        => configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configurationEditorJsonSerializer.Serialize(configuration)) ?? new Dictionary<string, object>();
+
+    /// <inheritdoc />
+    public virtual string ToDatabase(
+        IDictionary<string, object> configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        => configurationEditorJsonSerializer.Serialize(configuration);
+
+    /// <inheritdoc />
+    public virtual IDictionary<string, object> FromDatabase(
+        string? configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        => configuration.IsNullOrWhiteSpace() ? new Dictionary<string, object>() : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configuration) ?? new Dictionary<string, object>();
+
+    /// <inheritdoc />
+    public virtual IEnumerable<ValidationResult> Validate(IDictionary<string, object> configuration)
+        => Fields
+            .SelectMany(field =>
+                configuration.TryGetValue(field.Key, out var value)
+                    ? field.Validators.SelectMany(validator => validator.Validate(value, null, null, PropertyValidationContext.Empty()))
+                    : Enumerable.Empty<ValidationResult>())
+            .ToArray();
 
     /// <summary>
-    ///     Converts a configuration object into a serialized database value.
+    ///     Gets a field by its property name.
     /// </summary>
-    public static string? ToDatabase(
-        object? configuration,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
-        => configuration == null ? null : configurationEditorJsonSerializer.Serialize(configuration);
+    /// <remarks>
+    ///     Can be used in constructors to add infos to a field that has been defined
+    ///     by a property marked with the <see cref="ConfigurationFieldAttribute" />.
+    /// </remarks>
+    protected ConfigurationField Field(string name)
+        => Fields.First(x => x.PropertyName == name);
 
     /// <summary>
     ///     Gets the configuration as a typed object.
@@ -72,78 +118,4 @@ public class ConfigurationEditor : IConfigurationEditor
         throw new InvalidCastException(
             $"Cannot cast configuration of type {obj.GetType().Name} to {typeof(TConfiguration).Name}.");
     }
-
-    /// <inheritdoc />
-    public virtual bool IsConfiguration(object obj) => obj is IDictionary<string, object>;
-
-    /// <inheritdoc />
-    public virtual object FromDatabase(
-        string? configurationJson,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
-        => string.IsNullOrWhiteSpace(configurationJson)
-            ? new Dictionary<string, object>()
-            : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configurationJson)!;
-
-    /// <inheritdoc />
-    public virtual object? FromConfigurationEditor(IDictionary<string, object?>? editorValues, object? configuration)
-    {
-        // by default, return the posted dictionary
-        // but only keep entries that have a non-null/empty value
-        // rest will fall back to default during ToConfigurationEditor()
-        var keys = editorValues?.Where(x =>
-                x.Value == null || (x.Value is string stringValue && string.IsNullOrWhiteSpace(stringValue)))
-            .Select(x => x.Key).ToList();
-
-        if (keys is not null)
-        {
-            foreach (var key in keys)
-            {
-                editorValues?.Remove(key);
-            }
-        }
-
-        return editorValues;
-    }
-
-    /// <inheritdoc />
-    public virtual IDictionary<string, object> ToConfigurationEditor(object? configuration)
-    {
-        // editors that do not override ToEditor/FromEditor have their configuration
-        // as a dictionary of <string, object> and, by default, we merge their default
-        // configuration with their current configuration
-        if (configuration == null)
-        {
-            configuration = new Dictionary<string, object>();
-        }
-
-        if (!(configuration is IDictionary<string, object> c))
-        {
-            throw new ArgumentException(
-                $"Expecting a {typeof(Dictionary<string, object>).Name} instance but got {configuration.GetType().Name}.",
-                nameof(configuration));
-        }
-
-        // clone the default configuration, and apply the current configuration values
-        var d = new Dictionary<string, object>(DefaultConfiguration);
-        foreach ((string key, object value) in c)
-        {
-            d[key] = value;
-        }
-
-        return d;
-    }
-
-    /// <inheritdoc />
-    public virtual IDictionary<string, object> ToValueEditor(object? configuration)
-        => ToConfigurationEditor(configuration);
-
-    /// <summary>
-    ///     Gets a field by its property name.
-    /// </summary>
-    /// <remarks>
-    ///     Can be used in constructors to add infos to a field that has been defined
-    ///     by a property marked with the <see cref="ConfigurationFieldAttribute" />.
-    /// </remarks>
-    protected ConfigurationField Field(string name)
-        => Fields.First(x => x.PropertyName == name);
 }

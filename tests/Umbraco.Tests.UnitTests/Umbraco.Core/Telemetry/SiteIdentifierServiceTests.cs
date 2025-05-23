@@ -55,13 +55,13 @@ public class SiteIdentifierServiceTests
 
         if (shouldCreate)
         {
-            configManipulatorMock.Verify(x => x.SetGlobalId(It.IsAny<string>()), Times.Once);
+            configManipulatorMock.Verify(x => x.SetGlobalIdAsync(It.IsAny<string>()), Times.Once);
             Assert.AreNotEqual(Guid.Empty, identifier);
             Assert.IsTrue(result);
         }
         else
         {
-            configManipulatorMock.Verify(x => x.SetGlobalId(It.IsAny<string>()), Times.Never());
+            configManipulatorMock.Verify(x => x.SetGlobalIdAsync(It.IsAny<string>()), Times.Never());
             Assert.AreEqual(guidString.ToLower(), identifier.ToString());
             Assert.IsTrue(result);
         }

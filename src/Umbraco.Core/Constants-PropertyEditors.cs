@@ -101,11 +101,6 @@ public static partial class Constants
             public const string ListView = "Umbraco.ListView";
 
             /// <summary>
-            ///     Media Picker.
-            /// </summary>
-            public const string MediaPicker = "Umbraco.MediaPicker";
-
-            /// <summary>
             ///     Media Picker v.3.
             /// </summary>
             public const string MediaPicker3 = "Umbraco.MediaPicker3";
@@ -171,9 +166,9 @@ public static partial class Constants
             public const string TextArea = "Umbraco.TextArea";
 
             /// <summary>
-            ///     TinyMCE
+            ///     Rich Text Editor.
             /// </summary>
-            public const string TinyMce = "Umbraco.TinyMCE";
+            public const string RichText = "Umbraco.RichText";
 
             /// <summary>
             ///     Boolean.
@@ -209,6 +204,36 @@ public static partial class Constants
             ///     Alias for the multi URL picker editor.
             /// </summary>
             public const string MultiUrlPicker = "Umbraco.MultiUrlPicker";
+
+            /// <summary>
+            ///     Configuration-less string.
+            /// </summary>
+            public const string PlainString = "Umbraco.Plain.String";
+
+            /// <summary>
+            ///     Configuration-less JSON.
+            /// </summary>
+            public const string PlainJson = "Umbraco.Plain.Json";
+
+            /// <summary>
+            ///     Configuration-less decimal.
+            /// </summary>
+            public const string PlainDecimal = "Umbraco.Plain.Decimal";
+
+            /// <summary>
+            ///     Configuration-less integer.
+            /// </summary>
+            public const string PlainInteger = "Umbraco.Plain.Integer";
+
+            /// <summary>
+            ///     Configuration-less date/time.
+            /// </summary>
+            public const string PlainDateTime = "Umbraco.Plain.DateTime";
+
+            /// <summary>
+            ///     Configuration-less time.
+            /// </summary>
+            public const string PlainTime = "Umbraco.Plain.Time";
         }
 
         /// <summary>

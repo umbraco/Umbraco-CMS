@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.None, Logger = UmbracoTestOptions.Logger.Console)]
-public class StylesheetRepositoryTest : UmbracoIntegrationTest
+internal sealed class StylesheetRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpFileSystem()
@@ -35,7 +35,6 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
             IOHelper,
             GetRequiredService<IOptions<GlobalSettings>>(),
             HostingEnvironment,
-            null,
             null,
             _fileSystem,
             null,

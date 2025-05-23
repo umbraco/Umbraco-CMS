@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Collections;
@@ -7,14 +8,13 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Scoping;
 
 /// <summary>
-/// Mechanism for handling read and write locks
+/// Mechanism for handling read and write locks.
 /// </summary>
 public class LockingMechanism : ILockingMechanism
 {
     private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
     private readonly ILogger<LockingMechanism> _logger;
-    private readonly object _lockQueueLocker = new();
-    private readonly object _dictionaryLocker = new();
+    private readonly Lock _locker = new();
     private StackQueue<(DistributedLockType lockType, TimeSpan timeout, Guid instanceId, int lockId)>? _queuedLocks;
     private HashSet<int>? _readLocks;
     private Dictionary<Guid, Dictionary<int, int>>? _readLocksDictionary;
@@ -35,12 +35,12 @@ public class LockingMechanism : ILockingMechanism
     }
 
     /// <inheritdoc />
-    public void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyReadLockInner(instanceId, timeout, lockIds);
+    public void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerReadLockInner(instanceId, timeout, lockIds);
 
     public void ReadLock(Guid instanceId, params int[] lockIds) => ReadLock(instanceId, null, lockIds);
 
     /// <inheritdoc />
-    public void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyWriteLockInner(instanceId, timeout, lockIds);
+    public void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerWriteLockInner(instanceId, timeout, lockIds);
 
     public void WriteLock(Guid instanceId, params int[] lockIds) => WriteLock(instanceId, null, lockIds);
 
@@ -64,7 +64,7 @@ public class LockingMechanism : ILockingMechanism
     /// <param name="lockIds">Array of lock object identifiers.</param>
     private void EagerWriteLockInner(Guid instanceId, TimeSpan? timeout, params int[] lockIds)
     {
-        lock (_dictionaryLocker)
+        lock (_locker)
         {
             foreach (var lockId in lockIds)
             {
@@ -106,7 +106,7 @@ public class LockingMechanism : ILockingMechanism
     /// <param name="lockIds">Array of lock object identifiers.</param>
     private void EagerReadLockInner(Guid instanceId, TimeSpan? timeout, params int[] lockIds)
     {
-        lock (_dictionaryLocker)
+        lock (_locker)
         {
             foreach (var lockId in lockIds)
             {
@@ -190,24 +190,43 @@ public class LockingMechanism : ILockingMechanism
     /// <param name="lockId">Lock ID to increment.</param>
     /// <param name="instanceId">Instance ID of the scope requesting the lock.</param>
     /// <param name="locks">Reference to the dictionary to increment on</param>
-    private void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>>? locks)
+    /// <remarks>Internal for tests.</remarks>
+    internal static void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>>? locks)
     {
         // Since we've already checked that we're the parent in the WriteLockInner method, we don't need to check again.
-        // If it's the very first time a lock has been requested the WriteLocks dict hasn't been instantiated yet.
-        locks ??= new Dictionary<Guid, Dictionary<int, int>>();
+        // If it's the very first time a lock has been requested the WriteLocks dictionary hasn't been instantiated yet.
+        locks ??= [];
 
-        // Try and get the dict associated with the scope id.
-        var locksDictFound = locks.TryGetValue(instanceId, out Dictionary<int, int>? locksDict);
+        // Try and get the dictionary associated with the scope id.
+
+        // The following code is a micro-optimization.
+        // GetValueRefOrAddDefault does lookup or creation with only one hash key generation, internal bucket lookup and value lookup in the bucket.
+        // This compares to doing it twice when initializing, one for the lookup and one for the insertion of the initial value, we had with the
+        // previous code:
+        //   var locksDictFound = locks.TryGetValue(instanceId, out Dictionary<int, int>? locksDict);
+        //   if (locksDictFound)
+        //   {
+        //       locksDict!.TryGetValue(lockId, out var value);
+        //       locksDict[lockId] = value + 1;
+        //   }
+        //   else
+        //   {
+        //       // The scope hasn't requested a lock yet, so we have to create a dict for it.
+        //       locks.Add(instanceId, new Dictionary<int, int>());
+        //       locks[instanceId][lockId] = 1;
+        //   }
+
+        ref Dictionary<int, int>? locksDict = ref CollectionsMarshal.GetValueRefOrAddDefault(locks, instanceId, out bool locksDictFound);
         if (locksDictFound)
         {
-            locksDict!.TryGetValue(lockId, out var value);
-            locksDict[lockId] = value + 1;
+            // By getting a reference to any existing or default 0 value, we can increment it without the expensive write back into the dictionary.
+            ref int value = ref CollectionsMarshal.GetValueRefOrAddDefault(locksDict!, lockId, out _);
+            value++;
         }
         else
         {
-            // The scope hasn't requested a lock yet, so we have to create a dict for it.
-            locks.Add(instanceId, new Dictionary<int, int>());
-            locks[instanceId][lockId] = 1;
+            // The scope hasn't requested a lock yet, so we have to create a dictionary for it.
+            locksDict = new Dictionary<int, int> { { lockId, 1 } };
         }
     }
 
@@ -219,7 +238,7 @@ public class LockingMechanism : ILockingMechanism
 
     private void LazyLockInner(DistributedLockType lockType, Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
     {
-        lock (_lockQueueLocker)
+        lock (_locker)
         {
             if (_queuedLocks == null)
             {
@@ -239,7 +258,7 @@ public class LockingMechanism : ILockingMechanism
     /// <param name="instanceId">Instance ID of the scope to clear.</param>
     public void ClearLocks(Guid instanceId)
     {
-        lock (_dictionaryLocker)
+        lock (_locker)
         {
             _readLocksDictionary?.Remove(instanceId);
             _writeLocksDictionary?.Remove(instanceId);
@@ -294,7 +313,7 @@ public class LockingMechanism : ILockingMechanism
     /// </summary>
     public void EnsureLocks(Guid scopeInstanceId)
     {
-        lock (_lockQueueLocker)
+        lock (_locker)
         {
             if (!(_queuedLocks?.Count > 0))
             {

@@ -51,11 +51,10 @@ public static class ExamineExtensions
     }
 
     /// <summary>
-    ///     Creates an <see cref="IEnumerable{PublishedSearchResult}" /> containing all content, media or members from the
-    ///     <paramref name="snapshot" />.
+    ///     Creates an <see cref="IEnumerable{PublishedSearchResult}" /> containing all content, media or members from the snapshot.
     /// </summary>
     /// <param name="results">The search results.</param>
-    /// <param name="snapshot">The snapshot.</param>
+    /// <param name="cacheManager">The caches.</param>
     /// <returns>
     ///     An <see cref="IEnumerable{PublishedSearchResult}" /> containing all content, media or members.
     /// </returns>
@@ -65,11 +64,11 @@ public static class ExamineExtensions
     /// </remarks>
     public static IEnumerable<PublishedSearchResult> ToPublishedSearchResults(
         this IEnumerable<ISearchResult> results,
-        IPublishedSnapshot snapshot)
+        ICacheManager cacheManager)
     {
-        if (snapshot == null)
+        if (cacheManager == null)
         {
-            throw new ArgumentNullException(nameof(snapshot));
+            throw new ArgumentNullException(nameof(cacheManager));
         }
 
         var publishedSearchResults = new List<PublishedSearchResult>();
@@ -83,10 +82,10 @@ public static class ExamineExtensions
                 switch (indexType)
                 {
                     case IndexTypes.Content:
-                        content = snapshot.Content?.GetById(contentId);
+                        content = cacheManager.Content?.GetById(contentId);
                         break;
                     case IndexTypes.Media:
-                        content = snapshot.Media?.GetById(contentId);
+                        content = cacheManager.Media?.GetById(contentId);
                         break;
                     case IndexTypes.Member:
                         throw new NotSupportedException("Cannot convert search results to member instances");

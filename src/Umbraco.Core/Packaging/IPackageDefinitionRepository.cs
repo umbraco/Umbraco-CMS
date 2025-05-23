@@ -9,6 +9,8 @@ public interface IPackageDefinitionRepository
 
     PackageDefinition? GetById(int id);
 
+    PackageDefinition? GetByKey(Guid key);
+
     void Delete(int id);
 
     /// <summary>

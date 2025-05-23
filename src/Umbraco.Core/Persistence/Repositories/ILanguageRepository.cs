@@ -37,4 +37,6 @@ public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
     ///     <para>This can be optimized and bypass all deep cloning.</para>
     /// </remarks>
     int? GetDefaultId();
+
+    string[] GetIsoCodesByIds(ICollection<int> ids, bool throwOnNotFound = true);
 }

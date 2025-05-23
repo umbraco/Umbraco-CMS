@@ -36,11 +36,10 @@ namespace Umbraco.Cms.Core.Semver
 #if NETSTANDARD
     public sealed class SemVersion : IComparable<SemVersion>, IComparable
 #else
-    [Serializable]
     public sealed class SemVersion : IComparable<SemVersion>, IComparable, ISerializable
 #endif
     {
-        private static Regex parseEx =
+        private static readonly Regex _parseEx =
             new(
                 @"^(?<major>\d+)" +
                 @"(\.(?<minor>\d+))?" +
@@ -51,29 +50,6 @@ namespace Umbraco.Cms.Core.Semver
                 RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 #else
                 RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-#endif
-
-#if !NETSTANDARD
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="SemVersion" /> class.
-        /// </summary>
-        /// <param name="info"></param>
-        /// <param name="context"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        private SemVersion(SerializationInfo info, StreamingContext context)
-        {
-            if (info == null)
-            {
-                throw new ArgumentNullException("info");
-            }
-
-            SemVersion semVersion = Parse(info.GetString("SemVersion")!);
-            Major = semVersion.Major;
-            Minor = semVersion.Minor;
-            Patch = semVersion.Patch;
-            Prerelease = semVersion.Prerelease;
-            Build = semVersion.Build;
-        }
 #endif
 
         /// <summary>
@@ -137,7 +113,7 @@ namespace Umbraco.Cms.Core.Semver
         /// <exception cref="System.InvalidOperationException">When a invalid version string is passed.</exception>
         public static SemVersion Parse(string version, bool strict = false)
         {
-            Match match = parseEx.Match(version);
+            Match match = _parseEx.Match(version);
             if (!match.Success)
             {
                 throw new ArgumentException("Invalid version.", "version");
@@ -218,9 +194,9 @@ namespace Umbraco.Cms.Core.Semver
         /// <returns>If versionA is equal to versionB <c>true</c>, else <c>false</c>.</returns>
         public static bool Equals(SemVersion versionA, SemVersion versionB)
         {
-            if (ReferenceEquals(versionA, null))
+            if (versionA is null)
             {
-                return ReferenceEquals(versionB, null);
+                return versionB is null;
             }
 
             return versionA.Equals(versionB);
@@ -237,9 +213,9 @@ namespace Umbraco.Cms.Core.Semver
         /// </returns>
         public static int Compare(SemVersion versionA, SemVersion versionB)
         {
-            if (ReferenceEquals(versionA, null))
+            if (versionA is null)
             {
-                return ReferenceEquals(versionB, null) ? 0 : -1;
+                return versionB is null ? 0 : -1;
             }
 
             return versionA.CompareTo(versionB);
@@ -303,10 +279,10 @@ namespace Umbraco.Cms.Core.Semver
         public string Build { get; private set; }
 
         /// <summary>
-        ///     Returns a <see cref="System.String" /> that represents this instance.
+        ///     Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        ///     A <see cref="System.String" /> that represents this instance.
+        ///     A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
@@ -354,7 +330,7 @@ namespace Umbraco.Cms.Core.Semver
         /// </returns>
         public int CompareTo(SemVersion? other)
         {
-            if (ReferenceEquals(other, null))
+            if (other is null)
             {
                 return 1;
             }
@@ -389,7 +365,7 @@ namespace Umbraco.Cms.Core.Semver
         /// </returns>
         public int CompareByPrecedence(SemVersion other)
         {
-            if (ReferenceEquals(other, null))
+            if (other is null)
             {
                 return 1;
             }
@@ -443,9 +419,8 @@ namespace Umbraco.Cms.Core.Semver
             {
                 var ac = aComps[i];
                 var bc = bComps[i];
-                int anum, bnum;
-                var isanum = int.TryParse(ac, out anum);
-                var isbnum = int.TryParse(bc, out bnum);
+                var isanum = int.TryParse(ac, out int anum);
+                var isbnum = int.TryParse(bc, out int bnum);
                 int r;
                 if (isanum && isbnum)
                 {
@@ -479,15 +454,15 @@ namespace Umbraco.Cms.Core.Semver
         }
 
         /// <summary>
-        ///     Determines whether the specified <see cref="System.Object" /> is equal to this instance.
+        ///     Determines whether the specified <see cref="object" /> is equal to this instance.
         /// </summary>
-        /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
+        /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
         /// <returns>
-        ///     <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object? obj)
         {
-            if (ReferenceEquals(obj, null))
+            if (obj is null)
             {
                 return false;
             }
@@ -526,7 +501,6 @@ namespace Umbraco.Cms.Core.Semver
         }
 
 #if !NETSTANDARD
-        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)

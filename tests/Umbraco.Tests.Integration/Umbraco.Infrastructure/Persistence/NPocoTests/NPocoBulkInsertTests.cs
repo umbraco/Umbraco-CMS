@@ -15,10 +15,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests;
 
-// FIXME: npoco - is this still appropriate?
+// TODO: npoco - is this still appropriate?
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class NPocoBulkInsertTests : UmbracoIntegrationTest
+internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
 {
     private readonly TestHelper _testHelper = new();
 

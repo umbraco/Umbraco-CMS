@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Umbraco.Cms.Core;
 
 namespace Umbraco.Extensions;
@@ -27,8 +27,8 @@ public static class ObjectJsonExtensions
 
         string DefaultNamer(PropertyInfo property)
         {
-            JsonPropertyAttribute? jsonProperty = property.GetCustomAttribute<JsonPropertyAttribute>();
-            return jsonProperty?.PropertyName ?? property.Name;
+            JsonPropertyNameAttribute? jsonProperty = property.GetCustomAttribute<JsonPropertyNameAttribute>();
+            return jsonProperty?.Name ?? property.Name;
         }
 
         Type t = obj.GetType();

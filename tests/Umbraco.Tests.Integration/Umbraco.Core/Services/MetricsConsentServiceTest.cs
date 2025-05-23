@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MetricsConsentServiceTest : UmbracoIntegrationTest
+internal sealed class MetricsConsentServiceTest : UmbracoIntegrationTest
 {
     private IMetricsConsentService MetricsConsentService => GetRequiredService<IMetricsConsentService>();
 
@@ -18,9 +18,9 @@ public class MetricsConsentServiceTest : UmbracoIntegrationTest
     [TestCase(TelemetryLevel.Minimal)]
     [TestCase(TelemetryLevel.Basic)]
     [TestCase(TelemetryLevel.Detailed)]
-    public void Can_Store_Consent(TelemetryLevel level)
+    public async Task Can_Store_Consent(TelemetryLevel level)
     {
-        MetricsConsentService.SetConsentLevel(level);
+        await MetricsConsentService.SetConsentLevelAsync(level);
 
         var actual = MetricsConsentService.GetConsentLevel();
         Assert.IsNotNull(actual);
@@ -28,9 +28,9 @@ public class MetricsConsentServiceTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Enum_Stored_as_string()
+    public async Task Enum_Stored_as_string()
     {
-        MetricsConsentService.SetConsentLevel(TelemetryLevel.Detailed);
+        await MetricsConsentService.SetConsentLevelAsync(TelemetryLevel.Detailed);
 
         var stringValue = KeyValueService.GetValue(Cms.Core.Services.MetricsConsentService.Key);
 

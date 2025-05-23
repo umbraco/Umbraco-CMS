@@ -25,12 +25,10 @@ public class GlobalSettings
     internal const string StaticUmbracoCssPath = "~/css";
     internal const string StaticUmbracoScriptsPath = "~/scripts";
     internal const string StaticUmbracoMediaPath = "~/media";
-    internal const bool StaticInstallMissingDatabase = false;
     internal const bool StaticDisableElectionForSingleServer = false;
     internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
     internal const string StaticDistributedLockingReadLockDefaultTimeout = "00:01:00";
     internal const string StaticDistributedLockingWriteLockDefaultTimeout = "00:00:05";
-    internal const bool StaticSanitizeTinyMce = false;
     internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
     private const bool StaticForceCombineUrlPathLeftToRight = true;
     private const bool StaticShowMaintenancePageWhenInUpgradeState = true;
@@ -78,17 +76,6 @@ public class GlobalSettings
     public int VersionCheckPeriod { get; set; } = StaticVersionCheckPeriod;
 
     /// <summary>
-    ///     Gets or sets a value for the Umbraco back-office path.
-    /// </summary>
-    public string UmbracoPath
-    {
-        get => Constants.System.DefaultUmbracoPath;
-        [Obsolete($"{nameof(UmbracoPath)} is no longer configurable, this property setter is scheduled for removal in V12.")]
-        // NOTE: When removing this, also clean up the hardcoded removal of UmbracoPath in Umbraco.JsonSchema
-        set { }
-    }
-
-    /// <summary>
     ///     Gets or sets a value for the Umbraco icons path.
     /// </summary>
     /// <remarks>
@@ -125,12 +112,6 @@ public class GlobalSettings
     ///     If the value is a virtual path, it's resolved relative to the webroot.
     /// </remarks>
     public string UmbracoMediaPhysicalRootPath { get; set; } = null!;
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether to install the database when it is missing.
-    /// </summary>
-    [DefaultValue(StaticInstallMissingDatabase)]
-    public bool InstallMissingDatabase { get; set; } = StaticInstallMissingDatabase;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to disable the election for a single server.
@@ -204,12 +185,6 @@ public class GlobalSettings
     ///     Gets a value indicating whether there is a physical pickup directory configured.
     /// </summary>
     public bool IsPickupDirectoryLocationConfigured => !string.IsNullOrWhiteSpace(Smtp?.PickupDirectoryLocation);
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether TinyMCE scripting sanitization should be applied.
-    /// </summary>
-    [DefaultValue(StaticSanitizeTinyMce)]
-    public bool SanitizeTinyMce { get; set; } = StaticSanitizeTinyMce;
 
     /// <summary>
     ///     Gets or sets a value representing the maximum time to wait whilst attempting to obtain a distributed read lock.

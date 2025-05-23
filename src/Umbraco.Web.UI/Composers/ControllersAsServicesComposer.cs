@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Web.UI.Composers
                 builder.Services.TryAddTransient(controller, controller);
             }
 
-            builder.Services.AddUnique<RenderNoContentController>(x => new RenderNoContentController(x.GetService<IUmbracoContextAccessor>()!, x.GetService<IOptionsSnapshot<GlobalSettings>>()!, x.GetService<IHostingEnvironment>()!));
+            builder.Services.AddUnique<RenderNoContentController>(x => new RenderNoContentController(x.GetRequiredService<IUmbracoContextAccessor>(), x.GetRequiredService<IHostingEnvironment>(), x.GetRequiredService<IOptionsSnapshot<GlobalSettings>>()));
             return builder;
         }
     }

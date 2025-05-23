@@ -19,7 +19,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Directory = Lucene.Net.Store.Directory;
 using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
@@ -37,6 +36,9 @@ public class IndexInitializer
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IScopeProvider _scopeProvider;
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly IContentTypeService _contentTypeService;
+    private readonly IDocumentUrlService _documentUrlService;
+    private readonly ILanguageService _languageService;
 
     public IndexInitializer(
         IShortStringHelper shortStringHelper,
@@ -45,7 +47,10 @@ public class IndexInitializer
         IScopeProvider scopeProvider,
         ILoggerFactory loggerFactory,
         IOptions<ContentSettings> contentSettings,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        IContentTypeService contentTypeService,
+        IDocumentUrlService documentUrlService,
+        ILanguageService languageService)
     {
         _shortStringHelper = shortStringHelper;
         _propertyEditors = propertyEditors;
@@ -54,24 +59,9 @@ public class IndexInitializer
         _loggerFactory = loggerFactory;
         _contentSettings = contentSettings;
         _localizationService = localizationService;
-    }
-
-    public IndexInitializer(
-        IShortStringHelper shortStringHelper,
-        PropertyEditorCollection propertyEditors,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IScopeProvider scopeProvider,
-        ILoggerFactory loggerFactory,
-        IOptions<ContentSettings> contentSettings)
-        : this(
-        shortStringHelper,
-        propertyEditors,
-        mediaUrlGenerators,
-        scopeProvider,
-        loggerFactory,
-        contentSettings,
-        StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
-    {
+        _contentTypeService = contentTypeService;
+        _documentUrlService = documentUrlService;
+        _languageService = languageService;
     }
 
     public ContentValueSetBuilder GetContentValueSetBuilder(bool publishedValuesOnly)
@@ -83,7 +73,11 @@ public class IndexInitializer
             _shortStringHelper,
             _scopeProvider,
             publishedValuesOnly,
-            _localizationService);
+            _localizationService,
+            _contentTypeService,
+            _loggerFactory.CreateLogger<ContentValueSetBuilder>(),
+            _documentUrlService,
+            _languageService);
 
         return contentValueSetBuilder;
     }
@@ -109,7 +103,8 @@ public class IndexInitializer
             _mediaUrlGenerators,
             GetMockUserService(),
             _shortStringHelper,
-            _contentSettings);
+            _contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>());
         var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
         return mediaIndexDataSource;
     }

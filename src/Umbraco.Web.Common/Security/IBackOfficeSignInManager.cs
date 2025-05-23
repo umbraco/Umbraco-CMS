@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Web.Common.Security;
 
 /// <summary>
 ///     A <see cref="SignInManager{BackOfficeIdentityUser}" /> for the back office with a
 ///     <seealso cref="BackOfficeIdentityUser" />
 /// </summary>
-public interface IBackOfficeSignInManager
+public interface IBackOfficeSignInManager : ICoreBackOfficeSignInManager
 {
     AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string? redirectUrl, string? userId = null);
 

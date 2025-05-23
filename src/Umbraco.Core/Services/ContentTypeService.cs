@@ -2,9 +2,12 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
+using Umbraco.Cms.Core.Services.Locking;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -22,14 +25,25 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         IAuditRepository auditRepository,
         IDocumentTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : base(provider, loggerFactory, eventMessagesFactory, repository, auditRepository, entityContainerRepository, entityRepository, eventAggregator) =>
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : base(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters) =>
         ContentService = contentService;
 
-    // beware! order is important to avoid deadlocks
-    protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
+    protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;
 
-    protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
+    protected override int[] WriteLockIds => ContentTypeLocks.WriteLockIds;
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
 
@@ -80,6 +94,16 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
             return Repository.GetAllContentTypeIds(aliases);
         }
+    }
+
+    public async Task<IEnumerable<IContentType>> GetByQueryAsync(IQuery<IContentType> query, CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        // that one is special because it works across content, media and member types
+        scope.ReadLock(Constants.Locks.ContentTypes);
+        IEnumerable<IContentType> contentTypes = Repository.Get(query);
+        scope.Complete();
+        return contentTypes;
     }
 
     protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)

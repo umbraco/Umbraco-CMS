@@ -3,11 +3,11 @@ using Umbraco.Cms.Core.Models;
 namespace Umbraco.Cms.Core.Deploy;
 
 /// <summary>
-/// Defines methods that can convert data type configuration to / from an environment-agnostic string.
+/// Defines methods that can convert data type configuration to and from an environment-agnostic string.
 /// </summary>
 /// <remarks>
-/// Configuration may contain values such as content identifiers, that would be local
-/// to one environment, and need to be converted in order to be deployed.
+/// Configuration may contain values such as content identifiers, that would be local to one environment, and need to be converted in order to be deployed.
+/// It can also contain references to other deployable artifacts, that need to be tracked as dependencies.
 /// </remarks>
 public interface IDataTypeConfigurationConnector
 {
@@ -24,20 +24,30 @@ public interface IDataTypeConfigurationConnector
     /// </summary>
     /// <param name="dataType">The data type.</param>
     /// <param name="dependencies">The dependencies.</param>
+    /// <param name="contextCache">The context cache.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
-    /// The artifact configuration value.
+    /// A task that represents the asynchronous operation. The task result contains the artifact configuration value.
     /// </returns>
-    [Obsolete($"Implement {nameof(IDataTypeConfigurationConnector2)} and use the overload accepting {nameof(IContextCache)} instead. This overload will be removed in Umbraco 13.")]
-    string? ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies);
+    Task<string?> ToArtifactAsync(
+        IDataType dataType,
+        ICollection<ArtifactDependency> dependencies,
+        IContextCache contextCache,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the data type configuration corresponding to an artifact configuration value.
     /// </summary>
     /// <param name="dataType">The data type.</param>
     /// <param name="configuration">The artifact configuration value.</param>
+    /// <param name="contextCache">The context cache.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
-    /// The data type configuration.
+    /// A task that represents the asynchronous operation. The task result contains the data type configuration.
     /// </returns>
-    [Obsolete($"Implement {nameof(IDataTypeConfigurationConnector2)} and use the overload accepting {nameof(IContextCache)} instead. This overload will be removed in Umbraco 13.")]
-    object? FromArtifact(IDataType dataType, string? configuration);
+    Task<IDictionary<string, object>> FromArtifactAsync(
+        IDataType dataType,
+        string? configuration,
+        IContextCache contextCache,
+        CancellationToken cancellationToken = default);
 }

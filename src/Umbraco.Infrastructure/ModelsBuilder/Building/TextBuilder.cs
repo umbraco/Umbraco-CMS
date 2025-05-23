@@ -51,7 +51,15 @@ public class TextBuilder : Builder
     ///     Outputs an "auto-generated" header to a string builder.
     /// </summary>
     /// <param name="sb">The string builder.</param>
-    public static void WriteHeader(StringBuilder sb) => TextHeaderWriter.WriteHeader(sb);
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 17.")]
+    public static void WriteHeader(StringBuilder sb) => WriteHeader(sb, true);
+
+    /// <summary>
+    ///     Outputs an "auto-generated" header to a string builder.
+    /// </summary>
+    /// <param name="sb">The string builder.</param>
+    /// <param name="includeVersion">Flag indicating whether the tool version number should be included in the output.</param>
+    public static void WriteHeader(StringBuilder sb, bool includeVersion) => TextHeaderWriter.WriteHeader(sb, includeVersion);
 
     /// <summary>
     ///     Outputs a generated model to a string builder.
@@ -60,7 +68,7 @@ public class TextBuilder : Builder
     /// <param name="typeModel">The model to generate.</param>
     public void Generate(StringBuilder sb, TypeModel typeModel)
     {
-        WriteHeader(sb);
+        WriteHeader(sb, Config.IncludeVersionNumberInGeneratedModels);
 
         foreach (var t in TypesUsing)
         {
@@ -83,7 +91,7 @@ public class TextBuilder : Builder
     /// <param name="typeModels">The models to generate.</param>
     public void Generate(StringBuilder sb, IEnumerable<TypeModel> typeModels)
     {
-        WriteHeader(sb);
+        WriteHeader(sb, Config.IncludeVersionNumberInGeneratedModels);
 
         foreach (var t in TypesUsing)
         {
@@ -143,14 +151,17 @@ public class TextBuilder : Builder
     //
     // note that the blog post above clearly states that "Nor should it be applied at the type level if the type being generated is a partial class."
     // and since our models are partial classes, we have to apply the attribute against the individual members, not the class itself.
-    private static void WriteGeneratedCodeAttribute(StringBuilder sb, string tabs) => sb.AppendFormat(
+    private void WriteGeneratedCodeAttribute(StringBuilder sb, string tabs) => sb.AppendFormat(
         "{0}[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Umbraco.ModelsBuilder.Embedded\", \"{1}\")]\n",
-        tabs, ApiVersion.Current.Version);
+        tabs,
+        Config.IncludeVersionNumberInGeneratedModels ? ApiVersion.Current.Version : null);
 
     // writes an attribute that specifies that an output may be null.
     // (useful for consuming projects with nullable reference types enabled)
     private static void WriteMaybeNullAttribute(StringBuilder sb, string tabs, bool isReturn = false) =>
-        sb.AppendFormat("{0}[{1}global::System.Diagnostics.CodeAnalysis.MaybeNull]\n", tabs,
+        sb.AppendFormat(
+            "{0}[{1}global::System.Diagnostics.CodeAnalysis.MaybeNull]\n",
+            tabs,
             isReturn ? "return: " : string.Empty);
 
     private static string MixinStaticGetterName(string clrName) => string.Format("Get{0}", clrName);
@@ -278,7 +289,7 @@ public class TextBuilder : Builder
         sb.AppendFormat(
             "\t\tpublic new const string ModelTypeAlias = \"{0}\";\n",
             type.Alias);
-        TypeModel.ItemTypes itemType = type.IsElement ? TypeModel.ItemTypes.Content : type.ItemType; // fixme
+        TypeModel.ItemTypes itemType = type.IsElement ? TypeModel.ItemTypes.Content : type.ItemType; // TODO
         WriteGeneratedCodeAttribute(sb, "\t\t");
         sb.AppendFormat(
             "\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
@@ -286,16 +297,16 @@ public class TextBuilder : Builder
         WriteGeneratedCodeAttribute(sb, "\t\t");
         WriteMaybeNullAttribute(sb, "\t\t", true);
         sb.Append(
-            "\t\tpublic new static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor)\n");
+            "\t\tpublic new static IPublishedContentType GetModelContentType(IPublishedContentTypeCache contentTypeCache)\n");
         sb.Append(
-            "\t\t\t=> PublishedModelUtility.GetModelContentType(publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);\n");
+            "\t\t\t=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);\n");
         WriteGeneratedCodeAttribute(sb, "\t\t");
         WriteMaybeNullAttribute(sb, "\t\t", true);
         sb.AppendFormat(
-            "\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<{0}, TValue>> selector)\n",
+            "\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<{0}, TValue>> selector)\n",
             type.ClrName);
         sb.Append(
-            "\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(publishedSnapshotAccessor), selector);\n");
+            "\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);\n");
         sb.Append("#pragma warning restore 0109\n\n");
         sb.Append("\t\tprivate IPublishedValueFallback _publishedValueFallback;");
 
@@ -585,7 +596,7 @@ public class TextBuilder : Builder
             WriteNonGenericClrType(sb, type[..p]);
             sb.Append("<");
             var args = type[(p + 1)..].TrimEnd(Constants.CharArrays.GreaterThan)
-                .Split(Constants.CharArrays.Comma); // fixme will NOT work with nested generic types
+                .Split(Constants.CharArrays.Comma); // TODO: will NOT work with nested generic types
             for (var i = 0; i < args.Length; i++)
             {
                 if (i > 0)

@@ -34,13 +34,13 @@ public class TypeFinder : ITypeFinder
         "ServiceStack.", "SqlCE4Umbraco,", "Superpower,", // used by Serilog
         "System.", "TidyNet,", "TidyNet.", "WebDriver,", "itextsharp,", "mscorlib,", "NUnit,", "NUnit.", "NUnit3.",
         "Selenium.", "ImageProcessor", "MiniProfiler.", "Owin,", "SQLite",
-        "ReSharperTestRunner32", "ReSharperTestRunner64", // These are used by the Jetbrains Rider IDE and Visual Studio ReSharper Extension
+        "ReSharperTestRunner", "ReSharperTestRunner32", "ReSharperTestRunner64", "ReSharperTestRunnerArm32", "ReSharperTestRunnerArm64", // These are used by the Jetbrains Rider IDE and Visual Studio ReSharper Extension
     };
 
     private static readonly ConcurrentDictionary<string, Type?> TypeNamesCache = new();
 
     private readonly IAssemblyProvider _assemblyProvider;
-    private readonly object _localFilteredAssemblyCacheLocker = new();
+    private readonly Lock _localFilteredAssemblyCacheLocker = new();
     private readonly ILogger<TypeFinder> _logger;
     private readonly List<string> _notifiedLoadExceptionAssemblies = new();
 
@@ -48,11 +48,6 @@ public class TypeFinder : ITypeFinder
 
     private string[]? _assembliesAcceptingLoadExceptions;
     private volatile HashSet<Assembly>? _localFilteredAssemblyCache;
-
-    [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V14.")]
-    public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig? typeFinderConfig = null)
-        : this(logger, assemblyProvider, null, typeFinderConfig)
-    { }
 
     public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, string[]? additionalExlusionAssemblies, ITypeFinderConfig? typeFinderConfig = null)
     {
@@ -238,10 +233,7 @@ public class TypeFinder : ITypeFinder
             excludeFromResults = new HashSet<Assembly>();
         }
 
-        if (exclusionFilter == null)
-        {
-            exclusionFilter = new string[] { };
-        }
+        exclusionFilter ??= [];
 
         return GetAllAssemblies()
             .Where(x => excludeFromResults.Contains(x) == false

@@ -10,8 +10,10 @@ public static partial class Constants
         public static class Migrations
         {
             public const string UmbracoUpgradePlanName = "Umbraco.Core";
+            public const string UmbracoUpgradePlanPremigrationsName = "Umbraco.Core.Premigrations";
             public const string KeyValuePrefix = "Umbraco.Core.Upgrader.State+";
             public const string UmbracoUpgradePlanKey = KeyValuePrefix + UmbracoUpgradePlanName;
+            public const string UmbracoUpgradePlanPremigrationsKey = KeyValuePrefix + UmbracoUpgradePlanPremigrationsName;
         }
 
         public static class PermissionCategories
@@ -231,9 +233,19 @@ public static partial class Constants
             public const string RelatedMediaName = "Related Media";
 
             /// <summary>
-            ///     Alias for default relation type "Related Media"
+            ///     Alias for default relation type "Related Media".
             /// </summary>
             public const string RelatedMediaAlias = "umbMedia";
+
+            /// <summary>
+            ///     Name for default relation type "Related Member".
+            /// </summary>
+            public const string RelatedMemberName = "Related Member";
+
+            /// <summary>
+            ///     Alias for default relation type "Related Member".
+            /// </summary>
+            public const string RelatedMemberAlias = "umbMember";
 
             /// <summary>
             ///     Name for default relation type "Related Document".
@@ -241,7 +253,7 @@ public static partial class Constants
             public const string RelatedDocumentName = "Related Document";
 
             /// <summary>
-            ///     Alias for default relation type "Related Document"
+            ///     Alias for default relation type "Related Document".
             /// </summary>
             public const string RelatedDocumentAlias = "umbDocument";
 
@@ -282,7 +294,7 @@ public static partial class Constants
             ///     Developers should not manually use these relation types since they will all be cleared whenever an entity
             ///     (content, media or member) is saved since they are auto-populated based on property values.
             /// </remarks>
-            public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedDocumentAlias };
+            public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedMemberAlias, RelatedDocumentAlias };
 
             // TODO: return a list of built in types so we can use that to prevent deletion in the UI
         }

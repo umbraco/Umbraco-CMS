@@ -14,15 +14,15 @@ namespace Umbraco.Cms.Core.Actions;
 public interface IAction : IDiscoverable
 {
     /// <inheritdoc cref="Letter"/>
-    const char ActionLetter = default;
+    const string ActionLetter = "";
 
     /// <inheritdoc cref="Alias"/>
-    const string ActionAlias = default;
+    const string ActionAlias = "";
 
     /// <summary>
     ///     Gets the letter used to assign a permission (must be unique).
     /// </summary>
-    char Letter { get; }
+    string Letter { get; }
 
     /// <summary>
     ///     Gets a value indicating whether whether to allow subscribing to notifications for this action
@@ -37,6 +37,7 @@ public interface IAction : IDiscoverable
     /// <summary>
     ///     Gets the icon to display for this action
     /// </summary>
+    [Obsolete("No longer used. Scheduled for removal in V17.")]
     string Icon { get; }
 
     /// <summary>
@@ -51,5 +52,6 @@ public interface IAction : IDiscoverable
     /// <remarks>
     ///     Used in the UI when assigning permissions
     /// </remarks>
+    [Obsolete("No longer used. Scheduled for removal in V17.")]
     string? Category { get; }
 }

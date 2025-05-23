@@ -55,16 +55,6 @@ public static partial class Constants
             public const string MemberPicker = "1EA2E01F-EBD8-4CE1-8D71-6B1149E63548";
 
             /// <summary>
-            ///     Guid for Media Picker as string
-            /// </summary>
-            public const string MediaPicker = "135D60E0-64D9-49ED-AB08-893C9BA44AE5";
-
-            /// <summary>
-            ///     Guid for Multiple Media Picker as string
-            /// </summary>
-            public const string MultipleMediaPicker = "9DBBCBBB-2327-434A-B355-AF1B84E5010A";
-
-            /// <summary>
             ///     Guid for Media Picker v3 as string
             /// </summary>
             public const string MediaPicker3 = "4309A3EA-0D78-4329-A06C-C80B036AF19A";
@@ -245,16 +235,6 @@ public static partial class Constants
             public static readonly Guid MemberPickerGuid = new(MemberPicker);
 
             /// <summary>
-            ///     Guid for Media Picker
-            /// </summary>
-            public static readonly Guid MediaPickerGuid = new(MediaPicker);
-
-            /// <summary>
-            ///     Guid for Multiple Media Picker
-            /// </summary>
-            public static readonly Guid MultipleMediaPickerGuid = new(MultipleMediaPicker);
-
-            /// <summary>
             ///     Guid for Media Picker v3
             /// </summary>
             public static readonly Guid MediaPicker3Guid = new(MediaPicker3);
@@ -303,11 +283,6 @@ public static partial class Constants
             ///     Guid for List View - Media
             /// </summary>
             public static readonly Guid ListViewMediaGuid = new(ListViewMedia);
-
-            /// <summary>
-            ///     Guid for List View - Members
-            /// </summary>
-            public static readonly Guid ListViewMembersGuid = new(ListViewMembers);
 
             /// <summary>
             ///     Guid for Date Picker with time

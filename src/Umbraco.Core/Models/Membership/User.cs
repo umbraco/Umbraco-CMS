@@ -38,10 +38,10 @@ public class User : EntityBase, IUser, IProfile
     private int _sessionTimeout;
     private int[]? _startContentIds;
     private int[]? _startMediaIds;
-    private string? _tourData;
     private HashSet<IReadOnlyUserGroup> _userGroups;
 
     private string _username;
+    private UserKind _kind;
 
     /// <summary>
     ///     Constructor for creating a new/empty user
@@ -53,8 +53,8 @@ public class User : EntityBase, IUser, IProfile
         _language = globalSettings.DefaultUILanguage;
         _isApproved = true;
         _isLockedOut = false;
-        _startContentIds = new int[] { };
-        _startMediaIds = new int[] { };
+        _startContentIds = [];
+        _startMediaIds = [];
 
         // cannot be null
         _rawPasswordValue = string.Empty;
@@ -101,8 +101,8 @@ public class User : EntityBase, IUser, IProfile
         _userGroups = new HashSet<IReadOnlyUserGroup>();
         _isApproved = true;
         _isLockedOut = false;
-        _startContentIds = new int[] { };
-        _startMediaIds = new int[] { };
+        _startContentIds = [];
+        _startMediaIds = [];
     }
 
     /// <summary>
@@ -311,16 +311,6 @@ public class User : EntityBase, IUser, IProfile
     }
 
     /// <summary>
-    ///     A Json blob stored for recording tour data for a user
-    /// </summary>
-    [DataMember]
-    public string? TourData
-    {
-        get => _tourData;
-        set => SetPropertyValueAndDetectChanges(value, ref _tourData, nameof(TourData));
-    }
-
-    /// <summary>
     ///     Gets or sets the session timeout.
     /// </summary>
     /// <value>
@@ -366,6 +356,13 @@ public class User : EntityBase, IUser, IProfile
     {
         get => _language;
         set => SetPropertyValueAndDetectChanges(value, ref _language, nameof(Language));
+    }
+
+    [DataMember]
+    public UserKind Kind
+    {
+        get => _kind;
+        set => SetPropertyValueAndDetectChanges(value, ref _kind, nameof(Kind));
     }
 
     /// <summary>

@@ -1,4 +1,7 @@
+using Examine;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -19,6 +22,8 @@ public static partial class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
     {
+        builder.Services.AddUnique<IExamineManager, ExamineManager>();
+
         // populators are not a collection: one cannot remove ours, and can only add more
         // the container can inject IEnumerable<IIndexPopulator> and get them all
         builder.Services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
@@ -40,7 +45,11 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 true,
-                factory.GetRequiredService<ILocalizationService>()));
+                factory.GetRequiredService<ILocalizationService>(),
+                factory.GetRequiredService<IContentTypeService>(),
+                factory.GetRequiredService<ILogger<ContentValueSetBuilder>>(),
+                factory.GetRequiredService<IDocumentUrlService>(),
+                factory.GetRequiredService<ILanguageService>()));
         builder.Services.AddUnique<IContentValueSetBuilder>(factory =>
             new ContentValueSetBuilder(
                 factory.GetRequiredService<PropertyEditorCollection>(),
@@ -49,14 +58,21 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 false,
-                factory.GetRequiredService<ILocalizationService>()));
+                factory.GetRequiredService<ILocalizationService>(),
+                factory.GetRequiredService<IContentTypeService>(),
+                factory.GetRequiredService<ILogger<ContentValueSetBuilder>>(),
+                factory.GetRequiredService<IDocumentUrlService>(),
+                factory.GetRequiredService<ILanguageService>()));
         builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
         builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
         builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
-        builder.Services.AddSingleton<ExamineIndexRebuilder>();
+
+        builder.Services.AddUnique<IDeliveryApiCompositeIdHandler, DeliveryApiCompositeIdHandler>();
+
+        builder.Services.AddTransient<IIndexRebuilder, ExamineIndexRebuilder>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, ContentIndexingNotificationHandler>();

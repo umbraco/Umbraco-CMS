@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.AspNetCore.Razor.Language;
@@ -73,7 +73,7 @@ internal class UmbracoViewCompilerProvider : IViewCompilerProvider
 
     private static IFileProvider GetCompositeFileProvider(MvcRazorRuntimeCompilationOptions options)
     {
-        var fileProviders = options.FileProviders;
+        IList<IFileProvider> fileProviders = options.FileProviders;
         if (fileProviders.Count == 0)
         {
             throw new PanicException();

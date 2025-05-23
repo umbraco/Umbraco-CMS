@@ -2,7 +2,8 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -12,30 +13,47 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class ValueListUniqueValueValidator : IValueValidator
 {
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
+
+    public ValueListUniqueValueValidator(IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
-        // the value we get should be a JArray
-        // [ { "value": <value>, "sortOrder": 1 }, { ... }, ... ]
-        if (!(value is JArray json))
+        if (value is null)
         {
             yield break;
         }
 
-        // we ensure that values are unique
-        // (those are not empty - empty values are removed when persisting anyways)
-        var groupedValues = json.OfType<JObject>()
-            .Where(x => x["value"] != null)
-            .Select((x, index) => new { value = x["value"]?.ToString(), index })
-            .Where(x => x.value.IsNullOrWhiteSpace() == false)
-            .GroupBy(x => x.value);
-
-        foreach (var group in groupedValues.Where(x => x.Count() > 1))
+        var items = value as IEnumerable<string>;
+        if (items is null)
         {
-            yield return new ValidationResult($"The value \"{group.Last().value}\" must be unique", new[]
+            try
             {
-                // use the index number as server field so it can be wired up to the view
-                "item_" + group.Last().index.ToInvariantString(),
-            });
+                items = _configurationEditorJsonSerializer.Deserialize<string[]>(value.ToString() ?? string.Empty);
+            }
+            catch
+            {
+                // swallow and report error below
+            }
+        }
+
+        if (items is null)
+        {
+            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", ["items"]);
+            yield break;
+        }
+
+        var duplicateValues = items
+            .Select(item => item)
+            .GroupBy(v => v)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.First())
+            .ToArray();
+
+        foreach (var duplicateValue in duplicateValues)
+        {
+            yield return new ValidationResult($"The value \"{duplicateValue}\" must be unique", new[] { "items" });
         }
     }
 }

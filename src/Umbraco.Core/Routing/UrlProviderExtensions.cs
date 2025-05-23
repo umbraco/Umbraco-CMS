@@ -1,15 +1,71 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Extensions;
 
 public static class UrlProviderExtensions
 {
+    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
+    public static async Task<IEnumerable<UrlInfo>> GetContentUrlsAsync(
+        this IContent content,
+        IPublishedRouter publishedRouter,
+        IUmbracoContext umbracoContext,
+        ILanguageService languageService,
+        ILocalizedTextService textService,
+        IContentService contentService,
+        IVariationContextAccessor variationContextAccessor,
+        ILogger<IContent> logger,
+        UriUtility uriUtility,
+        IPublishedUrlProvider publishedUrlProvider)
+        => await content.GetContentUrlsAsync(
+            publishedRouter,
+            umbracoContext,
+            languageService,
+            textService,
+            contentService,
+            variationContextAccessor,
+            logger,
+            uriUtility,
+            publishedUrlProvider,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
+
+    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
+    public static async Task<IEnumerable<UrlInfo>> GetContentUrlsAsync(
+        this IContent content,
+        IPublishedRouter publishedRouter,
+        IUmbracoContext umbracoContext,
+        ILanguageService languageService,
+        ILocalizedTextService textService,
+        IContentService contentService,
+        IVariationContextAccessor variationContextAccessor,
+        ILogger<IContent> logger,
+        UriUtility uriUtility,
+        IPublishedUrlProvider publishedUrlProvider,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService)
+        => await content.GetContentUrlsAsync(
+            publishedRouter,
+            umbracoContext,
+            languageService,
+            textService,
+            contentService,
+            variationContextAccessor,
+            logger,
+            uriUtility,
+            publishedUrlProvider,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
+
     /// <summary>
     ///     Gets the URLs of the content item.
     /// </summary>
@@ -21,18 +77,20 @@ public static class UrlProviderExtensions
         this IContent content,
         IPublishedRouter publishedRouter,
         IUmbracoContext umbracoContext,
-        ILocalizationService localizationService,
+        ILanguageService languageService,
         ILocalizedTextService textService,
         IContentService contentService,
         IVariationContextAccessor variationContextAccessor,
         ILogger<IContent> logger,
         UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider)
+        IPublishedUrlProvider publishedUrlProvider,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
     {
         ArgumentNullException.ThrowIfNull(content);
         ArgumentNullException.ThrowIfNull(publishedRouter);
         ArgumentNullException.ThrowIfNull(umbracoContext);
-        ArgumentNullException.ThrowIfNull(localizationService);
+        ArgumentNullException.ThrowIfNull(languageService);
         ArgumentNullException.ThrowIfNull(textService);
         ArgumentNullException.ThrowIfNull(contentService);
         ArgumentNullException.ThrowIfNull(variationContextAccessor);
@@ -60,11 +118,11 @@ public static class UrlProviderExtensions
         // and, not only for those assigned to domains in the branch, because we want
         // to show what GetUrl() would return, for every culture.
         var urls = new HashSet<UrlInfo>();
-        var cultures = localizationService.GetAllLanguages().Select(x => x.IsoCode).ToList();
+        var cultures = (await languageService.GetAllAsync()).Select(x => x.IsoCode).ToList();
 
         // get all URLs for all cultures
         // in a HashSet, so de-duplicates too
-        foreach (UrlInfo cultureUrl in await GetContentUrlsByCultureAsync(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility, publishedUrlProvider))
+        foreach (UrlInfo cultureUrl in await GetContentUrlsByCultureAsync(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility, publishedUrlProvider, navigationQueryService, publishedContentStatusFilteringService))
         {
             urls.Add(cultureUrl);
         }
@@ -114,7 +172,9 @@ public static class UrlProviderExtensions
         IVariationContextAccessor variationContextAccessor,
         ILogger logger,
         UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider)
+        IPublishedUrlProvider publishedUrlProvider,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
     {
         var result = new List<UrlInfo>();
 
@@ -153,7 +213,7 @@ public static class UrlProviderExtensions
                 // got a URL, deal with collisions, add URL
                 default:
                     // detect collisions, etc
-                    Attempt<UrlInfo?> hasCollision = await DetectCollisionAsync(logger, content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility);
+                    Attempt<UrlInfo?> hasCollision = await DetectCollisionAsync(logger, content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility, navigationQueryService, publishedContentStatusFilteringService);
                     if (hasCollision.Success && hasCollision.Result is not null)
                     {
                         result.Add(hasCollision.Result);
@@ -209,7 +269,9 @@ public static class UrlProviderExtensions
         IPublishedRouter publishedRouter,
         ILocalizedTextService textService,
         IVariationContextAccessor variationContextAccessor,
-        UriUtility uriUtility)
+        UriUtility uriUtility,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
     {
         // test for collisions on the 'main' URL
         var uri = new Uri(url.TrimEnd(Constants.CharArrays.ForwardSlash), UriKind.RelativeOrAbsolute);
@@ -248,7 +310,7 @@ public static class UrlProviderExtensions
             while (o != null)
             {
                 l.Add(o.Name(variationContextAccessor)!);
-                o = o.Parent;
+                o = o.Parent<IPublishedContent>(navigationQueryService, publishedContentStatusFilteringService);
             }
 
             l.Reverse();

@@ -26,4 +26,25 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
         Assert.AreEqual(default(DateTime), AppCache.GetCacheItem<DateTime>("DateTimeTest"));
         Assert.AreEqual(null, AppCache.GetCacheItem<DateTime?>("DateTimeTest"));
     }
+
+    [Test]
+    public async Task Can_Get_With_Async_Factory()
+    {
+        var value = await AppPolicyCache.GetCacheItemAsync("AsyncFactoryGetTest", async () => await GetValueAsync(5), TimeSpan.FromMilliseconds(100));
+        Assert.AreEqual(50, value);
+    }
+
+    [Test]
+    public async Task Can_Insert_With_Async_Factory()
+    {
+        await AppPolicyCache.InsertCacheItemAsync("AsyncFactoryInsertTest", async () => await GetValueAsync(10), TimeSpan.FromMilliseconds(100));
+        var value = AppPolicyCache.GetCacheItem<int>("AsyncFactoryInsertTest");
+        Assert.AreEqual(100, value);
+    }
+
+    private static async Task<int> GetValueAsync(int value)
+    {
+        await Task.Delay(10);
+        return value * 10;
+    }
 }

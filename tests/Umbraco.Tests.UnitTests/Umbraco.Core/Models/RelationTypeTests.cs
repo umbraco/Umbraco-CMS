@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -53,6 +53,6 @@ public class RelationTypeTests
     {
         IRelationType item = _builder.Build();
 
-        Assert.DoesNotThrow(() => JsonConvert.SerializeObject(item));
+        Assert.DoesNotThrow(() => JsonSerializer.Serialize(item));
     }
 }

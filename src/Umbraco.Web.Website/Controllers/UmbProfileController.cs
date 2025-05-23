@@ -112,12 +112,13 @@ public class UmbProfileController : SurfaceController
         IdentityResult saveResult = await _memberManager.UpdateAsync(currentMember);
         if (!saveResult.Succeeded)
         {
+            scope.Complete();
             return saveResult;
         }
 
         // now we can update the custom properties
         // TODO: Ideally we could do this all through our MemberIdentityUser
-        IMember? member = _memberService.GetByKey(currentMember.Key);
+        IMember? member = _memberService.GetById(currentMember.Key);
         if (member == null)
         {
             // should never happen

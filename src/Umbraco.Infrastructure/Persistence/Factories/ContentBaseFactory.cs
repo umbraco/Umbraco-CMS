@@ -39,20 +39,26 @@ internal class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
+
+            // Dates stored in the database are local server time, but for SQL Server, will be considered
+            // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
+            content.CreateDate = DateTime.SpecifyKind(nodeDto.CreateDate, DateTimeKind.Local);
+            content.UpdateDate = DateTime.SpecifyKind(contentVersionDto.VersionDate, DateTimeKind.Local);
 
             content.Published = dto.Published;
             content.Edited = dto.Edited;
 
-            // TODO: shall we get published infos or not?
-            // if (dto.Published)
             if (publishedVersionDto != null)
             {
+                // We need this to get the proper versionId to match to unpublished values.
+                // This is only needed if the content has been published before.
                 content.PublishedVersionId = publishedVersionDto.Id;
-                content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
-                content.PublishName = publishedVersionDto.ContentVersionDto.Text;
-                content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
+                if (dto.Published)
+                {
+                    content.PublishDate = DateTime.SpecifyKind(publishedVersionDto.ContentVersionDto.VersionDate, DateTimeKind.Local);
+                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
+                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
+                }
             }
 
             // templates = ignored, managed by the repository
@@ -68,7 +74,7 @@ internal class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds an IMedia item from a dto and content type.
+    ///     Builds a Media item from a dto and content type.
     /// </summary>
     public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType? contentType)
     {
@@ -94,8 +100,8 @@ internal class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
+            content.CreateDate = DateTime.SpecifyKind(nodeDto.CreateDate, DateTimeKind.Local);
+            content.UpdateDate = DateTime.SpecifyKind(contentVersionDto.VersionDate, DateTimeKind.Local);
 
             // reset dirty initial properties (U4-1946)
             content.ResetDirtyProperties(false);
@@ -108,7 +114,7 @@ internal class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds an IMedia item from a dto and content type.
+    ///     Builds a Member item from a dto and member type.
     /// </summary>
     public static Member BuildEntity(MemberDto dto, IMemberType? contentType)
     {
@@ -123,7 +129,9 @@ internal class ContentBaseFactory
 
             content.Id = dto.NodeId;
             content.SecurityStamp = dto.SecurityStampToken;
-            content.EmailConfirmedDate = dto.EmailConfirmedDate;
+            content.EmailConfirmedDate = dto.EmailConfirmedDate.HasValue
+                ? DateTime.SpecifyKind(dto.EmailConfirmedDate.Value, DateTimeKind.Local)
+                : null;
             content.PasswordConfiguration = dto.PasswordConfig;
             content.Key = nodeDto.UniqueId;
             content.VersionId = contentVersionDto.Id;
@@ -137,14 +145,20 @@ internal class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
+            content.CreateDate = DateTime.SpecifyKind(nodeDto.CreateDate, DateTimeKind.Local);
+            content.UpdateDate = DateTime.SpecifyKind(contentVersionDto.VersionDate, DateTimeKind.Local);
             content.FailedPasswordAttempts = dto.FailedPasswordAttempts ?? default;
             content.IsLockedOut = dto.IsLockedOut;
             content.IsApproved = dto.IsApproved;
-            content.LastLoginDate = dto.LastLoginDate;
-            content.LastLockoutDate = dto.LastLockoutDate;
-            content.LastPasswordChangeDate = dto.LastPasswordChangeDate;
+            content.LastLockoutDate = dto.LastLockoutDate.HasValue
+                ? DateTime.SpecifyKind(dto.LastLockoutDate.Value, DateTimeKind.Local)
+                : null;
+            content.LastLoginDate = dto.LastLoginDate.HasValue
+                ? DateTime.SpecifyKind(dto.LastLoginDate.Value, DateTimeKind.Local)
+                : null;
+            content.LastPasswordChangeDate = dto.LastPasswordChangeDate.HasValue
+                ? DateTime.SpecifyKind(dto.LastPasswordChangeDate.Value, DateTimeKind.Local)
+                : null;
 
             // reset dirty initial properties (U4-1946)
             content.ResetDirtyProperties(false);
@@ -183,7 +197,7 @@ internal class ContentBaseFactory
                 new ContentScheduleDto
                 {
                     Action = x.Action.ToString(),
-                    Date = x.Date,
+                    Date = DateTime.SpecifyKind(x.Date, DateTimeKind.Local),
                     NodeId = entity.Id,
                     LanguageId = languageRepository.GetIdByIsoCode(x.Culture, false),
                     Id = x.Id,
@@ -258,7 +272,7 @@ internal class ContentBaseFactory
             UserId = entity.CreatorId,
             Text = entity.Name,
             NodeObjectType = objectType,
-            CreateDate = entity.CreateDate,
+            CreateDate = DateTime.SpecifyKind(entity.CreateDate, DateTimeKind.Local),
         };
 
         return dto;
@@ -272,7 +286,7 @@ internal class ContentBaseFactory
         {
             Id = entity.VersionId,
             NodeId = entity.Id,
-            VersionDate = entity.UpdateDate,
+            VersionDate = DateTime.SpecifyKind(entity.UpdateDate, DateTimeKind.Local),
             UserId = entity.WriterId,
             Current = true, // always building the current one
             Text = entity.Name,

@@ -8,6 +8,8 @@ public class ProfilingViewEngine : IViewEngine
 {
     private readonly string _name;
     private readonly IProfiler _profiler;
+
+    //TODO: can this be made private and with underscore?
     internal readonly IViewEngine Inner;
 
     public ProfilingViewEngine(IViewEngine inner, IProfiler profiler)
@@ -19,7 +21,7 @@ public class ProfilingViewEngine : IViewEngine
 
     public ViewEngineResult FindView(ActionContext context, string viewName, bool isMainPage)
     {
-        using (_profiler.Step(string.Format("{0}.FindView, {1}, {2}", _name, viewName, isMainPage)))
+        using (_profiler.IsEnabled ? _profiler.Step(string.Format("{0}.FindView, {1}, {2}", _name, viewName, isMainPage)) : null)
         {
             return WrapResult(Inner.FindView(context, viewName, isMainPage));
         }
@@ -27,7 +29,7 @@ public class ProfilingViewEngine : IViewEngine
 
     public ViewEngineResult GetView(string? executingFilePath, string viewPath, bool isMainPage)
     {
-        using (_profiler.Step(string.Format("{0}.GetView, {1}, {2}, {3}", _name, executingFilePath, viewPath, isMainPage)))
+        using (_profiler.IsEnabled ? _profiler.Step(string.Format("{0}.GetView, {1}, {2}, {3}", _name, executingFilePath, viewPath, isMainPage)) : null)
         {
             return Inner.GetView(executingFilePath, viewPath, isMainPage);
         }

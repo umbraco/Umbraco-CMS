@@ -1,0 +1,1 @@
+export const UMB_EXTENSION_TYPE_ENTITY_CREATE_OPTION_ACTION = 'entityCreateOptionAction';

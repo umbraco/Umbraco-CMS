@@ -82,7 +82,7 @@ public static class Suspendable
             _suspended = true;
         }
 
-        public static void ResumeIndexers(ExamineIndexRebuilder backgroundIndexRebuilder)
+        public static void ResumeIndexers(IIndexRebuilder backgroundIndexRebuilder)
         {
             _suspended = false;
 

@@ -23,11 +23,6 @@ public class DailyMotion : OEmbedProviderBase
         { "format", "xml" },
     };
 
-    public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
-    {
-        var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
-        XmlDocument xmlDocument = base.GetXmlResponse(requestUrl);
-
-        return GetXmlProperty(xmlDocument, "/oembed/html");
-    }
+    public override async Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
+        => await GetXmlBasedMarkupAsync(url, maxWidth, maxHeight, cancellationToken);
 }

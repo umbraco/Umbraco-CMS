@@ -1,3 +1,4 @@
+using System.Web;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -52,21 +53,38 @@ public class ContentFinderByRedirectUrl : IContentFinder
             return false;
         }
 
-        var route = frequest.Domain != null
-            ? frequest.Domain.ContentId +
-              DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded)
-            : frequest.AbsolutePathDecoded;
-
+        var route = frequest.AbsolutePathDecoded;
         IRedirectUrl? redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(route, frequest.Culture);
 
-        if (redirectUrl == null)
+        if (redirectUrl is null)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("No match for route: {Route}", route);
             }
 
-            return false;
+            // Routes under domains can be stored with the integer ID of the content where the domains were defined as the first part of the route,
+            // so if we haven't found a redirect, try using that format too.
+            // See: https://github.com/umbraco/Umbraco-CMS/pull/18160 and https://github.com/umbraco/Umbraco-CMS/pull/18763
+            if (frequest.Domain is not null)
+            {
+                route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded);
+                redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(route, frequest.Culture);
+
+                if (redirectUrl is null)
+                {
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug("No match for route with domain: {Route}", route);
+                    }
+
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
 
         IPublishedContent? content = umbracoContext.Content?.GetById(redirectUrl.ContentId);
@@ -89,7 +107,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
         }
 
         frequest
-            .SetRedirectPermanent(url)
+            .SetRedirectPermanent(HttpUtility.UrlPathEncode(url))
 
             // From: http://stackoverflow.com/a/22468386/5018
             // See http://issues.umbraco.org/issue/U4-8361#comment=67-30532

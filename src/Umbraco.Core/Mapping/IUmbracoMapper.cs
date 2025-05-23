@@ -30,7 +30,7 @@ public interface IUmbracoMapper
     /// </summary>
     /// <typeparam name="TSource">The source type.</typeparam>
     /// <typeparam name="TTarget">The target type.</typeparam>
-    /// <param name="ctor">A constructor method.</param>
+    /// <param name="ctor">A constructor method. Will not be used if the mapping call receives a Target object</param>
     /// <param name="map">A mapping method.</param>
     void Define<TSource, TTarget>(
         Func<TSource, MapperContext, TTarget> ctor,

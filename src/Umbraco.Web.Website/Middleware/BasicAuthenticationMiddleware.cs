@@ -7,10 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware;
@@ -28,27 +27,21 @@ public class BasicAuthenticationMiddleware : IMiddleware
     public BasicAuthenticationMiddleware(
         IRuntimeState runtimeState,
         IBasicAuthService basicAuthService,
-        IOptionsMonitor<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment)
     {
         _runtimeState = runtimeState;
         _basicAuthService = basicAuthService;
-
-        _backOfficePath = globalSettings.CurrentValue.GetBackOfficePath(hostingEnvironment);
+        _backOfficePath = hostingEnvironment.GetBackOfficePath();
     }
 
-    [Obsolete("Use Ctor with all methods. This will be removed in Umbraco 12")]
+    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. Scheduled for removal in Umbraco 17.")]
     public BasicAuthenticationMiddleware(
         IRuntimeState runtimeState,
-        IBasicAuthService basicAuthService) : this(
-        runtimeState,
-        basicAuthService,
-        StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
-        StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>()
-    )
-    {
-
-    }
+        IBasicAuthService basicAuthService,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnvironment)
+        : this(runtimeState, basicAuthService, hostingEnvironment)
+    { }
 
     /// <inheritdoc />
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -117,7 +110,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
     {
         if (_basicAuthService.IsRedirectToLoginPageEnabled())
         {
-            context.Response.Redirect($"{_backOfficePath}#/login/false?returnPath={WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery())}" , false);
+            context.Response.Redirect($"{_backOfficePath}/?status=false&returnPath={WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery())}", false);
         }
         else
         {

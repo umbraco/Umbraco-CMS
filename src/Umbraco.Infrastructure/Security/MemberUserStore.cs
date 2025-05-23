@@ -2,7 +2,6 @@ using System.Data;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -19,12 +18,13 @@ namespace Umbraco.Cms.Core.Security;
 public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdentityRole>, IMemberUserStore
 {
     private const string GenericIdentityErrorCode = "IdentityErrorUserStore";
+    public const string CancelledIdentityErrorCode = "CancelledIdentityErrorUserStore";
     private readonly IExternalLoginWithKeyService _externalLoginService;
     private readonly IUmbracoMapper _mapper;
     private readonly IMemberService _memberService;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IPublishedMemberCache _memberCache;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberUserStore" /> class for the members identity store
@@ -33,53 +33,26 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <param name="mapper">The mapper for properties</param>
     /// <param name="scopeProvider">The scope provider</param>
     /// <param name="describer">The error describer</param>
-    /// <param name="publishedSnapshotAccessor">The published snapshot accessor</param>
     /// <param name="externalLoginService">The external login service</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
+    /// <param name="memberCache"></param>
     [ActivatorUtilitiesConstructor]
     public MemberUserStore(
         IMemberService memberService,
         IUmbracoMapper mapper,
         ICoreScopeProvider scopeProvider,
         IdentityErrorDescriber describer,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IExternalLoginWithKeyService externalLoginService,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IPublishedMemberCache memberCache)
         : base(describer)
     {
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _externalLoginService = externalLoginService;
         _twoFactorLoginService = twoFactorLoginService;
-    }
-
-    [Obsolete("Use ctor with IExternalLoginWithKeyService and ITwoFactorLoginService param")]
-    public MemberUserStore(
-        IMemberService memberService,
-        IUmbracoMapper mapper,
-        ICoreScopeProvider scopeProvider,
-        IdentityErrorDescriber describer,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IExternalLoginWithKeyService externalLoginService)
-        : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
-    }
-
-    [Obsolete("Use ctor with IExternalLoginWithKeyService and ITwoFactorLoginService param")]
-    public MemberUserStore(
-        IMemberService memberService,
-        IUmbracoMapper mapper,
-        ICoreScopeProvider scopeProvider,
-        IdentityErrorDescriber describer,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor)
-        : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
+        _memberCache = memberCache;
     }
 
     /// <inheritdoc />
@@ -107,10 +80,38 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                     ? Constants.Security.DefaultMemberTypeAlias
                     : user.MemberTypeAlias!);
 
+            if (user.Key != Guid.Empty)
+            {
+                // at the time of writing, the memberEntity identity is not set until the member is saved. as we rely on
+                // that behavior when setting an explicit key, we need to know immediately if it changes. integration tests
+                // will detect this change of behavior.
+                if (memberEntity.HasIdentity)
+                {
+                    return Task.FromResult(IdentityResult.Failed(new IdentityError
+                    {
+                        Code = GenericIdentityErrorCode,
+                        Description = "Cannot assign a new key to a member that already has identity."
+                    }));
+                }
+
+                memberEntity.Key = user.Key;
+            }
+
             UpdateMemberProperties(memberEntity, user, out bool _);
 
             // create the member
-            _memberService.Save(memberEntity);
+            Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity, PublishNotificationSaveOptions.Saving);
+            if (saveAttempt.Success is false)
+            {
+                scope.Complete();
+                return Task.FromResult(IdentityResult.Failed(
+                    new IdentityError
+                    {
+                        Code = CancelledIdentityErrorCode,
+                        Description = string.Empty
+
+                    }));
+            }
 
             // We need to add roles now that the member has an Id. It do not work implicit in UpdateMemberProperties
             _memberService.AssignRoles(
@@ -161,7 +162,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    public override Task<IdentityResult> UpdateAsync(
+    public override async Task<IdentityResult> UpdateAsync(
         MemberIdentityUser user,
         CancellationToken cancellationToken = default)
     {
@@ -189,9 +190,21 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
                 var isTokensPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.LoginTokens));
 
-                if (UpdateMemberProperties(found, user, out var updateRoles))
+                IReadOnlyList<string> propertiesUpdated = UpdateMemberProperties(found, user, out var updateRoles);
+
+                if (propertiesUpdated.Count > 0)
                 {
-                    _memberService.Save(found);
+                    // As part of logging in members we update the last login date, and, if concurrent logins are disabled, the security stamp.
+                    // If and only if we are updating these properties, we can avoid the overhead of a full save of the member with the associated
+                    // locking, property updates, tag handling etc., and make a more efficient update.
+                    if (UpdatingOnlyLoginProperties(propertiesUpdated))
+                    {
+                        await _memberService.UpdateLoginPropertiesAsync(found);
+                    }
+                    else
+                    {
+                        _memberService.Save(found);
+                    }
 
                     if (updateRoles)
                     {
@@ -222,13 +235,19 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             }
 
             scope.Complete();
-            return Task.FromResult(IdentityResult.Success);
+            return IdentityResult.Success;
         }
         catch (Exception ex)
         {
-            return Task.FromResult(
-                IdentityResult.Failed(new IdentityError { Code = GenericIdentityErrorCode, Description = ex.Message }));
+            return IdentityResult.Failed(new IdentityError { Code = GenericIdentityErrorCode, Description = ex.Message });
         }
+    }
+
+    private static bool UpdatingOnlyLoginProperties(IReadOnlyList<string> propertiesUpdated)
+    {
+        string[] loginPropertyUpdates = [nameof(MemberIdentityUser.LastLoginDateUtc), nameof(MemberIdentityUser.SecurityStamp)];
+        return (propertiesUpdated.Count == 2 && propertiesUpdated.ContainsAll(loginPropertyUpdates)) ||
+               (propertiesUpdated.Count == 1 && propertiesUpdated.ContainsAny(loginPropertyUpdates));
     }
 
     /// <inheritdoc />
@@ -245,7 +264,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IMember? found = _memberService.GetById(UserIdToInt(user.Id));
+            IMember? found = _memberService.GetById(user.Key);
             if (found != null)
             {
                 _memberService.Delete(found);
@@ -285,14 +304,13 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             return null;
         }
 
-        IMember? member = _memberService.GetByKey(user.Key);
+        IMember? member = _memberService.GetById(user.Key);
         if (member == null)
         {
             return null;
         }
 
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-        return publishedSnapshot.Members?.Get(member);
+        return _memberCache.Get(member);
     }
 
     /// <inheritdoc />
@@ -321,15 +339,52 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             throw new ArgumentNullException(nameof(userId));
         }
 
-        IMember? user = Guid.TryParse(userId, out Guid key)
-            ? _memberService.GetByKey(key)
-            : _memberService.GetById(UserIdToInt(userId));
+        IMember? user = null;
+        if (Guid.TryParse(userId, out Guid key))
+        {
+            user = _memberService.GetById(key);
+        }
+        else if (TryResolveEntityIdFromIdentityId(userId, out int id))
+        {
+            user = _memberService.GetById(id);
+        }
+
         if (user == null)
         {
             return Task.FromResult((MemberIdentityUser)null!)!;
         }
 
         return Task.FromResult(AssignLoginsCallback(_mapper.Map<MemberIdentityUser>(user)))!;
+    }
+
+    private bool TryResolveEntityIdFromIdentityId(string? identityId, out int entityId)
+    {
+        if (TryConvertIdentityIdToInt(identityId, out entityId))
+        {
+            return true;
+        }
+
+        if (Guid.TryParse(identityId, out Guid key))
+        {
+            IMember? member = _memberService.GetById(key);
+            if (member is not null)
+            {
+                entityId = member.Id;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected override Task<int> ResolveEntityIdFromIdentityId(string? identityId)
+    {
+        if (TryResolveEntityIdFromIdentityId(identityId, out var entityId))
+        {
+            return Task.FromResult(entityId);
+        }
+
+        throw new InvalidOperationException($"Unable to resolve user with ID {identityId}");
     }
 
     /// <inheritdoc />
@@ -446,8 +501,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserLogin<string>?> FindUserLoginAsync(string userId, string loginProvider,
-        string providerKey, CancellationToken cancellationToken)
+    protected override async Task<IdentityUserLogin<string>?> FindUserLoginAsync(string userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -465,15 +519,14 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         MemberIdentityUser? user = await FindUserAsync(userId, cancellationToken);
         if (user?.Id is null)
         {
-            return await Task.FromResult<IdentityUserLogin<string>?>(null);
+            return null;
         }
 
         IList<UserLoginInfo> logins = await GetLoginsAsync(user, cancellationToken);
-        UserLoginInfo? found =
-            logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
+        UserLoginInfo? found = logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
         if (found is null)
         {
-            return await Task.FromResult<IdentityUserLogin<string>?>(null);
+            return null;
         }
 
         return new IdentityUserLogin<string>
@@ -487,8 +540,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    protected override Task<IdentityUserLogin<string>?> FindUserLoginAsync(string loginProvider, string providerKey,
-        CancellationToken cancellationToken)
+    protected override Task<IdentityUserLogin<string>?> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -670,9 +722,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         return user;
     }
 
-    private bool UpdateMemberProperties(IMember member, MemberIdentityUser identityUser, out bool updateRoles)
+    private IReadOnlyList<string> UpdateMemberProperties(IMember member, MemberIdentityUser identityUser, out bool updateRoles)
     {
-        var anythingChanged = false;
+        var updatedProperties = new List<string>();
         updateRoles = false;
 
         // don't assign anything if nothing has changed as this will trigger the track changes of the model
@@ -681,7 +733,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             || (identityUser.LastLoginDateUtc.HasValue &&
                 member.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.LastLoginDateUtc));
 
             // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
             DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue
@@ -695,14 +747,14 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             || (identityUser.LastPasswordChangeDateUtc.HasValue && member.LastPasswordChangeDate?.ToUniversalTime() !=
                 identityUser.LastPasswordChangeDateUtc.Value))
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.LastPasswordChangeDateUtc));
             member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
             && member.Comments != identityUser.Comments && identityUser.Comments.IsNullOrWhiteSpace() == false)
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.Comments));
             member.Comments = identityUser.Comments;
         }
 
@@ -712,34 +764,34 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             || ((member.EmailConfirmedDate.HasValue == false || member.EmailConfirmedDate.Value == default) &&
                 identityUser.EmailConfirmed))
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.EmailConfirmed));
             member.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.Now : null;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Name))
             && member.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.Name));
             member.Name = identityUser.Name ?? string.Empty;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Email))
             && member.Email != identityUser.Email && identityUser.Email.IsNullOrWhiteSpace() == false)
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.Email));
             member.Email = identityUser.Email!;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.AccessFailedCount))
             && member.FailedPasswordAttempts != identityUser.AccessFailedCount)
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.AccessFailedCount));
             member.FailedPasswordAttempts = identityUser.AccessFailedCount;
         }
 
         if (member.IsLockedOut != identityUser.IsLockedOut)
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.IsLockedOut));
             member.IsLockedOut = identityUser.IsLockedOut;
 
             if (member.IsLockedOut)
@@ -751,14 +803,14 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         if (member.IsApproved != identityUser.IsApproved)
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.IsApproved));
             member.IsApproved = identityUser.IsApproved;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.UserName))
             && member.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.UserName));
             member.Username = identityUser.UserName!;
         }
 
@@ -766,33 +818,33 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             && member.RawPasswordValue != identityUser.PasswordHash &&
             identityUser.PasswordHash.IsNullOrWhiteSpace() == false)
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.PasswordHash));
             member.RawPasswordValue = identityUser.PasswordHash;
             member.PasswordConfiguration = identityUser.PasswordConfig;
         }
 
         if (member.PasswordConfiguration != identityUser.PasswordConfig)
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.PasswordConfig));
             member.PasswordConfiguration = identityUser.PasswordConfig;
         }
 
         if (member.SecurityStamp != identityUser.SecurityStamp)
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.SecurityStamp));
             member.SecurityStamp = identityUser.SecurityStamp;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Roles)))
         {
-            anythingChanged = true;
+            updatedProperties.Add(nameof(MemberIdentityUser.Roles));
             updateRoles = true;
         }
 
         // reset all changes
         identityUser.ResetDirtyProperties(false);
 
-        return anythingChanged;
+        return updatedProperties.AsReadOnly();
     }
 
     /// <inheritdoc />

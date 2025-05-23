@@ -1,18 +1,21 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Models.Property;
@@ -23,37 +26,42 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 public class DataValueReferenceFactoryCollectionTests
 {
     private IDataValueEditorFactory DataValueEditorFactory { get; } = Mock.Of<IDataValueEditorFactory>(
-        x => x.Create<MediaPickerPropertyEditor.MediaPickerPropertyValueEditor>(It.IsAny<DataEditorAttribute>())
+        x => x.Create<MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor>(It.IsAny<DataEditorAttribute>())
              ==
-             new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(
-                 Mock.Of<ILocalizedTextService>(),
+             new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor(
                  Mock.Of<IShortStringHelper>(),
                  Mock.Of<IJsonSerializer>(),
                  Mock.Of<IIOHelper>(),
-                 new DataEditorAttribute("a", "a", "a")));
+                 new DataEditorAttribute("a"),
+                 Mock.Of<IMediaImportService>(),
+                 Mock.Of<IMediaService>(),
+                 Mock.Of<ITemporaryFileService>(),
+                 Mock.Of<IScopeProvider>(),
+                 Mock.Of<IBackOfficeSecurityAccessor>(),
+                 Mock.Of<IDataTypeConfigurationCache>(),
+                 Mock.Of<ILocalizedTextService>(),
+                 Mock.Of<IMediaTypeService>(),
+                 Mock.Of<IMediaNavigationQueryService>()));
 
     private IIOHelper IOHelper { get; } = Mock.Of<IIOHelper>();
 
     private IShortStringHelper ShortStringHelper { get; } = Mock.Of<IShortStringHelper>();
 
-    private IEditorConfigurationParser EditorConfigurationParser { get; } = Mock.Of<IEditorConfigurationParser>();
-
     [Test]
     public void GetAllReferences_All_Variants_With_IDataValueReferenceFactory()
     {
-        var collection = new DataValueReferenceFactoryCollection(() => new TestDataValueReferenceFactory().Yield());
+        var collection = new DataValueReferenceFactoryCollection(() => new TestDataValueReferenceFactory().Yield(), new NullLogger<DataValueReferenceFactoryCollection>());
 
         // label does not implement IDataValueReference
         var labelEditor = new LabelPropertyEditor(
             DataValueEditorFactory,
-            IOHelper,
-            EditorConfigurationParser);
+            IOHelper);
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelEditor.Yield()));
         var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var property =
             new Property(
                 new PropertyType(ShortStringHelper, new DataType(labelEditor, serializer))
@@ -86,19 +94,18 @@ public class DataValueReferenceFactoryCollectionTests
     [Test]
     public void GetAllReferences_All_Variants_With_IDataValueReference_Editor()
     {
-        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
+        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
 
         // mediaPicker does implement IDataValueReference
-        var mediaPicker = new MediaPickerPropertyEditor(
+        var mediaPicker = new MediaPicker3PropertyEditor(
             DataValueEditorFactory,
-            IOHelper,
-            EditorConfigurationParser);
+            IOHelper);
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => mediaPicker.Yield()));
         var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var property =
             new Property(
                 new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
@@ -131,19 +138,18 @@ public class DataValueReferenceFactoryCollectionTests
     [Test]
     public void GetAllReferences_Invariant_With_IDataValueReference_Editor()
     {
-        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
+        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
 
         // mediaPicker does implement IDataValueReference
-        var mediaPicker = new MediaPickerPropertyEditor(
+        var mediaPicker = new MediaPicker3PropertyEditor(
             DataValueEditorFactory,
-            IOHelper,
-            EditorConfigurationParser);
+            IOHelper);
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => mediaPicker.Yield()));
         var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var property =
             new Property(new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
             {
@@ -173,6 +179,33 @@ public class DataValueReferenceFactoryCollectionTests
         Assert.AreEqual(trackedUdi4, result.ElementAt(1).Udi.ToString());
     }
 
+    [Test]
+    public void GetAutomaticRelationTypesAliases_ContainsDefault()
+    {
+        var collection = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>, new NullLogger<DataValueReferenceFactoryCollection>());
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
+
+        var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
+
+        var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes;
+        CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
+    }
+
+    [Test]
+    public void GetAutomaticRelationTypesAliases_ContainsCustom()
+    {
+        var collection = new DataValueReferenceFactoryCollection(() => new TestDataValueReferenceFactory().Yield(), new NullLogger<DataValueReferenceFactoryCollection>());
+
+        var labelPropertyEditor = new LabelPropertyEditor(DataValueEditorFactory, IOHelper);
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelPropertyEditor.Yield()));
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+
+        var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
+
+        var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes.Append("umbTest");
+        CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
+    }
+
     private class TestDataValueReferenceFactory : IDataValueReferenceFactory
     {
         public IDataValueReference GetDataValueReference() => new TestMediaDataValueReference();
@@ -196,6 +229,12 @@ public class DataValueReferenceFactoryCollectionTests
                     yield return new UmbracoEntityReference(udi);
                 }
             }
+
+            public IEnumerable<string> GetAutomaticRelationTypesAliases() => new[]
+            {
+                "umbTest",
+                "umbTest", // Duplicate on purpose to test distinct aliases
+            };
         }
     }
 }

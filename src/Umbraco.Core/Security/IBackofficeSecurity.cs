@@ -16,14 +16,6 @@ public interface IBackOfficeSecurity
     IUser? CurrentUser { get; }
 
     /// <summary>
-    ///     Gets the current user's id.
-    /// </summary>
-    /// <returns>The current user's Id that has been authenticated for the request.</returns>
-    /// <remarks>If authentication hasn't taken place this will be unsuccessful.</remarks>
-    // TODO: This should just be an extension method on ClaimsIdentity
-    Attempt<int> GetUserId();
-
-    /// <summary>
     ///     Checks if the specified user as access to the app
     /// </summary>
     /// <param name="section"></param>

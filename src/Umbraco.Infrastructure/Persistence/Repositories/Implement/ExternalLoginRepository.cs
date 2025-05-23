@@ -46,7 +46,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
-    public int Count(IQuery<IIdentityUserToken> query)
+    public int Count(IQuery<IIdentityUserToken>? query)
     {
         Sql<ISqlContext> sql = Sql().SelectCount().From<ExternalLoginDto>();
         return Database.ExecuteScalar<int>(sql);
@@ -55,6 +55,12 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
     /// <inheritdoc />
     public void DeleteUserLogins(Guid userOrMemberKey) =>
         Database.Delete<ExternalLoginDto>("WHERE userOrMemberKey=@userOrMemberKey", new { userOrMemberKey });
+
+    /// <inheritdoc />
+    public void DeleteUserLoginsForRemovedProviders(IEnumerable<string> currentLoginProviders) =>
+        Database.Execute(Sql()
+            .Delete<ExternalLoginDto>()
+            .WhereNotIn<ExternalLoginDto>(x => x.LoginProvider, currentLoginProviders));
 
     /// <inheritdoc />
     public void Save(Guid userOrMemberKey, IEnumerable<IExternalLogin> logins)

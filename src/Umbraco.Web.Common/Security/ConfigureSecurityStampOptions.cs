@@ -20,10 +20,6 @@ public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampVali
     public ConfigureSecurityStampOptions(IOptions<SecuritySettings> securitySettings)
         => _securitySettings = securitySettings.Value;
 
-    [Obsolete("Use the overload accepting SecuritySettings instead. Scheduled for removal in v14.")]
-    public static void ConfigureOptions(SecurityStampValidatorOptions options)
-        => ConfigureOptions(options, StaticServiceProvider.Instance.GetRequiredService<SecuritySettings>());
-
     /// <summary>
     ///     Configures security stamp options and ensures any custom claims
     ///     set on the identity are persisted to the new identity when it's refreshed.
@@ -35,7 +31,7 @@ public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampVali
         // Adjust the security stamp validation interval to a shorter duration
         // when concurrent logins are not allowed and the duration has the default interval value
         // (currently defaults to 30 minutes), ensuring quicker re-validation.
-        if (securitySettings.AllowConcurrentLogins is false && options.ValidationInterval == TimeSpan.FromMinutes(30))
+        if (securitySettings.AllowConcurrentLogins is false && options.ValidationInterval == new SecurityStampValidatorOptions().ValidationInterval)
         {
             options.ValidationInterval = TimeSpan.FromSeconds(30);
         }

@@ -17,6 +17,7 @@ public class UserPasswordConfigurationSettings : IPasswordConfiguration
     internal const bool StaticRequireLowercase = false;
     internal const bool StaticRequireUppercase = false;
     internal const int StaticMaxFailedAccessAttemptsBeforeLockout = 5;
+    internal const string StaticMinimumResponseTime = "0.00:00:02";
 
     /// <inheritdoc />
     [DefaultValue(StaticRequiredLength)]
@@ -45,4 +46,10 @@ public class UserPasswordConfigurationSettings : IPasswordConfiguration
     /// <inheritdoc />
     [DefaultValue(StaticMaxFailedAccessAttemptsBeforeLockout)]
     public int MaxFailedAccessAttemptsBeforeLockout { get; set; } = StaticMaxFailedAccessAttemptsBeforeLockout;
+
+    /// <summary>
+    /// Gets or sets the minimum response time of the forgot password request.
+    /// </summary>
+    [DefaultValue(StaticMinimumResponseTime)]
+    public TimeSpan MinimumResponseTime { get; set; } = TimeSpan.Parse(StaticMinimumResponseTime);
 }

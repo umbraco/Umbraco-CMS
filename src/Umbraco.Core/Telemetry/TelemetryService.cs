@@ -37,35 +37,28 @@ internal class TelemetryService : ITelemetryService
     }
 
     /// <inheritdoc />
-    public bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData)
+    public async Task<TelemetryReportData?> GetTelemetryReportDataAsync()
     {
         if (_siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid telemetryId) is false)
-        {
-            telemetryReportData = null;
-            return false;
-        }
-
-        telemetryReportData = new TelemetryReportData
-        {
-            Id = telemetryId,
-            Version = GetVersion(),
-            Packages = GetPackageTelemetry(),
-            Detailed = _usageInformationService.GetDetailed(),
-        };
-        return true;
-    }
-
-    private string? GetVersion()
-    {
-        if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
         {
             return null;
         }
 
-        return _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
+        return new TelemetryReportData
+        {
+            Id = telemetryId,
+            Version = GetVersion(),
+            Packages = await GetPackageTelemetryAsync().ConfigureAwait(false),
+            Detailed = _usageInformationService.GetDetailed(),
+        };
     }
 
-    private IEnumerable<PackageTelemetry>? GetPackageTelemetry()
+    private string? GetVersion()
+        => _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
+        ? null
+        : _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
+
+    private async Task<IEnumerable<PackageTelemetry>?> GetPackageTelemetryAsync()
     {
         if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
         {
@@ -73,7 +66,7 @@ internal class TelemetryService : ITelemetryService
         }
 
         List<PackageTelemetry> packages = new();
-        IEnumerable<InstalledPackage> installedPackages = _packagingService.GetAllInstalledPackages();
+        IEnumerable<InstalledPackage> installedPackages = await _packagingService.GetAllInstalledPackagesAsync().ConfigureAwait(false);
 
         foreach (InstalledPackage installedPackage in installedPackages)
         {

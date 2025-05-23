@@ -9,13 +9,13 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionDelete : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const char ActionLetter = 'D';
+    public const string ActionLetter = "Umb.Document.Delete";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "delete";
 
     /// <inheritdoc/>
-    public char Letter => ActionLetter;
+    public string Letter => ActionLetter;
 
     /// <inheritdoc/>
     public string Alias => ActionAlias;

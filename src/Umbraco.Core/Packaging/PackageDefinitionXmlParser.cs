@@ -30,10 +30,6 @@ public class PackageDefinitionXmlParser
                 xml.Element("media")?.Elements("nodeUdi").Select(x => (GuidUdi)UdiParser.Parse(x.Value)).ToList() ??
                 EmptyGuidUdiList,
             MediaLoadChildNodes = xml.Element("media")?.AttributeValue<bool>("loadChildNodes") ?? false,
-            Macros =
-                xml.Element("macros")?.Value
-                    .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
-                EmptyStringList,
             Templates =
                 xml.Element("templates")?.Value
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
@@ -92,7 +88,6 @@ public class PackageDefinitionXmlParser
             new XElement("partialViews", string.Join(",", def.PartialViews ?? Array.Empty<string>())),
             new XElement("documentTypes", string.Join(",", def.DocumentTypes ?? Array.Empty<string>())),
             new XElement("mediaTypes", string.Join(",", def.MediaTypes ?? Array.Empty<string>())),
-            new XElement("macros", string.Join(",", def.Macros ?? Array.Empty<string>())),
             new XElement("languages", string.Join(",", def.Languages ?? Array.Empty<string>())),
             new XElement("dictionaryitems", string.Join(",", def.DictionaryItems ?? Array.Empty<string>())),
             new XElement(

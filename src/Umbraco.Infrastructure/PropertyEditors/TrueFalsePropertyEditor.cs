@@ -1,54 +1,73 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-///     Represents a checkbox property and parameter editor.
+/// Represents a true/false (toggle) property editor.
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.Boolean,
-    EditorType.PropertyValue | EditorType.MacroParameter,
-    "Toggle",
-    "boolean",
     ValueType = ValueTypes.Integer,
-    Group = Constants.PropertyEditors.Groups.Common,
-    Icon = "icon-checkbox",
     ValueEditorIsReusable = true)]
 public class TrueFalsePropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
-    private readonly IIOHelper _ioHelper;
-
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public TrueFalsePropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="TrueFalsePropertyEditor" /> class.
     /// </summary>
-    public TrueFalsePropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser)
+    public TrueFalsePropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
-    {
-        _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
-        SupportsReadOnly = true;
-    }
+        => SupportsReadOnly = true;
 
     /// <inheritdoc />
-    protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new TrueFalseConfigurationEditor(_ioHelper, _editorConfigurationParser);
+    protected override IDataValueEditor CreateValueEditor()
+        => DataValueEditorFactory.Create<TrueFalsePropertyValueEditor>(Attribute!);
+
+    /// <summary>
+    /// Defines the value editor for the true/false (toggle) property editor.
+    /// </summary>
+    internal class TrueFalsePropertyValueEditor : DataValueEditor
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrueFalsePropertyValueEditor"/> class.
+        /// </summary>
+        public TrueFalsePropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+        {
+        }
+
+        /// <inheritdoc />
+        public override IValueRequiredValidator RequiredValidator => new TrueFalseValueRequiredValidator();
+
+        /// <inheritdoc/>
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+            => ParsePropertyValue(property.GetValue(culture, segment));
+
+        /// <inheritdoc/>
+        /// <remarks>
+        /// NOTE: property editor value type is Integer, which means we need to store the boolean representation as 0 or 1.
+        /// </remarks>
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+            => ParsePropertyValue(editorValue.Value) ? 1 : 0;
+
+        private bool ParsePropertyValue(object? value)
+            => value switch
+            {
+                bool booleanValue => booleanValue,
+                int integerValue => integerValue == 1,
+                string stringValue => stringValue == "1" || stringValue.Equals("true", StringComparison.OrdinalIgnoreCase),
+                _ => false
+            };
+    }
 }

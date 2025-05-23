@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
-public class ScriptRepositoryTest : UmbracoIntegrationTest
+internal sealed class ScriptRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpFileSystem()
@@ -34,7 +34,6 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
             IOHelper,
             GetRequiredService<IOptions<GlobalSettings>>(),
             HostingEnvironment,
-            null,
             null,
             null,
             _fileSystem,

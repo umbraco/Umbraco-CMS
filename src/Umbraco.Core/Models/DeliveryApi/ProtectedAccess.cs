@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.DeliveryApi;
+namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
 public sealed class ProtectedAccess
 {

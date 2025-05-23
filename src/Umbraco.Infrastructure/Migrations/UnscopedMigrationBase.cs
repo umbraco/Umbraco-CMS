@@ -1,14 +1,26 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations;
+namespace Umbraco.Cms.Infrastructure.Migrations;
 
-/// <summary>
-/// Base class for creating a migration that does not have a scope provided for it
-/// </summary>
-/// <remarks>
-/// This is just a marker class, and has all the same functionality as the underlying MigrationBase
-/// </remarks>
-public abstract class UnscopedMigrationBase : MigrationBase
+/// <inheritdoc />
+public abstract class UnscopedMigrationBase : UnscopedAsyncMigrationBase
 {
-    protected UnscopedMigrationBase(IMigrationContext context) : base(context)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UnscopedMigrationBase" /> class.
+    /// </summary>
+    /// <param name="context">The context.</param>
+    protected UnscopedMigrationBase(IMigrationContext context)
+        : base(context)
+    { }
+
+    /// <inheritdoc />
+    protected override Task MigrateAsync()
     {
+        Migrate();
+
+        return Task.CompletedTask;
     }
+
+    /// <summary>
+    /// Executes the migration.
+    /// </summary>
+    protected abstract void Migrate();
 }

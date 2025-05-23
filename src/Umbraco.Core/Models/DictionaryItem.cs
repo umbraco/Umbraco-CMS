@@ -34,9 +34,6 @@ public class DictionaryItem : EntityBase, IDictionaryItem
         _translations = new List<IDictionaryTranslation>();
     }
 
-    [Obsolete("This will be removed in V14.")]
-    public Func<int, ILanguage?>? GetLanguage { get; set; }
-
     /// <summary>
     ///     Gets or Sets the Parent Id of the Dictionary Item
     /// </summary>
@@ -64,20 +61,6 @@ public class DictionaryItem : EntityBase, IDictionaryItem
     public IEnumerable<IDictionaryTranslation> Translations
     {
         get => _translations;
-        set
-        {
-            IDictionaryTranslation[] asArray = value.ToArray();
-
-            // ensure the language callback is set on each translation
-            if (GetLanguage != null)
-            {
-                foreach (DictionaryTranslation translation in asArray.OfType<DictionaryTranslation>())
-                {
-                    translation.GetLanguage = GetLanguage;
-                }
-            }
-
-            SetPropertyValueAndDetectChanges(asArray, ref _translations!, nameof(Translations), DictionaryTranslationComparer);
-        }
+        set => SetPropertyValueAndDetectChanges(value, ref _translations!, nameof(Translations), DictionaryTranslationComparer);
     }
 }

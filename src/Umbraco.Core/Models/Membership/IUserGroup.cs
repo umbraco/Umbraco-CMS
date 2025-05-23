@@ -1,4 +1,6 @@
+using System.Collections;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 
 namespace Umbraco.Cms.Core.Models.Membership;
 
@@ -24,16 +26,21 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     ///     If this property is true it will give the group access to all languages
     /// </summary>
     /// This is set to return true as default to avoid breaking changes
-    public bool HasAccessToAllLanguages => true;
+    public bool HasAccessToAllLanguages
+    {
+        get => true;
+        set { /* This is NoOp to avoid breaking changes */ }
+    }
 
     /// <summary>
-    ///     The set of default permissions
+    /// The set of permissions provided by the frontend.
     /// </summary>
     /// <remarks>
-    ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
-    ///     flexible permissions structure in the future.
+    /// By default the server has no concept of what all of these strings mean, we simple store them and return them to the UI.
     /// </remarks>
-    IEnumerable<string>? Permissions { get; set; }
+    ISet<string> Permissions { get; set; }
+
+    ISet<IGranularPermission> GranularPermissions { get; set; }
 
     IEnumerable<string> AllowedSections { get; }
 

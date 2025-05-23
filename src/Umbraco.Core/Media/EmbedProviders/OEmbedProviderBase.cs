@@ -18,7 +18,9 @@ public abstract class OEmbedProviderBase : IEmbedProvider
 
     public abstract Dictionary<string, string> RequestParams { get; }
 
-    public abstract string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
+    public abstract Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken);
+
+    public virtual string GetEmbedProviderUrl(string url, int? maxWidth, int? maxHeight) => GetEmbedProviderUrl(url, maxWidth ?? 0, maxHeight ?? 0);
 
     public virtual string GetEmbedProviderUrl(string url, int maxWidth, int maxHeight)
     {
@@ -50,31 +52,31 @@ public abstract class OEmbedProviderBase : IEmbedProvider
         return fullUrl.ToString();
     }
 
-    public virtual string DownloadResponse(string url)
+    public virtual async Task<string> DownloadResponseAsync(string url, CancellationToken cancellationToken)
     {
         if (_httpClient == null)
         {
             _httpClient = new HttpClient();
-            _httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("Umbraco-CMS");
+            _httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd(Constants.HttpClients.Headers.UserAgentProductName);
         }
 
         using (var request = new HttpRequestMessage(HttpMethod.Get, url))
         {
-            HttpResponseMessage response = _httpClient.SendAsync(request).GetAwaiter().GetResult();
-            return response.Content.ReadAsStringAsync().Result;
+            using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
+            return await response.Content.ReadAsStringAsync(cancellationToken);
         }
     }
 
-    public virtual T? GetJsonResponse<T>(string url)
+    public virtual async Task<T?> GetJsonResponseAsync<T>(string url, CancellationToken cancellationToken)
         where T : class
     {
-        var response = DownloadResponse(url);
+        var response = await DownloadResponseAsync(url, cancellationToken);
         return _jsonSerializer.Deserialize<T>(response);
     }
 
-    public virtual XmlDocument GetXmlResponse(string url)
+    public virtual async Task<XmlDocument> GetXmlResponseAsync(string url, CancellationToken cancellationToken)
     {
-        var response = DownloadResponse(url);
+        var response =  await DownloadResponseAsync(url, cancellationToken);
         var doc = new XmlDocument();
         doc.LoadXml(response);
 
@@ -85,5 +87,26 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     {
         XmlNode? selectSingleNode = doc.SelectSingleNode(property);
         return selectSingleNode != null ? selectSingleNode.InnerText : string.Empty;
+    }
+
+    public virtual async Task<string?> GetJsonBasedMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
+    {
+        var requestUrl = GetEmbedProviderUrl(url, maxWidth, maxHeight);
+        OEmbedResponse? oembed = await GetJsonResponseAsync<OEmbedResponse>(requestUrl, cancellationToken);
+
+        return oembed?.GetHtml();
+    }
+
+    public virtual async Task<string?> GetXmlBasedMarkupAsync(
+        string url,
+        int? maxWidth,
+        int? maxHeight,
+        CancellationToken cancellationToken,
+        string property = "/oembed/html")
+    {
+        var requestUrl = GetEmbedProviderUrl(url, maxWidth, maxHeight);
+        XmlDocument xmlDocument = await GetXmlResponseAsync(requestUrl, cancellationToken);
+
+        return GetXmlProperty(xmlDocument, property);
     }
 }

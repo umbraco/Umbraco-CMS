@@ -1,13 +1,11 @@
-@using Microsoft.Extensions.Options
-@using Umbraco.Cms.Core.Configuration.Models
+@model Umbraco.Cms.Web.Website.Models.NoNodesViewModel
+@using Umbraco.Cms.Api.Management.Controllers.Security
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Routing
-@using Umbraco.Extensions
-@model Umbraco.Cms.Web.Website.Models.NoNodesViewModel
-@inject IHostingEnvironment hostingEnvironment
-@inject IOptions<GlobalSettings> globalSettings
+@inject IHostingEnvironment HostingEnvironment
 @{
-    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+    var backOfficePath = HostingEnvironment.GetBackOfficePath();
+    var logoImage = Url.RouteUrl(BackOfficeGraphicsController.LogoRouteName, new {Version= "1"});
 }
 <!doctype html>
 <html class="no-js" lang="en">
@@ -18,14 +16,16 @@
 
     <title>Umbraco: No Published Content</title>
 
-    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath.TrimStart("~"), "/assets/css/nonodes.style.min.css")" />
+    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath , "website", "/nonodes.css")" />
 </head>
 <body>
 
     <section>
         <article>
             <div>
-                <div class="logo"></div>
+                <div class="logo" aria-hidden="true">
+                    <img alt="logo" src="@logoImage" height="91"/>
+                </div>
 
                 <h1>Welcome to your Umbraco installation</h1>
                 <h3>You're seeing this wonderful page because your website doesn't contain any published content yet.</h3>

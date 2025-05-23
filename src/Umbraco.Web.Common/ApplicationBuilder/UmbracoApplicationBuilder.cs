@@ -73,6 +73,8 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         AppBuilder.UseUmbracoMediaFileProvider();
 
+        AppBuilder.UseUmbracoBackOfficeRewrites();
+
         AppBuilder.UseStaticFiles();
 
         AppBuilder.UseUmbracoPluginsStaticFiles();
@@ -88,6 +90,8 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         AppBuilder.UseAuthentication();
         AppBuilder.UseAuthorization();
+
+        AppBuilder.UseAntiforgery();
 
         // This must come after auth because the culture is based on the auth'd user
         AppBuilder.UseRequestLocalization();

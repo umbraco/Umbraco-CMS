@@ -2,14 +2,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore;
 
-public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBeginNotification>, IDisposable
+public class AspNetCoreRequestAccessor : IRequestAccessor, IDisposable
 {
     private readonly ISet<string> _applicationUrls = new HashSet<string>();
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -32,22 +30,11 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
         _onChangeDisposable = webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
-    /// <summary>
-    /// <para>
-    /// This is now a NoOp, and is no longer used, instead ApplicationUrlRequestBeginNotificationHandler is used
-    /// </para>
-    /// </summary>
-    [Obsolete("This is no longer used, AspNetCoreRequestAccessor will no longer implement INotificationHandler in V12, see ApplicationUrlRequestBeginNotificationHandler instead.")]
-    public void Handle(UmbracoRequestBeginNotification notification)
-    {
-        // NoOP
-    }
-
     /// <inheritdoc />
     public string? GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
 
     /// <inheritdoc />
-    public string? GetQueryStringValue(string name) => _httpContextAccessor.GetRequiredHttpContext().Request.Query[name];
+    public string? GetQueryStringValue(string name) => _httpContextAccessor.HttpContext?.Request.Query[name];
 
     /// <inheritdoc />
     public Uri? GetRequestUrl() => _httpContextAccessor.HttpContext != null
@@ -67,7 +54,7 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
 
     public Uri? GetApplicationUrl()
     {
-        // Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
+        // TODO: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
         // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
         // about this is that this is here specifically for the slot swap scenario https://issues.umbraco.org/issue/U4-10626
 
@@ -99,8 +86,8 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
 
     private string? GetFormValue(string name)
     {
-        HttpRequest request = _httpContextAccessor.GetRequiredHttpContext().Request;
-        if (!request.HasFormContentType)
+        HttpRequest? request = _httpContextAccessor.HttpContext?.Request;
+        if (request?.HasFormContentType is not true)
         {
             return null;
         }

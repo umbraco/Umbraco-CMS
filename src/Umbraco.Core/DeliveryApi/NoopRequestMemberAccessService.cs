@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Security;
 

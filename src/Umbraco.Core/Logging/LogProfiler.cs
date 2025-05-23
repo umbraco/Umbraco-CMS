@@ -35,6 +35,9 @@ public class LogProfiler : IProfiler
         // the log never stops
     }
 
+    /// <inheritdoc />
+    public bool IsEnabled => _logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug);
+
     // a lightweight disposable timer
     private class LightDisposableTimer : DisposableObjectSlim
     {

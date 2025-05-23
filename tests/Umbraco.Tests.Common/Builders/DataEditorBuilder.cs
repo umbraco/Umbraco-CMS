@@ -20,6 +20,7 @@ public class DataEditorBuilder<TParent>
     private string _alias;
     private IDictionary<string, object> _defaultConfiguration;
     private string _name;
+    private ConfigurationEditor? _configurationEditor;
 
     public DataEditorBuilder(TParent parentBuilder)
         : base(parentBuilder)
@@ -46,6 +47,12 @@ public class DataEditorBuilder<TParent>
         return this;
     }
 
+    public DataEditorBuilder<TParent> WithConfigurationEditor(ConfigurationEditor configurationEditor)
+    {
+        _configurationEditor = configurationEditor;
+        return this;
+    }
+
     public ConfigurationEditorBuilder<DataEditorBuilder<TParent>> AddExplicitConfigurationEditorBuilder() =>
         _explicitConfigurationEditorBuilder;
 
@@ -58,14 +65,13 @@ public class DataEditorBuilder<TParent>
         var alias = _alias ?? name.ToCamelCase();
 
         var defaultConfiguration = _defaultConfiguration ?? new Dictionary<string, object>();
-        var explicitConfigurationEditor = _explicitConfigurationEditorBuilder.Build();
+        var explicitConfigurationEditor = _configurationEditor ?? _explicitConfigurationEditorBuilder.Build();
         var explicitValueEditor = _explicitValueEditorBuilder.Build();
 
         return new DataEditor(
             Mock.Of<IDataValueEditorFactory>())
         {
             Alias = alias,
-            Name = name,
             DefaultConfiguration = defaultConfiguration,
             ExplicitConfigurationEditor = explicitConfigurationEditor,
             ExplicitValueEditor = explicitValueEditor

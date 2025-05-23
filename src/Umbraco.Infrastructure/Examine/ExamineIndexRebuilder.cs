@@ -10,7 +10,7 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class ExamineIndexRebuilder : IIndexRebuilder
+internal class ExamineIndexRebuilder : IIndexRebuilder
 {
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IExamineManager _examineManager;
@@ -66,7 +66,17 @@ public class ExamineIndexRebuilder : IIndexRebuilder
             _logger.LogInformation("Starting async background thread for rebuilding index {indexName}.", indexName);
 
             _backgroundTaskQueue.QueueBackgroundWorkItem(
-                cancellationToken => Task.Run(() => RebuildIndex(indexName, delay.Value, cancellationToken)));
+                cancellationToken =>
+                {
+                    // Do not flow AsyncLocal to the child thread
+                    using (ExecutionContext.SuppressFlow())
+                    {
+                        Task.Run(() => RebuildIndex(indexName, delay.Value, cancellationToken));
+
+                        // immediately return so the queue isn't waiting.
+                        return Task.CompletedTask;
+                    }
+                });
         }
         else
         {
@@ -96,12 +106,16 @@ public class ExamineIndexRebuilder : IIndexRebuilder
             _backgroundTaskQueue.QueueBackgroundWorkItem(
                 cancellationToken =>
                 {
-                    // This is a fire/forget task spawned by the background thread queue (which means we
-                    // don't need to worry about ExecutionContext flowing).
-                    Task.Run(() => RebuildIndexes(onlyEmptyIndexes, delay.Value, cancellationToken));
+                    // Do not flow AsyncLocal to the child thread
+                    using (ExecutionContext.SuppressFlow())
+                    {
+                        // This is a fire/forget task spawned by the background thread queue (which means we
+                        // don't need to worry about ExecutionContext flowing).
+                        Task.Run(() => RebuildIndexes(onlyEmptyIndexes, delay.Value, cancellationToken));
 
-                    // immediately return so the queue isn't waiting.
-                    return Task.CompletedTask;
+                        // immediately return so the queue isn't waiting.
+                        return Task.CompletedTask;
+                    }
                 });
         }
         else
@@ -172,8 +186,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
             {
                 // If an index exists but it has zero docs we'll consider it empty and rebuild
                 IIndex[] indexes = (onlyEmptyIndexes
-                    ? _examineManager.Indexes.Where(x =>
-                        !x.IndexExists() || (x is IIndexStats stats && stats.GetDocumentCount() == 0))
+                    ? _examineManager.Indexes.Where(ShouldRebuild)
                     : _examineManager.Indexes).ToArray();
 
                 if (indexes.Length == 0)
@@ -211,6 +224,19 @@ public class ExamineIndexRebuilder : IIndexRebuilder
             {
                 Monitor.Exit(_rebuildLocker);
             }
+        }
+    }
+
+    private bool ShouldRebuild(IIndex index)
+    {
+        try
+        {
+            return !index.IndexExists() || (index is IIndexStats stats && stats.GetDocumentCount() == 0);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "An error occured trying to get determine index shouldRebuild status for index {IndexName}. The index will NOT be considered for rebuilding", index.Name);
+            return false;
         }
     }
 }

@@ -10,6 +10,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
@@ -105,7 +106,8 @@ public class HealthCheckNotifierJobTests
             mockScopeProvider.Object,
             mockLogger.Object,
             mockProfilingLogger.Object,
-            Mock.Of<ICronTabParser>());
+            Mock.Of<ICronTabParser>(),
+            Mock.Of<IEventAggregator>());
     }
 
     private void VerifyNotificationsNotSent() => VerifyNotificationsSentTimes(Times.Never());
@@ -134,6 +136,6 @@ public class HealthCheckNotifierJobTests
     {
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action) => new("Check message");
 
-        public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() => Enumerable.Empty<HealthCheckStatus>();
+        public override Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() => Task.FromResult(Enumerable.Empty<HealthCheckStatus>());
     }
 }

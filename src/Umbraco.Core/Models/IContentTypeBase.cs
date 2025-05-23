@@ -38,12 +38,12 @@ public interface IContentTypeBase : IUmbracoEntity, IRememberBeingDirty
     bool AllowedAsRoot { get; set; }
 
     /// <summary>
-    ///     Gets or Sets a boolean indicating whether this ContentType is a Container
+    ///     Gets or Sets a Guid, which is the key of the listview.
     /// </summary>
     /// <remarks>
     ///     ContentType Containers doesn't show children in the tree, but rather in grid-type view.
     /// </remarks>
-    bool IsContainer { get; set; }
+    Guid? ListView { get; set; }
 
     /// <summary>
     ///     Gets or sets a value indicating whether this content type is for an element.
@@ -179,4 +179,12 @@ public interface IContentTypeBase : IUmbracoEntity, IRememberBeingDirty
     ///     Gets an <see cref="ISimpleContentType" /> corresponding to this content type.
     /// </summary>
     ISimpleContentType ToSimple();
+
+
+    /// <summary>
+    /// Deep clones itself while resetting identities so it is treated as a new entity
+    /// </summary>
+    /// <param name="alias">The new alias of the <see cref="IContentTypeBase"/>.</param>
+    /// <returns>The copied, reset instance.</returns>
+    IContentTypeBase DeepCloneWithResetIdentities(string alias);
 }

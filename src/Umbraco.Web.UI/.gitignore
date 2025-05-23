@@ -1,0 +1,16 @@
+wwwroot/
+umbraco/[Dd]ata/
+umbraco/[Ll]ogs/
+umbraco/[Mm]odels/
+App_Plugins/
+App_Code/
+Views/
+!Views/Partials/blocklist/
+!Views/Partials/blockgrid/
+!Views/_ViewImports.cshtml
+appsettings.json
+appsettings.Development.json
+appsettings.Local.json
+appsettings-schema.json
+appsettings-schema.*.json
+umbraco-package-schema.json

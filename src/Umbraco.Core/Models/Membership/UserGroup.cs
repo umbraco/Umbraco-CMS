@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -18,12 +20,19 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
             enum1 => enum1.GetHashCode());
 
+    private static readonly DelegateEqualityComparer<ISet<IGranularPermission>> _granularPermissionSetComparer =
+        new(
+            (set1, set2) => Equals(set1, set2),
+            set => set.GetHashCode());
+
+
     private readonly IShortStringHelper _shortStringHelper;
     private string _alias;
     private string? _icon;
     private string _name;
     private bool _hasAccessToAllLanguages;
-    private IEnumerable<string>? _permissions;
+    private ISet<string> _permissions;
+    private ISet<IGranularPermission> _granularPermissions;
     private List<string> _sectionCollection;
     private List<int> _languageCollection;
     private int? _startContentId;
@@ -39,6 +48,8 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         _shortStringHelper = shortStringHelper;
         _sectionCollection = new List<string>();
         _languageCollection = new List<int>();
+        _permissions = new HashSet<string>();
+        _granularPermissions = new HashSet<IGranularPermission>();
     }
 
     /// <summary>
@@ -47,7 +58,6 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     /// <param name="userCount"></param>
     /// <param name="alias"></param>
     /// <param name="name"></param>
-    /// <param name="permissions"></param>
     /// <param name="icon"></param>
     /// <param name="shortStringHelper"></param>
     public UserGroup(
@@ -55,14 +65,12 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         int userCount,
         string? alias,
         string? name,
-        IEnumerable<string> permissions,
         string? icon)
         : this(shortStringHelper)
     {
         UserCount = userCount;
         _alias = alias ?? string.Empty;
         _name = name ?? string.Empty;
-        _permissions = permissions;
         _icon = icon;
     }
 
@@ -110,19 +118,19 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         set => SetPropertyValueAndDetectChanges(value, ref _hasAccessToAllLanguages, nameof(HasAccessToAllLanguages));
     }
 
-    /// <summary>
-    ///     The set of default permissions for the user group
-    /// </summary>
-    /// <remarks>
-    ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
-    ///     flexible permissions structure in the future.
-    /// </remarks>
-    [DataMember]
-    public IEnumerable<string>? Permissions
+    /// <inheritdoc />
+    public ISet<string> Permissions
     {
         get => _permissions;
-        set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), _stringEnumerableComparer);
+        set => SetPropertyValueAndDetectChanges(value, ref _permissions!, nameof(Permissions), _stringEnumerableComparer);
     }
+
+    public ISet<IGranularPermission> GranularPermissions
+    {
+        get => _granularPermissions;
+        set => SetPropertyValueAndDetectChanges(value, ref _granularPermissions!, nameof(GranularPermissions), _granularPermissionSetComparer);
+    }
+
 
     public IEnumerable<string> AllowedSections => _sectionCollection;
 

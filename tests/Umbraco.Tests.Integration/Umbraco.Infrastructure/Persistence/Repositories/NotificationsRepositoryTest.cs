@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class NotificationsRepositoryTest : UmbracoIntegrationTest
+internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
 {
     [Test]
     public void CreateNotification()
@@ -146,6 +146,7 @@ public class NotificationsRepositoryTest : UmbracoIntegrationTest
             {
                 var userDto = new UserDto
                 {
+                    Key = Guid.NewGuid(),
                     Email = "test" + i,
                     Login = "test" + i,
                     Password = "test",
@@ -208,6 +209,7 @@ public class NotificationsRepositoryTest : UmbracoIntegrationTest
             {
                 var userDto = new UserDto
                 {
+                    Key = Guid.NewGuid(),
                     Email = "test" + i,
                     Login = "test" + i,
                     Password = "test",

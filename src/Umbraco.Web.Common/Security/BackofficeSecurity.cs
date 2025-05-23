@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Web.Common.Security;
 
 public class BackOfficeSecurity : IBackOfficeSecurity
 {
-    private readonly object _currentUserLock = new();
+    private readonly Lock _currentUserLock = new();
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserService _userService;
     private IUser? _currentUser;
@@ -36,17 +36,22 @@ public class BackOfficeSecurity : IBackOfficeSecurity
                     // Check again
                     if (_currentUser == null)
                     {
-                        Attempt<int> id = GetUserId();
-                        if (id.Success)
-                        {
-                            _currentUser = id.Success ? _userService.GetUserById(id.Result) : null;
-                        }
+                        Attempt<Guid> keyAttempt = GetUserKey();
+                        _currentUser = keyAttempt.Success ? _userService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult() : null;
                     }
                 }
             }
 
             return _currentUser;
         }
+    }
+
+    private Attempt<Guid> GetUserKey()
+    {
+        ClaimsIdentity? identity = _httpContextAccessor.HttpContext?.GetCurrentIdentity();
+
+        Guid? id = identity?.GetUserKey();
+        return id.HasValue is false ? Attempt.Fail<Guid>() : Attempt.Succeed(id.Value);
     }
 
     /// <inheritdoc />

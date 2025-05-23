@@ -18,5 +18,5 @@ public interface IEmbedProvider
     /// <example>?key=value&amp;key2=value2</example>
     Dictionary<string, string> RequestParams { get; }
 
-    string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
+    Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken);
 }

@@ -1,7 +1,5 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
-
-using System;
 
 namespace Umbraco.Extensions
 {
@@ -19,6 +17,7 @@ namespace Umbraco.Extensions
         /// <returns>
         ///   <c>true</c> if any of the flags/bits are set within the enum value; otherwise, <c>false</c>.
         /// </returns>
+        [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
         public static bool HasFlagAny<T>(this T value, T flags)
             where T : Enum
         {

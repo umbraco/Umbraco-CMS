@@ -5,9 +5,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
@@ -17,8 +19,10 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
+
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -81,7 +85,11 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     }
 
     [TearDown]
-    public void TearDownAsync() => _host.StopAsync();
+    public void TearDownAsync()
+    {
+        _host.StopAsync();
+        Services.DisposeIfDisposable();
+    }
 
     /// <summary>
     ///     Create the Generic Host and execute startup ConfigureServices/Configure calls
@@ -129,47 +137,98 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
 
         // We register this service because we need it for IRuntimeState, if we don't this breaks 900 tests
         services.AddSingleton<IConflictingRouteService, TestConflictingRouteService>();
+        services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
 
         services.AddLogger(webHostEnvironment, Configuration);
+
+        // Register a keyed service to verify that all calls to ServiceDescriptor.ImplementationType
+        // are guarded by checking IsKeyedService first.
+        // Failure to check this when accessing a keyed service descriptor's ImplementationType property
+        // throws a InvalidOperationException.
+        services.AddKeyedSingleton<object>("key");
 
         // Add it!
         var hostingEnvironment = TestHelper.GetHostingEnvironment();
         var typeLoader = services.AddTypeLoader(
             GetType().Assembly,
-            hostingEnvironment,
             TestHelper.ConsoleLoggerFactory,
             AppCaches.NoCache,
             Configuration,
             TestHelper.Profiler);
-        var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
+        var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache);
 
         builder.AddConfiguration()
             .AddUmbracoCore()
             .AddWebComponents()
-            .AddRuntimeMinifier()
             .AddBackOfficeAuthentication()
             .AddBackOfficeIdentity()
             .AddMembersIdentity()
             .AddExamine()
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
+            .AddUmbracoHybridCache()
             .AddTestServices(TestHelper);
 
         if (TestOptions.Mapper)
         {
             // TODO: Should these just be called from within AddUmbracoCore/AddWebComponents?
             builder
-                .AddCoreMappingProfiles()
-                .AddWebMappingProfiles();
+                .AddCoreMappingProfiles();
         }
 
+        services.RemoveAll(x=>x.ImplementationType == typeof(DocumentUrlServiceInitializerNotificationHandler));
         services.AddSignalR();
         services.AddMvc();
 
         CustomTestSetup(builder);
+        ExecuteBuilderAttributes(builder);
 
         builder.Build();
     }
+
+    private void ExecuteBuilderAttributes(IUmbracoBuilder builder)
+    {
+        Type? testClassType = GetTestClassType()
+            ?? throw new Exception($"Could not find test class for {TestContext.CurrentContext.Test.FullName} in order to execute builder attributes.");
+
+        // Execute builder attributes defined on method.
+        foreach (ConfigureBuilderAttribute builderAttribute in GetConfigureBuilderAttributes<ConfigureBuilderAttribute>(testClassType))
+        {
+            builderAttribute.Execute(builder);
+        }
+
+        // Execute builder attributes defined on method with param value pass through from test case.
+        foreach (ConfigureBuilderTestCaseAttribute builderAttribute in GetConfigureBuilderAttributes<ConfigureBuilderTestCaseAttribute>(testClassType))
+        {
+            builderAttribute.Execute(builder);
+        }
+    }
+
+    private static Type? GetTestClassType()
+    {
+        string testClassName = TestContext.CurrentContext.Test.ClassName;
+
+        // Try resolving the type name directly (which will work for tests in this assembly).
+        Type testClass = Type.GetType(testClassName);
+        if (testClass is not null)
+        {
+            return testClass;
+        }
+
+        // Try scanning the loaded assemblies to see if we can find the class by full name. This will be necessary
+        // for integration test projects using the base classess provided by Umbraco.
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        return assemblies
+            .SelectMany(a => a.GetTypes().Where(t => t.FullName == testClassName))
+            .FirstOrDefault();
+    }
+
+    private static IEnumerable<TAttribute> GetConfigureBuilderAttributes<TAttribute>(Type testClassType)
+        where TAttribute : Attribute =>
+        testClassType
+            .GetMethods().First(m => m.Name == TestContext.CurrentContext.Test.MethodName)
+            .GetCustomAttributes(typeof(TAttribute), true)
+            .Cast<TAttribute>();
 
     /// <summary>
     ///     Hook for altering UmbracoBuilder setup
@@ -195,6 +254,16 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         if (GlobalSetupTeardown.TestConfiguration is not null)
         {
             configBuilder.AddConfiguration(GlobalSetupTeardown.TestConfiguration);
+        }
+    }
+
+    protected void DeleteAllTemplateViewFiles()
+    {
+        var fileSystems = GetRequiredService<FileSystems>();
+        var viewFileSystem = fileSystems.MvcViewsFileSystem!;
+        foreach (var file in viewFileSystem.GetFiles(string.Empty).ToArray())
+        {
+            viewFileSystem.DeleteFile(file);
         }
     }
 }

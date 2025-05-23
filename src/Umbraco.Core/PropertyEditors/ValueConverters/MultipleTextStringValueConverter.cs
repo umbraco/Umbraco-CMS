@@ -1,5 +1,4 @@
-﻿using System.Xml;
-using Umbraco.Cms.Core.Models.PublishedContent;
+﻿using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
@@ -55,26 +54,5 @@ public class MultipleTextStringValueConverter : PropertyValueConverterBase
         return values.Any() == false
             ? sourceString.Split(NewLineDelimiters, StringSplitOptions.None)
             : values.ToArray();
-    }
-
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-    {
-        var d = new XmlDocument();
-        XmlElement e = d.CreateElement("values");
-        d.AppendChild(e);
-
-        var values = (IEnumerable<string>?)inter;
-        if (values is not null)
-        {
-            foreach (var value in values)
-            {
-                XmlElement ee = d.CreateElement("value");
-                ee.InnerText = value;
-                e.AppendChild(ee);
-            }
-        }
-
-        return d.CreateNavigator();
     }
 }

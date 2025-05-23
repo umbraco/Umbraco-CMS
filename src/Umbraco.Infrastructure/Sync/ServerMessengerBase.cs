@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.Sync;
@@ -11,12 +11,18 @@ namespace Umbraco.Cms.Infrastructure.Sync;
 /// </summary>
 public abstract class ServerMessengerBase : IServerMessenger
 {
+    private readonly IJsonSerializer _jsonSerializer;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerMessengerBase"/> class.
     /// </summary>
     /// <param name="distributedEnabled">If set to <c>true</c> makes distributed calls when messaging a cache refresher.</param>
-    protected ServerMessengerBase(bool distributedEnabled)
-        => DistributedEnabled = distributedEnabled;
+    /// <param name="jsonSerializer"></param>
+    public ServerMessengerBase(bool distributedEnabled, IJsonSerializer jsonSerializer)
+    {
+        DistributedEnabled = distributedEnabled;
+        _jsonSerializer = jsonSerializer;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether distributed calls are made when messaging a cache refresher.
@@ -89,15 +95,6 @@ public abstract class ServerMessengerBase : IServerMessenger
         }
 
         Deliver(refresher, payload);
-    }
-
-    [Obsolete("This method is unused and not part of the contract. This will be removed in Umbraco 13.")]
-    public void PerformRefresh(ICacheRefresher refresher, string jsonPayload)
-    {
-        ArgumentNullException.ThrowIfNull(refresher);
-        ArgumentNullException.ThrowIfNull(jsonPayload);
-
-        Deliver(refresher, MessageType.RefreshByJson, json: jsonPayload);
     }
 
     /// <inheritdoc />
@@ -377,7 +374,7 @@ public abstract class ServerMessengerBase : IServerMessenger
         }
 
         // deliver remote
-        var json = JsonConvert.SerializeObject(payload);
+        var json = _jsonSerializer.Serialize(payload);
         DeliverRemote(refresher, MessageType.RefreshByJson, null, json);
     }
 

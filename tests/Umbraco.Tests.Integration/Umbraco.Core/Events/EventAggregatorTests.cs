@@ -11,7 +11,7 @@ using Umbraco.Cms.Tests.Integration.TestServerTest;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Events;
 
 [TestFixture]
-public class EventAggregatorTests : UmbracoTestServerTestBase
+internal sealed class EventAggregatorTests : UmbracoTestServerTestBase
 {
     protected override void ConfigureTestServices(IServiceCollection services)
     {

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json.schemastore.org/template.json",
+  "symbols": {
+    "StarterKit": {
+      "displayName": "Starter kit",
+      "type": "parameter",
+      "datatype": "choice",
+      "description": "Choose a starter kit to install.",
+      "defaultValue": "None",
+      "replaces": "STARTER_KIT_NAME",
+      // The choice here should be the name of the starter kit package, since it will be used directly for package reference.
+      "choices": [
+        {
+          "choice": "None",
+          "description": "No starter kit."
+        },
+        {
+          "choice": "Umbraco.TheStarterKit",
+          "description": "The Umbraco starter kit.",
+          "displayName": "The Starter Kit"
+        }
+      ]
+    },
+    // Used to determine the version of the starter kit to install.
+    // there should be cases for Latest, LTS and Custom for every starterkit added above.
+    // This has the benefit that all maintenance of starter kits in template can be done from this file.
+    "StarterKitVersion": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "STARTER_KIT_VERSION",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(StarterKit == 'Umbraco.TheStarterKit' && (UmbracoRelease == 'Latest' || UmbracoRelease == 'Custom'))",
+            "value": "14.0.0"
+          },
+          {
+            "condition": "(StarterKit == 'Umbraco.TheStarterKit' && UmbracoRelease == 'LTS')",
+            "value": "13.0.0"
+          }
+        ]
+      }
+    }
+  }
+}

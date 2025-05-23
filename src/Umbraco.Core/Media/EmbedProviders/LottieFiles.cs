@@ -19,10 +19,10 @@ public class LottieFiles : OEmbedProviderBase
 
     public override Dictionary<string, string> RequestParams => new();
 
-    public override string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
+    public override async Task<string?> GetMarkupAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
     {
-        var requestUrl = this.GetEmbedProviderUrl(url, maxWidth, maxHeight);
-        OEmbedResponse? oembed = this.GetJsonResponse<OEmbedResponse>(requestUrl);
+        var requestUrl = GetEmbedProviderUrl(url, maxWidth, maxHeight);
+        OEmbedResponse? oembed = await GetJsonResponseAsync<OEmbedResponse>(requestUrl, cancellationToken);
         var html = oembed?.GetHtml();
 
         // LottieFiles doesn't seem to support maxwidth and maxheight via oembed

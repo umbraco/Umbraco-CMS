@@ -32,7 +32,7 @@ public sealed class ContentTypeMapper : BaseMapper
         DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.AllowedAsRoot), nameof(ContentTypeDto.AllowAtRoot));
         DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.Description), nameof(ContentTypeDto.Description));
         DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.Icon), nameof(ContentTypeDto.Icon));
-        DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.IsContainer), nameof(ContentTypeDto.IsContainer));
+        DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.ListView), nameof(ContentTypeDto.ListView));
         DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.IsElement), nameof(ContentTypeDto.IsElement));
         DefineMap<ContentType, ContentTypeDto>(nameof(ContentType.Thumbnail), nameof(ContentTypeDto.Thumbnail));
     }

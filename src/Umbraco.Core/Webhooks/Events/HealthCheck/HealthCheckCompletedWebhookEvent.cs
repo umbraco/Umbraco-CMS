@@ -1,0 +1,32 @@
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
+
+namespace Umbraco.Cms.Core.Webhooks.Events;
+
+[WebhookEvent("Health Check Completed")]
+public class HealthCheckCompletedWebhookEvent : WebhookEventBase<HealthCheckCompletedNotification>
+{
+    public HealthCheckCompletedWebhookEvent(IWebhookFiringService webhookFiringService, IWebhookService webhookService, IOptionsMonitor<WebhookSettings> webhookSettings, IServerRoleAccessor serverRoleAccessor) : base(webhookFiringService, webhookService, webhookSettings, serverRoleAccessor)
+    {
+    }
+
+    public override string Alias => Constants.WebhookEvents.Aliases.HealthCheckCompleted;
+
+    public override object? ConvertNotificationToRequestPayload(HealthCheckCompletedNotification notification) =>
+        new
+        {
+            notification.HealthCheckResults.AllChecksSuccessful,
+            Results = notification.HealthCheckResults.ResultsAsDictionary.Select(result => new
+            {
+                result.Key,
+                Statusus = result.Value.Select(x => new
+                {
+                    ResultType = x.ResultType.ToString(),
+                    x.Message,
+                }),
+            }),
+        };
+}

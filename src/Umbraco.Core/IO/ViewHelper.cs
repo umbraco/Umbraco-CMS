@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -15,12 +16,6 @@ public class ViewHelper : IViewHelper
         {
             _viewFileSystem = fileSystems.MvcViewsFileSystem ?? throw new ArgumentNullException(nameof(fileSystems));
             _defaultViewContentProvider = defaultViewContentProvider ?? throw new ArgumentNullException(nameof(defaultViewContentProvider));
-        }[Obsolete("Inject IDefaultViewContentProvider instead")]
-    public static string GetDefaultFileContent(string? layoutPageAlias = null, string? modelClassName = null, string? modelNamespace = null, string? modelNamespaceAlias = null)
-    {
-        IDefaultViewContentProvider viewContentProvider =
-            StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
-        return viewContentProvider.GetDefaultFileContent(layoutPageAlias, modelClassName, modelNamespace, modelNamespaceAlias);
     }
 
     public bool ViewExists(ITemplate t) => t.Alias is not null && _viewFileSystem.FileExists(ViewPath(t.Alias));

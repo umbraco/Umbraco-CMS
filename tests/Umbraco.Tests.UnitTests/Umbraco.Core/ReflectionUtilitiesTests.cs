@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Extensions;
@@ -339,7 +339,7 @@ public class ReflectionUtilitiesTests
         setterInt4(object4, 42);
         Assert.AreEqual(42, object4.IntValue);
 
-        // FIXME: the code below runs fine with ReSharper test running within VisualStudio
+        // TODO: the code below runs fine with ReSharper test running within VisualStudio
         // but it crashes when running via vstest.console.exe - unless some settings are required?
 
         // converting works
@@ -581,7 +581,7 @@ public class ReflectionUtilitiesTests
         Assert.AreEqual(44, getter3(c));
     }
 
-    // FIXME: missing tests specifying 'returned' on method, property
+    // TODO: missing tests specifying 'returned' on method, property
     [Test]
     public void DeconstructAnonymousType()
     {
@@ -660,7 +660,9 @@ public class ReflectionUtilitiesTests
         public readonly int Field3 = 22;
 
         public int Field1 = 33;
+#pragma warning disable SA1306 // Field names should begin with lower-case letter
         private readonly int Field2 = 66;
+#pragma warning restore SA1306 // Field names should begin with lower-case letter
 
         public Class1()
         {
@@ -752,7 +754,7 @@ public class ReflectionUtilitiesTests
 
     public class Class5 : Class4
     {
-        [JsonProperty("intValue2")]
+        [JsonPropertyName("intValue2")]
         public int IntValue2 { get; set; }
 
         public string StringValue2 { get; set; }

@@ -2,16 +2,23 @@
 // See LICENSE for more details.
 
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -19,14 +26,32 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
-public class AdvancedMigrationTests : UmbracoIntegrationTest
+internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
 {
     private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
     private IEventAggregator EventAggregator => GetRequiredService<IEventAggregator>();
-    private IMigrationPlanExecutor MigrationPlanExecutor => GetRequiredService<IMigrationPlanExecutor>();
+    private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
+    private IScopeAccessor ScopeAccessor => GetRequiredService<IScopeAccessor>();
+    private ILoggerFactory LoggerFactory => GetRequiredService<ILoggerFactory>();
+    private IMigrationBuilder MigrationBuilder => GetRequiredService<IMigrationBuilder>();
+    private IUmbracoDatabaseFactory UmbracoDatabaseFactory => GetRequiredService<IUmbracoDatabaseFactory>();
+    private IServiceScopeFactory ServiceScopeFactory => GetRequiredService<IServiceScopeFactory>();
+    private DistributedCache DistributedCache => GetRequiredService<DistributedCache>();
+    private IDatabaseCacheRebuilder DatabaseCacheRebuilder => GetRequiredService<IDatabaseCacheRebuilder>();
+    private IMigrationPlanExecutor MigrationPlanExecutor => new MigrationPlanExecutor(
+        CoreScopeProvider,
+        ScopeAccessor,
+        LoggerFactory,
+        MigrationBuilder,
+        UmbracoDatabaseFactory,
+        DatabaseCacheRebuilder,
+        DistributedCache,
+        Mock.Of<IKeyValueService>(),
+        ServiceScopeFactory,
+        AppCaches.NoCache);
 
     [Test]
-    public void CreateTableOfTDto()
+    public async Task CreateTableOfTDtoAsync()
     {
         var builder = Mock.Of<IMigrationBuilder>();
         Mock.Get(builder)
@@ -48,7 +73,7 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
                     .From(string.Empty)
                     .To<CreateTableOfTDtoMigration>("done"));
 
-            upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+            await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
 
             var db = ScopeAccessor.AmbientScope.Database;
             var exists = ScopeAccessor.AmbientScope.SqlContext.SqlSyntax.DoesTableExist(db, "umbracoUser");
@@ -58,7 +83,7 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void DeleteKeysAndIndexesOfTDto()
+    public async Task DeleteKeysAndIndexesOfTDtoAsync()
     {
         var builder = Mock.Of<IMigrationBuilder>();
         Mock.Get(builder)
@@ -84,13 +109,13 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
                     .To<CreateTableOfTDtoMigration>("a")
                     .To<DeleteKeysAndIndexesMigration>("done"));
 
-            upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+            await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
             scope.Complete();
         }
     }
 
     [Test]
-    public void CreateKeysAndIndexesOfTDto()
+    public async Task CreateKeysAndIndexesOfTDtoAsync()
     {
         if (BaseTestDatabase.IsSqlite())
         {
@@ -126,13 +151,13 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
                     .To<DeleteKeysAndIndexesMigration>("b")
                     .To<CreateKeysAndIndexesOfTDtoMigration>("done"));
 
-            upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+            await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
             scope.Complete();
         }
     }
 
     [Test]
-    public void CreateKeysAndIndexes()
+    public async Task CreateKeysAndIndexesAsync()
     {
         if (BaseTestDatabase.IsSqlite())
         {
@@ -168,13 +193,13 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
                     .To<DeleteKeysAndIndexesMigration>("b")
                     .To<CreateKeysAndIndexesMigration>("done"));
 
-            upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+            await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
             scope.Complete();
         }
     }
 
     [Test]
-    public void AddColumn()
+    public async Task AddColumnAsync()
     {
         var builder = Mock.Of<IMigrationBuilder>();
         Mock.Get(builder)
@@ -200,7 +225,7 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
                     .To<CreateTableOfTDtoMigration>("a")
                     .To<AddColumnMigration>("done"));
 
-            upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+            await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>()).ConfigureAwait(false);
 
             var db = ScopeAccessor.AmbientScope.Database;
 

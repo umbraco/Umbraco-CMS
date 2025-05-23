@@ -26,25 +26,21 @@ public interface IUmbracoContext : IDisposable
     /// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
     Uri CleanedUmbracoUrl { get; }
 
-    /// <summary>
-    ///     Gets the published snapshot.
-    /// </summary>
-    IPublishedSnapshot PublishedSnapshot { get; }
-
+    // TODO: Obsolete these, and use cache manager to get
     /// <summary>
     ///     Gets the published content cache.
     /// </summary>
-    IPublishedContentCache? Content { get; }
+    IPublishedContentCache Content { get; }
 
     /// <summary>
     ///     Gets the published media cache.
     /// </summary>
-    IPublishedMediaCache? Media { get; }
+    IPublishedMediaCache Media { get; }
 
     /// <summary>
     ///     Gets the domains cache.
     /// </summary>
-    IDomainCache? Domains { get; }
+    IDomainCache Domains { get; }
 
     /// <summary>
     ///     Gets or sets the PublishedRequest object
@@ -63,10 +59,4 @@ public interface IUmbracoContext : IDisposable
     ///     Gets a value indicating whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
     /// </summary>
     bool InPreviewMode { get; }
-
-    /// <summary>
-    ///     Forces the context into preview
-    /// </summary>
-    /// <returns>A <see cref="IDisposable" /> instance to be disposed to exit the preview context</returns>
-    IDisposable ForcedPreview(bool preview);
 }

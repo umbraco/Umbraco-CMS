@@ -5,15 +5,24 @@
     <Description>Contains commonly used tools to write tests for Umbraco CMS, such as various builders for content etc.</Description>
     <RootNamespace>Umbraco.Cms.Tests.Common</RootNamespace>
     <IsPackable>true</IsPackable>
-    <EnablePackageValidation>true</EnablePackageValidation>
+    <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+    <!--
+      TODO: Fix and remove overrides:
+      [CS1998] async
+      [CS0618] obsolete references
+      [SYSLIB0012] obsolete references
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),CS1998,CS0618,SYSLIB0012</WarningsNotAsErrors>
+  </PropertyGroup>
+  
   <ItemGroup>
-    <PackageReference Include="AutoFixture.AutoMoq" Version="4.18.0" />
-    <PackageReference Include="MiniProfiler.AspNetCore" Version="4.3.8" />
-    <PackageReference Include="Moq" Version="4.18.4" />
-    <PackageReference Include="AutoFixture.NUnit3" Version="4.18.0" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="AutoFixture.AutoMoq" />
+    <PackageReference Include="AutoFixture.NUnit3" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="NUnit" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -7,15 +9,45 @@ namespace Umbraco.Cms.Api.Delivery.Querying;
 
 public abstract class QueryOptionBase
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IRequestRoutingService _requestRoutingService;
+    private readonly IRequestPreviewService _requestPreviewService;
+    private readonly IApiDocumentUrlService _apiDocumentUrlService;
+    private readonly IVariationContextAccessor _variationContextAccessor;
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
+    public QueryOptionBase(
+        IPublishedContentCache publishedContentCache,
+        IRequestRoutingService requestRoutingService)
+        : this(
+            requestRoutingService,
+            StaticServiceProvider.Instance.GetRequiredService<IRequestPreviewService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
+    public QueryOptionBase(
+        IPublishedContentCache publishedContentCache,
+        IRequestRoutingService requestRoutingService,
+        IRequestPreviewService requestPreviewService,
+        IRequestCultureService requestCultureService,
+        IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor)
+        : this(requestRoutingService, requestPreviewService, apiDocumentUrlService, variationContextAccessor)
+    {
+    }
 
     public QueryOptionBase(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IRequestRoutingService requestRoutingService)
+        IRequestRoutingService requestRoutingService,
+        IRequestPreviewService requestPreviewService,
+        IApiDocumentUrlService apiDocumentUrlService,
+        IVariationContextAccessor variationContextAccessor)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _requestRoutingService = requestRoutingService;
+        _requestPreviewService = requestPreviewService;
+        _apiDocumentUrlService = apiDocumentUrlService;
+        _variationContextAccessor = variationContextAccessor;
     }
 
     protected Guid? GetGuidFromQuery(string queryStringValue)
@@ -30,12 +62,11 @@ public abstract class QueryOptionBase
             return id;
         }
 
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-
         // Check if the passed value is a path of a content item
         var contentRoute = _requestRoutingService.GetContentRoute(queryStringValue);
-        IPublishedContent? contentItem = publishedSnapshot.Content?.GetByRoute(contentRoute);
-
-        return contentItem?.Key;
+        return _apiDocumentUrlService.GetDocumentKeyByRoute(
+            contentRoute,
+            _variationContextAccessor.VariationContext?.Culture,
+            _requestPreviewService.IsPreview());
     }
 }

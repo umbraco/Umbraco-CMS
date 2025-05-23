@@ -11,6 +11,16 @@ public interface IContentEntitySlim : IEntitySlim
     string ContentTypeAlias { get; }
 
     /// <summary>
+    /// Gets the content type key.
+    /// </summary>
+    Guid ContentTypeKey { get; }
+
+    /// <summary>
+    /// Gets the listview key.
+    /// </summary>
+    Guid? ListViewKey { get; }
+
+    /// <summary>
     ///     Gets the content type icon.
     /// </summary>
     string? ContentTypeIcon { get; }

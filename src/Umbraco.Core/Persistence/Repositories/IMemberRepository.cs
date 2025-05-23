@@ -1,5 +1,7 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
@@ -38,4 +40,13 @@ public interface IMemberRepository : IContentRepository<int, IMember>
     /// <param name="query"></param>
     /// <returns></returns>
     int GetCountByQuery(IQuery<IMember>? query);
+
+    Task<PagedModel<IMember>> GetPagedByFilterAsync(MemberFilter memberFilter,int skip, int take, Ordering? ordering = null);
+
+    /// <summary>
+    /// Saves only the properties related to login for the member, using an optimized, non-locking update.
+    /// </summary>
+    /// <param name="member">The member to update.</param>
+    /// <returns>Used to avoid the full save of the member object after a login operation.</returns>
+    Task UpdateLoginPropertiesAsync(IMember member) => Task.CompletedTask;
 }

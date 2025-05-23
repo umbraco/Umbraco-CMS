@@ -12,6 +12,15 @@ public interface IDeliveryApiPropertyValueConverter : IPropertyValueConverter
     PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType);
 
     /// <summary>
+    ///     Gets the property cache level for Delivery API representation when expanding the property.
+    /// </summary>
+    /// <param name="propertyType">The property type.</param>
+    /// <returns>The property cache level.</returns>
+    /// <remarks>Defaults to the value of <see cref="GetDeliveryApiPropertyCacheLevel"/>.</remarks>
+    PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType)
+        => GetDeliveryApiPropertyCacheLevel(propertyType);
+
+    /// <summary>
     ///     Gets the type of values returned by the converter for Delivery API representation.
     /// </summary>
     /// <param name="propertyType">The property type.</param>
@@ -45,8 +54,4 @@ public interface IDeliveryApiPropertyValueConverter : IPropertyValueConverter
     ///     </para>
     /// </remarks>
     object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding);
-
-    [Obsolete($"Use the {nameof(ConvertIntermediateToDeliveryApiObject)} that supports property expansion. Will be removed in V14.")]
-    object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-            => ConvertIntermediateToDeliveryApiObject(owner, propertyType, referenceCacheLevel, inter, preview, false);
 }

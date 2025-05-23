@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -9,15 +8,15 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class DefaultPropertyIndexValueFactory : IPropertyIndexValueFactory
 {
-    /// <inheritdoc />
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures)
-    {
-        yield return new KeyValuePair<string, IEnumerable<object?>>(
-            property.Alias,
-            property.GetValue(culture, segment, published).Yield());
-    }
-
-    [Obsolete("Use the overload with the availableCultures parameter instead, scheduled for removal in v14")]
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
-        => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
+    public IEnumerable<IndexValue> GetIndexValues(IProperty property, string? culture, string? segment, bool published,
+        IEnumerable<string> availableCultures, IDictionary<Guid, IContentType> contentTypeDictionary)
+        =>
+        [
+            new IndexValue
+            {
+                Culture = culture,
+                FieldName = property.Alias,
+                Values = [property.GetValue(culture, segment, published)]
+            }
+        ];
 }

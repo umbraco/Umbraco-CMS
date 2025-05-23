@@ -1,19 +1,18 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -22,26 +21,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class EntityServiceTests : UmbracoIntegrationTest
+internal sealed class EntityServiceTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetupTestData()
+    public async Task SetupTestData()
     {
         if (_langFr == null && _langEs == null)
         {
             _langFr = new Language("fr-FR", "French (France)");
             _langEs = new Language("es-ES", "Spanish (Spain)");
-            LocalizationService.Save(_langFr);
-            LocalizationService.Save(_langEs);
+            await LanguageService.CreateAsync(_langFr, Constants.Security.SuperUserKey);
+            await LanguageService.CreateAsync(_langEs, Constants.Security.SuperUserKey);
         }
 
-        CreateTestData();
+        await CreateTestData();
     }
 
-    private Language _langFr;
-    private Language _langEs;
+    private Language? _langFr;
+    private Language? _langEs;
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -56,6 +55,10 @@ public class EntityServiceTests : UmbracoIntegrationTest
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
     private IFileService FileService => GetRequiredService<IFileService>();
+
+    private IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
+
+    public IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
 
     [Test]
     public void EntityService_Can_Get_Paged_Descendants_Ordering_Path()
@@ -382,6 +385,43 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task EntityService_Can_Get_Paged_Document_Type_Children()
+    {
+        IEnumerable<IEntitySlim> children = EntityService.GetPagedChildren(
+            _documentTypeRootContainerKey,
+            [UmbracoObjectTypes.DocumentTypeContainer],
+            [UmbracoObjectTypes.DocumentTypeContainer, UmbracoObjectTypes.DocumentType],
+            0,
+            10,
+            false,
+            out long totalRecords);
+
+        Assert.AreEqual(3, totalRecords);
+        Assert.AreEqual(3, children.Count());
+        Assert.IsTrue(children.Single(x => x.Key == _documentTypeSubContainer1Key).HasChildren);     // Has a single folder as a child.
+        Assert.IsTrue(children.Single(x => x.Key == _documentTypeSubContainer2Key).HasChildren);     // Has a single document type as a child.
+        Assert.IsFalse(children.Single(x => x.Key == _documentType1Key).HasChildren);         // Is a document type (has no children).
+    }
+
+    [Test]
+    public async Task EntityService_Can_Get_Paged_Document_Type_Children_For_Folders_Only()
+    {
+        IEnumerable<IEntitySlim> children = EntityService.GetPagedChildren(
+            _documentTypeRootContainerKey,
+            [UmbracoObjectTypes.DocumentTypeContainer],
+            [UmbracoObjectTypes.DocumentTypeContainer],
+            0,
+            10,
+            false,
+            out long totalRecords);
+
+        Assert.AreEqual(2, totalRecords);
+        Assert.AreEqual(2, children.Count());
+        Assert.IsTrue(children.Single(x => x.Key == _documentTypeSubContainer1Key).HasChildren);     // Has a single folder as a child.
+        Assert.IsFalse(children.Single(x => x.Key == _documentTypeSubContainer2Key).HasChildren);    // Has a single document type as a child.
+    }
+
+    [Test]
     [LongRunning]
     public void EntityService_Can_Get_Paged_Media_Descendants()
     {
@@ -690,8 +730,6 @@ public class EntityServiceTests : UmbracoIntegrationTest
 
         for (var i = 0; i < entities.Length; i++)
         {
-            Assert.AreEqual(0, entities[i].AdditionalData.Count);
-
             if (i % 2 == 0)
             {
                 var doc = (IDocumentEntitySlim)entities[i];
@@ -701,10 +739,6 @@ public class EntityServiceTests : UmbracoIntegrationTest
                 Assert.AreEqual("Test " + i + " - FR", vals[0]);
                 Assert.AreEqual(_langEs.IsoCode.ToLowerInvariant(), keys[1].ToLowerInvariant());
                 Assert.AreEqual("Test " + i + " - ES", vals[1]);
-            }
-            else
-            {
-                Assert.AreEqual(0, entities[i].AdditionalData.Count);
             }
         }
     }
@@ -744,7 +778,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
         var entities = EntityService.GetAll(UmbracoObjectTypes.DocumentType).ToArray();
 
         Assert.That(entities.Any(), Is.True);
-        Assert.That(entities.Count(), Is.EqualTo(1));
+        Assert.That(entities.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -754,7 +788,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
         var entities = EntityService.GetAll(objectTypeId).ToArray();
 
         Assert.That(entities.Any(), Is.True);
-        Assert.That(entities.Count(), Is.EqualTo(1));
+        Assert.That(entities.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -763,7 +797,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
         var entities = EntityService.GetAll<IContentType>().ToArray();
 
         Assert.That(entities.Any(), Is.True);
-        Assert.That(entities.Count(), Is.EqualTo(1));
+        Assert.That(entities.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -842,9 +876,11 @@ public class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Cannot_Get_Id_For_Key_With_Incorrect_Object_Type()
     {
-        var result1 = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
+        var result1 = EntityService.GetId(
+            Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
             UmbracoObjectTypes.DocumentType);
-        var result2 = EntityService.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
+        var result2 = EntityService.GetId(
+            Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"),
             UmbracoObjectTypes.MediaType);
 
         Assert.IsTrue(result1.Success);
@@ -874,7 +910,28 @@ public class EntityServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(EntityService.GetId(Guid.NewGuid(), UmbracoObjectTypes.DocumentType).Success);
     }
 
-    private static bool s_isSetup;
+    [Test]
+    public void EntityService_GetPathKeys_ReturnsExpectedKeys()
+    {
+        var contentType = ContentTypeService.Get("umbTextpage");
+
+        var root = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(root);
+
+        var child = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+        ContentService.Save(child);
+        var grandChild = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), child);
+        ContentService.Save(grandChild);
+
+        var result = EntityService.GetPathKeys(grandChild);
+        Assert.AreEqual($"{root.Key},{child.Key},{grandChild.Key}", string.Join(",", result));
+
+        var result2 = EntityService.GetPathKeys(grandChild, omitSelf: true);
+        Assert.AreEqual($"{root.Key},{child.Key}", string.Join(",", result2));
+
+    }
+
+    private static bool _isSetup;
 
     private int _folderId;
     private ContentType _contentType;
@@ -889,13 +946,13 @@ public class EntityServiceTests : UmbracoIntegrationTest
     private Media _subfolder;
     private Media _subfolder2;
 
-    public void CreateTestData()
+    public async Task CreateTestData()
     {
-        if (s_isSetup == false)
+        if (_isSetup == false)
         {
-            s_isSetup = true;
+            _isSetup = true;
 
-            var template = TemplateBuilder.CreateTextPageTemplate();
+            var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
             FileService.SaveTemplate(template); // else, FK violation on contentType!
 
             // Create and Save ContentType "umbTextpage" -> _contentType.Id
@@ -911,7 +968,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
 
             // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
             _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
-            var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+            var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
             ContentService.Save(_subpage, -1, contentSchedule);
 
             // Create and Save Content "Text Page 2" based on "umbTextpage" -> 1055
@@ -946,6 +1003,38 @@ public class EntityServiceTests : UmbracoIntegrationTest
             // Create and save sub folder -> 1061
             _subfolder2 = MediaBuilder.CreateMediaFolder(_folderMediaType, _subfolder.Id);
             MediaService.Save(_subfolder2, -1);
+
+            // Setup document type folder structure for tests on paged children with or without folders
+            await CreateStructureForPagedDocumentTypeChildrenTest();
         }
+    }
+
+    private static readonly Guid _documentTypeRootContainerKey = Guid.NewGuid();
+    private static readonly Guid _documentTypeSubContainer1Key = Guid.NewGuid();
+    private static readonly Guid _documentTypeSubContainer2Key = Guid.NewGuid();
+    private static readonly Guid _documentType1Key = Guid.NewGuid();
+
+    private async Task CreateStructureForPagedDocumentTypeChildrenTest()
+    {
+        // Structure created:
+        //   - root container
+        //     - sub container 1
+        //       - sub container 1b
+        //     - sub container 2
+        //       - doc type 2
+        //     - doc type 1
+        await ContentTypeContainerService.CreateAsync(_documentTypeRootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
+        await ContentTypeContainerService.CreateAsync(_documentTypeSubContainer1Key, "Sub Container 1", _documentTypeRootContainerKey, Constants.Security.SuperUserKey);
+        await ContentTypeContainerService.CreateAsync(_documentTypeSubContainer2Key, "Sub Container 2", _documentTypeRootContainerKey, Constants.Security.SuperUserKey);
+        await ContentTypeContainerService.CreateAsync(Guid.NewGuid(), "Sub Container 1b", _documentTypeSubContainer1Key, Constants.Security.SuperUserKey);
+
+        var docType1Model = ContentTypeEditingBuilder.CreateBasicContentType("umbDocType1", "Doc Type 1");
+        docType1Model.ContainerKey = _documentTypeRootContainerKey;
+        docType1Model.Key = _documentType1Key;
+        await ContentTypeEditingService.CreateAsync(docType1Model, Constants.Security.SuperUserKey);
+
+        var docType2Model = ContentTypeEditingBuilder.CreateBasicContentType("umbDocType2", "Doc Type 2");
+        docType2Model.ContainerKey = _documentTypeSubContainer2Key;
+        await ContentTypeEditingService.CreateAsync(docType2Model, Constants.Security.SuperUserKey);
     }
 }

@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
-public class NPocoFetchTests : UmbracoIntegrationTest
+internal sealed class NPocoFetchTests : UmbracoIntegrationTest
 {
     [SetUp]
     protected void SeedDatabase()
@@ -309,7 +309,7 @@ public class NPocoFetchTests : UmbracoIntegrationTest
             //    GROUP BY zbThing1.id, zbThing1.name";
             var sql = ScopeAccessor.AmbientScope.SqlContext.Sql()
                 .Select<Thing1Dto>()
-                .Append(", COUNT(zbThing2Group.groupId) AS groupCount") // FIXME:
+                .Append(", COUNT(zbThing2Group.groupId) AS groupCount")
                 .From<Thing1Dto>()
                 .InnerJoin<Thing2GroupDto>().On<Thing1Dto, Thing2GroupDto>((t, t2g) => t.Id == t2g.ThingId)
                 .GroupBy<Thing1Dto>(x => x.Id, x => x.Name);

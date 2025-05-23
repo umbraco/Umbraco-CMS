@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class PropertyValueConverterCollection : BuilderCollectionBase<IPropertyValueConverter>
 {
-    private readonly object _locker = new();
+    private readonly Lock _locker = new();
     private Dictionary<IPropertyValueConverter, Type[]>? _defaultConverters;
 
     public PropertyValueConverterCollection(Func<IEnumerable<IPropertyValueConverter>> items)
@@ -44,5 +44,15 @@ public class PropertyValueConverterCollection : BuilderCollectionBase<IPropertyV
         => DefaultConverters.ContainsKey(converter);
 
     internal bool Shadows(IPropertyValueConverter shadowing, IPropertyValueConverter shadowed)
-        => DefaultConverters.TryGetValue(shadowing, out Type[]? types) && types.Contains(shadowed.GetType());
+    {
+        Type shadowedType = shadowed.GetType();
+
+        // any value converter built specifically to convert purely value type bound properties can always be shadowed
+        if (shadowedType.GetCustomAttribute<DefaultValueTypePropertyValueConverterAttribute>(false) is not null)
+        {
+            return true;
+        }
+
+        return DefaultConverters.TryGetValue(shadowing, out Type[]? types) && types.Contains(shadowedType);
+    }
 }
