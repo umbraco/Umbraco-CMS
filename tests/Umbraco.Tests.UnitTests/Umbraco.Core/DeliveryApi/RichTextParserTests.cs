@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -357,16 +357,71 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsEmpty(blockLevelBlock.Elements);
     }
 
+    private const string TestParagraph = "What follows from <strong>here</strong> <em>is</em> <a href=\"#\">just</a> a bunch of text.";
+
     [Test]
     public void ParseElement_CanHandleWhitespaceAroundInlineElemements()
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse("<p>What follows from <strong>here</strong> <em>is</em> <a href=\"#\">just</a> a bunch of text.</p>") as RichTextRootElement;
+        var element = parser.Parse($"<p>{TestParagraph}</p>") as RichTextRootElement;
         Assert.IsNotNull(element);
         var paragraphElement = element.Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(paragraphElement);
 
+        AssertTestParagraph(paragraphElement);
+    }
+
+    [TestCase(1, "\n")]
+    [TestCase(2, "\n")]
+    [TestCase(1, "\r")]
+    [TestCase(2, "\r")]
+    [TestCase(1, "\r\n")]
+    [TestCase(2, "\r\n")]
+    public void ParseElement_RemovesNewLinesAroundHtmlStructuralElements(int numberOfNewLineCharacters, string newlineCharacter)
+    {
+        var parser = CreateRichTextElementParser();
+
+        var newLineSeparator = string.Concat(Enumerable.Repeat(newlineCharacter, numberOfNewLineCharacters));
+        var element = parser.Parse($"<table>{newLineSeparator}<tr>{newLineSeparator}<td>{TestParagraph}</td>{newLineSeparator}</tr>{newLineSeparator}</table>") as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var tableElement = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(tableElement);
+
+        var rowElement = tableElement.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(rowElement);
+
+        var cellElement = rowElement.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(cellElement);
+
+        AssertTestParagraph(cellElement);
+    }
+
+    [TestCase(1, "\n")]
+    [TestCase(2, "\n")]
+    [TestCase(1, "\r")]
+    [TestCase(2, "\r")]
+    [TestCase(1, "\r\n")]
+    [TestCase(2, "\r\n")]
+    public void ParseElement_RemovesNewLinesAroundHtmlContentElements(int numberOfNewLineCharacters, string newlineCharacter)
+    {
+        var parser = CreateRichTextElementParser();
+
+        var newLineSeparator = string.Concat(Enumerable.Repeat(newlineCharacter, numberOfNewLineCharacters));
+        var element = parser.Parse($"<div><p>{TestParagraph}</p>{newLineSeparator}<p></p>{newLineSeparator}<p>&nbsp;</p>{newLineSeparator}<p>{TestParagraph}</p></div>") as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var divElement = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(divElement);
+
+        var paragraphELements = divElement.Elements;
+        Assert.AreEqual(4, paragraphELements.Count());
+
+        AssertTestParagraph(paragraphELements.First() as RichTextGenericElement);
+        AssertTestParagraph(paragraphELements.Last() as RichTextGenericElement);
+    }
+
+    private static void AssertTestParagraph(RichTextGenericElement paragraphElement)
+    {
         var childElements = paragraphElement.Elements.ToArray();
         Assert.AreEqual(7, childElements.Length);
 
