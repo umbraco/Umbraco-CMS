@@ -21,7 +21,7 @@ test('can create a empty stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbra
 
   // Act
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-  await umbracoUi.stylesheet.clickCreateButton();
+  await umbracoUi.stylesheet.clickCreateActionMenuOption();
   await umbracoUi.stylesheet.clickNewStylesheetButton();
   await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
   await umbracoUi.stylesheet.clickSaveButton();
@@ -40,7 +40,7 @@ test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => 
 
   //Act
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-  await umbracoUi.stylesheet.clickCreateButton();
+  await umbracoUi.stylesheet.clickCreateActionMenuOption();
   await umbracoUi.stylesheet.clickNewStylesheetButton();
   await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
   await umbracoUi.stylesheet.enterStylesheetContent(stylesheetContent);
@@ -112,7 +112,7 @@ test('cannot create a stylesheet with an empty name', async ({umbracoApi, umbrac
 
   // Act
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-  await umbracoUi.stylesheet.clickCreateButton();
+  await umbracoUi.stylesheet.clickCreateActionMenuOption();
   await umbracoUi.stylesheet.clickNewStylesheetButton();
   await umbracoUi.stylesheet.clickSaveButton();
 

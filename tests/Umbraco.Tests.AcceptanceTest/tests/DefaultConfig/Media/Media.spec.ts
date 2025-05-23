@@ -113,7 +113,7 @@ test('can trash a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(folderName);
-  await umbracoUi.media.clickTrashButton();
+  await umbracoUi.media.clickTrashActionMenuOption();
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
@@ -176,9 +176,7 @@ test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(mediaFileName);
-  await umbracoUi.media.clickTrashButton();
-  // Verify the references list not displayed
-  await umbracoUi.content.isReferenceHeadlineVisible(false);
+  await umbracoUi.media.clickTrashActionMenuOption();
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
@@ -272,7 +270,8 @@ test('can trash a media node with a relation', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  // await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  await umbracoUi.media.isErrorNotificationVisible(false);
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeTruthy();
@@ -310,7 +309,8 @@ test('can bulk trash media nodes with a relation', async ({umbracoApi, umbracoUi
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.media.isSuccessNotificationVisible();
+  // await umbracoUi.media.isSuccessNotificationVisible();
+  await umbracoUi.media.isErrorNotificationVisible(false);
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();

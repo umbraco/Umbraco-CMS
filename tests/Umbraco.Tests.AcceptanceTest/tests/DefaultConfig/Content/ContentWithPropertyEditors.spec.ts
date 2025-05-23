@@ -26,7 +26,7 @@ test.skip('can create content with the Rich Text Editor datatype', {tag: '@smoke
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.enterRichTextArea(contentText);
@@ -52,7 +52,7 @@ test.skip('can create content with the upload file datatype', async ({umbracoApi
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.uploadFile('./fixtures/mediaLibrary/' + uploadFilePath);
@@ -79,7 +79,7 @@ test.skip('can create content with the list view - content datatype', async ({um
   
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   // TODO: add step to interact with the list

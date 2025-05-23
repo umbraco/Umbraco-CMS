@@ -15,8 +15,8 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can create a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
-  await umbracoUi.mediaType.clickActionsMenuForName('Media Types');
-  await umbracoUi.mediaType.clickCreateButton();
+  await umbracoUi.mediaType.clickActionsMenuAtRoot();
+  await umbracoUi.mediaType.clickCreateActionMenuOption();
   await umbracoUi.mediaType.clickMediaTypeButton();
   await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
   await umbracoUi.mediaType.clickSaveButton();
@@ -86,7 +86,7 @@ test('can delete a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeName);
-  await umbracoUi.mediaType.clickDeleteButton();
+  await umbracoUi.mediaType.clickDeleteActionMenuOption();
   await umbracoUi.mediaType.clickConfirmToDeleteButton();
 
   // Assert

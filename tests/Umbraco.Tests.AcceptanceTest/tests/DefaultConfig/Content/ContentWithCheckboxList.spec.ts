@@ -28,7 +28,7 @@ test('can create content with the checkbox list data type', async ({umbracoApi, 
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
@@ -97,7 +97,6 @@ test('can not publish a mandatory checkbox list with an empty value', async ({um
   // Do not select any checkbox list values and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
-  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Select a checkbox list value and the validation error disappears
   await umbracoUi.content.chooseCheckboxListOption(optionValues[0]);

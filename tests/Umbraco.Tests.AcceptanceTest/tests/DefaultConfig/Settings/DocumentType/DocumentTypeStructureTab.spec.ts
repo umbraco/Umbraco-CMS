@@ -38,7 +38,7 @@ test('can add an allowed child node to a document type', {tag: '@smoke'}, async 
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickStructureTab();
   await umbracoUi.documentType.clickChooseButton();
-  await umbracoUi.documentType.clickButtonWithName(documentTypeName);
+  await umbracoUi.documentType.clickModalMenuItemWithName(documentTypeName);
   await umbracoUi.documentType.clickAllowedChildNodesButton();
   await umbracoUi.documentType.clickSaveButton();
 

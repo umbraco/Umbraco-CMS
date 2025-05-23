@@ -18,7 +18,7 @@ test('can create a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
 
   // Act
   await umbracoUi.documentType.clickActionsMenuAtRoot();
-  await umbracoUi.documentType.clickCreateButton();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentTypeButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
   await umbracoUi.documentType.clickSaveButton();
@@ -37,7 +37,7 @@ test('can create a document type with a template', {tag: '@smoke'}, async ({umbr
 
   // Act
   await umbracoUi.documentType.clickActionsMenuAtRoot();
-  await umbracoUi.documentType.clickCreateButton();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentTypeWithTemplateButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
   await umbracoUi.documentType.clickSaveButton();
@@ -62,7 +62,7 @@ test('can create a element type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
 
   // Act
   await umbracoUi.documentType.clickActionsMenuAtRoot();
-  await umbracoUi.documentType.clickCreateButton();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateElementTypeButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
   await umbracoUi.documentType.clickSaveButton();

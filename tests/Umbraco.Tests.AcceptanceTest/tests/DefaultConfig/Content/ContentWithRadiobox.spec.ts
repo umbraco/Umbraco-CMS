@@ -29,7 +29,7 @@ test('can create content with the radiobox data type', async ({umbracoApi, umbra
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
@@ -99,7 +99,6 @@ test('can not publish mandatory radiobox with an empty value', async ({umbracoAp
   // Do not select any radiobox values and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
-  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Select a radiobox value and the validation error disappears
   await umbracoUi.content.chooseRadioboxOption(optionValues[0]);

@@ -854,6 +854,48 @@ namespace Umbraco.Cms.Core.Services
         public void Save(IEnumerable<IMember> members)
             => Save(members, Constants.Security.SuperUserId);
 
+        /// <inheritdoc/>
+        /// <remarks>
+        /// <para>
+        ///     Note that in this optimized member save operation for use in the login process, where we only handle login related
+        ///     properties, we aren't taking any locks. If we were updating "content" properties, that could have relations between each
+        ///     other, we should following what we do for documents and lock.
+        ///     But here we are just updating these system fields, and it's fine if they work in a "last one wins" fashion without locking.
+        /// </para>
+        /// <para>
+        ///      Note also that we aren't calling "Audit" here (as well as to optimize performance, this is deliberate, because this is not
+        ///      a full save operation on the member that we'd want to audit who made the changes via the backoffice or API; rather it's
+        ///      just the member logging in as themselves).
+        /// </para>
+        /// <para>
+        ///      We are though publishing notifications, to maintain backwards compatibility for any solutions using these for
+        ///      processing following a member login.
+        /// </para>
+        /// <para>
+        ///      These notification handlers will ensure that the records to umbracoLog are also added in the same way as they
+        ///      are for a full save operation.
+        /// </para>
+        /// </remarks>
+        public async Task UpdateLoginPropertiesAsync(IMember member)
+        {
+            EventMessages evtMsgs = EventMessagesFactory.Get();
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            var savingNotification = new MemberSavingNotification(member, evtMsgs);
+            savingNotification.State.Add("LoginPropertiesOnly", true);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return;
+            }
+
+            await _memberRepository.UpdateLoginPropertiesAsync(member);
+
+            scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+
+            scope.Complete();
+        }
+
         #endregion
 
         #region Delete

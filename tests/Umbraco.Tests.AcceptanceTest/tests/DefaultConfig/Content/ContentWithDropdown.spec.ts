@@ -29,7 +29,7 @@ for (const dataTypeName of dataTypeNames) {
 
     // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
-    await umbracoUi.content.clickCreateButton();
+    await umbracoUi.content.clickCreateActionMenuOption();
     await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(contentName);
     await umbracoUi.content.clickSaveButton();
@@ -99,7 +99,6 @@ test('can not publish a mandatory dropdown with an empty value', async ({umbraco
   // Do not select any dropdown values and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
-  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Select a dropdown value and the validation error disappears
   await umbracoUi.content.chooseDropdownOption([optionValues[0]]);

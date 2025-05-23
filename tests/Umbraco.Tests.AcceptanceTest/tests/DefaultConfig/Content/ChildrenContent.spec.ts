@@ -31,7 +31,7 @@ test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
   await umbracoUi.content.enterContentName(childContentName);
   await umbracoUi.content.clickSaveButton();
@@ -44,7 +44,7 @@ test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   expect(childData[0].variants[0].name).toBe(childContentName);
   // verify that the child content displays in the tree after reloading children
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickReloadChildrenButton();
+  await umbracoUi.content.clickReloadChildrenActionMenuOption();
   await umbracoUi.content.clickCaretButtonForContentName(contentName);
   await umbracoUi.content.doesContentTreeHaveName(childContentName);
 
@@ -70,7 +70,7 @@ test('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickCaretButtonForContentName(contentName);
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(childOfChildDocumentTypeName);
   // This wait is needed
   await umbracoUi.content.enterContentName(childOfChildContentName);
@@ -102,7 +102,7 @@ test('cannot publish child if the parent is not published', async ({umbracoApi, 
   // Act
   await umbracoUi.content.clickCaretButtonForContentName(contentName);
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
-  await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
@@ -122,7 +122,7 @@ test('can publish content with child node', {tag: '@smoke'}, async ({umbracoApi,
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
-  await umbracoUi.content.clickPublishButton();
+  await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert

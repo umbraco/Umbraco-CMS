@@ -20,7 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create an empty partial view', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.partialView.clickActionsMenuAtRoot();
-  await umbracoUi.partialView.clickCreateButton();
+  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
   await umbracoUi.partialView.clickSaveButton();
@@ -40,7 +40,7 @@ test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) =
 
   // Act
   await umbracoUi.partialView.clickActionsMenuAtRoot();
-  await umbracoUi.partialView.clickCreateButton();
+  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewPartialViewFromSnippetButton();
   await umbracoUi.partialView.clickBreadcrumbButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
@@ -284,7 +284,7 @@ test.skip('can show returned items in query builder ', async ({umbracoApi, umbra
 test('cannot create a partial view with an empty name', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.partialView.clickActionsMenuAtRoot();
-  await umbracoUi.partialView.clickCreateButton();
+  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.clickSaveButton();
 

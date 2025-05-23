@@ -261,7 +261,7 @@ test('can replace multiple blocks',  async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickPasteButton();
   await umbracoUi.content.goToBlockGridBlockWithName(groupName, blockGridDataTypeName, elementTypeName, 0);
   await umbracoUi.content.doesBlockEditorBlockWithNameContainValue(elementGroupName, elementPropertyName, ConstantHelper.inputTypes.tipTap, blockPropertyValue);
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert

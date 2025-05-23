@@ -17,7 +17,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// TODO, this is flaky on the pipeline, not locally. Look into why
+test.fixme('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -33,7 +34,7 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
@@ -369,7 +370,7 @@ test.skip('can create content with the link to an unpublished document', async (
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();

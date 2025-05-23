@@ -26,11 +26,11 @@ test('can create content with allow vary by culture enabled', async ({umbracoApi
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveAndCloseButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   //await umbracoUi.content.isSuccessNotificationVisible();
@@ -52,10 +52,9 @@ test('can create content with names that vary by culture', async ({umbracoApi, u
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(secondLanguageName);
   await umbracoUi.content.enterContentName(danishContentName);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveAndCloseButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(danishContentName);
@@ -68,7 +67,6 @@ test('can create content with names that vary by culture and content that is inv
   // Arrange
   const danishContentName = 'Test indhold';
   const textContent = 'This is a test text';
-  const danishTextContent = 'Dette er testtekst';
   const dataTypeName = 'Textstring';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', true, false);
@@ -81,12 +79,10 @@ test('can create content with names that vary by culture and content that is inv
   await umbracoUi.content.clickSelectVariantButton();
   await umbracoUi.content.clickVariantAddModeButtonForLanguageName(secondLanguageName);
   await umbracoUi.content.enterContentName(danishContentName);
-  await umbracoUi.content.enterTextstring(danishTextContent);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveAndCloseButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(danishContentName);
@@ -94,7 +90,7 @@ test('can create content with names that vary by culture and content that is inv
   expect(contentData.variants[0].name).toBe(contentName);
   expect(contentData.variants[1].name).toBe(danishContentName);
   expect(contentData.values.length).toBe(1);
-  expect(contentData.values[0].value).toBe(danishTextContent);
+  expect(contentData.values[0].value).toBe(textContent);
 });
 
 test('can create content with names and content that vary by culture', async ({umbracoApi, umbracoUi}) => {
@@ -116,7 +112,7 @@ test('can create content with names and content that vary by culture', async ({u
   await umbracoUi.content.enterContentName(danishContentName);
   await umbracoUi.content.enterTextstring(danishTextContent);
   await umbracoUi.content.clickSaveButtonForContent();
-  await umbracoUi.content.clickSaveAndCloseButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   //await umbracoUi.content.isSuccessNotificationVisible();

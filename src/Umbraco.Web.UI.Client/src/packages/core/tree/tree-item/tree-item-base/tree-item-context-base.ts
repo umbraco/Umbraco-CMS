@@ -19,7 +19,8 @@ import {
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbDeprecation, UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { ensureSlash } from '@umbraco-cms/backoffice/router';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
@@ -81,6 +82,7 @@ export abstract class UmbTreeItemContextBase<
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
+	#parentContext = new UmbParentEntityContext(this);
 
 	// TODO: get this from the tree context
 	#paging = {
@@ -144,6 +146,13 @@ export abstract class UmbTreeItemContextBase<
 		this.#hasChildren.setValue(hasChildren);
 		this.#hasChildrenContext.setHasChildren(hasChildren);
 
+		const parentEntity: UmbEntityModel | undefined = treeItem.parent
+			? {
+					entityType: treeItem.parent.entityType,
+					unique: treeItem.parent.unique,
+				}
+			: undefined;
+		this.#parentContext.setParent(parentEntity);
 		this._treeItem.setValue(treeItem);
 
 		// Update observers:
@@ -441,9 +450,12 @@ export abstract class UmbTreeItemContextBase<
 			return;
 		}
 
-		const path = this.#path.getValue();
-		const location = window.location.pathname;
-		const isActive = location.includes(path);
+		/* Check if the current location includes the path of this tree item.
+		We ensure that the paths ends with a slash to avoid collisions with paths like /path-1 and /path-1-2 where /path-1 is in both.
+		Instead we compare /path-1/ with /path-1-2/ which wont collide.*/
+		const location = ensureSlash(window.location.pathname);
+		const comparePath = ensureSlash(this.#path.getValue());
+		const isActive = location.includes(comparePath);
 		this.#isActive.setValue(isActive);
 	}
 

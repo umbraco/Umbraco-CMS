@@ -37,7 +37,7 @@ test('can create a media type with an allowed child node type', {tag: '@smoke'},
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickStructureTab();
   await umbracoUi.mediaType.clickChooseButton();
-  await umbracoUi.mediaType.clickButtonWithName(mediaTypeName);
+  await umbracoUi.mediaType.clickModalMenuItemWithName(mediaTypeName);
   await umbracoUi.mediaType.clickAllowedChildNodesButton();
   await umbracoUi.mediaType.clickSaveButton();
 
@@ -58,8 +58,8 @@ test('can create a media type with multiple allowed child nodes types', async ({
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickStructureTab();
   await umbracoUi.mediaType.clickChooseButton();
-  await umbracoUi.mediaType.clickButtonWithName(mediaTypeName);
-  await umbracoUi.mediaType.clickButtonWithName(secondMediaTypeName);
+  await umbracoUi.mediaType.clickModalMenuItemWithName(mediaTypeName);
+  await umbracoUi.mediaType.clickModalMenuItemWithName(secondMediaTypeName);
   await umbracoUi.mediaType.clickAllowedChildNodesButton();
   await umbracoUi.mediaType.clickSaveButton();
 
