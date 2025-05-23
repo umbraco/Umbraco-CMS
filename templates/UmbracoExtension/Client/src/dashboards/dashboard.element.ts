@@ -8,7 +8,7 @@ import {
 import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
 import { UUIButtonElement } from "@umbraco-cms/backoffice/external/uui";
 import { UMB_NOTIFICATION_CONTEXT } from "@umbraco-cms/backoffice/notification";
-import { UMB_CURRENT_USER_CONTEXT } from "@umbraco-cms/backoffice/current-user";
+import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from "@umbraco-cms/backoffice/current-user";
 import { UmbracoExtensionService, UserModel } from "../api/index.js";
 
 @customElement("example-dashboard")
@@ -23,7 +23,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
   private _serverUserData?: UserModel;
 
   @state()
-  private _contextCurrentUser?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
+  private _contextCurrentUser?: UmbCurrentUserModel;
 
   #notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
@@ -39,7 +39,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
       // We can observe properties from it, such as the current user or perhaps just individual properties
       // When the currentUser object changes we will get notified and can reset the @state properrty
       this.observe(
-        currentUserContext.currentUser,
+        currentUserContext?.currentUser,
         (currentUser) => {
           this._contextCurrentUser = currentUser;
         },
