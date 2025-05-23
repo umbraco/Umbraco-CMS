@@ -269,7 +269,8 @@ test('can not publish content with publish permission disabled', async ({umbraco
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Bug, does nothing in the frontend.
+// Remove .skip when the front-end is ready. Currently there is no "Permissions" menu item displays
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19339
 test.skip('can set permissions with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName);
@@ -356,8 +357,7 @@ test('can update content with update permission enabled', async ({umbracoApi, um
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
 });
 
-// TODO: the permission for update is not working, it is always enabled.
-test.skip('can not update content with update permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('can not update content with update permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -530,8 +530,7 @@ test('can not set culture and hostnames with culture and hostnames permission di
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// TODO: Notification is not correct 'Public acccess setting created' should be 'access'
-test.skip('can set public access with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can set public access with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermission(userGroupName);
   const testMemberGroup = 'TestMemberGroup';

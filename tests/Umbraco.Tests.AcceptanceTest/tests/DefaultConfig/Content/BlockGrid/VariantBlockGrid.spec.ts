@@ -57,7 +57,6 @@ test('invariant document type with invariant block grid with invariant block wit
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-
   await umbracoUi.reloadPage();
   await umbracoUi.content.goToBlockGridBlockWithName(documentTypeGroupName, blockGridName, blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
@@ -77,7 +76,6 @@ test('can not create unsupported invariant document type with invariant block gr
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
@@ -96,7 +94,6 @@ test('can not create unsupported invariant document type with invariant block gr
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
