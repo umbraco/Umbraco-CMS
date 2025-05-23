@@ -596,8 +596,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			}
 
 			.switch-button:hover {
-				background: var(--uui-palette-sand);
-				color: var(--uui-palette-space-cadet-light);
+				background: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
 			}
 			.switch-button .variant-info {
 				flex-grow: 1;
