@@ -3,7 +3,7 @@ import { html, customElement, property, state, nothing } from '@umbraco-cms/back
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 import '../workspace/views/edit/content-editor-property.element.js';
 
@@ -25,6 +25,9 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 
 	@state()
 	_dataPath?: string;
+
+	@state()
+	_viewable?: boolean;
 
 	@state()
 	_writeable?: boolean;
@@ -56,10 +59,33 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 
 		this.observe(await this._workspaceContext?.structure.propertyStructureByAlias(this._alias), (propertyType) => {
 			this._propertyType = propertyType;
+			this.#checkViewGuard();
 		});
 	}
 
+	#checkViewGuard() {
+		if (!this._workspaceContext || !this._propertyType || !this._datasetVariantId) return;
+
+		const propertyVariantId = new UmbVariantId(
+			this._propertyType.variesByCulture ? this._datasetVariantId.culture : null,
+			this._propertyType.variesBySegment ? this._datasetVariantId.segment : null,
+		);
+
+		this.observe(
+			this._workspaceContext.propertyViewGuard.isPermittedForVariantAndProperty(
+				propertyVariantId,
+				this._propertyType,
+				this._datasetVariantId,
+			),
+			(permitted) => {
+				this._viewable = permitted;
+			},
+			`umbObservePropertyViewGuard`,
+		);
+	}
+
 	override render() {
+		if (!this._viewable) return nothing;
 		if (!this._datasetVariantId && !this._propertyType) return nothing;
 
 		return html`<umb-content-workspace-view-edit-property
