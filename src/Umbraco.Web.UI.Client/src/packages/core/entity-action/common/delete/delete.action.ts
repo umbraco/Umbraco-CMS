@@ -1,11 +1,11 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
-import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
 import type { MetaEntityActionDeleteKind } from './types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 export class UmbDeleteEntityAction<
 	MetaKind extends MetaEntityActionDeleteKind = MetaEntityActionDeleteKind,
