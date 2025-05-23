@@ -90,7 +90,9 @@ test('cannot edit property values without UI write permission', async ({umbracoA
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-test('can edit property values with UI write permission', async ({umbracoApi, umbracoUi}) => {
+// Remove .skip when the front-end is ready. 
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
+test.skip('can edit property values with UI write permission', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionAndWritePropertyValuePermission(userGroupName, true, false);

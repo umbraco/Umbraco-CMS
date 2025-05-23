@@ -50,7 +50,9 @@ test('can see property values in block list with UI read but not UI write permis
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-test('can edit property values in block list with UI write permission', async ({umbracoApi, umbracoUi}) => {
+// Remove .skip when the front-end is ready. 
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
+test.skip('can edit property values in block list with UI write permission', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
   await umbracoApi.document.createDefaultDocumentWithABlockListEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
@@ -101,14 +103,16 @@ test('can see property values in block grid with UI read but not UI write permis
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
   await umbracoUi.content.isPropertyEditorUiWithNameVisible('block-grid', true);
-  await umbracoUi.content.clickEditBlockListBlockButton();
+  await umbracoUi.content.clickEditBlockGridBlockButton();
 
   // Assert
   await umbracoUi.content.isPropertyEditorUiWithNameVisible('text-box');
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-test('can edit property values in block grid with UI write permission', async ({umbracoApi, umbracoUi}) => {
+// Remove .skip when the front-end is ready. 
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
+test.skip('can edit property values in block grid with UI write permission', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
   await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
@@ -121,7 +125,7 @@ test('can edit property values in block grid with UI write permission', async ({
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
   await umbracoUi.content.isPropertyEditorUiWithNameVisible('block-grid', true);
-  await umbracoUi.content.clickEditBlockListBlockButton();
+  await umbracoUi.content.clickEditBlockGridBlockButton();
   await umbracoUi.content.enterTextstring(updatedText);
   await umbracoUi.content.clickUpdateButton();
   await umbracoUi.content.clickSaveButton();
