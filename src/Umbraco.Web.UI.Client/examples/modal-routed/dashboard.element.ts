@@ -17,6 +17,7 @@ export class UmbDashboardElement extends UmbElementMixin(LitElement) {
 		},
 		{
 			path: '',
+			pathMatch: 'full',
 			redirectTo: 'tab1',
 		},
 	];

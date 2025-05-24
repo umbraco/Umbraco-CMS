@@ -75,6 +75,9 @@ export interface IRedirectRoute<D = any> extends IRouteBase<D> {
 	// The paths the route should redirect to. Can either be relative or absolute.
 	redirectTo: string;
 
+	// First redirect when the routes appears stable. Delaying the redirect so other routes get the change to resolve first.
+	awaitStability?: boolean;
+
 	// Whether the query should be preserved when redirecting.
 	preserveQuery?: boolean;
 }

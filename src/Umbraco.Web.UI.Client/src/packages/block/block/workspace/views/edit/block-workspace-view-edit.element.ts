@@ -123,6 +123,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			if (!this._hasRootGroups) {
 				routes.push({
 					path: '',
+					pathMatch: 'full',
 					redirectTo: routes[0]?.path,
 				});
 			}

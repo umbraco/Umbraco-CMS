@@ -63,8 +63,10 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 
 		if (newRoutes.length > 0) {
 			newRoutes.push({
+				path: '',
+				pathMatch: 'full',
+				awaitStability: true,
 				redirectTo: newRoutes[0].path,
-				path: ``,
 			});
 
 			newRoutes.push({
