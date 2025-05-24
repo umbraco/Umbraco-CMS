@@ -2,7 +2,7 @@ import { UmbContextProvider } from '../provide/context-provider.js';
 import { UmbContextToken } from '../token/context-token.js';
 import type { UmbContextMinimal } from '../types.js';
 import { UmbContextConsumer } from './context-consumer.js';
-import type { UmbContextRequestEventImplementation } from './context-request.event.js';
+import { UmbContextRequestEventImplementation } from './context-request.event.js';
 import { UMB_CONTEXT_REQUEST_EVENT_TYPE } from './context-request.event.js';
 import { assert, expect, oneEvent } from '@open-wc/testing';
 
@@ -266,7 +266,7 @@ describe('UmbContextConsumer', () => {
 			localConsumer.hostConnected();
 		});
 
-		it('does not respond to a non existing api alias', (done) => {
+		it('does not respond to a non existing api alias', async () => {
 			const provider = new UmbContextProvider(
 				document.body,
 				testContextAliasAndApiAlias,
@@ -277,21 +277,19 @@ describe('UmbContextConsumer', () => {
 			let callbackCount = 0;
 
 			const localConsumer = new UmbContextConsumer(element, testContextAliasAndNotExistingApiAlias, (context) => {
-				callbackCount++;
-				if (callbackCount === 1) {
-					expect(context).to.be.undefined;
-					done();
-				} else {
-					assert.fail('Callback should not be called more than once');
-				}
+				assert.fail('Callback should not be called more than once');
 			});
+			const requestEvent = oneEvent(localConsumer.getHostElement(), UMB_CONTEXT_REQUEST_EVENT_TYPE);
 			localConsumer.hostConnected();
 
+			await requestEvent;
+			await Promise.resolve();
+
 			// Delayed check to make sure the callback is not called.
-			Promise.resolve().then(() => {
-				localConsumer.hostDisconnected();
-				provider.hostDisconnected();
-			});
+
+			expect(callbackCount).to.equal(0, 'Callback should never have been called');
+			localConsumer.hostDisconnected();
+			provider.hostDisconnected();
 		});
 	});
 
@@ -368,7 +366,7 @@ describe('UmbContextConsumer', () => {
 			localConsumer.hostConnected();
 		});
 
-		it('disapproving discriminator does not fire callback', (done) => {
+		it('disapproving discriminator does not fire callback', async () => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
 
@@ -379,24 +377,21 @@ describe('UmbContextConsumer', () => {
 				new UmbContextToken(testContextAlias, undefined, badDiscriminator),
 				(_instance) => {
 					callbackCount++;
-					if (callbackCount === 1) {
-						expect(_instance).to.be.undefined;
-						done();
-					} else {
-						assert.fail('Callback should not be called more than once');
-					}
+					assert.fail('Callback should not be called more than once');
 				},
 			);
+			const requestEvent = oneEvent(localConsumer.getHostElement(), UMB_CONTEXT_REQUEST_EVENT_TYPE);
 			localConsumer.hostConnected();
 
 			// Wait for to ensure the above request didn't succeed:
-			Promise.resolve().then(() => {
-				localConsumer.hostDisconnected();
-				provider.hostDisconnected();
-			});
+			await requestEvent;
+			await Promise.resolve();
+			expect(callbackCount).to.equal(0, 'Callback should never have been called');
+			localConsumer.hostDisconnected();
+			provider.hostDisconnected();
 		});
 
-		it('context api of same context alias will prevent request from propagating', (done) => {
+		it('context api of same context alias will prevent request from propagating', async () => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
 
@@ -414,19 +409,18 @@ describe('UmbContextConsumer', () => {
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(_instance) => {
 					callbackCount++;
-					if (callbackCount === 1) {
-						expect(_instance).to.be.undefined;
-						done();
-					}
 				},
 			);
+			const requestEvent = oneEvent(localConsumer.getHostElement(), UMB_CONTEXT_REQUEST_EVENT_TYPE);
 			localConsumer.hostConnected();
 
+			await requestEvent;
+			await Promise.resolve();
 			// Wait for to ensure the above request didn't succeed:
-			Promise.resolve().then(() => {
-				localConsumer.hostDisconnected();
-				provider.hostDisconnected();
-			});
+
+			expect(callbackCount).to.equal(0, 'Callback should never have been called');
+			localConsumer.hostDisconnected();
+			provider.hostDisconnected();
 		});
 
 		it('context api of same context alias will NOT prevent request from propagating when set to passContextAliasMatches', (done) => {

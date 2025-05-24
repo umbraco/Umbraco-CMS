@@ -26,6 +26,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	// State which holds all the properties of the current container, this is a composition of all properties from the containers that matches our target [NL]
 	#propertyStructure = new UmbArrayState<UmbPropertyTypeModel>([], (x) => x.unique);
 	readonly propertyStructure = this.#propertyStructure.asObservable();
+	readonly propertyAliases = this.#propertyStructure.asObservablePart((x) => x.map((e) => e.alias));
 
 	constructor(host: UmbControllerHost) {
 		super(host);
