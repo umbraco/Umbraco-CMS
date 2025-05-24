@@ -44,12 +44,12 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     public FileUploadPropertyEditor(
         IBlockEditorElementTypeCache blockEditorElementTypeCache,
         IJsonSerializer jsonSerializer,
+        ILogger<FileUploadPropertyEditor> logger,
         IDataValueEditorFactory dataValueEditorFactory,
         MediaFileManager mediaFileManager,
         IOptionsMonitor<ContentSettings> contentSettings,
         UploadAutoFillProperties uploadAutoFillProperties,
         IContentService contentService,
-        ILogger<FileUploadPropertyEditor> logger,
         IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
