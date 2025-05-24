@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
@@ -78,7 +79,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         return false;
     }
 
-    #region Handle ContentCopiedNotification
+    #region Handle Copied Notifications
 
     public void Handle(ContentCopiedNotification notification)
     {
@@ -276,9 +277,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
 
     #endregion
 
-    public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
-
-    public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+    #region Handle Saving Notifications
 
     public void Handle(MediaSavingNotification notification)
     {
@@ -288,7 +287,183 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
+    /// <summary>
+    ///     Auto-fill properties (or clear).
+    /// </summary>
+    private void AutoFillProperties(IContentBase model)
+    {
+        IEnumerable<IProperty> properties = model.Properties.Where(x => IsUploadFieldPropertyType(x.PropertyType));
+
+        foreach (IProperty property in properties)
+        {
+            ImagingAutoFillUploadField? autoFillConfig = _contentSettings.CurrentValue.GetConfig(property.Alias);
+            if (autoFillConfig == null)
+            {
+                continue;
+            }
+
+            foreach (IPropertyValue pvalue in property.Values)
+            {
+                var svalue = property.GetValue(pvalue.Culture, pvalue.Segment) as string;
+                if (string.IsNullOrWhiteSpace(svalue))
+                {
+                    _uploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
+                }
+                else
+                {
+                    _uploadAutoFillProperties.Populate(model, autoFillConfig,
+                        _mediaFileManager.FileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region Handle Deleted Notifications
+
+    public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+    public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
     public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+
+    private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
+    {
+        IReadOnlyList<string> filePathsToDelete = ContainedFilePaths(deletedEntities);
+        _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
+    }
+
+    /// <summary>
+    ///     The paths to all file upload property files contained within a collection of content entities
+    /// </summary>
+    /// <param name="entities"></param>
+    private IReadOnlyList<string> ContainedFilePaths(IEnumerable<IContentBase> entities)
+    {
+        var paths = new List<string>();
+
+        foreach (IProperty? property in entities.SelectMany(x => x.Properties))
+        {
+            if (IsUploadFieldPropertyType(property.PropertyType))
+            {
+                paths.AddRange(GetPathsFromUploadField(property).ToArray());
+
+                continue;
+            }
+
+            if (IsBlockListPropertyType(property.PropertyType))
+            {
+                foreach (IPropertyValue blockPropertyValue in property.Values)
+                {
+                    paths.AddRange(GetPathsFromBlockProperties(GetBlockEditorData(blockPropertyValue.PublishedValue, _blockListEditorValues)));
+                    paths.AddRange(GetPathsFromBlockProperties(GetBlockEditorData(blockPropertyValue.EditedValue, _blockListEditorValues)));
+                }
+
+                continue;
+            }
+
+            if (IsBlockGridPropertyType(property.PropertyType))
+            {
+                foreach (IPropertyValue blockPropertyValue in property.Values)
+                {
+                    paths.AddRange(GetPathsFromBlockProperties(GetBlockEditorData(blockPropertyValue.PublishedValue, _blockGridEditorValues)));
+                    paths.AddRange(GetPathsFromBlockProperties(GetBlockEditorData(blockPropertyValue.EditedValue, _blockGridEditorValues)));
+                }
+
+                continue;
+            }
+        }
+
+        return paths;
+    }
+
+    private IEnumerable<string> GetPathsFromUploadField(IProperty property)
+    {
+        foreach (IPropertyValue propertyValue in property.Values)
+        {
+            if (propertyValue.PublishedValue != null && propertyValue.PublishedValue is string publishedUrl && !string.IsNullOrWhiteSpace(publishedUrl))
+            {
+                yield return _mediaFileManager.FileSystem.GetRelativePath(publishedUrl);
+            }
+
+            if (propertyValue.EditedValue != null && propertyValue.EditedValue is string editedUrl && !string.IsNullOrWhiteSpace(editedUrl))
+            {
+                yield return _mediaFileManager.FileSystem.GetRelativePath(editedUrl);
+            }
+        }
+    }
+
+    private IEnumerable<string> GetPathsFromBlockProperties<TValue, TLayout>(BlockEditorData<TValue, TLayout>? blockEditorData)
+        where TValue : BlockValue<TLayout>, new()
+        where TLayout : class, IBlockLayoutItem, new()
+    {
+        if (blockEditorData == null)
+        {
+            yield break;
+        }
+
+        IEnumerable<BlockItemData> blockItemsData = blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData);
+
+        foreach (BlockItemData blockItemData in blockItemsData)
+        {
+            foreach (BlockPropertyValue blockItemDataValue in blockItemData.Values)
+            {
+                if (blockItemDataValue.Value == null)
+                {
+                    continue;
+                }
+
+                IPropertyType? propertyType = blockItemDataValue.PropertyType;
+
+                if (propertyType == null)
+                {
+                    continue;
+                }
+
+                if (IsUploadFieldPropertyType(propertyType))
+                {
+                    FileUploadValue? originalValue = _fileUploadValueParser.Parse(blockItemDataValue.Value);
+
+                    if (string.IsNullOrWhiteSpace(originalValue?.Src))
+                    {
+                        continue;
+                    }
+
+                    yield return _mediaFileManager.FileSystem.GetRelativePath(originalValue.Src);
+
+                    continue;
+                }
+
+                if (IsBlockListPropertyType(propertyType))
+                {
+                    BlockEditorData<BlockListValue, BlockListLayoutItem>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, _blockListEditorValues);
+
+                    IEnumerable<string> paths = GetPathsFromBlockProperties(blockItemEditorDataValue);
+
+                    foreach (var path in paths)
+                    {
+                        yield return path;
+                    }
+
+                    continue;
+                }
+
+                if (IsBlockGridPropertyType(propertyType))
+                {
+                    BlockEditorData<BlockGridValue, BlockGridLayoutItem>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, _blockGridEditorValues);
+
+                    IEnumerable<string> paths = GetPathsFromBlockProperties(blockItemEditorDataValue);
+
+                    foreach (var path in paths)
+                    {
+                        yield return path;
+                    }
+
+                    continue;
+                }
+            }
+        }
+    }
+
+    #endregion
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
@@ -335,78 +510,5 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     private static bool IsBlockGridPropertyType(IPropertyType propertyType)
     {
         return propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.BlockGrid;
-    }
-
-    /// <summary>
-    ///     The paths to all file upload property files contained within a collection of content entities
-    /// </summary>
-    /// <param name="entities"></param>
-    private IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
-        .SelectMany(x => x.Properties)
-        .Where(x => IsUploadFieldPropertyType(x.PropertyType))
-        .SelectMany(GetFilePathsFromPropertyValues)
-        .Distinct();
-
-    /// <summary>
-    ///     Look through all property values stored against the property and resolve any file paths stored
-    /// </summary>
-    /// <param name="prop"></param>
-    /// <returns></returns>
-    private IEnumerable<string> GetFilePathsFromPropertyValues(IProperty prop)
-    {
-        IReadOnlyCollection<IPropertyValue> propVals = prop.Values;
-        foreach (IPropertyValue propertyValue in propVals)
-        {
-            // check if the published value contains data and return it
-            var propVal = propertyValue.PublishedValue;
-            if (propVal != null && propVal is string str1 && !str1.IsNullOrWhiteSpace())
-            {
-                yield return _mediaFileManager.FileSystem.GetRelativePath(str1);
-            }
-
-            // check if the edited value contains data and return it
-            propVal = propertyValue.EditedValue;
-            if (propVal != null && propVal is string str2 && !str2.IsNullOrWhiteSpace())
-            {
-                yield return _mediaFileManager.FileSystem.GetRelativePath(str2);
-            }
-        }
-    }
-
-    private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
-    {
-        IEnumerable<string> filePathsToDelete = ContainedFilePaths(deletedEntities);
-        _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
-    }
-
-    /// <summary>
-    ///     Auto-fill properties (or clear).
-    /// </summary>
-    private void AutoFillProperties(IContentBase model)
-    {
-        IEnumerable<IProperty> properties = model.Properties.Where(x => IsUploadFieldPropertyType(x.PropertyType));
-
-        foreach (IProperty property in properties)
-        {
-            ImagingAutoFillUploadField? autoFillConfig = _contentSettings.CurrentValue.GetConfig(property.Alias);
-            if (autoFillConfig == null)
-            {
-                continue;
-            }
-
-            foreach (IPropertyValue pvalue in property.Values)
-            {
-                var svalue = property.GetValue(pvalue.Culture, pvalue.Segment) as string;
-                if (string.IsNullOrWhiteSpace(svalue))
-                {
-                    _uploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
-                }
-                else
-                {
-                    _uploadAutoFillProperties.Populate(model, autoFillConfig,
-                        _mediaFileManager.FileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
-                }
-            }
-        }
     }
 }
