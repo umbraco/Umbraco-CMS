@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
@@ -103,30 +104,47 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     /// <returns></returns>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
-        {
-            return null;
-        }
+        // Note: we can't return here if editorValue is null or empty, because these is the following case:
+        // - current value not null (which means doc has at least one element in block list)
+        // - editor value (new value) is null (which means doc has no elements in block list)
+        // - if we check editor value for null value and return before MapBlockValueFromEditor, then we will not trigget updates for properties
+        // for most of the props it is fine, but for props which contains state out of umb resoucers it might be critical (e.g. file upload field)
+        // so, we must run MapBlockValueFromEditor even if editorValue is null or string.IsNullOrWhiteSpace(editorValue.Value.ToString()) is true.
 
-        BlockEditorData<TValue, TLayout>? blockEditorData;
-        try
-        {
-            blockEditorData = BlockEditorValues.DeserializeAndClean(editorValue.Value);
-        }
-        catch
-        {
-            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
-            return string.Empty;
-        }
+        BlockEditorData<TValue, TLayout>? currentBlockEditorData = GetBlockEditorData(currentValue);
+        BlockEditorData<TValue, TLayout>? blockEditorData = GetBlockEditorData(editorValue.Value);
 
-        if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
+        // we can skip MapBlockValueFromEditor if for both editorValue and currentValue values are empty
+        if (IsBlockEditorDataEmpty(currentBlockEditorData) && IsBlockEditorDataEmpty(blockEditorData))
         {
             return string.Empty;
         }
 
-        MapBlockValueFromEditor(blockEditorData.BlockValue);
+        MapBlockValueFromEditor(blockEditorData?.BlockValue, currentBlockEditorData?.BlockValue, editorValue.ContentKey);
+
+        // here we ensure that new value is not empty, if empty - skip serialization
+        if (IsBlockEditorDataEmpty(blockEditorData))
+        {
+            return string.Empty;
+        }
 
         // return json
         return JsonSerializer.Serialize(blockEditorData.BlockValue);
     }
+
+    private BlockEditorData<TValue, TLayout>? GetBlockEditorData(object? value)
+    {
+        try
+        {
+            return BlockEditorValues.DeserializeAndClean(value);
+        }
+        catch
+        {
+            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
+            return null;
+        }
+    }
+
+    private static bool IsBlockEditorDataEmpty([NotNullWhen(false)] BlockEditorData<TValue, TLayout>? editorData)
+        => editorData is null || editorData.BlockValue.ContentData.Count == 0;
 }

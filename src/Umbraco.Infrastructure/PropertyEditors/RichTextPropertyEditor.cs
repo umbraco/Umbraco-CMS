@@ -247,6 +247,8 @@ public class RichTextPropertyEditor : DataEditor
                 return null;
             }
 
+            TryParseEditorValue(currentValue, out RichTextEditorValue? currentRichTextEditorValue);
+
             Guid userKey = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ??
                           Constants.Security.SuperUserKey;
 
@@ -267,7 +269,7 @@ public class RichTextPropertyEditor : DataEditor
 
             richTextEditorValue.Markup = sanitized.NullOrWhiteSpaceAsNull() ?? string.Empty;
 
-            RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, MapBlockValueFromEditor);
+            RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueFromEditor(blockValue, currentRichTextEditorValue?.Blocks, editorValue.ContentKey));
 
             // return json
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(cleanedUpRichTextEditorValue, _jsonSerializer);

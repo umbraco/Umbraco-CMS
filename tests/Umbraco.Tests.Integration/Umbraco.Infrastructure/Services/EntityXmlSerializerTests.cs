@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -18,6 +19,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -161,6 +163,9 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
             Services);
 
         var ignored = new FileUploadPropertyEditor(
+            Mock.Of<IBlockEditorElementTypeCache>(),
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<ILogger<FileUploadPropertyEditor>>(),
             DataValueEditorFactory,
             mediaFileManager,
             Mock.Of<IOptionsMonitor<ContentSettings>>(x => x.CurrentValue == contentSettings),
