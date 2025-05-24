@@ -10,7 +10,7 @@ import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validatio
 export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 	private _alias?: string | undefined;
 
-	@property()
+	@property({ type: String, attribute: 'alias' })
 	public get alias(): string | undefined {
 		return this._alias;
 	}
