@@ -22,7 +22,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	@state()
-	_properties: Array<UmbPropertyTypeModel> = [];
+	_properties: Array<string> = [];
 
 	@state()
 	_visibleProperties?: Array<UmbPropertyTypeModel>;
@@ -36,7 +36,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 			);
 
 			this.observe(
-				this.#propertyStructureHelper.propertyStructure,
+				this.#propertyStructureHelper.propertyAliases,
 				(properties) => {
 					this._properties = properties;
 				},
@@ -48,11 +48,9 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	override render() {
 		return repeat(
 			this._properties,
-			(property) => property.alias,
+			(property) => property,
 			(property) =>
-				html`<umb-content-workspace-property
-					class="property"
-					alias=${property.alias}></umb-content-workspace-property>`,
+				html`<umb-content-workspace-property class="property" alias=${property}></umb-content-workspace-property>`,
 		);
 	}
 
