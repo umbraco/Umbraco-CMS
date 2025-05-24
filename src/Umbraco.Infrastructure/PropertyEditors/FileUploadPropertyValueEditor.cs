@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -27,6 +28,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
+    private readonly FileUploadValueParser _valueParser;
     private ContentSettings _contentSettings;
 
     public FileUploadPropertyValueEditor(
@@ -48,6 +50,8 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
         contentSettings.OnChange(x => _contentSettings = x);
+
+        _valueParser = new FileUploadValueParser(jsonSerializer);
 
         Validators.Add(new TemporaryFileUploadValidator(
             () => _contentSettings,
@@ -83,13 +87,13 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     /// </remarks>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        FileUploadValue? editorModelValue = ParseFileUploadValue(editorValue.Value);
+        FileUploadValue? editorModelValue = _valueParser.Parse(editorValue.Value);
 
         // no change?
         if (editorModelValue?.TemporaryFileId.HasValue is not true && string.IsNullOrEmpty(editorModelValue?.Src) is false)
         {
             // since current value can be json string, we have to parse value
-            var currentModelValue = ParseFileUploadValue(currentValue);
+            var currentModelValue = _valueParser.Parse(currentValue);
 
             return currentModelValue?.Src;
         }
@@ -149,28 +153,8 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         return filepath is null ? null : _mediaFileManager.FileSystem.GetUrl(filepath);
     }
 
-    private FileUploadValue? ParseFileUploadValue(object? editorValue)
-    {
-        if (editorValue is null)
-        {
-            return null;
-        }
-
-        if (editorValue is string sourceString && sourceString.DetectIsJson() is false)
-        {
-            return new FileUploadValue()
-            {
-                Src = sourceString
-            };
-        }
-
-        return _jsonSerializer.TryDeserialize(editorValue, out FileUploadValue? modelValue)
-            ? modelValue
-            : throw new ArgumentException($"Could not parse editor value to a {nameof(FileUploadValue)} object.");
-    }
-
     private Guid? TryParseTemporaryFileKey(object? editorValue)
-        => ParseFileUploadValue(editorValue)?.TemporaryFileId;
+        => _valueParser.Parse(editorValue)?.TemporaryFileId;
 
     private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
         => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
