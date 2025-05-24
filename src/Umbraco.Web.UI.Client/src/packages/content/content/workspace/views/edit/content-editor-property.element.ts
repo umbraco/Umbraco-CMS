@@ -33,7 +33,7 @@ export class UmbContentWorkspaceViewEditPropertyElement extends UmbLitElement {
 
 	override willUpdate(changedProperties: Map<string, any>) {
 		super.willUpdate(changedProperties);
-		if (changedProperties.has('type') || changedProperties.has('variantId') || changedProperties.has('_context')) {
+		if (changedProperties.has('property') || changedProperties.has('variantId') || changedProperties.has('_context')) {
 			if (this.variantId && this.property && this._context) {
 				const propertyVariantId = new UmbVariantId(
 					this.property.variesByCulture ? this.variantId.culture : null,
