@@ -2,11 +2,8 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -98,42 +95,14 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
 
             if (IsBlockListPropertyType(property.PropertyType))
             {
-                foreach (IPropertyValue blockPropertyValue in property.Values)
-                {
-                    var rawValue = property.GetValue(blockPropertyValue.Culture, blockPropertyValue.Segment);
-
-                    BlockEditorData<BlockListValue, BlockListLayoutItem>? blockEditorData = GetBlockEditorData(rawValue, _blockListEditorValues);
-
-                    (bool hasUpdates, string? updatedValue) = UpdateBlockProperty(notification, property.PropertyType, blockEditorData);
-
-                    if (hasUpdates)
-                    {
-                        notification.Copy.SetValue(property.Alias, updatedValue, blockPropertyValue.Culture, blockPropertyValue.Segment);
-                    }
-
-                    isUpdated |= hasUpdates;
-                }
+                isUpdated |= UpdateBlockProperty(notification, property, _blockListEditorValues);
 
                 continue;
             }
 
             if (IsBlockGridPropertyType(property.PropertyType))
             {
-                foreach (IPropertyValue blockPropertyValue in property.Values)
-                {
-                    var rawValue = property.GetValue(blockPropertyValue.Culture, blockPropertyValue.Segment);
-
-                    BlockEditorData<BlockGridValue, BlockGridLayoutItem>? blockEditorData = GetBlockEditorData(rawValue, _blockGridEditorValues);
-
-                    (bool hasUpdates, string? updatedValue) = UpdateBlockProperty(notification, property.PropertyType, blockEditorData);
-
-                    if (hasUpdates)
-                    {
-                        notification.Copy.SetValue(property.Alias, updatedValue, blockPropertyValue.Culture, blockPropertyValue.Segment);
-                    }
-
-                    isUpdated |= hasUpdates;
-                }
+                isUpdated |= UpdateBlockProperty(notification, property, _blockGridEditorValues);
 
                 continue;
             }
@@ -169,7 +138,32 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         return isUpdated;
     }
 
-    private (bool, string?) UpdateBlockProperty<TValue, TLayout>(ContentCopiedNotification notification, IPropertyType blockPropertyType, BlockEditorData<TValue, TLayout>? blockEditorData)
+    private bool UpdateBlockProperty<TValue, TLayout>(ContentCopiedNotification notification, IProperty property, BlockEditorValues<TValue, TLayout> blockEditorValues)
+        where TValue : BlockValue<TLayout>, new()
+        where TLayout : class, IBlockLayoutItem, new()
+    {
+        var isUpdated = false;
+
+        foreach (IPropertyValue blockPropertyValue in property.Values)
+        {
+            var rawBlockPropertyValue = property.GetValue(blockPropertyValue.Culture, blockPropertyValue.Segment);
+
+            BlockEditorData<TValue, TLayout>? blockEditorData = GetBlockEditorData(rawBlockPropertyValue, blockEditorValues);
+
+            (bool hasUpdates, string? updatedValue) = UpdateBlockEditorData(notification, blockEditorData);
+
+            if (hasUpdates)
+            {
+                notification.Copy.SetValue(property.Alias, updatedValue, blockPropertyValue.Culture, blockPropertyValue.Segment);
+            }
+
+            isUpdated |= hasUpdates;
+        }
+
+        return isUpdated;
+    }
+
+    private (bool, string?) UpdateBlockEditorData<TValue, TLayout>(ContentCopiedNotification notification, BlockEditorData<TValue, TLayout>? blockEditorData)
         where TValue : BlockValue<TLayout>, new()
         where TLayout : class, IBlockLayoutItem, new()
     {
@@ -180,73 +174,83 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
             return (isUpdated, null);
         }
 
-        IEnumerable<BlockItemData> blockItemsData = blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData);
+        IEnumerable<BlockPropertyValue> blockPropertyValues = blockEditorData.BlockValue.ContentData
+            .Concat(blockEditorData.BlockValue.SettingsData)
+            .SelectMany(x => x.Values);
 
-        foreach (BlockItemData blockItemData in blockItemsData)
+        foreach (BlockPropertyValue blockPropertyValue in blockPropertyValues)
         {
-            foreach (BlockPropertyValue blockItemDataValue in blockItemData.Values)
+            if (blockPropertyValue.Value == null)
             {
-                if (blockItemDataValue.Value == null)
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                IPropertyType? propertyType = blockItemDataValue.PropertyType;
+            IPropertyType? propertyType = blockPropertyValue.PropertyType;
 
-                if (propertyType == null)
-                {
-                    continue;
-                }
+            if (propertyType == null)
+            {
+                continue;
+            }
 
-                if (IsUploadFieldPropertyType(propertyType))
-                {
-                    FileUploadValue? originalValue = _fileUploadValueParser.Parse(blockItemDataValue.Value);
+            if (IsUploadFieldPropertyType(propertyType))
+            {
+                isUpdated |= UpdateUploadFieldBlockPropertyValue(blockPropertyValue, notification, propertyType);
 
-                    if (string.IsNullOrWhiteSpace(originalValue?.Src))
-                    {
-                        continue;
-                    }
+                continue;
+            }
 
-                    var copyFileUrl = CopyFile(originalValue.Src, notification, propertyType);
+            if (IsBlockListPropertyType(propertyType))
+            {
+                (bool hasUpdates, string? newValue) = UpdateBlockPropertyValue(blockPropertyValue, notification, _blockListEditorValues);
 
-                    blockItemDataValue.Value = copyFileUrl;
+                isUpdated |= hasUpdates;
 
-                    isUpdated = true;
+                blockPropertyValue.Value = newValue;
 
-                    continue;
-                }
+                continue;
+            }
 
-                if (IsBlockListPropertyType(propertyType))
-                {
-                    BlockEditorData<BlockListValue, BlockListLayoutItem>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, _blockListEditorValues);
+            if (IsBlockGridPropertyType(propertyType))
+            {
+                (bool hasUpdates, string? newValue) = UpdateBlockPropertyValue(blockPropertyValue, notification, _blockGridEditorValues);
 
-                    (bool hasUpdates, string? newValue) = UpdateBlockProperty(notification, propertyType, blockItemEditorDataValue);
+                isUpdated |= hasUpdates;
 
-                    isUpdated |= hasUpdates;
+                blockPropertyValue.Value = newValue;
 
-                    blockItemDataValue.Value = newValue;
-
-                    continue;
-                }
-
-                if (IsBlockGridPropertyType(propertyType))
-                {
-                    BlockEditorData<BlockGridValue, BlockGridLayoutItem>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, _blockGridEditorValues);
-
-                    (bool hasUpdates, string? newValue) = UpdateBlockProperty(notification, propertyType, blockItemEditorDataValue);
-
-                    isUpdated |= hasUpdates;
-
-                    blockItemDataValue.Value = newValue;
-
-                    continue;
-                }
+                continue;
             }
         }
 
         var updatedValue = _jsonSerializer.Serialize(blockEditorData.BlockValue);
 
         return (isUpdated, updatedValue);
+    }
+
+    private bool UpdateUploadFieldBlockPropertyValue(BlockPropertyValue blockItemDataValue, ContentCopiedNotification notification, IPropertyType propertyType)
+    {
+        FileUploadValue? originalValue = _fileUploadValueParser.Parse(blockItemDataValue.Value);
+
+        // if original value is empty, we do not need to copy file
+        if (string.IsNullOrWhiteSpace(originalValue?.Src))
+        {
+            return false;
+        }
+
+        var copyFileUrl = CopyFile(originalValue.Src, notification, propertyType);
+
+        blockItemDataValue.Value = copyFileUrl;
+
+        return true;
+    }
+
+    private (bool, string?) UpdateBlockPropertyValue<TValue, TLayout>(BlockPropertyValue blockItemDataValue, ContentCopiedNotification notification, BlockEditorValues<TValue, TLayout> blockEditorValues)
+        where TValue : BlockValue<TLayout>, new()
+        where TLayout : class, IBlockLayoutItem, new()
+    {
+        BlockEditorData<TValue, TLayout>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, blockEditorValues);
+
+        return UpdateBlockEditorData(notification, blockItemEditorDataValue);
     }
 
     private string CopyFile(string originalFileUrl, ContentCopiedNotification notification, IPropertyType propertyType)
@@ -258,21 +262,6 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         var copyFileUrl = _mediaFileManager.FileSystem.GetUrl(copyFilePath);
 
         return copyFileUrl;
-    }
-
-    private static BlockEditorData<TValue, TLayout>? GetBlockEditorData<TValue, TLayout>(object? value, BlockEditorValues<TValue, TLayout> blockListEditorValues)
-        where TValue : BlockValue<TLayout>, new()
-        where TLayout : class, IBlockLayoutItem, new()
-    {
-        try
-        {
-            return blockListEditorValues.DeserializeAndClean(value);
-        }
-        catch
-        {
-            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
-            return null;
-        }
     }
 
     #endregion
@@ -344,29 +333,21 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         {
             if (IsUploadFieldPropertyType(property.PropertyType))
             {
-                paths.AddRange(GetPathsFromUploadField(property).ToArray());
+                paths.AddRange(GetPathsFromUploadFieldProperty(property));
 
                 continue;
             }
 
             if (IsBlockListPropertyType(property.PropertyType))
             {
-                foreach (IPropertyValue blockPropertyValue in property.Values)
-                {
-                    paths.AddRange(GetPathsFromBlockProperties(GetBlockEditorData(blockPropertyValue.PublishedValue, _blockListEditorValues)));
-                    paths.AddRange(GetPathsFromBlockProperties(GetBlockEditorData(blockPropertyValue.EditedValue, _blockListEditorValues)));
-                }
+                paths.AddRange(GetPathsFromBlockProperty(property, _blockListEditorValues));
 
                 continue;
             }
 
             if (IsBlockGridPropertyType(property.PropertyType))
             {
-                foreach (IPropertyValue blockPropertyValue in property.Values)
-                {
-                    paths.AddRange(GetPathsFromBlockProperties(GetBlockEditorData(blockPropertyValue.PublishedValue, _blockGridEditorValues)));
-                    paths.AddRange(GetPathsFromBlockProperties(GetBlockEditorData(blockPropertyValue.EditedValue, _blockGridEditorValues)));
-                }
+                paths.AddRange(GetPathsFromBlockProperty(property, _blockGridEditorValues));
 
                 continue;
             }
@@ -375,7 +356,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         return paths;
     }
 
-    private IEnumerable<string> GetPathsFromUploadField(IProperty property)
+    private IEnumerable<string> GetPathsFromUploadFieldProperty(IProperty property)
     {
         foreach (IPropertyValue propertyValue in property.Values)
         {
@@ -391,79 +372,107 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
     }
 
-    private IEnumerable<string> GetPathsFromBlockProperties<TValue, TLayout>(BlockEditorData<TValue, TLayout>? blockEditorData)
+    private IReadOnlyCollection<string> GetPathsFromBlockProperty<TValue, TLayout>(IProperty property, BlockEditorValues<TValue, TLayout> blockEditorValues)
         where TValue : BlockValue<TLayout>, new()
         where TLayout : class, IBlockLayoutItem, new()
     {
+        var paths = new List<string>();
+
+        foreach (IPropertyValue blockPropertyValue in property.Values)
+        {
+            paths.AddRange(GetPathsFromBlockEditorData(GetBlockEditorData(blockPropertyValue.PublishedValue, blockEditorValues)));
+            paths.AddRange(GetPathsFromBlockEditorData(GetBlockEditorData(blockPropertyValue.EditedValue, blockEditorValues)));
+        }
+
+        return paths;
+    }
+
+    private IReadOnlyCollection<string> GetPathsFromBlockEditorData<TValue, TLayout>(BlockEditorData<TValue, TLayout>? blockEditorData)
+        where TValue : BlockValue<TLayout>, new()
+        where TLayout : class, IBlockLayoutItem, new()
+    {
+        var paths = new List<string>();
+
         if (blockEditorData == null)
         {
-            yield break;
+            return paths;
         }
 
-        IEnumerable<BlockItemData> blockItemsData = blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData);
+        IEnumerable<BlockPropertyValue> blockPropertyValues = blockEditorData.BlockValue.ContentData
+            .Concat(blockEditorData.BlockValue.SettingsData)
+            .SelectMany(x => x.Values);
 
-        foreach (BlockItemData blockItemData in blockItemsData)
+        foreach (BlockPropertyValue blockPropertyValue in blockPropertyValues)
         {
-            foreach (BlockPropertyValue blockItemDataValue in blockItemData.Values)
+            if (blockPropertyValue.Value == null)
             {
-                if (blockItemDataValue.Value == null)
+                continue;
+            }
+
+            IPropertyType? propertyType = blockPropertyValue.PropertyType;
+
+            if (propertyType == null)
+            {
+                continue;
+            }
+
+            if (IsUploadFieldPropertyType(propertyType))
+            {
+                FileUploadValue? originalValue = _fileUploadValueParser.Parse(blockPropertyValue.Value);
+
+                if (string.IsNullOrWhiteSpace(originalValue?.Src))
                 {
                     continue;
                 }
 
-                IPropertyType? propertyType = blockItemDataValue.PropertyType;
+                paths.Add(_mediaFileManager.FileSystem.GetRelativePath(originalValue.Src));
 
-                if (propertyType == null)
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                if (IsUploadFieldPropertyType(propertyType))
-                {
-                    FileUploadValue? originalValue = _fileUploadValueParser.Parse(blockItemDataValue.Value);
+            if (IsBlockListPropertyType(propertyType))
+            {
+                paths.AddRange(GetPathsFromBlockPropertyValue(blockPropertyValue, _blockListEditorValues));
 
-                    if (string.IsNullOrWhiteSpace(originalValue?.Src))
-                    {
-                        continue;
-                    }
+                continue;
+            }
 
-                    yield return _mediaFileManager.FileSystem.GetRelativePath(originalValue.Src);
+            if (IsBlockGridPropertyType(propertyType))
+            {
+                paths.AddRange(GetPathsFromBlockPropertyValue(blockPropertyValue, _blockGridEditorValues));
 
-                    continue;
-                }
-
-                if (IsBlockListPropertyType(propertyType))
-                {
-                    BlockEditorData<BlockListValue, BlockListLayoutItem>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, _blockListEditorValues);
-
-                    IEnumerable<string> paths = GetPathsFromBlockProperties(blockItemEditorDataValue);
-
-                    foreach (var path in paths)
-                    {
-                        yield return path;
-                    }
-
-                    continue;
-                }
-
-                if (IsBlockGridPropertyType(propertyType))
-                {
-                    BlockEditorData<BlockGridValue, BlockGridLayoutItem>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, _blockGridEditorValues);
-
-                    IEnumerable<string> paths = GetPathsFromBlockProperties(blockItemEditorDataValue);
-
-                    foreach (var path in paths)
-                    {
-                        yield return path;
-                    }
-
-                    continue;
-                }
+                continue;
             }
         }
+
+        return paths;
+    }
+
+    private IReadOnlyCollection<string> GetPathsFromBlockPropertyValue<TValue, TLayout>(BlockPropertyValue blockItemDataValue, BlockEditorValues<TValue, TLayout> blockEditorValues)
+        where TValue : BlockValue<TLayout>, new()
+        where TLayout : class, IBlockLayoutItem, new()
+    {
+        BlockEditorData<TValue, TLayout>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, blockEditorValues);
+
+        return GetPathsFromBlockEditorData(blockItemEditorDataValue);
     }
 
     #endregion
+
+    private static BlockEditorData<TValue, TLayout>? GetBlockEditorData<TValue, TLayout>(object? value, BlockEditorValues<TValue, TLayout> blockListEditorValues)
+        where TValue : BlockValue<TLayout>, new()
+        where TLayout : class, IBlockLayoutItem, new()
+    {
+        try
+        {
+            return blockListEditorValues.DeserializeAndClean(value);
+        }
+        catch
+        {
+            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
+            return null;
+        }
+    }
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
