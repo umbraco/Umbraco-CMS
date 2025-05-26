@@ -314,6 +314,24 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 		}
 	}
 
+	private getRedirectDelay() {
+		if ('connection' in navigator) {
+			const connection =
+				navigator.connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+
+			switch (connection.effectiveType) {
+				case 'slow-2g':
+				case '2g':
+					return 1200;
+				case '3g':
+					return 800;
+				case '4g':
+					return 200;
+			}
+		}
+		return 400;
+	}
+
 	/**
 	 * Loads a new path based on the routes.
 	 * Returns true if a navigation was made to a new page.
@@ -387,6 +405,14 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 				// Redirect if necessary
 				if (isRedirectRoute(route)) {
 					cleanup();
+					if (route.awaitStability === true) {
+						// await until browser is done loading, based on a guess:
+						const delay = this.getRedirectDelay();
+						await new Promise((resolve) => setTimeout(resolve, delay));
+						if (navigationInvalidated) {
+							return cancel();
+						}
+					}
 					handleRedirect(this, route);
 					return false;
 				}
