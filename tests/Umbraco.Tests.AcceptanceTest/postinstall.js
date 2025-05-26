@@ -15,8 +15,7 @@ try {
 }
 
 try {
-  if (fs.existsSync(consoleErrorsPath)) {
-  } else {
+  if (!fs.existsSync(consoleErrorsPath)) {
     const consoleErrorsFileContent = `{
   "consoleErrors": []
 }`;
