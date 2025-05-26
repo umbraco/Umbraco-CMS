@@ -25,23 +25,21 @@ internal sealed class FileUploadValueParser
     /// <exception cref="ArgumentException"></exception>
     public FileUploadValue? Parse(object? editorValue)
     {
+        if (editorValue is null)
         {
-            if (editorValue is null)
-            {
-                return null;
-            }
-
-            if (editorValue is string sourceString && sourceString.DetectIsJson() is false)
-            {
-                return new FileUploadValue()
-                {
-                    Src = sourceString,
-                };
-            }
-
-            return _jsonSerializer.TryDeserialize(editorValue, out FileUploadValue? modelValue)
-                ? modelValue
-                : throw new ArgumentException($"Could not parse editor value to a {nameof(FileUploadValue)} object.");
+            return null;
         }
+
+        if (editorValue is string sourceString && sourceString.DetectIsJson() is false)
+        {
+            return new FileUploadValue()
+            {
+                Src = sourceString,
+            };
+        }
+
+        return _jsonSerializer.TryDeserialize(editorValue, out FileUploadValue? modelValue)
+            ? modelValue
+            : throw new ArgumentException($"Could not parse editor value to a {nameof(FileUploadValue)} object.");
     }
 }
