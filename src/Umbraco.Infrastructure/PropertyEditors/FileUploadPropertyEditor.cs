@@ -2,10 +2,12 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -34,31 +36,62 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     private readonly IJsonSerializer _jsonSerializer;
     private readonly MediaFileManager _mediaFileManager;
     private readonly UploadAutoFillProperties _uploadAutoFillProperties;
-    private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
-    private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockGridEditorValues;
     private readonly FileUploadValueParser _fileUploadValueParser;
 
+    private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
+    private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockGridEditorValues;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileUploadPropertyEditor"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
     public FileUploadPropertyEditor(
-        IBlockEditorElementTypeCache blockEditorElementTypeCache,
-        IJsonSerializer jsonSerializer,
-        ILogger<FileUploadPropertyEditor> logger,
         IDataValueEditorFactory dataValueEditorFactory,
         MediaFileManager mediaFileManager,
         IOptionsMonitor<ContentSettings> contentSettings,
         UploadAutoFillProperties uploadAutoFillProperties,
         IContentService contentService,
         IIOHelper ioHelper)
+        : this(
+              dataValueEditorFactory,
+              mediaFileManager,
+              contentSettings,
+              uploadAutoFillProperties,
+              contentService,
+              ioHelper,
+              StaticServiceProvider.Instance.GetRequiredService<IBlockEditorElementTypeCache>(),
+              StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(),
+              StaticServiceProvider.Instance.GetRequiredService<ILogger<FileUploadPropertyEditor>>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileUploadPropertyEditor"/> class.
+    /// </summary>
+    public FileUploadPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        MediaFileManager mediaFileManager,
+        IOptionsMonitor<ContentSettings> contentSettings,
+        UploadAutoFillProperties uploadAutoFillProperties,
+        IContentService contentService,
+        IIOHelper ioHelper,
+        IBlockEditorElementTypeCache blockEditorElementTypeCache,
+        IJsonSerializer jsonSerializer,
+        ILogger<FileUploadPropertyEditor> logger)
         : base(dataValueEditorFactory)
     {
-        _jsonSerializer = jsonSerializer;
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
         _contentSettings = contentSettings;
         _uploadAutoFillProperties = uploadAutoFillProperties;
         _contentService = contentService;
         _ioHelper = ioHelper;
+        _jsonSerializer = jsonSerializer;
+
         SupportsReadOnly = true;
+
         _blockListEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(new BlockListEditorDataConverter(jsonSerializer), blockEditorElementTypeCache, logger);
         _blockGridEditorValues = new BlockEditorValues<BlockGridValue, BlockGridLayoutItem>(new BlockGridEditorDataConverter(jsonSerializer), blockEditorElementTypeCache, logger);
+
         _fileUploadValueParser = new FileUploadValueParser(jsonSerializer);
     }
 
@@ -78,6 +111,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
 
     #region Handle Copied Notifications
 
+    /// <inheritdoc/>
     public void Handle(ContentCopiedNotification notification)
     {
         ArgumentNullException.ThrowIfNull(notification);
@@ -119,18 +153,18 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     {
         var isUpdated = false;
 
-        // copy each of the property values (variants, segments) to the destination
+        // Copy each of the property values (variants, segments) to the destination.
         foreach (IPropertyValue propertyValue in property.Values)
         {
-            var rawFileUrl = property.GetValue(propertyValue.Culture, propertyValue.Segment);
-            if (rawFileUrl == null || rawFileUrl is not string originalFileUrl || string.IsNullOrWhiteSpace(originalFileUrl))
+            var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
+            if (propVal == null || propVal is not string sourceUrl || string.IsNullOrWhiteSpace(sourceUrl))
             {
                 continue;
             }
 
-            var copyFileUrl = CopyFile(originalFileUrl, notification, property.PropertyType);
+            var copyUrl = CopyFile(sourceUrl, notification.Copy, property.PropertyType);
 
-            notification.Copy.SetValue(property.Alias, copyFileUrl, propertyValue.Culture, propertyValue.Segment);
+            notification.Copy.SetValue(property.Alias, copyUrl, propertyValue.Culture, propertyValue.Segment);
 
             isUpdated = true;
         }
@@ -237,7 +271,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
             return false;
         }
 
-        var copyFileUrl = CopyFile(originalValue.Src, notification, propertyType);
+        var copyFileUrl = CopyFile(originalValue.Src, notification.Copy, propertyType);
 
         blockItemDataValue.Value = copyFileUrl;
 
@@ -253,21 +287,18 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         return UpdateBlockEditorData(notification, blockItemEditorDataValue);
     }
 
-    private string CopyFile(string originalFileUrl, ContentCopiedNotification notification, IPropertyType propertyType)
+    private string CopyFile(string sourceUrl, IContent destinationContent, IPropertyType propertyType)
     {
-        var originalFilePath = _mediaFileManager.FileSystem.GetRelativePath(originalFileUrl);
-        var originalFileName = Path.GetFileName(originalFilePath);
-        // TODO: maybe we should use temporary file system to avoid dangling files if on content save something goes wrong
-        var copyFilePath = _mediaFileManager.CopyFile(notification.Copy, propertyType, originalFilePath);
-        var copyFileUrl = _mediaFileManager.FileSystem.GetUrl(copyFilePath);
-
-        return copyFileUrl;
+        var sourcePath = _mediaFileManager.FileSystem.GetRelativePath(sourceUrl);
+        var copyPath = _mediaFileManager.CopyFile(destinationContent, propertyType, sourcePath);
+        return _mediaFileManager.FileSystem.GetUrl(copyPath);
     }
 
     #endregion
 
     #region Handle Saving Notifications
 
+    /// <inheritdoc/>
     public void Handle(MediaSavingNotification notification)
     {
         foreach (IMedia entity in notification.SavedEntities)
@@ -300,8 +331,12 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
                 }
                 else
                 {
-                    _uploadAutoFillProperties.Populate(model, autoFillConfig,
-                        _mediaFileManager.FileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
+                    _uploadAutoFillProperties.Populate(
+                        model,
+                        autoFillConfig,
+                        _mediaFileManager.FileSystem.GetRelativePath(svalue),
+                        pvalue.Culture,
+                        pvalue.Segment);
                 }
             }
         }
@@ -311,8 +346,13 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
 
     #region Handle Deleted Notifications
 
+    /// <inheritdoc/>
     public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+
+    /// <inheritdoc/>
     public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+
+    /// <inheritdoc/>
     public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
     private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
@@ -469,7 +509,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
         catch
         {
-            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
+            // If this occurs it means the data is invalid. Shouldn't happen but could if we change the data format.
             return null;
         }
     }
@@ -493,9 +533,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     ///     <c>true</c> if the specified property is an upload field; otherwise, <c>false</c>.
     /// </returns>
     private static bool IsUploadFieldPropertyType(IPropertyType propertyType)
-    {
-        return propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
-    }
+        => propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
 
     /// <summary>
     ///     Gets a value indicating whether a property is an block list field.
@@ -505,9 +543,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     ///     <c>true</c> if the specified property is an block list field; otherwise, <c>false</c>.
     /// </returns>
     private static bool IsBlockListPropertyType(IPropertyType propertyType)
-    {
-        return propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.BlockList;
-    }
+        => propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.BlockList;
 
     /// <summary>
     ///     Gets a value indicating whether a property is an block grid field.
@@ -517,7 +553,5 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     ///     <c>true</c> if the specified property is an block grid field; otherwise, <c>false</c>.
     /// </returns>
     private static bool IsBlockGridPropertyType(IPropertyType propertyType)
-    {
-        return propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.BlockGrid;
-    }
+        => propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.BlockGrid;
 }

@@ -147,12 +147,12 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
     private void MapBlockItemDataFromEditor(List<BlockItemData> editedItems, List<BlockItemData> currentItems, Guid contentKey)
     {
-        // creating mapping between edited and current block items
+        // Create mapping between edited and current block items.
         IEnumerable<BlockStateMapping<BlockItemData>> itemsMapping = GetBlockStatesMapping(editedItems, currentItems, (mapping, current) => mapping.Edited?.Key == current.Key);
 
         foreach (BlockStateMapping<BlockItemData> itemMapping in itemsMapping)
         {
-            // creating mapping between edited and current block item values
+            // Create mapping between edited and current block item values.
             IEnumerable<BlockStateMapping<BlockPropertyValue>> valuesMapping = GetBlockStatesMapping(itemMapping.Edited?.Values, itemMapping.Current?.Values, (mapping, current) => mapping.Edited?.Alias == current.Alias);
 
             foreach (BlockStateMapping<BlockPropertyValue> valueMapping in valuesMapping)
@@ -164,28 +164,28 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     ?? currentValue?.PropertyType
                     ?? throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(editedItems));
 
-                // Lookup the property editor
+                // Lookup the property editor.
                 IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
                 if (propertyEditor is null)
                 {
                     continue;
                 }
 
-                // Fetch the property types prevalue
+                // Fetch the property types prevalue.
                 var configuration = _dataTypeConfigurationCache.GetConfiguration(propertyType.DataTypeKey);
 
-                // Create a real content property data object
+                // Create a real content property data object.
                 var propertyData = new ContentPropertyData(editedValue?.Value, configuration)
                 {
                     ContentKey = contentKey,
                     PropertyTypeKey = propertyType.Key,
                 };
 
-                // Get the property editor to do it's conversion
+                // Get the property editor to do it's conversion.
                 IDataValueEditor valueEditor = propertyEditor.GetValueEditor();
                 var newValue = valueEditor.FromEditor(propertyData, currentValue?.Value);
 
-                // update the raw value since this is what will get serialized out
+                // Update the raw value since this is what will get serialized out.
                 if (editedValue != null)
                 {
                     editedValue.Value = newValue;

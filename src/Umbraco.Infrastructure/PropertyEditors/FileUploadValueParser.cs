@@ -4,28 +4,23 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.PropertyEditors;
 
-// TODO: add interfacea and inject it via DI
-
 /// <summary>
-/// File upload value parser
+/// Handles the parsing of raw values to <see cref="FileUploadValue"/> objects.
 /// </summary>
-public sealed class FileUploadValueParser
+internal sealed class FileUploadValueParser
 {
     private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
-    /// Creates instane of FileUploadValueParser
+    /// Initializes a new instance of the <see cref="FileUploadValueParser"/> class.
     /// </summary>
     /// <param name="jsonSerializer"></param>
-    public FileUploadValueParser(IJsonSerializer jsonSerializer)
-    {
-        _jsonSerializer = jsonSerializer;
-    }
+    public FileUploadValueParser(IJsonSerializer jsonSerializer) => _jsonSerializer = jsonSerializer;
 
     /// <summary>
-    /// Parses raw value to <a cref="FileUploadValue"></a>
+    /// Parses raw value to a <see cref="FileUploadValue"/>.
     /// </summary>
-    /// <param name="editorValue"></param>
+    /// <param name="editorValue">The editor value.</param>
     /// <returns><a cref="FileUploadValue"></a> value</returns>
     /// <exception cref="ArgumentException"></exception>
     public FileUploadValue? Parse(object? editorValue)
@@ -40,7 +35,7 @@ public sealed class FileUploadValueParser
             {
                 return new FileUploadValue()
                 {
-                    Src = sourceString
+                    Src = sourceString,
                 };
             }
 

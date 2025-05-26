@@ -24,13 +24,15 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class FileUploadPropertyValueEditor : DataValueEditor
 {
     private readonly MediaFileManager _mediaFileManager;
-    private readonly IJsonSerializer _jsonSerializer;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly FileUploadValueParser _valueParser;
     private ContentSettings _contentSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileUploadPropertyValueEditor"/> class.
+    /// </summary>
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
@@ -44,14 +46,13 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
-        _jsonSerializer = jsonSerializer;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
+        _valueParser = new FileUploadValueParser(jsonSerializer);
+
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
         contentSettings.OnChange(x => _contentSettings = x);
-
-        _valueParser = new FileUploadValueParser(jsonSerializer);
 
         Validators.Add(new TemporaryFileUploadValidator(
             () => _contentSettings,
@@ -60,6 +61,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
             IsAllowedInDataTypeConfiguration));
     }
 
+    /// <inheritdoc/>
     public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
     {
         // the stored property value (if any) is the path to the file; convert it to the client model (FileUploadValue)
@@ -67,11 +69,12 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         return propertyValue is string stringValue
             ? new FileUploadValue
             {
-                Src = stringValue
+                Src = stringValue,
             }
             : null;
     }
 
+    /// <inheritdoc/>
     /// <summary>
     ///     Converts the client model (FileUploadValue) into the value can be stored in the database (the file path).
     /// </summary>
@@ -93,7 +96,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         if (editorModelValue?.TemporaryFileId.HasValue is not true && string.IsNullOrEmpty(editorModelValue?.Src) is false)
         {
             // since current value can be json string, we have to parse value
-            var currentModelValue = _valueParser.Parse(currentValue);
+            FileUploadValue? currentModelValue = _valueParser.Parse(currentValue);
 
             return currentModelValue?.Src;
         }
