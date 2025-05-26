@@ -12,5 +12,11 @@ delete packageJson.devDependencies;
 packageJson.peerDependencies = { ...packageJson.dependencies };
 delete packageJson.dependencies;
 
+// Update workspaces path
+packageJson.workspaces = packageJson.workspaces.map((workspace) => {
+	// Rename the 'src/' prefix to 'dist-cms/' from each workspace path
+	return workspace.replace('./src', './dist-cms');
+});
+
 // Write the package.json back to disk
 writeFileSync(packageFile, JSON.stringify(packageJson, null, 2), 'utf8');
