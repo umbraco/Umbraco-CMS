@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join } from 'path';
 import glob from 'tiny-glob'
 
 console.log('[Prepublish] Cleansing package.json');
@@ -17,11 +18,11 @@ delete packageJson.dependencies;
 const workspaces = packageJson.workspaces || [];
 const workspacePromises = workspaces.map(async workspaceGlob => {
 	// Use glob to find the workspace path
-	workspaceGlob = workspaceGlob.replace(/\.\/src/, './dist-cms');
-	const workspacePaths = await glob(workspaceGlob, { cwd: './', absolute: true });
+	const localWorkspace = workspaceGlob.replace(/\.\/src/, './dist-cms');
+	const workspacePaths = await glob(localWorkspace, { cwd: './', absolute: true });
 
 	workspacePaths.forEach(workspace => {
-		const workspacePackageFile = `${workspace}/package.json`;
+		const workspacePackageFile = join(workspace, 'package.json');
 
 		// Ensure the workspace package.json exists
 		if (!existsSync(workspacePackageFile)) {
