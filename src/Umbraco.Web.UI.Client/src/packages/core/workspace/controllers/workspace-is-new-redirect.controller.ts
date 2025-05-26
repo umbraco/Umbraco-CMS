@@ -19,7 +19,7 @@ export class UmbWorkspaceIsNewRedirectController extends UmbControllerBase {
 	/**
 	 * TODO: Figure out why we need this timeout. [NL]
 	 * The problem this fixes it when save & publishing a document open in a modal, like from a collection.
-	 * The redirect trickeres something that ends up re-setting the path, making the modal path the one in the browser despite the modal is closed.
+	 * The redirect triggers something that ends up re-setting the path, making the modal path the one in the browser despite the modal is closed.
 	 */
 	timeout: any | undefined;
 
