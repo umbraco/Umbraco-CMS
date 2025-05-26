@@ -74,7 +74,7 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 				.filter=${(manifest: ManifestPickerSearchResultItem) => manifest.forEntityTypes.includes(item.entityType)}
 				.elementProps=${{
 					item,
-					disabled: !this.pickableFilter(item),
+					disabled: this.pickableFilter ? !this.pickableFilter(item) : undefined,
 				}}></umb-extension-with-api-slot>
 		`;
 	}
