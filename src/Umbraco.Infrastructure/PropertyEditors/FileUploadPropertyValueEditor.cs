@@ -20,15 +20,15 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the file upload property editor.
 /// </summary>
-internal class FileUploadPropertyValueEditor : DataValueEditor
+public class FileUploadPropertyValueEditor : DataValueEditor
 {
-    private readonly MediaFileManager _mediaFileManager;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
-    private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
-    private ContentSettings _contentSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileUploadPropertyValueEditor"/> class.
+    /// </summary>
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
@@ -41,21 +41,39 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         IFileStreamSecurityValidator fileStreamSecurityValidator)
         : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
-        _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
         _jsonSerializer = jsonSerializer;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
-        _fileStreamSecurityValidator = fileStreamSecurityValidator;
-        _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
-        contentSettings.OnChange(x => _contentSettings = x);
+
+        MediaFileManager = mediaFileManager;
+        FileStreamSecurityValidator = fileStreamSecurityValidator;
+
+        ContentSettings = contentSettings.CurrentValue;
+        contentSettings.OnChange(x => ContentSettings = x);
 
         Validators.Add(new TemporaryFileUploadValidator(
-            () => _contentSettings,
+            () => ContentSettings,
             TryParseTemporaryFileKey,
             TryGetTemporaryFile,
             IsAllowedInDataTypeConfiguration));
     }
 
+    /// <summary>
+    /// Gets the <see cref="MediaFileManager"/>.
+    /// </summary>
+    protected MediaFileManager MediaFileManager { get; }
+
+    /// <summary>
+    /// Gets the <see cref="IFileStreamSecurityValidator"/>.
+    /// </summary>
+    protected IFileStreamSecurityValidator FileStreamSecurityValidator { get; }
+
+    /// <summary>
+    /// Gets the <see cref="ContentSettings"/>.
+    /// </summary>
+    protected ContentSettings ContentSettings { get; private set; }
+
+    /// <inheritdoc/>
     public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
     {
         // the stored property value (if any) is the path to the file; convert it to the client model (FileUploadValue)
@@ -68,6 +86,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
             : null;
     }
 
+    /// <inheritdoc/>
     /// <summary>
     ///     Converts the client model (FileUploadValue) into the value can be stored in the database (the file path).
     /// </summary>
@@ -94,14 +113,14 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         // the current editor value (if any) is the path to the file
         var currentPath = currentValue is string currentStringValue
                           && currentStringValue.IsNullOrWhiteSpace() is false
-            ? _mediaFileManager.FileSystem.GetRelativePath(currentStringValue)
+            ? MediaFileManager.FileSystem.GetRelativePath(currentStringValue)
             : null;
 
         // resetting the current value?
         if (string.IsNullOrEmpty(editorModelValue?.Src) && currentPath.IsNullOrWhiteSpace() is false)
         {
             // delete the current file and clear the value of this property
-            _mediaFileManager.FileSystem.DeleteFile(currentPath);
+            MediaFileManager.FileSystem.DeleteFile(currentPath);
             return null;
         }
 
@@ -138,12 +157,12 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         // remove current file if replaced
         if (currentPath != filepath && currentPath.IsNullOrWhiteSpace() is false)
         {
-            _mediaFileManager.FileSystem.DeleteFile(currentPath);
+            MediaFileManager.FileSystem.DeleteFile(currentPath);
         }
 
         scope.Complete();
 
-        return filepath is null ? null : _mediaFileManager.FileSystem.GetUrl(filepath);
+        return filepath is null ? null : MediaFileManager.FileSystem.GetUrl(filepath);
     }
 
     private FileUploadValue? ParseFileUploadValue(object? editorValue)
@@ -192,7 +211,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         // this check is somewhat redundant as the file validity has already been checked by TemporaryFileUploadValidator,
         // but we'll retain it here as a last measure in case someone accidentally breaks the validator
         var extension = Path.GetExtension(file.FileName).TrimStart('.');
-        if (_contentSettings.IsFileAllowedForUpload(extension) is false ||
+        if (ContentSettings.IsFileAllowedForUpload(extension) is false ||
             IsAllowedInDataTypeConfiguration(extension, dataTypeConfiguration) is false)
         {
             return null;
@@ -200,18 +219,18 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
         // get the filepath
         // in case we are using the old path scheme, try to re-use numbers (bah...)
-        var filepath = _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey); // fs-relative path
+        var filepath = MediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey); // fs-relative path
 
         using (Stream filestream = file.OpenReadStream())
         {
-            if (_fileStreamSecurityValidator.IsConsideredSafe(filestream) == false)
+            if (FileStreamSecurityValidator.IsConsideredSafe(filestream) == false)
             {
                 return null;
             }
 
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods
-            _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!
+            MediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!
         }
 
         return filepath;
