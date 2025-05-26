@@ -918,6 +918,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			variantIdsIncludingInvariant,
 		);
 		this._data.setCurrent(newCurrentData);
+		this.setIsNew(false);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!eventContext) {
@@ -928,7 +929,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			unique: parent.unique,
 		});
 		eventContext.dispatchEvent(event);
-		this.setIsNew(false);
 	}
 
 	async #update(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
