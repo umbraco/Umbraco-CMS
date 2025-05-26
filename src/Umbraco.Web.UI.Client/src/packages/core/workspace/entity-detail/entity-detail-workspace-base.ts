@@ -373,6 +373,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.#entityContext.setUnique(data.unique);
 		this._data.setPersisted(data);
 		this._data.setCurrent(data);
+		this.setIsNew(false);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!eventContext) throw new Error('Event context not found.');
@@ -381,7 +382,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 			unique: parent.unique,
 		});
 		eventContext.dispatchEvent(event);
-		this.setIsNew(false);
 	}
 
 	protected async _update(currentData: DetailModelType) {

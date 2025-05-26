@@ -176,6 +176,8 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	 * Tears down the element.
 	 */
 	override disconnectedCallback() {
+		this._setParent(null);
+		this._cancelNavigation?.();
 		this.detachListeners();
 	}
 
@@ -412,6 +414,11 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 						if (navigationInvalidated) {
 							return cancel();
 						}
+					}
+					// Check if the current route is still matching the browser URL.:
+					if (!window.location.href.includes(this.constructAbsolutePath(''))) {
+						// If the parent is active, we should not redirect.
+						return cancel();
 					}
 					handleRedirect(this, route);
 					return false;
