@@ -109,14 +109,14 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         // We can skip MapBlockValueFromEditor if both editorValue and currentValue values are empty.
         if (IsBlockEditorDataEmpty(currentBlockEditorData) && IsBlockEditorDataEmpty(blockEditorData))
         {
-            return string.Empty;
+            return null;
         }
 
         MapBlockValueFromEditor(blockEditorData?.BlockValue, currentBlockEditorData?.BlockValue, editorValue.ContentKey);
 
         if (IsBlockEditorDataEmpty(blockEditorData))
         {
-            return string.Empty;
+            return null;
         }
 
         return JsonSerializer.Serialize(blockEditorData.BlockValue);
