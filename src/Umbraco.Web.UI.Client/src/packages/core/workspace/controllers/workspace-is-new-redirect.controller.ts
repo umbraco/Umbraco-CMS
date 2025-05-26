@@ -72,6 +72,5 @@ export class UmbWorkspaceIsNewRedirectController extends UmbControllerBase {
 			clearTimeout(this.timeout);
 			this.timeout = undefined;
 		}
-		super.destroy();
 	}
 }
