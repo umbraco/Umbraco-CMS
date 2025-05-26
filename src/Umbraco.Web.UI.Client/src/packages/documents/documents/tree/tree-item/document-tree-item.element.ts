@@ -43,7 +43,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			<span id="icon-container" slot="icon" class=${classMap({ draft: this._isDraft })}>
 				${icon && iconWithoutColor
 					? html`
-							<umb-icon id="icon" slot="icon" name="${this._isActive || this._isSelected ? iconWithoutColor : icon}"></umb-icon>
+							<umb-icon id="icon" slot="icon" name="${this.getIconVersionToRender(icon, iconWithoutColor)}"></umb-icon>
 							${this.#renderStateIcon()}
 						`
 					: nothing}
