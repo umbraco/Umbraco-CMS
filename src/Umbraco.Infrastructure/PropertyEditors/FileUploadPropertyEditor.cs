@@ -393,7 +393,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
             }
         }
 
-        return paths;
+        return paths.Distinct().ToList().AsReadOnly();
     }
 
     private IEnumerable<string> GetPathsFromUploadFieldProperty(IProperty property)
