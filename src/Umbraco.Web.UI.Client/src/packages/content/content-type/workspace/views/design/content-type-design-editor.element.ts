@@ -205,12 +205,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			});
 			routes.push({
 				path: '',
+				pathMatch: 'full',
 				redirectTo: 'root',
 				guards: [() => this.#processingTabId === undefined],
 			});
 		} else {
 			routes.push({
 				path: '',
+				pathMatch: 'full',
 				redirectTo: routes[0]?.path,
 				guards: [() => this.#processingTabId === undefined],
 			});

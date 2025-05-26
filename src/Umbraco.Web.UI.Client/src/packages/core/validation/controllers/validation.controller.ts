@@ -454,6 +454,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 
 	override destroy(): void {
+		super.destroy();
 		this.#validationMode = false;
 		if (this.#inUnprovidingState === true) {
 			return;
@@ -468,6 +469,5 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.#localMessages = undefined;
 		this.#parentMessages = undefined;
 		this.#parent = undefined;
-		super.destroy();
 	}
 }
