@@ -321,23 +321,12 @@ public class ContentStore
     {
         if (_writeLock.CurrentCount != 0)
         {
-            throw new InvalidOperationException("Write lock must be acquried.");
+            throw new InvalidOperationException("Write lock must be acquired.");
         }
     }
 
     private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
     {
-        // Wait for the write lock's count to be decremented to 0 (i.e. released) for a maximum of 2.1 seconds (100ms x 1 + 100ms x 2 ... + 100ms x 6).
-        // This is introduced to account for regression reported in https://github.com/umbraco/Umbraco-CMS/issues/19338 and
-        // after https://github.com/umbraco/Umbraco-CMS/pull/17246, which was implemented to resolve locking exceptions in async code.
-        // After this we find simultaneous requests to the content store failing to acquire the write lock.
-        WaitForWriteLock(TimeSpan.FromMilliseconds(100), 6);
-
-        if (_writeLock.CurrentCount == 0)
-        {
-            throw new InvalidOperationException("Recursive locks not allowed");
-        }
-
         if (_writeLock.Wait(_monitorTimeout))
         {
             lockInfo.Taken = true;
@@ -369,36 +358,6 @@ public class ContentStore
                     _nextGen = true;
                 }
             }
-        }
-    }
-
-    /// <summary>
-    /// Implements a basic retry policy with incremental backoff.
-    /// </summary>
-    /// <param name="delay">Initial size of delay.</param>
-    /// <param name="retries">Number of retries.</param>
-    /// <remarks>
-    /// Delay will increment on each retry, so the first retry will wait for the initial delay, the second the delay x 2, the third the delay x 3, etc.
-    /// </remarks>
-    private void WaitForWriteLock(TimeSpan delay, int retries)
-    {
-        var retryCount = 0;
-        while (_writeLock.CurrentCount == 0)
-        {
-            retryCount++;
-            if (retryCount > retries)
-            {
-                break;
-            }
-
-            var delayFor = (int)delay.TotalMilliseconds * retryCount;
-
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("Waiting for write lock, attempt {Attempt} of {Retries}. Sleeping for {DelayFor} milliseconds.", retryCount, retries, delayFor);
-            }
-
-            Thread.Sleep(delayFor);
         }
     }
 
@@ -449,7 +408,16 @@ public class ContentStore
         {
             if (lockInfo.Taken)
             {
-                _writeLock.Release();
+                if (_writeLock.CurrentCount == 0)
+                {
+                    _writeLock.Release();
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        "On releasing the content store lock the current count was found unexpectedly to be non-zero with a value of {CurrentCount}.",
+                        _writeLock.CurrentCount);
+                }
             }
         }
     }
