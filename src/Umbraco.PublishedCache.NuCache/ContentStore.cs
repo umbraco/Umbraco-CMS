@@ -327,7 +327,7 @@ public class ContentStore
 
     private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
     {
-        // Wait for the write lock's count to be decrecmented to 0 (i.e. released) for a maximum of 2.1 seconds (100ms x 1 + 100ms x 2 ... + 100ms x 6).
+        // Wait for the write lock's count to be decremented to 0 (i.e. released) for a maximum of 2.1 seconds (100ms x 1 + 100ms x 2 ... + 100ms x 6).
         // This is introduced to account for regression reported in https://github.com/umbraco/Umbraco-CMS/issues/19338 and
         // after https://github.com/umbraco/Umbraco-CMS/pull/17246, which was implemented to resolve locking exceptions in async code.
         // After this we find simultaneous requests to the content store failing to acquire the write lock.
