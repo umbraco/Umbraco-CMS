@@ -321,17 +321,12 @@ public class ContentStore
     {
         if (_writeLock.CurrentCount != 0)
         {
-            throw new InvalidOperationException("Write lock must be acquried.");
+            throw new InvalidOperationException("Write lock must be acquired.");
         }
     }
 
     private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
     {
-        if (_writeLock.CurrentCount == 0)
-        {
-            throw new InvalidOperationException("Recursive locks not allowed");
-        }
-
         if (_writeLock.Wait(_monitorTimeout))
         {
             lockInfo.Taken = true;
@@ -413,7 +408,16 @@ public class ContentStore
         {
             if (lockInfo.Taken)
             {
-                _writeLock.Release();
+                if (_writeLock.CurrentCount == 0)
+                {
+                    _writeLock.Release();
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        "On releasing the content store lock the current count was found unexpectedly to be non-zero with a value of {CurrentCount}.",
+                        _writeLock.CurrentCount);
+                }
             }
         }
     }
