@@ -8,5 +8,5 @@ export interface UmbItemRepository<ItemType> extends UmbApi {
 		error?: UmbProblemDetails | undefined;
 		asObservable?: () => Observable<Array<ItemType>>;
 	}>;
-	items: (uniques: string[]) => Promise<Observable<Array<ItemType>>>;
+	items: (uniques: string[]) => Promise<Observable<Array<ItemType>> | undefined>;
 }
