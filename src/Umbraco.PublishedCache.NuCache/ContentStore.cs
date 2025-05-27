@@ -408,16 +408,7 @@ public class ContentStore
         {
             if (lockInfo.Taken)
             {
-                if (_writeLock.CurrentCount == 0)
-                {
-                    _writeLock.Release();
-                }
-                else
-                {
-                    _logger.LogWarning(
-                        "On releasing the content store lock the current count was found unexpectedly to be non-zero with a value of {CurrentCount}.",
-                        _writeLock.CurrentCount);
-                }
+                _writeLock.Release();
             }
         }
     }
