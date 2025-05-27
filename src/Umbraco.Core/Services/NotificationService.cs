@@ -96,7 +96,7 @@ public class NotificationService : INotificationService
 
         // see notes above
         var id = Constants.Security.SuperUserId;
-        const int pagesz = 400; // load batches of 400 users
+        const int UserBatchSize = 400; // load batches of 400 users
         do
         {
             var notifications = GetUsersNotifications(new List<int>(), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
@@ -106,10 +106,10 @@ public class NotificationService : INotificationService
             }
 
             // users are returned ordered by id, notifications are returned ordered by user id
-            var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-            foreach (IUser user in users)
+            var approvedUsers = _userService.GetNextApprovedUsers(id, UserBatchSize).ToList();
+            foreach (IUser approvedUser in approvedUsers)
             {
-                Notification[] userNotifications = notifications.Where(n => n.UserId == user.Id).ToArray();
+                Notification[] userNotifications = notifications.Where(n => n.UserId == approvedUser.Id).ToArray();
                 foreach (Notification notification in userNotifications)
                 {
                     // notifications are inherited down the tree - find the topmost entity
@@ -130,14 +130,14 @@ public class NotificationService : INotificationService
                     }
 
                     // queue notification
-                    NotificationRequest req = CreateNotificationRequest(operatingUser, user, entityForNotification, prevVersionDictionary[entityForNotification.Id], actionName, siteUri, createSubject, createBody);
+                    NotificationRequest req = CreateNotificationRequest(operatingUser, approvedUser, entityForNotification, prevVersionDictionary[entityForNotification.Id], actionName, siteUri, createSubject, createBody);
                     Enqueue(req);
                     break;
                 }
             }
 
             // load more users if any
-            id = users.Count == pagesz ? users.Last().Id + 1 : -1;
+            id = approvedUsers.Count == UserBatchSize ? approvedUsers.Last().Id + 1 : -1;
         }
         while (id > 0);
     }

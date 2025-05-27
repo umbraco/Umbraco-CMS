@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
@@ -43,6 +44,8 @@ public static class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddTestServices(this IUmbracoBuilder builder, TestHelper testHelper)
     {
         builder.Services.AddUnique(AppCaches.NoCache);
+        builder.Services.AddUnique(Mock.Of<IMemberPartialViewCacheInvalidator>());
+
         builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
         builder.Services.AddUnique(testHelper.MainDom);
 

@@ -240,6 +240,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
 
         builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
+        builder.Services.AddSingleton<IRichTextRegexValidator, RichTextRegexValidator>();
 
         return builder;
     }

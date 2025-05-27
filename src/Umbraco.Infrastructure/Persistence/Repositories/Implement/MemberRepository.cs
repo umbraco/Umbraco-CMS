@@ -38,7 +38,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     private readonly ITagRepository _tagRepository;
     private bool _passwordConfigInitialized;
     private string? _passwordConfigJson;
-    private const string UsernameCacheKey = "uRepo_userNameKey+";
 
     public MemberRepository(
         IScopeAccessor scopeAccessor,
@@ -229,7 +228,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     }
 
     public IMember? GetByUsername(string? username) =>
-        _memberByUsernameCachePolicy.GetByUserName(UsernameCacheKey, username, PerformGetByUsername, PerformGetAllByUsername);
+        _memberByUsernameCachePolicy.GetByUserName(CacheKeys.MemberUserNameCachePrefix, username, PerformGetByUsername, PerformGetAllByUsername);
 
     public int[] GetMemberIds(string[] usernames)
     {
@@ -511,7 +510,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     protected override void PersistDeletedItem(IMember entity)
     {
-        _memberByUsernameCachePolicy.DeleteByUserName(UsernameCacheKey, entity.Username);
+        _memberByUsernameCachePolicy.DeleteByUserName(CacheKeys.MemberUserNameCachePrefix, entity.Username);
         base.PersistDeletedItem(entity);
     }
 
@@ -844,9 +843,54 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
         OnUowRefreshedEntity(new MemberRefreshNotification(entity, new EventMessages()));
 
-        _memberByUsernameCachePolicy.DeleteByUserName(UsernameCacheKey, entity.Username);
+        _memberByUsernameCachePolicy.DeleteByUserName(CacheKeys.MemberUserNameCachePrefix, entity.Username);
 
         entity.ResetDirtyProperties();
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateLoginPropertiesAsync(IMember member)
+    {
+        var updatedLastLoginDate = member.IsPropertyDirty(nameof(member.LastLoginDate));
+        var updatedSecurityStamp = member.IsPropertyDirty(nameof(member.SecurityStamp));
+        if (updatedLastLoginDate is false && updatedSecurityStamp is false)
+        {
+            return;
+        }
+
+        NPocoSqlExtensions.SqlUpd<MemberDto> GetMemberSetExpression(IMember member, NPocoSqlExtensions.SqlUpd<MemberDto> m)
+        {
+            var setExpression = new NPocoSqlExtensions.SqlUpd<MemberDto>(SqlContext);
+            if (updatedLastLoginDate)
+            {
+                setExpression.Set(x => x.LastLoginDate, member.LastLoginDate);
+            }
+
+            if (updatedSecurityStamp)
+            {
+                setExpression.Set(x => x.SecurityStampToken, member.SecurityStamp);
+            }
+
+            return setExpression;
+        }
+
+        member.UpdatingEntity();
+
+        Sql<ISqlContext> updateMemberQuery = Sql()
+            .Update<MemberDto>(m => GetMemberSetExpression(member, m))
+            .Where<MemberDto>(m => m.NodeId == member.Id);
+        await Database.ExecuteAsync(updateMemberQuery);
+
+        Sql<ISqlContext> updateContentVersionQuery = Sql()
+            .Update<ContentVersionDto>(m => m.Set(x => x.VersionDate, member.UpdateDate))
+            .Where<ContentVersionDto>(m => m.NodeId == member.Id && m.Current == true);
+        await Database.ExecuteAsync(updateContentVersionQuery);
+
+        OnUowRefreshedEntity(new MemberRefreshNotification(member, new EventMessages()));
+
+        _memberByUsernameCachePolicy.DeleteByUserName(CacheKeys.MemberUserNameCachePrefix, member.Username);
+
+        member.ResetDirtyProperties();
     }
 
     #endregion
