@@ -34,15 +34,9 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
     super();
 
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-      if (!authContext?.passwordConfiguration) {
-        this._passwordConfiguration = undefined;
-        this._passwordPattern = '';
-        return;
-      }
-
       // Build a pattern
       let pattern = '';
-      this._passwordConfiguration = authContext.passwordConfiguration;
+      this._passwordConfiguration = authContext?.passwordConfiguration;
       if (this._passwordConfiguration?.requireDigit) {
         pattern += '(?=.*\\d)';
       }
