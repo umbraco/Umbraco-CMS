@@ -7,8 +7,6 @@ import {
 	ValidateInviteCodeResponse,
 	ValidatePasswordResetCodeResponse,
 } from '../types.js';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import {
 	postSecurityForgotPassword,
 	postSecurityForgotPasswordReset,
@@ -17,6 +15,8 @@ import {
 	postUserInviteVerify,
 } from '../api/index.js';
 import { isProblemDetails } from '../utils/is-problem-details.function.js';
+import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbAuthRepository extends UmbRepositoryBase {
 	#localize = new UmbLocalizationController(this);
