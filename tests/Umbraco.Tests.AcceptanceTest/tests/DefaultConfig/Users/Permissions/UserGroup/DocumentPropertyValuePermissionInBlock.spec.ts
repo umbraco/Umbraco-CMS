@@ -40,7 +40,7 @@ test('can see property values in block list with UI read but not UI write permis
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
   await umbracoUi.content.isPropertyEditorUiWithNameVisible('block-list', true);
   await umbracoUi.content.clickEditBlockListBlockButton();
@@ -62,7 +62,7 @@ test.skip('can edit property values in block list with UI write permission', asy
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
   await umbracoUi.content.isPropertyEditorUiWithNameVisible('block-list', true);
   await umbracoUi.content.clickEditBlockListBlockButton();
@@ -84,7 +84,7 @@ test('cannot see property values in block list with only UI write but no UI read
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert
@@ -100,7 +100,7 @@ test('can see property values in block grid with UI read but not UI write permis
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
   await umbracoUi.content.isPropertyEditorUiWithNameVisible('block-grid', true);
   await umbracoUi.content.clickEditBlockGridBlockButton();
@@ -122,7 +122,7 @@ test.skip('can edit property values in block grid with UI write permission', asy
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
   await umbracoUi.content.isPropertyEditorUiWithNameVisible('block-grid', true);
   await umbracoUi.content.clickEditBlockGridBlockButton();
@@ -144,7 +144,7 @@ test('cannot see property values in block grid with only UI write but no UI read
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert

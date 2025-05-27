@@ -36,7 +36,7 @@ test('cannot see property values without UI read permission', async ({umbracoApi
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert
@@ -51,7 +51,7 @@ test('can see property values with UI read but not UI write permission', async (
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert
@@ -67,7 +67,7 @@ test('cannot open content without document read permission even with UI read per
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert
@@ -82,7 +82,7 @@ test('cannot edit property values without UI write permission', async ({umbracoA
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert
@@ -101,7 +101,7 @@ test.skip('can edit property values with UI write permission', async ({umbracoAp
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
   await umbracoUi.content.enterTextstring(updatedText);
   await umbracoUi.content.clickSaveButton();
@@ -120,7 +120,7 @@ test('cannot see property values with only UI write but no UI read permission', 
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert
