@@ -1402,8 +1402,7 @@
 		},
 		{
 			"name": "icon-next",
-			"file": "play.svg",
-			"legacy": true
+			"file": "skip-forward.svg"
 		},
 		{
 			"name": "icon-nodes",
