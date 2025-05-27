@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureNameNotExists(languageName);
 });
 
-test('can add language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can add language', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.language.goToLanguages();
 
@@ -25,7 +25,7 @@ test('can add language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.language.clickSaveButton();
 
   // Assert
-  await umbracoUi.language.isErrorNotificationVisible(false);
+  await umbracoUi.language.waitForLanguageToBeCreated();
   expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();
   // Verify the created language displays in the list
   await umbracoUi.language.clickLanguagesMenu();
@@ -82,8 +82,7 @@ test('can delete language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.language.removeLanguageByName(languageName);
 
   // Assert
-  //await umbracoUi.language.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
-  await umbracoUi.language.isErrorNotificationVisible(false);
+  await umbracoUi.language.waitForLanguageToBeDeleted();
   expect(await umbracoApi.language.doesExist(isoCode)).toBeFalsy();
   await umbracoUi.language.isLanguageNameVisible(languageName, false);
 });
@@ -135,5 +134,6 @@ test('cannot add a language with duplicate ISO code', async ({umbracoApi, umbrac
   await umbracoUi.language.clickSaveButton();
 
   // Assert
+  await umbracoUi.language.isFailedStateButtonVisible();
   await umbracoUi.language.doesErrorNotificationHaveText(NotificationConstantHelper.error.duplicateISOcode);
 });

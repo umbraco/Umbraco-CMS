@@ -1,4 +1,5 @@
 import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {expect} from "@playwright/test";
 
 // Document Type
 const documentTypeName = 'DocumentTypeName';
@@ -56,8 +57,7 @@ test('invariant document type with invariant block grid with invariant block wit
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible(false);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton()
   await umbracoUi.reloadPage();
   await umbracoUi.content.goToBlockGridBlockWithName(documentTypeGroupName, blockGridName, blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
@@ -77,7 +77,7 @@ test('can not create unsupported invariant document type with invariant block gr
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton(false);
+  await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
@@ -97,17 +97,17 @@ test('can not create unsupported invariant document type with invariant block gr
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton(false);
+  await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
-test('variant document type with variant block grid with variant block with an variant textString', async ({umbracoApi, umbracoUi}) => {
+test('variant document type with variant block grid with variant block with an variant textString', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, true);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridName, blockGridId, documentTypeGroupName, true);
-  await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
+  const contentId = await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -121,10 +121,9 @@ test('variant document type with variant block grid with variant block with an v
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-
   await umbracoUi.reloadPage();
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.content.goToBlockGridBlockWithName(documentTypeGroupName, blockGridName, blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
 });
@@ -134,7 +133,7 @@ test('variant document type with invariant block grid with variant block with an
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, false);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridName, blockGridId, documentTypeGroupName, true, false);
-  await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
+  const contentId = await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -148,8 +147,8 @@ test('variant document type with invariant block grid with variant block with an
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
 
   await umbracoUi.reloadPage();
   await umbracoUi.content.goToBlockGridBlockWithName(documentTypeGroupName, blockGridName, blockName);
@@ -161,7 +160,7 @@ test('variant document type with invariant block grid with variant block with an
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, true);
   blockGridId = await umbracoApi.dataType.createBlockGridWithABlockAndAllowAtRoot(blockGridName, elementTypeId, true);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridName, blockGridId, documentTypeGroupName, true, false);
-  await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
+  const contentId = await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -175,8 +174,8 @@ test('variant document type with invariant block grid with variant block with an
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
 
   await umbracoUi.reloadPage();
   await umbracoUi.content.goToBlockGridBlockWithName(documentTypeGroupName, blockGridName, blockName);

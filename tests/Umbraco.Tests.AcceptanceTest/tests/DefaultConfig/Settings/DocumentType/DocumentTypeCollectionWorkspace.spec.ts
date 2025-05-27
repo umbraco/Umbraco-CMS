@@ -26,7 +26,7 @@ test('can create a document type using create options', async ({umbracoApi, umbr
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Check if the created document type is displayed in the collection view and has correct icon
   await umbracoUi.documentType.clickDocumentTypesMenu();
@@ -46,8 +46,7 @@ test('can create a document type with a template using create options', async ({
 
   // Assert
   // Checks if both the success notification for document Types and the template are visible
-  //await umbracoUi.documentType.doesSuccessNotificationsHaveCount(2);
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   // Checks if the documentType contains the template
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   const templateData = await umbracoApi.template.getByName(documentTypeName);
@@ -72,7 +71,7 @@ test('can create a element type using create options', async ({umbracoApi, umbra
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
@@ -93,8 +92,7 @@ test('can create a document type folder using create options', async ({umbracoAp
   await umbracoUi.documentType.clickCreateFolderButton();
 
   // Assert
-  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   const folder = await umbracoApi.documentType.getByName(documentFolderName);
   expect(folder.name).toBe(documentFolderName);
   // Check if the created document type folder is displayed in the collection view and has correct icon
@@ -114,7 +112,7 @@ test('can create a document type in a folder using create options', async ({umbr
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Check if the created document type is displayed in the collection view and has correct icon
   await umbracoUi.documentType.goToDocumentType(documentFolderName);
@@ -134,7 +132,7 @@ test('can create a document type with a template in a folder using create option
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   // Checks if the documentType contains the template
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   const templateData = await umbracoApi.template.getByName(documentTypeName);
@@ -160,7 +158,7 @@ test('can create a element type in a folder using create options', async ({umbra
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
@@ -184,8 +182,7 @@ test('can create a document type folder in a folder using create options', async
   await umbracoUi.documentType.clickCreateFolderButton();
 
   // Assert
-  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   const folder = await umbracoApi.documentType.getByName(childFolderName);
   expect(folder.name).toBe(childFolderName);
   // Check if the created document type folder is displayed in the collection view and has correct icon

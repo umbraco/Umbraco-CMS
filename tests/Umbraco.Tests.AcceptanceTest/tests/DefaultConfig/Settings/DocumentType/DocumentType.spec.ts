@@ -24,7 +24,7 @@ test('can create a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   await umbracoUi.documentType.reloadTree('Document Types');
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
@@ -43,9 +43,7 @@ test('can create a document type with a template', {tag: '@smoke'}, async ({umbr
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  // Checks if both the success notification for document Types and the template are visible
-  //await umbracoUi.documentType.doesSuccessNotificationsHaveCount(2);
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   // Checks if the documentType contains the template
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   const templateData = await umbracoApi.template.getByName(documentTypeName);
@@ -68,7 +66,7 @@ test('can create a element type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
@@ -84,9 +82,9 @@ test('can rename a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
 
   // Act
   await umbracoUi.documentType.goToDocumentType(wrongName);
-  await umbracoUi.waitForTimeout(1000);
+  // await umbracoUi.waitForTimeout(1000);
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
-  await umbracoUi.waitForTimeout(1000);
+  // await umbracoUi.waitForTimeout(1000);
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
@@ -148,7 +146,6 @@ test('can delete a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   await umbracoUi.documentType.clickDeleteAndConfirmButton();
 
   // Assert
-  //await umbracoUi.documentType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.waitForDocumentTypeToBeDeleted();
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeFalsy();
 });

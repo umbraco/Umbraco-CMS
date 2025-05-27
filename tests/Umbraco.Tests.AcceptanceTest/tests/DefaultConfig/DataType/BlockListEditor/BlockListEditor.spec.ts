@@ -32,8 +32,8 @@ test('can create a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.waitForDataTypeToBeCreated();
+  await umbracoUi.dataType.isDataTypeTreeItemVisible(blockListEditorName);
   expect(await umbracoApi.dataType.doesNameExist(blockListEditorName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(dataTypeData.editorAlias).toBe(blockListEditorAlias);
@@ -67,10 +67,9 @@ test('can delete a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickConfirmToDeleteButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.waitForDataTypeToBeDeleted();
   expect(await umbracoApi.dataType.doesExist(blockListId)).toBeFalsy();
-  await umbracoUi.dataType.isTreeItemVisible(blockListEditorName, false);
+  await umbracoUi.dataType.isDataTypeTreeItemVisible(blockListEditorName, false);
 });
 
 test('can add a block to a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

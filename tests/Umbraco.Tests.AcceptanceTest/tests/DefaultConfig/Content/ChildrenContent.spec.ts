@@ -106,6 +106,7 @@ test('cannot publish child if the parent is not published', async ({umbracoApi, 
   await umbracoUi.content.clickConfirmToPublishButton();
 
   // Assert
+  await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.parentNotPublished);
   const contentData = await umbracoApi.document.getByName(childContentName);
   expect(contentData.variants[0].state).toBe('Draft');

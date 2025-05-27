@@ -29,7 +29,7 @@ test('can create a rich text editor with tiptap', {tag: '@smoke'}, async ({umbra
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(tipTapName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(tipTapName);
   expect(dataTypeData.editorAlias).toBe(tipTapAlias);
@@ -62,10 +62,10 @@ test('can delete a rich text editor with tiptap', async ({umbracoApi, umbracoUi}
   await umbracoUi.dataType.clickDeleteAndConfirmButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.dataType.waitForDataTypeToBeDeleted();
   await umbracoUi.dataType.isErrorNotificationVisible(false);
   expect(await umbracoApi.dataType.doesNameExist(tipTapName)).toBeFalsy();
-  await umbracoUi.dataType.isTreeItemVisible(tipTapName, false);
+  await umbracoUi.dataType.isDataTypeTreeItemVisible(tipTapName, false);
 });
 
 test('can add dimensions', async ({umbracoApi, umbracoUi}) => {

@@ -22,8 +22,9 @@ test('can create a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
-  await umbracoUi.mediaType.isErrorNotificationVisible(false);
+  await umbracoUi.mediaType.waitForMediaTypeToBeCreated();
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
+  await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeName, true);
 });
 
 test('can rename a media type', async ({umbracoApi, umbracoUi}) => {
@@ -40,6 +41,9 @@ test('can rename a media type', async ({umbracoApi, umbracoUi}) => {
   // Assert
   await umbracoUi.mediaType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
+  await umbracoUi.mediaType.isMediaTypeTreeItemVisible(wrongName, false);
+  await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeName, true);
+
 });
 
 test('can update the alias for a media type', async ({umbracoApi, umbracoUi}) => {
@@ -90,7 +94,7 @@ test('can delete a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   await umbracoUi.mediaType.clickConfirmToDeleteButton();
 
   // Assert
-  //await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
-  await umbracoUi.mediaType.isErrorNotificationVisible(false);
+  await umbracoUi.mediaType.waitForMediaTypeToBeDeleted();
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeFalsy();
+  await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeName, false);
 });

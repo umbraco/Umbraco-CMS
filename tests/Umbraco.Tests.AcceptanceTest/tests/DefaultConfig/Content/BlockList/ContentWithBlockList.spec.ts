@@ -39,8 +39,7 @@ test('can create content with an empty block list', async ({umbracoApi, umbracoU
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -61,12 +60,9 @@ test('can publish content with an empty block list', async ({umbracoApi, umbraco
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveAndPublishButton();
-  // When clicking save and publish for content that is being created and not updated. The success state / checkmark will not be assertable, because we are being
-  // redirected instantly. So we will have to check on the notification or by going to the info tab
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -92,7 +88,6 @@ test('can add a block element in the content', async ({umbracoApi, umbracoUi}) =
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(inputText);
@@ -115,7 +110,6 @@ test('can edit block element in the content', async ({umbracoApi, umbracoUi}) =>
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-  await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(updatedText);
 });
@@ -133,7 +127,6 @@ test('can delete block element in the content', async ({umbracoApi, umbracoUi}) 
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-  await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   const blockGridValue = contentData.values.find(item => item.value);
   expect(blockGridValue).toBeFalsy();
@@ -182,7 +175,6 @@ test('can set the label of block element in the content', async ({umbracoApi, um
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-  await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesBlockElementHaveName(blockLabel);
 });
 
@@ -212,7 +204,6 @@ test.skip('can add settings model for the block in the content', async ({umbraco
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-  await umbracoUi.content.isErrorNotificationVisible(false);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(contentBlockInputText);
   expect(contentData.values[0].value.settingsData[0].values[0].value).toEqual(settingBlockInputText);
@@ -240,7 +231,7 @@ test('can create content with a block list with the inline editing mode enabled'
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });
 
@@ -263,7 +254,6 @@ test('can add a block element with inline editing mode enabled', async ({umbraco
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(inputText);

@@ -99,7 +99,7 @@ test('cannot input the text that exceeds the allowed amount of characters', asyn
 
   // Assert
   await umbracoUi.content.isTextWithMessageVisible(warningMessage);
-  await umbracoUi.content.isSuccessStateVisibleForSaveButton(false);
+  await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
 
   // Clean

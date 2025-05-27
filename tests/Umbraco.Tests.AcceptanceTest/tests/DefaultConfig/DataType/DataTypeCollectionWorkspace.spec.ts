@@ -28,7 +28,7 @@ test('can create a data type using create options', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   // Check if the created data type is displayed in the collection view and has correct icon
   await umbracoUi.dataType.clickDataTypesMenu();
@@ -46,8 +46,7 @@ test('can create a data type folder using create options', async ({umbracoApi, u
   await umbracoUi.dataType.clickConfirmCreateFolderButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   // Check if the created data type is displayed in the collection view and has correct icon
   await umbracoUi.dataType.clickDataTypesMenu();
@@ -68,7 +67,7 @@ test('can create a data type in a folder using create options', async ({umbracoA
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   // Check if the created data type is displayed in the collection view and has correct icon
   await umbracoUi.dataType.goToDataType(dataTypeFolderName);
@@ -89,8 +88,7 @@ test('can create a data type folder in a folder using create options', async ({u
   await umbracoUi.dataType.clickConfirmCreateFolderButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
   // Check if the created data type is displayed in the collection view and has correct icon
   await umbracoUi.dataType.doesCollectionTreeItemTableRowHaveName(childFolderName);

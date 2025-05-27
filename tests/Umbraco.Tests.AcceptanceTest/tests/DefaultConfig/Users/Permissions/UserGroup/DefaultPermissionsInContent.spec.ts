@@ -193,8 +193,8 @@ test('can create content with create permission enabled', async ({umbracoApi, um
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
+  expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
 });
 
 test('can not create content with create permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -237,7 +237,7 @@ test('can not create notifications with notification permission disabled', async
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can publish content with publish permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can publish content with publish permission enabled', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublishPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -351,8 +351,7 @@ test('can update content with update permission enabled', async ({umbracoApi, um
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
 });
 
@@ -371,7 +370,8 @@ test.skip('can not update content with update permission disabled', async ({umbr
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can duplicate content with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
+// https://github.com/umbraco/Umbraco-CMS/issues/19431
+test.skip('can duplicate content with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedContentName = rootDocumentName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermission(userGroupName);
@@ -412,11 +412,12 @@ test('can not duplicate content with duplicate permission disabled', async ({umb
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can move content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
+// https://github.com/umbraco/Umbraco-CMS/issues/19431
+test.skip('can move content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const moveToDocumentName = 'SecondRootDocument';
   const moveToDocumentId = await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, rootDocumentTypeId, documentText, dataTypeName);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveToPermission(userGroupName);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveToPermission(userGroupName, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -499,6 +500,7 @@ test('can not sort children with sort children permission disabled', async ({umb
 
 test('can set culture and hostnames with culture and hostnames permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const domainName = '/domain';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -509,11 +511,15 @@ test('can set culture and hostnames with culture and hostnames permission enable
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.clickAddNewDomainButton();
-  await umbracoUi.content.enterDomain('/domain');
+  await umbracoUi.content.enterDomain(domainName);
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.culturesAndHostnamesSaved);
+  await umbracoUi.content.waitForDomainToBeCreated()
+  const document = await umbracoApi.document.getByName(rootDocumentName);
+  const domains = await umbracoApi.document.getDomains(document.id);
+  expect(domains.domains[0].domainName).toEqual(domainName);
+  expect(domains.domains[0].isoCode).toEqual('en-US');
 });
 
 test('can not set culture and hostnames with culture and hostnames permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -530,7 +536,7 @@ test('can not set culture and hostnames with culture and hostnames permission di
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// TODO: Notification is not correct 'Public acccess setting created' should be 'access'
+// TODO: Notification is not correct 'Public access setting created' should be 'access'
 test.skip('can set public access with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermission(userGroupName);

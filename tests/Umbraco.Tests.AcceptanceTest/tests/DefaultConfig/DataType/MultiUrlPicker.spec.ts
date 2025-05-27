@@ -103,6 +103,7 @@ test.skip('cannot update the minimum number of items greater than the maximum', 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.isFailedStateButtonVisible();
   await umbracoUi.dataType.isErrorNotificationVisible();
 });
 

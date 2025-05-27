@@ -90,6 +90,7 @@ test.skip('cannot update the minimum greater than the maximum', async ({umbracoA
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.isFailedStateButtonVisible();
   await umbracoUi.dataType.isErrorNotificationVisible();
 });
 

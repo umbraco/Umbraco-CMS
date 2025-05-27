@@ -32,7 +32,7 @@ test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(blockGridEditorName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
   expect(dataTypeData.editorAlias).toBe(blockGridEditorAlias);
@@ -51,6 +51,7 @@ test('can rename a block grid editor', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.dataType.isDataTypeTreeItemVisible(blockGridEditorName);
   expect(await umbracoApi.dataType.doesNameExist(blockGridEditorName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongName)).toBeFalsy();
 });
@@ -65,10 +66,9 @@ test('can delete a block grid editor', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickDeleteAndConfirmButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.waitForDataTypeToBeDeleted();
   expect(await umbracoApi.dataType.doesExist(blockGridId)).toBeFalsy();
-  await umbracoUi.dataType.isTreeItemVisible(blockGridEditorName, false);
+  await umbracoUi.dataType.isDataTypeTreeItemVisible(blockGridEditorName, false);
 });
 
 test('can add a block to a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

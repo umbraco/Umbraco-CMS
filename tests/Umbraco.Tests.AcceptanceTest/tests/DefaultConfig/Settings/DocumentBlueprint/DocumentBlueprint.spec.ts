@@ -29,8 +29,7 @@ test('can create a document blueprint from the settings menu', {tag: '@smoke'}, 
   await umbracoUi.documentBlueprint.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentBlueprint.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.documentBlueprint.isErrorNotificationVisible(false);
+  await umbracoUi.documentBlueprint.waitForDocumentBlueprintToBeCreated()
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
   await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true);
 });
@@ -49,8 +48,7 @@ test('can rename a document blueprint', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentBlueprint.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentBlueprint.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.documentBlueprint.isErrorNotificationVisible(false);
+  await umbracoUi.documentBlueprint.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
   expect(await umbracoApi.documentBlueprint.doesNameExist(wrongDocumentBlueprintName)).toBeFalsy();
   await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true, false);
@@ -70,8 +68,7 @@ test('can delete a document blueprint', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentBlueprint.clickConfirmToDeleteButton();
 
   // Assert
-  //await umbracoUi.documentBlueprint.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
-  await umbracoUi.documentBlueprint.isErrorNotificationVisible(false);
+  await umbracoUi.documentBlueprint.waitForDocumentBlueprintToBeDeleted();
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeFalsy();
   await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, false, false);
 });
@@ -89,8 +86,7 @@ test('can create a document blueprint from the content menu', async ({umbracoApi
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
-  //await umbracoUi.documentBlueprint.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.documentBlueprint.isErrorNotificationVisible(false);
+  await umbracoUi.documentBlueprint.waitForDocumentBlueprintToBeCreated();
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
   await umbracoUi.documentBlueprint.goToSettingsTreeItem('Document Blueprints');
   await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true);

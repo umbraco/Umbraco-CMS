@@ -169,7 +169,7 @@ test('can enable show content workspace view first', async ({umbracoApi, umbraco
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'showContentFirst', true)).toBeTruthy();
 });
 
