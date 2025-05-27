@@ -19,7 +19,12 @@ export class UmbUserGroupCollectionRepository extends UmbControllerBase implemen
 
 		this.#init = this.consumeContext(UMB_USER_GROUP_DETAIL_STORE_CONTEXT, (instance) => {
 			this.#detailStore = instance;
-		}).asPromise({ preventTimeout: true });
+		})
+			.asPromise({ preventTimeout: true })
+			.catch(() => {
+				// If the context is not available, we can assume that the store is not available.
+				this.#detailStore = undefined;
+			});
 	}
 
 	async requestCollection(filter: UmbUserGroupCollectionFilterModel = { skip: 0, take: 100 }) {

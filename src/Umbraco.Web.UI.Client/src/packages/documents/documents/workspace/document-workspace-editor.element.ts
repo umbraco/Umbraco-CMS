@@ -1,5 +1,4 @@
 import type { UmbDocumentVariantOptionModel } from '../types.js';
-import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -10,10 +9,6 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
-	//
-	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well. [NL]
-	private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
-
 	#appLanguage?: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
@@ -67,7 +62,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
-					component: this.splitViewElement,
+					component: () => import('./document-workspace-split-view.element.js'),
 					setup: (_component, info) => {
 						// Set split view/active info..
 						const variantSplit = info.match.fragments.consumed.split('_&_');
@@ -84,7 +79,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 				path: variant.unique,
-				component: this.splitViewElement,
+				component: () => import('./document-workspace-split-view.element.js'),
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);

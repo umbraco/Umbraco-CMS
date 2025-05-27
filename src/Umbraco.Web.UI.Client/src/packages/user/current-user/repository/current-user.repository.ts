@@ -24,13 +24,21 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 				if (instance) {
 					this.#currentUserStore = instance;
 				}
-			}).asPromise({ preventTimeout: true }),
+			})
+				.asPromise({ preventTimeout: true })
+				.catch(() => {
+					// If the context is not available, we can assume that the store is not available.
+					this.#currentUserStore = undefined;
+				}),
 
 			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				if (instance) {
-					this.notificationContext = instance;
-				}
-			}).asPromise({ preventTimeout: true }),
+				this.notificationContext = instance;
+			})
+				.asPromise({ preventTimeout: true })
+				.catch(() => {
+					// If the context is not available, we can assume that the context is not available.
+					this.notificationContext = undefined;
+				}),
 		]);
 	}
 

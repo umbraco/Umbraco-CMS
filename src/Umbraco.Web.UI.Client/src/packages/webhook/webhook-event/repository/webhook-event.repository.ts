@@ -20,7 +20,12 @@ export class UmbWebhookEventRepository extends UmbRepositoryBase implements UmbA
 			if (instance) {
 				this.#store = instance;
 			}
-		}).asPromise({ preventTimeout: true });
+		})
+			.asPromise({ preventTimeout: true })
+			.catch(() => {
+				// If the context is not available, we can assume that the store is not available.
+				this.#store = undefined;
+			});
 	}
 
 	async requestEvents() {

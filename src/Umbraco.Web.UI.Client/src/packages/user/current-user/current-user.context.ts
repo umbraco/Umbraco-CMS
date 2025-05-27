@@ -56,7 +56,12 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		if (asObservable) {
 			await this.observe(asObservable(), (currentUser) => {
 				this.#currentUser?.setValue(currentUser);
-			}).asPromise();
+			})
+				.asPromise()
+				.catch(() => {
+					// If the context is not available, we can assume that the current user is not available.
+					this.#currentUser?.setValue(undefined);
+				});
 		}
 	}
 

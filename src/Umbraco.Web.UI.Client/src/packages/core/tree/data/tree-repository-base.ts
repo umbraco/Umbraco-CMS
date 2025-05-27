@@ -64,7 +64,12 @@ export abstract class UmbTreeRepositoryBase<
 			if (instance) {
 				this._treeStore = instance;
 			}
-		}).asPromise({ preventTimeout: true });
+		})
+			.asPromise({ preventTimeout: true })
+			.catch(() => {
+				// If the context is not available, we can assume that the store is not available.
+				this._treeStore = undefined;
+			});
 	}
 
 	/**

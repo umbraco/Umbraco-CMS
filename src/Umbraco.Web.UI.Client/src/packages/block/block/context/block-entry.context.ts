@@ -557,7 +557,7 @@ export abstract class UmbBlockEntryContext<
 		// observe variantId:
 		this.observe(
 			observeMultiple([
-				this._manager.variantId,
+				this._manager?.variantId,
 				this.#contentStructure?.ownerContentTypeObservablePart((x) => x?.variesByCulture),
 				this.#contentStructure?.ownerContentTypeObservablePart((x) => x?.variesBySegment),
 			]),

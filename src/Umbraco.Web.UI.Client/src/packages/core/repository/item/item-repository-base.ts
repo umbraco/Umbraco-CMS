@@ -25,7 +25,13 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 			if (instance) {
 				this._itemStore = instance as UmbItemStore<ItemType>;
 			}
-		}).asPromise({ preventTimeout: true });
+		})
+			.asPromise({ preventTimeout: true })
+			.catch(() => {
+				// If the context is not available, we can assume that the store is not available.
+				// This can happen if the repository is used before the store is initialized.
+				this._itemStore = undefined;
+			});
 	}
 
 	/**

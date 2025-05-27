@@ -18,22 +18,31 @@ export abstract class UmbUserRepositoryBase extends UmbRepositoryBase {
 
 		this.init = Promise.all([
 			this.consumeContext(UMB_USER_DETAIL_STORE_CONTEXT, (instance) => {
-				if (instance) {
-					this.detailStore = instance;
-				}
-			}).asPromise({ preventTimeout: true }),
+				this.detailStore = instance;
+			})
+				.asPromise({ preventTimeout: true })
+				.catch(() => {
+					// If the context is not available, we can assume that the store is not available.
+					this.detailStore = undefined;
+				}),
 
 			this.consumeContext(UMB_USER_ITEM_STORE_CONTEXT, (instance) => {
-				if (instance) {
-					this.itemStore = instance;
-				}
-			}).asPromise({ preventTimeout: true }),
+				this.itemStore = instance;
+			})
+				.asPromise({ preventTimeout: true })
+				.catch(() => {
+					// If the context is not available, we can assume that the store is not available.
+					this.itemStore = undefined;
+				}),
 
 			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				if (instance) {
-					this.notificationContext = instance;
-				}
-			}).asPromise({ preventTimeout: true }),
+				this.notificationContext = instance;
+			})
+				.asPromise({ preventTimeout: true })
+				.catch(() => {
+					// If the context is not available, we can assume that the store is not available.
+					this.notificationContext = undefined;
+				}),
 		]);
 	}
 }

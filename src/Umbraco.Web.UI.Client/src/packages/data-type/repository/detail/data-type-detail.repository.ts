@@ -13,7 +13,12 @@ export class UmbDataTypeDetailRepository extends UmbDetailRepositoryBase<UmbData
 
 		this.#init = this.consumeContext(UMB_DATA_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
 			this.#detailStore = instance;
-		}).asPromise({ preventTimeout: true });
+		})
+			.asPromise({ preventTimeout: true })
+			.catch(() => {
+				// If the context is not available, we can assume that the store is not available.
+				this.#detailStore = undefined;
+			});
 	}
 
 	async byPropertyEditorUiAlias(propertyEditorUiAlias: string) {
