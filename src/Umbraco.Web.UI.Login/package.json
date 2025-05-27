@@ -14,8 +14,8 @@
     "npm": ">=10.9"
   },
   "devDependencies": {
-    "@hey-api/client-fetch": "^0.10.0",
-    "@hey-api/openapi-ts": "^0.67.3",
+    "@hey-api/client-fetch": "^0.10.2",
+    "@hey-api/openapi-ts": "^0.67.6",
     "@umbraco-cms/backoffice": "16.0.0-rc3",
     "msw": "^2.7.0",
     "typescript": "^5.8.3",
