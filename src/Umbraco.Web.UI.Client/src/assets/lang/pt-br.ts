@@ -139,7 +139,7 @@ export default {
 		errorButDataWasSaved:
 			'Seus dados foram salvos mas antes que possa publicar esta página existem alguns erros que precisam ser concertados:',
 		errorChangingProviderPassword:
-			'O provedor de membros (Membership provider) atual não suporta alterações de senha (EnablePasswordRetrieval tem que estar definica como true)',
+			'O provedor de membros (Membership provider) atual não suporta alterações de senha (EnablePasswordRetrieval tem que estar definida como true)',
 		errorHeader: 'Houve erros:',
 		errorHeaderWithoutTab: 'Houve erros:',
 		errorInPasswordFormat:
@@ -158,7 +158,7 @@ export default {
 		missingTitle: 'Favor digitar um título',
 		missingType: 'Favor escolher um tipo',
 		pictureResizeBiggerThanOrg:
-			'Você está prestes a tornar esta figura maior que o tamanho original. Tem certeza que deseja proceguir?',
+			'Você está prestes a tornar esta figura maior que o tamanho original. Tem certeza que deseja prosseguir?',
 		startNodeDoesNotExists: 'Nó inicial removido, favor entrar em contato com seu administrador',
 		stylesMustMarkBeforeSelect: 'Favor marcar conteúdo antes de alterar o estilo',
 		tableColMergeLeft: 'Favor colocar o cursos à esquerda das duas células que deseja mesclar',
