@@ -321,17 +321,12 @@ public class ContentStore
     {
         if (_writeLock.CurrentCount != 0)
         {
-            throw new InvalidOperationException("Write lock must be acquried.");
+            throw new InvalidOperationException("Write lock must be acquired.");
         }
     }
 
     private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
     {
-        if (_writeLock.CurrentCount == 0)
-        {
-            throw new InvalidOperationException("Recursive locks not allowed");
-        }
-
         if (_writeLock.Wait(_monitorTimeout))
         {
             lockInfo.Taken = true;
