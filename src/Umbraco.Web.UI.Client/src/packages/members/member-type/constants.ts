@@ -1,4 +1,5 @@
 export * from './entity-actions/constants.js';
+export * from './member-type-root/constants.js';
 export * from './paths.js';
 export * from './property-type/constants.js';
 export * from './repository/constants.js';

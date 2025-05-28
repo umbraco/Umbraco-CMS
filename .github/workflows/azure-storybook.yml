@@ -3,8 +3,9 @@ name: Storybook CI/CD
 on:
   push:
     branches:
-      - contrib
+      - main
       - v*/dev
+      - v*/main
     paths:
       - src/Umbraco.Web.UI.Client/package.json
       - src/Umbraco.Web.UI.Client/package-lock.json
@@ -13,8 +14,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - contrib
+      - main
       - v*/dev
+      - v*/main
 
 env:
   NODE_OPTIONS: --max_old_space_size=16384
@@ -30,7 +32,7 @@ jobs:
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          production_branch: contrib
+          production_branch: main
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ORANGE_SEA_0C7411A03 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"

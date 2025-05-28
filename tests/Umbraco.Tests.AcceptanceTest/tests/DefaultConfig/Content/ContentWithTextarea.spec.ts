@@ -54,7 +54,7 @@ test('can publish content with the textarea data type', async ({umbracoApi, umbr
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
+  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);

@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// TODO: Keeps failing on the pipeline, but not locally. Look into this
+// TODO, this is flaky on the pipeline, not locally. Look into why
 test.fixme('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';

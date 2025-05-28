@@ -182,7 +182,7 @@ export class UmbContentTypeStructureManager<
 			return { data: this.getOwnerContentType(), asObservable: () => this.ownerContentType };
 		}
 		await this.#initRepository;
-		this.#clear();
+		this.clear();
 		this.#ownerContentTypeUnique = unique;
 		if (!unique) {
 			this.#initRejection?.(`Content Type structure manager could not load: ${unique}`);
@@ -199,7 +199,7 @@ export class UmbContentTypeStructureManager<
 
 	public async createScaffold(preset?: Partial<T>): Promise<UmbRepositoryResponse<T>> {
 		await this.#initRepository;
-		this.#clear();
+		this.clear();
 
 		const repsonse = await this.#repository!.createScaffold(preset);
 		const { data } = repsonse;
@@ -827,7 +827,7 @@ export class UmbContentTypeStructureManager<
 			.filter(UmbFilterDuplicateStrings);
 	}
 
-	#clear() {
+	public clear() {
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
 		this.#repoManager?.clear();

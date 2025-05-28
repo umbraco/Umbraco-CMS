@@ -8,9 +8,16 @@ schedules:
     displayName: Daily midnight build
     branches:
       include:
-        - v14/dev
         - v15/dev
+        - release/16.0
         - main
+
+parameters:
+    # Skipped due to DB locks
+  - name: sqliteAcceptanceTests
+    displayName: Run SQLite Acceptance Tests
+    type: boolean
+    default: false
 
 variables:
   nodeVersion: 20
@@ -122,6 +129,7 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
+        condition: eq(${{parameters.sqliteAcceptanceTests}}, True)
         timeoutInMinutes: 180
         variables:
           # Connection string
@@ -131,22 +139,22 @@ stages:
           matrix:
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npm run test -- --shard=1/3"
+              testCommand: "npm run testSqlite -- --shard=1/3"
             LinuxPart2Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npm run test -- --shard=2/3"
+              testCommand: "npm run testSqlite -- --shard=2/3"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              testCommand: "npm run test -- --shard=3/3"
+              testCommand: "npm run testSqlite -- --shard=3/3"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=1/3"
+              testCommand: "npm run testSqlite -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=2/3"
+              testCommand: "npm run testSqlite -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=3/3"
+              testCommand: "npm run testSqlite -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -288,29 +296,29 @@ stages:
         strategy:
           matrix:
             LinuxPart1Of3:
-              testCommand: "npm run testSqlite -- --shard=1/3"
+              testCommand: "npm run test -- --shard=1/3"
               vmImage: "ubuntu-latest"
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             LinuxPart2Of3:
-              testCommand: "npm run testSqlite -- --shard=2/3"
+              testCommand: "npm run test -- --shard=2/3"
               vmImage: "ubuntu-latest"
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             LinuxPart3Of3:
-              testCommand: "npm run testSqlite -- --shard=3/3"
+              testCommand: "npm run test -- --shard=3/3"
               vmImage: "ubuntu-latest"
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run testSqlite -- --shard=1/3"
+              testCommand: "npm run test -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run testSqlite -- --shard=2/3"
+              testCommand: "npm run test -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run testSqlite -- --shard=3/3"
+              testCommand: "npm run test -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:

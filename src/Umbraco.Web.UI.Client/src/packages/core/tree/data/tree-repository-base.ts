@@ -142,7 +142,8 @@ export abstract class UmbTreeRepositoryBase<
 		const { data, error } = await this._treeSource.getAncestorsOf(args);
 
 		// TODO: implement observable for ancestor items in the store
-		return { data, error };
+		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
+		return { data, error: error as any };
 	}
 
 	/**
