@@ -58,9 +58,7 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 		let problemDetails: UmbProblemDetails | undefined = undefined;
 		if (error && UmbApiError.isUmbApiError(error)) {
 			problemDetails = error.problemDetails;
-		}
-
-		if (data) {
+		} else if (data) {
 			this._itemStore.appendItems(data);
 		}
 
