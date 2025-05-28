@@ -31,9 +31,10 @@ public class DockerFileTests
 
     private static (string DockerFileAspNetVersion, string DockerFileSdkVersion) GetNetVersionsFromDockerFile()
     {
+        const int SegmentsToRepoRoot = 5; // Number of directory segments from the test directory to the repository root.
         var testContextDirectoryParts = TestContext.CurrentContext.TestDirectory.Split(Path.DirectorySeparatorChar);
-        var solutionRootDirectory = string.Join(Path.DirectorySeparatorChar, testContextDirectoryParts.Take(testContextDirectoryParts.Length - 5));
-        var dockerFilePath = $"{solutionRootDirectory}{Path.DirectorySeparatorChar}templates{Path.DirectorySeparatorChar}UmbracoProject{Path.DirectorySeparatorChar}Dockerfile";
+        var solutionRootDirectory = string.Join(Path.DirectorySeparatorChar, testContextDirectoryParts.Take(testContextDirectoryParts.Length - SegmentsToRepoRoot));
+        var dockerFilePath = Path.Combine(solutionRootDirectory, "templates", "UmbracoProject", "Dockerfile");
 
         var dockerFileContent = File.ReadAllText(dockerFilePath);
         var dockerFileFromLines = dockerFileContent
@@ -44,9 +45,9 @@ public class DockerFileTests
         Assert.AreEqual(2, dockerFileFromLines.Count);
 
         var dockerFileAspNetVersion = GetVersionFromDockerFromLine(dockerFileFromLines[0]);
-        var dockerFileSdkVersion = GetVersionFromDockerFromLine(dockerFileFromLines[0]);
+        var dockerFileSdkVersion = GetVersionFromDockerFromLine(dockerFileFromLines[1]);
 
-        return (dockerFileAspNetVersion, dockerFileAspNetVersion);
+        return (dockerFileAspNetVersion, dockerFileSdkVersion);
     }
 
     private static string GetVersionFromDockerFromLine(string line) => line.Split(' ')[1].Split(':')[1];
