@@ -5,7 +5,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemStore } from '@umbraco-cms/backoffice/store';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { of } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbApiError, type UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
 
 export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 	extends UmbRepositoryBase
