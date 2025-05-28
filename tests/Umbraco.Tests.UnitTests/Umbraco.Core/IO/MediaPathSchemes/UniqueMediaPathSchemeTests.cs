@@ -10,7 +10,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.IO.MediaPathSchemes;
 [TestFixture]
 public class UniqueMediaPathSchemeTests
 {
-    public static MediaFileManager MediaFileManager => new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(), Mock.Of<ILogger<MediaFileManager>>(), Mock.Of<IShortStringHelper>(), Mock.Of<IServiceProvider>());
+    private static MediaFileManager MediaFileManager => new(
+        Mock.Of<IFileSystem>(),
+        Mock.Of<IMediaPathScheme>(),
+        Mock.Of<ILogger<MediaFileManager>>(),
+        Mock.Of<IShortStringHelper>(),
+        Mock.Of<IServiceProvider>());
 
     [Test]
     public void GetFilePath_Creates_ExpectedPath()
@@ -29,8 +34,8 @@ public class UniqueMediaPathSchemeTests
     public void GetFilePath_ShouldThrow_WhenUsingVersion7Guids(bool userVersion7ForItemGuid, bool userVersion7ForPropertyGuid)
     {
         var scheme = new UniqueMediaPathScheme();
-        var itemGuid = new Guid("00000000-0000-7000-0000-000000000001");
-        var propertyGuid = new Guid("00000000-0000-4000-0000-000000000002");
+        var itemGuid = new Guid($"00000000-0000-{(userVersion7ForItemGuid ? "7" : "4")}000-0000-000000000001");
+        var propertyGuid = new Guid($"00000000-0000-{(userVersion7ForPropertyGuid ? "7" : "4")}000-0000-000000000002");
         var filename = "test.txt";
 
         Assert.Throws<ArgumentException>(() => scheme.GetFilePath(MediaFileManager, itemGuid, propertyGuid, filename));
