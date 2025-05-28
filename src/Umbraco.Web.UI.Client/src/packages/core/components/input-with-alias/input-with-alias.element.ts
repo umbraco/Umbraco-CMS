@@ -138,8 +138,6 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		}
 
 		#alias {
-			max-width: 50%;
-
 			&.muted {
 				opacity: 0.55;
 				padding: var(--uui-size-1, 3px) var(--uui-size-space-3, 9px);
