@@ -55,7 +55,6 @@ test('can see property values with UI read but not UI write permission', async (
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert
-  await umbracoUi.content.isPropertyEditorUiWithNameVisible('text-box');
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 

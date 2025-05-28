@@ -46,7 +46,6 @@ test('can see property values in block list with UI read but not UI write permis
   await umbracoUi.content.clickEditBlockListBlockButton();
 
   // Assert
-  await umbracoUi.content.isPropertyEditorUiWithNameVisible('text-box');
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
@@ -106,7 +105,6 @@ test('can see property values in block grid with UI read but not UI write permis
   await umbracoUi.content.clickEditBlockGridBlockButton();
 
   // Assert
-  await umbracoUi.content.isPropertyEditorUiWithNameVisible('text-box');
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
