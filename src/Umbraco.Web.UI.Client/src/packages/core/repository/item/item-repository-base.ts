@@ -24,7 +24,7 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 		this.#itemSource = new itemSource(host);
 
 		this._init = this.consumeContext(itemStoreContextAlias, (instance) => {
-			this._itemStore = instance as UmbItemStore<ItemType>;
+			this._itemStore = instance;
 		})
 			.asPromise({ preventTimeout: true })
 			// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
@@ -52,14 +52,12 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 			return {};
 		}
 
-		let problemDetails: UmbProblemDetails | undefined = undefined;
-		if (error && UmbApiError.isUmbApiError(error)) {
-			problemDetails = error.problemDetails;
-		} else if (data) {
+		if (data) {
 			this._itemStore.appendItems(data);
 		}
 
-		return { data, error: problemDetails, asObservable: () => this._itemStore!.items(uniques) };
+		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
+		return { data, error: error as any, asObservable: () => this._itemStore!.items(uniques) };
 	}
 
 	/**

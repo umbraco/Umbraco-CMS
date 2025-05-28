@@ -11,7 +11,7 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbApiError, type UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
+import type { UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
 import { of } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
@@ -92,14 +92,12 @@ export abstract class UmbTreeRepositoryBase<
 			return {};
 		}
 
-		let problemDetails: UmbProblemDetails | undefined = undefined;
-		if (error && UmbApiError.isUmbApiError(error)) {
-			problemDetails = error.problemDetails;
-		} else if (data) {
+		if (data) {
 			this._treeStore.appendItems(data.items);
 		}
 
-		return { data, error: problemDetails, asObservable: () => this._treeStore!.rootItems };
+		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
+		return { data, error: error as any, asObservable: () => this._treeStore!.rootItems };
 	}
 
 	/**
@@ -122,14 +120,12 @@ export abstract class UmbTreeRepositoryBase<
 			return {};
 		}
 
-		let problemDetails: UmbProblemDetails | undefined = undefined;
-		if (error && UmbApiError.isUmbApiError(error)) {
-			problemDetails = error.problemDetails;
-		} else if (data) {
+		if (data) {
 			this._treeStore.appendItems(data.items);
 		}
 
-		return { data, error: problemDetails, asObservable: () => this._treeStore!.childrenOf(args.parent.unique) };
+		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
+		return { data, error: error as any, asObservable: () => this._treeStore!.childrenOf(args.parent.unique) };
 	}
 
 	/**
@@ -144,13 +140,9 @@ export abstract class UmbTreeRepositoryBase<
 
 		const { data, error } = await this._treeSource.getAncestorsOf(args);
 
-		let problemDetails: UmbProblemDetails | undefined = undefined;
-		if (error && UmbApiError.isUmbApiError(error)) {
-			problemDetails = error.problemDetails;
-		}
-
 		// TODO: implement observable for ancestor items in the store
-		return { data, error: problemDetails };
+		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
+		return { data, error: error as any };
 	}
 
 	/**
