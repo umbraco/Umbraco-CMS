@@ -548,7 +548,10 @@ export abstract class UmbBlockEntryContext<
 	abstract _gotContentType(contentType: UmbContentTypeModel | undefined): void;
 
 	async #observeVariantId() {
-		if (!this._manager) return;
+		if (!this._manager) {
+			this.removeUmbControllerByAlias('observeVariantId');
+			return;
+		}
 		await this.#contentStructurePromise;
 		if (!this.#contentStructure) {
 			throw new Error('No contentStructure found');
@@ -557,9 +560,9 @@ export abstract class UmbBlockEntryContext<
 		// observe variantId:
 		this.observe(
 			observeMultiple([
-				this._manager?.variantId,
-				this.#contentStructure?.ownerContentTypeObservablePart((x) => x?.variesByCulture),
-				this.#contentStructure?.ownerContentTypeObservablePart((x) => x?.variesBySegment),
+				this._manager.variantId,
+				this.#contentStructure.ownerContentTypeObservablePart((x) => x?.variesByCulture),
+				this.#contentStructure.ownerContentTypeObservablePart((x) => x?.variesBySegment),
 			]),
 			([variantId, variesByCulture, variesBySegment]) => {
 				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
