@@ -38,10 +38,8 @@ export abstract class UmbDetailRepositoryBase<
 				this.#detailStore = instance;
 			})
 				.asPromise({ preventTimeout: true })
-				.catch(() => {
-					// If the context is not available, we can assume that the store is not available.
-					this.#detailStore = undefined;
-				}),
+				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+				.catch(() => undefined),
 		]);
 	}
 
