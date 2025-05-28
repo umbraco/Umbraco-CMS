@@ -56,7 +56,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#generateRoutes() {
-		if (!this.#variants || !this.#appCulture) return;
+		if (!this.#variants || !this.#appCulture) {
+			this._routes = [];
+			return;
+		}
 
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
@@ -98,11 +101,15 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				path: '',
 				pathMatch: 'full',
-				resolve: () => {
+				resolve: async () => {
+					if (!this.#workspaceContext) {
+						throw new Error('Workspace context is not available when resolving the default route.');
+					}
+
 					const route = routes.find((route) => route.path === this.#appCulture);
 
 					if (!route) {
-						const firstVariantPath = routes.find((route) => route.path === this.#variants?.[0].unique)?.path;
+						const firstVariantPath = routes.find((route) => route.path === this.#variants?.[0]?.unique)?.path;
 
 						if (firstVariantPath) {
 							history.replaceState({}, '', `${this.#workspaceRoute}/${firstVariantPath}`);
