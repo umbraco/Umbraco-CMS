@@ -14,7 +14,7 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 			<span id="icon-container" slot="icon">
 				${icon && iconWithoutColor
 					? html`
-							<umb-icon id="icon" slot="icon" name="${this.getIconVersionToRender(icon, iconWithoutColor)}"></umb-icon>
+							<umb-icon id="icon" slot="icon" name="${this._getIconVersionToRender(icon, iconWithoutColor)}"></umb-icon>
 							${this.#renderStateIcon()}
 						`
 					: nothing}

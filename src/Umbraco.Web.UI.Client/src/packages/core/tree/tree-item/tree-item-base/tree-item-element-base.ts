@@ -168,7 +168,7 @@ export abstract class UmbTreeItemElementBase<
 		const iconWithoutColor = icon?.split(' ')[0];
 
 		if (icon && iconWithoutColor) {
-			return html`<umb-icon slot="icon" name="${this.getIconVersionToRender(icon, iconWithoutColor)}"></umb-icon>`;
+			return html`<umb-icon slot="icon" name="${this._getIconVersionToRender(icon, iconWithoutColor)}"></umb-icon>`;
 		}
 
 		if (isFolder) {
@@ -178,7 +178,7 @@ export abstract class UmbTreeItemElementBase<
 		return html`<umb-icon slot="icon" name="icon-circle-dotted"></umb-icon>`;
 	}
 
-	protected getIconVersionToRender(icon: string, iconWithoutColor: string) {
+	protected _getIconVersionToRender(icon: string, iconWithoutColor: string) {
 		return this._isActive || this._isSelected ? iconWithoutColor : icon;
 	}
 
