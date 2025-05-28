@@ -557,6 +557,12 @@ export abstract class UmbBlockEntryContext<
 			throw new Error('No contentStructure found');
 		}
 
+		if (!this._manager) {
+			// The manager maybe got removed while we awaited the promise above.
+			this.removeUmbControllerByAlias('observeVariantId');
+			return;
+		}
+
 		// observe variantId:
 		this.observe(
 			observeMultiple([
