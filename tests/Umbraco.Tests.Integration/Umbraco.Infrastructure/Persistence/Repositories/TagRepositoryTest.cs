@@ -1047,6 +1047,50 @@ public class TagRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public void Can_Create_Tag_Relations_With_Mixed_Casing()
+    {
+        var provider = ScopeProvider;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType =
+                ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+            ContentTypeRepository.Save(contentType);
+
+            var content1 = ContentBuilder.CreateSimpleContent(contentType);
+            var content2 = ContentBuilder.CreateSimpleContent(contentType);
+            DocumentRepository.Save(content1);
+            DocumentRepository.Save(content2);
+
+            var repository = CreateRepository(provider);
+            Tag[] tags1 = { new() { Text = "tag1", Group = "test" } };
+            repository.Assign(
+                content1.Id,
+                contentType.PropertyTypes.First().Id,
+                tags1,
+                false);
+
+            // Note the casing is different from tags1, but both should be considered equivalent.
+            Tag[] tags2 = { new() { Text = "TAG1", Group = "test" } };
+            repository.Assign(
+                content2.Id,
+                contentType.PropertyTypes.First().Id,
+                tags2,
+                false);
+
+            // Only one tag should have been saved.
+            var tagCount = scope.Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM cmsTags WHERE [group] = 'test'");
+            Assert.AreEqual(1, tagCount);
+
+            // Both content items should be found as tagged by the tag, even though one was assigned with the tag differing in case.
+            Assert.AreEqual(2, repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").Count());
+        }
+    }
+
     private TagRepository CreateRepository(IScopeProvider provider) =>
         new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
 }
