@@ -27,11 +27,8 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 			this._itemStore = instance as UmbItemStore<ItemType>;
 		})
 			.asPromise({ preventTimeout: true })
-			.catch(() => {
-				// If the context is not available, we can assume that the store is not available.
-				// This can happen if the repository is used before the store is initialized.
-				this._itemStore = undefined;
-			});
+			// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+			.catch(() => undefined);
 	}
 
 	/**
@@ -83,6 +80,6 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 			return of([]);
 		}
 
-		return this._itemStore!.items(uniques);
+		return this._itemStore.items(uniques);
 	}
 }

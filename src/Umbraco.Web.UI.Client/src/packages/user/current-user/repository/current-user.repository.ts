@@ -2,7 +2,6 @@ import { UmbCurrentUserServerDataSource } from './current-user.server.data-sourc
 import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 /**
@@ -14,7 +13,7 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	#currentUserSource = new UmbCurrentUserServerDataSource(this._host);
 	#currentUserStore?: typeof UMB_CURRENT_USER_STORE_CONTEXT.TYPE;
 	#init: Promise<unknown>;
-	protected notificationContext?: UmbNotificationContext;
+	protected notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -26,19 +25,14 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 				}
 			})
 				.asPromise({ preventTimeout: true })
-				.catch(() => {
-					// If the context is not available, we can assume that the store is not available.
-					this.#currentUserStore = undefined;
-				}),
+				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+				.catch(() => undefined),
 
 			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.notificationContext = instance;
 			})
 				.asPromise({ preventTimeout: true })
-				.catch(() => {
-					// If the context is not available, we can assume that the context is not available.
-					this.notificationContext = undefined;
-				}),
+				.catch(() => undefined),
 		]);
 	}
 

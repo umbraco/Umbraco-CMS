@@ -58,10 +58,8 @@ export class UmbCurrentUserContext extends UmbContextBase {
 				this.#currentUser?.setValue(currentUser);
 			})
 				.asPromise()
-				.catch(() => {
-					// If the context is not available, we can assume that the current user is not available.
-					this.#currentUser?.setValue(undefined);
-				});
+				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+				.catch(() => undefined);
 		}
 	}
 
