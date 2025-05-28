@@ -47,7 +47,21 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	@property({ type: Object })
-	validationRange?: UmbNumberRangeValueType;
+	private _validationRange?: UmbNumberRangeValueType | undefined;
+	public get validationRange(): UmbNumberRangeValueType | undefined {
+		return this._validationRange;
+	}
+	public set validationRange(value: UmbNumberRangeValueType | undefined) {
+		this._validationRange = value;
+		this._minPlaceholder = value?.min !== undefined ? String(value?.min) : '';
+		this._maxPlaceholder = value?.max !== undefined && value.max !== Infinity ? String(value.max) : '∞';
+	}
+
+	@state()
+	private _minPlaceholder: string = '';
+
+	@state()
+	private _maxPlaceholder: string = '';
 
 	private updateValue() {
 		const newValue =
@@ -114,7 +128,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.minLabel}
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
-				placeholder=${this.validationRange?.min ?? ''}
+				placeholder=${this._minPlaceholder}
 				.value=${this._minValue}
 				@input=${this.#onMinInput}></uui-input>
 			<b>–</b>
@@ -123,13 +137,20 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.maxLabel}
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
-				placeholder=${this.validationRange?.max ?? '∞'}
+				placeholder=${this._maxPlaceholder}
 				.value=${this._maxValue}
 				@input=${this.#onMaxInput}></uui-input>
 		`;
 	}
 
 	static override styles = css`
+		:host {
+			display: flex;
+			align-items: center;
+		}
+		b {
+			margin: 0 var(--uui-size-space-1);
+		}
 		:host(:invalid:not([pristine])) {
 			color: var(--uui-color-invalid);
 		}
