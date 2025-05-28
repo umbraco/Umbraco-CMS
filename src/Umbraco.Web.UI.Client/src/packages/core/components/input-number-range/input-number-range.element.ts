@@ -47,15 +47,15 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	@property({ type: Object })
-	private _validationRange?: UmbNumberRangeValueType | undefined;
 	public get validationRange(): UmbNumberRangeValueType | undefined {
-		return this._validationRange;
+		return this.#validationRange;
 	}
 	public set validationRange(value: UmbNumberRangeValueType | undefined) {
-		this._validationRange = value;
+		this.#validationRange = value;
 		this._minPlaceholder = value?.min !== undefined ? String(value?.min) : '';
 		this._maxPlaceholder = value?.max !== undefined && value.max !== Infinity ? String(value.max) : '∞';
 	}
+	#validationRange?: UmbNumberRangeValueType | undefined;
 
 	@state()
 	private _minPlaceholder: string = '';
