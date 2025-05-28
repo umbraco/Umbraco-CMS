@@ -248,13 +248,13 @@ WHERE r.tagId IS NULL";
     {
         public bool Equals(ITag? x, ITag? y) =>
             ReferenceEquals(x, y) // takes care of both being null
-            || (x != null && y != null && x.Text == y.Text && x.Group == y.Group && x.LanguageId == y.LanguageId);
+            || (x != null && y != null && x.Text.ToLowerInvariant() == y.Text.ToLowerInvariant() && x.Group == y.Group && x.LanguageId == y.LanguageId);
 
         public int GetHashCode(ITag obj)
         {
             unchecked
             {
-                var h = obj.Text.GetHashCode();
+                var h = obj.Text.ToLowerInvariant().GetHashCode();
                 h = (h * 397) ^ obj.Group.GetHashCode();
                 h = (h * 397) ^ (obj.LanguageId?.GetHashCode() ?? 0);
                 return h;

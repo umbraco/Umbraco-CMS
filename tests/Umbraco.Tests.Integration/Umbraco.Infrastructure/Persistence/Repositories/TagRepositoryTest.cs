@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -1066,7 +1065,8 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content2);
 
             var repository = CreateRepository(provider);
-            Tag[] tags1 = { new() { Text = "tag1", Group = "test" } };
+            // Note two tags are applied, but they differ only in case.
+            Tag[] tags1 = { new() { Text = "tag1", Group = "test" }, new() { Text = "Tag1", Group = "test" } };
             repository.Assign(
                 content1.Id,
                 contentType.PropertyTypes.First().Id,
