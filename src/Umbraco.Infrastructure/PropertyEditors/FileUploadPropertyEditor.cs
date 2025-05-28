@@ -22,6 +22,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+// TODO (V17): Consider moving the notification handlers that are part of the is class to their own class, so we adhere
+// better to the single responsibility principle.
+
 [DataEditor(
     Constants.PropertyEditors.Aliases.UploadField,
     ValueEditorIsReusable = true)]
@@ -37,6 +40,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     private readonly MediaFileManager _mediaFileManager;
     private readonly UploadAutoFillProperties _uploadAutoFillProperties;
     private readonly FileUploadValueParser _fileUploadValueParser;
+    private readonly IBlockEditorElementTypeCache _elementTypeCache;
 
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
     private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockGridEditorValues;
@@ -61,7 +65,8 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
               ioHelper,
               StaticServiceProvider.Instance.GetRequiredService<IBlockEditorElementTypeCache>(),
               StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(),
-              StaticServiceProvider.Instance.GetRequiredService<ILogger<FileUploadPropertyEditor>>())
+              StaticServiceProvider.Instance.GetRequiredService<ILogger<FileUploadPropertyEditor>>(),
+              StaticServiceProvider.Instance.GetRequiredService<IBlockEditorElementTypeCache>())
     {
     }
 
@@ -77,7 +82,8 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         IIOHelper ioHelper,
         IBlockEditorElementTypeCache blockEditorElementTypeCache,
         IJsonSerializer jsonSerializer,
-        ILogger<FileUploadPropertyEditor> logger)
+        ILogger<FileUploadPropertyEditor> logger,
+        IBlockEditorElementTypeCache elementTypeCache)
         : base(dataValueEditorFactory)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
@@ -86,6 +92,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         _contentService = contentService;
         _ioHelper = ioHelper;
         _jsonSerializer = jsonSerializer;
+        _elementTypeCache = elementTypeCache;
 
         SupportsReadOnly = true;
 
@@ -137,6 +144,13 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
             if (IsBlockGridPropertyType(property.PropertyType))
             {
                 isUpdated |= UpdateBlockProperty(notification, property, _blockGridEditorValues);
+
+                continue;
+            }
+
+            if (IsRichTextPropertyType(property.PropertyType))
+            {
+                // TODO: Handle rich text properties with blocks.
 
                 continue;
             }
@@ -263,15 +277,15 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
 
     private bool UpdateUploadFieldBlockPropertyValue(BlockPropertyValue blockItemDataValue, ContentCopiedNotification notification, IPropertyType propertyType)
     {
-        FileUploadValue? originalValue = _fileUploadValueParser.Parse(blockItemDataValue.Value);
+        FileUploadValue? fileUploadValue = _fileUploadValueParser.Parse(blockItemDataValue.Value);
 
         // if original value is empty, we do not need to copy file
-        if (string.IsNullOrWhiteSpace(originalValue?.Src))
+        if (string.IsNullOrWhiteSpace(fileUploadValue?.Src))
         {
             return false;
         }
 
-        var copyFileUrl = CopyFile(originalValue.Src, notification.Copy, propertyType);
+        var copyFileUrl = CopyFile(fileUploadValue.Src, notification.Copy, propertyType);
 
         blockItemDataValue.Value = copyFileUrl;
 
@@ -362,7 +376,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     }
 
     /// <summary>
-    ///     The paths to all file upload property files contained within a collection of content entities
+    ///     The paths to all file upload property files contained within a collection of content entities.
     /// </summary>
     /// <param name="entities"></param>
     private IReadOnlyList<string> ContainedFilePaths(IEnumerable<IContentBase> entities)
@@ -388,6 +402,13 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
             if (IsBlockGridPropertyType(property.PropertyType))
             {
                 paths.AddRange(GetPathsFromBlockProperty(property, _blockGridEditorValues));
+
+                continue;
+            }
+
+            if (IsRichTextPropertyType(property.PropertyType))
+            {
+                paths.AddRange(GetPathsFromRichTextProperty(property));
 
                 continue;
             }
@@ -420,26 +441,24 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
 
         foreach (IPropertyValue blockPropertyValue in property.Values)
         {
-            paths.AddRange(GetPathsFromBlockEditorData(GetBlockEditorData(blockPropertyValue.PublishedValue, blockEditorValues)));
-            paths.AddRange(GetPathsFromBlockEditorData(GetBlockEditorData(blockPropertyValue.EditedValue, blockEditorValues)));
+            paths.AddRange(GetPathsFromBlockValue(GetBlockEditorData(blockPropertyValue.PublishedValue, blockEditorValues)?.BlockValue));
+            paths.AddRange(GetPathsFromBlockValue(GetBlockEditorData(blockPropertyValue.EditedValue, blockEditorValues)?.BlockValue));
         }
 
         return paths;
     }
 
-    private IReadOnlyCollection<string> GetPathsFromBlockEditorData<TValue, TLayout>(BlockEditorData<TValue, TLayout>? blockEditorData)
-        where TValue : BlockValue<TLayout>, new()
-        where TLayout : class, IBlockLayoutItem, new()
+    private IReadOnlyCollection<string> GetPathsFromBlockValue(BlockValue? blockValue)
     {
         var paths = new List<string>();
 
-        if (blockEditorData == null)
+        if (blockValue is null)
         {
             return paths;
         }
 
-        IEnumerable<BlockPropertyValue> blockPropertyValues = blockEditorData.BlockValue.ContentData
-            .Concat(blockEditorData.BlockValue.SettingsData)
+        IEnumerable<BlockPropertyValue> blockPropertyValues = blockValue.ContentData
+            .Concat(blockValue.SettingsData)
             .SelectMany(x => x.Values);
 
         foreach (BlockPropertyValue blockPropertyValue in blockPropertyValues)
@@ -494,7 +513,57 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     {
         BlockEditorData<TValue, TLayout>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, blockEditorValues);
 
-        return GetPathsFromBlockEditorData(blockItemEditorDataValue);
+        return GetPathsFromBlockValue(blockItemEditorDataValue?.BlockValue);
+    }
+
+    private IReadOnlyCollection<string> GetPathsFromRichTextProperty(IProperty property)
+    {
+        var paths = new List<string>();
+
+        IPropertyValue? propertyValue = property.Values.FirstOrDefault();
+        if (propertyValue is null)
+        {
+            return paths;
+        }
+
+        paths.AddRange(GetPathsFromBlockValue(GetRichTextBlockValue(propertyValue.PublishedValue)));
+        paths.AddRange(GetPathsFromBlockValue(GetRichTextBlockValue(propertyValue.EditedValue)));
+
+        return paths;
+    }
+
+    private RichTextBlockValue? GetRichTextBlockValue(object? value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        _jsonSerializer.TryDeserialize(value, out RichTextEditorValue? richTextEditorValue);
+        if (richTextEditorValue?.Blocks is null)
+        {
+            return null;
+        }
+
+        // Ensure the property type is populated on all blocks.
+        Guid[] elementTypeKeys = richTextEditorValue.Blocks.ContentData
+            .Select(x => x.ContentTypeKey)
+            .Union(richTextEditorValue.Blocks.SettingsData
+                .Select(x => x.ContentTypeKey))
+            .Distinct()
+            .ToArray();
+
+        IEnumerable<IContentType> elementTypes = _elementTypeCache.GetMany(elementTypeKeys);
+
+        foreach (BlockItemData dataItem in richTextEditorValue.Blocks.ContentData.Union(richTextEditorValue.Blocks.SettingsData))
+        {
+            foreach (BlockPropertyValue item in dataItem.Values)
+            {
+                item.PropertyType = elementTypes.FirstOrDefault(x => x.Key == dataItem.ContentTypeKey)?.PropertyTypes.FirstOrDefault(pt => pt.Alias == item.Alias);
+            }
+        }
+
+        return richTextEditorValue.Blocks;
     }
 
     #endregion
@@ -554,4 +623,15 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// </returns>
     private static bool IsBlockGridPropertyType(IPropertyType propertyType)
         => propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.BlockGrid;
+
+    /// <summary>
+    ///     Gets a value indicating whether a property is an rich text field (supporting blocks).
+    /// </summary>
+    /// <param name="propertyType">The property type.</param>
+    /// <returns>
+    ///     <c>true</c> if the specified property is an rich text field; otherwise, <c>false</c>.
+    /// </returns>
+    private static bool IsRichTextPropertyType(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.RichText ||
+           propertyType.PropertyEditorAlias == "Umbraco.TinyMCE";
 }
