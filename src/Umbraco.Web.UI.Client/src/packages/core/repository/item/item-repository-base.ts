@@ -4,6 +4,7 @@ import type { UmbItemRepository } from './item-repository.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemStore } from '@umbraco-cms/backoffice/store';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 	extends UmbRepositoryBase
@@ -22,10 +23,11 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 		this.#itemSource = new itemSource(host);
 
 		this._init = this.consumeContext(itemStoreContextAlias, (instance) => {
-			if (instance) {
-				this._itemStore = instance as UmbItemStore<ItemType>;
-			}
-		}).asPromise({ preventTimeout: true });
+			this._itemStore = instance;
+		})
+			.asPromise({ preventTimeout: true })
+			// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+			.catch(() => undefined);
 	}
 
 	/**
@@ -42,18 +44,19 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 			return {};
 		}
 
-		const { data, error: _error } = await this.#itemSource.getItems(uniques);
+		const { data, error } = await this.#itemSource.getItems(uniques);
 
 		if (!this._itemStore) {
 			// If store is gone, then we are most likely in a disassembled state.
 			return {};
 		}
-		const error: any = _error;
+
 		if (data) {
-			this._itemStore!.appendItems(data);
+			this._itemStore.appendItems(data);
 		}
 
-		return { data, error, asObservable: () => this._itemStore!.items(uniques) };
+		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
+		return { data, error: error as any, asObservable: () => this._itemStore!.items(uniques) };
 	}
 
 	/**
@@ -68,6 +71,12 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 		} catch {
 			return undefined;
 		}
-		return this._itemStore!.items(uniques);
+
+		if (!this._itemStore) {
+			// If store is gone, then we are most likely in a disassembled state.
+			return of([]);
+		}
+
+		return this._itemStore.items(uniques);
 	}
 }
