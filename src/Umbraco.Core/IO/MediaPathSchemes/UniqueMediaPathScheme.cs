@@ -20,7 +20,7 @@ public class UniqueMediaPathScheme : IMediaPathScheme
         // We should detect that, throw, and recommend creation of standard GUIDs or the use of a custom IMediaPathScheme instead.
         if (itemGuid.Version == 7 || propertyGuid.Version == 7)
         {
-            throw new InvalidOperationException(
+            throw new ArgumentException(
                 "The UniqueMediaPathScheme cannot be used with version 7 GUIDs due to an increased risk of collisions in the generated file paths. " +
                 "Please use version 4 GUIDs created via Guid.NewGuid() or implement and register a different IMediaPathScheme.");
         }
