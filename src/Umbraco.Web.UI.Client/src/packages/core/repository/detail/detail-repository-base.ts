@@ -59,7 +59,7 @@ export abstract class UmbDetailRepositoryBase<
 	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType>> {
+	async requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType | undefined>> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
@@ -72,7 +72,7 @@ export abstract class UmbDetailRepositoryBase<
 		return {
 			data,
 			error,
-			asObservable: () => this.#detailStore!.byUnique(unique),
+			asObservable: () => this.#detailStore?.byUnique(unique),
 		};
 	}
 

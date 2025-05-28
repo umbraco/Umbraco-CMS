@@ -175,7 +175,7 @@ export class UmbContentTypeStructureManager<
 	 * @param {string} unique - The unique of the ContentType to load.
 	 * @returns {Promise} - Promise resolved
 	 */
-	public async loadType(unique: string): Promise<UmbRepositoryResponseWithAsObservable<T>> {
+	public async loadType(unique: string): Promise<UmbRepositoryResponseWithAsObservable<T | undefined>> {
 		if (this.#ownerContentTypeUnique === unique) {
 			// Its the same, but we do not know if its done loading jet, so we will wait for the load promise to finish. [NL]
 			await this.#init;
