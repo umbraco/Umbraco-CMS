@@ -97,6 +97,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
+				pathMatch: 'full',
 				resolve: () => {
 					const route = routes.find((route) => route.path === this.#appCulture);
 
@@ -118,12 +119,12 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 					history.replaceState({}, '', `${this.#workspaceRoute}/${route?.path}`);
 				},
 			});
-		}
 
-		routes.push({
-			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-		});
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
+		}
 
 		this._routes = routes;
 	}
