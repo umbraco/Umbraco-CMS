@@ -22,9 +22,7 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 		this.#itemSource = new itemSource(host);
 
 		this._init = this.consumeContext(itemStoreContextAlias, (instance) => {
-			if (instance) {
-				this._itemStore = instance as UmbItemStore<ItemType>;
-			}
+			this._itemStore = instance as UmbItemStore<ItemType>;
 		})
 			.asPromise({ preventTimeout: true })
 			.catch(() => {

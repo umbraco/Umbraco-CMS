@@ -61,9 +61,7 @@ export abstract class UmbTreeRepositoryBase<
 		this._treeSource = new treeSourceConstructor(this);
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
-			if (instance) {
-				this._treeStore = instance;
-			}
+			this._treeStore = instance;
 		})
 			.asPromise({ preventTimeout: true })
 			.catch(() => {
