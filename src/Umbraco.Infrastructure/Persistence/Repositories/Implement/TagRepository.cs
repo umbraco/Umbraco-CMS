@@ -254,7 +254,7 @@ WHERE r.tagId IS NULL";
         {
             unchecked
             {
-                var h = obj.Text.ToLowerInvariant().GetHashCode();
+                var h = StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Text);
                 h = (h * 397) ^ obj.Group.GetHashCode();
                 h = (h * 397) ^ (obj.LanguageId?.GetHashCode() ?? 0);
                 return h;
