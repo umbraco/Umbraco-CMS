@@ -172,7 +172,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
             Mock.Of<IBlockEditorElementTypeCache>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<ILogger<FileUploadPropertyEditor>>(),
-            Mock.Of<IBlockEditorElementTypeCache>();
+            Mock.Of<IBlockEditorElementTypeCache>());
 
         var media = MediaBuilder.CreateMediaImage(mediaType, -1);
         media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests
