@@ -151,7 +151,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
 
             if (IsRichTextPropertyType(property.PropertyType))
             {
-                // TODO: Handle rich text properties with blocks.
+                isUpdated |= UpdateRichTextProperty(notification, property);
 
                 continue;
             }
@@ -218,7 +218,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     {
         var isUpdated = false;
 
-        if (blockEditorData == null)
+        if (blockEditorData is null)
         {
             return (isUpdated, null);
         }
@@ -227,16 +227,73 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
             .Concat(blockEditorData.BlockValue.SettingsData)
             .SelectMany(x => x.Values);
 
+        isUpdated = UpdateBlockPropertyValues(notification, isUpdated, blockPropertyValues);
+
+        var updatedValue = _jsonSerializer.Serialize(blockEditorData.BlockValue);
+
+        return (isUpdated, updatedValue);
+    }
+
+    private bool UpdateRichTextProperty(ContentCopiedNotification notification, IProperty property)
+    {
+        var isUpdated = false;
+
+        foreach (IPropertyValue blockPropertyValue in property.Values)
+        {
+            var rawBlockPropertyValue = property.GetValue(blockPropertyValue.Culture, blockPropertyValue.Segment);
+
+            RichTextBlockValue? richTextBlockValue = GetRichTextBlockValue(rawBlockPropertyValue);
+
+            (bool hasUpdates, string? updatedValue) = UpdateBlockEditorData(notification, richTextBlockValue);
+
+            if (hasUpdates && string.IsNullOrEmpty(updatedValue) is false)
+            {
+                RichTextEditorValue? richTextEditorValue = GetRichTextEditorValue(rawBlockPropertyValue);
+                if (richTextEditorValue is not null)
+                {
+                    richTextEditorValue.Blocks = _jsonSerializer.Deserialize<RichTextBlockValue>(updatedValue);
+                    notification.Copy.SetValue(property.Alias, _jsonSerializer.Serialize(richTextEditorValue), blockPropertyValue.Culture, blockPropertyValue.Segment);
+                }
+            }
+
+            isUpdated |= hasUpdates;
+        }
+
+        return isUpdated;
+    }
+
+    private (bool, string?) UpdateBlockEditorData(ContentCopiedNotification notification, RichTextBlockValue? richTextBlockValue)
+    {
+        var isUpdated = false;
+
+        if (richTextBlockValue is null)
+        {
+            return (isUpdated, null);
+        }
+
+        IEnumerable<BlockPropertyValue> blockPropertyValues = richTextBlockValue.ContentData
+            .Concat(richTextBlockValue.SettingsData)
+            .SelectMany(x => x.Values);
+
+        isUpdated = UpdateBlockPropertyValues(notification, isUpdated, blockPropertyValues);
+
+        var updatedValue = _jsonSerializer.Serialize(richTextBlockValue);
+
+        return (isUpdated, updatedValue);
+    }
+
+    private bool UpdateBlockPropertyValues(ContentCopiedNotification notification, bool isUpdated, IEnumerable<BlockPropertyValue> blockPropertyValues)
+    {
         foreach (BlockPropertyValue blockPropertyValue in blockPropertyValues)
         {
-            if (blockPropertyValue.Value == null)
+            if (blockPropertyValue.Value is null)
             {
                 continue;
             }
 
             IPropertyType? propertyType = blockPropertyValue.PropertyType;
 
-            if (propertyType == null)
+            if (propertyType is null)
             {
                 continue;
             }
@@ -271,9 +328,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
             }
         }
 
-        var updatedValue = _jsonSerializer.Serialize(blockEditorData.BlockValue);
-
-        return (isUpdated, updatedValue);
+        return isUpdated;
     }
 
     private bool UpdateUploadFieldBlockPropertyValue(BlockPropertyValue blockItemDataValue, ContentCopiedNotification notification, IPropertyType propertyType)
@@ -533,7 +588,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         return paths;
     }
 
-    private RichTextBlockValue? GetRichTextBlockValue(object? value)
+    private RichTextEditorValue? GetRichTextEditorValue(object? value)
     {
         if (value is null)
         {
@@ -541,6 +596,12 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
 
         _jsonSerializer.TryDeserialize(value, out RichTextEditorValue? richTextEditorValue);
+        return richTextEditorValue;
+    }
+
+    private RichTextBlockValue? GetRichTextBlockValue(object? value)
+    {
+        RichTextEditorValue? richTextEditorValue = GetRichTextEditorValue(value);
         if (richTextEditorValue?.Blocks is null)
         {
             return null;
