@@ -22,7 +22,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-// TODO (V17): Consider moving the notification handlers that are part of the is class to their own class, so we adhere
+// TODO (V17): Consider moving the notification handlers that are part of this class to their own class, so we adhere
 // better to the single responsibility principle.
 
 [DataEditor(
