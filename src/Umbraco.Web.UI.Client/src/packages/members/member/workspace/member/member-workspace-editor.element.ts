@@ -81,6 +81,7 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
+				pathMatch: 'full',
 				redirectTo: routes[options.length * options.length]?.path,
 			});
 		}

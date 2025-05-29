@@ -205,12 +205,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			});
 			routes.push({
 				path: '',
+				pathMatch: 'full',
 				redirectTo: 'root',
 				guards: [() => this.#processingTabId === undefined],
 			});
 		} else {
 			routes.push({
 				path: '',
+				pathMatch: 'full',
 				redirectTo: routes[0]?.path,
 				guards: [() => this.#processingTabId === undefined],
 			});
@@ -225,15 +227,15 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					this.#currentTabComponent = undefined;
 				},
 			});
+		} else {
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+				setup: () => {
+					this.#currentTabComponent = undefined;
+				},
+			});
 		}
-
-		routes.push({
-			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-			setup: () => {
-				this.#currentTabComponent = undefined;
-			},
-		});
 
 		this._routes = routes;
 
