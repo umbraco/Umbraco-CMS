@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -258,29 +259,8 @@ public class RichTextPropertyEditor : DataEditor
             }
 
             // Ensure the property type is populated on all blocks.
-            Guid[] elementTypeKeys = (richTextEditorValue?.Blocks?.ContentData ?? [])
-                .Select(x => x.ContentTypeKey)
-                .Union((richTextEditorValue?.Blocks?.SettingsData ?? [])
-                    .Select(x => x.ContentTypeKey))
-                .Union((currentRichTextEditorValue?.Blocks?.ContentData ?? [])
-                    .Select(x => x.ContentTypeKey))
-                .Union((currentRichTextEditorValue?.Blocks?.SettingsData ?? [])
-                    .Select(x => x.ContentTypeKey))
-                .Distinct()
-                .ToArray();
-
-            IEnumerable<IContentType> elementTypes = _elementTypeCache.GetMany(elementTypeKeys);
-
-            foreach (BlockItemData dataItem in (richTextEditorValue?.Blocks?.ContentData ?? [])
-                .Union(richTextEditorValue?.Blocks?.SettingsData ?? [])
-                .Union(currentRichTextEditorValue?.Blocks?.ContentData ?? [])
-                .Union(currentRichTextEditorValue?.Blocks?.SettingsData ?? []))
-            {
-                foreach (BlockPropertyValue item in dataItem.Values)
-                {
-                    item.PropertyType = elementTypes.FirstOrDefault(x => x.Key == dataItem.ContentTypeKey)?.PropertyTypes.FirstOrDefault(pt => pt.Alias == item.Alias);
-                }
-            }
+            richTextEditorValue?.EnsurePropertyTypePopulatedOnBlocks(_elementTypeCache);
+            currentRichTextEditorValue?.EnsurePropertyTypePopulatedOnBlocks(_elementTypeCache);
 
             RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueFromEditor(blockValue, currentRichTextEditorValue?.Blocks, editorValue.ContentKey));
 

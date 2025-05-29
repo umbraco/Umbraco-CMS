@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Extensions;
 
@@ -546,22 +547,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         }
 
         // Ensure the property type is populated on all blocks.
-        Guid[] elementTypeKeys = richTextEditorValue.Blocks.ContentData
-            .Select(x => x.ContentTypeKey)
-            .Union(richTextEditorValue.Blocks.SettingsData
-                .Select(x => x.ContentTypeKey))
-            .Distinct()
-            .ToArray();
-
-        IEnumerable<IContentType> elementTypes = _elementTypeCache.GetMany(elementTypeKeys);
-
-        foreach (BlockItemData dataItem in richTextEditorValue.Blocks.ContentData.Union(richTextEditorValue.Blocks.SettingsData))
-        {
-            foreach (BlockPropertyValue item in dataItem.Values)
-            {
-                item.PropertyType = elementTypes.FirstOrDefault(x => x.Key == dataItem.ContentTypeKey)?.PropertyTypes.FirstOrDefault(pt => pt.Alias == item.Alias);
-            }
-        }
+        richTextEditorValue.EnsurePropertyTypePopulatedOnBlocks(_elementTypeCache);
 
         return richTextEditorValue.Blocks;
     }
