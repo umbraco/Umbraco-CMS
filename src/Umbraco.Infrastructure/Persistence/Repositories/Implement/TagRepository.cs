@@ -134,7 +134,7 @@ internal class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
         var sql1 = $@"INSERT INTO cmsTags (tag, {group}, languageId)
 SELECT tagSet.tag, tagSet.{group}, tagSet.languageId
 FROM {tagSetSql}
-LEFT OUTER JOIN cmsTags ON (LOWER(tagSet.tag) = LOWER(cmsTags.tag) AND tagSet.{group} = cmsTags.{group} AND COALESCE(tagSet.languageId, -1) = COALESCE(cmsTags.languageId, -1))
+LEFT OUTER JOIN cmsTags ON (LOWER(tagSet.tag) = LOWER(cmsTags.tag) AND LOWER(tagSet.{group}) = LOWER(cmsTags.{group}) AND COALESCE(tagSet.languageId, -1) = COALESCE(cmsTags.languageId, -1))
 WHERE cmsTags.id IS NULL";
 
         Database.Execute(sql1);
@@ -145,7 +145,7 @@ SELECT {contentId}, {propertyTypeId}, tagSet2.Id
 FROM (
     SELECT t.Id
     FROM {tagSetSql}
-    INNER JOIN cmsTags as t ON (LOWER(tagSet.tag) = LOWER(t.tag) AND tagSet.{group} = t.{group} AND COALESCE(tagSet.languageId, -1) = COALESCE(t.languageId, -1))
+    INNER JOIN cmsTags as t ON (LOWER(tagSet.tag) = LOWER(t.tag) AND LOWER(tagSet.{group}) = LOWER(t.{group}) AND COALESCE(tagSet.languageId, -1) = COALESCE(t.languageId, -1))
 ) AS tagSet2
 LEFT OUTER JOIN cmsTagRelationship r ON (tagSet2.id = r.tagId AND r.nodeId = {contentId} AND r.propertyTypeID = {propertyTypeId})
 WHERE r.tagId IS NULL";
@@ -248,14 +248,18 @@ WHERE r.tagId IS NULL";
     {
         public bool Equals(ITag? x, ITag? y) =>
             ReferenceEquals(x, y) // takes care of both being null
-            || (x != null && y != null && x.Text.ToLowerInvariant() == y.Text.ToLowerInvariant() && x.Group == y.Group && x.LanguageId == y.LanguageId);
+            || (x != null &&
+                y != null &&
+                string.Equals(x.Text, y.Text, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(x.Group, y.Group, StringComparison.OrdinalIgnoreCase) &&
+            x.LanguageId == y.LanguageId);
 
         public int GetHashCode(ITag obj)
         {
             unchecked
             {
                 var h = StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Text);
-                h = (h * 397) ^ obj.Group.GetHashCode();
+                h = (h * 397) ^ StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Group);
                 h = (h * 397) ^ (obj.LanguageId?.GetHashCode() ?? 0);
                 return h;
             }
