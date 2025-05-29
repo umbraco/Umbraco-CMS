@@ -253,7 +253,8 @@ public class RichTextPropertyEditor : DataEditor
             TryParseEditorValue(editorValue.Value, out RichTextEditorValue? richTextEditorValue);
             TryParseEditorValue(currentValue, out RichTextEditorValue? currentRichTextEditorValue);
 
-            if (richTextEditorValue?.Blocks is null && currentRichTextEditorValue?.Blocks is null)
+            // We can early return if we have a null value and the current value doesn't have any blocks.
+            if (richTextEditorValue is null && currentRichTextEditorValue?.Blocks is null)
             {
                 return null;
             }
