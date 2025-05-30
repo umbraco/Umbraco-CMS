@@ -35,6 +35,8 @@ test('the default configuration of Administrators is correct', async ({umbracoAp
     "Umb.Document.Read",
     "Umb.Document.CreateBlueprint",
     "Umb.Document.Notifications",
+    "Umb.Document.PropertyValue.Read",
+    "Umb.Document.PropertyValue.Write"
   ];
   const granularPermissions = [];
   const hasAccessToAllLanguages = true;
@@ -86,6 +88,8 @@ test('the default configuration of Editors is correct', async ({umbracoApi, umbr
     "Umb.Document.Read",
     "Umb.Document.CreateBlueprint",
     "Umb.Document.Notifications",
+    "Umb.Document.PropertyValue.Read",
+    "Umb.Document.PropertyValue.Write"
   ];
   const granularPermissions = [];
   const hasAccessToAllLanguages = true;
@@ -156,7 +160,9 @@ test('the default configuration of Translators data is correct', async ({umbraco
   const sections = ["Umb.Section.Translation"];
   const fallbackPermissions = [
     "Umb.Document.Update",
-    "Umb.Document.Read"
+    "Umb.Document.Read",
+    "Umb.Document.PropertyValue.Read",
+    "Umb.Document.PropertyValue.Write"
   ];
   const granularPermissions = [];
   const hasAccessToAllLanguages = true;
@@ -193,7 +199,9 @@ test('the default configuration of Writers data is correct', async ({umbracoApi,
     "Umb.Document.Create",
     "Umb.Document.Update",
     "Umb.Document.Read",
-    "Umb.Document.Notifications"
+    "Umb.Document.Notifications",
+    "Umb.Document.PropertyValue.Read",
+    "Umb.Document.PropertyValue.Write"
   ];
   const granularPermissions = [];
   const hasAccessToAllLanguages = true;
