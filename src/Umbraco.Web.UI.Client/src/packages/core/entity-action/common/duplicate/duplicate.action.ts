@@ -1,8 +1,8 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
-import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
 import type { UmbDuplicateRepository } from './duplicate-repository.interface.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 export class UmbDuplicateEntityAction extends UmbEntityActionBase<any> {
 	override async execute() {
