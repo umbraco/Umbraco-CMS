@@ -34,7 +34,9 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerPrivateExtensions() {
-		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPrivate());
+		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPrivate(), {
+			disableNotifications: true,
+		});
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}
@@ -46,7 +48,9 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Any user can access this method without any permissions.
 	 */
 	public async registerPublicExtensions() {
-		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPublic());
+		const { data: packages } = await tryExecute(this, ManifestService.getManifestManifestPublic(), {
+			disableNotifications: true,
+		});
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}
