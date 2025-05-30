@@ -247,6 +247,25 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
 
                 continue;
             }
+
+            if (IsRichTextPropertyType(propertyType))
+            {
+                (bool hasUpdates, string? newValue) = UpdateRichTextPropertyValue(blockPropertyValue, notification);
+
+                if (hasUpdates && string.IsNullOrEmpty(newValue) is false)
+                {
+                    RichTextEditorValue? richTextEditorValue = GetRichTextEditorValue(blockPropertyValue.Value);
+                    if (richTextEditorValue is not null)
+                    {
+                        isUpdated |= hasUpdates;
+
+                        richTextEditorValue.Blocks = JsonSerializer.Deserialize<RichTextBlockValue>(newValue);
+                        blockPropertyValue.Value = richTextEditorValue;
+                    }
+                }
+
+                continue;
+            }
         }
 
         return isUpdated;
@@ -276,6 +295,12 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
         BlockEditorData<TValue, TLayout>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, blockEditorValues);
 
         return UpdateBlockEditorData(notification, blockItemEditorDataValue);
+    }
+
+    private (bool, string?) UpdateRichTextPropertyValue(BlockPropertyValue blockItemDataValue, ContentCopiedNotification notification)
+    {
+        RichTextBlockValue? richTextBlockValue = GetRichTextBlockValue(blockItemDataValue.Value);
+        return UpdateBlockEditorData(notification, richTextBlockValue);
     }
 
     private string CopyFile(string sourceUrl, IContent destinationContent, IPropertyType propertyType)
