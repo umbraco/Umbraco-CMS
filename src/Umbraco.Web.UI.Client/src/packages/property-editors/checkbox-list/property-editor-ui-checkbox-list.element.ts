@@ -98,14 +98,12 @@ export class UmbPropertyEditorUICheckboxListElement
 	 * This fixes the issue where UI doesn't update when values are set programmatically.
 	 */
 	#updateCheckedState() {
-		if (this._list.length > 0) {
-			this._list = this._list.map(item => ({
-				...item,
-				checked: this.#selection.includes(item.value)
-			}));
-			// Trigger a re-render
-			this.requestUpdate();
-		}
+		this._list = this._list.map(item => ({
+			...item,
+			checked: this.#selection.includes(item.value)
+		}));
+		// Trigger a re-render
+		this.requestUpdate();
 	}
 
 	override render() {

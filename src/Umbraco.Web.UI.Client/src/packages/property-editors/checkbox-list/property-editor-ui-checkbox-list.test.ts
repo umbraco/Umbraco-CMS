@@ -9,6 +9,46 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 		element = await fixture(html`<umb-property-editor-ui-checkbox-list></umb-property-editor-ui-checkbox-list>`);
 	});
 
+	// Helper function to reduce code duplication
+	function getCheckboxListInput() {
+		return element.shadowRoot?.querySelector('umb-input-checkbox-list');
+	}
+
+	// Helper function to get checked values from DOM
+	function getCheckedValues() {
+		const checkboxListInput = getCheckboxListInput();
+		const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
+		const checkedValues: string[] = [];
+		
+		checkboxElements.forEach((checkbox: Element) => {
+			const uuiCheckbox = checkbox as any;
+			if (uuiCheckbox.checked) {
+				checkedValues.push(uuiCheckbox.value);
+			}
+		});
+		
+		return checkedValues;
+	}
+
+	// Helper function to verify both selection and DOM state
+	function verifySelectionAndDOM(expectedSelection: string[], expectedChecked: string[]) {
+		const checkboxListInput = getCheckboxListInput();
+		expect(checkboxListInput?.selection).to.deep.equal(expectedSelection);
+		expect(getCheckedValues().sort()).to.deep.equal(expectedChecked.sort());
+	}
+
+	// Helper function to setup basic configuration
+	function setupBasicConfig() {
+		element.config = {
+			getValueByAlias: (alias: string) => {
+				if (alias === 'items') {
+					return ['Red', 'Green', 'Blue'];
+				}
+				return undefined;
+			}
+		} as any;
+	}
+
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUICheckboxListElement);
 	});
@@ -21,42 +61,16 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 
 	describe('programmatic value setting', () => {
 		beforeEach(async () => {
-			// Set up configuration with test items
-			element.config = {
-				getValueByAlias: (alias: string) => {
-					if (alias === 'items') {
-						return ['Red', 'Green', 'Blue'];
-					}
-					return undefined;
-				}
-			} as any;
+			setupBasicConfig();
 			await element.updateComplete;
 		});
 
 		it('should update UI immediately when value is set programmatically with array', async () => {
-			// Set value programmatically
 			element.value = ['Red', 'Blue'];
 			await element.updateComplete;
 
-			// Get the checkbox list input element
-			const checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			expect(checkboxListInput).to.exist;
-
-			// Check that the selection property is updated
-			expect(checkboxListInput?.selection).to.deep.equal(['Red', 'Blue']);
-
-			// Check that the actual uui-checkbox elements are properly checked
-			const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			const checkedValues: string[] = [];
-			
-			checkboxElements.forEach((checkbox: Element) => {
-				const uuiCheckbox = checkbox as any; // uui-checkbox element
-				if (uuiCheckbox.checked) {
-					checkedValues.push(uuiCheckbox.value);
-				}
-			});
-			
-			expect(checkedValues).to.deep.equal(['Red', 'Blue']);
+			expect(getCheckboxListInput()).to.exist;
+			verifySelectionAndDOM(['Red', 'Blue'], ['Red', 'Blue']);
 		});
 
 		it('should update UI immediately when value is set to empty array', async () => {
@@ -68,51 +82,21 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			element.value = [];
 			await element.updateComplete;
 
-			const checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			expect(checkboxListInput?.selection).to.deep.equal([]);
-
-			// Check that no uui-checkbox elements are checked
-			const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			const checkedElements = Array.from(checkboxElements).filter((checkbox: Element) => (checkbox as any).checked);
-			
-			expect(checkedElements).to.have.length(0);
+			verifySelectionAndDOM([], []);
 		});
 
 		it('should update UI immediately when value is set to single string', async () => {
-			// Set single string value
 			element.value = 'Green';
 			await element.updateComplete;
 
-			const checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			expect(checkboxListInput?.selection).to.deep.equal(['Green']);
-
-			// Check that only the 'Green' uui-checkbox is checked
-			const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			const checkedValues: string[] = [];
-			
-			checkboxElements.forEach((checkbox: Element) => {
-				const uuiCheckbox = checkbox as any;
-				if (uuiCheckbox.checked) {
-					checkedValues.push(uuiCheckbox.value);
-				}
-			});
-			
-			expect(checkedValues).to.deep.equal(['Green']);
+			verifySelectionAndDOM(['Green'], ['Green']);
 		});
 
 		it('should handle undefined value gracefully', async () => {
-			// Set undefined value
 			element.value = undefined;
 			await element.updateComplete;
 
-			const checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			expect(checkboxListInput?.selection).to.deep.equal([]);
-
-			// Check that no uui-checkbox elements are checked
-			const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			const checkedElements = Array.from(checkboxElements).filter((checkbox: Element) => (checkbox as any).checked);
-			
-			expect(checkedElements).to.have.length(0);
+			verifySelectionAndDOM([], []);
 		});
 
 		it('should handle invalid values gracefully', async () => {
@@ -120,24 +104,8 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			element.value = ['Red', 'InvalidColor', 'Blue'];
 			await element.updateComplete;
 
-			// Should still include the invalid value in selection (component preserves all values)
-			const checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			expect(checkboxListInput?.selection).to.deep.equal(['Red', 'InvalidColor', 'Blue']);
-
-			// Check that only valid uui-checkbox elements are checked (Red and Blue)
-			// InvalidColor doesn't exist in the configured list, so no checkbox for it should be rendered/checked
-			const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			const checkedValues: string[] = [];
-			
-			checkboxElements.forEach((checkbox: Element) => {
-				const uuiCheckbox = checkbox as any;
-				if (uuiCheckbox.checked) {
-					checkedValues.push(uuiCheckbox.value);
-				}
-			});
-			
-			// Only Red and Blue should be checked since InvalidColor doesn't exist as a checkbox in the configured list
-			expect(checkedValues.sort()).to.deep.equal(['Blue', 'Red']);
+			// Should preserve all values in selection but only check valid ones in DOM
+			verifySelectionAndDOM(['Red', 'InvalidColor', 'Blue'], ['Red', 'Blue']);
 		});
 
 		it('should maintain value consistency between getter and setter', async () => {
@@ -146,62 +114,22 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			await element.updateComplete;
 
 			expect(element.value).to.deep.equal(testValue);
-
-			// Verify the uui-checkboxes match the value
-			const checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			const checkedValues: string[] = [];
-			
-			checkboxElements.forEach((checkbox: Element) => {
-				const uuiCheckbox = checkbox as any;
-				if (uuiCheckbox.checked) {
-					checkedValues.push(uuiCheckbox.value);
-				}
-			});
-			
-			expect(checkedValues).to.deep.equal(testValue);
+			verifySelectionAndDOM(testValue, testValue);
 		});
 
 		it('should update multiple times correctly', async () => {
-			// First update
-			element.value = ['Red'];
-			await element.updateComplete;
-			
-			let checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			expect(checkboxListInput?.selection).to.deep.equal(['Red']);
+			// Test data for multiple updates
+			const updates = [
+				{ value: ['Red'], expected: ['Red'] },
+				{ value: ['Green', 'Blue'], expected: ['Green', 'Blue'] },
+				{ value: [], expected: [] }
+			];
 
-			// Verify first update uui-checkboxes
-			let checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			let checkedValues = Array.from(checkboxElements)
-				.filter((checkbox: Element) => (checkbox as any).checked)
-				.map((checkbox: Element) => (checkbox as any).value);
-			expect(checkedValues).to.deep.equal(['Red']);
-
-			// Second update
-			element.value = ['Green', 'Blue'];
-			await element.updateComplete;
-			
-			checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			expect(checkboxListInput?.selection).to.deep.equal(['Green', 'Blue']);
-
-			// Verify second update uui-checkboxes
-			checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			checkedValues = Array.from(checkboxElements)
-				.filter((checkbox: Element) => (checkbox as any).checked)
-				.map((checkbox: Element) => (checkbox as any).value);
-			expect(checkedValues).to.deep.equal(['Green', 'Blue']);
-
-			// Third update
-			element.value = [];
-			await element.updateComplete;
-			
-			checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			expect(checkboxListInput?.selection).to.deep.equal([]);
-
-			// Verify third update uui-checkboxes (none should be checked)
-			checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			const checkedElements = Array.from(checkboxElements).filter((checkbox: Element) => (checkbox as any).checked);
-			expect(checkedElements).to.have.length(0);
+			for (const update of updates) {
+				element.value = update.value;
+				await element.updateComplete;
+				verifySelectionAndDOM(update.expected, update.expected);
+			}
 		});
 	});
 
@@ -219,21 +147,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			element.value = ['Option1', 'Option3'];
 			await element.updateComplete;
 
-			const checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			expect(checkboxListInput?.selection).to.deep.equal(['Option1', 'Option3']);
-
-			// Verify the actual uui-checkboxes are checked correctly
-			const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			const checkedValues: string[] = [];
-			
-			checkboxElements.forEach((checkbox: Element) => {
-				const uuiCheckbox = checkbox as any;
-				if (uuiCheckbox.checked) {
-					checkedValues.push(uuiCheckbox.value);
-				}
-			});
-			
-			expect(checkedValues).to.deep.equal(['Option1', 'Option3']);
+			verifySelectionAndDOM(['Option1', 'Option3'], ['Option1', 'Option3']);
 		});
 
 		it('should handle object array configuration', async () => {
@@ -253,21 +167,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			element.value = ['red', 'blue'];
 			await element.updateComplete;
 
-			const checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
-			expect(checkboxListInput?.selection).to.deep.equal(['red', 'blue']);
-
-			// Verify the actual uui-checkboxes are checked correctly
-			const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
-			const checkedValues: string[] = [];
-			
-			checkboxElements.forEach((checkbox: Element) => {
-				const uuiCheckbox = checkbox as any;
-				if (uuiCheckbox.checked) {
-					checkedValues.push(uuiCheckbox.value);
-				}
-			});
-			
-			expect(checkedValues).to.deep.equal(['red', 'blue']);
+			verifySelectionAndDOM(['red', 'blue'], ['red', 'blue']);
 		});
 
 		it('should handle empty configuration gracefully', async () => {
@@ -281,8 +181,8 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			// Should not throw error
 			expect(element.value).to.deep.equal(['test']);
 
-			// Should have no uui-checkboxes to check since configuration is empty
-			const checkboxListInput = element.shadowRoot?.querySelector('umb-input-checkbox-list');
+			// Should have no uui-checkboxes since configuration is empty
+			const checkboxListInput = getCheckboxListInput();
 			const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
 			expect(checkboxElements).to.have.length(0);
 		});
