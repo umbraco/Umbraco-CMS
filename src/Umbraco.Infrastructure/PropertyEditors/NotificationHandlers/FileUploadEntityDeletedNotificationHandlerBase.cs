@@ -29,8 +29,8 @@ internal abstract class FileUploadEntityDeletedNotificationHandlerBase : FileUpl
         ILogger logger)
         : base(jsonSerializer, mediaFileManager, elementTypeCache)
     {
-        _blockListEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(new BlockListEditorDataConverter(jsonSerializer), elementTypeCache, logger);
-        _blockGridEditorValues = new BlockEditorValues<BlockGridValue, BlockGridLayoutItem>(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
+        _blockListEditorValues = new(new BlockListEditorDataConverter(jsonSerializer), elementTypeCache, logger);
+        _blockGridEditorValues = new(new BlockGridEditorDataConverter(jsonSerializer), elementTypeCache, logger);
     }
 
     /// <summary>
