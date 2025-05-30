@@ -31,6 +31,8 @@ export class UmbPropertyEditorUIDropdownElement
 	@property({ type: Array })
 	public override set value(value: Array<string> | string | undefined) {
 		this.#selection = this.#ensureValueIsArray(value);
+		// Update the selected state of existing options when value changes
+		this.#updateSelectedState();
 	}
 	public override get value(): Array<string> | undefined {
 		return this.#selection;
@@ -57,6 +59,10 @@ export class UmbPropertyEditorUIDropdownElement
 
 	@property({ type: String })
 	name?: string;
+
+	constructor() {
+		super();
+	}
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -118,6 +124,23 @@ export class UmbPropertyEditorUIDropdownElement
 		this._options.forEach((item) => (item.selected = selection.includes(item.value)));
 		this.value = value;
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	/**
+	 * Updates the selected state of all options based on current selection.
+	 * This fixes the issue where UI doesn't update when values are set programmatically.
+	 */
+	#updateSelectedState() {
+		// Only update if we have options loaded and a valid selection
+		if (this._options.length > 0 && this.#selection) {
+			// Create a new array to trigger state change detection
+			this._options = this._options.map((item) => ({
+				...item,
+				selected: this.#selection.includes(item.value)
+			}));
+			// Trigger a re-render
+			this.requestUpdate();
+		}
 	}
 
 	override render() {
