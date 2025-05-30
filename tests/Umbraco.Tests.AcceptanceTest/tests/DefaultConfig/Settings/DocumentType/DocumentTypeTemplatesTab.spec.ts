@@ -62,8 +62,7 @@ test('can set an allowed template as default for document type', async ({umbraco
   await umbracoApi.template.ensureNameNotExists(secondTemplateName);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently the error displays when remove an allowed template
-test.skip('can remove an allowed template from a document type', async ({umbracoApi, umbracoUi}) => {
+test('can remove an allowed template from a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);

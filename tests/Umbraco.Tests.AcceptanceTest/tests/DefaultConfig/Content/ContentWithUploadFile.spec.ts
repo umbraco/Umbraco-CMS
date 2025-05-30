@@ -90,8 +90,7 @@ for (const uploadFile of uploadFiles) {
   });
 }
 
-// TODO: Remove skip when the front-end is ready. Currently the uploaded file still displays after removing.
-test.skip('can remove a text file in the content', async ({umbracoApi, umbracoUi}) => {
+test('can remove a text file in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadFileName = 'File.txt';
   const mineType = 'text/plain';
