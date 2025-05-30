@@ -29,7 +29,11 @@ export class UmbPropertyEditorUICheckboxListElement
 	@property({ type: Array })
 	public override set value(value: Array<string> | string | undefined) {
 		this.#selection = Array.isArray(value) ? value : value ? [value] : [];
+
+		// Update the checked state of existing list items when value changes
+		this.#updateCheckedState();
 	}
+
 	public override get value(): Array<string> | undefined {
 		return this.#selection;
 	}
@@ -87,6 +91,19 @@ export class UmbPropertyEditorUICheckboxListElement
 	#onChange(event: CustomEvent & { target: UmbInputCheckboxListElement }) {
 		this.value = event.target.selection;
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	/**
+	 * Updates the checked state of all list items based on current selection.
+	 * This fixes the issue where UI doesn't update when values are set programmatically.
+	 */
+	#updateCheckedState() {
+		this._list = this._list.map(item => ({
+			...item,
+			checked: this.#selection.includes(item.value)
+		}));
+		// Trigger a re-render
+		this.requestUpdate();
 	}
 
 	override render() {
