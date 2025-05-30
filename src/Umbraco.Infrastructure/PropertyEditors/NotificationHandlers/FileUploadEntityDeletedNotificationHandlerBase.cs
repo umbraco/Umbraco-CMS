@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -6,6 +7,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
@@ -167,6 +169,13 @@ internal abstract class FileUploadEntityDeletedNotificationHandlerBase : FileUpl
 
                 continue;
             }
+
+            if (IsRichTextPropertyType(propertyType))
+            {
+                paths.AddRange(GetPathsFromRichTextPropertyValue(blockPropertyValue));
+
+                continue;
+            }
         }
 
         return paths;
@@ -195,5 +204,15 @@ internal abstract class FileUploadEntityDeletedNotificationHandlerBase : FileUpl
         paths.AddRange(GetPathsFromBlockValue(GetRichTextBlockValue(propertyValue.EditedValue)));
 
         return paths;
+    }
+
+    private IReadOnlyCollection<string> GetPathsFromRichTextPropertyValue(BlockPropertyValue blockItemDataValue)
+    {
+        RichTextEditorValue? richTextEditorValue = GetRichTextEditorValue(blockItemDataValue.Value);
+
+        // Ensure the property type is populated on all blocks.
+        richTextEditorValue?.EnsurePropertyTypePopulatedOnBlocks(ElementTypeCache);
+
+        return GetPathsFromBlockValue(richTextEditorValue?.Blocks);
     }
 }
