@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -22,10 +23,14 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
 
     /// <inheritdoc/>
     public async Task<int> GetAsync(Guid key)
+        => await TryGetAsync(key) is { Success: true } attempt ? attempt.Result : throw new InvalidOperationException("No user found with the specified key");
+
+    /// <inheritdoc/>
+    public async Task<Attempt<int>> TryGetAsync(Guid key)
     {
         if (_keyToId.TryGetValue(key, out int id))
         {
-            return id;
+            return Attempt.Succeed(id);
         }
 
         // We don't have it in the cache, so we'll need to look it up in the database
@@ -36,7 +41,7 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
             if (_keyToId.TryGetValue(key, out int recheckedId))
             {
                 // It was added while we were waiting, so we'll just return it
-                return recheckedId;
+                return Attempt.Succeed(recheckedId);
             }
 
             // Still not here, so actually fetch it now
@@ -48,12 +53,15 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Key == key);
 
-            int fetchedId = (await scope.Database.ExecuteScalarAsync<int?>(query))
-                            ?? throw new InvalidOperationException("No user found with the specified key");
+            int? fetchedId = await scope.Database.ExecuteScalarAsync<int?>(query);
+            if (fetchedId is null)
+            {
+                return Attempt.Fail<int>();
+            }
 
 
-            _keyToId[key] = fetchedId;
-            return fetchedId;
+            _keyToId[key] = fetchedId.Value;
+            return Attempt.Succeed(fetchedId.Value);
         }
         finally
         {
@@ -63,10 +71,14 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
 
     /// <inheritdoc/>
     public async Task<Guid> GetAsync(int id)
+        => await TryGetAsync(id) is { Success: true } attempt ? attempt.Result : throw new InvalidOperationException("No user found with the specified id");
+
+    /// <inheritdoc/>
+    public async Task<Attempt<Guid>> TryGetAsync(int id)
     {
         if (_idToKey.TryGetValue(id, out Guid key))
         {
-            return key;
+            return Attempt.Succeed(key);
         }
 
         await _idToKeyLock.WaitAsync();
@@ -74,7 +86,7 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
         {
             if (_idToKey.TryGetValue(id, out Guid recheckedKey))
             {
-                return recheckedKey;
+                return Attempt.Succeed(recheckedKey);
             }
 
             using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
@@ -85,12 +97,15 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Id == id);
 
-            Guid fetchedKey = scope.Database.ExecuteScalar<Guid?>(query)
-                              ?? throw new InvalidOperationException("No user found with the specified id");
+            Guid? fetchedKey = scope.Database.ExecuteScalar<Guid?>(query);
+            if (fetchedKey is null)
+            {
+                return Attempt<Guid>.Fail();
+            }
 
-            _idToKey[id] = fetchedKey;
+            _idToKey[id] = fetchedKey.Value;
 
-            return fetchedKey;
+            return Attempt.Succeed(fetchedKey.Value);
         }
         finally
         {
