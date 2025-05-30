@@ -29,9 +29,11 @@ export class UmbPropertyEditorUICheckboxListElement
 	@property({ type: Array })
 	public override set value(value: Array<string> | string | undefined) {
 		this.#selection = Array.isArray(value) ? value : value ? [value] : [];
+
 		// Update the checked state of existing list items when value changes
 		this.#updateCheckedState();
 	}
+
 	public override get value(): Array<string> | undefined {
 		return this.#selection;
 	}
