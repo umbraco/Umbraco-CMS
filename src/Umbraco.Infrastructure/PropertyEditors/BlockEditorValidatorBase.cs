@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Validation;
@@ -88,7 +88,13 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
 
         foreach (var group in itemDataGroups)
         {
-            var allElementTypes = _elementTypeCache.GetMany(group.Items.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
+            Guid[] elementTypeKeys = group.Items.Select(x => x.ContentTypeKey).ToArray();
+            if (elementTypeKeys.Length == 0)
+            {
+                continue;
+            }
+
+            var allElementTypes = _elementTypeCache.GetMany(elementTypeKeys).ToDictionary(x => x.Key);
 
             for (var i = 0; i < group.Items.Length; i++)
             {
