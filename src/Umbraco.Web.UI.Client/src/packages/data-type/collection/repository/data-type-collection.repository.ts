@@ -19,7 +19,12 @@ export class UmbDataTypeCollectionRepository extends UmbRepositoryBase implement
 			if (instance) {
 				this.#itemStore = instance;
 			}
-		}).asPromise({ preventTimeout: true });
+		})
+			.asPromise({ preventTimeout: true })
+			.catch(() => {
+				// If the context is not available, we can assume that the store is not available.
+				this.#itemStore = undefined;
+			});
 
 		this.#collectionSource = new UmbDataTypeCollectionServerDataSource(host);
 	}
