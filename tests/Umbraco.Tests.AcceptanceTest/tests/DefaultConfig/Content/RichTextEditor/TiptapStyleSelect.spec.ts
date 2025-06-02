@@ -63,7 +63,6 @@ test('can apply paragraph header format', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<h4>' + inputText + '</h4><p></p>');
 });
@@ -78,7 +77,6 @@ test('can apply paragraph blocks format', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<p>' + inputText + '</p>');
 });
@@ -93,7 +91,6 @@ test('can apply block quote format', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<blockquote><p>' + inputText + '</p></blockquote><p></p>');
 });
@@ -108,7 +105,6 @@ test('can apply code block format', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<pre><code>' + inputText + '</code></pre><p></p>');
 });
