@@ -1,10 +1,12 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
@@ -13,10 +15,32 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
     public static readonly Guid UniqueId = Guid.Parse("E285DF34-ACDC-4226-AE32-C0CB5CF388DA");
 
     private readonly IIdKeyMap _idKeyMap;
+    private readonly IMemberPartialViewCacheInvalidator _memberPartialViewCacheInvalidator;
 
+    [Obsolete("Use the non obsoleted contructor instead. Planned for removal in V18")]
     public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
-        : base(appCaches, serializer, eventAggregator, factory) =>
+        : this(
+            appCaches,
+            serializer,
+            idKeyMap,
+            eventAggregator,
+            factory,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberPartialViewCacheInvalidator>())
+    {
+    }
+
+    public MemberCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IIdKeyMap idKeyMap,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IMemberPartialViewCacheInvalidator memberPartialViewCacheInvalidator)
+        : base(appCaches, serializer, eventAggregator, factory)
+    {
         _idKeyMap = idKeyMap;
+        _memberPartialViewCacheInvalidator = memberPartialViewCacheInvalidator;
+    }
 
     #region Indirect
 
@@ -65,7 +89,8 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
 
     private void ClearCache(params JsonPayload[] payloads)
     {
-        AppCaches.ClearPartialViewCache();
+        _memberPartialViewCacheInvalidator.ClearPartialViewCacheItems(payloads.Select(p => p.Id));
+
         Attempt<IAppPolicyCache?> memberCache = AppCaches.IsolatedCaches.Get<IMember>();
 
         foreach (JsonPayload p in payloads)
