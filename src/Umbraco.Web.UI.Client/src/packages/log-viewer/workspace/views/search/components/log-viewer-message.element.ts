@@ -110,7 +110,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 		query = {
 			...query,
-			lq: encodeURIComponent(`${name}=${sanitizedValue}`),
+			lq: `${name}=${sanitizedValue}`,
 		};
 
 		const queryString = toQueryString(query);
