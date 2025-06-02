@@ -37,7 +37,10 @@ export class UmbDocumentUserPermissionCondition
 		});
 
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
-			if (!context) return;
+			if (!context) {
+				this.removeUmbControllerByAlias('umbUserPermissionEntityContextObserver');
+				return;
+			}
 
 			this.observe(
 				observeMultiple([context.entityType, context.unique]),

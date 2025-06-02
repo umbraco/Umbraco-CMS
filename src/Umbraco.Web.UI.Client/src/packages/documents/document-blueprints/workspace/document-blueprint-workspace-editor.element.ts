@@ -79,14 +79,14 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
+				pathMatch: 'full',
 				redirectTo: routes[variants.length * variants.length]?.path,
 			});
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			});
 		}
-
-		routes.push({
-			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-		});
 
 		this._routes = routes;
 	}

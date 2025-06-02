@@ -40,7 +40,7 @@ test.fixme('can create content with the document link', {tag: '@smoke'}, async (
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
-  await umbracoUi.content.clickButtonWithName('Choose');
+  await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 

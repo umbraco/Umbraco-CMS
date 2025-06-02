@@ -17,6 +17,7 @@ export class UmbExampleModal extends UmbModalBaseElement {
 		},
 		{
 			path: '',
+			pathMatch: 'full',
 			redirectTo: 'modalOverview',
 		},
 	];

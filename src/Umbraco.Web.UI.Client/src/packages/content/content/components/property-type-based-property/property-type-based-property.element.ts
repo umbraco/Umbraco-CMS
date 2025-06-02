@@ -1,4 +1,4 @@
-import { UmbContentPropertyContext } from '../../content-property.context.js';
+import { UmbPropertyTypeBasedPropertyContext } from './property-type-based-property.context.js';
 import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
@@ -57,17 +57,18 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _isUnsupported?: boolean;
 
 	@state()
-	private _dataTypeData?: UmbPropertyEditorConfig;
+	private _dataTypeValues?: UmbPropertyEditorConfig;
 
 	private _dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	private _dataTypeObserver?: UmbObserverController<UmbDataTypeDetailModel | undefined>;
 
-	#contentPropertyContext = new UmbContentPropertyContext(this);
+	#context = new UmbPropertyTypeBasedPropertyContext(this);
 
 	private async _checkSchemaSupport() {
 		if (!this._ownerEntityType || !this._propertyEditorSchemaAlias) return;
 
 		if (this._ownerEntityType in UMB_UNSUPPORTED_EDITOR_SCHEMA_ALIASES) {
+			// TODO: We should get rid of this system, f your reading this please dont rely on this, we will get rid of it in the future. [NL]
 			this._isUnsupported = UMB_UNSUPPORTED_EDITOR_SCHEMA_ALIASES[this._ownerEntityType].includes(
 				this._propertyEditorSchemaAlias,
 			);
@@ -83,9 +84,9 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 				await this._dataTypeDetailRepository.byUnique(dataTypeUnique),
 				(dataType) => {
 					const contextValue = dataType ? { unique: dataType.unique } : undefined;
-					this.#contentPropertyContext.setDataType(contextValue);
+					this.#context.setDataType(contextValue);
 
-					this._dataTypeData = dataType?.values;
+					this._dataTypeValues = dataType?.values;
 					this._propertyEditorUiAlias = dataType?.editorUiAlias || undefined;
 					this._propertyEditorSchemaAlias = dataType?.editorAlias || undefined;
 					this._checkSchemaSupport();
@@ -127,7 +128,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 				.description=${this._property.description ?? undefined}
 				.appearance=${this._property.appearance}
 				property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
-				.config=${this._dataTypeData}
+				.config=${this._dataTypeValues}
 				.validation=${this._property.validation}
 				?readonly=${this.readonly}>
 			</umb-property>
