@@ -22,7 +22,9 @@ export class UmbSaveWorkspaceAction<
 				this.#observeUnique();
 				this._gotWorkspaceContext();
 			},
-		).asPromise();
+		)
+			.asPromise()
+			.catch(() => undefined);
 	}
 
 	#observeUnique() {

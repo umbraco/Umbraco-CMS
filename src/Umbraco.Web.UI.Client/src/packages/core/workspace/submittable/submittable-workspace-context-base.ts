@@ -162,6 +162,17 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	protected invalidSubmit(reason?: any): Promise<void> {
 		return Promise.reject(reason);
 	}
+
+	override destroy(): void {
+		this.#isNew.destroy();
+		this.routes.destroy();
+		super.destroy();
+		this.#submitPromise = undefined;
+		this.#submitResolve = undefined;
+		this.#submitReject = undefined;
+		this.#validationContexts.forEach((context) => context.destroy());
+		this.#validationContexts = [];
+	}
 }
 
 /*
