@@ -92,7 +92,7 @@ test('can create content with names that vary by culture and content that is inv
   expect(contentData.values[0].value).toBe(textContent);
 });
 
-test('can create content with names and content that vary by culture', async ({page, umbracoApi, umbracoUi}) => {
+test('can create content with names and content that vary by culture', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const danishContentName = 'Test indhold';
   const textContent = 'This is a test text';
@@ -111,12 +111,10 @@ test('can create content with names and content that vary by culture', async ({p
   await umbracoUi.content.enterContentName(danishContentName);
   await umbracoUi.content.enterTextstring(danishTextContent);
   await umbracoUi.content.clickSaveButtonForContent();
-  await page.pause()
   await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.waitForContentToBeCreated();
-  await page.pause()
   expect(await umbracoApi.document.doesNameExist(danishContentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(danishContentName);
   expect(contentData.variants.length).toBe(2);

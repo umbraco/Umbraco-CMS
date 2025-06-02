@@ -32,8 +32,7 @@ test('can create content with the upload video data type', async ({umbracoApi, u
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);

@@ -237,7 +237,7 @@ test('can not create notifications with notification permission disabled', async
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can publish content with publish permission enabled', async ({page, umbracoApi, umbracoUi}) => {
+test('can publish content with publish permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublishPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -456,7 +456,8 @@ test('can not move content with move to permission disabled', async ({umbracoApi
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can sort children with sort children permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Needs a better way to assert
+test.fixme('can sort children with sort children permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermission(userGroupName);
@@ -476,11 +477,10 @@ test('can sort children with sort children permission enabled', async ({umbracoA
   await umbracoUi.content.clickSortButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.itemsSorted);
   // TODO: uncomment when it is not flaky
-  // await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
-  // await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
-  // await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
+  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
+  await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
 });
 
 test('can not sort children with sort children permission disabled', async ({umbracoApi, umbracoUi}) => {

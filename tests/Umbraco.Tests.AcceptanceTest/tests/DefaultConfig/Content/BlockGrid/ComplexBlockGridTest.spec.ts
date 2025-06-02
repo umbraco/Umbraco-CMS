@@ -64,8 +64,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(richTextDataTypeName);
 });
 
-// Needs to be updated as we are not asserting on save or publish notifications as we did in 15
-test.fixme('can update property value nested in a block grid area with an RTE with a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can update property value nested in a block grid area with an RTE with a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   test.slow();
   // Arrange
   // ElementType with Textstring And REGEX only accept letters and numbers
@@ -106,10 +105,9 @@ test.fixme('can update property value nested in a block grid area with an RTE wi
   await umbracoUi.content.clickCreateButtonForModalWithElementTypeNameAndGroupName(richTextEditorElementTypeName, richTextEditorElementGroupName);
   await umbracoUi.content.clickSaveAndPublishButton();
   // Checks that the error notification is shown since the textstring block has the wrong value
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved, true, true);
+  await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished, true, true);
   // Updates the textstring block with the correct value
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
   await umbracoUi.content.clickEditBlockListEntryWithName(textStringElementTypeName);
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, correctPropertyValue);
@@ -118,10 +116,7 @@ test.fixme('can update property value nested in a block grid area with an RTE wi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  // await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved, true, true);
-  // await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published, true, true);
-  await umbracoUi.content.isErrorNotificationVisible(false);
-  await umbracoUi.waitForTimeout(1000);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Checks if published
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');

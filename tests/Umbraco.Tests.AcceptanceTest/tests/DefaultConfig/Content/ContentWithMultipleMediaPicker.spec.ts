@@ -43,8 +43,7 @@ test('can create content with multiple media picker data type', async ({umbracoA
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -87,8 +86,7 @@ test('can add multiple media files to the multiple media picker', async ({umbrac
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));

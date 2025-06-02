@@ -40,8 +40,7 @@ test.skip('can create content with the list view data type', async ({umbracoApi,
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -88,7 +87,7 @@ test.skip('can create content with a child in the list', async ({umbracoApi, umb
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
 });
@@ -220,8 +219,7 @@ test.skip('can publish child content from list', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickPublishSelectedListItems();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(1);
   const childContentData = await umbracoApi.document.getByName(childContentName);
   expect(childContentData.variants[0].state).toBe(expectedState);
@@ -273,6 +271,7 @@ test.skip('can unpublish child content from list', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickConfirmToUnpublishButton();
 
   // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   await umbracoUi.content.isErrorNotificationVisible(false);
   const childContentData = await umbracoApi.document.getByName(childContentName);

@@ -32,8 +32,7 @@ test('can create content with the custom data type with email address property e
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -78,8 +77,7 @@ test('can create content with the custom data type with decimal property editor'
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
@@ -126,8 +124,7 @@ test.skip('can create content with the custom data type with code editor propert
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -172,8 +169,7 @@ test('can create content with the custom data type with markdown editor property
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -218,8 +214,7 @@ test('can create content with the custom data type with multiple text string pro
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -265,8 +260,7 @@ test('can create content with the custom data type with slider property editor',
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);

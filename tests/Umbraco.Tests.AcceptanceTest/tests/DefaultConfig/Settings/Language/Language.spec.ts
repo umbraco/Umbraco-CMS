@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureNameNotExists(languageName);
 });
 
-test('can add language', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can add language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.language.goToLanguages();
 

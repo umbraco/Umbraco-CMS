@@ -71,7 +71,7 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.clickSaveButton();
 
     // Assert
-    await umbracoUi.media.isSuccessStateVisibleForSaveButton();
+    await umbracoUi.media.waitForMediaItemToBeCreated();
     const mediaData = await umbracoApi.media.getByName(mediaFileType.fileName);
     const mediaUrl = await umbracoApi.media.getMediaUrl(mediaData.id);
     await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaUrl);
@@ -83,7 +83,7 @@ for (const mediaFileType of mediaFileTypes) {
   });
 }
 
-test('can create a folder', async ({page, umbracoApi, umbracoUi}) => {
+test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.ensureNameNotExists(folderName);
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
@@ -96,7 +96,6 @@ test('can create a folder', async ({page, umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.media.waitForMediaItemToBeCreated();
-  await umbracoUi.media.isErrorNotificationVisible(false);
   await umbracoUi.media.isMediaTreeItemVisible(folderName);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeTruthy();
 
@@ -314,8 +313,7 @@ test('can bulk trash media nodes with a relation', async ({umbracoApi, umbracoUi
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  // await umbracoUi.media.isSuccessNotificationVisible();
-  await umbracoUi.media.isErrorNotificationVisible(false);
+  await umbracoUi.media.waitForMediaToBeTrashed();
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();

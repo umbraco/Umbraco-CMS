@@ -45,8 +45,7 @@ test.fixme('can create content with the document link', {tag: '@smoke'}, async (
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -285,7 +284,7 @@ test('cannot submit an empty link', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+  await umbracoUi.content.isTextWithMessageVisible('This field is required');
 });
 
 test('cannot update the URL picker with an empty link', async ({umbracoApi, umbracoUi}) => {
@@ -305,7 +304,7 @@ test('cannot update the URL picker with an empty link', async ({umbracoApi, umbr
   await umbracoUi.content.clickUpdateButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+  await umbracoUi.content.isTextWithMessageVisible('This field is required');
 });
 
 // TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
@@ -327,7 +326,7 @@ test.skip('cannot submit an empty URL with an anchor or query', async ({umbracoA
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+  await umbracoUi.content.isTextWithMessageVisible('This field is required');
 });
 
 // TODO: Remove skip when the front-end ready. Currently it still accept the empty link using spacebar
@@ -381,8 +380,7 @@ test.skip('can create content with the link to an unpublished document', async (
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);

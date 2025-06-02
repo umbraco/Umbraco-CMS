@@ -46,7 +46,7 @@ test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.partialView.waitForPartialViewToBeCreated();
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
   const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
 

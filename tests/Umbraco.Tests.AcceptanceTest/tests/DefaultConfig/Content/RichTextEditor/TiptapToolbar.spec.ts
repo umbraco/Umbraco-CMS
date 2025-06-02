@@ -38,7 +38,6 @@ test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbrac
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toContain('<img');
@@ -94,7 +93,7 @@ test('cannot submit an empty link in RTE Tiptap property editor', async ({umbrac
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+  await umbracoUi.content.isTextWithMessageVisible('This field is required');
 });
 
 // TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring

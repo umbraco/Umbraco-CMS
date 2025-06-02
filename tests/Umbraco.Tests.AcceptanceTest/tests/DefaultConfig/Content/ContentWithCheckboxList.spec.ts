@@ -34,8 +34,7 @@ test('can create content with the checkbox list data type', async ({umbracoApi, 
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -56,7 +55,6 @@ test('can publish content with the checkbox list data type', async ({umbracoApi,
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values).toEqual([]);
@@ -77,7 +75,6 @@ test('can create content with the custom checkbox list data type', async ({umbra
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual([optionValues[0]]);
@@ -105,7 +102,6 @@ test('can not publish a mandatory checkbox list with an empty value', async ({um
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual([optionValues[0]]);

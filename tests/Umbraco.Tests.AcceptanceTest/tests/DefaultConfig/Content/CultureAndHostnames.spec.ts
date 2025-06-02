@@ -40,8 +40,7 @@ test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   const domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.defaultIsoCode).toEqual(isoCode);
 });
@@ -61,8 +60,7 @@ test('can add a domain', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.waitForTimeout(500);
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForDomainToBeCreated();
   const domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains.length).toBe(1);
   expect(domainsData.domains[0].domainName).toEqual(domainName);
@@ -83,8 +81,7 @@ test('can update culture and hostname', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForDomainToBeUpdated();
   domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains[0].domainName).toEqual(updatedDomainName);
   expect(domainsData.domains[0].isoCode).toEqual(isoCode);
@@ -103,7 +100,7 @@ test('can delete culture and hostname', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForDomainToBeDeleted();
   await umbracoUi.content.isErrorNotificationVisible(false);
   domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains.length).toBe(0);
@@ -129,7 +126,7 @@ test('can add culture and hostname for multiple languages', async ({umbracoApi, 
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForDomainToBeCreated();
   await umbracoUi.content.isErrorNotificationVisible(false);
   const domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains.length).toBe(2);
@@ -137,4 +134,7 @@ test('can add culture and hostname for multiple languages', async ({umbracoApi, 
   expect(domainsData.domains[0].isoCode).toEqual(isoCode);
   expect(domainsData.domains[1].domainName).toEqual(secondDomainName);
   expect(domainsData.domains[1].isoCode).toEqual(secondIsoCode);
+
+  // Clean
+  await umbracoApi.language.ensureNameNotExists(secondLanguageName);
 });

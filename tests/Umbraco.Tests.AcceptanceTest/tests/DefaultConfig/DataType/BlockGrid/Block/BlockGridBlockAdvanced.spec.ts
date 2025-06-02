@@ -60,7 +60,7 @@ test.skip('can remove a custom stylesheet from a block', async ({umbracoApi, umb
   await umbracoUi.dataType.goToBlockAdvancedTab();
 });
 
-test('can update overlay size in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can update overlay size in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const overlaySize = 'medium';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);

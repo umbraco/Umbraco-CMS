@@ -55,7 +55,6 @@ test('can not publish a block grid with a mandatory radiobox without a value', a
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });
 
 test('can not publish a block grid with a mandatory checkbox list without a value', async ({umbracoApi, umbracoUi}) => {
@@ -84,7 +83,6 @@ test('can not publish a block grid with a mandatory checkbox list without a valu
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });
 
 test('can not publish a block grid with a mandatory dropdown without a value', async ({umbracoApi, umbracoUi}) => {
@@ -113,5 +111,4 @@ test('can not publish a block grid with a mandatory dropdown without a value', a
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 });

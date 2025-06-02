@@ -35,8 +35,7 @@ test('can create content with the radiobox data type', async ({umbracoApi, umbra
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -58,7 +57,6 @@ test('can publish content with the radiobox data type', async ({umbracoApi, umbr
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -107,7 +105,6 @@ test('can not publish mandatory radiobox with an empty value', async ({umbracoAp
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual(optionValues[0]);

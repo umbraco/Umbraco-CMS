@@ -203,7 +203,7 @@ test('can enable approved', async ({umbracoApi, umbracoUi}) => {
   expect(memberData.isApproved).toBe(true);
 });
 
-test('can delete member', {tag: '@smoke'}, async ({page, umbracoApi, umbracoUi}) => {
+test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);

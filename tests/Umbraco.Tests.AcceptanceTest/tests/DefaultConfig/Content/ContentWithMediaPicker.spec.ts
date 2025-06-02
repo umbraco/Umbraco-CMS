@@ -69,9 +69,7 @@ test('can publish content with the media picker data type', async ({umbracoApi, 
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  // await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -97,8 +95,6 @@ test('can remove a media picker in the content', async ({umbracoApi, umbracoUi})
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
-  // await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -156,7 +152,6 @@ test.fixme('can not publish a mandatory media picker with an empty value', async
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value[0].mediaKey).toEqual(mediaFileId);

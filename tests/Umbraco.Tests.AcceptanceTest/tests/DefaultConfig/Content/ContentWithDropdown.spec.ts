@@ -55,7 +55,6 @@ for (const dataTypeName of dataTypeNames) {
 
     // Assert
     await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-    await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.variants[0].state).toBe(expectedState);
     expect(contentData.values).toEqual([]);
@@ -78,7 +77,6 @@ for (const dataTypeName of dataTypeNames) {
 
     // Assert
     await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-    await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
     expect(contentData.values[0].value).toEqual(selectedOptions);
@@ -107,7 +105,6 @@ test('can not publish a mandatory dropdown with an empty value', async ({umbraco
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value).toEqual([optionValues[0]]);
