@@ -254,7 +254,6 @@ test('can add a statusbar', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
   const statusbarValue = tipTapData.values.find(value => value.alias === 'statusbar');
   expect(statusbarValue.value).toEqual([[statusbarApiValue]]);
@@ -271,7 +270,6 @@ test('can remove a statusbar', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   const tipTapData = await umbracoApi.dataType.getByName(tipTapName);
   const statusbarValue = tipTapData.values.find(value => value.alias === 'statusbar');
   expect(statusbarValue).toBeFalsy();

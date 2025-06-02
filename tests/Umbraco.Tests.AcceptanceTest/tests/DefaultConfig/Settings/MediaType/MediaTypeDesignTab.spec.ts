@@ -299,7 +299,6 @@ test('can create a media type with a composition', async ({umbracoApi, umbracoUi
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.mediaType.isSuccessNotificationVisible();
   await umbracoUi.mediaType.isErrorNotificationVisible(false);
   expect(umbracoUi.mediaType.doesGroupHaveValue(groupName)).toBeTruthy();
   // Checks if the composition in the media type is correct
@@ -326,7 +325,7 @@ test('can reorder groups in a media type', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.mediaType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.mediaType.isSuccessNotificationVisible();
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.mediaType.isErrorNotificationVisible(false);
   // Since we swapped sorting order, the firstGroupValue should have sortOrder 1 and the secondGroupValue should have sortOrder 0
   expect(await umbracoApi.mediaType.doesMediaTypeGroupNameContainCorrectSortOrder(mediaTypeName, secondGroupValue, 0)).toBeTruthy();
