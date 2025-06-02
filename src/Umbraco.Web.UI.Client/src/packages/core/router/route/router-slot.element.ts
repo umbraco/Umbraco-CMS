@@ -95,6 +95,9 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	}
 
 	override disconnectedCallback() {
+		// Close modals open by this router slot.
+		this.#routeContext._internal_modalRouterChanged(undefined);
+
 		super.disconnectedCallback();
 		window.removeEventListener('navigationsuccess', this._onNavigationChanged);
 		this.#listening = false;
