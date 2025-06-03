@@ -33,7 +33,6 @@ test('cannot create member group with empty name', async ({umbracoApi, umbracoUi
 
   // Assert
   await umbracoUi.memberGroup.isFailedStateButtonVisible();
-
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeFalsy();
 });
 

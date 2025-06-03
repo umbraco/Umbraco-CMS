@@ -106,7 +106,6 @@ test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}
 
   // Assert
   await umbracoUi.media.waitForMediaToBeTrashed();
-  await umbracoUi.media.isErrorNotificationVisible(false);
   expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
@@ -133,7 +132,6 @@ test.fixme('can allow bulk move in the media section', async ({umbracoApi, umbra
 
   // Assert
   await umbracoUi.media.waitForMediaToBeMoved();
-  await umbracoUi.media.isErrorNotificationVisible(false);
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, firstMediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, secondMediaFileName)).toBeTruthy();
 

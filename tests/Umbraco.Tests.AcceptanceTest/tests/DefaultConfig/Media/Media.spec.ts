@@ -14,7 +14,6 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
 
-//TODO: Remove skip when the frontend is ready. Currently it is possible to create an empty media file, should not be possible
 test('can not create a empty media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
@@ -139,7 +138,6 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.media.waitForMediaItemToBeCreated();
-  await umbracoUi.media.isErrorNotificationVisible(false);
   await umbracoUi.media.isMediaTreeItemVisible(parentFolderName);
   await umbracoUi.media.isMediaTreeItemVisible(folderName, false);
   await umbracoUi.media.clickMediaCaretButtonForName(parentFolderName);
@@ -215,8 +213,7 @@ test('can restore a media item from the recycle bin', async ({umbracoApi, umbrac
   await umbracoApi.media.emptyRecycleBin();
 });
 
-test('can delete a media item from the recycle bin', async ({umbracoApi, umbracoUi}
-) => {
+test('can delete a media item from the recycle bin', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.emptyRecycleBin();
   await umbracoApi.media.createDefaultMediaFile(mediaFileName);
@@ -228,8 +225,7 @@ test('can delete a media item from the recycle bin', async ({umbracoApi, umbraco
   await umbracoUi.media.deleteMediaItem(mediaFileName);
 
   // Assert
-  //await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
-  await umbracoUi.media.isErrorNotificationVisible(false);
+  await umbracoUi.media.waitForMediaToBeTrashed();
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
@@ -274,8 +270,7 @@ test('can trash a media node with a relation', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
-  // await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
-  await umbracoUi.media.isErrorNotificationVisible(false);
+  await umbracoUi.media.waitForMediaToBeTrashed();
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeTruthy();

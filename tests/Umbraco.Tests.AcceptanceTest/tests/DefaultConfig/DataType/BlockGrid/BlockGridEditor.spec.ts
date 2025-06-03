@@ -274,7 +274,7 @@ test('max can not be less than min in a block grid editor', async ({umbracoApi, 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton(false);
+  await umbracoUi.dataType.isFailedStateButtonVisible();
   await umbracoUi.dataType.doesAmountContainErrorMessageWithText('The low value must not be exceed the high value');
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
   expect(dataTypeData.values[0].value.min).toBe(minAmount);

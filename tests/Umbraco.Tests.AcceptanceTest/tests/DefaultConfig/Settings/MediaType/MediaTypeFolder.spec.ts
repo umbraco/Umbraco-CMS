@@ -64,7 +64,6 @@ test('can rename a media type folder', async ({umbracoApi, umbracoUi}) => {
   expect(folder.name).toBe(mediaTypeFolderName);
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(oldFolderName, false);
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeFolderName, true);
-
 });
 
 test('can create a media type folder in a folder', async ({umbracoApi, umbracoUi}) => {

@@ -171,7 +171,7 @@ test('max can not be less than min', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton(false);
+  await umbracoUi.dataType.isFailedStateButtonVisible();
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
   await umbracoUi.dataType.doesAmountContainErrorMessageWithText('The low value must not be exceed the high value');
   expect(dataTypeData.values[0].value.min).toBe(minAmount);

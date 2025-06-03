@@ -34,8 +34,6 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
-  // TODO: Since we are not asserting on a success notification yet, we need to wait for a second to make sure the content is published
-  await umbracoUi.waitForTimeout(1000);
   const contentData = await umbracoApi.document.getByName(contentName);
   await umbracoUi.content.doesIdHaveText(contentData.id);
   const expectedCreatedDate = new Date(contentData.variants[0].createDate).toLocaleString("en-US", {

@@ -33,7 +33,6 @@ test.skip('can create content with the Rich Text Editor datatype', {tag: '@smoke
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
@@ -59,7 +58,6 @@ test.skip('can create content with the upload file datatype', async ({umbracoApi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);

@@ -370,8 +370,8 @@ test.skip('can not update content with update permission disabled', async ({umbr
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// https://github.com/umbraco/Umbraco-CMS/issues/19431
-test.skip('can duplicate content with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Needs create permission to be enabled to duplicate content
+test.fixme('can duplicate content with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedContentName = rootDocumentName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermission(userGroupName);
@@ -412,8 +412,8 @@ test('can not duplicate content with duplicate permission disabled', async ({umb
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// https://github.com/umbraco/Umbraco-CMS/issues/19431
-test.skip('can move content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Needs create permission to be enabled to move content
+test.fixme('can move content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const moveToDocumentName = 'SecondRootDocument';
   const moveToDocumentId = await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, rootDocumentTypeId, documentText, dataTypeName);
@@ -515,7 +515,7 @@ test('can set culture and hostnames with culture and hostnames permission enable
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
-  await umbracoUi.content.waitForDomainToBeCreated()
+  await umbracoUi.content.waitForDomainToBeCreated();
   const document = await umbracoApi.document.getByName(rootDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);

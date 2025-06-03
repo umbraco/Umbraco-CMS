@@ -49,7 +49,7 @@ test('can rename a user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.isSuccessStateVisibleForSaveButton(false);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeTruthy();
 });
 

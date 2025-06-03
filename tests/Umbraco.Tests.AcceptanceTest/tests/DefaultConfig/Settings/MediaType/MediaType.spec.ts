@@ -43,7 +43,6 @@ test('can rename a media type', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(wrongName, false);
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeName, true);
-
 });
 
 test('can update the alias for a media type', async ({umbracoApi, umbracoUi}) => {

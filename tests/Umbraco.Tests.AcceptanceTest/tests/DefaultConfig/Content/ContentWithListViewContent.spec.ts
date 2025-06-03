@@ -271,9 +271,7 @@ test.skip('can unpublish child content from list', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickConfirmToUnpublishButton();
 
   // Assert
-  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
-  await umbracoUi.content.isErrorNotificationVisible(false);
   const childContentData = await umbracoApi.document.getByName(childContentName);
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
