@@ -1,15 +1,5 @@
 import type { ManifestLocalization } from '../extensions/localization.extension.js';
 import {
-	type UmbLocalizationSetBase,
-	type UmbLocalizationDictionary,
-	type UmbLocalizationFlatDictionary,
-	UMB_DEFAULT_LOCALIZATION_CULTURE,
-} from '@umbraco-cms/backoffice/localization-api';
-import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
-import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import {
 	catchError,
 	distinctUntilChanged,
 	filter,
@@ -18,8 +8,17 @@ import {
 	of,
 	switchMap,
 } from '@umbraco-cms/backoffice/external/rxjs';
-import type { Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbLocalizationManager, UMB_DEFAULT_LOCALIZATION_CULTURE } from '@umbraco-cms/backoffice/localization-api';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbLocalizationSetBase,
+	UmbLocalizationDictionary,
+	UmbLocalizationFlatDictionary,
+} from '@umbraco-cms/backoffice/localization-api';
+import type { Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * Adds or updates a dictionary in the inner dictionary.
