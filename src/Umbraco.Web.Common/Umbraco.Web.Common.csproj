@@ -4,6 +4,8 @@
     <Title>Umbraco CMS - Web</Title>
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
+	<Nullable>annotations</Nullable>
+	<TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

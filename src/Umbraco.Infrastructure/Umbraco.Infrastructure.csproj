@@ -4,6 +4,8 @@
     <Title>Umbraco CMS - Infrastructure</Title>
     <Description>Contains the infrastructure assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Infrastructure</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+	<Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

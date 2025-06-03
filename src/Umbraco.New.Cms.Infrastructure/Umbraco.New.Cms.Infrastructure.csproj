@@ -4,6 +4,8 @@
     <Description>Contains the infrastructure assembly needed to run Umbraco CMS.</Description>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
+    <TargetFramework>net8.0</TargetFramework>
+	<Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

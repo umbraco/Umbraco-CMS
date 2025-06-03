@@ -5,6 +5,8 @@
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
     <GenerateProgramFile>false</GenerateProgramFile>
+    <TargetFramework>net8.0</TargetFramework>
+	<Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

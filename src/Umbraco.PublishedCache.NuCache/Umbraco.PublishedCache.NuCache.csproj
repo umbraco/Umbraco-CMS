@@ -4,6 +4,8 @@
     <Title>Umbraco CMS - Published cache - NuCache</Title>
     <Description>Contains the published cache assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Infrastructure.PublishedCache</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+	<Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

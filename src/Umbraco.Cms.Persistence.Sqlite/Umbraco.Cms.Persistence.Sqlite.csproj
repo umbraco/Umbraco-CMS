@@ -2,6 +2,8 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Persistence - SQLite</Title>
     <Description>Adds support for SQLite to Umbraco CMS.</Description>
+    <TargetFramework>net8.0</TargetFramework>
+	<Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
