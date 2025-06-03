@@ -98,7 +98,7 @@ export class UmbLocalizationRegistry {
 
 							// Sort translations by their original extension weight (highest-to-lowest)
 							// This ensures that the translations with the lowest weight override the others
-							translations.sort((a, b) => b.$weight - a.$weight);
+							translations.sort((a, b) => a.$weight - b.$weight);
 
 							// Load the translations into the localization manager
 							umbLocalizationManager.registerManyLocalizations(translations);
@@ -145,7 +145,7 @@ export class UmbLocalizationRegistry {
 
 	#setBrowserLanguage(locale: Intl.Locale, translations: UmbLocalizationSetBase[]) {
 		// Set the document language
-		const newLang = locale!.baseName.toLowerCase();
+		const newLang = locale.baseName.toLowerCase();
 		if (document.documentElement.lang.toLowerCase() !== newLang) {
 			document.documentElement.lang = newLang;
 		}
@@ -163,7 +163,7 @@ export class UmbLocalizationRegistry {
 
 		// If no direct match, look for a match with the language code only
 		const langOnlyDirectMatch = reverseTranslations.find(
-			(t) => t.$code.toLowerCase() === locale!.language.toLowerCase(),
+			(t) => t.$code.toLowerCase() === locale.language.toLowerCase(),
 		);
 		if (langOnlyDirectMatch) {
 			document.documentElement.dir = langOnlyDirectMatch.$dir;
