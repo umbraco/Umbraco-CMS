@@ -51,7 +51,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can browse content node with permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithBrowseNodePermission(userGroupName);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -66,7 +66,7 @@ test('can browse content node with permission enabled', async ({umbracoApi, umbr
 
 test('can not browse content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithBrowseNodePermission(userGroupName, false);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();

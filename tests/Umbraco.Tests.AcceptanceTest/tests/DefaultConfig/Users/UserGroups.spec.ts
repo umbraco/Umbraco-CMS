@@ -457,7 +457,7 @@ test('can remove granular permission to a specific document for a user group', a
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
-  await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentWithBrowseNode(userGroupName, documentId);
+  await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentWithRead(userGroupName, documentId);
   expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, [allPermissions.verbPermission[0]])).toBeTruthy();
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
