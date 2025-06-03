@@ -78,12 +78,6 @@ export class UmbLocalizationRegistry {
 					const currAliases = curr.map((ext) => ext.alias).sort();
 					return JSON.stringify(prevAliases) === JSON.stringify(currAliases);
 				}),
-				// Catch any errors that occur while loading the translations
-				// This is important to ensure that the observable does not error out and stop the subscription
-				catchError((error) => {
-					console.error('Error loading translations:', error);
-					return [];
-				}),
 				// With switchMap, if a new language is selected before the previous translations finish loading,
 				// the previous promise is canceled (unsubscribed), and only the latest one is processed.
 				// This prevents race conditions and stale state.
@@ -108,6 +102,12 @@ export class UmbLocalizationRegistry {
 						})(),
 					),
 				),
+				// Catch any errors that occur while loading the translations
+				// This is important to ensure that the observable does not error out and stop the subscription
+				catchError((error) => {
+					console.error('Error loading translations:', error);
+					return [];
+				}),
 			)
 			// Subscribe to the observable to trigger the loading of translations
 			.subscribe();
