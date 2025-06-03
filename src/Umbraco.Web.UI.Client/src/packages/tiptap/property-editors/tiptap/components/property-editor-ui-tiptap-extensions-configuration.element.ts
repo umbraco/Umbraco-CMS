@@ -197,7 +197,7 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 			}
 
 			.group {
-				flex: 1;
+				width: calc((100% - 2rem) / 3);
 
 				ul {
 					list-style: none;
