@@ -84,7 +84,7 @@ export class UmbLocalizationRegistry {
 				distinctUntilChanged((prev, curr) => {
 					const prevAliases = prev.map((ext) => ext.alias).sort();
 					const currAliases = curr.map((ext) => ext.alias).sort();
-					return JSON.stringify(prevAliases) === JSON.stringify(currAliases);
+					return this.#arraysEqual(prevAliases, currAliases);
 				}),
 				// With switchMap, if a new language is selected before the previous translations finish loading,
 				// the previous promise is canceled (unsubscribed), and only the latest one is processed.
@@ -182,6 +182,14 @@ export class UmbLocalizationRegistry {
 		if (document.documentElement.dir !== 'ltr') {
 			document.documentElement.dir = 'ltr';
 		}
+	}
+
+	#arraysEqual(a: string[], b: string[]) {
+		if (a.length !== b.length) return false;
+		for (let i = 0; i < a.length; i++) {
+			if (a[i] !== b[i]) return false;
+		}
+		return true;
 	}
 
 	/**
