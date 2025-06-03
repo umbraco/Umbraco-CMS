@@ -7,6 +7,7 @@ export {
 	map,
 	distinctUntilChanged,
 	combineLatest,
+	concatMap,
 	shareReplay,
 	takeUntil,
 	debounceTime,
@@ -19,4 +20,5 @@ export {
 	startWith,
 	skip,
 	first,
+	from,
 } from 'rxjs';
