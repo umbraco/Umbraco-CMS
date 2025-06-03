@@ -32,17 +32,18 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
 
     /// <inheritdoc />
     public async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
-        Guid performingUserKey,
+        Guid? performingUserKey,
         string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
-        Guid affectedUserKey,
+        Guid? affectedUserKey,
         string? affectedDetails,
         string eventType,
         string eventDetails)
     {
         var performingUserId = await GetUserId(performingUserKey);
         var affectedUserId = await GetUserId(affectedUserKey);
+
         return WriteInner(
             performingUserId,
             performingUserKey,
@@ -54,32 +55,22 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             affectedDetails,
             eventType,
             eventDetails);
-
-        async Task<int> GetUserId(Guid userKey)
-        {
-            return userKey switch
-            {
-                _ when userKey == Constants.Security.UnknownUserKey => Constants.Security.UnknownUserId,
-                _ when await _userIdKeyResolver.TryGetAsync(userKey) is { Success: true } attempt => attempt.Result,
-                _ => Constants.Security.UnknownUserId,
-            };
-        }
     }
 
     /// <inheritdoc />
     [Obsolete("Use the overload that takes user keys. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
-        int performingUserId,
-        string perfomingDetails,
+        int? performingUserId,
+        string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
-        int affectedUserId,
+        int? affectedUserId,
         string? affectedDetails,
         string eventType,
         string eventDetails) =>
         await WriteInner(
             performingUserId,
-            perfomingDetails,
+            performingDetails,
             performingIp,
             eventDateUtc,
             affectedUserId,
@@ -89,11 +80,11 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
 
     // This method is used by the AuditService while the AuditService.Write() method is not removed.
     internal async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteInner(
-        int performingUserId,
+        int? performingUserId,
         string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
-        int affectedUserId,
+        int? affectedUserId,
         string? affectedDetails,
         string eventType,
         string eventDetails)
@@ -112,31 +103,24 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             affectedDetails,
             eventType,
             eventDetails);
-
-        async Task<Guid?> GetUserKey(int userId)
-        {
-            return userId switch
-            {
-                Constants.Security.UnknownUserId => Constants.Security.UnknownUserKey,
-                _ when await _userIdKeyResolver.TryGetAsync(userId) is { Success: true } attempt => attempt.Result,
-                _ => Constants.Security.UnknownUserKey,
-            };
-        }
     }
 
     private Attempt<IAuditEntry, AuditEntryOperationStatus> WriteInner(
-        int performingUserId,
+        int? performingUserId,
         Guid? performingUserKey,
         string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
-        int affectedUserId,
+        int? affectedUserId,
         Guid? affectedUserKey,
         string? affectedDetails,
         string eventType,
         string eventDetails)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(performingUserId, Constants.Security.SuperUserId);
+        if (performingUserId < Constants.Security.SuperUserId)
+        {
+            throw new ArgumentOutOfRangeException(nameof(performingUserId));
+        }
 
         if (string.IsNullOrWhiteSpace(performingDetails))
         {
@@ -179,12 +163,12 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
 
         var entry = new AuditEntry
         {
-            PerformingUserId = performingUserId,
+            PerformingUserId = performingUserId ?? Constants.Security.UnknownUserId, // Default to UnknownUserId as it is non-nullable
             PerformingUserKey = performingUserKey,
             PerformingDetails = performingDetails,
             PerformingIp = performingIp,
             EventDateUtc = eventDateUtc,
-            AffectedUserId = affectedUserId,
+            AffectedUserId = affectedUserId ?? Constants.Security.UnknownUserId, // Default to UnknownUserId as it is non-nullable
             AffectedUserKey = affectedUserKey,
             AffectedDetails = affectedDetails,
             EventType = eventType,
@@ -204,6 +188,16 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
 
         return Attempt.SucceedWithStatus(AuditEntryOperationStatus.Success, (IAuditEntry)entry);
     }
+
+    internal async Task<int?> GetUserId(Guid? key) =>
+        key is not null && await _userIdKeyResolver.TryGetAsync(key.Value) is { Success: true } attempt
+            ? attempt.Result
+            : null;
+
+    internal async Task<Guid?> GetUserKey(int? id) =>
+        id is not null && await _userIdKeyResolver.TryGetAsync(id.Value) is { Success: true } attempt
+            ? attempt.Result
+            : null;
 
     // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
     internal IEnumerable<IAuditEntry> GetAll()

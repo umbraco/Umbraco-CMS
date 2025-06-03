@@ -28,11 +28,11 @@ public interface IAuditEntryService : IService
     /// <param name="eventDetails">Free-form details about the audited event.</param>
     /// <returns>The created audit entry.</returns>
     public Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
-        Guid performingUserKey,
+        Guid? performingUserKey,
         string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
-        Guid affectedUserKey,
+        Guid? affectedUserKey,
         string? affectedDetails,
         string eventType,
         string eventDetails);
@@ -58,11 +58,11 @@ public interface IAuditEntryService : IService
     /// <returns>The created audit entry.</returns>
     [Obsolete("Use the overload that takes user keys. Scheduled for removal in Umbraco 19.")]
     public Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
-        int performingUserId,
+        int? performingUserId,
         string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
-        int affectedUserId,
+        int? affectedUserId,
         string? affectedDetails,
         string eventType,
         string eventDetails);

@@ -125,7 +125,7 @@ public sealed class AuditNotificationsHandler :
             await Audit(
                 performingUser,
                 null,
-                $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
+                affectedDetails: FormatDetails(id, member, appendType: true),
                 "umbraco/member/roles/assigned",
                 $"roles modified, assigned {roles}");
         }
@@ -170,7 +170,7 @@ public sealed class AuditNotificationsHandler :
         await Audit(
             performingUser,
             null,
-            $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+            affectedDetails: FormatDetails(member, appendType: true),
             "umbraco/member/exported",
             "exported member data");
     }
@@ -188,9 +188,9 @@ public sealed class AuditNotificationsHandler :
             await Audit(
                 performingUser,
                 null,
-                $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+                affectedDetails: FormatDetails(member, appendType: true),
                 "umbraco/member/delete",
-                $"delete member id:{member.Id} \"{member.Name}\" {FormatEmail(member)}");
+                $"delete member id:{FormatDetails(member)}");
         }
     }
 
@@ -210,7 +210,7 @@ public sealed class AuditNotificationsHandler :
             await Audit(
                 performingUser,
                 null,
-                $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+                affectedDetails: FormatDetails(member, appendType: true),
                 "umbraco/member/save",
                 $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
         }
@@ -233,7 +233,7 @@ public sealed class AuditNotificationsHandler :
             await Audit(
                 performingUser,
                 null,
-                $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
+                affectedDetails: FormatDetails(id, member, appendType: true),
                 "umbraco/member/roles/removed",
                 $"roles modified, removed {roles}");
         }
@@ -298,7 +298,7 @@ public sealed class AuditNotificationsHandler :
             await Audit(
                 performingUser,
                 null,
-                $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
+                $"User Group {FormatDetails(group)}",
                 "umbraco/user-group/save",
                 $"{sb}");
 
@@ -310,7 +310,7 @@ public sealed class AuditNotificationsHandler :
                     user,
                     null,
                     "umbraco/user-group/save",
-                    $"Removed user \"{user.Name}\" {FormatEmail(user)} from group {group.Id} \"{group.Name}\" ({group.Alias})");
+                    $"Removed user {FormatDetails(user)} from group {FormatDetails(group)}");
             }
 
             foreach (IUser user in groupWithUser.AddedUsers)
@@ -320,7 +320,7 @@ public sealed class AuditNotificationsHandler :
                     user,
                     null,
                     "umbraco/user-group/save",
-                    $"Added user \"{user.Name}\" {FormatEmail(user)} to group {group.Id} \"{group.Name}\" ({group.Alias})");
+                    $"Added user {FormatDetails(user)} to group {FormatDetails(group)}");
             }
         }
     }
@@ -362,22 +362,44 @@ public sealed class AuditNotificationsHandler :
         string eventType,
         string eventDetails)
     {
-        affectedDetails ??= affectedUser is null ? string.Empty : $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}";
+        affectedDetails ??= affectedUser is null ? string.Empty : FormatDetails(affectedUser, appendType: true);
         await _auditEntryService.WriteAsync(
-            performingUser?.Key ?? Constants.Security.UnknownUserKey,
-            $"User \"{performingUser?.Name ?? Constants.Security.UnknownUserName}\" {FormatEmail(performingUser)}",
+            performingUser?.Key,
+            FormatDetails(performingUser, appendType: true),
             PerformingIp,
             DateTime.UtcNow,
-            affectedUser?.Key ?? Constants.Security.SuperUserKey,
+            affectedUser?.Key,
             affectedDetails,
             eventType,
             eventDetails);
     }
 
-    private string FormatEmail(IMember? member) =>
-        member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{member.Email}>";
+    private static string FormatDetails(IUser? user, bool appendType = false)
+    {
+        var userName = user?.Name ?? Constants.Security.UnknownUserName;
+        var details = appendType ? $"User \"{userName}\"" : $"\"{userName}\"";
+        var email = FormatEmail(user?.Email);
 
-    private string FormatEmail(IUser? user) => user is not null && !user.Email.IsNullOrWhiteSpace()
-        ? $"<{user.Email}>"
-        : string.Empty;
+        return email is not null
+            ? $"{details} {email}"
+            : details;
+    }
+
+    private static string FormatDetails(IMember member, bool appendType = false)
+        => FormatDetails(member.Id, member, appendType);
+
+    private static string FormatDetails(int id, IMember? member, bool appendType = false)
+    {
+        var userName = member?.Name ?? "(unknown)";
+        var details = appendType ? $"Member {id} \"{userName}\"" : $"{id} \"{userName}\"";
+        var email = FormatEmail(member?.Email);
+
+        return email is not null
+            ? $"{details} {email}"
+            : details;
+    }
+
+    private static string FormatDetails(IUserGroup group) => $"{group.Id} \"{group.Name}\" ({group.Alias})";
+
+    private static string? FormatEmail(string? email) => !email.IsNullOrWhiteSpace() ? $"<{email}>" : null;
 }
