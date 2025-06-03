@@ -17,7 +17,7 @@ public class MemberPasswordHasherTests
         "Password123!",
         "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==",
         null,
-        ExpectedResult = PasswordVerificationResult.Success,
+        ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded,
         Description = "AspNetCoreIdentityPasswordHash: Correct password")]
     [TestCase(
         "wrongPassword",
