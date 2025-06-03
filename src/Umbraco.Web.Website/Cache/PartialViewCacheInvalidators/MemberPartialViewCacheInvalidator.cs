@@ -31,5 +31,8 @@ public class MemberPartialViewCacheInvalidator : IMemberPartialViewCacheInvalida
         {
             _appCaches.RuntimeCache.ClearByRegex($"{CoreCacheHelperExtensions.PartialViewCacheKey}.*-m{memberId}-*");
         }
+
+        // since it is possible to add a cache item linked to members without a member logged in, we should always clear these items.
+        _appCaches.RuntimeCache.ClearByRegex($"{CoreCacheHelperExtensions.PartialViewCacheKey}.*-m-*");
     }
 }
