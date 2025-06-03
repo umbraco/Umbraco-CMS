@@ -148,7 +148,7 @@ internal sealed class BackOfficeUserManagerAuditer :
         }
 
         return user.Email.IsNullOrWhiteSpace()
-            ? $"\"{user.Name}\""
-            : $"\"{user.Name}\" <{user.Email}>";
+            ? $"User \"{user.Name}\""
+            : $"User \"{user.Name}\" <{user.Email}>";
     }
 }

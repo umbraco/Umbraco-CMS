@@ -37,62 +37,7 @@ public class AuditEntryServiceTests
     }
 
     [Test]
-    public async Task WriteAsync_UsingIds_Calls_Repository_With_Correct_Values()
-    {
-        SetupScopeProviderMock();
-
-        var date = DateTime.UtcNow;
-        _auditEntryRepositoryMock.Setup(x => x.IsAvailable()).Returns(true);
-        _auditEntryRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditEntry>()))
-            .Callback<IAuditEntry>(item =>
-            {
-                Assert.AreEqual(Constants.Security.SuperUserId, item.PerformingUserId);
-                Assert.AreEqual(Constants.Security.SuperUserKey, item.PerformingUserKey);
-                Assert.AreEqual("performingDetails", item.PerformingDetails);
-                Assert.AreEqual("performingIp", item.PerformingIp);
-                Assert.AreEqual(date, item.EventDateUtc);
-                Assert.AreEqual(Constants.Security.UnknownUserId, item.AffectedUserId);
-                Assert.AreEqual(null, item.AffectedUserKey);
-                Assert.AreEqual("affectedDetails", item.AffectedDetails);
-                Assert.AreEqual("umbraco/test", item.EventType);
-                Assert.AreEqual("eventDetails", item.EventDetails);
-            });
-        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserId))
-            .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserKey));
-        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.UnknownUserId))
-            .ReturnsAsync(Attempt.Fail<Guid>());
-
-        var result = await _auditEntryService.WriteAsync(
-            Constants.Security.SuperUserId,
-            "performingDetails",
-            "performingIp",
-            date,
-            Constants.Security.UnknownUserId,
-            "affectedDetails",
-            "umbraco/test",
-            "eventDetails");
-        _auditEntryRepositoryMock.Verify(x => x.IsAvailable(), Times.AtLeastOnce);
-        _auditEntryRepositoryMock.Verify(x => x.Save(It.IsAny<IAuditEntry>()), Times.Once);
-
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(AuditEntryOperationStatus.Success, result.Status);
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(Constants.Security.SuperUserId, result.Result.PerformingUserId);
-            Assert.AreEqual(Constants.Security.SuperUserKey, result.Result.PerformingUserKey);
-            Assert.AreEqual("performingDetails", result.Result.PerformingDetails);
-            Assert.AreEqual("performingIp", result.Result.PerformingIp);
-            Assert.AreEqual(date, result.Result.EventDateUtc);
-            Assert.AreEqual(Constants.Security.UnknownUserId, result.Result.AffectedUserId);
-            Assert.AreEqual(null, result.Result.AffectedUserKey);
-            Assert.AreEqual("affectedDetails", result.Result.AffectedDetails);
-            Assert.AreEqual("umbraco/test", result.Result.EventType);
-            Assert.AreEqual("eventDetails", result.Result.EventDetails);
-        });
-    }
-
-    [Test]
-    public async Task WriteAsync_UsingKeys_Calls_Repository_With_Correct_Values()
+    public async Task WriteAsync_Calls_Repository_With_Correct_Values()
     {
         SetupScopeProviderMock();
 

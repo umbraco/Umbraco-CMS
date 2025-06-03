@@ -57,27 +57,6 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             eventDetails);
     }
 
-    /// <inheritdoc />
-    [Obsolete("Use the overload that takes user keys. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
-        int? performingUserId,
-        string performingDetails,
-        string performingIp,
-        DateTime eventDateUtc,
-        int? affectedUserId,
-        string? affectedDetails,
-        string eventType,
-        string eventDetails) =>
-        await WriteInner(
-            performingUserId,
-            performingDetails,
-            performingIp,
-            eventDateUtc,
-            affectedUserId,
-            affectedDetails,
-            eventType,
-            eventDetails);
-
     // This method is used by the AuditService while the AuditService.Write() method is not removed.
     internal async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteInner(
         int? performingUserId,
