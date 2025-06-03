@@ -16,11 +16,10 @@
   "devDependencies": {
     "@hey-api/client-fetch": "^0.10.2",
     "@hey-api/openapi-ts": "^0.67.6",
-    "@umbraco-cms/backoffice": "16.0.0-rc3",
+    "@umbraco-cms/backoffice": "16.0.0-rc4",
     "msw": "^2.7.0",
     "typescript": "^5.8.3",
-    "vite": "^6.3.5",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite": "^6.3.5"
   },
   "msw": {
     "workerDirectory": [
