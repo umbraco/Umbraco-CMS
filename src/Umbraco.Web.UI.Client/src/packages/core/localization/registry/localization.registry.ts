@@ -92,10 +92,7 @@ export class UmbLocalizationRegistry {
 
 							// Sort translations by their original extension weight (highest-to-lowest)
 							// This ensures that the translations with the lowest weight override the others
-							translations.sort((a, b) => {
-								if (a.$weight === b.$weight) return 0;
-								return a.$weight < b.$weight ? 1 : -1;
-							});
+							translations.sort((a, b) => b.$weight - a.$weight);
 
 							// Load the translations into the localization manager
 							umbLocalizationManager.registerManyLocalizations(translations);
