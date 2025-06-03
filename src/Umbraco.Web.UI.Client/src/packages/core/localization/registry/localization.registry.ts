@@ -9,7 +9,7 @@ import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { distinctUntilChanged, filter, from, map, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
+import { catchError, distinctUntilChanged, filter, from, map, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 import type { Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 
@@ -77,6 +77,12 @@ export class UmbLocalizationRegistry {
 					const prevAliases = prev.map((ext) => ext.alias).sort();
 					const currAliases = curr.map((ext) => ext.alias).sort();
 					return JSON.stringify(prevAliases) === JSON.stringify(currAliases);
+				}),
+				// Catch any errors that occur while loading the translations
+				// This is important to ensure that the observable does not error out and stop the subscription
+				catchError((error) => {
+					console.error('Error loading translations:', error);
+					return [];
 				}),
 				// With switchMap, if a new language is selected before the previous translations finish loading,
 				// the previous promise is canceled (unsubscribed), and only the latest one is processed.
