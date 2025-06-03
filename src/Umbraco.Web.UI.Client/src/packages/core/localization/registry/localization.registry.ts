@@ -9,14 +9,15 @@ import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
+import { distinctUntilChanged, filter, from, map, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 
 /**
- *
- * @param innerDictionary
- * @param dictionaryName
- * @param dictionary
+ * Adds or updates a dictionary in the inner dictionary.
+ * @param {UmbLocalizationFlatDictionary} innerDictionary The inner dictionary to add or update the dictionary in.
+ * @param {string} dictionaryName The name of the dictionary to add or update.
+ * @param {UmbLocalizationDictionary['value']} dictionary The dictionary to add or update.
  */
 function addOrUpdateDictionary(
 	innerDictionary: UmbLocalizationFlatDictionary,
@@ -34,63 +35,82 @@ export class UmbLocalizationRegistry {
 	);
 	readonly currentLanguage = this.#currentLanguage.asObservable();
 
-	#loadedExtAliases: Array<string> = [];
-
 	/**
 	 * Get the current registered translations.
 	 * @returns {Map<string, UmbLocalizationSetBase>} Returns the registered translations
 	 */
-	get localizations() {
+	get localizations(): Map<string, UmbLocalizationSetBase> {
 		return umbLocalizationManager.localizations;
 	}
 
+	#subscription: Subscription;
+
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
-		combineLatest([this.currentLanguage, extensionRegistry.byType('localization')]).subscribe(
-			async ([currentLanguage, extensions]) => {
-				const locale = new Intl.Locale(currentLanguage);
-				const currentLanguageExtensions = extensions.filter(
-					(ext) =>
-						ext.meta.culture.toLowerCase() === locale.baseName.toLowerCase() ||
-						ext.meta.culture.toLowerCase() === locale.language.toLowerCase(),
-				);
+		// Store the locale in a variable to use when setting the document language and direction
+		let locale: Intl.Locale | undefined = undefined;
 
-				// If there are no extensions for the current language, return early
-				if (!currentLanguageExtensions.length) return;
-
-				// Register the new translations only if they have not been registered before
-				const diff = currentLanguageExtensions.filter((ext) => !this.#loadedExtAliases.includes(ext.alias));
-
-				// Load all localizations
-				const translations = await Promise.all(currentLanguageExtensions.map(this.#loadExtension));
-
-				// If there are no translations, return early
-				if (!translations.length) return;
-
-				if (diff.length) {
-					const filteredTranslations = translations.filter((t) =>
-						diff.some((ext) => ext.meta.culture.toLowerCase() === t.$code),
+		this.#subscription = this.currentLanguage
+			.pipe(
+				// Ensure the current language is not empty
+				filter((currentLanguage) => !!currentLanguage),
+				// Use distinctUntilChanged to avoid unnecessary re-renders when the language hasn't changed
+				distinctUntilChanged(),
+				// Switch to the extensions registry to get the current language and the extensions for that language
+				// Note: This also cancels the previous subscription if the language changes
+				switchMap((currentLanguage) => {
+					return extensionRegistry.byType('localization').pipe(
+						// Filter the extensions to only those that match the current language
+						map((extensions) => {
+							locale = new Intl.Locale(currentLanguage);
+							return extensions.filter(
+								(ext) =>
+									ext.meta.culture.toLowerCase() === locale!.baseName.toLowerCase() ||
+									ext.meta.culture.toLowerCase() === locale!.language.toLowerCase(),
+							);
+						}),
 					);
-					umbLocalizationManager.registerManyLocalizations(filteredTranslations);
-				}
+				}),
+				// Ensure we only process extensions that are registered
+				filter((extensions) => extensions.length > 0),
+				// Ensure we only process extensions that have not been loaded before
+				distinctUntilChanged((prev, curr) => {
+					const prevAliases = prev.map((ext) => ext.alias).sort();
+					const currAliases = curr.map((ext) => ext.alias).sort();
+					return JSON.stringify(prevAliases) === JSON.stringify(currAliases);
+				}),
+				// With switchMap, if a new language is selected before the previous translations finish loading,
+				// the previous promise is canceled (unsubscribed), and only the latest one is processed.
+				// This prevents race conditions and stale state.
+				switchMap((extensions) =>
+					from(
+						(async () => {
+							// Load all localizations
+							const translations = await Promise.all(extensions.map(this.#loadExtension));
 
-				// Set the document language
-				const newLang = locale.baseName.toLowerCase();
-				if (document.documentElement.lang.toLowerCase() !== newLang) {
-					document.documentElement.lang = newLang;
-				}
+							// If there are no translations, return early
+							if (!translations.length) return;
 
-				// Set the document direction to the direction of the primary language
-				const newDir = translations[0].$dir ?? 'ltr';
-				if (document.documentElement.dir !== newDir) {
-					document.documentElement.dir = newDir;
-				}
-			},
-		);
+							// Sort translations by their original extension weight (highest-to-lowest)
+							// This ensures that the translations with the lowest weight override the others
+							translations.sort((a, b) => {
+								if (a.$weight === b.$weight) return 0;
+								return a.$weight < b.$weight ? 1 : -1;
+							});
+
+							// Load the translations into the localization manager
+							umbLocalizationManager.registerManyLocalizations(translations);
+
+							// Set the browser language and direction based on the translations
+							this.#setBrowserLanguage(locale!, translations);
+						})(),
+					),
+				),
+			)
+			// Subscribe to the observable to trigger the loading of translations
+			.subscribe();
 	}
 
 	#loadExtension = async (extension: ManifestLocalization) => {
-		this.#loadedExtAliases.push(extension.alias);
-
 		const innerDictionary: UmbLocalizationFlatDictionary = {};
 
 		// If extension contains a dictionary, add it to the inner dictionary.
@@ -115,16 +135,55 @@ export class UmbLocalizationRegistry {
 		return {
 			$code: extension.meta.culture.toLowerCase(),
 			$dir: extension.meta.direction ?? 'ltr',
+			$weight: extension.weight ?? 100,
 			...innerDictionary,
-		} satisfies UmbLocalizationSetBase;
+		} satisfies UmbLocalizationSetBase & { $weight: number };
 	};
+
+	#setBrowserLanguage(locale: Intl.Locale, translations: UmbLocalizationSetBase[]) {
+		// Set the document language
+		const newLang = locale!.baseName.toLowerCase();
+		if (document.documentElement.lang.toLowerCase() !== newLang) {
+			document.documentElement.lang = newLang;
+		}
+
+		// We need to find the direction of the new language, so we look for the best match
+		// If the new language is not found, we default to 'ltr'
+		const reverseTranslations = translations.slice().reverse();
+
+		// Look for a direct match first
+		const directMatch = reverseTranslations.find((t) => t.$code.toLowerCase() === newLang);
+		if (directMatch) {
+			document.documentElement.dir = directMatch.$dir;
+			return;
+		}
+
+		// If no direct match, look for a match with the language code only
+		const langOnlyDirectMatch = reverseTranslations.find(
+			(t) => t.$code.toLowerCase() === locale!.language.toLowerCase(),
+		);
+		if (langOnlyDirectMatch) {
+			document.documentElement.dir = langOnlyDirectMatch.$dir;
+			return;
+		}
+
+		// If no match is found, default to 'ltr'
+		if (document.documentElement.dir !== 'ltr') {
+			document.documentElement.dir = 'ltr';
+		}
+	}
 
 	/**
 	 * Load a language from the extension registry.
 	 * @param {string} locale The locale to load.
 	 */
 	loadLanguage(locale: string) {
-		this.#currentLanguage.setValue(locale.toLowerCase());
+		const canonicalLocale = Intl.getCanonicalLocales(locale)[0];
+		this.#currentLanguage.setValue(canonicalLocale);
+	}
+
+	destroy() {
+		this.#subscription.unsubscribe();
 	}
 }
 
