@@ -9,7 +9,15 @@ import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { catchError, distinctUntilChanged, filter, from, map, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
+import {
+	catchError,
+	distinctUntilChanged,
+	filter,
+	from,
+	map,
+	of,
+	switchMap,
+} from '@umbraco-cms/backoffice/external/rxjs';
 import type { Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 
@@ -106,7 +114,7 @@ export class UmbLocalizationRegistry {
 				// This is important to ensure that the observable does not error out and stop the subscription
 				catchError((error) => {
 					console.error('Error loading translations:', error);
-					return [];
+					return of([]);
 				}),
 			)
 			// Subscribe to the observable to trigger the loading of translations
