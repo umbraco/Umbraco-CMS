@@ -21,6 +21,9 @@
     <PackageReference Include="SixLabors.ImageSharp.Web" />
     <PackageReference Include="Smidge.InMemory" />
     <PackageReference Include="Smidge.Nuglify" />
+    <PackageReference Include="IPNetwork2">
+      <Aliases>IPNetwork2</Aliases>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
