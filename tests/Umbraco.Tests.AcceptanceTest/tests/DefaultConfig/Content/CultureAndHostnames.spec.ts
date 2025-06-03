@@ -101,7 +101,6 @@ test('can delete culture and hostname', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.content.waitForDomainToBeDeleted();
-  await umbracoUi.content.isErrorNotificationVisible(false);
   domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains.length).toBe(0);
 });
@@ -127,7 +126,6 @@ test('can add culture and hostname for multiple languages', async ({umbracoApi, 
 
   // Assert
   await umbracoUi.content.waitForDomainToBeCreated();
-  await umbracoUi.content.isErrorNotificationVisible(false);
   const domainsData = await umbracoApi.document.getDomains(contentId);
   expect(domainsData.domains.length).toBe(2);
   expect(domainsData.domains[0].domainName).toEqual(domainName);

@@ -116,7 +116,7 @@ test('can enable allow in root from a block', async ({umbracoApi, umbracoUi}) =>
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockGridWithPermissions(blockGridEditorName, contentElementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
@@ -134,7 +134,7 @@ test('can enable allow in areas from a block', async ({umbracoApi, umbracoUi}) =
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
+  await umbracoApi.dataType.createBlockGridWithPermissions(blockGridEditorName, contentElementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
