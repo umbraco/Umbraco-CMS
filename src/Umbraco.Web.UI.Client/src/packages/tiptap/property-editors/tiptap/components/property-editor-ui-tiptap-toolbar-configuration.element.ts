@@ -278,6 +278,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		const forbidden = !this.#context?.isExtensionEnabled(item.alias);
 
 		switch (item.kind) {
+			case 'styleMenu':
 			case 'menu':
 				return html`
 					<uui-button
