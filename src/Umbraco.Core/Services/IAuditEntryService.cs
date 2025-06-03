@@ -27,7 +27,7 @@ public interface IAuditEntryService : IService
     /// </param>
     /// <param name="eventDetails">Free-form details about the audited event.</param>
     /// <returns>The created audit entry.</returns>
-    public Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
+    public Task<IAuditEntry> WriteAsync(
         Guid? performingUserKey,
         string performingDetails,
         string performingIp,

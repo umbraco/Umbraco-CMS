@@ -42,7 +42,6 @@ public class AuditEntryServiceTests
         SetupScopeProviderMock();
 
         var date = DateTime.UtcNow;
-        _auditEntryRepositoryMock.Setup(x => x.IsAvailable()).Returns(true);
         _auditEntryRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditEntry>()))
             .Callback<IAuditEntry>(item =>
             {
@@ -70,21 +69,19 @@ public class AuditEntryServiceTests
             "umbraco/test",
             "eventDetails");
 
-        _auditEntryRepositoryMock.Verify(x => x.IsAvailable(), Times.AtLeastOnce);
         _auditEntryRepositoryMock.Verify(x => x.Save(It.IsAny<IAuditEntry>()), Times.Once);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(AuditEntryOperationStatus.Success, result.Status);
+        Assert.NotNull(result);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(Constants.Security.SuperUserId, result.Result.PerformingUserId);
-            Assert.AreEqual("performingDetails", result.Result.PerformingDetails);
-            Assert.AreEqual("performingIp", result.Result.PerformingIp);
-            Assert.AreEqual(date, result.Result.EventDateUtc);
-            Assert.AreEqual(Constants.Security.UnknownUserId, result.Result.AffectedUserId);
-            Assert.AreEqual("affectedDetails", result.Result.AffectedDetails);
-            Assert.AreEqual("umbraco/test", result.Result.EventType);
-            Assert.AreEqual("eventDetails", result.Result.EventDetails);
+            Assert.AreEqual(Constants.Security.SuperUserId, result.PerformingUserId);
+            Assert.AreEqual("performingDetails", result.PerformingDetails);
+            Assert.AreEqual("performingIp", result.PerformingIp);
+            Assert.AreEqual(date, result.EventDateUtc);
+            Assert.AreEqual(Constants.Security.UnknownUserId, result.AffectedUserId);
+            Assert.AreEqual("affectedDetails", result.AffectedDetails);
+            Assert.AreEqual("umbraco/test", result.EventType);
+            Assert.AreEqual("eventDetails", result.EventDetails);
         });
     }
 

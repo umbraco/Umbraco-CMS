@@ -3,7 +3,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -12,8 +11,6 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
 {
     private readonly IAuditEntryRepository _auditEntryRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly Lock _isAvailableLock = new();
-    private bool _isAvailable;
 
     /// <summary>
     ///    Initializes a new instance of the <see cref="AuditEntryService" /> class.
@@ -31,7 +28,7 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
+    public async Task<IAuditEntry> WriteAsync(
         Guid? performingUserKey,
         string performingDetails,
         string performingIp,
@@ -58,7 +55,7 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     }
 
     // This method is used by the AuditService while the AuditService.Write() method is not removed.
-    internal async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteInner(
+    internal async Task<IAuditEntry> WriteInner(
         int? performingUserId,
         string performingDetails,
         string performingIp,
@@ -84,7 +81,7 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             eventDetails);
     }
 
-    private Attempt<IAuditEntry, AuditEntryOperationStatus> WriteInner(
+    private IAuditEntry WriteInner(
         int? performingUserId,
         Guid? performingUserKey,
         string performingDetails,
@@ -154,18 +151,13 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             EventDetails = eventDetails,
         };
 
-        if (!IsAvailable())
-        {
-            return Attempt.FailWithStatus(AuditEntryOperationStatus.RepositoryNotAvailable, (IAuditEntry)entry);
-        }
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             _auditEntryRepository.Save(entry);
             scope.Complete();
         }
 
-        return Attempt.SucceedWithStatus(AuditEntryOperationStatus.Success, (IAuditEntry)entry);
+        return entry;
     }
 
     internal async Task<int?> GetUserId(Guid? key) =>
@@ -181,37 +173,9 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
     internal IEnumerable<IAuditEntry> GetAll()
     {
-        if (!IsAvailable())
-        {
-            return [];
-        }
-
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _auditEntryRepository.GetMany();
         }
-    }
-
-    private bool IsAvailable()
-    {
-        if (_isAvailable)
-        {
-            return true;
-        }
-
-        lock (_isAvailableLock)
-        {
-            if (_isAvailable)
-            {
-                return true;
-            }
-
-            using (ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                _isAvailable = _auditEntryRepository.IsAvailable();
-            }
-        }
-
-        return _isAvailable;
     }
 }

@@ -303,6 +303,6 @@ public sealed class AuditService : RepositoryService, IAuditService
             affectedUserId,
             affectedDetails,
             eventType,
-            eventDetails).GetAwaiter().GetResult().Result;
+            eventDetails).GetAwaiter().GetResult();
     }
 }

@@ -31,9 +31,9 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
             expected.AffectedDetails,
             expected.EventType,
             expected.EventDetails);
-        Assert.IsTrue(result.Success);
+        Assert.NotNull(result);
 
-        var actual = result.Result;
+        var actual = result;
 
         var entries = sut.GetAll().ToArray();
 
@@ -68,9 +68,9 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
             "affectedDetails",
             "umbraco/test",
             "eventDetails");
-        Assert.IsTrue(result.Success);
+        Assert.NotNull(result);
 
-        var actual = result.Result;
+        var actual = result;
 
         var entries = sut.GetAll().ToArray();
 

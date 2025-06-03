@@ -1,3 +1,5 @@
+using System.Data.Common;
+using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -5,12 +7,12 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -19,12 +21,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IAuditEntryRepository
 {
+    private readonly IRuntimeState _runtimeState;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="AuditEntryRepository" /> class.
     /// </summary>
-    public AuditEntryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<AuditEntryRepository> logger)
+    public AuditEntryRepository(
+        IRuntimeState runtimeState,
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<AuditEntryRepository> logger)
         : base(scopeAccessor, cache, logger)
     {
+        _runtimeState = runtimeState;
     }
 
     /// <inheritdoc />
@@ -38,23 +47,6 @@ internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IA
         Page<AuditEntryDto> page = Database.Page<AuditEntryDto>(pageIndex + 1, pageCount, sql);
         records = page.TotalItems;
         return page.Items.Select(AuditEntryFactory.BuildEntity);
-    }
-
-    /// <inheritdoc />
-    public bool IsAvailable()
-    {
-        var tables = SqlSyntax.GetTablesInSchema(Database).ToArray();
-        if (!tables.InvariantContains(Constants.DatabaseSchema.Tables.AuditEntry))
-        {
-            return false;
-        }
-
-        // This check is needed to determine if the migration 'V_17_0_0.AddGuidsToAuditEntries' has run.
-        // Otherwise, an exception will be thrown when trying to write audits when in "maintenance" mode.
-        // This check can be removed once that migration is removed.
-        ColumnInfo[] columns = SqlSyntax.GetColumnsInSchema(Database).Distinct().ToArray();
-        return columns.Any(x => x.TableName.InvariantEquals(Constants.DatabaseSchema.Tables.AuditEntry)
-                                && x.ColumnName.InvariantEquals("performingUserKey"));
     }
 
     /// <inheritdoc />
@@ -127,7 +119,55 @@ internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IA
         entity.AddingEntity();
 
         AuditEntryDto dto = AuditEntryFactory.BuildDto(entity);
-        Database.Insert(dto);
+        try
+        {
+            Database.Insert(dto);
+        }
+        catch (DbException) when (_runtimeState.Level == RuntimeLevel.Upgrade)
+        {
+            // This can happen when in upgrade state, before the migration to add user keys runs.
+            // In this case, we will try to insert the audit entry without the user keys.
+            // This catch clause can be removed when 'V_17_0_0.AddGuidsToAuditEntries' is removed.
+            Expression<Func<AuditEntryDto, object?>>[] fields =
+            [
+                x => x.PerformingUserId,
+                x => x.PerformingDetails,
+                x => x.PerformingIp,
+                x => x.EventDateUtc,
+                x => x.AffectedUserId,
+                x => x.AffectedDetails,
+                x => x.EventType,
+                x => x.EventDetails
+            ];
+
+            var cols = Sql().ColumnsForInsert(fields);
+            IEnumerable<object?> values = fields.Select(f => f.Compile().Invoke(dto));
+
+            Sql<ISqlContext> sqlValues = Sql();
+            foreach (var (value, index) in values.Select((v, i) => (v, i)))
+            {
+                switch (value)
+                {
+                    case null:
+                        sqlValues.Append((index == 0 ? string.Empty : ",") + "NULL");
+                        break;
+                    case "":
+                        sqlValues.Append((index == 0 ? string.Empty : ",") + "''");
+                        break;
+                    default:
+                        sqlValues.Append((index == 0 ? string.Empty : ",") + "@0", value);
+                        break;
+                }
+            }
+
+            Sql<ISqlContext> sqlInsert = Sql($"INSERT INTO {Constants.DatabaseSchema.Tables.AuditEntry} ({cols})")
+                .Append("VALUES (")
+                .Append(sqlValues)
+                .Append(")");
+
+            Database.Execute(sqlInsert);
+        }
+
         entity.Id = dto.Id;
         entity.ResetDirtyProperties();
     }
