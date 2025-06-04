@@ -127,7 +127,7 @@ internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IA
         {
             // This can happen when in upgrade state, before the migration to add user keys runs.
             // In this case, we will try to insert the audit entry without the user keys.
-            // This catch clause can be removed when 'V_17_0_0.AddGuidsToAuditEntries' is removed.
+            // TODO (V22): Remove this catch clause when 'V_17_0_0.AddGuidsToAuditEntries' is removed.
             Expression<Func<AuditEntryDto, object?>>[] fields =
             [
                 x => x.PerformingUserId,
