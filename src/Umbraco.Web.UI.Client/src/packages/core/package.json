@@ -12,7 +12,7 @@
 		"uuid": "^11.1.0"
 	},
 	"devDependencies": {
-		"@hey-api/client-fetch": "^0.10.0",
-		"@hey-api/openapi-ts": "^0.66.6"
+		"@hey-api/client-fetch": "^0.11.0",
+		"@hey-api/openapi-ts": "^0.69.2"
 	}
 }
