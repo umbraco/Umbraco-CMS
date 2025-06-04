@@ -3,8 +3,22 @@ import { isUmbNotifications, UMB_NOTIFICATION_HEADER } from './isUmbNotification
 import { isProblemDetailsLike } from './apiTypeValidators.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
-import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+import type { RequestOptions, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+
+const MAX_RETRIES = 3;
+const AUTH_WAIT_TIMEOUT = 120000; // 120 seconds
+
+// Store pending requests
+const pending401Requests: Array<{
+	request: Request;
+	requestConfig: RequestOptions;
+	retry: () => Promise<Response>;
+	resolve: (value: Response) => void;
+	reject: (reason?: unknown) => void;
+	retries: number;
+}> = [];
 
 export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
@@ -14,9 +28,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 */
 	public bindDefaultInterceptors(client: typeof umbHttpClient) {
 		this.addAuthResponseInterceptor(client);
+		this.addForbiddenResponseInterceptor(client);
 		this.addUmbGeneratedResourceInterceptor(client);
 		this.addUmbNotificationsInterceptor(client);
-		this.addForbiddenResponseInterceptor(client);
 		this.addErrorInterceptor(client);
 	}
 
@@ -26,14 +40,107 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * @internal
 	 */
 	addAuthResponseInterceptor(client: typeof umbHttpClient) {
-		client.interceptors.response.use(async (response: Response) => {
+		client.interceptors.response.use(async (response, request, requestConfig) => {
 			if (response.status === 401) {
 				// See if we can get the UmbAuthContext and let it know the user is timed out
 				const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
-				if (!authContext) {
-					throw new Error('Could not get the auth context');
+				if (!authContext) throw new Error('Could not get the auth context');
+
+				// Only retry for GET requests
+				if (request.method !== 'GET') {
+					// If it's not a GET request, we timeout and return the response
+					authContext.timeOut();
+					return response;
 				}
-				authContext.timeOut();
+
+				// Find if this request is already in the queue and increment retries
+				let retries = 1;
+				const existing = pending401Requests.find(
+					(req) => req.request === request && req.requestConfig === requestConfig,
+				);
+				if (existing) {
+					retries = existing.retries + 1;
+					if (retries > MAX_RETRIES) {
+						return response;
+					}
+					existing.retries = retries;
+				}
+
+				// Return a promise that will resolve when re-auth completes
+				return new Promise<Response>((resolve, reject) => {
+					// Before pushing to the queue
+					const wasQueueEmpty = pending401Requests.length === 0;
+
+					pending401Requests.push({
+						request,
+						requestConfig,
+						retry: async () => {
+							const { data, response } = await client.request(requestConfig as never);
+
+							// Manually create a new response object with the data because the original response has been read
+							let body: string;
+							if (typeof data === 'string') {
+								body = data;
+							} else {
+								body = JSON.stringify(data);
+							}
+
+							if (response) {
+								return new Response(body, {
+									...response,
+									headers: {
+										...Object.fromEntries(response.headers.entries()),
+										'Content-Type': 'application/json',
+									},
+								});
+							}
+
+							throw new Error('Response is not available for retry');
+						},
+						resolve,
+						reject,
+						retries,
+					});
+
+					// If the queue was empty, we need to signal the auth context that we are timing out
+					// This is to ensure that the auth context is only signaled once, even if multiple requests are queued
+					// and the auth context is not already timing out
+					if (wasQueueEmpty) {
+						// Show login overlay
+						authContext.timeOut();
+					}
+
+					console.log(
+						'[Interceptor] 401 Unauthorized - queuing request for re-authentication and have tried',
+						retries - 1,
+						'times before',
+						requestConfig,
+					);
+
+					// Wait for auth signal or timeout
+					Promise.race([
+						firstValueFrom(authContext.authorizationSignal),
+						new Promise((_, rej) => setTimeout(() => rej(new Error('Auth timeout')), AUTH_WAIT_TIMEOUT)),
+					])
+						.then(() => {
+							console.log('[Interceptor] 401 Unauthorized - re-authentication completed');
+							// On auth, retry all pending requests
+							const requests = pending401Requests.splice(0, pending401Requests.length);
+							requests.forEach((req) => {
+								console.log(
+									'[Interceptor] 401 Unauthorized - retrying request after re-authentication',
+									req.requestConfig,
+								);
+								req.retry().then(req.resolve).catch(req.reject);
+							});
+						})
+						.catch((err) => {
+							console.error('[Interceptor] 401 Unauthorized - re-authentication failed', err);
+							// On timeout, reject all pending requests
+							const requests = pending401Requests.splice(0, pending401Requests.length);
+							requests.forEach((req) => req.reject(err));
+						});
+				});
 			}
 			return response;
 		});
@@ -45,17 +152,18 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * @internal
 	 */
 	addForbiddenResponseInterceptor(client: typeof umbHttpClient) {
-			client.interceptors.response.use(async (response: Response) => {
-				if (response.status === 403) {
-					const headline = 'Permission Denied';
-					const message = 'You do not have the necessary permissions to complete the requested action. If you believe this is in error, please reach out to your administrator.';
+		client.interceptors.response.use(async (response: Response) => {
+			if (response.status === 403) {
+				const headline = 'Permission Denied';
+				const message =
+					'You do not have the necessary permissions to complete the requested action. If you believe this is in error, please reach out to your administrator.';
 
-					this.#peekError(headline, message, null);
-				}
+				this.#peekError(headline, message, null);
+			}
 
-				return response;
-			});
-		}
+			return response;
+		});
+	}
 
 	/**
 	 * Interceptor which checks responses for the Umb-Generated-Resource header and replaces the value into the response body.
