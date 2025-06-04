@@ -31,8 +31,8 @@ test.describe('Modelsbuilder tests', () => {
         .done()
       .done()
       .build();
-    await umbracoApi.documentTypes.save(docType);
 
+    await umbracoApi.documentTypes.save(docType);
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -46,7 +46,7 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoUi.createContentWithDocumentType(docTypeName);
     await umbracoUi.setEditorHeaderName(contentName);
     // Fortunately for us the input field of a text box has the alias of the property as an id :)
-    await page.locator("#title").type("Hello world!");
+    await page.locator("#title").type("Hello world!")
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
     // Ensure that we can render it on the frontend = we can compile the models and views
@@ -61,7 +61,7 @@ test.describe('Modelsbuilder tests', () => {
     const docTypeName = "TestDocument";
     const docTypeAlias = AliasHelper.toAlias(docTypeName);
     const propertyAlias = "title";
-    const propertyValue = "Hello world!";
+    const propertyValue = "Hello world!"
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(docTypeName);
@@ -79,8 +79,8 @@ test.describe('Modelsbuilder tests', () => {
         .done()
       .done()
       .build();
-    const savedDocType = await umbracoApi.documentTypes.save(docType);
 
+    const savedDocType = await umbracoApi.documentTypes.save(docType);
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -89,6 +89,7 @@ test.describe('Modelsbuilder tests', () => {
 }
 
 <h1>@Model.Title</h1>`);
+
     const content = new ContentBuilder()
       .withContentTypeAlias(savedDocType["alias"])
       .withAction("publishNew")
@@ -102,6 +103,7 @@ test.describe('Modelsbuilder tests', () => {
         .done()
       .done()
       .build()
+
     await umbracoApi.content.save(content);
 
     // Navigate to the document type
@@ -115,7 +117,6 @@ test.describe('Modelsbuilder tests', () => {
     await page.locator('.umb-card-grid >> [title="Textstring"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.submit));
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    // Has a long timeout because it can sometimes take longer than 5 sec to save on the pipeline
     await umbracoUi.isSuccessNotificationVisible();
 
     // Now that the content is updated and the models are rebuilt, ensure that we can still render the frontend.
@@ -130,7 +131,7 @@ test.describe('Modelsbuilder tests', () => {
     const docTypeName = "TestDocument";
     const docTypeAlias = AliasHelper.toAlias(docTypeName);
     const propertyAlias = "title";
-    const propertyValue = "Hello world!";
+    const propertyValue = "Hello world!"
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(docTypeName);
@@ -148,8 +149,8 @@ test.describe('Modelsbuilder tests', () => {
         .done()
       .done()
       .build();
-    const savedDocType = await umbracoApi.documentTypes.save(docType);
 
+    const savedDocType = await umbracoApi.documentTypes.save(docType);
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -171,7 +172,8 @@ test.describe('Modelsbuilder tests', () => {
           .withValue(propertyValue)
         .done()
       .done()
-      .build();
+      .build()
+
     await umbracoApi.content.save(content);
 
     // Navigate to the document type
@@ -180,25 +182,22 @@ test.describe('Modelsbuilder tests', () => {
     const editor = await page.locator('.ace_content');
     await editor.click();
     // We only have to type out the opening tag, the editor adds the closing tag automatically.
-    await editor.type("<p>Edited");
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
+    await editor.type("<p>Edited")
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save))
 
     await umbracoUi.isSuccessNotificationVisible();
-
-    await umbracoApi.content.verifyRenderedContent("/", "<h1>" + propertyValue + "</h1><p>Edited</p>", true);
+    await umbracoApi.content.verifyRenderedContent("/", "<h1>" + propertyValue + "</h1><p>Edited</p>", true)
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(docTypeName);
     await umbracoApi.templates.ensureNameNotExists(docTypeName);
   });
 
-  test('Can update view and document type', async ({page, umbracoApi, umbracoUi}, testInfo) => {
-    await testInfo.slow();
-
+  test('Can update view and document type', async ({page, umbracoApi, umbracoUi}) => {
     const docTypeName = "TestDocument";
     const docTypeAlias = AliasHelper.toAlias(docTypeName);
     const propertyAlias = "title";
-    const propertyValue = "Hello world!";
+    const propertyValue = "Hello world!"
     const contentName = "Home";
 
     await umbracoApi.content.deleteAllContent();
@@ -217,8 +216,8 @@ test.describe('Modelsbuilder tests', () => {
         .done()
       .done()
       .build();
-    const savedDocType = await umbracoApi.documentTypes.save(docType);
 
+    const savedDocType = await umbracoApi.documentTypes.save(docType);
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -240,7 +239,8 @@ test.describe('Modelsbuilder tests', () => {
           .withValue(propertyValue)
         .done()
       .done()
-      .build();
+      .build()
+
     await umbracoApi.content.save(content);
 
     // Navigate to the document type
@@ -255,31 +255,26 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.submit));
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
     await umbracoUi.isSuccessNotificationVisible();
-    await page.locator('span:has-text("×")').click();
 
     // Update the template
     await umbracoUi.clickElement(umbracoUi.getTreeItem("settings", ["templates", docTypeName]));
     const editor = await page.locator('.ace_content');
     await editor.click();
     // We only have to type out the opening tag, the editor adds the closing tag automatically.
-    await editor.type("<p>@Model.Bod");
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
+    await editor.type("<p>@Model.Bod")
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save))
     await umbracoUi.isSuccessNotificationVisible();
-    await page.locator('span:has-text("×")').click();
 
     // Navigate to the content section and update the content
     await umbracoUi.goToSection(ConstantHelper.sections.content);
     await umbracoUi.refreshContentTree();
     await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [contentName]));
     await page.locator("#bod").type("Fancy body text");
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
-
-    await page.waitForTimeout(2000);
 
     await umbracoApi.content.verifyRenderedContent("/", "<h1>" + propertyValue + "</h1><p>Fancy body text</p>", true);
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(docTypeName);
-    await umbracoApi.templates.ensureNameNotExists(docTypeName);
+    await umbracoApi.templates.ensureNameNotExists(docTypeName)
   });
 });
