@@ -63,5 +63,6 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 		}
 
 		this._peekError(headline, message, details);
+		console.error('Error in tryExecute:', error);
 	}
 }
