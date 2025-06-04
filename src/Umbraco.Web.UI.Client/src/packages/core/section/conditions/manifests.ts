@@ -1,4 +1,4 @@
-import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from './constants.js';
+import { UMB_SECTION_ALIAS_CONDITION_ALIAS, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from './constants.js';
 import { UmbSectionAliasCondition } from './section-alias.condition.js';
 import { UmbSectionUserPermissionCondition } from './section-user-permission.condition.js';
 
@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'condition',
 		name: 'Section Alias Condition',
-		alias: 'Umb.Condition.SectionAlias',
+		alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 		api: UmbSectionAliasCondition,
 	},
 ];
