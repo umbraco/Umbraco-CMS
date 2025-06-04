@@ -1,3 +1,4 @@
+import { updateItemsState } from '../utils/property-editor-ui-state-manager.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
@@ -56,17 +57,14 @@ export class UmbPropertyEditorUISelectElement extends UmbLitElement implements U
 	#updateSelectedState() {
 		// Only update if we have options loaded
 		if (this._options.length > 0) {
-			this._options = this._options.map((option) => ({
-				...option,
-				selected: option.value === this._value,
-			}));
+			this._options = updateItemsState(this._options, [this._value], 'selected');
 			// Trigger a re-render
 			this.requestUpdate();
 		}
 	}
 
 	override render() {
-		return html`<uui-select .options=${this._options} @change=${this.#onChange}></uui-select>`;
+		return html`<uui-select .options=${this._options} @change=${this.#onChange} label="Select option"></uui-select>`;
 	}
 }
 
