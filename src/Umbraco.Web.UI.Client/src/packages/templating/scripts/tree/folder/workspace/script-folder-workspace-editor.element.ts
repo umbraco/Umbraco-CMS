@@ -1,4 +1,4 @@
-import { UMB_SCRIPT_FOLDER_WORKSPACE_CONTEXT } from '../../../constants.js';
+import { UMB_SCRIPT_FOLDER_WORKSPACE_CONTEXT } from './script-folder-workspace.context-token.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
