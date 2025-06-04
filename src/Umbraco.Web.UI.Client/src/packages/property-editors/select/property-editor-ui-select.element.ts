@@ -60,7 +60,7 @@ export class UmbPropertyEditorUISelectElement extends UmbLitElement implements U
 	}
 
 	override render() {
-		return html`<uui-select .options=${this._options} @change=${this.#onChange} label="Select option"></uui-select>`;
+		return html`<uui-select .options=${this._options} @change=${this.#onChange}></uui-select>`;
 	}
 }
 
