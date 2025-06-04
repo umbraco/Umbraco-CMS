@@ -6,5 +6,6 @@ export interface UmbNamableWorkspaceContext extends UmbWorkspaceContext {
 	name: Observable<string | undefined>;
 	getName(): string | undefined;
 	setName(name: string): void;
-	nameWriteGuard: UmbNameWriteGuardManager;
+	// TODO: implement across all namable workspaces and make it mandatory
+	nameWriteGuard?: UmbNameWriteGuardManager;
 }

@@ -48,7 +48,7 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 
 	#observeNameWriteGuardRules() {
 		this.observe(
-			this.#workspaceContext?.nameWriteGuard.isPermittedForName(),
+			this.#workspaceContext?.nameWriteGuard?.isPermittedForName(),
 			(isPermitted) => {
 				this._isWritableName = isPermitted ?? true;
 			},
