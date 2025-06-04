@@ -5,8 +5,7 @@
     <Description>Contains the website assembly needed to run the frontend of Umbraco CMS.</Description>
     <OutputType>Library</OutputType>
     <RootNamespace>Umbraco.Cms.Web.Website</RootNamespace>
-    <TargetFramework>net8.0</TargetFramework>
-	<Nullable>annotations</Nullable>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

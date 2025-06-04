@@ -5,8 +5,7 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
-    <TargetFramework>net8.0</TargetFramework>
-	<Nullable>annotations</Nullable>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

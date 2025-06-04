@@ -3,8 +3,7 @@
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
     <EnablePackageValidation>false</EnablePackageValidation>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
-    <TargetFramework>net8.0</TargetFramework>
-	<Nullable>annotations</Nullable>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />

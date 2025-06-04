@@ -7,8 +7,7 @@
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
     <GenerateCompatibilitySuppressionFile>true</GenerateCompatibilitySuppressionFile>
-    <TargetFramework>net8.0</TargetFramework>
-	<Nullable>annotations</Nullable>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

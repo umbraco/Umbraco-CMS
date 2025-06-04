@@ -4,8 +4,7 @@
     <Description>Contains the static assets needed to run Umbraco CMS.</Description>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
-    <TargetFramework>net8.0</TargetFramework>
-	<Nullable>annotations</Nullable>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

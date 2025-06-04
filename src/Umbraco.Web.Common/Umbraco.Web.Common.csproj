@@ -1,11 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Umbraco.Cms.Web.Common</PackageId>
     <Title>Umbraco CMS - Web</Title>
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
-	<Nullable>annotations</Nullable>
-	<TargetFramework>net8.0</TargetFramework>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

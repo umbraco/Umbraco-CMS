@@ -5,8 +5,7 @@
     <Description>Contains the backoffice assembly needed to run the backend of Umbraco CMS.</Description>
     <OutputType>Library</OutputType>
     <RootNamespace>Umbraco.Cms.Web.BackOffice</RootNamespace>
-    <TargetFramework>net8.0</TargetFramework>
-	<Nullable>annotations</Nullable>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
