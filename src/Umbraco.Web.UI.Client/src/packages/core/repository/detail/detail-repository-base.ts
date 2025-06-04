@@ -7,6 +7,7 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 export abstract class UmbDetailRepositoryBase<
 		DetailModelType extends UmbEntityModel,
@@ -43,11 +44,13 @@ export abstract class UmbDetailRepositoryBase<
 
 	/**
 	 * Creates a scaffold
-	 * @param {Partial<DetailModelType>} [preset]
+	 * @param {UmbDeepPartialObject<DetailModelType>} [preset]
 	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async createScaffold(preset?: Partial<DetailModelType>): Promise<UmbRepositoryResponse<DetailModelType>> {
+	async createScaffold(
+		preset?: UmbDeepPartialObject<DetailModelType>,
+	): Promise<UmbRepositoryResponse<DetailModelType>> {
 		return this.detailDataSource.createScaffold(preset);
 	}
 

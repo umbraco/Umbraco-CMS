@@ -111,7 +111,6 @@ test.skip('can delete a redirect', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.redirectManagement.deleteFirstRedirectURL();
 
   // Assert
-  const contentData = await umbracoApi.document.get(contentId);
   const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
   await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentUrl, false);
 });
