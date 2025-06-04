@@ -124,8 +124,8 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// <returns>
     ///     <c>true</c> if the specified property is an upload field; otherwise, <c>false</c>.
     /// </returns>
-    private static bool IsUploadField(IProperty property) => property.PropertyType.PropertyEditorAlias ==
-                                                             Constants.PropertyEditors.Aliases.UploadField;
+    protected virtual bool IsUploadField(IProperty property) =>
+        property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
 
     /// <summary>
     ///     The paths to all file upload property files contained within a collection of content entities

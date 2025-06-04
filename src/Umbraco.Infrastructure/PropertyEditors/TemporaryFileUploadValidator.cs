@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Models.Validation;
@@ -6,21 +6,27 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class TemporaryFileUploadValidator : IValueValidator
+/// <summary>
+/// Validates a temporary file upload.
+/// </summary>
+public class TemporaryFileUploadValidator : IValueValidator
 {
     private readonly GetContentSettings _getContentSettings;
     private readonly ParseTemporaryFileKey _parseTemporaryFileKey;
     private readonly GetTemporaryFileModel _getTemporaryFileModel;
     private readonly ValidateFileType? _validateFileType;
 
-    internal delegate ContentSettings GetContentSettings();
+    public delegate ContentSettings GetContentSettings();
 
-    internal delegate Guid? ParseTemporaryFileKey(object? editorValue);
+    public delegate Guid? ParseTemporaryFileKey(object? editorValue);
 
-    internal delegate TemporaryFileModel? GetTemporaryFileModel(Guid temporaryFileKey);
+    public delegate TemporaryFileModel? GetTemporaryFileModel(Guid temporaryFileKey);
 
-    internal delegate bool ValidateFileType(string extension, object? dataTypeConfiguration);
+    public delegate bool ValidateFileType(string extension, object? dataTypeConfiguration);
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TemporaryFileUploadValidator"/> class.
+    /// </summary>
     public TemporaryFileUploadValidator(
         GetContentSettings getContentSettings,
         ParseTemporaryFileKey parseTemporaryFileKey,
@@ -33,6 +39,7 @@ internal class TemporaryFileUploadValidator : IValueValidator
         _validateFileType = validateFileType;
     }
 
+    /// <inheritdoc/>
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
         Guid? temporaryFileKey = _parseTemporaryFileKey(value);
@@ -46,7 +53,7 @@ internal class TemporaryFileUploadValidator : IValueValidator
         {
             yield return new ValidationResult(
                 $"No temporary file was found for the key: {temporaryFileKey.Value}",
-                new[] { "value" });
+                ["value"]);
         }
         else
         {
@@ -61,7 +68,7 @@ internal class TemporaryFileUploadValidator : IValueValidator
             {
                 yield return new ValidationResult(
                     $"The file type for file name \"{temporaryFile.FileName}\" is not valid for upload",
-                    new[] { "value" });
+                    ["value"]);
             }
         }
     }
