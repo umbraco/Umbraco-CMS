@@ -15,10 +15,6 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 export class UmbPropertyEditorUISelectElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	private _value: string = '';
 
-	constructor() {
-		super();
-	}
-
 	// Update the selected state of existing options when value changes
 	@property()
 	public set value(newValue: string | undefined) {
