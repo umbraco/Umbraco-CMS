@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
@@ -193,19 +193,7 @@ internal class CompilationOptionsProvider
 
         var parseOptions = new CSharpParseOptions(preprocessorSymbols: (IEnumerable<string>)defines);
 
-        if (string.IsNullOrEmpty(dependencyContextOptions.LanguageVersion))
-        {
-            // If the user does not specify a LanguageVersion, assume CSharp 8.0. This matches the language version Razor 3.0 targets by default.
-            parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.CSharp8);
-        }
-        else if (LanguageVersionFacts.TryParse(dependencyContextOptions.LanguageVersion, out var languageVersion))
-        {
-            parseOptions = parseOptions.WithLanguageVersion(languageVersion);
-        }
-        else
-        {
-            Debug.Fail($"LanguageVersion {languageVersion} specified in the deps file could not be parsed.");
-        }
+        parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.Latest);
 
         return parseOptions;
     }
