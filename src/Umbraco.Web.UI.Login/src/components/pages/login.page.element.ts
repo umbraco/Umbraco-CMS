@@ -33,7 +33,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
       this.#authContext = authContext;
-      this.supportPersistLogin = authContext.supportsPersistLogin;
+      this.supportPersistLogin = authContext?.supportsPersistLogin ?? false;
     });
   }
 

@@ -72,7 +72,11 @@ export class UmbPropertyTypeWorkspaceContext
 			this.#contentTypeContext = context;
 		})
 			.skipHost()
-			.asPromise({ preventTimeout: true });
+			.asPromise({ preventTimeout: true })
+			.catch(() => {
+				// If the context is not available, we can assume that the context is not available.
+				this.#contentTypeContext = undefined;
+			});
 
 		this.routes.setRoutes([
 			{

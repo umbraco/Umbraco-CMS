@@ -74,8 +74,10 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
 			{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta },
 		]);
-
-		this._firstActionHref = await this._firstActionApi?.getHref();
+		if (this._firstActionApi) {
+			(this._firstActionApi as any).manifest = this._firstActionManifest;
+			this._firstActionHref = await this._firstActionApi.getHref();
+		}
 	}
 
 	async #onFirstActionClick(event: PointerEvent) {
