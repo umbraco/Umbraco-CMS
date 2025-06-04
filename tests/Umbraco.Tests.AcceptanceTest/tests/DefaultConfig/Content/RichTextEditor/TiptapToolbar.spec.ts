@@ -93,12 +93,10 @@ test('cannot submit an empty link in RTE Tiptap property editor', async ({umbrac
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible('This field is required');
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);
@@ -119,9 +117,7 @@ test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tipta
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17974
-test.skip('can insert a link to an unpublished document in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test('can insert a link to an unpublished document in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const customDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customDataTypeName);

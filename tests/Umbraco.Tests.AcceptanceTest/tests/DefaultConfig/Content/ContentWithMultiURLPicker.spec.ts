@@ -284,7 +284,7 @@ test('cannot submit an empty link', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible('This field is required');
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
 test('cannot update the URL picker with an empty link', async ({umbracoApi, umbracoUi}) => {
@@ -304,12 +304,10 @@ test('cannot update the URL picker with an empty link', async ({umbracoApi, umbr
   await umbracoUi.content.clickUpdateButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible('This field is required');
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test.skip('cannot submit an empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -326,7 +324,7 @@ test.skip('cannot submit an empty URL with an anchor or query', async ({umbracoA
   await umbracoUi.content.clickAddButton();
 
   // Assert
-  await umbracoUi.content.isTextWithMessageVisible('This field is required');
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
 // TODO: Remove skip when the front-end ready. Currently it still accept the empty link using spacebar
