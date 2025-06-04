@@ -56,7 +56,10 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		if (asObservable) {
 			await this.observe(asObservable(), (currentUser) => {
 				this.#currentUser?.setValue(currentUser);
-			}).asPromise();
+			})
+				.asPromise()
+				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+				.catch(() => undefined);
 		}
 	}
 
