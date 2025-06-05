@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
     <GenerateProgramFile>false</GenerateProgramFile>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

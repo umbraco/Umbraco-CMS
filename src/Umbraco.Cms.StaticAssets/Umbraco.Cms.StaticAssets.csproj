@@ -4,6 +4,7 @@
     <Description>Contains the static assets needed to run Umbraco CMS.</Description>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

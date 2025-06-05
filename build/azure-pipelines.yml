@@ -48,7 +48,7 @@ parameters:
 
 variables:
   nodeVersion: 20
-  dotnetVersion: 6.x
+  dotnetVersion: 8.x
   dotnetIncludePreviewVersions: false
   solution: umbraco.sln
   buildConfiguration: Release

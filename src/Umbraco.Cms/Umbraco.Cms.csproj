@@ -5,6 +5,7 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

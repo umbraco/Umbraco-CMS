@@ -4,6 +4,7 @@
     <Title>Umbraco CMS - Core</Title>
     <Description>Contains the core assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Core</RootNamespace>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
