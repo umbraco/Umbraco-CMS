@@ -61,8 +61,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			// Build a plain ProblemDetails object for the response body
 			const problemDetails: UmbProblemDetails = {
 				status: response.status,
-				title: response.statusText,
-				detail: 'Unauthorized request, waiting for re-authentication.',
+				title: response.statusText || 'Unauthorized request, waiting for re-authentication.',
+				detail: undefined,
 				errors: undefined,
 				type: 'Unauthorized',
 				stack: undefined,
@@ -170,9 +170,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			// Build a plain ProblemDetails object for the response body
 			const problemDetails: UmbProblemDetails = {
 				status: response.status,
-				title: response.statusText,
-				detail:
+				title:
+					response.statusText ||
 					'You do not have the necessary permissions to complete the requested action. If you believe this is in error, please reach out to your administrator.',
+				detail: undefined,
 				errors: undefined,
 				type: 'Unauthorized',
 				stack: undefined,
@@ -216,8 +217,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			// Build a plain ProblemDetails object for the response body
 			let problemDetails: UmbProblemDetails = {
 				status: response.status,
-				title: response.statusText,
-				detail: 'A fatal server error occurred. If this continues, please reach out to your administrator.',
+				title:
+					response.statusText ||
+					'A fatal server error occurred. If this continues, please reach out to your administrator.',
+				detail: undefined,
 				errors: undefined,
 				type: 'ServerError',
 				stack: undefined,
