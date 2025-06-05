@@ -61,10 +61,6 @@ export class UmbPropertyEditorUIDropdownElement
 	@property({ type: String })
 	name?: string;
 
-	constructor() {
-		super();
-	}
-
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 

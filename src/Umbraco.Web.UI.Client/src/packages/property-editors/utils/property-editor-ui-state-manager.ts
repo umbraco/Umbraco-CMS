@@ -17,13 +17,30 @@ export interface UmbSelectableItem {
  * @param items - Array of items to update
  * @param selection - Array of selected values
  * @param stateProperty - Property name to update ('selected' or 'checked')
- * @returns New array with updated state
+ * @returns New array with updated state, or original array if no changes needed
  */
 export function updateItemsState<T extends UmbSelectableItem>(
 	items: T[],
 	selection: string[],
 	stateProperty: 'selected' | 'checked' = 'selected'
 ): T[] {
+	// Check if any state changes are needed to avoid unnecessary array allocations
+	let hasChanges = false;
+	for (const item of items) {
+		const shouldBeSelected = selection.includes(item.value);
+		const currentState = item[stateProperty] ?? false;
+		if (currentState !== shouldBeSelected) {
+			hasChanges = true;
+			break;
+		}
+	}
+
+	// Return original array if no changes needed
+	if (!hasChanges) {
+		return items;
+	}
+
+	// Only create new array if changes are needed
 	return items.map(item => ({
 		...item,
 		[stateProperty]: selection.includes(item.value)
