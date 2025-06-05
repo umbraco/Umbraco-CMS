@@ -14,15 +14,16 @@ export interface UmbSelectableItem {
 
 /**
  * Updates the selected state of items based on current selection
- * @param items - Array of items to update
- * @param selection - Array of selected values
- * @param stateProperty - Property name to update ('selected' or 'checked')
- * @returns New array with updated state, or original array if no changes needed
+ * @template T
+ * @param {T[]} items - Array of items to update
+ * @param {string[]} selection - Array of selected values
+ * @param {'selected' | 'checked'} stateProperty - Property name to update ('selected' or 'checked')
+ * @returns {T[]} New array with updated state, or original array if no changes needed
  */
 export function updateItemsState<T extends UmbSelectableItem>(
 	items: T[],
 	selection: string[],
-	stateProperty: 'selected' | 'checked' = 'selected'
+	stateProperty: 'selected' | 'checked' = 'selected',
 ): T[] {
 	// Check if any state changes are needed to avoid unnecessary array allocations
 	let hasChanges = false;
@@ -41,34 +42,39 @@ export function updateItemsState<T extends UmbSelectableItem>(
 	}
 
 	// Only create new array if changes are needed
-	return items.map(item => ({
+	return items.map((item) => ({
 		...item,
-		[stateProperty]: selection.includes(item.value)
+		[stateProperty]: selection.includes(item.value),
 	}));
 }
 
 /**
  * Mixin for property editor elements that need to update UI state
  * when values are set programmatically
+ * @template T
+ * @param {T} Base - The base class to extend
+ * @returns {T} Extended class with UI state management
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function UmbPropertyEditorUIStateMixin<T extends new (...args: any[]) => any>(Base: T) {
 	return class extends Base {
 		/**
 		 * Updates the UI state and triggers a re-render
-		 * @param updateFn - Function that updates the internal state
+		 * @param {() => void} updateFn - Function that updates the internal state
 		 */
 		protected updateUIState(updateFn: () => void): void {
 			updateFn();
-			this.requestUpdate();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(this as any).requestUpdate();
 		}
 	};
 }
 
 /**
  * Helper function to ensure a value is an array
- * @param value - Value to convert to array
- * @returns Array representation of the value
+ * @param {string | string[] | null | undefined} value - Value to convert to array
+ * @returns {string[]} Array representation of the value
  */
 export function ensureArray(value: string | string[] | null | undefined): string[] {
 	return Array.isArray(value) ? value : value ? [value] : [];
-} 
+}
