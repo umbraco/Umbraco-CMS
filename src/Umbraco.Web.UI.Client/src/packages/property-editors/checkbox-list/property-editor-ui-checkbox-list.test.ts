@@ -1,6 +1,15 @@
 import { UmbPropertyEditorUICheckboxListElement } from './property-editor-ui-checkbox-list.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { 
+	setupBasicStringConfig, 
+	setupObjectConfig, 
+	setupEmptyConfig,
+	getCheckboxListElement,
+	getCheckboxSelection,
+	verifyMultiSelectValueAndDOM,
+	MULTI_SELECT_TEST_DATA
+} from '../utils/property-editor-test-utils.js';
 
 describe('UmbPropertyEditorUICheckboxListElement', () => {
 	let element: UmbPropertyEditorUICheckboxListElement;
@@ -9,14 +18,9 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 		element = await fixture(html`<umb-property-editor-ui-checkbox-list></umb-property-editor-ui-checkbox-list>`);
 	});
 
-	// Helper function to reduce code duplication
-	function getCheckboxListInput() {
-		return element.shadowRoot?.querySelector('umb-input-checkbox-list');
-	}
-
-	// Helper function to get checked values from DOM
-	function getCheckedValues() {
-		const checkboxListInput = getCheckboxListInput();
+	// Local helper function to get checked values from DOM (specific to this component)
+	function getLocalCheckedValues() {
+		const checkboxListInput = getCheckboxListElement(element);
 		const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
 		const checkedValues: string[] = [];
 		
@@ -30,23 +34,11 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 		return checkedValues;
 	}
 
-	// Helper function to verify both selection and DOM state
-	function verifySelectionAndDOM(expectedSelection: string[], expectedChecked: string[]) {
-		const checkboxListInput = getCheckboxListInput();
+	// Local helper function to verify both selection and DOM state
+	function verifyLocalSelectionAndDOM(expectedSelection: string[], expectedChecked: string[]) {
+		const checkboxListInput = getCheckboxListElement(element);
 		expect(checkboxListInput?.selection).to.deep.equal(expectedSelection);
-		expect(getCheckedValues().sort()).to.deep.equal(expectedChecked.sort());
-	}
-
-	// Helper function to setup basic configuration
-	function setupBasicConfig() {
-		element.config = {
-			getValueByAlias: (alias: string) => {
-				if (alias === 'items') {
-					return ['Red', 'Green', 'Blue'];
-				}
-				return undefined;
-			}
-		} as any;
+		expect(getLocalCheckedValues().sort()).to.deep.equal(expectedChecked.sort());
 	}
 
 	it('is defined with its own instance', () => {
@@ -61,7 +53,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 
 	describe('programmatic value setting', () => {
 		beforeEach(async () => {
-			setupBasicConfig();
+			setupBasicStringConfig(element);
 			await element.updateComplete;
 		});
 
@@ -69,8 +61,8 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			element.value = ['Red', 'Blue'];
 			await element.updateComplete;
 
-			expect(getCheckboxListInput()).to.exist;
-			verifySelectionAndDOM(['Red', 'Blue'], ['Red', 'Blue']);
+			expect(getCheckboxListElement(element)).to.exist;
+			verifyLocalSelectionAndDOM(['Red', 'Blue'], ['Red', 'Blue']);
 		});
 
 		it('should update UI immediately when value is set to empty array', async () => {
@@ -82,21 +74,21 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			element.value = [];
 			await element.updateComplete;
 
-			verifySelectionAndDOM([], []);
+			verifyLocalSelectionAndDOM([], []);
 		});
 
 		it('should update UI immediately when value is set to single string', async () => {
 			element.value = 'Green';
 			await element.updateComplete;
 
-			verifySelectionAndDOM(['Green'], ['Green']);
+			verifyLocalSelectionAndDOM(['Green'], ['Green']);
 		});
 
 		it('should handle undefined value gracefully', async () => {
 			element.value = undefined;
 			await element.updateComplete;
 
-			verifySelectionAndDOM([], []);
+			verifyLocalSelectionAndDOM([], []);
 		});
 
 		it('should handle invalid values gracefully', async () => {
@@ -105,7 +97,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			await element.updateComplete;
 
 			// Should preserve all values in selection but only check valid ones in DOM
-			verifySelectionAndDOM(['Red', 'InvalidColor', 'Blue'], ['Red', 'Blue']);
+			verifyLocalSelectionAndDOM(['Red', 'InvalidColor', 'Blue'], ['Red', 'Blue']);
 		});
 
 		it('should maintain value consistency between getter and setter', async () => {
@@ -114,66 +106,39 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			await element.updateComplete;
 
 			expect(element.value).to.deep.equal(testValue);
-			verifySelectionAndDOM(testValue, testValue);
+			verifyLocalSelectionAndDOM(testValue, testValue);
 		});
 
 		it('should update multiple times correctly', async () => {
-			// Test data for multiple updates
-			const updates = [
-				{ value: ['Red'], expected: ['Red'] },
-				{ value: ['Green', 'Blue'], expected: ['Green', 'Blue'] },
-				{ value: [], expected: [] }
-			];
-
-			for (const update of updates) {
+			for (const update of MULTI_SELECT_TEST_DATA) {
 				element.value = update.value;
 				await element.updateComplete;
-				verifySelectionAndDOM(update.expected, update.expected);
+				verifyLocalSelectionAndDOM(update.expected, update.expected);
 			}
 		});
 	});
 
 	describe('configuration handling', () => {
 		it('should handle string array configuration', async () => {
-			element.config = {
-				getValueByAlias: (alias: string) => {
-					if (alias === 'items') {
-						return ['Option1', 'Option2', 'Option3'];
-					}
-					return undefined;
-				}
-			} as any;
+			setupBasicStringConfig(element, ['Option1', 'Option2', 'Option3']);
 			
 			element.value = ['Option1', 'Option3'];
 			await element.updateComplete;
 
-			verifySelectionAndDOM(['Option1', 'Option3'], ['Option1', 'Option3']);
+			verifyLocalSelectionAndDOM(['Option1', 'Option3'], ['Option1', 'Option3']);
 		});
 
 		it('should handle object array configuration', async () => {
-			element.config = {
-				getValueByAlias: (alias: string) => {
-					if (alias === 'items') {
-						return [
-							{ name: 'Red Color', value: 'red' },
-							{ name: 'Green Color', value: 'green' },
-							{ name: 'Blue Color', value: 'blue' }
-						];
-					}
-					return undefined;
-				}
-			} as any;
+			setupObjectConfig(element);
 			
 			element.value = ['red', 'blue'];
 			await element.updateComplete;
 
-			verifySelectionAndDOM(['red', 'blue'], ['red', 'blue']);
+			verifyLocalSelectionAndDOM(['red', 'blue'], ['red', 'blue']);
 		});
 
 		it('should handle empty configuration gracefully', async () => {
-			element.config = {
-				getValueByAlias: () => undefined
-			} as any;
+			setupEmptyConfig(element);
 			
 			element.value = ['test'];
 			await element.updateComplete;
@@ -182,7 +147,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 			expect(element.value).to.deep.equal(['test']);
 
 			// Should have no uui-checkboxes since configuration is empty
-			const checkboxListInput = getCheckboxListInput();
+			const checkboxListInput = getCheckboxListElement(element);
 			const checkboxElements = checkboxListInput?.shadowRoot?.querySelectorAll('uui-checkbox') || [];
 			expect(checkboxElements).to.have.length(0);
 		});

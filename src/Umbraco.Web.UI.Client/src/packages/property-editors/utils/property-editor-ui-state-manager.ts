@@ -25,10 +25,13 @@ export function updateItemsState<T extends UmbSelectableItem>(
 	selection: string[],
 	stateProperty: 'selected' | 'checked' = 'selected',
 ): T[] {
+	// Convert to Set for O(1) lookups instead of O(n) includes
+	const selectionSet = new Set(selection);
+	
 	// Check if any state changes are needed to avoid unnecessary array allocations
 	let hasChanges = false;
 	for (const item of items) {
-		const shouldBeSelected = selection.includes(item.value);
+		const shouldBeSelected = selectionSet.has(item.value);
 		const currentState = item[stateProperty] ?? false;
 		if (currentState !== shouldBeSelected) {
 			hasChanges = true;
@@ -44,7 +47,7 @@ export function updateItemsState<T extends UmbSelectableItem>(
 	// Only create new array if changes are needed
 	return items.map((item) => ({
 		...item,
-		[stateProperty]: selection.includes(item.value),
+		[stateProperty]: selectionSet.has(item.value),
 	}));
 }
 

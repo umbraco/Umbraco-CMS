@@ -1,6 +1,12 @@
 import { UmbPropertyEditorUIDropdownElement } from './property-editor-ui-dropdown.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { 
+	setupBasicStringConfig, 
+	setupObjectConfig, 
+	setupEmptyConfig,
+	MULTI_SELECT_TEST_DATA
+} from '../utils/property-editor-test-utils.js';
 
 describe('UmbPropertyEditorUIDropdownElement', () => {
 	let element: UmbPropertyEditorUIDropdownElement;
@@ -9,20 +15,18 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 		element = await fixture(html` <umb-property-editor-ui-dropdown></umb-property-editor-ui-dropdown> `);
 	});
 
-	// Helper function to reduce code duplication
-	function getDropdownInput() {
+	// Local helper functions to avoid conflicts with shared utilities
+	function getLocalDropdownInput() {
 		return element.shadowRoot?.querySelector('umb-input-dropdown-list');
 	}
 
-	// Helper function to get select element for multiple mode
-	function getSelectElement() {
+	function getNativeSelectElement() {
 		return element.shadowRoot?.querySelector('select');
 	}
 
-	// Helper function to get selected values from DOM
-	function getSelectedValues() {
-		const dropdownInput = getDropdownInput();
-		const selectElement = getSelectElement();
+	function getLocalSelectedValues() {
+		const dropdownInput = getLocalDropdownInput();
+		const selectElement = getNativeSelectElement();
 		
 		if (dropdownInput) {
 			// Single mode
@@ -36,14 +40,12 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 		return [];
 	}
 
-	// Helper function to verify both selection and DOM state
-	function verifySelectionAndDOM(expectedSelection: string[], expectedSelected: string[]) {
+	function verifyLocalSelectionAndDOM(expectedSelection: string[], expectedSelected: string[]) {
 		expect(element.value).to.deep.equal(expectedSelection);
-		expect(getSelectedValues().sort()).to.deep.equal(expectedSelected.sort());
+		expect(getLocalSelectedValues().sort()).to.deep.equal(expectedSelected.sort());
 	}
 
-	// Helper function to setup basic configuration
-	function setupBasicConfig(multiple = false) {
+	function setupBasicConfigWithMultiple(multiple = false) {
 		element.config = {
 			getValueByAlias: (alias: string) => {
 				if (alias === 'items') {
@@ -69,7 +71,7 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 
 	describe('programmatic value setting - single mode', () => {
 		beforeEach(async () => {
-			setupBasicConfig(false);
+			setupBasicConfigWithMultiple(false);
 			await element.updateComplete;
 		});
 
@@ -77,8 +79,8 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 			element.value = ['Red'];
 			await element.updateComplete;
 
-			expect(getDropdownInput()).to.exist;
-			verifySelectionAndDOM(['Red'], ['Red']);
+			expect(getLocalDropdownInput()).to.exist;
+			verifyLocalSelectionAndDOM(['Red'], ['Red']);
 		});
 
 		it('should update UI immediately when value is set to empty array', async () => {
@@ -90,21 +92,21 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 			element.value = [];
 			await element.updateComplete;
 
-			verifySelectionAndDOM([], []);
+			verifyLocalSelectionAndDOM([], []);
 		});
 
 		it('should update UI immediately when value is set to single string', async () => {
 			element.value = 'Blue';
 			await element.updateComplete;
 
-			verifySelectionAndDOM(['Blue'], ['Blue']);
+			verifyLocalSelectionAndDOM(['Blue'], ['Blue']);
 		});
 
 		it('should handle undefined value gracefully', async () => {
 			element.value = undefined;
 			await element.updateComplete;
 
-			verifySelectionAndDOM([], []);
+			verifyLocalSelectionAndDOM([], []);
 		});
 
 		it('should handle invalid values gracefully', async () => {
@@ -122,28 +124,21 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 			await element.updateComplete;
 
 			expect(element.value).to.deep.equal(testValue);
-			verifySelectionAndDOM(testValue, testValue);
+			verifyLocalSelectionAndDOM(testValue, testValue);
 		});
 
 		it('should update multiple times correctly', async () => {
-			// Test data for multiple updates
-			const updates = [
-				{ value: ['Red'], expected: ['Red'] },
-				{ value: ['Blue'], expected: ['Blue'] },
-				{ value: [], expected: [] }
-			];
-
-			for (const update of updates) {
+			for (const update of MULTI_SELECT_TEST_DATA) {
 				element.value = update.value;
 				await element.updateComplete;
-				verifySelectionAndDOM(update.expected, update.expected);
+				verifyLocalSelectionAndDOM(update.expected, update.expected);
 			}
 		});
 	});
 
 	describe('programmatic value setting - multiple mode', () => {
 		beforeEach(async () => {
-			setupBasicConfig(true);
+			setupBasicConfigWithMultiple(true);
 			await element.updateComplete;
 		});
 
@@ -151,8 +146,8 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 			element.value = ['Red', 'Blue'];
 			await element.updateComplete;
 
-			expect(getSelectElement()).to.exist;
-			verifySelectionAndDOM(['Red', 'Blue'], ['Red', 'Blue']);
+			expect(getNativeSelectElement()).to.exist;
+			verifyLocalSelectionAndDOM(['Red', 'Blue'], ['Red', 'Blue']);
 		});
 
 		it('should update UI immediately when value is set to empty array', async () => {
@@ -164,14 +159,14 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 			element.value = [];
 			await element.updateComplete;
 
-			verifySelectionAndDOM([], []);
+			verifyLocalSelectionAndDOM([], []);
 		});
 
 		it('should handle multiple selections correctly', async () => {
 			element.value = ['Red', 'Green', 'Blue'];
 			await element.updateComplete;
 
-			verifySelectionAndDOM(['Red', 'Green', 'Blue'], ['Red', 'Green', 'Blue']);
+			verifyLocalSelectionAndDOM(['Red', 'Green', 'Blue'], ['Red', 'Green', 'Blue']);
 		});
 
 		it('should handle invalid values gracefully', async () => {
@@ -201,7 +196,7 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 			element.value = ['Option1'];
 			await element.updateComplete;
 
-			verifySelectionAndDOM(['Option1'], ['Option1']);
+			verifyLocalSelectionAndDOM(['Option1'], ['Option1']);
 		});
 
 		it('should handle object array configuration', async () => {
@@ -224,7 +219,7 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 			element.value = ['red'];
 			await element.updateComplete;
 
-			verifySelectionAndDOM(['red'], ['red']);
+			verifyLocalSelectionAndDOM(['red'], ['red']);
 		});
 
 		it('should handle empty configuration gracefully', async () => {
@@ -241,19 +236,19 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 
 		it('should switch between single and multiple modes correctly', async () => {
 			// Start with single mode
-			setupBasicConfig(false);
+			setupBasicConfigWithMultiple(false);
 			element.value = ['Red'];
 			await element.updateComplete;
 
-			expect(getDropdownInput()).to.exist;
-			expect(getSelectElement()).to.not.exist;
+			expect(getLocalDropdownInput()).to.exist;
+			expect(getNativeSelectElement()).to.not.exist;
 
 			// Switch to multiple mode
-			setupBasicConfig(true);
+			setupBasicConfigWithMultiple(true);
 			await element.updateComplete;
 
-			expect(getDropdownInput()).to.not.exist;
-			expect(getSelectElement()).to.exist;
+			expect(getLocalDropdownInput()).to.not.exist;
+			expect(getNativeSelectElement()).to.exist;
 		});
 	});
 });
