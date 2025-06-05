@@ -20,6 +20,9 @@ const pending401Requests: Array<{
 	retries: number;
 }> = [];
 
+// Store non-GET requests that received a 401 response, to notify the user later
+const nonGet401Requests: Array<{ request: Request; requestConfig: RequestOptions }> = [];
+
 export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Binds the default interceptors to the client.
@@ -48,7 +51,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 				// Only retry for GET requests
 				if (request.method !== 'GET') {
-					// If it's not a GET request, we timeout and return the response
+					// Collect info for later notification
+					nonGet401Requests.push({ request, requestConfig });
+
+					// Show login overlay (only once per burst, as before)
 					authContext.timeOut();
 					return response;
 				}
@@ -124,6 +130,18 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					])
 						.then(() => {
 							console.log('[Interceptor] 401 Unauthorized - re-authentication completed');
+
+							// Notify about non-GET 401s after successful re-auth
+							if (nonGet401Requests.length > 0) {
+								this.#peekError(
+									'Some actions were not completed',
+									'Some actions could not be completed because your session expired. Please try again.',
+									null,
+									'warning',
+								);
+								nonGet401Requests.length = 0; // Clear after notifying
+							}
+
 							// On auth, retry all pending requests
 							const requests = pending401Requests.splice(0, pending401Requests.length);
 							requests.forEach((req) => {
@@ -139,6 +157,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 							// On timeout, reject all pending requests
 							const requests = pending401Requests.splice(0, pending401Requests.length);
 							requests.forEach((req) => req.reject(err));
+							nonGet401Requests.length = 0; // Clear on failure too
 						});
 				});
 			}
