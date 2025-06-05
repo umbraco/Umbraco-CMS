@@ -117,7 +117,7 @@ describe('UmbPropertyEditorUISelectElement', () => {
 			expect(element.value).to.equal('test');
 
 			// Should have no options since configuration is empty
-			const selectElement = getSelectElement(element);
+			const selectElement = getSelectElement(element) as { options?: HTMLOptionElement[] } | null;
 			expect(selectElement?.options).to.have.length(0);
 		});
 

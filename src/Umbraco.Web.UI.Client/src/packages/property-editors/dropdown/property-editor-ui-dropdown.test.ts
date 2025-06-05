@@ -29,8 +29,11 @@ describe('UmbPropertyEditorUIDropdownElement', () => {
 		const selectElement = getNativeSelectElement();
 		
 		if (dropdownInput) {
-			// Single mode
-			return dropdownInput.value ? [dropdownInput.value] : [];
+			// Single mode - the dropdown input value might be a string or comma-separated string
+			const value = dropdownInput.value;
+			if (!value) return [];
+			// Handle both single values and comma-separated values
+			return typeof value === 'string' ? value.split(', ').filter(v => v.length > 0) : [value];
 		} else if (selectElement) {
 			// Multiple mode
 			const selectedOptions = selectElement.selectedOptions;

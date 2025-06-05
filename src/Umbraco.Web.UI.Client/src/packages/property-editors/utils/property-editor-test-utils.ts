@@ -5,147 +5,151 @@ import { expect } from '@open-wc/testing';
  */
 
 /**
+ * Type definitions for better domain modeling
+ */
+export type PropertyEditorElement = { config?: unknown };
+export type ShadowDOMElement = { shadowRoot?: ShadowRoot | null };
+export type SingleSelectElement = { value: string } & ShadowDOMElement;
+export type MultiSelectElement = { value: string[] } & ShadowDOMElement;
+
+export interface ConfigItem {
+	name: string;
+	value: string;
+}
+
+export interface TestDataEntry<T> {
+	value: T;
+	expected: T;
+}
+
+export type ConfigAlias = 'items' | 'multiple';
+export type CSSSelector = 'uui-select' | 'umb-input-checkbox-list' | 'umb-input-dropdown-list';
+
+/**
  * Helper function to setup basic string array configuration
- * @param {{ config?: unknown }} element - The property editor element to configure
- * @param {unknown} element.config - Configuration object to set
+ * @param {PropertyEditorElement} element - The property editor element to configure
  * @param {string[]} items - Array of string items for configuration
  */
-export function setupBasicStringConfig(element: { config?: unknown }, items: string[] = ['Red', 'Green', 'Blue']) {
+export function setupBasicStringConfig(element: PropertyEditorElement, items: string[] = ['Red', 'Green', 'Blue']) {
 	element.config = {
-		getValueByAlias: (alias: string) => {
+		getValueByAlias: (alias: ConfigAlias) => {
 			if (alias === 'items') {
 				return items;
 			}
 			return undefined;
 		},
-	} as { getValueByAlias: (alias: string) => unknown };
+	} as { getValueByAlias: (alias: ConfigAlias) => unknown };
 }
 
 /**
  * Helper function to setup object array configuration
- * @param {{ config?: unknown }} element - The property editor element to configure
- * @param {unknown} element.config - Configuration object to set
- * @param {Array<{ name: string; value: string }>} items - Array of object items for configuration
+ * @param {PropertyEditorElement} element - The property editor element to configure
+ * @param {ConfigItem[]} items - Array of object items for configuration
  */
 export function setupObjectConfig(
-	element: { config?: unknown },
-	items: Array<{ name: string; value: string }> = [
+	element: PropertyEditorElement,
+	items: ConfigItem[] = [
 		{ name: 'Red Color', value: 'red' },
 		{ name: 'Green Color', value: 'green' },
 		{ name: 'Blue Color', value: 'blue' },
 	],
 ) {
 	element.config = {
-		getValueByAlias: (alias: string) => {
+		getValueByAlias: (alias: ConfigAlias) => {
 			if (alias === 'items') {
 				return items;
 			}
 			return undefined;
 		},
-	} as { getValueByAlias: (alias: string) => unknown };
+	} as { getValueByAlias: (alias: ConfigAlias) => unknown };
 }
 
 /**
  * Helper function to setup empty configuration
- * @param {{ config?: unknown }} element - The property editor element to configure
- * @param {unknown} element.config - Configuration object to set
+ * @param {PropertyEditorElement} element - The property editor element to configure
  */
-export function setupEmptyConfig(element: { config?: unknown }) {
+export function setupEmptyConfig(element: PropertyEditorElement) {
 	element.config = {
 		getValueByAlias: () => undefined,
-	} as { getValueByAlias: (alias: string) => unknown };
+	} as { getValueByAlias: (alias: ConfigAlias) => unknown };
 }
 
 /**
  * Helper function to get select element from shadow DOM
- * @param {{ shadowRoot?: ShadowRoot | null }} element - The property editor element
- * @param {ShadowRoot | null} element.shadowRoot - Shadow DOM root for querying
+ * @param {ShadowDOMElement} element - The property editor element
  * @returns {Element | null} The UUI select element or null
  */
-export function getSelectElement(element: { shadowRoot?: ShadowRoot | null }) {
-	return element.shadowRoot?.querySelector('uui-select');
+export function getSelectElement(element: ShadowDOMElement) {
+	return element.shadowRoot?.querySelector('uui-select' as CSSSelector);
 }
 
 /**
  * Helper function to get checkbox list element from shadow DOM
- * @param {{ shadowRoot?: ShadowRoot | null }} element - The property editor element
- * @param {ShadowRoot | null} element.shadowRoot - Shadow DOM root for querying
+ * @param {ShadowDOMElement} element - The property editor element
  * @returns {Element | null} The checkbox list element or null
  */
-export function getCheckboxListElement(element: { shadowRoot?: ShadowRoot | null }) {
-	return element.shadowRoot?.querySelector('umb-input-checkbox-list');
+export function getCheckboxListElement(element: ShadowDOMElement) {
+	return element.shadowRoot?.querySelector('umb-input-checkbox-list' as CSSSelector);
 }
 
 /**
  * Helper function to get dropdown element from shadow DOM
- * @param {{ shadowRoot?: ShadowRoot | null }} element - The property editor element
- * @param {ShadowRoot | null} element.shadowRoot - Shadow DOM root for querying
+ * @param {ShadowDOMElement} element - The property editor element
  * @returns {Element | null} The dropdown element or null
  */
-export function getDropdownElement(element: { shadowRoot?: ShadowRoot | null }) {
-	return element.shadowRoot?.querySelector('umb-input-dropdown-list');
+export function getDropdownElement(element: ShadowDOMElement) {
+	return element.shadowRoot?.querySelector('umb-input-dropdown-list' as CSSSelector);
 }
 
 /**
  * Helper function to get selected value from select DOM
- * @param {{ shadowRoot?: ShadowRoot | null }} element - The property editor element
- * @param {ShadowRoot | null} element.shadowRoot - Shadow DOM root for querying
+ * @param {ShadowDOMElement} element - The property editor element
  * @returns {string} The selected value string
  */
-export function getSelectedValue(element: { shadowRoot?: ShadowRoot | null }) {
-	const selectElement = getSelectElement(element);
+export function getSelectedValue(element: ShadowDOMElement): string {
+	const selectElement = getSelectElement(element) as { value?: string } | null;
 	return selectElement?.value || '';
 }
 
 /**
  * Helper function to get selection from checkbox list DOM
- * @param {{ shadowRoot?: ShadowRoot | null }} element - The property editor element
- * @param {ShadowRoot | null} element.shadowRoot - Shadow DOM root for querying
+ * @param {ShadowDOMElement} element - The property editor element
  * @returns {string[]} Array of selected values
  */
-export function getCheckboxSelection(element: { shadowRoot?: ShadowRoot | null }) {
-	const checkboxElement = getCheckboxListElement(element);
+export function getCheckboxSelection(element: ShadowDOMElement): string[] {
+	const checkboxElement = getCheckboxListElement(element) as { selection?: string[] } | null;
 	return checkboxElement?.selection || [];
 }
 
 /**
  * Helper function to get selection from dropdown DOM
- * @param {{ shadowRoot?: ShadowRoot | null }} element - The property editor element
- * @param {ShadowRoot | null} element.shadowRoot - Shadow DOM root for querying
+ * @param {ShadowDOMElement} element - The property editor element
  * @returns {string[]} Array of selected values
  */
-export function getDropdownSelection(element: { shadowRoot?: ShadowRoot | null }) {
+export function getDropdownSelection(element: ShadowDOMElement): string[] {
 	const dropdownElement = getDropdownElement(element) as { value?: string } | null;
 	return dropdownElement?.value ? dropdownElement.value.split(', ') : [];
 }
 
 /**
  * Helper function to verify both value and DOM state for single select
- * @param {{ value: string; shadowRoot?: ShadowRoot | null }} element - The property editor element
- * @param {string} element.value - Current value of the element
- * @param {ShadowRoot | null} element.shadowRoot - Shadow DOM root for querying
+ * @param {SingleSelectElement} element - The property editor element
  * @param {string} expectedValue - Expected element value
  * @param {string} expectedSelected - Expected selected value in DOM
  */
-export function verifySelectValueAndDOM(
-	element: { value: string; shadowRoot?: ShadowRoot | null },
-	expectedValue: string,
-	expectedSelected: string,
-) {
+export function verifySelectValueAndDOM(element: SingleSelectElement, expectedValue: string, expectedSelected: string) {
 	expect(element.value).to.equal(expectedValue);
 	expect(getSelectedValue(element)).to.equal(expectedSelected);
 }
 
 /**
  * Helper function to verify both value and DOM state for multi-select
- * @param {{ value: string[]; shadowRoot?: ShadowRoot | null }} element - The property editor element
- * @param {string[]} element.value - Current value array of the element
- * @param {ShadowRoot | null} element.shadowRoot - Shadow DOM root for querying
+ * @param {MultiSelectElement} element - The property editor element
  * @param {string[]} expectedValue - Expected element value array
  * @param {string[]} expectedSelection - Expected selection array in DOM
  */
 export function verifyMultiSelectValueAndDOM(
-	element: { value: string[]; shadowRoot?: ShadowRoot | null },
+	element: MultiSelectElement,
 	expectedValue: string[],
 	expectedSelection: string[],
 ) {
@@ -155,14 +159,12 @@ export function verifyMultiSelectValueAndDOM(
 
 /**
  * Helper function to verify both value and DOM state for dropdown
- * @param {{ value: string[]; shadowRoot?: ShadowRoot | null }} element - The property editor element
- * @param {string[]} element.value - Current value array of the element
- * @param {ShadowRoot | null} element.shadowRoot - Shadow DOM root for querying
+ * @param {MultiSelectElement} element - The property editor element
  * @param {string[]} expectedValue - Expected element value array
  * @param {string[]} expectedSelection - Expected selection array in DOM
  */
 export function verifyDropdownValueAndDOM(
-	element: { value: string[]; shadowRoot?: ShadowRoot | null },
+	element: MultiSelectElement,
 	expectedValue: string[],
 	expectedSelection: string[],
 ) {
@@ -173,14 +175,14 @@ export function verifyDropdownValueAndDOM(
 /**
  * Common test data for multiple updates
  */
-export const SINGLE_SELECT_TEST_DATA = [
+export const SINGLE_SELECT_TEST_DATA: TestDataEntry<string>[] = [
 	{ value: 'Red', expected: 'Red' },
 	{ value: 'Green', expected: 'Green' },
 	{ value: 'Blue', expected: 'Blue' },
 	{ value: '', expected: '' },
 ];
 
-export const MULTI_SELECT_TEST_DATA = [
+export const MULTI_SELECT_TEST_DATA: TestDataEntry<string[]>[] = [
 	{ value: ['Red'], expected: ['Red'] },
 	{ value: ['Red', 'Blue'], expected: ['Red', 'Blue'] },
 	{ value: ['Green'], expected: ['Green'] },

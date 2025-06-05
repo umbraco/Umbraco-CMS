@@ -36,7 +36,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 
 	// Local helper function to verify both selection and DOM state
 	function verifyLocalSelectionAndDOM(expectedSelection: string[], expectedChecked: string[]) {
-		const checkboxListInput = getCheckboxListElement(element);
+		const checkboxListInput = getCheckboxListElement(element) as { selection?: string[] } | null;
 		expect(checkboxListInput?.selection).to.deep.equal(expectedSelection);
 		expect(getLocalCheckedValues().sort()).to.deep.equal(expectedChecked.sort());
 	}
