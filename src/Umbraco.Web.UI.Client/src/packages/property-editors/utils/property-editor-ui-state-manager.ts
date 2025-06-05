@@ -65,7 +65,7 @@ export function UmbPropertyEditorUIStateMixin<T extends new (...args: any[]) => 
 		 * Updates the UI state and triggers a re-render
 		 * @param {() => void} updateFn - Function that updates the internal state
 		 */
-		protected updateUIState(updateFn: () => void): void {
+		updateUIState(updateFn: () => void): void {
 			updateFn();
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			(this as any).requestUpdate();
