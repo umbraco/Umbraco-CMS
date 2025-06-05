@@ -34,8 +34,7 @@ test('can create content configured as a collection', async ({umbracoApi, umbrac
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   await umbracoUi.content.isTabNameVisible('Collection');
   await umbracoUi.content.doesContentListHaveNoItemsInList();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
@@ -58,6 +57,7 @@ test('can create child content in a collection', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickSaveButton();
 
   // Assert
+  await umbracoUi.content.waitForContentToBeCreated();
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData.length).toBe(expectedNames.length);
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
@@ -90,6 +90,7 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
   await umbracoUi.content.clickSaveButton();
 
   // Assert
+  await umbracoUi.content.waitForContentToBeCreated();
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData.length).toBe(expectedNames.length);
   expect(childData[0].variants[0].name).toBe(firstChildContentName);
