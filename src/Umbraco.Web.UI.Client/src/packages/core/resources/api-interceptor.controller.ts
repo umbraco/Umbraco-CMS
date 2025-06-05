@@ -68,7 +68,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			});
 
 			const newResponse = new Response(JSON.stringify(error), {
-				...response,
+				status: response.status,
+				statusText: response.statusText,
 				headers: {
 					...Object.fromEntries(response.headers.entries()),
 					'Content-Type': 'application/json',
@@ -123,7 +124,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 						if (response) {
 							return new Response(body, {
-								...response,
+								status: response.status,
+								statusText: response.statusText,
 								headers: {
 									...Object.fromEntries(response.headers.entries()),
 									'Content-Type': 'application/json',
@@ -202,7 +204,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			});
 
 			const newResponse = new Response(JSON.stringify(error), {
-				...response,
+				status: response.status,
+				statusText: response.statusText,
 				headers: {
 					...Object.fromEntries(response.headers.entries()),
 					'Content-Type': 'application/json',
@@ -229,7 +232,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 			// Generate new response body with the generated resource, which is a guid
 			const newResponse = new Response(generatedResource, {
-				...response,
+				status: response.status,
+				statusText: response.statusText,
 				headers: {
 					...Object.fromEntries(response.headers.entries()),
 					'Content-Type': 'plain/text',
@@ -279,7 +283,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 			// Return the error response
 			return new Response(JSON.stringify(apiError), {
-				...response,
+				status: response.status,
+				statusText: response.statusText,
 				headers: {
 					...Object.fromEntries(response.headers.entries()),
 					'Content-Type': 'application/json',
