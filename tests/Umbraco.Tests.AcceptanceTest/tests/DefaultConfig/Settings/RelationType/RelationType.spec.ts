@@ -8,6 +8,10 @@ test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.relationType.goToSettingsTreeItem('Relations');
 });
 
+test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+});
+
 const relationTypes = [
   {name: 'Relate Document On Copy', parentType: 'Document', childType: 'Document', biDirectional: 'true', dependency: 'false'},
   {name: 'Relate Parent Document On Delete', parentType: 'Document', childType: 'Document', biDirectional: 'false', dependency: 'false'},
@@ -47,9 +51,6 @@ test('can see related document in relation type', async ({umbracoApi, umbracoUi}
 
   // Assert
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, contentToBePickedName);
-
-  // Clean
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test('can see related media in relation type', async ({umbracoApi, umbracoUi}) => {
@@ -73,7 +74,6 @@ test('can see related media in relation type', async ({umbracoApi, umbracoUi}) =
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaName);
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test('can see related member in relation type', async ({umbracoApi, umbracoUi}) => {
@@ -99,7 +99,6 @@ test('can see related member in relation type', async ({umbracoApi, umbracoUi}) 
 
   // Clean
   await umbracoApi.member.ensureNameNotExists(memberName);
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test('can not see relation after content with relation is deleted', async ({umbracoApi, umbracoUi}) => {
@@ -147,9 +146,6 @@ test('can not see relation after media with relation is deleted', async ({umbrac
   // Assert
   await umbracoUi.reloadPage();
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, mediaName, false);
-
-  // Clean
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 test('can not see relation after member with relation is deleted', async ({umbracoApi, umbracoUi}) => {
@@ -176,7 +172,4 @@ test('can not see relation after member with relation is deleted', async ({umbra
   // Assert
   await umbracoUi.reloadPage();
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, memberName, false);
-
-  // Clean
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
