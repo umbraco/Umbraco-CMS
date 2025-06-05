@@ -227,15 +227,15 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					this.#currentTabComponent = undefined;
 				},
 			});
+		} else {
+			routes.push({
+				path: `**`,
+				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+				setup: () => {
+					this.#currentTabComponent = undefined;
+				},
+			});
 		}
-
-		routes.push({
-			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-			setup: () => {
-				this.#currentTabComponent = undefined;
-			},
-		});
 
 		this._routes = routes;
 

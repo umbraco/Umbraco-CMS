@@ -70,7 +70,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			PartialViewService.getPartialViewByPath({ path: { path: encodeURIComponent(path) } }),
+			PartialViewService.getPartialViewByPath({ path: { path } }),
 		);
 
 		if (error || !data) {
@@ -100,7 +100,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const { error } = await tryExecute(
 			this.#host,
 			PartialViewService.putPartialViewByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 				body,
 			}),
 		);
@@ -121,7 +121,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		return tryExecute(
 			this.#host,
 			PartialViewService.deletePartialViewByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 			}),
 		);
 	}

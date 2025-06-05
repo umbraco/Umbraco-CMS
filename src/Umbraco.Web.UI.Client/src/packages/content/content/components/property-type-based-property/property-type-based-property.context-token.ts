@@ -10,5 +10,5 @@ export const UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT = new UmbContextToken<UmbP
  * This will be removed in v.18
  */
 export const UMB_CONTENT_PROPERTY_CONTEXT = new UmbContextToken<UmbPropertyTypeBasedPropertyContext>(
-	'UmbContentPropertyContext',
+	'UmbPropertyTypeBasedPropertyContext',
 );
