@@ -10,26 +10,37 @@ import type { RequestOptions, umbHttpClient } from '@umbraco-cms/backoffice/http
 const MAX_RETRIES = 3;
 const AUTH_WAIT_TIMEOUT = 120000; // 120 seconds
 
-// Store pending requests
-const pending401Requests: Array<{
-	request: Request;
-	requestConfig: RequestOptions;
-	retry: () => Promise<Response>;
-	resolve: (value: Response) => void;
-	reject: (reason?: unknown) => void;
-	retries: number;
-}> = [];
-
-// Store non-GET requests that received a 401 response, to notify the user later
-const nonGet401Requests: Array<{ request: Request; requestConfig: RequestOptions }> = [];
-
 export class UmbApiInterceptorController extends UmbControllerBase {
+	/**
+	 * Store pending requests that received a 401 response and are waiting for re-authentication.
+	 * This is used to retry the requests after re-authentication.
+	 */
+	#pending401Requests: Array<{
+		request: Request;
+		requestConfig: RequestOptions;
+		retry: () => Promise<Response>;
+		resolve: (value: Response) => void;
+		reject: (reason?: unknown) => void;
+		retries: number;
+	}> = [];
+
+	/**
+	 * Store non-GET requests that received a 401 response.
+	 * This is used to notify the user about actions that could not be completed due to session expiration.
+	 * These requests will not be retried, as they are not idempotent.
+	 * Instead, we will notify the user about these requests after re-authentication.
+	 */
+	#nonGet401Requests: Array<{ request: Request; requestConfig: RequestOptions }> = [];
+
 	/**
 	 * Binds the default interceptors to the client.
 	 * This includes the auth response interceptor, the error interceptor and the umb-notifications interceptor.
 	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 */
 	public bindDefaultInterceptors(client: typeof umbHttpClient) {
+		// Add default observables to the instance
+		this.observeNonGet401Requests();
+		// Add the default interceptors to the client
 		this.addAuthResponseInterceptor(client);
 		this.addForbiddenResponseInterceptor(client);
 		this.addUmbGeneratedResourceInterceptor(client);
@@ -52,7 +63,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				// Only retry for GET requests
 				if (request.method !== 'GET') {
 					// Collect info for later notification
-					nonGet401Requests.push({ request, requestConfig });
+					this.#nonGet401Requests.push({ request, requestConfig });
 
 					// Show login overlay (only once per burst, as before)
 					authContext.timeOut();
@@ -61,7 +72,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 				// Find if this request is already in the queue and increment retries
 				let retries = 1;
-				const existing = pending401Requests.find(
+				const existing = this.#pending401Requests.find(
 					(req) => req.request === request && req.requestConfig === requestConfig,
 				);
 				if (existing) {
@@ -75,9 +86,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				// Return a promise that will resolve when re-auth completes
 				return new Promise<Response>((resolve, reject) => {
 					// Before pushing to the queue
-					const wasQueueEmpty = pending401Requests.length === 0;
+					const wasQueueEmpty = this.#pending401Requests.length === 0;
 
-					pending401Requests.push({
+					this.#pending401Requests.push({
 						request,
 						requestConfig,
 						retry: async () => {
@@ -131,19 +142,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 						.then(() => {
 							console.log('[Interceptor] 401 Unauthorized - re-authentication completed');
 
-							// Notify about non-GET 401s after successful re-auth
-							if (nonGet401Requests.length > 0) {
-								this.#peekError(
-									'Some actions were not completed',
-									'Some actions could not be completed because your session expired. Please try again.',
-									null,
-									'warning',
-								);
-								nonGet401Requests.length = 0; // Clear after notifying
-							}
-
 							// On auth, retry all pending requests
-							const requests = pending401Requests.splice(0, pending401Requests.length);
+							const requests = this.#pending401Requests.splice(0, this.#pending401Requests.length);
 							requests.forEach((req) => {
 								console.log(
 									'[Interceptor] 401 Unauthorized - retrying request after re-authentication',
@@ -155,9 +155,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 						.catch((err) => {
 							console.error('[Interceptor] 401 Unauthorized - re-authentication failed', err);
 							// On timeout, reject all pending requests
-							const requests = pending401Requests.splice(0, pending401Requests.length);
+							const requests = this.#pending401Requests.splice(0, this.#pending401Requests.length);
 							requests.forEach((req) => req.reject(err));
-							nonGet401Requests.length = 0; // Clear on failure too
+							this.#nonGet401Requests.length = 0; // Clear on failure too
 						});
 				});
 			}
@@ -294,6 +294,34 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			}
 
 			return response;
+		});
+	}
+
+	/**
+	 * Listen for authorization signal to clear non-GET 401 requests
+	 */
+	observeNonGet401Requests() {
+		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
+			this.observe(
+				context?.authorizationSignal,
+				() => {
+					// Notify about non-GET 401s after successful re-auth
+					if (this.#nonGet401Requests.length > 0) {
+						const errors: Record<string, string> = {};
+						this.#nonGet401Requests.forEach((req) => {
+							errors[`${req.requestConfig.method} ${req.requestConfig.url}`] = `Request failed with 401 Unauthorized.`;
+						});
+						this.#peekError(
+							'Some actions were not completed',
+							'Some actions could not be completed because your session expired. Please try again.',
+							errors,
+							'warning',
+						);
+						this.#nonGet401Requests.length = 0; // Clear after notifying
+					}
+				},
+				'_authClearNonGet401Requests',
+			);
 		});
 	}
 
