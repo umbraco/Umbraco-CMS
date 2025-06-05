@@ -14,8 +14,8 @@ public static class ContentSettingsExtensions
     ///   <c>true</c> if the file extension is allowed for upload; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsFileAllowedForUpload(this ContentSettings contentSettings, string extension)
-        => contentSettings.AllowedUploadedFileExtensions.Any(x => x.InvariantEquals(extension)) ||
-        (contentSettings.AllowedUploadedFileExtensions.Any() == false && contentSettings.DisallowedUploadedFileExtensions.Any(x => x.InvariantEquals(extension)) == false);
+        => contentSettings.AllowedUploadedFileExtensions.Any(x => x.InvariantEquals(extension.Trim())) ||
+        (contentSettings.AllowedUploadedFileExtensions.Any() == false && contentSettings.DisallowedUploadedFileExtensions.Any(x => x.InvariantEquals(extension.Trim())) == false);
 
     /// <summary>
     /// Gets the auto-fill configuration for a specified property alias.

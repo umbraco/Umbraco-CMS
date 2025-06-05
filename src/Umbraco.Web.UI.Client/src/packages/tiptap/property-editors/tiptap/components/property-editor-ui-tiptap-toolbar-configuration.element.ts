@@ -278,6 +278,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		const forbidden = !this.#context?.isExtensionEnabled(item.alias);
 
 		switch (item.kind) {
+			case 'styleMenu':
 			case 'menu':
 				return html`
 					<uui-button
@@ -354,10 +355,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			uui-box {
 				[slot='header-actions'] {
 					margin-bottom: var(--uui-size-2);
-
-					uui-input {
-						align-items: baseline;
-					}
 
 					uui-icon {
 						color: var(--uui-color-border);

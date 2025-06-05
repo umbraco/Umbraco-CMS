@@ -39,7 +39,7 @@ export class UmbRenameStylesheetServerDataSource {
 		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.putStylesheetByPathRename({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 				body,
 			}),
 		);
