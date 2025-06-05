@@ -1,7 +1,7 @@
 import { extractUmbNotificationColor } from './extractUmbNotificationColor.function.js';
 import { isUmbNotifications, UMB_NOTIFICATION_HEADER } from './isUmbNotifications.function.js';
 import { isProblemDetailsLike } from './apiTypeValidators.function.js';
-import { UmbApiError } from './umb-error.js';
+import type { UmbProblemDetails } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
@@ -58,16 +58,17 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		client.interceptors.response.use(async (response, request, requestConfig): Promise<Response> => {
 			if (response.status !== 401) return response;
 
-			const error = new UmbApiError(response.statusText, response.status, request, {
+			// Build a plain ProblemDetails object for the response body
+			const problemDetails: UmbProblemDetails = {
 				status: response.status,
 				title: response.statusText,
 				detail: 'Unauthorized request, waiting for re-authentication.',
 				errors: undefined,
 				type: 'Unauthorized',
 				stack: undefined,
-			});
+			};
 
-			const newResponse = this.#createResponse(error, response);
+			const newResponse = this.#createResponse(problemDetails, response);
 
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
 			if (!authContext) throw new Error('Could not get the auth context');
@@ -107,7 +108,6 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 						const { data, response: retryResponse } = await client.request(requestConfig as never);
 
 						return this.#createResponse(data, retryResponse);
-						throw new Error('Response is not available for retry');
 					},
 					resolve,
 					reject,
@@ -132,7 +132,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				// Wait for auth signal or timeout
 				Promise.race([
 					firstValueFrom(authContext.authorizationSignal),
-					new Promise((_, rej) => setTimeout(() => rej(error), AUTH_WAIT_TIMEOUT)),
+					new Promise((_, rej) => setTimeout(() => rej(problemDetails), AUTH_WAIT_TIMEOUT)),
 				])
 					.then(() => {
 						console.log('[Interceptor] 401 Unauthorized - re-authentication completed');
@@ -164,10 +164,11 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * @internal
 	 */
 	addForbiddenResponseInterceptor(client: typeof umbHttpClient) {
-		client.interceptors.response.use((response, request): Response => {
+		client.interceptors.response.use((response): Response => {
 			if (response.status !== 403) return response;
 
-			const error = new UmbApiError(response.statusText, response.status, request, {
+			// Build a plain ProblemDetails object for the response body
+			const problemDetails: UmbProblemDetails = {
 				status: response.status,
 				title: response.statusText,
 				detail:
@@ -175,9 +176,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				errors: undefined,
 				type: 'Unauthorized',
 				stack: undefined,
-			});
+			};
 
-			return this.#createResponse(error, response);
+			return this.#createResponse(problemDetails, response);
 		});
 	}
 
@@ -205,21 +206,22 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * @internal
 	 */
 	addErrorInterceptor(client: typeof umbHttpClient) {
-		client.interceptors.response.use(async (response, request): Promise<Response> => {
+		client.interceptors.response.use(async (response): Promise<Response> => {
 			// If the response is ok, we just return the response
 			if (response.ok) return response;
 
 			// We will check if it is not a 401 error, as that is handled by the auth interceptor
 			if (response.status === 401) return response;
 
-			const apiError = new UmbApiError(response.statusText, response.status, request, {
+			// Build a plain ProblemDetails object for the response body
+			let problemDetails: UmbProblemDetails = {
 				status: response.status,
 				title: response.statusText,
 				detail: 'A fatal server error occurred. If this continues, please reach out to your administrator.',
 				errors: undefined,
 				type: 'ServerError',
 				stack: undefined,
-			});
+			};
 
 			try {
 				// Clones the response to read the body
@@ -228,15 +230,15 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 				// If there is JSON in the error, we will try to parse it as a ProblemDetails object
 				if (errorBody && isProblemDetailsLike(errorBody)) {
-					// Set the problem details on the apiError
-					apiError.problemDetails = errorBody;
+					// Merge the parsed problem details into our default
+					problemDetails = errorBody;
 				}
 			} catch (e) {
 				// Ignore JSON parse error
 				console.error('[Interceptor] Caught a 500 Error, but failed parsing error body (expected JSON)', e);
 			}
 
-			return this.#createResponse(apiError, response);
+			return this.#createResponse(problemDetails, response);
 		});
 	}
 
@@ -331,6 +333,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		});
 	}
 
+	/**
+	 * Helper to show a notification error.
+	 */
 	async #peekError(headline: string, message: string, details: unknown, color?: UmbNotificationColor) {
 		// Store the host for usage in the following async context
 		const host = this._host;
