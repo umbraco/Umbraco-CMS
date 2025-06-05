@@ -617,7 +617,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     }
 
     [HttpGet]
-    public UrlAndAnchors GetUrlAndAnchors(int id, string? culture = "*")
+    public UrlAndAnchors GetUrlAndAnchors(int id, string? culture = null)
     {
         culture ??= ClientCulture();
 
