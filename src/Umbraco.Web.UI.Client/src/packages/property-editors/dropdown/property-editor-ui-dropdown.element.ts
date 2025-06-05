@@ -126,8 +126,8 @@ export class UmbPropertyEditorUIDropdownElement
 	 * This fixes the issue where UI doesn't update when values are set programmatically.
 	 */
 	#updateSelectedState() {
-		// Only update if we have options loaded and a valid selection
-		if (this._options.length > 0 && this.#selection) {
+		// Only update if we have options loaded
+		if (this._options.length > 0) {
 			// Create a new array to trigger state change detection
 			this._options = updateItemsState(this._options, this.#selection, 'selected');
 			// Trigger a re-render
