@@ -203,6 +203,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			// Generate new response body with the generated resource, which is a guid
 			const newResponse = new Response(generatedResource, {
 				...response,
+				headers: {
+					...Object.fromEntries(response.headers.entries()),
+					'Content-Type': 'plain/text',
+				},
 			});
 
 			return newResponse;
