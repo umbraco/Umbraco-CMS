@@ -7,15 +7,15 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["UmbracoProject/UmbracoProject.csproj", "UmbracoProject/"]
-RUN dotnet restore "UmbracoProject/UmbracoProject.csproj"
+COPY ["Umbraco.Web.UI/Umbraco.Web.UI.csproj", "Umbraco.Web.UI/"]
+RUN dotnet restore "Umbraco.Web.UI/Umbraco.Web.UI.csproj"
 COPY . .
-WORKDIR "/src/UmbracoProject"
-RUN dotnet build "UmbracoProject.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Umbraco.Web.UI"
+RUN dotnet build "Umbraco.Web.UI.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "UmbracoProject.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Umbraco.Web.UI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
@@ -30,4 +30,4 @@ RUN chown $APP_UID umbraco --recursive
 RUN chown $APP_UID wwwroot/umbraco --recursive
 #endif
 USER $APP_UID
-ENTRYPOINT ["dotnet", "UmbracoProject.dll"]
+ENTRYPOINT ["dotnet", "Umbraco.Web.UI.dll"]

@@ -15,7 +15,7 @@
     "language": "C#",
     "type": "project"
   },
-  "sourceName": "UmbracoProject",
+  "sourceName": "Umbraco.Web.UI",
   "defaultName": "UmbracoProject1",
   "preferNameDirectory": true,
   "additionalConfigFiles": [ "starterkits.template.json"],
@@ -393,7 +393,7 @@
       "parameters": {
         "fallback": 5000
       },
-      "replaces": "HTTP_PORT_FROM_TEMPLATE"
+      "replaces": "11000"
     },
     "HttpsPort": {
       "type": "generated",
@@ -403,7 +403,7 @@
         "high": 44399,
         "fallback": 5001
       },
-      "replaces": "HTTPS_PORT_FROM_TEMPLATE"
+      "replaces": "44339"
     },
     "TelemetryId": {
       "type": "generated",

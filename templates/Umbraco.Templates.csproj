@@ -42,25 +42,16 @@
   </Target>
 
   <ItemGroup>
-    <Content Include="..\src\Umbraco.Web.UI\Program.cs">
-      <Link>UmbracoProject\Program.cs</Link>
+    <!-- Include files that are template specific -->
+    <Content Include="UmbracoProject\**" Exclude="bin;obj" />
+    <Content
+      Include="..\src\Umbraco.Web.UI\**\*.*"
+      Exclude="**\bin\**;**\obj\**;**\Composers\**;**\umbraco\**;**\appsettings*.json;**\*-schema.json;**\.gitignore">
+      <LinkBase>UmbracoProject</LinkBase>
       <PackagePath>UmbracoProject</PackagePath>
     </Content>
-    <Content Include="UmbracoProject\**" Exclude="bin;obj" />
     <Content Include="UmbracoExtension\**" Exclude="bin;obj" />
     <Content Include="UmbracoDockerCompose\**" Exclude="bin;obj" />
-    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
-      <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
-    </Content>
-    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blockgrid\**">
-      <Link>UmbracoProject\Views\Partials\blockgrid\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
-    </Content>
-    <Content Include="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml">
-      <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
-      <PackagePath>UmbracoProject\Views</PackagePath>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>

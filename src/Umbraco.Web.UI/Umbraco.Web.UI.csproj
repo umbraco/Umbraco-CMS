@@ -1,25 +1,65 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!--#if (AuthoringMode)-->
   <PropertyGroup>
-    <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
+    <!-- Disable CPM for authoring mode, as it won't be used in the generated projects and would increase complexity -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <!-- TODO: Fix and remove overrides: [SA1119] Correct unnecessary parenthesis -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1119</WarningsNotAsErrors>
+  </PropertyGroup>
+  <!--#endif-->
+
+  <PropertyGroup>
+    <TargetFramework Condition="'$(DotnetVersion)' != ''">DOTNET_VERSION_FROM_TEMPLATE</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace Condition="'$(name)' == ''or '$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">Umbraco.Cms.Web.UI</RootNamespace>
     <IsPackable>false</IsPackable>
-    <EnablePackageValidation>false</EnablePackageValidation>
-    <!-- Disable compression for static files, because MapStaticAssets() is not used anyway (yet) -->
+    <!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
     <CompressionEnabled>false</CompressionEnabled>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!--#if (UmbracoVersion != "null")
+    <PackageReference Include="Umbraco.Cms" Version="CUSTOM_VERSION" />
+    #else
+    <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
+    #endif-->
+    <!--#if (StarterKit != "None")
+    <PackageReference Include="STARTER_KIT_NAME" Version="STARTER_KIT_VERSION"/>
+    #endif -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+  </ItemGroup>
+
   <PropertyGroup>
-    <!--
-      TODO: Fix and remove overrides:
-      [SA1119] Correct unnecessary parenthesis
-    -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1119</WarningsNotAsErrors>
+    <!-- Razor files are needed for the backoffice to work correctly -->
+    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
-  
-  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
-  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
+
+  <!--#if (ModelsBuilderMode == "InMemoryAuto" || (DevelopmentMode == "BackofficeDevelopment" && ModelsBuilderMode == "Default")) -->
+  <PropertyGroup>
+    <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+  </PropertyGroup>
+  <!--#endif -->
+
+  <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\buildTransitive\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" Condition="'$(PackageProjectName)' != ''" />
+  <ItemGroup Condition="'$(PackageProjectName)' != ''">
+    <ProjectReference Include="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.csproj" />
+  </ItemGroup>
+
+  <!--#if (AuthoringMode)-->
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
   </ItemGroup>
+
+  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
+  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
 
   <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
@@ -36,30 +76,6 @@
     <Content Update="$(NuGetPackageRoot)\microsoft.codeanalysis.workspaces.msbuild\**\**" Visible="false" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Ensure the AppLocalIcu setting is the same as the referenced ICU package version and changes are also done to the template project! -->
-    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" VersionOverride="72.1.0.3" />
-    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
-  </ItemGroup>
-
-  <PropertyGroup>
-    <!-- Razor files are needed for the backoffice to work correctly -->
-    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
-    <RazorCompileOnBuild>false</RazorCompileOnBuild>
-    <RazorCompileOnPublish>false</RazorCompileOnPublish>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoInstall\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoLogin\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="umbraco\UmbracoBackOffice\Default.cshtml" />
-  </ItemGroup>
-
   <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">
     <Message Text="Copying appsettings.template.json to appsettings.json because it doesn't exist" Importance="high" />
     <Copy SourceFiles="appsettings.template.json" DestinationFiles="appsettings.json" />
@@ -69,4 +85,5 @@
     <Message Text="Copying appsettings.Development.template.json to appsettings.Development.json because it doesn't exist" Importance="high" />
     <Copy SourceFiles="appsettings.Development.template.json" DestinationFiles="appsettings.Development.json" />
   </Target>
+  <!--#endif-->
 </Project>
