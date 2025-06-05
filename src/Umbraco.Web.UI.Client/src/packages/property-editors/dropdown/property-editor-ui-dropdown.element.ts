@@ -128,10 +128,13 @@ export class UmbPropertyEditorUIDropdownElement
 	#updateSelectedState() {
 		// Only update if we have options loaded
 		if (this._options.length > 0) {
-			// Create a new array to trigger state change detection
-			this._options = updateItemsState(this._options, this.#selection, 'selected');
-			// Trigger a re-render
-			this.requestUpdate();
+			// Update state only if changes are needed
+			const updatedOptions = updateItemsState(this._options, this.#selection, 'selected');
+			if (updatedOptions !== this._options) {
+				this._options = updatedOptions;
+				// Trigger a re-render only when state actually changed
+				this.requestUpdate();
+			}
 		}
 	}
 

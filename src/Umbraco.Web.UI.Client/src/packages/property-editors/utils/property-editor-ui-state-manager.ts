@@ -51,27 +51,7 @@ export function updateItemsState<T extends UmbSelectableItem>(
 	}));
 }
 
-/**
- * Mixin for property editor elements that need to update UI state
- * when values are set programmatically
- * @template T
- * @param {T} Base - The base class to extend
- * @returns {T} Extended class with UI state management
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function UmbPropertyEditorUIStateMixin<T extends new (...args: any[]) => any>(Base: T) {
-	return class extends Base {
-		/**
-		 * Updates the UI state and triggers a re-render
-		 * @param {() => void} updateFn - Function that updates the internal state
-		 */
-		updateUIState(updateFn: () => void): void {
-			updateFn();
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			(this as any).requestUpdate();
-		}
-	};
-}
+
 
 /**
  * Helper function to ensure a value is an array
