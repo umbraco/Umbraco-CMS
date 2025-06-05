@@ -211,8 +211,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			// If the response is ok, we just return the response
 			if (response.ok) return response;
 
-			// We will check if it is not a 401 error, as that is handled by the auth interceptor
-			if (response.status === 401) return response;
+			// We will check if it is not a 401 or 403 error, as that is handled by other interceptors
+			if (response.status === 401 || response.status === 403) return response;
 
 			// Build a plain ProblemDetails object for the response body
 			let problemDetails: UmbProblemDetails = {
