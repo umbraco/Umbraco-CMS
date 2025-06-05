@@ -24,8 +24,7 @@ test('can create a template', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.waitForTemplateToBeCreated();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeTruthy();
   await umbracoUi.template.isTemplateRootTreeItemVisible(templateName);
 });
@@ -44,8 +43,7 @@ test('can update content of a template', {tag: '@smoke'}, async ({umbracoApi, um
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   // Checks if the template was updated
   const updatedTemplate = await umbracoApi.template.getByName(templateName);
   expect(updatedTemplate.content).toBe(updatedTemplateContent);
@@ -65,8 +63,7 @@ test('can rename a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.get(templateId);
   expect(templateData.name).toBe(templateName);
 });
@@ -82,8 +79,7 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.clickDeleteAndConfirmButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.waitForTemplateToBeDeleted();
   await umbracoUi.template.reloadTemplateTree();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
   await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false, false);
@@ -104,8 +100,7 @@ test('can set a template as master template', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   await umbracoUi.template.isMasterTemplateNameVisible(templateName);
   // Checks if the childTemplate has the masterTemplate set
   const childTemplateData = await umbracoApi.template.getByName(childTemplateName);
@@ -132,8 +127,7 @@ test('can remove a master template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   await umbracoUi.template.isMasterTemplateNameVisible('No master');
   const childTemplate = await umbracoApi.template.getByName(childTemplateName);
   expect(childTemplate.masterTemplate).toBe(null);
@@ -176,8 +170,7 @@ test.skip('can use query builder with Order By statement for a template', async 
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(expectedTemplateContent);
 });
@@ -217,8 +210,7 @@ test.fixme('can use query builder with Where statement for a template', async ({
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(expectedTemplateContent);
 });
@@ -236,8 +228,7 @@ test('can insert sections - render child template into a template', async ({umbr
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 });
@@ -256,8 +247,7 @@ test('can insert sections - render a named section into a template', async ({umb
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 });
@@ -276,8 +266,7 @@ test('can insert sections - define a named section into a template', async ({umb
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.isSuccessNotificationVisible();
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 });
@@ -296,8 +285,7 @@ test('can insert dictionary item into a template', async ({umbracoApi, umbracoUi
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 
@@ -320,8 +308,7 @@ test('can insert partial view into a template', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 });
@@ -338,8 +325,7 @@ test('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  //await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.template.isErrorNotificationVisible(false);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 });
@@ -382,8 +368,6 @@ test('cannot create a template with an empty name', {tag: '@smoke'}, async ({umb
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  // await umbracoUi.template.isErrorNotificationVisible();
-  // TODO: Uncomment this when the front-end updates the error message
-  //await umbracoUi.template.doesErrorNotificationHaveText(NotificationConstantHelper.error.emptyName);
+  await umbracoUi.template.isFailedStateButtonVisible();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
 });
