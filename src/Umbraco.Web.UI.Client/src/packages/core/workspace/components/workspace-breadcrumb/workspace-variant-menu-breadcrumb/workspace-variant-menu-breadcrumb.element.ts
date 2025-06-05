@@ -58,10 +58,12 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	#observeStructure() {
 		if (!this.#structureContext || !this.#workspaceContext) return;
-		const isNew = this.#workspaceContext.getIsNew();
 
 		this.observe(this.#structureContext.structure, (value) => {
-			this._structure = isNew ? value : value.slice(0, -1);
+			if (!this.#workspaceContext) return;
+			const unique = this.#workspaceContext.getUnique();
+			// exclude the current unique from the structure. We append this with an observer of the name
+			this._structure = value.filter((structureItem) => structureItem.unique !== unique);
 		});
 	}
 
