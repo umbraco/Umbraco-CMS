@@ -67,16 +67,8 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				stack: undefined,
 			});
 
-			const newResponse = new Response(JSON.stringify(error), {
-				status: response.status,
-				statusText: response.statusText,
-				headers: {
-					...Object.fromEntries(response.headers.entries()),
-					'Content-Type': 'application/json',
-				},
-			});
+			const newResponse = this.#createResponse(error, response);
 
-			// See if we can get the UmbAuthContext and let it know the user is timed out
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
 			if (!authContext) throw new Error('Could not get the auth context');
 
@@ -112,27 +104,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					request,
 					requestConfig,
 					retry: async () => {
-						const { data, response } = await client.request(requestConfig as never);
+						const { data, response: retryResponse } = await client.request(requestConfig as never);
 
-						// Manually create a new response object with the data because the original response has been read
-						let body: string;
-						if (typeof data === 'string') {
-							body = data;
-						} else {
-							body = JSON.stringify(data);
-						}
-
-						if (response) {
-							return new Response(body, {
-								status: response.status,
-								statusText: response.statusText,
-								headers: {
-									...Object.fromEntries(response.headers.entries()),
-									'Content-Type': 'application/json',
-								},
-							});
-						}
-
+						return this.#createResponse(data, retryResponse);
 						throw new Error('Response is not available for retry');
 					},
 					resolve,
@@ -203,16 +177,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				stack: undefined,
 			});
 
-			const newResponse = new Response(JSON.stringify(error), {
-				status: response.status,
-				statusText: response.statusText,
-				headers: {
-					...Object.fromEntries(response.headers.entries()),
-					'Content-Type': 'application/json',
-				},
-			});
-
-			return newResponse;
+			return this.#createResponse(error, response);
 		});
 	}
 
@@ -230,17 +195,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				return response;
 			}
 
-			// Generate new response body with the generated resource, which is a guid
-			const newResponse = new Response(generatedResource, {
-				status: response.status,
-				statusText: response.statusText,
-				headers: {
-					...Object.fromEntries(response.headers.entries()),
-					'Content-Type': 'plain/text',
-				},
-			});
-
-			return newResponse;
+			return this.#createResponse(generatedResource, response);
 		});
 	}
 
@@ -281,15 +236,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				console.error('[Interceptor] Caught a 500 Error, but failed parsing error body (expected JSON)', e);
 			}
 
-			// Return the error response
-			return new Response(JSON.stringify(apiError), {
-				status: response.status,
-				statusText: response.statusText,
-				headers: {
-					...Object.fromEntries(response.headers.entries()),
-					'Content-Type': 'application/json',
-				},
-			});
+			return this.#createResponse(apiError, response);
 		});
 	}
 
@@ -329,6 +276,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 	/**
 	 * Listen for authorization signal to clear non-GET 401 requests
+	 * @internal
 	 */
 	observeNonGet401Requests() {
 		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
@@ -352,6 +300,34 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				},
 				'_authClearNonGet401Requests',
 			);
+		});
+	}
+
+	/**
+	 * Helper to create a new Response with correct Content-Type.
+	 * @param {unknown} body The body of the response, can be a string or an object.
+	 * @param {Response} originalResponse The original response to copy status and headers from.
+	 * @param {number} [statusOverride] Optional status override for the response.
+	 * @param {string} [statusTextOverride] Optional status text override for the response.
+	 * @returns {Response} The new Response object with the correct Content-Type and body.
+	 */
+	#createResponse(
+		body: unknown,
+		originalResponse: Response,
+		statusOverride?: number,
+		statusTextOverride?: string,
+	): Response {
+		const isString = typeof body === 'string';
+		const contentType = isString ? 'text/plain' : 'application/json';
+		const responseBody = isString ? body : JSON.stringify(body);
+
+		return new Response(responseBody, {
+			status: statusOverride ?? originalResponse.status,
+			statusText: statusTextOverride ?? originalResponse.statusText,
+			headers: {
+				...Object.fromEntries(originalResponse.headers.entries()),
+				'Content-Type': contentType,
+			},
 		});
 	}
 
