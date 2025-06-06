@@ -13,6 +13,7 @@ import {
 	switchMap,
 	distinctUntilChanged,
 	throttleTime,
+	auditTime,
 } from '@umbraco-cms/backoffice/external/rxjs';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -49,8 +50,9 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @remark It will emit once per second, so it can be used to trigger UI updates or other actions when the user has timed out.
 	 */
 	readonly timeoutSignal = this.#isTimeout.asObservable().pipe(
-		// Throttle the timeout signal to ensure that it emits once, then waits for 1s before allowing another emission.
-		throttleTime(1000),
+		// Audit the timeout signal to ensure that it waits for 1s before allowing another emission, which prevents rapid firing of the signal.
+		// This is useful to prevent the UI from being flooded with timeout events.
+		auditTime(1000),
 	);
 
 	/**

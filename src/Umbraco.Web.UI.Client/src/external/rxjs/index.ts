@@ -23,4 +23,5 @@ export {
 	tap,
 	delay,
 	throttleTime,
+	auditTime,
 } from 'rxjs';
