@@ -8,8 +8,10 @@ const englishUk: ManifestLocalization = {
 	type: 'localization',
 	alias: 'test.en',
 	name: 'Test English (UK)',
+	weight: 100,
 	meta: {
 		culture: 'en',
+		direction: 'ltr',
 		localizations: {
 			general: {
 				color: 'Colour',
@@ -22,6 +24,7 @@ const english: ManifestLocalization = {
 	type: 'localization',
 	alias: 'test.en-us',
 	name: 'Test English (US)',
+	weight: 100,
 	meta: {
 		culture: 'en-us',
 		direction: 'ltr',
@@ -46,14 +49,41 @@ const englishOverride: ManifestLocalization = {
 	type: 'localization',
 	alias: 'test.en.override',
 	name: 'Test English',
+	weight: 0,
 	meta: {
 		culture: 'en-us',
 		localizations: {
 			general: {
 				close: 'Close 2',
+				overridden: 'Overridden',
 			},
 		},
 	},
+};
+
+// This is a factory function that returns the localization object.
+const englishAsyncFactory = async () => {
+	await aTimeout(100); // Simulate async loading
+	return {
+		// Simulate a JS module that exports a localization object.
+		default: {
+			general: {
+				close: 'Close Async',
+				overridden: 'Overridden Async',
+			},
+		},
+	};
+};
+
+const englishAsyncOverride: ManifestLocalization = {
+	type: 'localization',
+	alias: 'test.en.async-override',
+	name: 'Test English Async Override',
+	weight: -100,
+	meta: {
+		culture: 'en-us',
+	},
+	js: englishAsyncFactory,
 };
 
 const danish: ManifestLocalization = {
@@ -87,10 +117,7 @@ const danishRegional: ManifestLocalization = {
 //#endregion
 
 describe('UmbLocalizeController', () => {
-	umbExtensionsRegistry.register(englishUk);
-	umbExtensionsRegistry.register(english);
-	umbExtensionsRegistry.register(danish);
-	umbExtensionsRegistry.register(danishRegional);
+	umbExtensionsRegistry.registerMany([englishUk, english, danish, danishRegional]);
 
 	let registry: UmbLocalizationRegistry;
 
@@ -102,6 +129,16 @@ describe('UmbLocalizeController', () => {
 
 	afterEach(() => {
 		registry.localizations.clear();
+		registry.destroy();
+	});
+
+	it('should register into the localization manager', async () => {
+		expect(registry.localizations.size).to.equal(2, 'Should have registered the 2 original iso codes (en, en-us)');
+
+		// Register an additional language to test the registry.
+		registry.loadLanguage(danish.meta.culture);
+		await aTimeout(0);
+		expect(registry.localizations.size).to.equal(3, 'Should have registered the 3rd language (da)');
 	});
 
 	it('should set the document language and direction', async () => {
@@ -122,9 +159,48 @@ describe('UmbLocalizeController', () => {
 
 		await aTimeout(0);
 
-		const current = registry.localizations.get(english.meta.culture);
-		expect(current).to.have.property('general_close', 'Close 2');
-		expect(current).to.have.property('general_logout', 'Log out');
+		const current = registry.localizations.get(englishOverride.meta.culture);
+		expect(current).to.have.property(
+			'general_close',
+			'Close 2',
+			'Should have overridden the close (from first language)',
+		);
+		expect(current).to.have.property('general_logout', 'Log out', 'Should not have overridden the logout');
+
+		umbExtensionsRegistry.unregister(englishOverride.alias);
+	});
+
+	it('should load translations based on weight (lowest weight overrides)', async () => {
+		// set weight to 200, so it will not override the existing translation
+		const englishOverrideLowWeight = { ...englishOverride, weight: 200 } satisfies ManifestLocalization;
+		umbExtensionsRegistry.register(englishOverrideLowWeight);
+		await aTimeout(0);
+
+		let current = registry.localizations.get(englishOverrideLowWeight.meta.culture);
+		expect(current).to.have.property(
+			'general_close',
+			'Close',
+			'Should not have overridden the close (from first language)',
+		);
+		expect(current).to.have.property('general_overridden', 'Overridden', 'Should be able to register its own keys');
+
+		// Now register a new async override with a lower weight
+		umbExtensionsRegistry.register(englishAsyncOverride);
+		await aTimeout(200); // Wait for the async override to load
+		current = registry.localizations.get(englishOverrideLowWeight.meta.culture);
+		expect(current).to.have.property(
+			'general_close',
+			'Close Async',
+			'(async) Should have overridden the close (from first language)',
+		);
+		expect(current).to.have.property(
+			'general_overridden',
+			'Overridden Async',
+			'(async) Should have overridden the overridden',
+		);
+
+		umbExtensionsRegistry.unregister(englishOverrideLowWeight.alias);
+		umbExtensionsRegistry.unregister(englishAsyncOverride.alias);
 	});
 
 	it('should be able to switch to the fallback language', async () => {

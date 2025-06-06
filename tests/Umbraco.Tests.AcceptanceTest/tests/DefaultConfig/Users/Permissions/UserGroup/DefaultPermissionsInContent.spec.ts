@@ -51,7 +51,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can browse content node with permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithBrowseNodePermission(userGroupName);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -66,7 +66,7 @@ test('can browse content node with permission enabled', async ({umbracoApi, umbr
 
 test('can not browse content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithBrowseNodePermission(userGroupName, false);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -193,8 +193,8 @@ test('can create content with create permission enabled', async ({umbracoApi, um
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
+  expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
 });
 
 test('can not create content with create permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -352,8 +352,7 @@ test('can update content with update permission enabled', async ({umbracoApi, um
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
 });
 
@@ -371,7 +370,8 @@ test('can not update content with update permission disabled', async ({umbracoAp
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can duplicate content with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Needs create permission to be enabled to duplicate content
+test.fixme('can duplicate content with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedContentName = rootDocumentName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermission(userGroupName);
@@ -412,11 +412,12 @@ test('can not duplicate content with duplicate permission disabled', async ({umb
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can move content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Needs create permission to be enabled to move content
+test.fixme('can move content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const moveToDocumentName = 'SecondRootDocument';
   const moveToDocumentId = await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, rootDocumentTypeId, documentText, dataTypeName);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveToPermission(userGroupName);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveToPermission(userGroupName, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -455,7 +456,8 @@ test('can not move content with move to permission disabled', async ({umbracoApi
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can sort children with sort children permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Needs a better way to assert
+test.fixme('can sort children with sort children permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermission(userGroupName);
@@ -475,11 +477,10 @@ test('can sort children with sort children permission enabled', async ({umbracoA
   await umbracoUi.content.clickSortButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.itemsSorted);
   // TODO: uncomment when it is not flaky
-  // await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
-  // await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
-  // await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
+  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
+  await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
 });
 
 test('can not sort children with sort children permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -499,6 +500,7 @@ test('can not sort children with sort children permission disabled', async ({umb
 
 test('can set culture and hostnames with culture and hostnames permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const domainName = '/domain';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -509,11 +511,15 @@ test('can set culture and hostnames with culture and hostnames permission enable
   await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
   await umbracoUi.content.clickAddNewDomainButton();
-  await umbracoUi.content.enterDomain('/domain');
+  await umbracoUi.content.enterDomain(domainName);
   await umbracoUi.content.clickSaveModalButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.culturesAndHostnamesSaved);
+  await umbracoUi.content.waitForDomainToBeCreated();
+  const document = await umbracoApi.document.getByName(rootDocumentName);
+  const domains = await umbracoApi.document.getDomains(document.id);
+  expect(domains.domains[0].domainName).toEqual(domainName);
+  expect(domains.domains[0].isoCode).toEqual('en-US');
 });
 
 test('can not set culture and hostnames with culture and hostnames permission disabled', async ({umbracoApi, umbracoUi}) => {

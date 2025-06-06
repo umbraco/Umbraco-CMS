@@ -179,7 +179,8 @@ stages:
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
-              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
+              CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -267,6 +268,14 @@ stages:
             displayName: Copy Playwright results
             condition: succeededOrFailed()
 
+          # Copy console error log
+          - pwsh: |
+              if (Test-Path tests/Umbraco.Tests.AcceptanceTest/console-errors.json) {
+                  Copy-Item tests/Umbraco.Tests.AcceptanceTest/console-errors.json $(Build.ArtifactStagingDirectory)
+              }
+            displayName: Copy console error log
+            condition: succeededOrFailed()
+
           # Publish
           - task: PublishPipelineArtifact@1
             displayName: Publish test artifacts
@@ -342,7 +351,8 @@ stages:
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
-              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
+              CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -446,6 +456,14 @@ stages:
                 Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
               }
             displayName: Copy Playwright results
+            condition: succeededOrFailed()
+
+          # Copy console error log
+          - pwsh: |
+              if (Test-Path tests/Umbraco.Tests.AcceptanceTest/console-errors.json) {
+                  Copy-Item tests/Umbraco.Tests.AcceptanceTest/console-errors.json $(Build.ArtifactStagingDirectory)
+              }
+            displayName: Copy console error log
             condition: succeededOrFailed()
 
           # Publish

@@ -80,8 +80,7 @@ test.skip('can rename content with language set in userGroup', async ({umbracoAp
   await umbracoUi.content.clickSaveAndCloseButton();
 
   // Assert
-  //await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.userGroup.isErrorNotificationVisible(false);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.content.isContentInTreeVisible(updatedContentName);
 });
 

@@ -45,7 +45,7 @@ test('can bulk trash content nodes without a relation', async ({umbracoApi, umbr
   await umbracoUi.content.clickConfirmTrashButton();
 
   // // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
   expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(firstChildContentName);
@@ -79,8 +79,8 @@ test('can bulk trash content nodes with a relation', async ({umbracoApi, umbraco
   await umbracoUi.content.isReferenceItemNameVisible(firstChildContentName);
   await umbracoUi.content.clickConfirmTrashButton();
 
-  // // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  // Assert
+  await umbracoUi.content.waitForContentToBeTrashed();
   expect(await umbracoApi.document.doesNameExist(firstChildContentName)).toBeFalsy();
   expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(firstChildContentName);
