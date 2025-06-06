@@ -66,22 +66,25 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		new UmbBackofficeEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+	}
 
-		// So far local packages are this simple to registerer, so no need for a manager to do that:
+	override async firstUpdated() {
+		await this.#extensionsAfterAuth();
+
+		// So far local packages are this simple to register, so no need for a manager to do that:
 		CORE_PACKAGES.forEach(async (packageImport) => {
 			const packageModule = await packageImport;
 			umbExtensionsRegistry.registerMany(packageModule.extensions);
 		});
+	}
 
-		const serverExtensions = new UmbServerExtensionRegistrator(this, umbExtensionsRegistry);
-
-		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
-		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-			this.observe(authContext?.isAuthorized, (isAuthorized) => {
-				if (!isAuthorized) return;
-				serverExtensions.registerPrivateExtensions();
-			});
-		});
+	async #extensionsAfterAuth() {
+		const authContext = await this.getContext(UMB_AUTH_CONTEXT, { preventTimeout: true });
+		if (!authContext) {
+			throw new Error('UmbBackofficeElement requires the UMB_AUTH_CONTEXT to be set.');
+		}
+		await this.observe(authContext.isAuthorized).asPromise();
+		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions();
 	}
 
 	override render() {

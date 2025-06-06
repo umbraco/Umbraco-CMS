@@ -1,4 +1,4 @@
-import type { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
+import type { UmbApiError, UmbCancelError } from './umb-error.js';
 export type * from './data-api/types.js';
 
 export interface XhrRequestOptions extends UmbTryExecuteOptions {
@@ -38,7 +38,7 @@ export interface UmbTryExecuteOptions {
 }
 
 export type UmbApiWithErrorResponse = {
-	error?: UmbError | UmbApiError | UmbCancelError | Error;
+	error?: UmbApiError | UmbCancelError;
 };
 
 /**

@@ -22,7 +22,7 @@ const silencedLogs = [
 /** @type {import('@web/dev-server').DevServerConfig} */
 export default {
 	rootDir: '.',
-	files: ['./src/**/*.test.ts'],
+	files: ['./src/**/*.test.ts', '!**/node_modules/**'],
 	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: false },
 	browsers: [playwrightLauncher({ product: 'chromium' })],
 	/* TODO: fix coverage report

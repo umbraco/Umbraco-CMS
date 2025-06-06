@@ -40,6 +40,9 @@ export type ValidateInviteCodeResponse = {
 
 export type PasswordConfigurationModel = PasswordConfigurationResponseModel;
 
+/**
+ * @deprecated Use `UmbProblemDetails` from `@umbraco-cms/backoffice/resources` instead.
+ */
 export type UmbProblemDetails = {
 	type?: string | null;
 	title?: string | null;

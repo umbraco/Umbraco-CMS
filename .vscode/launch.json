@@ -62,6 +62,7 @@
       "cwd": "${workspaceFolder}/src/Umbraco.Web.UI",
       "stopAtEntry": false,
       "requireExactSource": false,
+      "postDebugTask": "kill-umbraco-web-ui",
       // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
       "serverReadyAction": {
         "action": "openExternally",
@@ -96,6 +97,7 @@
       "stopAtEntry": false,
       "requireExactSource": false,
       "checkForDevCert": true,
+      "postDebugTask": "kill-umbraco-web-ui",
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "https://localhost:44339",
