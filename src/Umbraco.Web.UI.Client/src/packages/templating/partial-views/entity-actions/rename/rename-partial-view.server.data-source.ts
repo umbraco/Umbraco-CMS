@@ -39,7 +39,7 @@ export class UmbRenamePartialViewServerDataSource {
 		const { data, error } = await tryExecute(
 			this.#host,
 			PartialViewService.putPartialViewByPathRename({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 				body,
 			}),
 		);

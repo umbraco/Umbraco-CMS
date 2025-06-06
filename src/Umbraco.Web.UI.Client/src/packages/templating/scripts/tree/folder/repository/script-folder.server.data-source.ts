@@ -58,7 +58,7 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.getScriptFolderByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 			}),
 		);
 
@@ -124,7 +124,7 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 		return tryExecute(
 			this.#host,
 			ScriptService.deleteScriptFolderByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 			}),
 		);
 	}

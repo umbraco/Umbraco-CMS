@@ -33,8 +33,7 @@ test('can create content with empty RTE Tiptap property editor', async ({umbraco
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -58,8 +57,7 @@ test('can create content with non-empty RTE Tiptap property editor', async ({umb
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -81,15 +79,14 @@ test('can publish content with RTE Tiptap property editor', async ({umbracoApi, 
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
   expect(contentData.values[0].value.markup).toEqual('<p>' + inputText + '</p>');
 });
 
-test.fixme('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test('can add a media in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Media Picker';
   const imageName = 'Test Image For Content';
@@ -110,8 +107,7 @@ test.fixme('can add a media in RTE Tiptap property editor', async ({umbracoApi, 
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toContain('<img');
@@ -140,8 +136,7 @@ test('can add a video in RTE Tiptap property editor', async ({umbracoApi, umbrac
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toContain('data-embed-url');
@@ -169,9 +164,7 @@ test('cannot submit an empty link in RTE Tiptap property editor', async ({umbrac
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty URL with an anchor or querystring in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -191,9 +184,7 @@ test.skip('cannot submit an empty URL with an anchor or querystring in RTE Tipta
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17974
-test.skip('can insert a link to an unpublished document in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
+test('can insert a link to an unpublished document in RTE Tiptap property editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconTitle = 'Link';
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
@@ -216,8 +207,7 @@ test.skip('can insert a link to an unpublished document in RTE Tiptap property e
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
