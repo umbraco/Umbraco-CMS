@@ -70,7 +70,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			StylesheetService.getStylesheetByPath({ path: { path: encodeURIComponent(path) } }),
+			StylesheetService.getStylesheetByPath({ path: { path } }),
 		);
 
 		if (error || !data) {
@@ -100,7 +100,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const { error } = await tryExecute(
 			this.#host,
 			StylesheetService.putStylesheetByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 				body,
 			}),
 		);
@@ -121,7 +121,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		return tryExecute(
 			this.#host,
 			StylesheetService.deleteStylesheetByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 			}),
 		);
 	}

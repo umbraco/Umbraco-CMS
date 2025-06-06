@@ -23,7 +23,7 @@ test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dictionary.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.dictionary.waitForDictionaryToBeCreated();
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeTruthy();
   await umbracoUi.dictionary.clickLeftArrowButton();
@@ -44,9 +44,7 @@ test('can delete a dictionary item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dictionary.deleteDictionary();
 
   // Assert
-  // TODO: Since we are not asserting on a success notification yet, we need to wait to make sure the dictionary is deleted
-  await umbracoUi.waitForTimeout(500);
-  //await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.dictionary.waitForDictionaryToBeDeleted();
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
   expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeFalsy();
   // Verify the dictionary item does not display in the tree
@@ -69,7 +67,7 @@ test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({um
   await umbracoUi.dictionary.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dictionary.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.dictionary.waitForDictionaryToBeCreated();
   await umbracoUi.dictionary.isErrorNotificationVisible(false);
   const dictionaryChildren = await umbracoApi.dictionary.getChildren(parentDictionaryId);
   expect(dictionaryChildren[0].name).toEqual(dictionaryName);
@@ -133,7 +131,7 @@ test('can import a dictionary item', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dictionary.importDictionary(udtFilePath);
 
   // Assert
-  await umbracoUi.waitForTimeout(500);
+  await umbracoUi.dictionary.waitForDictionaryToBeImported();
   // Verify the imported dictionary item displays in the list
   await umbracoUi.reloadPage();
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importDictionaryName)).toBeTruthy();
@@ -156,13 +154,11 @@ test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({u
   await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
   await umbracoUi.dictionary.clickImportActionMenuOption();
   await umbracoUi.dictionary.importDictionary(udtFilePath);
-  // These timeouts are necessary as this test can fail
-  await umbracoUi.waitForTimeout(500);
 
   // Assert
   // Verify the imported dictionary items display in the list
+  await umbracoUi.dictionary.waitForDictionaryToBeImported();
   await umbracoUi.reloadPage();
-  await umbracoUi.waitForTimeout(500);
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importParentDictionaryName)).toBeTruthy();
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(importChildDictionaryName)).toBeTruthy();
   // Verify the imported dictionary items display in the tree
