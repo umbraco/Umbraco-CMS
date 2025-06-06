@@ -52,6 +52,7 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.Routing;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
@@ -352,11 +353,11 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentSavingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, BlockGridPropertyNotificationHandler>()
-            .AddNotificationHandler<ContentCopiedNotification, FileUploadPropertyEditor>()
-            .AddNotificationHandler<ContentDeletedNotification, FileUploadPropertyEditor>()
-            .AddNotificationHandler<MediaDeletedNotification, FileUploadPropertyEditor>()
-            .AddNotificationHandler<MediaSavingNotification, FileUploadPropertyEditor>()
-            .AddNotificationHandler<MemberDeletedNotification, FileUploadPropertyEditor>()
+            .AddNotificationHandler<ContentCopiedNotification, FileUploadContentCopiedNotificationHandler>()
+            .AddNotificationHandler<ContentDeletedNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MediaDeletedNotification, FileUploadMediaDeletedNotificationHandler>()
+            .AddNotificationHandler<MediaSavingNotification, FileUploadMediaSavingNotificationHandler>()
+            .AddNotificationHandler<MemberDeletedNotification, FileUploadMemberDeletedNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
