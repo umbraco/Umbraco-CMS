@@ -63,7 +63,7 @@ public class DocumentUrlService : IDocumentUrlService
         public required IList<UrlSegment> UrlSegments { get; set; }
 
         /// <summary>
-        /// Gets or sets a valye indicating whether the document is a draft version or not.
+        /// Gets or sets a value indicating whether the document is a draft version or not.
         /// </summary>
         public required bool IsDraft { get; set; }
 
@@ -82,7 +82,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
 
             /// <summary>
-            /// Gets the URL segmnent string.
+            /// Gets the URL segment string.
             /// </summary>
             public string Segment { get; }
 

@@ -22,7 +22,6 @@ public class DocumentUrlServiceTests
             },
         };
         var cacheModels = DocumentUrlService.ConvertToCacheModel(segments).ToList();
-        ;
 
         Assert.AreEqual(1, cacheModels.Count);
         Assert.AreEqual(segments[0].DocumentKey, cacheModels[0].DocumentKey);
