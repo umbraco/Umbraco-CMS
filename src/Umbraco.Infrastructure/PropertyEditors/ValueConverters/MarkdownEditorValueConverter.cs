@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using HeyRed.MarkdownSharp;
+using Markdig;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Strings;
@@ -15,6 +15,7 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
 {
     private readonly HtmlLocalLinkParser _localLinkParser;
     private readonly HtmlUrlParser _urlParser;
+    private static readonly MarkdownPipeline _markdownPipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
 
     public MarkdownEditorValueConverter(HtmlLocalLinkParser localLinkParser, HtmlUrlParser urlParser)
     {
@@ -51,8 +52,7 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
     {
         // convert markup to HTML for frontend rendering.
         // source should come from ConvertSource and be a string (or null) already
-        var mark = new Markdown();
-        return new HtmlEncodedString(inter == null ? string.Empty : mark.Transform((string)inter));
+        return new HtmlEncodedString(inter == null ? string.Empty : Markdown.ToHtml((string)inter, _markdownPipeline));
     }
 
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
