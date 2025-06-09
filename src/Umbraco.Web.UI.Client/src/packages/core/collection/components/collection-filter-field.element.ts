@@ -34,7 +34,7 @@ export class UmbCollectionFilterFieldElement extends UmbLitElement {
 	static override readonly styles = [
 		css`
 			uui-input {
-				display: block;
+				width: 100%;
 			}
 		`,
 	];

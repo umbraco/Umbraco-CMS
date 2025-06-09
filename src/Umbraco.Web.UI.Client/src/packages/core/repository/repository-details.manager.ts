@@ -33,10 +33,10 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		return this.#init;
 	}
 
-	#uniques = new UmbArrayState<string>([], (x) => x);
+	#uniques = new UmbArrayState<DetailType['unique']>([], (x) => x);
 	uniques = this.#uniques.asObservable();
 
-	#entries = new UmbArrayState<DetailType>([], (x) => x.unique);
+	#entries = new UmbArrayState<DetailType, DetailType['unique']>([], (x) => x.unique);
 	entries = this.#entries.asObservable();
 
 	#statuses = new UmbArrayState<UmbRepositoryRequestStatus>([], (x) => x.unique);
@@ -77,11 +77,15 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 			this.uniques,
 			(uniques) => {
 				// remove entries based on no-longer existing uniques:
-				const removedEntries = this.#entries.getValue().filter((entry) => !uniques.includes(entry.unique));
-				this.#entries.remove(removedEntries);
+				const removedEntries = this.#entries
+					.getValue()
+					.filter((entry) => !uniques.includes(entry.unique))
+					.map((x) => x.unique);
+
 				this.#statuses.remove(removedEntries);
+				this.#entries.remove(removedEntries);
 				removedEntries.forEach((entry) => {
-					this.removeUmbControllerByAlias('observeEntry_' + entry.unique);
+					this.removeUmbControllerByAlias('observeEntry_' + entry);
 				});
 
 				this.#requestNewDetails();

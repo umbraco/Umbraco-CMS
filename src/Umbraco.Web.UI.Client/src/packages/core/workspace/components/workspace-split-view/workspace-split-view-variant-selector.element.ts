@@ -299,6 +299,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				data-mark="input:entity-name"
 				placeholder=${this.localize.term('placeholders_entername')}
 				label=${this.localize.term('placeholders_entername')}
+				autocomplete="off"
 				.value=${this.#getNameValue()}
 				@input=${this.#handleInput}
 				required
@@ -595,8 +596,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			}
 
 			.switch-button:hover {
-				background: var(--uui-palette-sand);
-				color: var(--uui-palette-space-cadet-light);
+				background: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
 			}
 			.switch-button .variant-info {
 				flex-grow: 1;

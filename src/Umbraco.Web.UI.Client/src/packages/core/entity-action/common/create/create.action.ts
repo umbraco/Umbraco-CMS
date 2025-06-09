@@ -81,6 +81,7 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<MetaEntityActionC
 
 		if (!api) throw new Error(`Could not create api for ${manifest.alias}`);
 
+		(api as any).manifest = manifest;
 		this.#singleOptionApi = api;
 	}
 }

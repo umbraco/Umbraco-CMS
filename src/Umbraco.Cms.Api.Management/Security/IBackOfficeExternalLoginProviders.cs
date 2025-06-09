@@ -23,4 +23,11 @@ public interface IBackOfficeExternalLoginProviders
     /// </summary>
     /// <returns></returns>
     bool HasDenyLocalLogin();
+
+    /// <summary>
+    ///     Used during startup to see if the configured external login providers is different from the persisted information.
+    ///     If they are different, this will invalidate backoffice sessions and clear external logins for removed providers
+    ///     if the external login provider setup has changed.
+    /// </summary>
+    void InvalidateSessionsIfExternalLoginProvidersChanged() { }
 }

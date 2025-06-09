@@ -14,7 +14,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Segment;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
 public class AllSegmentController : SegmentControllerBase
 {
     private readonly ISegmentService _segmentService;

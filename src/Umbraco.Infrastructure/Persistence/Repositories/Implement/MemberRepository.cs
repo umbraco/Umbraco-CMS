@@ -947,5 +947,50 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         entity.ResetDirtyProperties();
     }
 
+    /// <inheritdoc/>
+    public async Task UpdateLoginPropertiesAsync(IMember member)
+    {
+        var updatedLastLoginDate = member.IsPropertyDirty(nameof(member.LastLoginDate));
+        var updatedSecurityStamp = member.IsPropertyDirty(nameof(member.SecurityStamp));
+        if (updatedLastLoginDate is false && updatedSecurityStamp is false)
+        {
+            return;
+        }
+
+        NPocoSqlExtensions.SqlUpd<MemberDto> GetMemberSetExpression(IMember member, NPocoSqlExtensions.SqlUpd<MemberDto> m)
+        {
+            var setExpression = new NPocoSqlExtensions.SqlUpd<MemberDto>(SqlContext);
+            if (updatedLastLoginDate)
+            {
+                setExpression.Set(x => x.LastLoginDate, member.LastLoginDate);
+            }
+
+            if (updatedSecurityStamp)
+            {
+                setExpression.Set(x => x.SecurityStampToken, member.SecurityStamp);
+            }
+
+            return setExpression;
+        }
+
+        member.UpdatingEntity();
+
+        Sql<ISqlContext> updateMemberQuery = Sql()
+            .Update<MemberDto>(m => GetMemberSetExpression(member, m))
+            .Where<MemberDto>(m => m.NodeId == member.Id);
+        await Database.ExecuteAsync(updateMemberQuery);
+
+        Sql<ISqlContext> updateContentVersionQuery = Sql()
+            .Update<ContentVersionDto>(m => m.Set(x => x.VersionDate, member.UpdateDate))
+            .Where<ContentVersionDto>(m => m.NodeId == member.Id && m.Current == true);
+        await Database.ExecuteAsync(updateContentVersionQuery);
+
+        OnUowRefreshedEntity(new MemberRefreshNotification(member, new EventMessages()));
+
+        _memberByUsernameCachePolicy.DeleteByUserName(CacheKeys.MemberUserNameCachePrefix, member.Username);
+
+        member.ResetDirtyProperties();
+    }
+
     #endregion
 }
