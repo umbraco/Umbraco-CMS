@@ -119,7 +119,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
 
     private void DeleteExternalLogins(List<int> externalLoginIds)
     {
-        if (externalLoginIds.Count <= 0)
+        if (externalLoginIds.Count == 0)
         {
             return;
         }
