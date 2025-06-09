@@ -40,6 +40,7 @@ internal static class LanguageFactory
             CultureName = entity.CultureName,
             IsDefault = entity.IsDefault,
             IsMandatory = entity.IsMandatory,
+            SortOrder = entity.SortOrder,
             FallbackLanguageId = fallbackLanguageId
         };
 
