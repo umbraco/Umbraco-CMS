@@ -18,6 +18,7 @@ public static class DateTimeExtensions
         Hour,
         Minute,
         Second,
+        Millisecond,
     }
 
     /// <summary>
@@ -61,6 +62,11 @@ public static class DateTimeExtensions
             return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0, dt.Kind);
         }
 
-        return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Kind);
+        if (truncateTo == DateTruncate.Second)
+        {
+            return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Kind);
+        }
+
+        return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind);
     }
 }
