@@ -20,7 +20,7 @@ public class AddSortOrderToLanguage : UnscopedMigrationBase
 
     protected override void Migrate()
     {
-        Logger.LogDebug("Adding name and description columns to webhooks.");
+        Logger.LogDebug("Adding sortOrder column to language.");
 
         if (TableExists(Constants.DatabaseSchema.Tables.Language))
         {
