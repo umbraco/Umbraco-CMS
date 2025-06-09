@@ -85,6 +85,14 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	}
 
 	#onCloseEnd(key: string) {
+		//move notification container out of modal container
+		var parentNode = this.parentNode;
+		var uuiModalContainer = this.renderRoot.querySelector('uui-modal-container');
+		var modalSidebar = uuiModalContainer?.querySelector('uui-modal-sidebar') as any;
+		if(parentNode){
+			parentNode.insertBefore(modalSidebar.shadowRoot.querySelector('dialog').querySelector('umb-backoffice-notification-container'), this);
+		}
+
 		this._modalManager?.remove(key);
 	}
 
@@ -107,6 +115,32 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 					: ''}
 			</uui-modal-container>
 		`;
+	}
+
+	async addNotificationContainer(){
+		const modalContainer = this.renderRoot.querySelector('uui-modal-container');
+		if(!modalContainer){
+			return;
+		}
+
+		await modalContainer.updateComplete;
+
+		var modalSidebar = modalContainer.querySelector('uui-modal-sidebar') as any;
+		if (!modalSidebar) {
+			return;
+		}
+		
+		var dialog = modalSidebar.shadowRoot?.querySelector('dialog');
+		if(!dialog){
+			return
+		}
+
+		//move notification container into modal container
+		dialog.insertBefore((this.parentNode as HTMLElement).querySelector('umb-backoffice-notification-container'), dialog.firstChild);
+	}
+
+	override async updated(){
+		await Promise.all([this.updateComplete, this.addNotificationContainer()]);
 	}
 
 	static override styles: CSSResultGroup = [
