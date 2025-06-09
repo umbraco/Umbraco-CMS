@@ -671,7 +671,7 @@ public partial class ContentEditingServiceTests
         void VerifyUpdate(IContent? updatedContent)
         {
             Assert.IsNotNull(updatedContent);
-            Assert.AreEqual(firstUpdateDateEn.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond), updatedContent.GetUpdateDate("en-US")?.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond    ));
+            Assert.AreEqual(firstUpdateDateEn.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond), updatedContent.GetUpdateDate("en-US")?.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond));
 
             var lastUpdateDateDa = updatedContent.GetUpdateDate("da-DK")
                                    ?? throw new InvalidOperationException("Expected an update date for DA");
