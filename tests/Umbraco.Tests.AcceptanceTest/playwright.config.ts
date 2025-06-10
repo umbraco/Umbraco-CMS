@@ -53,6 +53,17 @@ export default defineConfig({
         storageState: STORAGE_STATE
       }
     },
+    {
+      name: 'deliveryApi',
+      testMatch: 'DeliveryApi/**',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
     // This project is used to test the install steps, for that we do not need to authenticate.
     {
       name: 'unattendedInstallConfig',
