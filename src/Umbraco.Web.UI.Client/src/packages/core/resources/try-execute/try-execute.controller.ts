@@ -55,6 +55,12 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 				return;
 			}
 
+			if (apiError.problemDetails.status === 404) {
+				// Not found error, show no notification
+				// the user will see a 404 page instead, or otherwise the UI will handle it
+				return;
+			}
+
 			// UmbProblemDetails, show notification
 			message = apiError.problemDetails.title;
 			details = apiError.problemDetails.errors ?? undefined;
