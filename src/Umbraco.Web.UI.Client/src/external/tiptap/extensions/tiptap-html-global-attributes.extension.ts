@@ -64,6 +64,14 @@ export const HtmlGlobalAttributes = Extension.create<HtmlGlobalAttributesOptions
 						.map((type) => commands.updateAttributes(type, { class: className }))
 						.every((response) => response);
 				},
+			toggleClassName:
+				(className, type) =>
+				({ commands, editor }) => {
+					if (!className) return false;
+					const types = type ? [type] : this.options.types;
+					const existing = types.map((type) => editor.getAttributes(type)?.class as string).filter((x) => x);
+					return existing.length ? commands.unsetClassName(type) : commands.setClassName(className, type);
+				},
 			unsetClassName:
 				(type) =>
 				({ commands }) => {
@@ -76,6 +84,14 @@ export const HtmlGlobalAttributes = Extension.create<HtmlGlobalAttributesOptions
 					if (!id) return false;
 					const types = type ? [type] : this.options.types;
 					return types.map((type) => commands.updateAttributes(type, { id })).every((response) => response);
+				},
+			toggleId:
+				(id, type) =>
+				({ commands, editor }) => {
+					if (!id) return false;
+					const types = type ? [type] : this.options.types;
+					const existing = types.map((type) => editor.getAttributes(type)?.id as string).filter((x) => x);
+					return existing.length ? commands.unsetId(type) : commands.setId(id, type);
 				},
 			unsetId:
 				(type) =>
@@ -91,8 +107,10 @@ declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
 		htmlGlobalAttributes: {
 			setClassName: (className?: string, type?: string) => ReturnType;
+			toggleClassName: (className?: string, type?: string) => ReturnType;
 			unsetClassName: (type?: string) => ReturnType;
 			setId: (id?: string, type?: string) => ReturnType;
+			toggleId: (id?: string, type?: string) => ReturnType;
 			unsetId: (type?: string) => ReturnType;
 		};
 	}
