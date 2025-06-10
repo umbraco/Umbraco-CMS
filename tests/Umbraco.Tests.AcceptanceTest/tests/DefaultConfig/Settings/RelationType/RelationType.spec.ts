@@ -173,6 +173,7 @@ test('can not see relation after member with relation is deleted', async ({umbra
   await umbracoUi.waitForTimeout(2000);
 
   await umbracoUi.relationType.goToRelationTypeWithName('Related Member');
+  await umbracoUi.reloadPage();
   await umbracoUi.relationType.isRelationWithParentAndChildVisible(contentName, memberName);
 
   // Act
