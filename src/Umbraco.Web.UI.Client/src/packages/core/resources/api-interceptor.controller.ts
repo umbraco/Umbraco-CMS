@@ -161,6 +161,11 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				return response;
 			}
 
+			// Remove any remaining Umb-Generated-Resource and Location headers
+			response.headers.delete('Umb-Generated-Resource');
+			response.headers.delete('Location');
+
+			// Return a new response with the generated resource in the body (plain text)
 			return this.#createResponse(generatedResource, response);
 		});
 	}
