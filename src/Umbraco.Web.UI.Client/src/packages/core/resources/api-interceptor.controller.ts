@@ -178,7 +178,20 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			// We will check if it is not a 401 or 403 error, as that is handled by other interceptors
 			if (response.status === 401 || response.status === 403) return response;
 
-			// Build a plain ProblemDetails object for the response body
+			// Special handling for 404 Not Found
+			if (response.status === 404) {
+				const notFoundProblemDetails: UmbProblemDetails = {
+					status: response.status,
+					title: response.statusText || 'The requested resource was not found.',
+					detail: undefined,
+					errors: undefined,
+					type: 'NotFound',
+					stack: undefined,
+				};
+				return this.#createResponse(notFoundProblemDetails, response);
+			}
+
+			// For all other errors, we will build a ProblemDetails object
 			let problemDetails: UmbProblemDetails = {
 				status: response.status,
 				title:
@@ -202,7 +215,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				}
 			} catch (e) {
 				// Ignore JSON parse error
-				console.error('[Interceptor] Caught a 500 Error, but failed parsing error body (expected JSON)', e);
+				console.error('[Interceptor] Caught a server error, but failed parsing error body (expected JSON)', e);
 			}
 
 			return this.#createResponse(problemDetails, response);
