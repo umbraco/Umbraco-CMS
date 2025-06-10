@@ -161,10 +161,6 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				return response;
 			}
 
-			// Remove any remaining Umb-Generated-Resource and Location headers
-			response.headers.delete('Umb-Generated-Resource');
-			response.headers.delete('Location');
-
 			// Return a new response with the generated resource in the body (plain text)
 			return this.#createResponse(generatedResource, response);
 		});
@@ -305,25 +301,26 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * Helper to create a new Response with correct Content-Type.
 	 * @param {unknown} body The body of the response, can be a string or an object.
 	 * @param {Response} originalResponse The original response to copy status and headers from.
-	 * @param {number} [statusOverride] Optional status override for the response.
-	 * @param {string} [statusTextOverride] Optional status text override for the response.
 	 * @returns {Response} The new Response object with the correct Content-Type and body.
 	 */
-	#createResponse(
-		body: unknown,
-		originalResponse: Response,
-		statusOverride?: number,
-		statusTextOverride?: string,
-	): Response {
+	#createResponse(body: unknown, originalResponse: Response): Response {
 		const isString = typeof body === 'string';
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
 
+		// Construct new headers but preserve "X-" headers from the original response
+		const headersOverride: Record<string, string> = {};
+		originalResponse.headers.forEach((value, key) => {
+			if (key.toLowerCase().startsWith('x-')) {
+				headersOverride[key] = value;
+			}
+		});
+
 		return new Response(responseBody, {
-			status: statusOverride ?? originalResponse.status,
-			statusText: statusTextOverride ?? originalResponse.statusText,
+			status: originalResponse.status,
+			statusText: originalResponse.statusText,
 			headers: {
-				...Object.fromEntries(originalResponse.headers.entries()),
+				...headersOverride,
 				'Content-Type': contentType,
 			},
 		});
