@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/main/src/NerdBank.GitVersioning/version.schema.json",
-  "version": "16.0.0-rc5", // TODO: When bumping this to 16.0.0, also remove the -rc suffix in the starterkits.template.json file. The starter kit final version for 16 will be released at the same time as the CMS.
+  "version": "16.0.0-rc6", // TODO: When bumping this to 16.0.0, also remove the -rc suffix in the starterkits.template.json file. The starter kit final version for 16 will be released at the same time as the CMS.
   "assemblyVersion": {
     "precision": "build"
   },
