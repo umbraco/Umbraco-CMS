@@ -99,6 +99,27 @@ export const HtmlGlobalAttributes = Extension.create<HtmlGlobalAttributesOptions
 					const types = type ? [type] : this.options.types;
 					return types.map((type) => commands.resetAttributes(type, 'id')).every((response) => response);
 				},
+			setStyles:
+				(style, type) =>
+				({ commands }) => {
+					if (!style) return false;
+					const types = type ? [type] : this.options.types;
+					return types.map((type) => commands.updateAttributes(type, { style })).every((response) => response);
+				},
+			toggleStyles:
+				(style, type) =>
+				({ commands, editor }) => {
+					if (!style) return false;
+					const types = type ? [type] : this.options.types;
+					const existing = types.map((type) => editor.getAttributes(type)?.style as string).filter((x) => x);
+					return existing.length ? commands.unsetStyles(type) : commands.setStyles(style, type);
+				},
+			unsetStyles:
+				(type) =>
+				({ commands }) => {
+					const types = type ? [type] : this.options.types;
+					return types.map((type) => commands.resetAttributes(type, 'style')).every((response) => response);
+				},
 		};
 	},
 });
@@ -112,6 +133,9 @@ declare module '@tiptap/core' {
 			setId: (id?: string, type?: string) => ReturnType;
 			toggleId: (id?: string, type?: string) => ReturnType;
 			unsetId: (type?: string) => ReturnType;
+			setStyles: (style?: string, type?: string) => ReturnType;
+			toggleStyles: (style?: string, type?: string) => ReturnType;
+			unsetStyles: (type?: string) => ReturnType;
 		};
 	}
 }
