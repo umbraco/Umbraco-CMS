@@ -11,8 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class RichTextPropertyNotificationHandler : BlockEditorPropertyNotificationHandlerBase<RichTextBlockLayoutItem>
 {
-    public RichTextPropertyNotificationHandler(
-        ILogger<BlockEditorPropertyNotificationHandlerBase<RichTextBlockLayoutItem>> logger)
+    public RichTextPropertyNotificationHandler(ILogger<RichTextPropertyNotificationHandler> logger)
         : base(logger)
     {
     }
