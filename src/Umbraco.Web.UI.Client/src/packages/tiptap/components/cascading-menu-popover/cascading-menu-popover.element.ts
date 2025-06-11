@@ -26,8 +26,8 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 		return !!items?.some((item) => item.isActive?.() || this.#isMenuActive(item.items));
 	}
 
-	#onMouseEnter(item: UmbCascadingMenuItem, popoverId: string) {
-		if (!item.items?.length) return;
+	#onMouseEnter(item: UmbCascadingMenuItem, popoverId?: string) {
+		if (!item.items?.length || !popoverId) return;
 
 		const popover = this.#getPopoverById(popoverId);
 		if (!popover) return;
@@ -38,7 +38,9 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 		popover.showPopover();
 	}
 
-	#onMouseLeave(item: UmbCascadingMenuItem, popoverId: string) {
+	#onMouseLeave(item: UmbCascadingMenuItem, popoverId?: string) {
+		if (!popoverId) return;
+
 		const popover = this.#getPopoverById(popoverId);
 		if (!popover) return;
 
@@ -48,12 +50,16 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 		popover.hidePopover();
 	}
 
-	#onClick(item: UmbCascadingMenuItem, popoverId: string) {
+	#onClick(item: UmbCascadingMenuItem, popoverId?: string) {
 		item.execute?.();
 
-		setTimeout(() => {
-			this.#onMouseLeave(item, popoverId);
-		}, 100);
+		if (!popoverId) {
+			setTimeout(() => {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				this.hidePopover();
+			}, 100);
+		}
 	}
 
 	override render() {
@@ -69,10 +75,10 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 	}
 
 	#renderItem(item: UmbCascadingMenuItem, index: number) {
-		const popoverId = `item-${index}`;
+		const popoverId = item.items ? `menu-${index}` : undefined;
 
 		const element = item.element;
-		if (element) {
+		if (element && popoverId) {
 			element.setAttribute('popovertarget', popoverId);
 		}
 
@@ -90,7 +96,7 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 						<uui-menu-item
 							class=${item.separatorAfter ? 'separator' : ''}
 							label=${label}
-							popovertarget=${popoverId}
+							popovertarget=${ifDefined(popoverId)}
 							select-mode="highlight"
 							?selected=${isActive}
 							@click-label=${() => this.#onClick(item, popoverId)}>
@@ -102,8 +108,13 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 						</uui-menu-item>
 					`,
 				)}
-				<umb-cascading-menu-popover id=${popoverId} placement="right-start" .items=${item.items}>
-				</umb-cascading-menu-popover>
+				${when(
+					popoverId,
+					(popoverId) => html`
+						<umb-cascading-menu-popover id=${popoverId} placement="right-start" .items=${item.items}>
+						</umb-cascading-menu-popover>
+					`,
+				)}
 			</div>
 		`;
 	}
