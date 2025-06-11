@@ -55,8 +55,14 @@ public interface IContentService : IContentServiceBase<IContent>
     void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Creates a blueprint from a content item.
+    /// </summary>
+    IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
     ///     Creates a new content item from a blueprint.
     /// </summary>
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
     IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
