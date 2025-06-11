@@ -1,9 +1,5 @@
 using Microsoft.Extensions.Logging;
-using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_3_0;
-using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
-using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
 
