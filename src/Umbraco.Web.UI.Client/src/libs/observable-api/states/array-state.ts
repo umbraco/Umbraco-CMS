@@ -84,7 +84,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 
 	/**
 	 * @function remove
-	 * @param {unknown[]} uniques - The unique values to remove.
+	 * @param {U[]} uniques - The unique values to remove.
 	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with id '1' and '2'</caption>
@@ -95,7 +95,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * const myState = new UmbArrayState(data, (x) => x.id);
 	 * myState.remove([1, 2]);
 	 */
-	remove(uniques: unknown[]) {
+	remove(uniques: U[]) {
 		if (this.getUniqueMethod) {
 			let next = this.getValue();
 			if (!next) return this;
@@ -114,7 +114,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 
 	/**
 	 * @function removeOne
-	 * @param {unknown} unique - The unique value to remove.
+	 * @param {U} unique - The unique value to remove.
 	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with id '1'</caption>
@@ -125,7 +125,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * const myState = new UmbArrayState(data, (x) => x.id);
 	 * myState.removeOne(1);
 	 */
-	removeOne(unique: unknown) {
+	removeOne(unique: U) {
 		if (this.getUniqueMethod) {
 			let next = this.getValue();
 			if (!next) return this;
@@ -251,7 +251,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 
 	/**
 	 * @function updateOne
-	 * @param {unknown} unique - Unique value to find entry to update.
+	 * @param {U} unique - Unique value to find entry to update.
 	 * @param {Partial<T>} entry - new data to be added in this Subject.
 	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Update a item with some new data, requires the ArrayState to be constructed with a getUnique method.
@@ -263,7 +263,7 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * const myState = new UmbArrayState(data, (x) => x.key);
 	 * myState.updateOne(2, {value: 'updated-bar'});
 	 */
-	updateOne(unique: unknown, entry: Partial<T>) {
+	updateOne(unique: U, entry: Partial<T>) {
 		if (!this.getUniqueMethod) {
 			throw new Error("Can't partial update an ArrayState without a getUnique method provided when constructed.");
 		}

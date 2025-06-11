@@ -109,6 +109,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		if (routes.length !== 0) {
 			routes.push({
 				path: '',
+				pathMatch: 'full',
 				redirectTo: routes[0].path,
 			});
 

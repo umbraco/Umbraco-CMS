@@ -1,5 +1,5 @@
+import type { UmbApiResponse } from '../types.js';
 import { UmbTryExecuteController } from './try-execute.controller.js';
-import type { UmbApiResponse } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 

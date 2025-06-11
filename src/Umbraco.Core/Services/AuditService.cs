@@ -49,7 +49,13 @@ public sealed class AuditService : RepositoryService, IAuditService
         IAuditEntryRepository auditEntryRepository,
         IUserService userService,
         IEntityService entityService)
-        : this(provider, loggerFactory, eventMessagesFactory, auditRepository, userService, entityService)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            auditRepository,
+            userService,
+            entityService)
     {
     }
 
@@ -337,7 +343,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             affectedUserId,
             affectedDetails,
             eventType,
-            eventDetails).GetAwaiter().GetResult().Result;
+            eventDetails).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />

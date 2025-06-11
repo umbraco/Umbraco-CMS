@@ -16,6 +16,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		this.addAuthResponseInterceptor(client);
 		this.addUmbGeneratedResourceInterceptor(client);
 		this.addUmbNotificationsInterceptor(client);
+		this.addForbiddenResponseInterceptor(client);
 		this.addErrorInterceptor(client);
 	}
 
@@ -37,6 +38,24 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 			return response;
 		});
 	}
+
+	/**
+	 * Interceptor which checks responses for 403 errors and displays them as a notification.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * @internal
+	 */
+	addForbiddenResponseInterceptor(client: typeof umbHttpClient) {
+			client.interceptors.response.use(async (response: Response) => {
+				if (response.status === 403) {
+					const headline = 'Permission Denied';
+					const message = 'You do not have the necessary permissions to complete the requested action. If you believe this is in error, please reach out to your administrator.';
+
+					this.#peekError(headline, message, null);
+				}
+
+				return response;
+			});
+		}
 
 	/**
 	 * Interceptor which checks responses for the Umb-Generated-Resource header and replaces the value into the response body.

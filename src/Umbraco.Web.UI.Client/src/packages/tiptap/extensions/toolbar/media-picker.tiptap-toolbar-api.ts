@@ -1,6 +1,7 @@
 import { UmbTiptapToolbarElementApiBase } from '../base.js';
-import { getGuidFromUdi, getProcessedImageUrl, imageSize } from '@umbraco-cms/backoffice/utils';
+import { getGuidFromUdi, imageSize } from '@umbraco-cms/backoffice/utils';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
@@ -8,15 +9,23 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaCaptionAltTextModalValue } from '@umbraco-cms/backoffice/media';
 
 export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbTiptapToolbarElementApiBase {
+	#imagingRepository = new UmbImagingRepository(this);
+
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	/**
-	 * @returns {number} The maximum width of uploaded images
+	 * @returns {number} The configured maximum allowed image size
 	 */
-	get maxWidth(): number {
+	get maxImageSize(): number {
 		const maxImageSize = parseInt(this.configuration?.getValueByAlias('maxImageSize') ?? '', 10);
 		return isNaN(maxImageSize) ? 500 : maxImageSize;
 	}
+
+	/**
+	 * @deprecated Use `maxImageSize` instead.
+	 * @returns {number} The maximum width of uploaded images
+	 */
+	maxWidth = this.maxImageSize;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -98,12 +107,29 @@ export default class UmbTiptapToolbarMediaPickerToolbarExtensionApi extends UmbT
 	async #insertInEditor(editor: Editor, mediaUnique: string, media: UmbMediaCaptionAltTextModalValue) {
 		if (!media?.url) return;
 
-		const { width, height } = await imageSize(media.url, { maxWidth: this.maxWidth });
-		const src = await getProcessedImageUrl(media.url, { width, height, mode: ImageCropModeModel.MAX });
+		const maxImageSize = this.maxImageSize;
+
+		// Get the resized image URL
+		const { data } = await this.#imagingRepository.requestResizedItems([mediaUnique], {
+			width: maxImageSize,
+			height: maxImageSize,
+			mode: ImageCropModeModel.MAX,
+		});
+
+		if (!data?.length || !data[0]?.url) {
+			console.error('No data returned from imaging repository');
+			return;
+		}
+
+		// Set the media URL to the first item in the data array
+		const src = data[0].url;
+
+		// Fetch the actual image dimensions
+		const { width, height } = await imageSize(src);
 
 		const img = {
-			alt: media.altText,
 			src,
+			alt: media.altText,
 			'data-udi': `umb://media/${mediaUnique.replace(/-/g, '')}`,
 			width: width.toString(),
 			height: height.toString(),

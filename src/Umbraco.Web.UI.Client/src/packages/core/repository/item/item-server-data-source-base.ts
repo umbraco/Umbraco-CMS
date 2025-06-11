@@ -1,10 +1,11 @@
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbDataSourceResponse } from '../data-source-response.interface.js';
 import type { UmbItemDataSource } from './item-data-source.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export interface UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType extends { unique: string }> {
-	getItems: (uniques: Array<string>) => Promise<UmbDataSourceResponse<Array<ServerItemType>>>;
+	getItems?: (uniques: Array<string>) => Promise<UmbDataSourceResponse<Array<ServerItemType>>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
 
@@ -14,10 +15,10 @@ export interface UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType 
  * @implements {DocumentTreeDataSource}
  */
 export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType extends { unique: string }>
+	extends UmbControllerBase
 	implements UmbItemDataSource<ClientItemType>
 {
-	#host: UmbControllerHost;
-	#getItems: (uniques: Array<string>) => Promise<UmbDataSourceResponse<Array<ServerItemType>>>;
+	#getItems?: (uniques: Array<string>) => Promise<UmbDataSourceResponse<Array<ServerItemType>>>;
 	#mapper: (item: ServerItemType) => ClientItemType;
 
 	/**
@@ -27,7 +28,7 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 	 * @memberof UmbItemServerDataSourceBase
 	 */
 	constructor(host: UmbControllerHost, args: UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType>) {
-		this.#host = host;
+		super(host);
 		this.#getItems = args.getItems;
 		this.#mapper = args.mapper;
 	}
@@ -39,14 +40,17 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 	 * @memberof UmbItemServerDataSourceBase
 	 */
 	async getItems(uniques: Array<string>) {
+		if (!this.#getItems) throw new Error('getItems is not implemented');
 		if (!uniques) throw new Error('Uniques are missing');
-		const { data, error } = await tryExecute(this.#host, this.#getItems(uniques));
 
-		if (data) {
-			const items = data.map((item) => this.#mapper(item));
-			return { data: items };
-		}
+		const { data, error } = await tryExecute(this, this.#getItems(uniques));
 
-		return { error };
+		return { data: this._getMappedItems(data), error };
+	}
+
+	protected _getMappedItems(items: Array<ServerItemType> | undefined): Array<ClientItemType> | undefined {
+		if (!items) return undefined;
+		if (!this.#mapper) throw new Error('Mapper is not implemented');
+		return items.map((item) => this.#mapper(item));
 	}
 }

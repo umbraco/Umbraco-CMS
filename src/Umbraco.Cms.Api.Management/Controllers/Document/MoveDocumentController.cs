@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +39,20 @@ public class MoveDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Move(CancellationToken cancellationToken, Guid id, MoveDocumentRequestModel moveDocumentRequestModel)
     {
+        AuthorizationResult sourceAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionMove.ActionLetter, [id]),
+            AuthorizationPolicies.ContentPermissionByResource);
+        AuthorizationResult destinationAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionNew.ActionLetter, [moveDocumentRequestModel.Target?.Id]),
+            AuthorizationPolicies.ContentPermissionByResource);
+
+        if (sourceAuthorizationResult.Succeeded is false || destinationAuthorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             ContentPermissionResource.WithKeys(ActionMove.ActionLetter, new[] { moveDocumentRequestModel.Target?.Id, id }),
