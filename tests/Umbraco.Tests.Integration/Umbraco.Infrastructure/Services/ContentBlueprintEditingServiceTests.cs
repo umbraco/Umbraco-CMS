@@ -136,7 +136,11 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
                     return CreateBlockValueOfType<BlockGridValue, BlockGridLayoutItem>();
                 case Constants.PropertyEditors.Aliases.RichText:
                     var res = CreateBlockValueOfType<RichTextBlockValue, RichTextBlockLayoutItem>();
-                    return (new RichTextEditorValue { Markup = string.Empty, Blocks = res.BlockValue }, res.BlockKeys);
+                    return (new RichTextEditorValue
+                    {
+                        Markup = string.Join(string.Empty, res.BlockKeys.Chunk(2).Select(c => $"<umb-rte-block data-content-key=\"{c.First()}\"></umb-rte-block>")),
+                        Blocks = res.BlockValue,
+                    }, res.BlockKeys);
                 default:
                     throw new NotSupportedException($"Editor alias '{editorAlias}' is not supported for block blueprints.");
             }
