@@ -753,6 +753,7 @@ stages:
               vmImage: "windows-latest"
               testFolder: "UnattendedInstallConfig"
               testCommand: "npx playwright test --project=unattendedInstallConfig --grep=InstallSQLServer"
+              SA_PASSWORD: "TestPassword"
               CONNECTIONSTRINGS__UMBRACODBDSN: ""
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
               port: 44331
@@ -760,6 +761,7 @@ stages:
               vmImage: "ubuntu-latest"
               testFolder: "UnattendedInstallConfig"
               testCommand: "npx playwright test --project=unattendedInstallConfig --grep=InstallSQLServer"
+              SA_PASSWORD: "TestPassword"
               CONNECTIONSTRINGS__UMBRACODBDSN: ""
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
               port: 44331
@@ -767,11 +769,11 @@ stages:
             WindowsDeliveryApiConfig:
               vmImage: "windows-latest"
               testFolder: "DeliveryApi"
-              testCommand: "npx playwright test --project=deliverApi"
+              testCommand: "npx playwright test --project=deliveryApi"
             LinuxDeliveryApiConfig:
               vmImage: "ubuntu-latest"
               testFolder: "DeliveryApi"
-              testCommand: "npx playwright test --project=deliverApi"
+              testCommand: "npx playwright test --project=deliveryApi"
         pool:
           vmImage: $(vmImage)
         steps:
