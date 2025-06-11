@@ -4,6 +4,7 @@ import { css, html, repeat, customElement, state, nothing, property } from '@umb
 import type { UmbModalManagerContext, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalElement } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIModalSidebarElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-backoffice-modal-container')
 export class UmbBackofficeModalContainerElement extends UmbLitElement {
@@ -86,11 +87,19 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 
 	#onCloseEnd(key: string) {
 		//move notification container out of modal container
-		var parentNode = this.parentNode;
-		var uuiModalContainer = this.renderRoot.querySelector('uui-modal-container');
-		var modalSidebar = uuiModalContainer?.querySelector('uui-modal-sidebar') as any;
-		if(parentNode){
-			parentNode.insertBefore(modalSidebar.shadowRoot.querySelector('dialog').querySelector('umb-backoffice-notification-container'), this);
+		const parentNode = this.parentNode;
+		const uuiModalContainer = this.renderRoot.querySelector('uui-modal-container');
+		const modalSidebar = uuiModalContainer?.querySelector('uui-modal-sidebar') as UUIModalSidebarElement | null;
+
+		if (!modalSidebar) return;
+
+		const dialog = modalSidebar.shadowRoot?.querySelector('dialog');
+		if (!dialog) return;
+
+		const notificationContainer = dialog.querySelector('umb-backoffice-notification-container') as HTMLElement;
+
+		if (parentNode) {
+			parentNode.insertBefore(notificationContainer, this);
 		}
 
 		this._modalManager?.remove(key);
@@ -117,26 +126,24 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		`;
 	}
 
-	async addNotificationContainer(){
+	async addNotificationContainer() {
 		const modalContainer = this.renderRoot.querySelector('uui-modal-container');
-		if(!modalContainer){
-			return;
-		}
+		if (!modalContainer) return;
 
 		await modalContainer.updateComplete;
 
-		var modalSidebar = modalContainer.querySelector('uui-modal-sidebar') as any;
-		if (!modalSidebar) {
-			return;
-		}
-		
-		var dialog = modalSidebar.shadowRoot?.querySelector('dialog');
-		if(!dialog){
-			return
-		}
+		const modalSidebar = modalContainer.querySelector('uui-modal-sidebar') as UUIModalSidebarElement;
+		if (!modalSidebar) return;
 
+		const parentNode = this.parentNode as HTMLElement;
+		if (!parentNode) return;
+
+		const notificationContainer = parentNode.querySelector('umb-backoffice-notification-container') as HTMLElement;
+
+		const dialog = modalSidebar.shadowRoot?.querySelector('dialog');
+		if (!dialog) return;
 		//move notification container into modal container
-		dialog.insertBefore((this.parentNode as HTMLElement).querySelector('umb-backoffice-notification-container'), dialog.firstChild);
+		dialog.insertBefore(notificationContainer, dialog.firstChild);
 	}
 
 	override async updated(){
