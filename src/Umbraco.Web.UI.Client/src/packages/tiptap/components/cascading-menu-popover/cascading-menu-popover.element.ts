@@ -9,6 +9,7 @@ export type UmbCascadingMenuItem = {
 	element?: HTMLElement;
 	separatorAfter?: boolean;
 	style?: string;
+	isActive?: () => boolean | undefined;
 	execute?: () => void;
 };
 
@@ -19,6 +20,10 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 
 	#getPopoverById(popoverId: string): UUIPopoverContainerElement | null | undefined {
 		return this.shadowRoot?.querySelector(`#${popoverId}`) as UUIPopoverContainerElement;
+	}
+
+	#isMenuActive(items?: UmbCascadingMenuItem[]): boolean {
+		return !!items?.some((item) => item.isActive?.() || this.#isMenuActive(item.items));
 	}
 
 	#onMouseEnter(item: UmbCascadingMenuItem, popoverId: string) {
@@ -72,6 +77,7 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 		}
 
 		const label = this.localize.string(item.label);
+		const isActive = item.isActive?.() || this.#isMenuActive(item.items) || false;
 
 		return html`
 			<div
@@ -85,6 +91,8 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 							class=${item.separatorAfter ? 'separator' : ''}
 							label=${label}
 							popovertarget=${popoverId}
+							select-mode="highlight"
+							?selected=${isActive}
 							@click-label=${() => this.#onClick(item, popoverId)}>
 							${when(item.icon, (icon) => html`<uui-icon slot="icon" name=${icon}></uui-icon>`)}
 							<div slot="label" class="menu-item">
