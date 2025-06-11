@@ -60,8 +60,10 @@ public interface IContentService : IContentServiceBase<IContent>
     IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Creates a new content item from a blueprint.
+    ///     (Deprecated) Creates a new content item from a blueprint.
     /// </summary>
+    /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
+    /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
     [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
     IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
