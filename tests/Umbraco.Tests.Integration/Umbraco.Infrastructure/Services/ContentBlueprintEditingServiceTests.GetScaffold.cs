@@ -34,7 +34,15 @@ public partial class ContentBlueprintEditingServiceTests
             };
             var result = await ContentBlueprintEditingService.GetScaffoldedAsync(blueprint.Key);
             Assert.IsNotNull(result);
-            Assert.AreEqual(blueprint.Key, result.Key);
+            Assert.AreNotEqual(blueprint.Key, result.Key);
+            Assert.AreEqual(
+                blueprint.ContentType.Key,
+                result.ContentType.Key,
+                "The content type of the scaffolded content should match the original blueprint content type.");
+            Assert.AreEqual(
+                blueprint.Properties.Select(p => (p.Alias, p.PropertyType.Key)),
+                result.Properties.Select(p => (p.Alias, p.PropertyType.Key)),
+                "The properties of the scaffolded content should match the original blueprint properties.");
 
             var propertyValues = result.Properties.SelectMany(property => property.Values).ToArray();
             Assert.IsNotEmpty(propertyValues);

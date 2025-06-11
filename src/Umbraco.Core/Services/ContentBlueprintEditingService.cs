@@ -45,11 +45,13 @@ internal sealed class ContentBlueprintEditingService
             return Task.FromResult<IContent?>(null);
         }
 
+        IContent scaffold = blueprint.DeepCloneWithResetIdentities();
+
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        scope.Notifications.Publish(new ContentScaffoldedNotification(blueprint, blueprint, Constants.System.Root, new EventMessages()));
+        scope.Notifications.Publish(new ContentScaffoldedNotification(blueprint, scaffold, Constants.System.Root, new EventMessages()));
         scope.Complete();
 
-        return Task.FromResult<IContent?>(blueprint);
+        return Task.FromResult<IContent?>(scaffold);
     }
 
     public async Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeAsync(Guid contentTypeKey, int skip, int take)
