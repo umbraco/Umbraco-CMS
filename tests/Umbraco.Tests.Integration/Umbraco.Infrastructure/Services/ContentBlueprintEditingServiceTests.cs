@@ -1,13 +1,10 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Tests.Common.Builders;
-using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -42,148 +39,6 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
         var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         return result.Result.Content!;
-    }
-
-
-    private async Task<(IContent Content, List<Guid> BlockKeys)> CreateBlueprintWithBlocksEditor(bool variant, string editorAlias)
-    {
-        var contentType = variant ? await CreateVariantContentType() : CreateInvariantContentType();
-
-        // Create element type
-        var elementContentType = new ContentTypeBuilder()
-            .WithAlias("elementType")
-            .WithName("Element")
-            .WithIsElement(true)
-            .Build();
-        await ContentTypeService.CreateAsync(elementContentType, Constants.Security.SuperUserKey);
-
-        // Create settings element type
-        var settingsContentType = new ContentTypeBuilder()
-            .WithAlias("settingsType")
-            .WithName("Settings")
-            .WithIsElement(true)
-            .Build();
-        await ContentTypeService.CreateAsync(settingsContentType, Constants.Security.SuperUserKey);
-
-        // Create blocks datatype using the created elements
-        var dataType = DataTypeBuilder.CreateSimpleElementDataType(IOHelper, editorAlias, elementContentType.Key, settingsContentType.Key);
-        var dataTypeAttempt = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        Assert.True(dataTypeAttempt.Success, $"Failed to create data type: {dataTypeAttempt.Exception?.Message}");
-
-        // Create new blocks property types
-        var invariantPropertyType = new PropertyTypeBuilder<ContentTypeBuilder>(new ContentTypeBuilder())
-            .WithPropertyEditorAlias(editorAlias)
-            .WithValueStorageType(ValueStorageType.Ntext)
-            .WithAlias("invariantBlocks")
-            .WithName("Invariant Blocks")
-            .WithDataTypeId(dataType.Id)
-            .WithVariations(ContentVariation.Nothing)
-            .Build();
-        contentType.AddPropertyType(invariantPropertyType);
-
-        if (contentType.VariesByCulture())
-        {
-            var propertyType = new PropertyTypeBuilder<ContentTypeBuilder>(new ContentTypeBuilder())
-                .WithPropertyEditorAlias(editorAlias)
-                .WithValueStorageType(ValueStorageType.Ntext)
-                .WithAlias("blocks")
-                .WithName("Blocks")
-                .WithDataTypeId(dataType.Id)
-                .WithVariations(contentType.Variations)
-                .Build();
-            contentType.AddPropertyType(propertyType);
-        }
-
-        // Update the content type with the new blocks property type
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
-
-        string?[] cultures = contentType.VariesByCulture()
-            ? [null, "en-US", "da-DK"]
-            : [null];
-
-        var createModel = new ContentBlueprintCreateModel
-        {
-            ContentTypeKey = contentType.Key,
-            ParentKey = Constants.System.RootKey,
-            Variants = cultures.Where(c => variant ? c != null : c == null).Select(c => new VariantModel { Culture = c, Name = $"Initial Blueprint {c}" }),
-        };
-
-        List<Guid> allBlockKeys = [];
-        foreach (var culture in cultures)
-        {
-            var (blockValue, blockKeys) = CreateBlockValue();
-            createModel.Properties = createModel.Properties.Append(
-                new PropertyValueModel
-                {
-                    Alias = culture == null ? "invariantBlocks" : "blocks",
-                    Value = JsonSerializer.Serialize(blockValue),
-                    Culture = culture,
-                });
-            allBlockKeys.AddRange(blockKeys);
-        }
-
-        var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        return (result.Result.Content, allBlockKeys);
-
-        (object BlockValue, IEnumerable<Guid> BlockKeys) CreateBlockValue()
-        {
-            switch (editorAlias)
-            {
-                case Constants.PropertyEditors.Aliases.BlockList:
-                    return CreateBlockValueOfType<BlockListValue, BlockListLayoutItem>();
-                case Constants.PropertyEditors.Aliases.BlockGrid:
-                    return CreateBlockValueOfType<BlockGridValue, BlockGridLayoutItem>();
-                case Constants.PropertyEditors.Aliases.RichText:
-                    var res = CreateBlockValueOfType<RichTextBlockValue, RichTextBlockLayoutItem>();
-                    return (new RichTextEditorValue
-                    {
-                        Markup = string.Join(string.Empty, res.BlockKeys.Chunk(2).Select(c => $"<umb-rte-block data-content-key=\"{c.First()}\"></umb-rte-block>")),
-                        Blocks = res.BlockValue,
-                    }, res.BlockKeys);
-                default:
-                    throw new NotSupportedException($"Editor alias '{editorAlias}' is not supported for block blueprints.");
-            }
-        }
-
-        (T BlockValue, IEnumerable<Guid> BlockKeys) CreateBlockValueOfType<T, TLayout>()
-            where T : BlockValue, new()
-            where TLayout : IBlockLayoutItem, new()
-        {
-            // Generate two pairs of Guids as a list of tuples
-            const int numberOfBlocks = 2;
-            var blockKeys = Enumerable.Range(0, numberOfBlocks)
-                .Select(_ => Enumerable.Range(0, 2).Select(_ => Guid.NewGuid()).ToList())
-                .ToList();
-            return (new T
-            {
-                Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
-                {
-                    [editorAlias] = blockKeys.Select(blockKeyGroup =>
-                        new TLayout
-                        {
-                            ContentKey = blockKeyGroup[0],
-                            SettingsKey = blockKeyGroup[1],
-                        }).OfType<IBlockLayoutItem>(),
-                },
-                ContentData = blockKeys.Select(blockKeyGroup => new BlockItemData
-                    {
-                        Key = blockKeyGroup[0],
-                        ContentTypeAlias = elementContentType.Alias,
-                        ContentTypeKey = elementContentType.Key,
-                        Values = [],
-                    })
-                    .ToList(),
-                SettingsData = blockKeys.Select(blockKeyGroup => new BlockItemData
-                    {
-                        Key = blockKeyGroup[1],
-                        ContentTypeAlias = settingsContentType.Alias,
-                        ContentTypeKey = settingsContentType.Key,
-                        Values = [],
-                    })
-                    .ToList(),
-            }, blockKeys.SelectMany(l => l));
-        }
     }
 
     private async Task<IContent> CreateVariantContentBlueprint()
