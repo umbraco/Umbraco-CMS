@@ -29,14 +29,14 @@ public class Language : EntityBase, ILanguage
         _cultureName = cultureName ?? throw new ArgumentNullException(nameof(cultureName));
     }
 
-        /// <inheritdoc />
-        [DataMember]
-        public string IsoCode
+    /// <inheritdoc />
+    [DataMember]
+    public string IsoCode
+    {
+        get => _isoCode;
+        set
         {
-            get => _isoCode;
-            set
-            {
-                ArgumentNullException.ThrowIfNull(value);
+            ArgumentNullException.ThrowIfNull(value);
 
             SetPropertyValueAndDetectChanges(value, ref _isoCode!, nameof(IsoCode));
         }
