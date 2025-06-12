@@ -78,6 +78,8 @@ export class UmbWorkspaceActionElement<
 	@state()
 	private _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
 
+	#buttonStateResetTimeoutId: number | null = null;
+
 	/**
 	 * Create a list of original and overwritten aliases of workspace actions for the action.
 	 */
@@ -139,11 +141,20 @@ export class UmbWorkspaceActionElement<
 	}
 
 	#initButtonStateReset() {
-		/* When the button have additional option we do not show the waiting state.
-		Therefore we need to ensure the button state is reset, so we are able to show the success state again. */
-		setTimeout(() => {
+		/* When the button has additional options, we do not show the waiting state.  
+    Therefore, we need to ensure the button state is reset, so we are able to show the success state again. */
+		this.#clearButtonStateResetTimeout();
+
+		this.#buttonStateResetTimeoutId = window.setTimeout(() => {
 			this._buttonState = undefined;
 		}, 2000);
+	}
+
+	#clearButtonStateResetTimeout() {
+		if (this.#buttonStateResetTimeoutId !== null) {
+			clearTimeout(this.#buttonStateResetTimeoutId);
+			this.#buttonStateResetTimeoutId = null;
+		}
 	}
 
 	#observeExtensions(aliases: string[]): void {
@@ -197,6 +208,11 @@ export class UmbWorkspaceActionElement<
 			() => html` <uui-button-group> ${this.#renderButton()} ${this.#renderActionMenu()} </uui-button-group> `,
 			() => this.#renderButton(),
 		);
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#clearButtonStateResetTimeout();
 	}
 }
 
