@@ -115,16 +115,14 @@ export class UmbWorkspaceActionElement<
 			try {
 				if (!this.#api) throw new Error('No api defined');
 				await this.#api.execute();
-				if (!this._additionalOptions) {
-					this._buttonState = 'success';
-				}
+				this._buttonState = 'success';
+				this.#initResetButtonState();
 			} catch (reason) {
 				if (reason) {
 					console.warn(reason);
 				}
-				if (!this._additionalOptions) {
-					this._buttonState = 'failed';
-				}
+				this._buttonState = 'failed';
+				this.#initResetButtonState();
 			}
 		}
 		this.dispatchEvent(new UmbActionExecutedEvent());
@@ -138,6 +136,14 @@ export class UmbWorkspaceActionElement<
 			},
 			'isDisabledObserver',
 		);
+	}
+
+	#initResetButtonState() {
+		/* When the button have additional option we do not show the waiting state.
+		Therefore we need to ensure the button state is reset, so we are able to show the success state again. */
+		setTimeout(() => {
+			this._buttonState = undefined;
+		}, 2000);
 	}
 
 	#observeExtensions(aliases: string[]): void {
