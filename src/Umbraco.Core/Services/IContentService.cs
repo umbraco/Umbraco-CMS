@@ -57,7 +57,9 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Creates a blueprint from a content item.
     /// </summary>
-    IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
+    // TODO: Remove the default implementation when CreateContentFromBlueprint is removed.
+    IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
 
     /// <summary>
     ///     (Deprecated) Creates a new content item from a blueprint.
