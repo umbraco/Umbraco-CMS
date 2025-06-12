@@ -1,7 +1,7 @@
-import { isProblemDetailsLike } from '../apiTypeValidators.function.js';
 import { UmbResourceController } from '../resource.controller.js';
 import type { UmbApiResponse, UmbTryExecuteOptions } from '../types.js';
-import { UmbApiError, UmbCancelError } from '../umb-error.js';
+import { UmbCancelError } from '../umb-error.js';
+import type { UmbApiError } from '../umb-error.js';
 
 export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 	#abortSignal?: AbortSignal;
@@ -35,33 +35,51 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 		super.destroy();
 	}
 
-	#notifyOnError(error: unknown) {
+	#notifyOnError(error: UmbApiError | UmbCancelError): void {
 		if (UmbCancelError.isUmbCancelError(error)) {
 			// Cancel error, do not show notification
 			return;
 		}
 
 		let headline = 'An error occurred';
-		let message = 'An error occurred while trying to execute the request.';
+		let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
 		let details: Record<string, string[]> | undefined = undefined;
 
-		// Check if we can extract problem details from the error
-		const problemDetails = UmbApiError.isUmbApiError(error)
-			? error.problemDetails
-			: isProblemDetailsLike(error)
-				? error
-				: undefined;
+		const apiError = error as UmbApiError;
 
-		if (problemDetails) {
+		// Check if we can extract problem details from the error
+		if (apiError.problemDetails) {
+			if (apiError.problemDetails.status === 401) {
+				// Unauthorized error, show no notification
+				// the user will see a login screen instead
+				return;
+			}
+
+			if (apiError.problemDetails.status === 404) {
+				// Not found error, show no notification
+				// the user will see a 404 page instead, or otherwise the UI will handle it
+				return;
+			}
+
 			// UmbProblemDetails, show notification
-			message = problemDetails.title;
-			details = problemDetails.errors ?? undefined;
+			message = apiError.problemDetails.title;
+			details = apiError.problemDetails.errors ?? undefined;
+
+			// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
+			if (
+				apiError.problemDetails.detail?.includes('ObjectCacheAppCache') ||
+				apiError.problemDetails.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
+			) {
+				headline = 'Please restart the server';
+				message =
+					'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
+			}
 		} else {
 			// Unknown error, show notification
-			headline = '';
-			message = error instanceof Error ? error.message : 'An unknown error occurred.';
+			message = apiError instanceof Error ? apiError.message : 'An unknown error occurred.';
 		}
 
 		this._peekError(headline, message, details);
+		console.error('[UmbTryExecuteController] Error in request:', error);
 	}
 }

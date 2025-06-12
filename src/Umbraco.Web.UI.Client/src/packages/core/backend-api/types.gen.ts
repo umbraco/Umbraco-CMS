@@ -1014,7 +1014,9 @@ export type HealthCheckActionRequestModel = {
     providedValue?: string | null;
     providedValueValidation?: string | null;
     providedValueValidationRegex?: string | null;
-    actionParameters?: {} | null;
+    actionParameters?: {
+        [key: string]: unknown;
+    } | null;
 };
 
 export type HealthCheckGroupPresentationModel = {
@@ -1096,7 +1098,9 @@ export type IndexResponseModel = {
     searcherName: string;
     documentCount: number;
     fieldCount: number;
-    providerProperties?: {} | null;
+    providerProperties?: {
+        [key: string]: unknown;
+    } | null;
 };
 
 export type InstallRequestModelReadable = {
