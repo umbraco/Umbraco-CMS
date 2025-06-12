@@ -33,7 +33,7 @@ internal class ContentVersionCultureVariationDto
     [Column("name")]
     public string? Name { get; set; }
 
-    [Column("date")] // TODO: db rename to 'updateDate'
+    [Column("date", ForceToUtc = false)] // TODO: db rename to 'updateDate'
     public DateTime UpdateDate { get; set; }
 
     [Column("availableUserId")] // TODO: db rename to 'updateDate'

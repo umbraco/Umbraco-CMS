@@ -2097,7 +2097,7 @@ export default {
 		duplicateUsername: "Username '%0%' is already taken",
 		customValidation: 'Custom validation',
 		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
-		entriesExceed: 'Maximum %0% entries, <strong>%1%</strong> too many.',
+		entriesExceed: 'Maximum %0% entries, you have entered <strong>%1%</strong> too many.',
 		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 	},
 	healthcheck: {

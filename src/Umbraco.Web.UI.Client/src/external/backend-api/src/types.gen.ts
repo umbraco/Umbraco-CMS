@@ -3523,6 +3523,12 @@ export type PutDocumentBlueprintByIdMoveData = {
 
 export type PutDocumentBlueprintByIdMoveResponse = (string);
 
+export type GetDocumentBlueprintByIdScaffoldData = {
+    id: string;
+};
+
+export type GetDocumentBlueprintByIdScaffoldResponse = ((DocumentBlueprintResponseModel));
+
 export type PostDocumentBlueprintFolderData = {
     requestBody?: (CreateFolderRequestModel);
 };

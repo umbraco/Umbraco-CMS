@@ -26,23 +26,36 @@
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
-  <!-- Restore and build backoffice project -->
+  <!-- General ignored files -->
+  <ItemGroup>
+    <Content Remove="wwwroot\umbraco\assets\README.md" />
+  </ItemGroup>
+
+
+
+  <!-- BEGIN: Restore and build backoffice project -->
   <PropertyGroup>
     <BackofficeProjectDirectory Condition="'$(BackofficeProjectDirectory)' == ''">..\Umbraco.Web.UI.Client\</BackofficeProjectDirectory>
-    <BackofficeAssetsPath>wwwroot\umbraco\backoffice</BackofficeAssetsPath>
+    <BackofficeAssetsPath>$(ProjectDir)wwwroot\umbraco\backoffice</BackofficeAssetsPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <BackofficeAssetsInputs Include="$(BackofficeProjectDirectory)package.json;$(BackofficeProjectDirectory)package-lock.json;$(BackofficeProjectDirectory)src\**" Exclude="$(DefaultItemExcludes)" />
     <Content Remove="$(BackofficeAssetsPath)\**" />
   </ItemGroup>
 
-  <Target Name="RestoreBackoffice" Inputs="$(BackofficeProjectDirectory)package-lock.json" Outputs="$(BackofficeProjectDirectory)node_modules\.package-lock.json">
-    <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
-    <Exec Command="npm ci --no-fund --no-audit --prefer-offline" WorkingDirectory="$(BackofficeProjectDirectory)" />
+  <Target Name="BuildStaticAssetsPreconditions" BeforeTargets="AssignTargetPaths">
+    <Message Text="Skip BuildBackoffice target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip BuildBackoffice target because '$(BackofficeAssetsPath)' already exists" Importance="high" Condition="Exists('$(BackofficeAssetsPath)')" />
+    <Message Text="Call BuildBackoffice target because UmbracoBuild is empty (this is Visual Studio) and '$(BackofficeAssetsPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BackofficeAssetsPath)')" />
+    <CallTarget Targets="BuildBackoffice" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BackofficeAssetsPath)')" />
   </Target>
 
-  <Target Name="BuildBackoffice" DependsOnTargets="RestoreBackoffice" BeforeTargets="AssignTargetPaths" Inputs="@(BackofficeAssetsInputs)" Outputs="$(IntermediateOutputPath)backoffice.complete.txt">
+  <Target Name="RestoreBackoffice" Inputs="$(BackofficeProjectDirectory)package-lock.json" Outputs="$(BackofficeProjectDirectory)node_modules\.package-lock.json">
+    <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
+    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(BackofficeProjectDirectory)" />
+  </Target>
+
+  <Target Name="BuildBackoffice" DependsOnTargets="RestoreBackoffice">
     <Message Importance="high" Text="Executing Backoffice NPM build script..." />
     <Exec Command="npm run build:for:cms" WorkingDirectory="$(BackofficeProjectDirectory)" />
     <ItemGroup>
@@ -61,27 +74,46 @@
     </DefineStaticWebAssets>
   </Target>
 
-  <!-- Restore and build login project -->
+  <Target Name="CleanStaticAssetsPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
+    <Message Text="Skip CleanBackoffice target because '$(BackofficeAssetsPath)' doesn't exist" Importance="high" Condition="!Exists('$(BackofficeAssetsPath)')" />
+    <Message Text="Skip CleanBackoffice target because preserve.backoffice marker file exists" Importance="high" Condition="Exists('$(BackofficeAssetsPath)') and Exists('$(SolutionDir)preserve.backoffice')" />
+    <Message Text="Call CleanBackoffice target because '$(BackofficeAssetsPath)' exists and preserve.backoffice marker file doesn't exist" Importance="high" Condition="Exists('$(BackofficeAssetsPath)') and !Exists('$(SolutionDir)preserve.backoffice')" />
+    <CallTarget Targets="CleanBackoffice" Condition="Exists('$(BackofficeAssetsPath)') and !Exists('$(SolutionDir)preserve.backoffice')" />
+  </Target>
+
+  <Target Name="CleanBackoffice">
+    <ItemGroup>
+      <BackofficeDirectories Include="$(BackofficeAssetsPath)" />
+    </ItemGroup>
+    <RemoveDir Directories="@(BackofficeDirectories)" />
+  </Target>
+  <!-- END: Restore and build backoffice project -->
+
+
+
+  <!-- BEGIN: Restore and build login project -->
   <PropertyGroup>
     <LoginProjectDirectory Condition="'$(LoginProjectDirectory)' == ''">..\Umbraco.Web.UI.Login\</LoginProjectDirectory>
-    <LoginAssetsPath>wwwroot\umbraco\login</LoginAssetsPath>
+    <LoginAssetsPath>$(ProjectDir)wwwroot\umbraco\login</LoginAssetsPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <LoginAssetsInputs Include="$(LoginProjectDirectory)**" Exclude="$(DefaultItemExcludes)" />
     <Content Remove="$(LoginAssetsPath)\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Remove="wwwroot\umbraco\assets\README.md" />
-  </ItemGroup>
+  <Target Name="BuildLoginStaticAssetsPreconditions" BeforeTargets="AssignTargetPaths">
+    <Message Text="Skip BuildLogin target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip BuildLogin target because '$(LoginAssetsPath)' already exists" Importance="high" Condition="Exists('$(LoginAssetsPath)')" />
+    <Message Text="Call BuildLogin target because UmbracoBuild is empty (this is Visual Studio) and '$(LoginAssetsPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginAssetsPath)')" />
+    <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginAssetsPath)')" />
+  </Target>
 
   <Target Name="RestoreLogin" Inputs="$(LoginProjectDirectory)package-lock.json" Outputs="$(LoginProjectDirectory)node_modules/.package-lock.json">
     <Message Importance="high" Text="Restoring Login NPM packages..." />
-    <Exec Command="npm ci --no-fund --no-audit --prefer-offline" WorkingDirectory="$(LoginProjectDirectory)" />
+    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(LoginProjectDirectory)" />
   </Target>
 
-  <Target Name="BuildLogin" DependsOnTargets="RestoreLogin" BeforeTargets="AssignTargetPaths" Inputs="@(LoginAssetsInputs)" Outputs="$(IntermediateOutputPath)login.complete.txt">
+  <Target Name="BuildLogin" DependsOnTargets="RestoreLogin">
     <Message Importance="high" Text="Executing Login NPM build script..." />
     <Exec Command="npm run build" WorkingDirectory="$(LoginProjectDirectory)" />
     <ItemGroup>
@@ -99,4 +131,19 @@
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
   </Target>
+
+  <Target Name="CleanLoginStaticAssetsPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
+    <Message Text="Skip CleanLogin target because '$(LoginAssetsPath)' doesn't exist" Importance="high" Condition="!Exists('$(LoginAssetsPath)')" />
+    <Message Text="Skip CleanLogin target because preserve.login marker file exists" Importance="high" Condition="Exists('$(LoginAssetsPath)') and Exists('$(SolutionDir)preserve.login')" />
+    <Message Text="Call CleanLogin target because '$(LoginAssetsPath)' exists and preserve.login marker file doesn't exist" Importance="high" Condition="Exists('$(LoginAssetsPath)') and !Exists('$(SolutionDir)preserve.login')" />
+    <CallTarget Targets="CleanLogin" Condition="Exists('$(LoginAssetsPath)') and !Exists('$(SolutionDir)preserve.login')" />
+  </Target>
+
+  <Target Name="CleanLogin">
+    <ItemGroup>
+      <LoginDirectories Include="$(LoginAssetsPath)" />
+    </ItemGroup>
+    <RemoveDir Directories="@(LoginDirectories)" />
+  </Target>
+  <!-- END: Restore and build login project -->
 </Project>
