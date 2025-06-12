@@ -21,4 +21,7 @@ export {
 	switchMap,
 	takeUntil,
 	tap,
+	delay,
+	throttleTime,
+	auditTime,
 } from 'rxjs';
