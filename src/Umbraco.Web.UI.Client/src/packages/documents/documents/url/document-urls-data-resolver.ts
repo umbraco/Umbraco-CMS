@@ -3,7 +3,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_VARIANT_CONTEXT, type UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A controller for resolving data for document urls
@@ -13,7 +13,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
  */
 export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	#appCulture?: string;
-	#propertyDataSetCulture?: UmbVariantId;
+	#variantId?: UmbVariantId;
 	#data?: Array<UmbDocumentUrlModel> | undefined;
 
 	#init: Promise<unknown>;
@@ -29,11 +29,9 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		// TODO: listen for UMB_VARIANT_CONTEXT when available
 		this.#init = Promise.all([
-			this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-				this.#propertyDataSetCulture = context?.getVariantId();
-				this.#setCultureAwareValues();
+			this.consumeContext(UMB_VARIANT_CONTEXT, async (context) => {
+				this.#variantId = await context?.getVariantId();
 			}).asPromise(),
 		]);
 	}
@@ -83,7 +81,7 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	}
 
 	#getCurrentCulture(): string | undefined {
-		return this.#propertyDataSetCulture?.culture || this.#appCulture;
+		return this.#variantId?.culture || this.#appCulture;
 	}
 
 	#getDataForCurrentCulture(): Array<UmbDocumentUrlModel> | undefined {
