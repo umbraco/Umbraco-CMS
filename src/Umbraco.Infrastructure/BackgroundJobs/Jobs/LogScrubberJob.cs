@@ -21,17 +21,16 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// </remarks>
 public class LogScrubberJob : IRecurringBackgroundJob
 {
-    public TimeSpan Period { get => TimeSpan.FromHours(4); }
-
-    // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
-
-
     private readonly IAuditService _auditService;
     private readonly ILogger<LogScrubberJob> _logger;
     private readonly IProfilingLogger _profilingLogger;
     private readonly ICoreScopeProvider _scopeProvider;
     private LoggingSettings _settings;
+
+    public TimeSpan Period => TimeSpan.FromHours(4);
+
+    // No-op event as the period never changes on this job
+    public event EventHandler PeriodChanged { add { } remove { } }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="LogScrubberJob" /> class.
@@ -48,7 +47,6 @@ public class LogScrubberJob : IRecurringBackgroundJob
         ILogger<LogScrubberJob> logger,
         IProfilingLogger profilingLogger)
     {
-
         _auditService = auditService;
         _settings = settings.CurrentValue;
         _scopeProvider = scopeProvider;
@@ -57,17 +55,14 @@ public class LogScrubberJob : IRecurringBackgroundJob
         settings.OnChange(x => _settings = x);
     }
 
-    public Task RunJobAsync()
+    public async Task RunJobAsync()
     {
-
         // Ensure we use an explicit scope since we are running on a background thread.
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         using (_profilingLogger.DebugDuration<LogScrubberJob>("Log scrubbing executing", "Log scrubbing complete"))
         {
-            _auditService.CleanLogs((int)_settings.MaxLogAge.TotalMinutes);
+            await _auditService.CleanLogsAsync((int)_settings.MaxLogAge.TotalMinutes);
             _ = scope.Complete();
         }
-
-        return Task.CompletedTask;
     }
 }

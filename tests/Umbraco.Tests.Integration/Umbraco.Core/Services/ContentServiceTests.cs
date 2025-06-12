@@ -1018,7 +1018,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
+    public async Task Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
     {
         CreateEnglishAndFrenchDocumentType(out var langUk, out var langFr, out var contentType);
 
@@ -1028,7 +1028,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var published = ContentService.Publish(content, new[] { langFr.IsoCode });
 
         // audit log will only show that french was published
-        var lastLog = AuditService.GetLogs(content.Id).Last();
+        var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
         Assert.AreEqual("Published languages: fr-FR", lastLog.Comment);
 
         // re-get
@@ -1038,7 +1038,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         published = ContentService.Publish(content, new[] { langUk.IsoCode });
 
         // audit log will only show that english was published
-        lastLog = AuditService.GetLogs(content.Id).Last();
+        lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
         Assert.AreEqual("Published languages: en-GB", lastLog.Comment);
     }
 
@@ -1075,7 +1075,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         var unpublished = ContentService.Unpublish(content, langFr.IsoCode);
 
         // audit log will only show that french was unpublished
-        var lastLog = AuditService.GetLogs(content.Id).Last();
+        var lastLog = (await AuditService.GetItemsByEntityAsync(content.Id, 0, 1)).Items.First();
         Assert.AreEqual("Unpublished languages: fr-FR", lastLog.Comment);
 
         // re-get
@@ -1084,7 +1084,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         unpublished = ContentService.Unpublish(content, langGb.IsoCode);
 
         // audit log will only show that english was published
-        var logs = AuditService.GetLogs(content.Id).ToList();
+        var logs = (await AuditService.GetItemsByEntityAsync(content.Id, 0, int.MaxValue, Direction.Ascending)).Items.ToList();
         Assert.AreEqual("Unpublished languages: en-GB", logs[^2].Comment);
         Assert.AreEqual("Unpublished (mandatory language unpublished)", logs[^1].Comment);
     }

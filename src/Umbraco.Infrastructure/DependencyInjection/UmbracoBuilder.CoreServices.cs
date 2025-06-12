@@ -338,11 +338,11 @@ public static partial class UmbracoBuilderExtensions
 
         // add handlers for building content relations
         builder
-            .AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>()
             .AddNotificationHandler<ContentMovedNotification, RelateOnTrashNotificationHandler>()
-            .AddNotificationHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationHandler<MediaMovedNotification, RelateOnTrashNotificationHandler>()
-            .AddNotificationHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
+            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
         // add notification handlers for property editors
         builder
