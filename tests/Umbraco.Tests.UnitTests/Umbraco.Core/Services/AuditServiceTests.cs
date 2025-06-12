@@ -154,7 +154,6 @@ public class AuditServiceTests
         Fixture fixture = new Fixture();
         long totalRecords = 12;
 
-        // TODO: Test whether the provided query has a filter on id
         _auditRepositoryMock.Setup(x => x.GetPagedResultsByQuery(
                 It.IsAny<IQuery<IAuditItem>>(),
                 2,
@@ -173,26 +172,10 @@ public class AuditServiceTests
         Assert.AreEqual(2, result.Items.Count());
     }
 
-    [Test]
-    public async Task GetItemsByEntityAsync_Returns_No_Results_When_Key_Is_Not_Found()
-    {
-        SetupScopeProviderMock();
-
-        _entityServiceMock.Setup(x => x.GetId(Guid.Empty, UmbracoObjectTypes.Document)).Returns(Attempt<int>.Fail());
-
-        var result = await _auditService.GetItemsByEntityAsync(-1, 10, 10);
-        Assert.AreEqual(0, result.Total);
-        Assert.AreEqual(0, result.Items.Count());
-    }
-
     [TestCase(Constants.System.Root)]
     [TestCase(-100)]
     public async Task GetItemsByEntityAsync_Returns_No_Results_When_Id_Is_Root_Or_Lower(int userId)
     {
-        SetupScopeProviderMock();
-
-        _entityServiceMock.Setup(x => x.GetId(Guid.Empty, UmbracoObjectTypes.Document)).Returns(Attempt<int>.Fail());
-
         var result = await _auditService.GetItemsByEntityAsync(userId, 10, 10);
         Assert.AreEqual(0, result.Total);
         Assert.AreEqual(0, result.Items.Count());
@@ -208,7 +191,6 @@ public class AuditServiceTests
         Fixture fixture = new Fixture();
         long totalRecords = 12;
 
-        // TODO: Test whether the provided query has a filter on id
         _auditRepositoryMock.Setup(x => x.GetPagedResultsByQuery(
                 It.IsAny<IQuery<IAuditItem>>(),
                 2,
