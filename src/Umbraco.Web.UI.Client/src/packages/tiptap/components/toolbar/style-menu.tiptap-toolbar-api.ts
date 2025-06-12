@@ -15,12 +15,12 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 		code: { type: 'code', command: (chain) => chain.toggleCode() },
 		codeBlock: { type: 'codeBlock', command: (chain) => chain.toggleCodeBlock() },
 		div: { type: 'div', command: (chain) => chain.toggleNode('div', 'paragraph') },
-		em: { type: 'italic', command: (chain) => chain.setItalic() },
+		em: { type: 'italic', command: (chain) => chain.toggleItalic() },
 		ol: { type: 'orderedList', command: (chain) => chain.toggleOrderedList() },
-		strong: { type: 'bold', command: (chain) => chain.setBold() },
-		s: { type: 'strike', command: (chain) => chain.setStrike() },
+		strong: { type: 'bold', command: (chain) => chain.toggleBold() },
+		s: { type: 'strike', command: (chain) => chain.toggleStrike() },
 		span: { type: 'span', command: (chain) => chain.toggleMark('span') },
-		u: { type: 'underline', command: (chain) => chain.setUnderline() },
+		u: { type: 'underline', command: (chain) => chain.toggleUnderline() },
 		ul: { type: 'bulletList', command: (chain) => chain.toggleBulletList() },
 	};
 
@@ -29,6 +29,6 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 		const { tag, id, class: className } = item.data;
 		const focus = editor.chain().focus();
 		const ext = tag ? this.#commands[tag] : null;
-		(ext?.command?.(focus) ?? focus).setId(id, ext?.type).setClassName(className, ext?.type).run();
+		(ext?.command?.(focus) ?? focus).toggleId(id, ext?.type).toggleClassName(className, ext?.type).run();
 	}
 }
