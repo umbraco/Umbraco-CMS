@@ -28,11 +28,6 @@ public static partial class Constants
         public const int UnknownUserId = 0;
 
         /// <summary>
-        ///     The key for the 'unknown' user.
-        /// </summary>
-        public static readonly Guid UnknownUserKey = Guid.Empty;
-
-        /// <summary>
         ///     The name of the 'unknown' user.
         /// </summary>
         public const string UnknownUserName = "SYSTEM";

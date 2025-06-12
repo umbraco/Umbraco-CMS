@@ -1,8 +1,4 @@
 using System.Globalization;
-using System.Text;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -129,8 +125,6 @@ internal sealed class BackOfficeUserManagerAuditer :
         IUser? performingUser = performingId is not null ? _userService.GetUserById(performingId.Value) : null;
         IUser? affectedUser = affectedId is not null ? _userService.GetUserById(affectedId.Value) : null;
 
-        Guid? affectedKey = null;
-            affectedKey = affectedUser?.Key;
         await _auditEntryService.WriteAsync(
             performingUser?.Key,
             FormatDetails(performingId, performingUser),

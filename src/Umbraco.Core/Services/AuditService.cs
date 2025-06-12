@@ -68,12 +68,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         string? comment = null,
         string? parameters = null)
     {
-        var userId = userKey switch
-        {
-            { } when userKey == Constants.Security.UnknownUserKey => Constants.Security.UnknownUserId,
-            _ => (await _userService.GetAsync(userKey))?.Id,
-        };
-
+        var userId = (await _userService.GetAsync(userKey))?.Id;
         if (userId is null)
         {
             return Attempt.Fail(AuditLogOperationStatus.UserNotFound);
@@ -320,7 +315,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use AuditEntryService.WriteAsync() instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use AuditEntryService.WriteAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IAuditEntry Write(
         int performingUserId,
         string perfomingDetails,
