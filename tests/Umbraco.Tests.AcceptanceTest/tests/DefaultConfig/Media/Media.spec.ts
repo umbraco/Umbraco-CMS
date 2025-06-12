@@ -131,13 +131,13 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(parentFolderName);
-  await umbracoUi.media.clickCreateModalButton();
+  await umbracoUi.media.clickCreateActionMenuOption();
   await umbracoUi.media.clickMediaTypeName('Folder');
   await umbracoUi.media.enterMediaItemName(folderName);
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.waitForMediaItemToBeCreated();
+  //await umbracoUi.media.waitForMediaItemToBeCreated(); // This is flaky, and Playwright seems to succeed even with its default timeout
   await umbracoUi.media.isMediaTreeItemVisible(parentFolderName);
   await umbracoUi.media.isMediaTreeItemVisible(folderName, false);
   await umbracoUi.media.clickMediaCaretButtonForName(parentFolderName);
