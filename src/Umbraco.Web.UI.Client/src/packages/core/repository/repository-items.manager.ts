@@ -250,7 +250,8 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		}
 	}
 
-	#sortByUniques(data: Array<ItemType>): Array<ItemType> {
+	#sortByUniques(data?: Array<ItemType>): Array<ItemType> {
+		if (!data) return [];
 		const uniques = this.getUniques();
 		return [...data].sort((a, b) => {
 			const aIndex = uniques.indexOf(this.#getUnique(a) ?? '');
