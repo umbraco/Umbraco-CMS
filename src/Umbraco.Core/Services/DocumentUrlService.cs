@@ -141,14 +141,18 @@ public class DocumentUrlService : IDocumentUrlService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         if (ShouldRebuildUrls())
         {
-            _logger.LogInformation("Rebuilding all URLs.");
+            _logger.LogInformation("Rebuilding all document URLs.");
             await RebuildAllUrlsAsync();
         }
+
+        _logger.LogInformation("Caching document URLs.");
 
         IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments = _documentUrlRepository.GetAll();
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         var languageIdToIsoCode = languages.ToDictionary(x => x.Id, x => x.IsoCode);
+
+        int numberOfCachedUrls = 0;
         foreach (PublishedDocumentUrlSegments publishedDocumentUrlSegment in ConvertToCacheModel(publishedDocumentUrlSegments))
         {
             if (cancellationToken.IsCancellationRequested)
@@ -159,8 +163,11 @@ public class DocumentUrlService : IDocumentUrlService
             if (languageIdToIsoCode.TryGetValue(publishedDocumentUrlSegment.LanguageId, out var isoCode))
             {
                 UpdateCache(_coreScopeProvider.Context!, publishedDocumentUrlSegment, isoCode);
+                numberOfCachedUrls++;
             }
         }
+
+        _logger.LogInformation("Cached {NumberOfUrls} document URLs.", numberOfCachedUrls);
 
         _isInitialized = true;
         scope.Complete();
