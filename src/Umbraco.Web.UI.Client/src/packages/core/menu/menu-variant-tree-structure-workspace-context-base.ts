@@ -54,10 +54,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	async #requestStructure() {
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew
-			? this.#workspaceContext?._internal_createUnderParentEntityType
+			? this.#workspaceContext?._internal_createUnderParentEntityUnique
 			: this.#workspaceContext?.unique;
 		const entityTypeObservable = isNew
-			? this.#workspaceContext?._internal_createUnderParentEntityUnique
+			? this.#workspaceContext?._internal_createUnderParentEntityType
 			: this.#workspaceContext?.entityType;
 
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
@@ -112,7 +112,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	}
 
 	#setParentData(structureItems: Array<UmbVariantStructureItemModel>) {
-		/* If the item is not new, the current item is the last item in the array. 
+		/* If the item is not new, the current item is the last item in the array.
 			We filter out the current item unique to handle any case where it could show up */
 		const parent = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique()).pop();
 
@@ -142,7 +142,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 				return entity;
 			})
-			/* If the item is not new, the current item is the last item in the array. 
+			/* If the item is not new, the current item is the last item in the array.
 			We filter out the current item unique to handle any case where it could show up */
 			.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
 

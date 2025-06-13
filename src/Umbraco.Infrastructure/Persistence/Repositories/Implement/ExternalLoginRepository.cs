@@ -57,10 +57,17 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
         Database.Delete<ExternalLoginDto>("WHERE userOrMemberKey=@userOrMemberKey", new { userOrMemberKey });
 
     /// <inheritdoc />
-    public void DeleteUserLoginsForRemovedProviders(IEnumerable<string> currentLoginProviders) =>
-        Database.Execute(Sql()
-            .Delete<ExternalLoginDto>()
-            .WhereNotIn<ExternalLoginDto>(x => x.LoginProvider, currentLoginProviders));
+    public void DeleteUserLoginsForRemovedProviders(IEnumerable<string> currentLoginProviders)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<ExternalLoginDto>(x => x.Id)
+            .From<ExternalLoginDto>()
+            .Where<ExternalLoginDto>(x => !x.LoginProvider.StartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix)) // Only remove external logins relating to backoffice users, not members.
+            .WhereNotIn<ExternalLoginDto>(x => x.LoginProvider, currentLoginProviders);
+
+        var toDelete = Database.Query<ExternalLoginDto>(sql).Select(x => x.Id).ToList();
+        DeleteExternalLogins(toDelete);
+    }
 
     /// <inheritdoc />
     public void Save(Guid userOrMemberKey, IEnumerable<IExternalLogin> logins)
@@ -100,13 +107,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
         }
 
         // do the deletes, updates and inserts
-        if (toDelete.Count > 0)
-        {
-            // Before we can remove the external login, we must remove the external login tokens associated with that external login,
-            // otherwise we'll get foreign key constraint errors
-            Database.DeleteMany<ExternalLoginTokenDto>().Where(x => toDelete.Contains(x.ExternalLoginId)).Execute();
-            Database.DeleteMany<ExternalLoginDto>().Where(x => toDelete.Contains(x.Id)).Execute();
-        }
+        DeleteExternalLogins(toDelete);
 
         foreach (KeyValuePair<int, IExternalLogin> u in toUpdate)
         {
@@ -114,6 +115,19 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
         }
 
         Database.InsertBulk(toInsert.Select(i => ExternalLoginFactory.BuildDto(userOrMemberKey, i)));
+    }
+
+    private void DeleteExternalLogins(List<int> externalLoginIds)
+    {
+        if (externalLoginIds.Count == 0)
+        {
+            return;
+        }
+
+        // Before we can remove the external login, we must remove the external login tokens associated with that external login,
+        // otherwise we'll get foreign key constraint errors
+        Database.DeleteMany<ExternalLoginTokenDto>().Where(x => externalLoginIds.Contains(x.ExternalLoginId)).Execute();
+        Database.DeleteMany<ExternalLoginDto>().Where(x => externalLoginIds.Contains(x.Id)).Execute();
     }
 
     /// <inheritdoc />
