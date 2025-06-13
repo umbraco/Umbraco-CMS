@@ -7,6 +7,7 @@ import type { UmbMockUserModel } from './user.data.js';
 import { data, mfaLoginProviders } from './user.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
+	CalculatedUserStartNodesResponseModel,
 	CreateUserRequestModel,
 	CurrentUserResponseModel,
 	InviteUserRequestModel,
@@ -42,6 +43,21 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 
 	constructor(data: UmbMockUserModel[]) {
 		super(data);
+	}
+
+	calculateStartNodes(id: string): CalculatedUserStartNodesResponseModel {
+		const user = this.data.find((user) => user.id === id);
+		if (!user) {
+			throw new Error(`User with id ${id} not found`);
+		}
+
+		return {
+			id: user.id,
+			documentStartNodeIds: user.documentStartNodeIds,
+			mediaStartNodeIds: user.mediaStartNodeIds,
+			hasDocumentRootAccess: user.hasDocumentRootAccess,
+			hasMediaRootAccess: user.hasMediaRootAccess,
+		};
 	}
 
 	getConfiguration(): UserConfigurationResponseModel {
