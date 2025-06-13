@@ -24,6 +24,8 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this._availableExtensions = this.#context.filterExtensions(query);
 	}, 250);
 
+	#initialized = false;
+
 	@state()
 	private _availableExtensions: Array<UmbTiptapToolbarExtension> = [];
 
@@ -37,6 +39,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.#value = this.#context.isValidToolbarValue(value) ? value : [[[]]];
 	}
 	get value(): UmbTiptapToolbarValue | undefined {
+		if (this.#value === undefined) return undefined;
 		return this.#context.cloneToolbarValue(this.#value);
 	}
 	#value?: UmbTiptapToolbarValue;
@@ -58,14 +61,17 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			this.observe(this.#context.toolbar, (toolbar) => {
 				if (!toolbar.length) return;
 				this._toolbar = toolbar;
-				this.#value = toolbar.map((rows) => rows.data.map((groups) => [...groups.data]));
-				propertyContext?.setValue(this.#value);
+				if (this.#initialized) {
+					this.#value = toolbar.map((rows) => rows.data.map((groups) => [...groups.data]));
+					propertyContext?.setValue(this.#value);
+				}
 			});
 		});
 	}
 
 	protected override firstUpdated() {
 		this.#context.setToolbar(this.value);
+		this.#initialized = true;
 	}
 
 	#onClick(item: UmbTiptapToolbarExtension) {
