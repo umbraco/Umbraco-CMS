@@ -262,7 +262,7 @@ test('can trash a media node with a relation', async ({umbracoApi, umbracoUi}) =
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(mediaFileName);
-  await umbracoUi.media.clickTrashButton();
+  await umbracoUi.media.clickTrashActionMenuOption();
   // Verify the references list
   await umbracoUi.media.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.referenceHeadline);
   await umbracoUi.media.doesReferenceItemsHaveCount(1);

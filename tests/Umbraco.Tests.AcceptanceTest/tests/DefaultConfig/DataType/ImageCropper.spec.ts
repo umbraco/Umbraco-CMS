@@ -23,13 +23,14 @@ test('can add crop', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
+  await umbracoUi.dataType.clickAddCropButton();
   await umbracoUi.dataType.enterCropValues(
     cropData[0].toString(),
     cropData[1].toString(),
     cropData[2].toString(),
     cropData[3].toString()
   );
-  await umbracoUi.dataType.clickAddCropButton();
+  await umbracoUi.dataType.clickCreateCropButton();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
@@ -47,7 +48,7 @@ test('can edit crop', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.editCropByAlias(cropData[0]);
   await umbracoUi.dataType.enterCropValues(updatedCropData[0], updatedCropData[1], updatedCropData[2].toString(), updatedCropData[3].toString());
-  await umbracoUi.dataType.clickSaveCropButton();
+  await umbracoUi.dataType.clickEditCropButton();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert

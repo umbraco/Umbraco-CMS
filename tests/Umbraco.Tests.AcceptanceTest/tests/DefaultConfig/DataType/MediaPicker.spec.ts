@@ -72,13 +72,14 @@ test('can add image crop', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
+  await umbracoUi.dataType.clickAddCropButton();
   await umbracoUi.dataType.enterCropValues(
     cropData[0].toString(),
     cropData[1].toString(),
     cropData[2].toString(),
     cropData[3].toString()
   );
-  await umbracoUi.dataType.clickAddCropButton();
+  await umbracoUi.dataType.clickCreateCropButton();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
