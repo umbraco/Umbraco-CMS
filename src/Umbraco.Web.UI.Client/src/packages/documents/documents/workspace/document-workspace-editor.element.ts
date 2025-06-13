@@ -20,15 +20,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	#workspaceRoute?: string;
 	#appCulture?: string;
 	#variants?: Array<UmbDocumentVariantOptionModel>;
+	#isForbidden = false;
 
 	@state()
 	_routes?: Array<UmbRoute>;
-
-	/**
-	 * Indicates whether the user is forbidden from accessing the workspace.
-	 * This is used to determine if the user has permission to view the workspace.
-	 */
-	#isForbidden = false;
 
 	constructor() {
 		super();
