@@ -438,7 +438,7 @@ stages:
             displayName: Wait for application
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
-            # Install Playwright and dependencies
+          # Install Playwright and dependencies
           - pwsh: npx playwright install chromium
             displayName: Install Playwright only with Chromium browser
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -569,7 +569,7 @@ stages:
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
             displayName: Restore NPM packages
 
-            # Install Template
+          # Install Template
           - pwsh: |
               $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
               dotnet new nugetconfig
@@ -813,7 +813,7 @@ stages:
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
             displayName: Restore NPM packages
 
-            # Install Template
+          # Install Template
           - pwsh: |
               $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
               dotnet new nugetconfig
