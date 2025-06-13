@@ -749,17 +749,11 @@ stages:
               vmImage: "windows-latest"
               testFolder: "UnattendedInstallConfig"
               testCommand: "npx playwright test --project=unattendedInstallConfig --grep=InstallSQLServer"
-              SA_PASSWORD: "UmbracoAcceptance123!"
-              CONNECTIONSTRINGS__UMBRACODBDSN: ""
-              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
               port: 44331
             LinuxUnattendedInstallConfig:
               vmImage: "ubuntu-latest"
               testFolder: "UnattendedInstallConfig"
               testCommand: "npx playwright test --project=unattendedInstallConfig --grep=InstallSQLServer"
-              SA_PASSWORD: "UmbracoAcceptance123!"
-              CONNECTIONSTRINGS__UMBRACODBDSN: ""
-              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: ""
               port: 44331
             # DeliveryApiConfig
             WindowsDeliveryApiConfig:
