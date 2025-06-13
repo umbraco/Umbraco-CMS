@@ -1,23 +1,17 @@
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-const elementName = 'umb-document-blueprint-folder-workspace-editor';
-@customElement(elementName)
+@customElement('umb-document-blueprint-folder-workspace-editor')
 export class UmbDocumentBlueprintFolderWorkspaceEditorElement extends UmbLitElement {
 	override render() {
-		return html`<umb-workspace-editor>
-			<umb-workspace-header-name-editable slot="header"></umb-workspace-header-name-editable>
-		</umb-workspace-editor>`;
+		return html`<umb-folder-workspace-editor> </umb-folder-workspace-editor>`;
 	}
-
-	static override styles = [UmbTextStyles];
 }
 
 export { UmbDocumentBlueprintFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDocumentBlueprintFolderWorkspaceEditorElement;
+		['umb-document-blueprint-folder-workspace-editor']: UmbDocumentBlueprintFolderWorkspaceEditorElement;
 	}
 }

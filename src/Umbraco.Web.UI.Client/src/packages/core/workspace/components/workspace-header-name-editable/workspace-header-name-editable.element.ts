@@ -31,6 +31,9 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 	@state()
 	private _name = '';
 
+	@state()
+	private _isWritableName = true;
+
 	#workspaceContext?: typeof UMB_NAMABLE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -39,7 +42,18 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 		this.consumeContext(UMB_NAMABLE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			this.#observeName();
+			this.#observeNameWriteGuardRules();
 		});
+	}
+
+	#observeNameWriteGuardRules() {
+		this.observe(
+			this.#workspaceContext?.nameWriteGuard?.isPermittedForName(),
+			(isPermitted) => {
+				this._isWritableName = isPermitted ?? true;
+			},
+			'umbObserveWorkspaceNameWriteGuardRules',
+		);
 	}
 
 	#observeName() {
@@ -73,7 +87,7 @@ export class UmbWorkspaceHeaderNameEditableElement extends UmbLitElement {
 			@input="${this.#onNameInput}"
 			label=${this.label ?? this.localize.term('placeholders_entername')}
 			placeholder=${this.placeholder ?? this.localize.term('placeholders_entername')}
-			?readonly=${this.readonly}
+			?readonly=${this.readonly || !this._isWritableName}
 			required
 			${umbBindToValidation(this, `$.name`, this._name)}
 			${umbFocus()}></uui-input>`;
