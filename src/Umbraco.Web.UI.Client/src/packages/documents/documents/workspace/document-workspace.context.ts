@@ -125,6 +125,7 @@ export class UmbDocumentWorkspaceContext
 		});
 
 		this.observe(this.isNew, (isNew) => {
+			if (isNew === undefined) return;
 			if (isNew) {
 				this.#enforceUserPermission(
 					UMB_USER_PERMISSION_DOCUMENT_CREATE,
