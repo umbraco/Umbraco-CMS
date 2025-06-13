@@ -241,6 +241,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		const { data, error, asObservable } = response;
 
 		if (error) {
+			this.removeUmbControllerByAlias('umbEntityDetailTypeStoreObserver');
 			if (UmbApiError.isUmbApiError(error)) {
 				if (error.status === 401 || error.status === 403) {
 					this.forbidden.addState({ unique: FORBIDDEN_STATE_UNIQUE, message: error.message });
