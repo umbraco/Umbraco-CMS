@@ -753,6 +753,7 @@ stages:
             LinuxUnattendedInstallConfig:
               vmImage: "ubuntu-latest"
               testFolder: "UnattendedInstallConfig"
+              SA_PASSWORD: "UmbracoAcceptance123!"
               testCommand: "npx playwright test --project=unattendedInstallConfig --grep=InstallSQLServer"
               port: 44331
             # DeliveryApiConfig
@@ -760,7 +761,6 @@ stages:
               vmImage: "windows-latest"
               testFolder: "DeliveryApi"
               testCommand: "npx playwright test --project=deliveryApi"
-              SA_PASSWORD: "UmbracoAcceptance123!"
               CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
             LinuxDeliveryApiConfig:
