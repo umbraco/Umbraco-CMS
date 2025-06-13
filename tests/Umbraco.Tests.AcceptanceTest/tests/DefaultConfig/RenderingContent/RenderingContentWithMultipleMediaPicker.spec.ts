@@ -40,8 +40,7 @@ test('can render content with multiple media picker value', async ({umbracoApi, 
   await umbracoUi.contentRender.doesContentRenderValueContainText(secondMediaFileName);
 });
 
-// Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18531
-test.fixme('can render content with multiple image media picker value', async ({umbracoApi, umbracoUi}) => {
+test('can render content with multiple image media picker value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeName = 'Multiple Image Media Picker';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

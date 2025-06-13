@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -92,7 +92,7 @@ test('can open content picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can choose start node for the content picker in the content', async ({umbracoApi, umbracoUi}) => {
+test('can create content with content picker without ignore start node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomContentPicker';
   const childContentPickerDocumentTypeName = 'ChildDocumentTypeForContentPicker';
@@ -111,11 +111,11 @@ test('can choose start node for the content picker in the content', async ({umbr
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.addContentPicker(childContentPickerName);
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isContentNameVisible(childContentPickerName);
-  await umbracoUi.content.isContentNameVisible(contentPickerName, false);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -123,7 +123,7 @@ test('can choose start node for the content picker in the content', async ({umbr
   await umbracoApi.documentType.ensureNameNotExists(childContentPickerDocumentTypeName);
 });
 
-test.skip('can ignore user start node for the content picker in the content', async ({umbracoApi, umbracoUi}) => {
+test('can create content with content picker with ignore start node', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomContentPicker';
   const childContentPickerDocumentTypeName = 'ChildDocumentTypeForContentPicker';
@@ -142,11 +142,11 @@ test.skip('can ignore user start node for the content picker in the content', as
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.addContentPicker(childContentPickerName);
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isContentNameVisible(childContentPickerName);
-  await umbracoUi.content.isContentNameVisible(contentPickerName);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
