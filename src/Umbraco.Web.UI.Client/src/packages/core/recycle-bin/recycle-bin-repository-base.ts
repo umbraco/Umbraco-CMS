@@ -23,7 +23,6 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase implements UmbRecycleBinRepository {
 	#recycleBinSource: UmbRecycleBinDataSource;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
-	#requestTrashSuccessNotification?: UmbNotificationHandler;
 	#requestRestoreSuccessNotification?: UmbNotificationHandler;
 
 	/**
@@ -48,15 +47,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	async requestTrash(args: UmbRecycleBinTrashRequestArgs) {
-		const { error } = await this.#recycleBinSource.trash(args);
-
-		if (!error) {
-			this.#requestTrashSuccessNotification?.close();
-			const notification = { data: { message: `Trashed` } };
-			this.#requestTrashSuccessNotification = this.#notificationContext?.peek('positive', notification);
-		}
-
-		return { error };
+		return this.#recycleBinSource.trash(args);
 	}
 
 	/**
@@ -69,6 +60,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 		const { error } = await this.#recycleBinSource.restore(args);
 
 		if (!error) {
+			// TODO: keep this notification until we refresh the tree/structure correctly after the action
 			this.#requestRestoreSuccessNotification?.close();
 			const notification = { data: { message: `Restored` } };
 			this.#requestRestoreSuccessNotification = this.#notificationContext?.peek('positive', notification);
@@ -83,13 +75,6 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	async requestEmpty() {
-		const { error } = await this.#recycleBinSource.empty();
-
-		if (!error) {
-			const notification = { data: { message: `Recycle Bin Emptied` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-
 		return this.#recycleBinSource.empty();
 	}
 
