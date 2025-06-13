@@ -57,4 +57,12 @@ public interface ILanguage : IEntity, IRememberBeingDirty
     /// </remarks>
     [DataMember]
     public string? FallbackIsoCode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the sort order.
+    /// </summary>
+    /// <value>
+    /// The sort order.
+    /// </value>
+    int SortOrder { get; set; }
 }
