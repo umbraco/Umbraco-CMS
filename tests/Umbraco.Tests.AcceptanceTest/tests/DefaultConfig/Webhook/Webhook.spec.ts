@@ -37,7 +37,7 @@ test('can create a webhook', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.webhook.isWebhookEnabled(webhookName);
 });
 
-test('can update a webhook name', async ({umbracoApi, umbracoUi}) => {
+test('can update webhook name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedName = 'Updated Webhook';
   await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken);
@@ -54,7 +54,7 @@ test('can update a webhook name', async ({umbracoApi, umbracoUi}) => {
 });
 
 test('can delete a webhook', async ({umbracoApi, umbracoUi}) => {
-// Arrange
+  // Arrange
   await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken);
   await umbracoUi.webhook.goToWebhooks();
 
@@ -136,7 +136,7 @@ test('cannot remove all events from a webhook', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.content.isErrorNotificationVisible();
 });
 
-test('can remove an content type from a webhook', async ({umbracoApi, umbracoUi}) => {
+test('can remove a content type from a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const event = 'Media Saved';
   const mediaTypeName = 'Audio';
@@ -154,7 +154,6 @@ test('can remove an content type from a webhook', async ({umbracoApi, umbracoUi}
   await umbracoUi.webhook.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.webhook.doesWebhookHaveContentTypeId(webhookName, mediaTypeData.id)).toBeFalsy();
 });
-
 
 test('can remove a header from a webhook', async ({umbracoApi, umbracoUi}) => {
   // Arrange

@@ -1,6 +1,7 @@
 import {expect} from "@playwright/test";
 import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
+// Webhook
 const webhookName = 'Test Webhook';
 let webhookSiteToken = '';
 
@@ -53,15 +54,11 @@ test('can trigger when content is deleted', async ({umbracoApi, umbracoUi}) => {
   const event = 'Content Deleted';
   await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
   const contentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  await umbracoApi.document.moveToRecycleBin(contentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.webhook.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickActionsMenuForContent(documentName);
-  await umbracoUi.content.clickTrashActionMenuOption();
-  await umbracoUi.content.clickConfirmTrashButton();
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
-  await umbracoUi.waitForTimeout(100);
   await umbracoUi.content.clickEmptyRecycleBinButton();
   await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
 
@@ -128,6 +125,7 @@ test('can trigger when media is deleted', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaName);
   await umbracoUi.media.deleteMediaItem(mediaName);
+  await umbracoUi.media.waitForMediaToBeTrashed();
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
@@ -155,7 +153,6 @@ test('can trigger the webhook for a specific media type', async ({umbracoApi, um
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
-  console.log(JSON.stringify(webhookSiteData));
   expect(webhookSiteData[0].content).toContain(mediaId);
   expect(webhookSiteData[0].content).not.toContain(secondMediaId);
 
@@ -186,6 +183,7 @@ test('can trigger the webhook for a specific content type', async ({umbracoApi, 
   await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
   await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
