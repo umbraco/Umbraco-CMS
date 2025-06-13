@@ -24,6 +24,12 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	_routes?: Array<UmbRoute>;
 
+	/**
+	 * Indicates whether the user is forbidden from accessing the workspace.
+	 * This is used to determine if the user has permission to view the workspace.
+	 */
+	#isForbidden = false;
+
 	constructor() {
 		super();
 
@@ -44,6 +50,15 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 					this.#generateRoutes();
 				},
 				'_observeVariants',
+			);
+
+			this.observe(
+				this.#workspaceContext?.forbidden.isOn,
+				(isForbidden) => {
+					this.#isForbidden = isForbidden ?? false;
+					this.#generateRoutes();
+				},
+				'_observeForbidden',
 			);
 		});
 	}
@@ -126,12 +141,15 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 					history.replaceState({}, '', `${this.#workspaceRoute}/${route?.path}`);
 				},
 			});
-
-			routes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-			});
 		}
+
+		routes.push({
+			path: '**',
+			component: async () => {
+				const router = await import('@umbraco-cms/backoffice/router');
+				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+			},
+		});
 
 		this._routes = routes;
 	}
