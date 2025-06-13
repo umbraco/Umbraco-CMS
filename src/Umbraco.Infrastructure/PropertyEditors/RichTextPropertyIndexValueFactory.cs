@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -50,9 +51,11 @@ internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFacto
                 : null;
 
         // index the stripped HTML values combined with "blocks values resume" value
+        var richTextWithoutMarkup = StripHtmlForIndexing(richTextEditorValue.Markup);
+
         yield return new KeyValuePair<string, IEnumerable<object?>>(
             property.Alias,
-            new object[] { $"{richTextEditorValue.Markup.StripHtml()} {blocksIndexValuesResume}" });
+            new object[] { $"{richTextWithoutMarkup} {blocksIndexValuesResume}" });
 
         // store the raw value
         yield return new KeyValuePair<string, IEnumerable<object?>>(
@@ -75,4 +78,28 @@ internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFacto
 
     protected override IEnumerable<BlockItemData> GetDataItems(RichTextEditorValue input)
         => input.Blocks?.ContentData ?? new List<BlockItemData>();
+
+    /// <summary>
+    /// Strips HTML tags from content while preserving whitespace from line breaks.
+    /// This addresses the issue where &lt;br&gt; tags don't create word boundaries when HTML is stripped.
+    /// </summary>
+    /// <param name="html">The HTML content to strip</param>
+    /// <returns>Plain text with proper word boundaries</returns>
+    private static string StripHtmlForIndexing(string html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+        {
+            return string.Empty;
+        }
+
+        // Replace <br> and <br/> tags (with any amount of whitespace and attributes) with spaces
+        // This regex matches:
+        // - <br> (with / without spaces or attributes)
+        // - <br /> (with / without spaces or attributes)
+        html = Regex.Replace(html, @"<br\s*[^>]*/?>\s*", " ", RegexOptions.IgnoreCase);
+
+        // Use the existing Microsoft StripHtml function for everything else
+        return html.StripHtml();
+    }
+
 }
