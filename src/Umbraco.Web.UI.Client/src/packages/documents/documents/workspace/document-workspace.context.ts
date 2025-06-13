@@ -73,8 +73,6 @@ export class UmbDocumentWorkspaceContext
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
-	#userCanCreate = false;
-	#userCanUpdate = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -126,52 +124,18 @@ export class UmbDocumentWorkspaceContext
 			this.#publishingContext = context;
 		});
 
-		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
-			{
-				config: {
-					allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
-				},
-				onChange: (permitted: boolean) => {
-					if (permitted === this.#userCanCreate) return;
-					this.#userCanCreate = permitted;
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_CREATE,
-						this.#userCanCreate,
-						'You do not have permission to create documents.',
-					);
-				},
-			},
-		]);
-
-		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
-			{
-				config: {
-					allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
-				},
-				onChange: (permitted: boolean) => {
-					if (permitted === this.#userCanUpdate) return;
-					this.#userCanUpdate = permitted;
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-						this.#userCanUpdate,
-						'You do not have permission to update documents.',
-					);
-				},
-			},
-		]);
-
-		this.observe(this.variants, () => {
-			this.#setReadOnlyStateForUserPermission(
-				UMB_USER_PERMISSION_DOCUMENT_CREATE,
-				this.#userCanCreate,
-				'You do not have permission to create documents.',
-			);
-
-			this.#setReadOnlyStateForUserPermission(
-				UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-				this.#userCanUpdate,
-				'You do not have permission to update documents.',
-			);
+		this.observe(this.isNew, (isNew) => {
+			if (isNew) {
+				this.#enforceUserPermission(
+					UMB_USER_PERMISSION_DOCUMENT_CREATE,
+					'You do not have permission to create documents.',
+				);
+			} else {
+				this.#enforceUserPermission(
+					UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+					'You do not have permission to update documents.',
+				);
+			}
 		});
 
 		this.routes.setRoutes([
@@ -220,6 +184,22 @@ export class UmbDocumentWorkspaceContext
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
 					await this.load(unique);
+				},
+			},
+		]);
+	}
+
+	#enforceUserPermission(verb: string, message: string) {
+		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
+		this.#handleUserPermissionChange(verb, false, message);
+
+		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [verb],
+				},
+				onChange: (permitted: boolean) => {
+					this.#handleUserPermissionChange(verb, permitted, message);
 				},
 			},
 		]);
@@ -425,7 +405,7 @@ export class UmbDocumentWorkspaceContext
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
-	async #setReadOnlyStateForUserPermission(identifier: string, permitted: boolean, message: string) {
+	async #handleUserPermissionChange(identifier: string, permitted: boolean, message: string) {
 		if (permitted) {
 			this.readOnlyGuard?.removeRule(identifier);
 			return;
@@ -434,6 +414,9 @@ export class UmbDocumentWorkspaceContext
 		this.readOnlyGuard?.addRule({
 			unique: identifier,
 			message,
+			/* This guard is a bit backwards. The rule is permitted to be read-only. 
+			If the user do not have permission, we set it to true = permitted to be read-only. */
+			permitted: true,
 		});
 	}
 
