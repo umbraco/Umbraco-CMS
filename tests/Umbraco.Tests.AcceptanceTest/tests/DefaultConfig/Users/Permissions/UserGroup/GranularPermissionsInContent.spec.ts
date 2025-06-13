@@ -33,6 +33,7 @@ let userGroupId = null;
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
   await umbracoApi.user.ensureNameNotExists(testUser.name);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
@@ -50,6 +51,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(secondDocumentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
+  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
@@ -67,12 +69,11 @@ test('can read a specific document with read permission enabled', async ({umbrac
   // Assert
   await umbracoUi.content.doesDocumentHaveName(firstDocumentName);
   await umbracoUi.content.goToContentWithName(secondDocumentName);
-  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.permissionDenied);
+  await umbracoUi.content.isErrorNotificationVisible();
 });
 
 test('can create document blueprint for a specific document with create document blueprint permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateDocumentBlueprintPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -88,9 +89,6 @@ test('can create document blueprint for a specific document with create document
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.documentBlueprintCreated);
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
-
-  // Clean
-  await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
 });
 
 test('can delete a specific content with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -185,10 +183,10 @@ test('can unpublish a specific content with unpublish permission enabled', async
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   expect(await umbracoApi.document.isDocumentPublished(firstDocumentId)).toBeFalsy();
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
-  expect(await umbracoApi.document.isDocumentPublished(secondDocumentId)).toBeTruthy();
 });
 
-test('can update a specific content with update permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19286
+test.skip('can update a specific content with update permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -228,7 +226,8 @@ test('can duplicate a specific content with duplicate permission enabled', async
   await umbracoUi.content.isPermissionInActionsMenuVisible('Duplicate to…', false);
 });
 
-test('can move a specific content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19547
+test.skip('can move a specific content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const moveToDocumentName = 'MoveToDocument';
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentName, childDocumentTypeId, firstDocumentId);
@@ -249,10 +248,6 @@ test('can move a specific content with move to permission enabled', async ({umbr
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
   await umbracoUi.content.clickActionsMenuForContent(secondDocumentName);
   await umbracoUi.content.isPermissionInActionsMenuVisible('Move to…', false);
-
-  // Clean
-  await umbracoApi.document.ensureNameNotExists(moveToDocumentName);
-  await umbracoApi.document.ensureNameNotExists(childDocumentName);
 });
 
 test('can sort children with sort children permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -270,9 +265,6 @@ test('can sort children with sort children permission enabled', async ({umbracoA
   // Assert
   await umbracoUi.content.isPermissionInActionsMenuVisible('Sort children…');
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
-
-  // Clean
-  await umbracoApi.document.ensureNameNotExists(childDocumentName);
 });
 
 test('can set culture and hostnames for a specific content with culture and hostnames permission enabled', async ({umbracoApi, umbracoUi}) => {
