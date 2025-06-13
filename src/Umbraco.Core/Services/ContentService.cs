@@ -3627,6 +3627,7 @@ public class ContentService : RepositoryService, IContentService
 
     private static readonly string?[] ArrayOfOneNullString = { null };
 
+    /// <inheritdoc />
     public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
     {
         if (blueprint == null)

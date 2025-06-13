@@ -56,6 +56,9 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Creates a new content item from a blueprint.
     /// </summary>
+    /// <remarks>Warning: If you intend to save the resulting <c>IContent</c> as a content node, you must trigger a
+    /// <see cref="Notifications.ContentScaffoldedNotification"/> notification to ensure that the block ids are regenerated.
+    /// Failing to do so could lead to caching issues.</remarks>
     IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
