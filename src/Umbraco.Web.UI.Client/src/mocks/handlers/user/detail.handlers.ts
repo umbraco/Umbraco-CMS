@@ -20,6 +20,10 @@ export const detailHandlers = [
 		);
 	}),
 
+	rest.get(umbracoPath(`${UMB_SLUG}/configuration`), (_req, res, ctx) => {
+		return res(ctx.status(200), ctx.json(umbUserMockDb.getConfiguration()));
+	}),
+
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));

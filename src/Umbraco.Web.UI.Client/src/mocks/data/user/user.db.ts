@@ -12,6 +12,7 @@ import type {
 	InviteUserRequestModel,
 	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
+	UserConfigurationResponseModel,
 	UserItemResponseModel,
 	UserResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -41,6 +42,22 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 
 	constructor(data: UmbMockUserModel[]) {
 		super(data);
+	}
+
+	getConfiguration(): UserConfigurationResponseModel {
+		return {
+			allowChangePassword: true,
+			allowTwoFactor: true,
+			canInviteUsers: true,
+			passwordConfiguration: {
+				minimumPasswordLength: 8,
+				requireDigit: true,
+				requireLowercase: true,
+				requireUppercase: true,
+				requireNonLetterOrDigit: true,
+			},
+			usernameIsEmail: true,
+		};
 	}
 
 	/**
