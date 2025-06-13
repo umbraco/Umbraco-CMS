@@ -146,7 +146,15 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 		return await tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLog({
-				query: { skip, take, orderDirection, filterExpression, logLevel, startDate, endDate },
+				query: {
+					skip,
+					take,
+					orderDirection,
+					filterExpression,
+					logLevel: logLevel?.length ? logLevel : undefined,
+					startDate,
+					endDate,
+				},
 			}),
 		);
 	}
