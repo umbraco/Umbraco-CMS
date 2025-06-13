@@ -30,6 +30,12 @@ export const detailHandlers = [
 		return res(ctx.status(200), ctx.json(umbUserMockDb.calculateStartNodes(id)));
 	}),
 
+	rest.get(umbracoPath(`${UMB_SLUG}/:id/client-credentials`), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return res(ctx.status(400));
+		return res(ctx.status(200), ctx.json(umbUserMockDb.clientCredentials(id)));
+	}),
+
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));

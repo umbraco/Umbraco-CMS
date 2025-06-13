@@ -60,6 +60,16 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 		};
 	}
 
+	clientCredentials(id: string): Array<string> {
+		const user = this.data.find((user) => user.id === id);
+		if (!user) {
+			throw new Error(`User with id ${id} not found`);
+		}
+
+		// TODO: Implement logic to return client credentials for the user
+		return [];
+	}
+
 	getConfiguration(): UserConfigurationResponseModel {
 		return {
 			allowChangePassword: true,
