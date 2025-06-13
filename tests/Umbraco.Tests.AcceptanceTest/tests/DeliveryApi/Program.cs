@@ -1,4 +1,4 @@
-// Figure out a better way?
+// TODO: Consider refactoring the initialization process to improve readability or simplify the builder configuration.
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.CreateUmbracoBuilder()
