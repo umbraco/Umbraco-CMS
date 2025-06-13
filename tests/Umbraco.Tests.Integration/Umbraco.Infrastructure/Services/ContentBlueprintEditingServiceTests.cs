@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
@@ -16,6 +17,8 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
     private IContentBlueprintContainerService ContentBlueprintContainerService => GetRequiredService<IContentBlueprintContainerService>();
 
     private IEntityService EntityService => GetRequiredService<IEntityService>();
+
+    private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
     private async Task<IContent> CreateInvariantContentBlueprint()
     {
@@ -75,8 +78,8 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
             Properties =
             [
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
-                new PropertyValueModel { Alias = "author", Value = "The author value" }
-            ]
+                new PropertyValueModel { Alias = "author", Value = "The author value" },
+            ],
         };
         return createModel;
     }
@@ -90,11 +93,12 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
             [
                 new PropertyValueModel { Alias = "title", Value = "The title value updated" },
                 new PropertyValueModel { Alias = "author", Value = "The author value updated" }
-            ]
+            ],
         };
         return createModel;
     }
 
     private IEntitySlim[] GetBlueprintChildren(Guid? containerKey)
-        => EntityService.GetPagedChildren(containerKey, new[] { UmbracoObjectTypes.DocumentBlueprintContainer }, UmbracoObjectTypes.DocumentBlueprint, 0, 100, out _).ToArray();
+        => EntityService.GetPagedChildren(containerKey, [UmbracoObjectTypes.DocumentBlueprintContainer], UmbracoObjectTypes.DocumentBlueprint, 0, 100, out _).ToArray();
 }
+
