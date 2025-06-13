@@ -16,6 +16,7 @@ export class UmbWorkspaceSplitViewManager {
 		(a, b) => (a.index || 0) - (b.index || 0),
 	);
 	public readonly activeVariantsInfo = this.#activeVariantsInfo.asObservable();
+	public readonly splitViewActive = this.#activeVariantsInfo.asObservablePart((x) => x.length > 1);
 
 	private _routeBase?: string;
 	public getWorkspaceRoute(): string | undefined {
