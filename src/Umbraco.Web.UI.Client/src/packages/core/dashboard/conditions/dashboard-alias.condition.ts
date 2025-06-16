@@ -1,11 +1,8 @@
 import { UMB_DASHBOARD_CONTEXT } from '../default/index.js';
+import type { UmbDashboardAliasConditionConfig } from './types.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	UmbConditionConfigBase,
-	UmbConditionControllerArguments,
-	UmbExtensionCondition,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbDashboardAliasCondition
 	extends UmbConditionBase<UmbDashboardAliasConditionConfig>
@@ -37,17 +34,3 @@ export class UmbDashboardAliasCondition
 }
 
 export { UmbDashboardAliasCondition as api };
-
-export type UmbDashboardAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.DashboardAlias'> & {
-	/**
-	 * Define the dashboard that this extension should be available in
-	 * @example "Umb.Dashboard.Content"
-	 */
-	match: string;
-	/**
-	 * Define one or more dashboards that this extension should be available in
-	 * @example
-	 * ["Umb.Dashboard.Content", "Umb.Dashboard.Media"]
-	 */
-	oneOf?: Array<string>;
-};
