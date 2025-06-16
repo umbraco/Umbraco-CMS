@@ -17,7 +17,6 @@ export class UmbDashboardElement extends UmbLitElement {
 	override render() {
 		return html`
 			<section id="content">
-				Demo Dashboard Text: Apps will be rendered below.
 				<umb-extension-slot
 					type="dashboardApp"
 					.renderMethod=${this.#extensionSlotRenderMethod}

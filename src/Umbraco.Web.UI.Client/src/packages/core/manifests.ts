@@ -21,6 +21,7 @@ import { manifests as temporaryFileManifests } from './temporary-file/manifests.
 import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
+import { manifests as tempLocationManifests } from './_temp-poc-location/manifests.js';
 
 import type { UmbExtensionManifestKind } from './extension-registry/index.js';
 
@@ -48,4 +49,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...themeManifests,
 	...treeManifests,
 	...workspaceManifests,
+	...tempLocationManifests,
 ];
