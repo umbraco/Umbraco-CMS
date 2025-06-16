@@ -37,16 +37,6 @@ public class SiblingsTreeController : DocumentTreeControllerBase
     [HttpGet("siblings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<IEnumerable<DocumentTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid siblingId, int before, int after)
-    {
-        IEntitySlim[] siblings = EntityService.GetSiblings(siblingId, UmbracoObjectTypes.Document, before, after).ToArray();
-        Guid? parentKey = siblings.FirstOrDefault()?.Key;
-        if (parentKey is null)
-        {
-            return Task.FromResult<ActionResult<IEnumerable<DocumentTreeItemResponseModel>>>(NotFound());
-        }
-
-        DocumentTreeItemResponseModel[] treeItemsViewModels = MapTreeItemViewModels(parentKey, siblings);
-        return Task.FromResult<ActionResult<IEnumerable<DocumentTreeItemResponseModel>>>(treeItemsViewModels);
-    }
+    public Task<ActionResult<IEnumerable<DocumentTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after)
+        => GetSiblings(target, before, after);
 }
