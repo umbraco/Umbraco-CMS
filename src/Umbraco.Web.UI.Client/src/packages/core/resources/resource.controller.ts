@@ -1,5 +1,5 @@
 import { isApiError, isCancelablePromise, isCancelError, isProblemDetailsLike } from './apiTypeValidators.function.js';
-import { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
+import { UmbApiError, UmbCancelError } from './umb-error.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -22,7 +22,7 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 	 * @param {*} error The error to map
 	 * @returns {*} The mapped error
 	 */
-	mapToUmbError(error: unknown): UmbApiError | UmbCancelError | UmbError {
+	mapToUmbError(error: unknown): UmbApiError | UmbCancelError {
 		if (isProblemDetailsLike(error)) {
 			return new UmbApiError(error.detail ?? error.title, error.status, null, error);
 		} else if (isApiError(error)) {
@@ -33,11 +33,18 @@ export class UmbResourceController<T = unknown> extends UmbControllerBase {
 			return error;
 		} else if (UmbApiError.isUmbApiError(error)) {
 			return error;
-		} else if (UmbError.isUmbError(error)) {
-			return error;
 		}
-		// If the error is not an UmbError, we will just return it as is
-		return new UmbError(error instanceof Error ? error.message : 'Unknown error');
+
+		// If the error is not recognizable, for example if it has no ProblemDetails body, we will return a generic UmbApiError.
+		// This is to ensure that we always return an UmbApiError, so we can handle it in a consistent way.
+		return new UmbApiError(error instanceof Error ? error.message : 'Unknown error', 0, null, {
+			status: 0,
+			title: 'Unknown error',
+			detail: error instanceof Error ? error.message : 'Unknown error',
+			errors: undefined,
+			type: 'error',
+			stack: error instanceof Error ? error.stack : undefined,
+		});
 	}
 
 	/**
