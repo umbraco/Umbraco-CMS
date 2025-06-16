@@ -45,23 +45,26 @@ export class UmbDashboardElement extends UmbLitElement {
 			.grid-container {
 				display: grid;
 				grid-template-columns: repeat(4, 1fr);
-				grid-template-rows: repeat(1, 225px);
-				gap: var(--uui-size-layout-1);
+				grid-template-rows: repeat(100, 225px);
+				margin: calc(var(--uui-size-space-3) * -1);
 			}
 
 			umb-extension-slot::part(umb-dashboard-app-small) {
 				grid-column: span 1;
 				grid-row: span 1;
+				margin: var(--uui-size-space-3);
 			}
 
 			umb-extension-slot::part(umb-dashboard-app-medium) {
 				grid-column: span 2;
 				grid-row: span 2;
+				margin: var(--uui-size-space-3);
 			}
 
 			umb-extension-slot::part(umb-dashboard-app-large) {
 				grid-column: span 2;
-				grid-row: span 8;
+				grid-row: span 3;
+				margin: var(--uui-size-space-3);
 			}
 		`,
 	];
