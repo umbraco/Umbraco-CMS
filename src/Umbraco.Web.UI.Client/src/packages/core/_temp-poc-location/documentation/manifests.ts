@@ -20,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		element: () => import('./videos-intro-dashboard-app.element.js'),
 		meta: {
 			headline: '#settingsDashboard_videosHeader',
-			size: 'small',
+			size: 'large',
 		},
 	},
 ];
