@@ -2,8 +2,8 @@ import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/ex
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 
-@customElement('umb-dashboard2')
-export class UmbDashboard2Element extends UmbElementMixin(LitElement) {
+@customElement('umb-example-dashboard2')
+export class UmbExampleDashboard2Element extends UmbElementMixin(LitElement) {
 	constructor() {
 		super();
 	}
@@ -25,10 +25,10 @@ export class UmbDashboard2Element extends UmbElementMixin(LitElement) {
 	static override styles = [UmbTextStyles, css``];
 }
 
-export default UmbDashboard2Element;
+export default UmbExampleDashboard2Element;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dashboard2': UmbDashboard2Element;
+		'umb-example-dashboard2': UmbExampleDashboard2Element;
 	}
 }

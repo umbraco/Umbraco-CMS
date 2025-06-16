@@ -4,7 +4,6 @@ import { css, html, customElement, nothing, ifDefined } from '@umbraco-cms/backo
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
-const elementName = 'umb-dashboard';
 @customElement('umb-dashboard')
 export class UmbDashboardElement extends UmbLitElement {
 	#defaultSize = 'small';
@@ -73,6 +72,6 @@ export { UmbDashboardElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDashboardElement;
+		['umb-dashboard']: UmbDashboardElement;
 	}
 }
