@@ -5,7 +5,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		type: 'dashboardApp',
 		alias: 'Umb.DashboardApp.CertificationIntro',
 		name: 'Certification Intro Dashboard App',
-		weight: 400,
+		weight: 100,
 		element: () => import('./certification-intro-dashboard-app.element.js'),
 		meta: {
 			headline: '#settingsDashboard_trainingHeader',
