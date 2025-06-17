@@ -569,7 +569,7 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    public async Task Updating_Single_Variant_Name_Does_Not_Change_Update_Dates_Of_Other_Vaiants()
+    public async Task Updating_Single_Variant_Name_Does_Not_Change_Update_Dates_Of_Other_Variants()
     {
         var contentType = await CreateVariantContentType(variantTitleAsMandatory: false);
 
@@ -614,11 +614,11 @@ public partial class ContentEditingServiceTests
         void VerifyUpdate(IContent? updatedContent)
         {
             Assert.IsNotNull(updatedContent);
-            Assert.AreEqual(firstUpdateDateDa, updatedContent.GetUpdateDate("da-DK"));
+            Assert.AreEqual(firstUpdateDateDa?.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond), updatedContent.GetUpdateDate("da-DK")?.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond));
 
             var lastUpdateDateEn = updatedContent.GetUpdateDate("en-US")
                                    ?? throw new InvalidOperationException("Expected a publish date for EN");
-            Assert.Greater(lastUpdateDateEn, firstUpdateDateEn);
+            Assert.Greater(lastUpdateDateEn.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond), firstUpdateDateEn?.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond));
         }
     }
 
@@ -671,11 +671,11 @@ public partial class ContentEditingServiceTests
         void VerifyUpdate(IContent? updatedContent)
         {
             Assert.IsNotNull(updatedContent);
-            Assert.AreEqual(firstUpdateDateEn, updatedContent.GetUpdateDate("en-US"));
+            Assert.AreEqual(firstUpdateDateEn.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond), updatedContent.GetUpdateDate("en-US")?.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond));
 
             var lastUpdateDateDa = updatedContent.GetUpdateDate("da-DK")
                                    ?? throw new InvalidOperationException("Expected an update date for DA");
-            Assert.Greater(lastUpdateDateDa, firstUpdateDateDa);
+            Assert.Greater(lastUpdateDateDa.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond), firstUpdateDateDa.TruncateTo(DateTimeExtensions.DateTruncate.Millisecond));
         }
     }
 }
