@@ -6,7 +6,7 @@ import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { umbDeepMerge } from '@umbraco-cms/backoffice/utils';
+import {umbDeepMerge, type UmbDeepPartialObject} from '@umbraco-cms/backoffice/utils';
 import { UmbMemberTypeDetailServerDataSource } from '@umbraco-cms/backoffice/member-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
@@ -22,7 +22,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 	 * @returns { CreateMemberRequestModel }
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async createScaffold(preset: Partial<UmbMemberDetailModel> = {}) {
+	async createScaffold(preset: UmbDeepPartialObject<UmbMemberDetailModel> = {}) {
 		let memberTypeIcon = '';
 
 		const memberTypeUnique = preset.memberType?.unique;
@@ -64,7 +64,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 			],
 		};
 
-		const scaffold = umbDeepMerge(defaultData, preset) as UmbMemberDetailModel;
+		const scaffold = umbDeepMerge(preset, defaultData);
 
 		return { data: scaffold };
 	}

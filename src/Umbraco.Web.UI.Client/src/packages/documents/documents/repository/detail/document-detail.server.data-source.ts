@@ -56,7 +56,7 @@ export class UmbDocumentServerDataSource
 			variants: [],
 		};
 
-		const scaffold = umbDeepMerge(defaultData, preset) as UmbDocumentDetailModel;
+		const scaffold = umbDeepMerge(preset, defaultData);
 
 		return { data: scaffold };
 	}
