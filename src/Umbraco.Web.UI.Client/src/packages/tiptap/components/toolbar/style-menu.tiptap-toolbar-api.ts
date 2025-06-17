@@ -2,14 +2,28 @@ import { UmbTiptapToolbarElementApiBase } from '../../extensions/base.js';
 import type { MetaTiptapToolbarStyleMenuItem } from '../../extensions/types.js';
 import type { ChainedCommands, Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
+type UmbTiptapToolbarStyleMenuCommandType = {
+	type: string;
+	command: (chain: ChainedCommands) => ChainedCommands;
+	isActive?: (editor?: Editor) => boolean | undefined;
+};
+
 export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElementApiBase {
-	#commands: Record<string, { type: string; command: (chain: ChainedCommands) => ChainedCommands }> = {
-		h1: { type: 'heading', command: (chain) => chain.toggleHeading({ level: 1 }) },
-		h2: { type: 'heading', command: (chain) => chain.toggleHeading({ level: 2 }) },
-		h3: { type: 'heading', command: (chain) => chain.toggleHeading({ level: 3 }) },
-		h4: { type: 'heading', command: (chain) => chain.toggleHeading({ level: 4 }) },
-		h5: { type: 'heading', command: (chain) => chain.toggleHeading({ level: 5 }) },
-		h6: { type: 'heading', command: (chain) => chain.toggleHeading({ level: 6 }) },
+	#headingCommand(level: 1 | 2 | 3 | 4 | 5 | 6): UmbTiptapToolbarStyleMenuCommandType {
+		return {
+			type: 'heading',
+			command: (chain) => chain.toggleHeading({ level }),
+			isActive: (editor) => editor?.isActive('heading', { level }),
+		};
+	}
+
+	#commands: Record<string, UmbTiptapToolbarStyleMenuCommandType> = {
+		h1: this.#headingCommand(1),
+		h2: this.#headingCommand(2),
+		h3: this.#headingCommand(3),
+		h4: this.#headingCommand(4),
+		h5: this.#headingCommand(5),
+		h6: this.#headingCommand(6),
 		p: { type: 'paragraph', command: (chain) => chain.setParagraph() },
 		blockquote: { type: 'blockquote', command: (chain) => chain.toggleBlockquote() },
 		code: { type: 'code', command: (chain) => chain.toggleCode() },
@@ -23,6 +37,20 @@ export default class UmbTiptapToolbarStyleMenuApi extends UmbTiptapToolbarElemen
 		u: { type: 'underline', command: (chain) => chain.toggleUnderline() },
 		ul: { type: 'bulletList', command: (chain) => chain.toggleBulletList() },
 	};
+
+	override isActive(editor?: Editor, item?: MetaTiptapToolbarStyleMenuItem) {
+		if (!editor || !item?.data) return false;
+
+		const { tag, id, class: className } = item.data;
+		const ext = tag ? this.#commands[tag] : null;
+		const attrs = editor?.getAttributes(ext?.type ?? 'paragraph');
+
+		const tagMatch = !tag ? true : ext ? (ext.isActive?.(editor) ?? editor?.isActive(ext.type) ?? false) : false;
+		const idMatch = !id ? true : attrs.id === id;
+		const classMatch = !className ? true : attrs.class?.includes(className) === true;
+
+		return tagMatch && idMatch && classMatch;
+	}
 
 	override execute(editor?: Editor, item?: MetaTiptapToolbarStyleMenuItem) {
 		if (!editor || !item?.data) return;
