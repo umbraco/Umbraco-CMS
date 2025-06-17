@@ -1,3 +1,5 @@
+import { ensureArray, updateItemsState } from '../utils/property-editor-ui-state-manager.js';
+import './components/input-checkbox-list/input-checkbox-list.element.js';
 import type {
 	UmbCheckboxListItem,
 	UmbInputCheckboxListElement,
@@ -11,7 +13,6 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 
-import './components/input-checkbox-list/input-checkbox-list.element.js';
 
 /**
  * @element umb-property-editor-ui-checkbox-list
@@ -28,8 +29,12 @@ export class UmbPropertyEditorUICheckboxListElement
 
 	@property({ type: Array })
 	public override set value(value: Array<string> | string | undefined) {
-		this.#selection = Array.isArray(value) ? value : value ? [value] : [];
+		this.#selection = ensureArray(value);
+
+		// Update the checked state of existing list items when value changes
+		this.#updateCheckedState();
 	}
+
 	public override get value(): Array<string> | undefined {
 		return this.#selection;
 	}
@@ -87,6 +92,23 @@ export class UmbPropertyEditorUICheckboxListElement
 	#onChange(event: CustomEvent & { target: UmbInputCheckboxListElement }) {
 		this.value = event.target.selection;
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	/**
+	 * Updates the checked state of all list items based on current selection.
+	 * This fixes the issue where UI doesn't update when values are set programmatically.
+	 */
+	#updateCheckedState() {
+		// Only update if we have list items loaded
+		if (this._list.length > 0) {
+			// Update state only if changes are needed
+			const updatedList = updateItemsState(this._list, this.#selection, 'checked');
+			if (updatedList !== this._list) {
+				this._list = updatedList;
+				// Trigger a re-render only when state actually changed
+				this.requestUpdate();
+			}
+		}
 	}
 
 	override render() {
