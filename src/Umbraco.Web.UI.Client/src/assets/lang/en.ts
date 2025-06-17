@@ -373,6 +373,14 @@ export default {
 			const entityName = entityType ?? 'item';
 			return `The requested ${entityName} could not be found. Please check the URL and try again.`;
 		},
+		forbiddenTitle: (entityType: string) => {
+			const entityName = entityType ?? 'item';
+			return `Access denied to this ${entityName}`;
+		},
+		forbiddenDescription: (entityType: string) => {
+			const entityName = entityType ?? 'item';
+			return `You do not have permission to access this ${entityName}. Please contact your administrator for assistance.`;
+		},
 	},
 	media: {
 		clickToUpload: 'Click to upload',
@@ -2735,6 +2743,9 @@ export default {
 	routing: {
 		routeNotFoundTitle: 'Not found',
 		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
+		routeForbiddenTitle: 'Access denied',
+		routeForbiddenDescription:
+			'You do not have permission to access this resource. Please contact your administrator for assistance.',
 	},
 	codeEditor: {
 		label: 'Code editor',
