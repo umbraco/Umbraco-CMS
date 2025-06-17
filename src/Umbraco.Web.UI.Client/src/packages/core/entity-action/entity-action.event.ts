@@ -26,4 +26,11 @@ export class UmbEntityActionEvent<
 	getEventUnique(): string | undefined {
 		return this._args.eventUnique;
 	}
+
+	toObject(): ArgsType {
+		return {
+			...this._args,
+			type: this.type,
+		};
+	}
 }
