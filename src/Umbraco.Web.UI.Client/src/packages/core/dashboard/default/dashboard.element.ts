@@ -1,8 +1,11 @@
 import type { ManifestDashboardApp } from '../dashboard-app.extension.js';
+import { UMB_DASHBOARD_APP_PICKER_MODAL } from '../app/picker/picker-modal.token.js';
+import type { UmbDashboardAppDetailModel } from '../app/types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, nothing, ifDefined, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-dashboard')
 export class UmbDashboardElement extends UmbLitElement {
@@ -14,9 +17,44 @@ export class UmbDashboardElement extends UmbLitElement {
 		['large', 'large'],
 	]);
 
+	@state()
+	_apps: Array<UmbDashboardAppDetailModel> = [];
+
+	// TODO: this is just a temp value. We need to look up the item data.
+	@state()
+	_appUniques: Array<string> = [];
+
+	constructor() {
+		super();
+	}
+
+	async #openAppPicker() {
+		const value = await umbOpenModal(this, UMB_DASHBOARD_APP_PICKER_MODAL, {
+			data: {
+				multiple: true,
+			},
+			value: {
+				selection: this._appUniques,
+			},
+		}).catch(() => undefined);
+
+		if (value) {
+			//this._apps = value.selection;
+			this._appUniques = value.selection.filter((item) => item !== null) as Array<string>;
+		}
+	}
+
 	override render() {
 		return html`
 			<section id="content">
+				<uui-button look="placeholder" @click=${this.#openAppPicker}>Add</uui-button>
+				${repeat(
+					this._appUniques,
+					(unique) => unique,
+					(unique) => {
+						return html`${unique}`;
+					},
+				)}
 				<umb-extension-slot
 					type="dashboardApp"
 					.renderMethod=${this.#extensionSlotRenderMethod}
