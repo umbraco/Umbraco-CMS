@@ -50,7 +50,7 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the collection of error pages.
     /// </summary>
-    public ISet<ContentErrorPage> Error404Collection { get; set; } = new HashSet<ContentErrorPage>();
+    public IEnumerable<ContentErrorPage> Error404Collection { get; set; } = [];
 
     /// <summary>
     ///     Gets or sets a value for the preview badge mark-up.
