@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const allPermissions = {
   uiPermission:
-    ['Browse',
+    ['Read',
       'Create Document Blueprint',
       'Delete',
       'Create',
