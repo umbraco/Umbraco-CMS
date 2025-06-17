@@ -145,6 +145,52 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
+    public IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int parentId, int before, int after)
+    {
+        // TODO: Try and clean this up a bit, it's obscene...
+
+        // Get all children of the parent node which is not trashed, ordered by SortOrder, and assign each a row number.
+        // Subquery to assign row numbers to siblings
+        Sql<ISqlContext> rowNumberSql = Sql()
+            .Select($"ROW_NUMBER() OVER (ORDER BY {SqlContext.SqlSyntax.GetQuotedTableName("umbracoNode")}.{SqlContext.SqlSyntax.GetQuotedColumnName("sortOrder")}) AS rn")
+            .AndSelect<NodeDto>(n => n.UniqueId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == false);
+
+        // Find the specific row number of the target node.
+        Sql<ISqlContext> targetRowSql = Sql()
+            .Select("rn")
+            .From().AppendSubQuery(rowNumberSql, "Target")
+            .Where<NodeDto>(x => x.UniqueId == targetKey, "Target");
+
+        // Main query: select siblings within the window
+        // Select the UniqueId of nodes which row number is within the specified range of the target node's row number.
+        var beforeArguments = new List<Object>();
+        beforeArguments.AddRange(targetRowSql.Arguments);
+        beforeArguments.Add(before);
+
+        var afterArguments = new List<Object>();
+        afterArguments.AddRange(targetRowSql.Arguments);
+        afterArguments.Add(after);
+
+        Sql<ISqlContext>? mainSql = Sql()
+            .Select("UniqueId")
+            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .Where($"rn >= ({targetRowSql.SQL}) - @3", beforeArguments.ToArray())
+            .Where($"rn <= ({targetRowSql.SQL}) + @3", afterArguments.ToArray())
+            .OrderBy("rn");
+
+        List<Guid>? keys = Database.Fetch<Guid>(mainSql);
+
+        if (keys is null || keys.Count == 0)
+        {
+            return Enumerable.Empty<IEntitySlim>();
+        }
+
+        return GetAll(objectType, keys.ToArray());
+    }
+
+
     public IEntitySlim? Get(Guid key, Guid objectTypeId)
     {
         var isContent = objectTypeId == Constants.ObjectTypes.Document ||

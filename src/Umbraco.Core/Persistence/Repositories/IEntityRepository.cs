@@ -19,6 +19,8 @@ public interface IEntityRepository : IRepository
 
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
 
+    IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int parentId, int before, int after);
+
     /// <summary>
     ///     Gets entities for a query
     /// </summary>

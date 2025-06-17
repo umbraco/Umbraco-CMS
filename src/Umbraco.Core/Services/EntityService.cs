@@ -340,8 +340,12 @@ public class EntityService : RepositoryService, IEntityService
             return [];
         }
 
-        IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == entity.ParentId && x.SortOrder >= entity.SortOrder - before && x.SortOrder <= entity.SortOrder + after && x.Trashed == false);
-        IEnumerable<IEntitySlim> siblings = _entityRepository.GetByQuery(query, objectType.GetGuid());
+        IEntitySlim[] siblings = _entityRepository.GetSiblings(
+            objectType.GetGuid(),
+            key,
+            entity.ParentId,
+            before,
+            after).ToArray();
 
         scope.Complete();
         return siblings;
