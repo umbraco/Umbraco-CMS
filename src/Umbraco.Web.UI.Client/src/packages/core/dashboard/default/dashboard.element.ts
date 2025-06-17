@@ -1,11 +1,14 @@
 import type { ManifestDashboardApp } from '../dashboard-app.extension.js';
 import { UMB_DASHBOARD_APP_PICKER_MODAL } from '../app/picker/picker-modal.token.js';
-import type { UmbDashboardAppDetailModel } from '../app/types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, nothing, ifDefined, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbExtensionsElementInitializer,
+	type UmbExtensionElementInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-dashboard')
 export class UmbDashboardElement extends UmbLitElement {
@@ -17,15 +20,47 @@ export class UmbDashboardElement extends UmbLitElement {
 		['large', 'large'],
 	]);
 
-	@state()
-	_apps: Array<UmbDashboardAppDetailModel> = [];
+	#extensionsController?: UmbExtensionsElementInitializer<UmbExtensionManifest, 'dashboardApp', ManifestDashboardApp>;
 
-	// TODO: this is just a temp value. We need to look up the item data.
+	@state()
+	_appElements: Array<any> = [];
+
 	@state()
 	_appUniques: Array<string> = [];
 
 	constructor() {
 		super();
+	}
+
+	#observeDashboardApps(): void {
+		this.#extensionsController?.destroy();
+		this.#extensionsController = new UmbExtensionsElementInitializer<
+			UmbExtensionManifest,
+			'dashboardApp',
+			ManifestDashboardApp
+		>(
+			this,
+			umbExtensionsRegistry,
+			'dashboardApp',
+			(manifest) => this._appUniques.includes(manifest.alias),
+			(extensionControllers) => {
+				this._appElements = extensionControllers.map((controller) => {
+					if (controller.component && controller.manifest) {
+						const size = this.#sizeMap.get(controller.manifest.meta?.size) ?? this.#defaultSize;
+						const headline = controller.manifest?.meta?.headline
+							? this.localize.string(controller.manifest?.meta?.headline)
+							: undefined;
+
+						return html`<uui-box part="umb-dashboard-app-${size}" headline=${ifDefined(headline)}
+							>${controller.component}</uui-box
+						>`;
+					} else {
+						return html`<uui-box part="umb-dashboard-app-${this.#defaultSize}">Not Found</uui-box>`;
+					}
+				});
+			},
+			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
+		);
 	}
 
 	async #openAppPicker() {
@@ -39,8 +74,8 @@ export class UmbDashboardElement extends UmbLitElement {
 		}).catch(() => undefined);
 
 		if (value) {
-			//this._apps = value.selection;
 			this._appUniques = value.selection.filter((item) => item !== null) as Array<string>;
+			this.#observeDashboardApps();
 		}
 	}
 
@@ -48,13 +83,13 @@ export class UmbDashboardElement extends UmbLitElement {
 		return html`
 			<section id="content">
 				<uui-button look="placeholder" @click=${this.#openAppPicker}>Add</uui-button>
-				${repeat(
-					this._appUniques,
-					(unique) => unique,
-					(unique) => {
-						return html`${unique}`;
-					},
-				)}
+				<div class="grid-container">
+					${repeat(
+						this._appElements,
+						(element) => element,
+						(element) => element,
+					)}
+				</div>
 				<umb-extension-slot
 					type="dashboardApp"
 					.renderMethod=${this.#extensionSlotRenderMethod}
@@ -83,7 +118,6 @@ export class UmbDashboardElement extends UmbLitElement {
 			.grid-container {
 				display: grid;
 				grid-template-columns: repeat(4, 1fr);
-				grid-template-rows: repeat(100, 225px);
 				margin: calc(var(--uui-size-space-3) * -1);
 			}
 
