@@ -118,7 +118,9 @@ export class UmbDashboardElement extends UmbLitElement {
 			.grid-container {
 				display: grid;
 				grid-template-columns: repeat(4, 1fr);
+				//grid-template-rows: repeat(100, 225px);
 				margin: calc(var(--uui-size-space-3) * -1);
+				margin-bottom: 20px;
 			}
 
 			umb-extension-slot::part(umb-dashboard-app-small) {
