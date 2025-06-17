@@ -1,49 +1,30 @@
 import { UMB_SCRIPT_FOLDER_WORKSPACE_CONTEXT } from './script-folder-workspace.context-token.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-const elementName = 'umb-script-folder-workspace-editor';
-@customElement(elementName)
+@customElement('umb-script-folder-workspace-editor')
 export class UmbScriptFolderWorkspaceEditorElement extends UmbLitElement {
-	@state()
-	private _name = '';
-
-	#workspaceContext?: typeof UMB_SCRIPT_FOLDER_WORKSPACE_CONTEXT.TYPE;
-
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_SCRIPT_FOLDER_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#workspaceContext = workspaceContext;
-			this.#observeName();
+			workspaceContext?.nameWriteGuard.addRule({
+				unique: 'UMB_SERVER_PREVENT_FILE_SYSTEM_FOLDER_RENAME',
+				permitted: false,
+				message: 'It is not possible to change the name of a script folder.',
+			});
 		});
 	}
 
-	#observeName() {
-		if (!this.#workspaceContext) return;
-		this.observe(
-			this.#workspaceContext.name,
-			(name) => {
-				if (name !== this._name) {
-					this._name = name ?? '';
-				}
-			},
-			'observeName',
-		);
-	}
-
 	override render() {
-		return html`<umb-workspace-editor headline=${this._name}> </umb-workspace-editor>`;
+		return html`<umb-folder-workspace-editor></umb-folder-workspace-editor>`;
 	}
-
-	static override styles = [UmbTextStyles, css``];
 }
 
 export { UmbScriptFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbScriptFolderWorkspaceEditorElement;
+		['umb-script-folder-workspace-editor']: UmbScriptFolderWorkspaceEditorElement;
 	}
 }

@@ -1,8 +1,10 @@
 import type { UmbNamableWorkspaceContext } from '../types.js';
+import { UmbNameWriteGuardManager } from '../namable/index.js';
 import { UmbEntityDetailWorkspaceContextBase } from './entity-detail-workspace-base.js';
-import type { UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
+import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
 import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 		NamedDetailModelType extends UmbNamedEntityModel = UmbNamedEntityModel,
@@ -17,7 +19,14 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 	// Just for context token safety:
 	public readonly IS_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT = true;
 
-	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+	public readonly name = this._data.createObservablePartOfCurrent((data) => data?.name);
+
+	public readonly nameWriteGuard = new UmbNameWriteGuardManager(this);
+
+	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
+		super(host, args);
+		this.nameWriteGuard.fallbackToPermitted();
+	}
 
 	getName() {
 		return this._data.getCurrent()?.name;
