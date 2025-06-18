@@ -31,7 +31,7 @@ export class UmbDashboardAppCollectionRepository extends UmbControllerBase imple
 		const total = manifests.length;
 		const items = manifests.slice(skip, skip + take);
 		const data = { items, total };
-		return { data };
+		return { data, error: undefined };
 	}
 }
 
