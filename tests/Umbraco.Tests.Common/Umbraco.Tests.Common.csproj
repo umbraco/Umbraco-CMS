@@ -10,14 +10,13 @@
 
   <PropertyGroup>
     <!--
-      TODO: Fix the following warnings and remove overrides:
+      TODO: Fix and remove overrides:
       [CS1998] async
-      [CSO618] obsolete references
+      [CS0618] obsolete references
       [SYSLIB0012] obsolete references
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS1998,CS0618,SYSLIB0012</WarningsNotAsErrors>
   </PropertyGroup>
-
   
   <ItemGroup>
     <PackageReference Include="AutoFixture.AutoMoq" />

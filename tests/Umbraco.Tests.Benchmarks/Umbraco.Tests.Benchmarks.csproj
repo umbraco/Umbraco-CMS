@@ -8,11 +8,6 @@
   
   <PropertyGroup>
     <!--
-      TODO: Fix the following warnings and remove overrides:
-      [SYSLIB0021] API supports obsolete serialization
-      [IDE0060] removed unused parameters
-      [CS0618] update obsolete references
-      [CS0649] field not assigned to
       TODO: Fix and remove overrides:
       [SYSLIB0021] API supports obsolete serialization
       [IDE0060] removed unused parameters

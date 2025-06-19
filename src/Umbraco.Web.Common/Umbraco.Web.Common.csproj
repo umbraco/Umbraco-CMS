@@ -5,10 +5,9 @@
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
   </PropertyGroup>
-
   <PropertyGroup>
     <!--
-      TODO: Fix the following warnings and remove overrides:
+      TODO: Fix and remove overrides:
       [SA1117] params all on same line
       [SA1401] make fields private
       [SA1134] own line attributes
@@ -19,7 +18,7 @@
       [CS0419]/[CS1574] cref ambiguities
       [SA1649] file name match type
     -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,ASP0019,CS0618,IDE0040,SA1400,SA1405,SYSLIB0051,CS0419,CS1574,SA1649</WarningsNotAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SA1117,SA1401,SA1134,ASP0019,CS0618,SYSLIB0051,IDE0040,SA1400,SA1405,CS0419,CS1574,SA1649</WarningsNotAsErrors>
   </PropertyGroup>
   
   <ItemGroup>
@@ -33,7 +32,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Serilog.AspNetCore" />
   </ItemGroup>
@@ -42,10 +40,7 @@
     <!-- Take top-level depedendency on System.Net.Http, because Dazinator.Extensions.FileProviders depends on a vulnerable version -->
     <PackageReference Include="System.Net.Http" />
     <!-- Take top-level depedendency on System.Text.RegularExpressions, because Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depends on a vulnerable version -->
-    <PackageReference Include="System.Text.RegularExpressions" />
-    <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
-    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
-    <!-- Both Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web -->
+    <PackageReference Include="System.Text.RegularExpressions" />     
     <!-- Take top-level depedendency on Microsoft.IdentityModel.JsonWebTokens, because OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
     <!-- Take top-level depedendency on System.Text.Encodings.Web, because Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders depends on a vulnerable version -->

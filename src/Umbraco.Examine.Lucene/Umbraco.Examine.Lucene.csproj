@@ -5,15 +5,13 @@
     <Description>Adds Examine searching support using Lucene to Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Infrastructure.Examine</RootNamespace>
   </PropertyGroup>
-
   <PropertyGroup>
     <!--
-      TODO: Fix the following warnings and remove overrides:
+      TODO: Fix and remove overrides:
       [CS0618] Handle member obsolete appropriately
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0618</WarningsNotAsErrors>
   </PropertyGroup>
-
   
   <ItemGroup>
     <PackageReference Include="Examine" />

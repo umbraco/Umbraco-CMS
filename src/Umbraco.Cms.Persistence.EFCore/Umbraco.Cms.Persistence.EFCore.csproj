@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <!--
-      TODO: Fix the following warnings and remove overrides:
+      TODO: Fix and remove overrides:
       [IDE0270] Simplify null checks
       [CS0108] resolve hiding inherited members
       [CS1998] remove async or make method synchronous
@@ -17,8 +17,6 @@
   <ItemGroup>
     <!-- Take top-level depedendency on Microsoft.Extensions.Caching.Memory, because Microsoft.EntityFrameworkCore.* depends on a vulnerable version -->
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />

@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <!--
-      TODO: Fix the following warnings and remove overrides:
+      TODO: Fix and remove overrides:
       [ASP0019] use IHeaderDictionary.Append or the indexer to append or set headers
       [CS0612]/CS0618] obsolete
     -->

@@ -6,13 +6,11 @@
   
   <PropertyGroup>
     <!--
-      TODO: Fix the following warnings and remove overrides:
       TODO: Fix and remove overrides:
       [CS0114] Resolve hiding inherited members
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0114</WarningsNotAsErrors>
   </PropertyGroup>
-  
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" />
   </ItemGroup>

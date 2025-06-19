@@ -11,12 +11,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!--
-      TODO: Fix the following warnings and remove overrides:
-      [CS0108] hidden inherited members
-      [SYSLIB0012]/[CS0618] obsolete references
-      [CS1998] async
-      [SA1116]/[SA1117] parameter formatting
+    <!--   
       TODO: Fix and remove overrides:
       [CS0108] hidden inherited members
       [SYSLIB0012] and [CS0618] obsolete references
@@ -29,7 +24,6 @@
       [CS0649] field not assigned to
       [CS0168] unused variable
     -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors),SYSLIB0012,SA1117,SA1116,CS0162,CS0169,SA1134,SA1405,CS0108,CS0618,CS4014,CS1998,CS0649,CS0168</WarningsNotAsErrors>
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0108,SYSLIB0012,CS0618,SA1116,SA1117,CS0162,CS0169,SA1134,SA1405,CS4014,CS1998,CS0649,CS0168</WarningsNotAsErrors>
   </PropertyGroup>
 
