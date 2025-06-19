@@ -5,17 +5,15 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
-
   <PropertyGroup>
     <!--
-      TODO: Fix the following warnings and remove overrides:
+      TODO: Fix and remove overrides:
       [IDE0270] Simplify null checks
       [CS0108] resolve hiding inherited members
       [CS1998] remove async or make method synchronous
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),IDE0270,CS0108,CS1998</WarningsNotAsErrors>
   </PropertyGroup>
-
   
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj" />

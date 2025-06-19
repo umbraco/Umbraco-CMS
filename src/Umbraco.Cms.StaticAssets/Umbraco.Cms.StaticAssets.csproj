@@ -10,7 +10,6 @@
 
   <PropertyGroup>
     <!--
-      TODO: Fix the following warnings and remove overrides:
       TODO: Fix and remove overrides:
       [NU5123] Rename files so path is shorter
     -->

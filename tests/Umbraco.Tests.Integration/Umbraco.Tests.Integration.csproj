@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!--   
+    <!--
       TODO: Fix and remove overrides:
       [CS0108] hidden inherited members
       [SYSLIB0012] and [CS0618] obsolete references

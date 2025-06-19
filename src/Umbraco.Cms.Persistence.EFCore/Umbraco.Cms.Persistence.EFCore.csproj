@@ -17,6 +17,7 @@
   <ItemGroup>
     <!-- Take top-level depedendency on Microsoft.Extensions.Caching.Memory, because Microsoft.EntityFrameworkCore.* depends on a vulnerable version -->
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />

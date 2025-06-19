@@ -11,6 +11,7 @@
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0114</WarningsNotAsErrors>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" />
   </ItemGroup>

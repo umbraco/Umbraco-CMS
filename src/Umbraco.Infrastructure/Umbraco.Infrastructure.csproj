@@ -5,6 +5,7 @@
     <Description>Contains the infrastructure assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Infrastructure</RootNamespace>
   </PropertyGroup>
+
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:
@@ -29,7 +30,6 @@
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0618,CA1416,SA1117,SA1401,SA1134,CA2017,CS0108,SYSLIB0051,SA1649,CS1998,CS0169,CS0114,IDE0060,SA1130,IDE1006,CS1066,CS0612,CS1574</WarningsNotAsErrors>
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DefineConstants>$(DefineConstants);TRACE_SCOPES</DefineConstants>
   </PropertyGroup>

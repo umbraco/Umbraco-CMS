@@ -3,6 +3,7 @@
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.UnitTests</RootNamespace>
   </PropertyGroup>
+
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:
