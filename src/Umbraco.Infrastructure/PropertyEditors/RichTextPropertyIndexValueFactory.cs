@@ -96,7 +96,7 @@ internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFacto
         // This regex matches:
         // - <br> (with / without spaces or attributes)
         // - <br /> (with / without spaces or attributes)
-        html = Regex.Replace(html, @"<br\s*[^>]*/?>\s*", " ", RegexOptions.IgnoreCase);
+        html = Regex.Replace(html, @"<br\b[^>]*/?>\s*", " ", RegexOptions.IgnoreCase);
 
         // Use the existing Microsoft StripHtml function for everything else
         return html.StripHtml();
