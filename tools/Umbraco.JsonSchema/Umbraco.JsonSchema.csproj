@@ -8,7 +8,6 @@
   <PropertyGroup>
     <!--
       TODO: Fix the following warnings and remove overrides:
-      TODO: Fix and remove overrides:
       [SA1117] params all on same line
       [SA1401] make fields private
       [SA1134] own line attributes
