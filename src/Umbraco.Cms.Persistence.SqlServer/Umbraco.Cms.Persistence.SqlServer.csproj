@@ -2,7 +2,8 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Persistence - SQL Server</Title>
     <Description>Adds support for SQL Server to Umbraco CMS.</Description>
-  </PropertyGroup>  
+  </PropertyGroup>
+
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:

@@ -5,7 +5,6 @@
     <Description>Adds Examine searching support using Lucene to Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Infrastructure.Examine</RootNamespace>
   </PropertyGroup>
-
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:

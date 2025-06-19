@@ -5,6 +5,7 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
+
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:
