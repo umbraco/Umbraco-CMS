@@ -23,8 +23,8 @@ public class RichTextPropertyIndexValueFactoryTests
     [Test]
     [TestCase("<p>Sample text</p>", "Sample text")]
     [TestCase("<p>John Smith<br>Company ABC<br>London</p>", "John Smith Company ABC London")]
-    [TestCase("<p>John Smith<break>Company ABC<break>London</p>", "John Smith Company ABC London")]
-    [TestCase("<p>John Smith<br>Company ABC<branything>London</p>", "John Smith Company ABC London")]
+    [TestCase("<p>John Smith<break>Company ABC<break>London</p>", "John SmithCompany ABCLondon")]
+    [TestCase("<p>John Smith<br>Company ABC<branything>London</p>", "John Smith Company ABCLondon")]
     [TestCase("<p>Another sample text with <strong>bold</strong> content</p>", "Another sample text with bold content")]
     [TestCase("<p>Text with <a href=\"https://example.com\">link</a></p>", "Text with link")]
     [TestCase("<p>Text with <img src=\"image.jpg\" alt=\"image\" /></p>", "Text with ")]
@@ -44,6 +44,8 @@ public class RichTextPropertyIndexValueFactoryTests
         "Text with bold and italic content")]
     [TestCase("<p>Text with <a href=\"https://example.com\" target=\"_blank\">external link</a></p>",
         "Text with external link")]
+    [TestCase("<p>John Smith<br class=\"test\">Company ABC<br>London</p>", "John Smith Company ABC London")]
+    [TestCase("<p>John Smith<br \r\n />Company ABC<br>London</p>", "John Smith Company ABC London")]
     public void Can_Create_Index_Values_From_RichText_Property(string testContent, string expected)
     {
         var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(() => null));
