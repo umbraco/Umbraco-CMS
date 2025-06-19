@@ -5,6 +5,7 @@
     <Description>Contains the website assembly needed to run the frontend of Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Website</RootNamespace>
   </PropertyGroup>
+
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:
@@ -16,6 +17,7 @@
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),ASP0019,CS0618,SA1401,SA1649,IDE1006</WarningsNotAsErrors>
   </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
