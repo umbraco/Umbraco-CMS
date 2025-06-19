@@ -1,19 +1,27 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEditing
+internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEditing
 {
     private IPublishedMediaCache PublishedMediaHybridCache => GetRequiredService<IPublishedMediaCache>();
 
-    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder.AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>();
+        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
+    }
 
     // Media with crops
     [Test]
@@ -120,9 +128,8 @@ public class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEditing
 
         var mediaUpdateModel = new MediaUpdateModel
         {
-            InvariantName = newName,
-            InvariantProperties = SubImage.InvariantProperties,
-            Variants = SubImage.Variants,
+            Properties = SubImage.Properties,
+            Variants = [new VariantModel { Name = newName }]
         };
 
         // Act
@@ -144,9 +151,8 @@ public class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEditing
 
         var mediaUpdateModel = new MediaUpdateModel
         {
-            InvariantName = newName,
-            InvariantProperties = SubImage.InvariantProperties,
-            Variants = SubImage.Variants,
+            Properties = SubImage.Properties,
+            Variants = [new VariantModel { Name = newName }]
         };
 
         // Act

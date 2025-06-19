@@ -113,7 +113,7 @@ public class MemberManagerTests
     }
 
     [Test]
-    public async Task GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
+    public Task GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
     {
         // arrange
         var sut = CreateSut();
@@ -124,6 +124,7 @@ public class MemberManagerTests
 
         // act
         Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateAsync(null));
+        return Task.CompletedTask;
     }
 
     [Test]
@@ -268,7 +269,7 @@ public class MemberManagerTests
             .Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(fakeMember);
         _mockMemberService
-            .Setup(x => x.Save(fakeMember, Constants.Security.SuperUserId))
+            .Setup(x => x.Save(fakeMember, It.IsAny<PublishNotificationSaveOptions>(), Constants.Security.SuperUserId))
             .Returns(Attempt.Succeed<OperationResult?>(null));
 
     }

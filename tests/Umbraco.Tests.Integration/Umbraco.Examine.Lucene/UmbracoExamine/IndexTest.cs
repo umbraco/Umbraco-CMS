@@ -3,6 +3,7 @@ using Examine;
 using Lucene.Net.Util;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -16,8 +17,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class IndexTest : ExamineBaseTest
+internal sealed class IndexTest : ExamineBaseTest
 {
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+
+    [SetUp]
+    public void Setup()
+    {
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+
     [Test]
     [LongRunning]
     public void GivenValidationParentNode_WhenContentIndexedUnderDifferentParent_DocumentIsNotIndexed()

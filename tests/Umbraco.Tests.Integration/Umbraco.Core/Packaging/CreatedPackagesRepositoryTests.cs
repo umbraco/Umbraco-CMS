@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
+internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetupTestData() => _testBaseFolder = Guid.NewGuid();

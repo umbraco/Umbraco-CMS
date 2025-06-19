@@ -6,6 +6,10 @@ public class WebhookModelBase
 {
     public bool Enabled { get; set; } = true;
 
+    public string? Name { get; set; }
+
+    public string? Description { get; set; }
+
     [Required]
     public string Url { get; set; } = string.Empty;
 

@@ -1,10 +1,7 @@
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
@@ -34,37 +31,6 @@ public class FileService : RepositoryService, IFileService
     private readonly ITemplateRepository _templateRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
-    [Obsolete("Use other ctor - will be removed in Umbraco 15")]
-    public FileService(
-        ICoreScopeProvider uowProvider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IStylesheetRepository stylesheetRepository,
-        IScriptRepository scriptRepository,
-        ITemplateRepository templateRepository,
-        IPartialViewRepository partialViewRepository,
-        IAuditRepository auditRepository,
-        IShortStringHelper shortStringHelper,
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment)
-        : this(
-            uowProvider,
-            loggerFactory,
-            eventMessagesFactory,
-            stylesheetRepository,
-            scriptRepository,
-            partialViewRepository,
-            auditRepository,
-            hostingEnvironment,
-            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>(),
-            templateRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
-            shortStringHelper,
-            globalSettings)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public FileService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -77,7 +43,6 @@ public class FileService : RepositoryService, IFileService
         ITemplateService templateService,
         ITemplateRepository templateRepository,
         IUserIdKeyResolver userIdKeyResolver,
-        // We need these else it will be ambigious ctors
         IShortStringHelper shortStringHelper,
         IOptions<GlobalSettings> globalSettings)
         : base(uowProvider, loggerFactory, eventMessagesFactory)

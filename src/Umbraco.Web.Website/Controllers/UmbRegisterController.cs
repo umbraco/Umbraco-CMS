@@ -139,7 +139,7 @@ public class UmbRegisterController : SurfaceController
         {
             // Update the custom properties
             // TODO: See TODO in MembersIdentityUser, Should we support custom member properties for persistence/retrieval?
-            IMember? member = _memberService.GetByKey(identityUser.Key);
+            IMember? member = _memberService.GetById(identityUser.Key);
             if (member == null)
             {
                 // should never happen

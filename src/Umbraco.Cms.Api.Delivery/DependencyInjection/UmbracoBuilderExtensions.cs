@@ -49,6 +49,7 @@ public static class UmbracoBuilderExtensions
                 : provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
         });
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
+        builder.Services.AddSingleton<IRequestSegmmentService, RequestSegmentService>();
         builder.Services.AddSingleton<IRequestRoutingService, RequestRoutingService>();
         builder.Services.AddSingleton<IRequestRedirectService, RequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, RequestPreviewService>();
@@ -61,7 +62,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiMediaQueryService, ApiMediaQueryService>();
         builder.Services.AddTransient<IMemberApplicationManager, MemberApplicationManager>();
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
-        builder.Services.AddScoped<IMemberClientCredentialsManager, MemberClientCredentialsManager>();
+        builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
 
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();
@@ -105,7 +106,7 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddOutputCache(options =>
         {
-            options.AddBasePolicy(_ => { });
+            options.AddBasePolicy(build => build.AddPolicy<NoOutputCachePolicy>());
 
             if (outputCacheSettings.ContentDuration.TotalSeconds > 0)
             {

@@ -19,7 +19,7 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
 
     protected delegate void VariantViewModelMapping(string? culture, string? segment, TVariantViewModel variantViewModel);
 
-    protected IEnumerable<TValueViewModel> MapValueViewModels(IEnumerable<IProperty> properties, ValueViewModelMapping? additionalPropertyMapping = null) =>
+    protected IEnumerable<TValueViewModel> MapValueViewModels(IEnumerable<IProperty> properties, ValueViewModelMapping? additionalPropertyMapping = null, bool published = false) =>
         properties
             .SelectMany(property => property
                 .Values
@@ -31,12 +31,19 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                         return null;
                     }
 
+                    IProperty? publishedProperty = null;
+                    if (published)
+                    {
+                        publishedProperty = new Property(property.PropertyType);
+                        publishedProperty.SetValue(propertyValue.PublishedValue, propertyValue.Culture, propertyValue.Segment);
+                    }
+
                     var variantViewModel = new TValueViewModel
                     {
                         Culture = propertyValue.Culture,
                         Segment = propertyValue.Segment,
                         Alias = property.Alias,
-                        Value = propertyEditor.GetValueEditor().ToEditor(property, propertyValue.Culture, propertyValue.Segment),
+                        Value = propertyEditor.GetValueEditor().ToEditor(publishedProperty ?? property, propertyValue.Culture, propertyValue.Segment),
                         EditorAlias = propertyEditor.Alias
                     };
                     additionalPropertyMapping?.Invoke(propertyEditor, variantViewModel);
@@ -49,7 +56,8 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
     {
         IPropertyValue[] propertyValues = source.Properties.SelectMany(propertyCollection => propertyCollection.Values).ToArray();
         var cultures = source.AvailableCultures.DefaultIfEmpty(null).ToArray();
-        var segments = propertyValues.Select(property => property.Segment).Distinct().DefaultIfEmpty(null).ToArray();
+        // the default segment (null) must always be included in the view model - both for variant and invariant documents
+        var segments = propertyValues.Select(property => property.Segment).Union([null]).Distinct().ToArray();
 
         return cultures
             .SelectMany(culture => segments.Select(segment =>

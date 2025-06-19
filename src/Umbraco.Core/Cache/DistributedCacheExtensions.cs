@@ -140,7 +140,9 @@ public static class DistributedCacheExtensions
             Id = x.Item.Id,
             Key = x.Item.Key,
             ChangeTypes = x.ChangeTypes,
-            Blueprint = x.Item.Blueprint
+            Blueprint = x.Item.Blueprint,
+            PublishedCultures = x.PublishedCultures?.ToArray(),
+            UnpublishedCultures = x.UnpublishedCultures?.ToArray()
         });
 
         dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);

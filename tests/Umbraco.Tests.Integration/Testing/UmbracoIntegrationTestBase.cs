@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 [NonParallelizable]
 public abstract class UmbracoIntegrationTestBase
 {
-    private static readonly object s_dbLocker = new();
+    private static readonly Lock s_dbLocker = new();
     private static ITestDatabase? s_dbInstance;
     private static TestDbMeta s_fixtureDbMeta;
     private static int s_testCount = 1;
@@ -51,11 +51,11 @@ public abstract class UmbracoIntegrationTestBase
 
     [SetUp]
     public void SetUp_Logging() =>
-        TestContext.Progress.Write($"Start test {s_testCount++}: {TestContext.CurrentContext.Test.Name}");
+        TestContext.Out.Write($"Start test {s_testCount++}: {TestContext.CurrentContext.Test.Name}");
 
     [TearDown]
     public void TearDown_Logging() =>
-        TestContext.Progress.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
+        TestContext.Out.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
 
     [OneTimeTearDown]
     public void FixtureTearDown()

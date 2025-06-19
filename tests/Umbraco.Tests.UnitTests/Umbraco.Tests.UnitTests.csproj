@@ -2,8 +2,6 @@
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.UnitTests</RootNamespace>
-    <IsPackable>false</IsPackable>
-    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
   
   <PropertyGroup>
@@ -20,6 +18,7 @@
       [SA1405] debug message text
       [IDE0060] remove param
       [SA1405] Debug.Assert message text
+      [IDE0060] remove parameter
       [ASP0019] header append
       [CS0114] inherited member
       [CS0661]/[CS0659] adjust overrides
@@ -29,9 +28,9 @@
       [IDE1006] fix naming rule violation
       [CS0612] obsolete
     -->
-    <WarningsNotAsErrors>$(WarningsNotAsErrors),SYSLIB0013,CS0618,CS1998,SA1117,CS0067,CA1822,CA1416,IDE0028,SA1401,SA1405,IDE0060,SA1405,ASP0019,CS0114,CS0661,CS0659,CS0414,CS0252,CS0612,IDE0060,IDE1006</WarningsNotAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SYSLIB0013,CS0618,CS1998,SA1117,CS0067,CA1822,CA1416,IDE0028,SA1401,SA1405,IDE0060,ASP0019,CS0114,CS0661,CS0659,CS0414,CS0252,CS0612,IDE1006</WarningsNotAsErrors>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="NUnit3TestAdapter" />
@@ -49,6 +48,9 @@
     </Compile>
     <Compile Update="Umbraco.Cms.Api.Management\Services\BackOfficeExternalLoginServiceTests.UnLinkLoginAsync.cs">
       <DependentUpon>BackOfficeExternalLoginServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Extensions\ContentExtensionsTests.GetStatus.cs">
+      <DependentUpon>ContentExtensionsTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

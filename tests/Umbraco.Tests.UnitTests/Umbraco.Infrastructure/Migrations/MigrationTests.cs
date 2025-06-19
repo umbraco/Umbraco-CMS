@@ -52,14 +52,14 @@ public class MigrationTests
 
         public ISqlContext SqlContext { get; set; }
 
-#if DEBUG_SCOPES
-            public ScopeInfo GetScopeInfo(IScope scope)
-            {
-                throw new NotImplementedException();
-            }
-            public IEnumerable<ScopeInfo> ScopeInfos => throw new NotImplementedException();
-#endif
         public IScope AmbientScope { get; }
+
+#if DEBUG_SCOPES
+        public IEnumerable<ScopeInfo> ScopeInfos => throw new NotImplementedException();
+
+        public ScopeInfo GetScopeInfo(IScope scope) => throw new NotImplementedException();
+#endif
+
     }
 
     private class TestPlan : MigrationPlan
@@ -77,11 +77,11 @@ public class MigrationTests
             Mock.Of<ILogger<MigrationContext>>());
 
     [Test]
-    public void RunGoodMigration()
+    public async Task RunGoodMigration()
     {
         var migrationContext = GetMigrationContext();
         MigrationBase migration = new GoodMigration(migrationContext);
-        migration.Run();
+        await migration.RunAsync();
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class MigrationTests
     {
         var migrationContext = GetMigrationContext();
         MigrationBase migration = new BadMigration1(migrationContext);
-        Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Run());
+        Assert.ThrowsAsync<IncompleteMigrationExpressionException>(migration.RunAsync);
     }
 
     [Test]
@@ -97,7 +97,7 @@ public class MigrationTests
     {
         var migrationContext = GetMigrationContext();
         MigrationBase migration = new BadMigration2(migrationContext);
-        Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Run());
+        Assert.ThrowsAsync<IncompleteMigrationExpressionException>(migration.RunAsync);
     }
 
     public class GoodMigration : MigrationBase

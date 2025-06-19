@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -21,7 +20,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
@@ -36,7 +34,7 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     private readonly IRuntimeState _runtimeState;
     private string? _passwordConfigJson;
     private bool _passwordConfigInitialized;
-    private readonly object _sqliteValidateSessionLock = new();
+    private readonly Lock _sqliteValidateSessionLock = new();
     private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
     private readonly IAppPolicyCache _globalCache;
     private readonly IScopeAccessor _scopeAccessor;
@@ -1218,7 +1216,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var args = filterSql.Arguments;
         var sqlFilter = hasWhereClause
             ? filterSql.SQL
-            : " WHERE " + filterSql.SQL.TrimStartExact("AND ");
+            : " WHERE " + filterSql.SQL.TrimStart("AND ");
 
         sql.Append(SqlContext.Sql(sqlFilter, args));
 
@@ -1268,5 +1266,32 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         return sql;
     }
+
+    /// <inheritdoc />
+    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentLoginProviders)
+    {
+        // Get all the user or member keys associated with the removed providers.
+        Sql<ISqlContext> idsQuery = SqlContext.Sql()
+            .Select<ExternalLoginDto>(x => x.UserOrMemberKey)
+            .From<ExternalLoginDto>()
+            .WhereNotIn<ExternalLoginDto>(x => x.LoginProvider, currentLoginProviders);
+        List<Guid> userAndMemberKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
+        if (userAndMemberKeysAssociatedWithRemovedProviders.Count == 0)
+        {
+            return;
+        }
+
+        // Invalidate the security stamps on the users associated with the removed providers.
+        Sql<ISqlContext> updateSecurityStampsQuery = Sql()
+            .Update<UserDto>(u => u.Set(x => x.SecurityStampToken, "0".PadLeft(32, '0')))
+            .WhereIn<UserDto>(x => x.Key, userAndMemberKeysAssociatedWithRemovedProviders);
+        Database.Execute(updateSecurityStampsQuery);
+
+        // Delete the OpenIddict tokens for the users associated with the removed providers.
+        // The following is safe from SQL injection as we are dealing with GUIDs, not strings.
+        var userKeysForInClause = string.Join("','", userAndMemberKeysAssociatedWithRemovedProviders.Select(x => x.ToString()));
+        Database.Execute("DELETE FROM umbracoOpenIddictTokens WHERE Subject IN ('" + userKeysForInClause + "')");
+    }
+
     #endregion
 }

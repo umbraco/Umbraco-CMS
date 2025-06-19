@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -21,12 +22,16 @@ public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropert
         IJsonSerializer jsonSerializer,
         IUmbracoContextFactory umbracoContextFactory,
         ILanguageService languageService,
-        IOptions<ConvertBlockEditorPropertiesOptions> options)
-        : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService)
-        => SkipMigration = options.Value.SkipRichTextEditors;
+        IOptions<ConvertBlockEditorPropertiesOptions> options,
+        ICoreScopeProvider coreScopeProvider)
+        : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService, coreScopeProvider)
+    {
+        SkipMigration = options.Value.SkipRichTextEditors;
+        ParallelizeMigration = options.Value.ParallelizeMigration;
+    }
 
     protected override IEnumerable<string> PropertyEditorAliases
-        => new[] { Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.RichText };
+        => new[] { "Umbraco.TinyMCE", Constants.PropertyEditors.Aliases.RichText };
 
     protected override EditorValueHandling DetermineEditorValueHandling(object editorValue)
         => editorValue is RichTextEditorValue richTextEditorValue
@@ -60,8 +65,9 @@ public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropert
         IDataTypeService dataTypeService,
         IJsonSerializer jsonSerializer,
         IUmbracoContextFactory umbracoContextFactory,
-        ILanguageService languageService)
-        : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService)
+        ILanguageService languageService,
+        ICoreScopeProvider coreScopeProvider)
+        : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService, coreScopeProvider)
     {
     }
 

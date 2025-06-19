@@ -28,5 +28,6 @@ public class ContentDeletedWebhookEvent : WebhookEventContentBase<ContentDeleted
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentDeletedNotification notification) =>
         notification.DeletedEntities;
 
-    protected override object ConvertEntityToRequestPayload(IContent entity) => new DefaultPayloadModel { Id = entity.Key };
+    protected override object ConvertEntityToRequestPayload(IContent entity)
+        => new DefaultPayloadModel { Id = entity.Key };
 }

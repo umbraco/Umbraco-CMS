@@ -1,0 +1,4 @@
+export {
+	UMB_ENTITY_BULK_ACTION_DELETE_KIND_MANIFEST,
+	UMB_ENTITY_BULK_ACTION_DELETE_KIND,
+} from './bulk-delete.action.kind.js';

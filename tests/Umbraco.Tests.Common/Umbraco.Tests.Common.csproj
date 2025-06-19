@@ -18,10 +18,11 @@
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS1998,CS0618,SYSLIB0012</WarningsNotAsErrors>
   </PropertyGroup>
 
+  
   <ItemGroup>
     <PackageReference Include="AutoFixture.AutoMoq" />
-    <PackageReference Include="Moq" />
     <PackageReference Include="AutoFixture.NUnit3" />
+    <PackageReference Include="Moq" />
     <PackageReference Include="NUnit" />
   </ItemGroup>
 

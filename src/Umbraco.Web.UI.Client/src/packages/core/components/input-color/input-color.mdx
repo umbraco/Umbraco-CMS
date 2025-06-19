@@ -1,0 +1,25 @@
+import { Meta, Title, Primary, Controls, Story, Source } from '@storybook/blocks';
+import * as ColorStories from './input-color.stories';
+
+<Meta of={ColorStories} />
+
+<Title />
+This color picker allows you to select a color from a palette.
+
+This shows how we can override the autogen docs from StoryBook to document a component how we want to exactly using [MDX doc blocks](https://storybook.js.org/docs/7.0/web-components/writing-docs/doc-blocks)
+
+## Stories
+
+### Primary
+
+<Story of={ColorStories.Overview} />
+<Source of={ColorStories.Overview} />
+
+## Properties
+
+<Controls of={ColorStories.Overview} />
+
+### Without Labels
+
+<Story of={ColorStories.WithoutLabels} />
+<Source of={ColorStories.WithoutLabels} dark />

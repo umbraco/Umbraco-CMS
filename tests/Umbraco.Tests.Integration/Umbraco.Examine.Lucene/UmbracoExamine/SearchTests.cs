@@ -16,8 +16,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class SearchTests : ExamineBaseTest
+internal sealed class SearchTests : ExamineBaseTest
 {
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+
+    [SetUp]
+    public void Setup()
+    {
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+
     [Test]
     [LongRunning]
     public void Test_Sort_Order_Sorting()

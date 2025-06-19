@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -17,6 +19,33 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
     private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
     private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
     private readonly IMediaService _mediaService;
+    private readonly IMediaCacheService _mediaCacheService;
+    private readonly ICacheManager _cacheManager;
+
+    [Obsolete("Use the constructor with ICacheManager instead, scheduled for removal in V17.")]
+    public MediaCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IIdKeyMap idKeyMap,
+        IEventAggregator eventAggregator,
+        ICacheRefresherNotificationFactory factory,
+        IMediaNavigationQueryService mediaNavigationQueryService,
+        IMediaNavigationManagementService mediaNavigationManagementService,
+        IMediaService mediaService,
+        IMediaCacheService mediaCacheService)
+        : this(
+            appCaches,
+            serializer,
+            idKeyMap,
+            eventAggregator,
+            factory,
+            mediaNavigationQueryService,
+            mediaNavigationManagementService,
+            mediaService,
+            mediaCacheService,
+            StaticServiceProvider.Instance.GetRequiredService<ICacheManager>())
+    {
+    }
 
     public MediaCacheRefresher(
         AppCaches appCaches,
@@ -26,13 +55,19 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         ICacheRefresherNotificationFactory factory,
         IMediaNavigationQueryService mediaNavigationQueryService,
         IMediaNavigationManagementService mediaNavigationManagementService,
-        IMediaService mediaService)
+        IMediaService mediaService,
+        IMediaCacheService mediaCacheService,
+        ICacheManager cacheManager)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
         _mediaNavigationQueryService = mediaNavigationQueryService;
         _mediaNavigationManagementService = mediaNavigationManagementService;
         _mediaService = mediaService;
+        _mediaCacheService = mediaCacheService;
+
+        // TODO: Use IElementsCache instead of ICacheManager, see ContentCacheRefresher for more information.
+        _cacheManager = cacheManager;
     }
 
     #region Indirect
@@ -84,6 +119,13 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         AppCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
         Attempt<IAppPolicyCache?> mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
 
+        // Ideally, we'd like to not have to clear the entire cache here. However, this was the existing behavior in NuCache.
+        // The reason for this is that we have no way to know which elements are affected by the changes or what their keys are.
+        // This is because currently published elements live exclusively in a JSON blob in the umbracoPropertyData table.
+        // This means that the only way to resolve these keys is to actually parse this data with a specific value converter, and for all cultures, which is not possible.
+        // If published elements become their own entities with relations, instead of just property data, we can revisit this.
+        _cacheManager.ElementsCache.Clear();
+
         foreach (JsonPayload payload in payloads)
         {
             if (payload.ChangeTypes == TreeChangeTypes.Remove)
@@ -107,6 +149,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
                 }
             }
 
+            HandleMemoryCache(payload);
             HandleNavigation(payload);
         }
 
@@ -114,6 +157,41 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
 
         base.Refresh(payloads);
+    }
+
+    private void HandleMemoryCache(JsonPayload payload)
+    {
+        Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
+        {
+            _mediaCacheService.RefreshMemoryCacheAsync(key).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            if (_mediaNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys))
+            {
+                var branchKeys = descendantsKeys.ToList();
+                branchKeys.Add(key);
+
+                foreach (Guid branchKey in branchKeys)
+                {
+                    _mediaCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                }
+            }
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            _mediaCacheService.ClearMemoryCacheAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            _mediaCacheService.RemoveFromMemoryCacheAsync(key).GetAwaiter().GetResult();
+        }
     }
 
     private void HandleNavigation(JsonPayload payload)
@@ -169,7 +247,7 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         // First creation
         if (ExistsInNavigation(media.Key) is false && ExistsInNavigationBin(media.Key) is false)
         {
-            _mediaNavigationManagementService.Add(media.Key, GetParentKey(media));
+            _mediaNavigationManagementService.Add(media.Key, media.ContentType.Key, GetParentKey(media), media.SortOrder);
             if (media.Trashed)
             {
                 // If created as trashed, move to bin
@@ -185,14 +263,20 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             }
             else
             {
-                // It must have been saved. Check if parent is different
-                if (_mediaNavigationQueryService.TryGetParentKey(media.Key, out var oldParentKey))
+                if (_mediaNavigationQueryService.TryGetParentKey(media.Key, out var oldParentKey) is false)
                 {
-                    Guid? newParentKey = GetParentKey(media);
-                    if (oldParentKey != newParentKey)
-                    {
-                        _mediaNavigationManagementService.Move(media.Key, newParentKey);
-                    }
+                    return;
+                }
+
+                // It must have been saved. Check if parent is different
+                Guid? newParentKey = GetParentKey(media);
+                if (oldParentKey != newParentKey)
+                {
+                    _mediaNavigationManagementService.Move(media.Key, newParentKey);
+                }
+                else
+                {
+                    _mediaNavigationManagementService.UpdateSortOrder(media.Key, media.SortOrder);
                 }
             }
         }

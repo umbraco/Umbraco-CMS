@@ -3,7 +3,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaNavigationServiceTests
+internal sealed partial class MediaNavigationServiceTests
 {
     [Test]
     [TestCase("1CD97C02-8534-4B72-AE9E-AE52EC94CF31")] // Album
@@ -35,6 +35,44 @@ public partial class MediaNavigationServiceTests
                 var descendantExistsInRecycleBin = MediaNavigationQueryService.TryGetParentKeyInBin(descendant, out _);
                 Assert.IsFalse(descendantExistsInRecycleBin);
             }
+        });
+    }
+
+    // TODO: Add more test cases
+    [Test]
+    public async Task Sort_Order_Of_Siblings_Updates_When_Deleting_Media_And_Adding_New_One()
+    {
+        // Arrange
+        Guid nodeToDelete = SubAlbum2.Key;
+        Guid node = Image1.Key;
+
+        // Act
+        await MediaEditingService.DeleteAsync(nodeToDelete, Constants.Security.SuperUserKey);
+
+        // Assert
+        MediaNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> siblingsKeysAfterDeletion);
+        var siblingsKeysAfterDeletionList = siblingsKeysAfterDeletion.ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, siblingsKeysAfterDeletionList.Count);
+            Assert.AreEqual(SubAlbum1.Key, siblingsKeysAfterDeletionList[0]);
+        });
+
+        // Create a new sibling under the same parent
+        var key = Guid.NewGuid();
+        var createModel = CreateMediaCreateModel("Child Image", key, ImageMediaType.Key, Album.Key);
+        await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        MediaNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> siblingsKeysAfterCreation);
+        var siblingsKeysAfterCreationList = siblingsKeysAfterCreation.ToList();
+
+        // Verify sibling order after creating the new media
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, siblingsKeysAfterCreationList.Count);
+            Assert.AreEqual(SubAlbum1.Key, siblingsKeysAfterCreationList[0]);
+            Assert.AreEqual(key, siblingsKeysAfterCreationList[1]);
         });
     }
 }

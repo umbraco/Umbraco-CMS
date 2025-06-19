@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
@@ -43,13 +44,12 @@ using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Mail;
+using Umbraco.Cms.Infrastructure.Mail.Interfaces;
 using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Routing;
@@ -123,6 +123,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
         builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, SystemTextConfigurationEditorJsonSerializer>();
+        builder.Services.AddUnique<IWebhookJsonSerializer, SystemTextWebhookJsonSerializer>();
 
         // register database builder
         // *not* a singleton, don't want to keep it around
@@ -146,8 +147,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
         builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
-        builder.Services.AddSingleton<ICacheRebuilder, CacheRebuilder>();
-
         builder.Services.AddSingleton<IVariationContextAccessor, HybridVariationContextAccessor>();
         builder.Services.AddSingleton<IBackOfficeVariationContextAccessor, HttpContextBackOfficeVariationContextAccessor>();
 
@@ -165,12 +164,14 @@ public static partial class UmbracoBuilderExtensions
         // discovered when CoreBootManager configures the converters. We will remove the basic one defined
         // in core so that the more enhanced version is active.
         builder.PropertyValueConverters()
-            .Remove<SimpleTinyMceValueConverter>();
+            .Remove<SimpleRichTextValueConverter>();
 
         // register *all* checks, except those marked [HideFromTypeFinder] of course
         builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
         builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
+
+        builder.Services.AddTransient<IEmailSenderClient, BasicSmtpEmailSenderClient>();
 
         // replace
         builder.Services.AddSingleton<IEmailSender, EmailSender>(
@@ -178,12 +179,15 @@ public static partial class UmbracoBuilderExtensions
                 services.GetRequiredService<ILogger<EmailSender>>(),
                 services.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
                 services.GetRequiredService<IEventAggregator>(),
+                services.GetRequiredService<IEmailSenderClient>(),
                 services.GetService<INotificationHandler<SendEmailNotification>>(),
                 services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
+
         builder.Services.AddTransient<IUserInviteSender, EmailUserInviteSender>();
         builder.Services.AddTransient<IUserForgotPasswordSender, EmailUserForgotPasswordSender>();
 
-        builder.Services.AddSingleton<IExamineManager, ExamineManager>();
+        builder.Services.AddSingleton<IExamineManager, NoopExamineManager>();
+        builder.Services.AddSingleton<IIndexRebuilder, NoopIndexRebuilder>();
 
         builder.Services.AddScoped<ITagQuery, TagQuery>();
 
@@ -221,8 +225,13 @@ public static partial class UmbracoBuilderExtensions
 
         builder.AddInstaller();
 
-        // Services required to run background jobs (with out the handler)
-        builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+        // Services required to run background jobs
+        // We can simplify this registration once the obsolete IBackgroundTaskQueue is removed.
+        builder.Services.AddSingleton<HostedServices.BackgroundTaskQueue>();
+        builder.Services.AddSingleton<IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
+#pragma warning disable CS0618 // Type or member is obsolete
+        builder.Services.AddSingleton<HostedServices.IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
+#pragma warning restore CS0618 // Type or member is obsolete
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 
@@ -238,6 +247,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBlockEditorElementTypeCache, BlockEditorElementTypeCache>();
 
         builder.Services.AddSingleton<IRichTextRequiredValidator, RichTextRequiredValidator>();
+
+        builder.Services.AddSingleton<IRichTextRegexValidator, RichTextRegexValidator>();
 
         return builder;
     }
@@ -321,7 +332,6 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentMovedToRecycleBinNotification, UserNotificationsHandler>()
             .AddNotificationHandler<ContentCopiedNotification, UserNotificationsHandler>()
             .AddNotificationHandler<ContentRolledBackNotification, UserNotificationsHandler>()
-            .AddNotificationHandler<ContentSentToPublishNotification, UserNotificationsHandler>()
             .AddNotificationHandler<ContentUnpublishedNotification, UserNotificationsHandler>()
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, UserNotificationsHandler>()
             .AddNotificationHandler<PublicAccessEntrySavedNotification, UserNotificationsHandler>();
@@ -342,6 +352,9 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentSavingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, BlockGridPropertyNotificationHandler>()
+            .AddNotificationHandler<ContentSavingNotification, RichTextPropertyNotificationHandler>()
+            .AddNotificationHandler<ContentCopyingNotification, RichTextPropertyNotificationHandler>()
+            .AddNotificationHandler<ContentScaffoldedNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, FileUploadPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, FileUploadPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, FileUploadPropertyEditor>()
@@ -406,8 +419,8 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
 
         // Handlers for publish warnings
-        builder
-            .AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
+        builder.AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ContentPublishedNotification, AddUnroutableContentWarningsWhenPublishingNotificationHandler>();
 
         // Handlers for save warnings
         builder
@@ -433,6 +446,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestRedirectService, NoopRequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, NoopRequestPreviewService>();
         builder.Services.AddSingleton<IRequestMemberAccessService, NoopRequestMemberAccessService>();
+        builder.Services.AddTransient<ICurrentMemberClaimsProvider, NoopCurrentMemberClaimsProvider>();
         builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, NoopApiContentQueryService>();
         builder.Services.AddSingleton<IApiMediaQueryService, NoopApiMediaQueryService>();
@@ -444,6 +458,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiRichTextElementParser, ApiRichTextElementParser>();
         builder.Services.AddSingleton<IApiRichTextMarkupParser, ApiRichTextMarkupParser>();
         builder.Services.AddSingleton<IApiPropertyRenderer, ApiPropertyRenderer>();
+        builder.Services.AddSingleton<IApiDocumentUrlService, ApiDocumentUrlService>();
+        builder.Services.AddScoped<IMemberClientCredentialsManager, MemberClientCredentialsManager>();
 
         return builder;
     }

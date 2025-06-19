@@ -2,6 +2,7 @@
   <PropertyGroup>
     <!--
       TODO: Fix the following warnings and remove overrides:
+      TODO: Fix and remove overrides:
       [CS0618] handle member obsolete appropriately
       [IDE1006] fix naming rule violation
       [IDE0057] simplify substring

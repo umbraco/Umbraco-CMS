@@ -96,6 +96,7 @@ public class ContentFinderByUrlNew : IContentFinder
             umbracoContext.InPreviewMode
             );
 
+
         IPublishedContent? node = null;
         if (documentKey.HasValue)
         {

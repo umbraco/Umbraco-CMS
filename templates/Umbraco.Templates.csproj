@@ -9,37 +9,22 @@
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <IncludeContentInPack>true</IncludeContentInPack>
     <ContentTargetFolders>.</ContentTargetFolders>
-    <NoWarn>NU5128</NoWarn>
+    <NoWarn>$(NoWarn),NU5128</NoWarn>
   </PropertyGroup>
+
+  <!-- Added project references as the sample API in umbraco-extension will fail -->
   <ItemGroup>
-    <Content Include="..\src\Umbraco.Web.UI\Program.cs">
-      <Link>UmbracoProject\Program.cs</Link>
-      <PackagePath>UmbracoProject</PackagePath>
-    </Content>
-    <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
-    <Content Include="UmbracoPackageRcl\**" Exclude="bin;obj" />
-    <Content Include="UmbracoProject\**" Exclude="bin;obj" />
-    <Content Include="UmbracoDockerCompose\**" Exclude="bin;obj"/>
-    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
-      <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
-    </Content>
-    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blockgrid\**">
-      <Link>UmbracoProject\Views\Partials\blockgrid\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
-    </Content>
-    <Content Include="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml">
-      <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
-      <PackagePath>UmbracoProject\Views</PackagePath>
-    </Content>
+    <ProjectReference Include="..\src\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
+    <ProjectReference Include="..\src\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
+    <ProjectReference Include="..\src\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+    <ProjectReference Include="..\src\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
+
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Update="**\.template.config\template.json" Pack="false" />
-  </ItemGroup>
+
   <Target Name="GetUpdatedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetUmbracoBuildVersion">
     <ItemGroup>
       <_TemplateJsonFiles Include="**\.template.config\template.json" Exclude="bin\**;obj\**" />
@@ -55,4 +40,30 @@
       </_PackageFiles>
     </ItemGroup>
   </Target>
+
+  <ItemGroup>
+    <Content Include="..\src\Umbraco.Web.UI\Program.cs">
+      <Link>UmbracoProject\Program.cs</Link>
+      <PackagePath>UmbracoProject</PackagePath>
+    </Content>
+    <Content Include="UmbracoProject\**" Exclude="bin;obj" />
+    <Content Include="UmbracoExtension\**" Exclude="bin;obj" />
+    <Content Include="UmbracoDockerCompose\**" Exclude="bin;obj" />
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
+      <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blockgrid\**">
+      <Link>UmbracoProject\Views\Partials\blockgrid\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml">
+      <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
+      <PackagePath>UmbracoProject\Views</PackagePath>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="**\.template.config\template.json" Pack="false" />
+  </ItemGroup>
 </Project>

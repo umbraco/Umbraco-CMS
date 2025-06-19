@@ -15,6 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Take top-level depedendency on Microsoft.Extensions.Caching.Memory, because Microsoft.EntityFrameworkCore.* depends on a vulnerable version -->
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
@@ -25,7 +29,7 @@
     <PackageReference Include="Azure.Identity" />
     <!-- Take top-level depedendency on System.Runtime.Caching, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
     <PackageReference Include="System.Runtime.Caching" />
-    <!-- Both  Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer, Dazinator.Extensions.FileProviders bring in legacy versions of System.Text.Encodings.Web -->
+    <!-- Take top-level depedendency on System.Text.Encodings.Web, because Microsoft.EntityFrameworkCore.SqlServer brings in a legacy version -->
     <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>
 

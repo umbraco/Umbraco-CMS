@@ -13,8 +13,9 @@ namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 [DeliveryApiAccess]
 [VersionedDeliveryApiRoute("content")]
 [ApiExplorerSettings(GroupName = "Content")]
-[LocalizeFromAcceptLanguageHeader]
+[ContextualizeFromAcceptHeaders]
 [ValidateStartItem]
+[AddVaryHeader]
 [OutputCache(PolicyName = Constants.DeliveryApi.OutputCache.ContentCachePolicy)]
 public abstract class ContentApiControllerBase : DeliveryApiControllerBase
 {

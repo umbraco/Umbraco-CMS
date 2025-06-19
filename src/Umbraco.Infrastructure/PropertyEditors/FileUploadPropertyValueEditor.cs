@@ -32,7 +32,6 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
-        ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
@@ -40,7 +39,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
         IFileStreamSecurityValidator fileStreamSecurityValidator)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
         _jsonSerializer = jsonSerializer;
@@ -87,7 +86,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         FileUploadValue? editorModelValue = ParseFileUploadValue(editorValue.Value);
 
         // no change?
-        if (editorModelValue?.TemporaryFileId.HasValue is not true)
+        if (editorModelValue?.TemporaryFileId.HasValue is not true && string.IsNullOrEmpty(editorModelValue?.Src) is false)
         {
             return currentValue;
         }
@@ -99,7 +98,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
             : null;
 
         // resetting the current value?
-        if (editorModelValue?.Src is null && currentPath.IsNullOrWhiteSpace() is false)
+        if (string.IsNullOrEmpty(editorModelValue?.Src) && currentPath.IsNullOrWhiteSpace() is false)
         {
             // delete the current file and clear the value of this property
             _mediaFileManager.FileSystem.DeleteFile(currentPath);

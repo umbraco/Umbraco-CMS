@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +22,7 @@ public class AllSearcherController : SearcherControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearcherResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<SearcherResponse>>> All(
+    public Task<ActionResult<PagedViewModel<SearcherResponse>>> All(
         CancellationToken cancellationToken,
         int skip = 0,
         int take = 100)
@@ -30,13 +30,13 @@ public class AllSearcherController : SearcherControllerBase
         var searchers = new List<SearcherResponse>(
             _examineManager.RegisteredSearchers.Select(searcher => new SearcherResponse { Name = searcher.Name })
                 .OrderBy(x =>
-                    x.Name.TrimEndExact("Searcher"))); // order by name , but strip the "Searcher" from the end if it exists
+                    x.Name.TrimEnd("Searcher"))); // order by name , but strip the "Searcher" from the end if it exists
         var viewModel = new PagedViewModel<SearcherResponse>
         {
             Items = searchers.Skip(skip).Take(take),
             Total = searchers.Count,
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Task.FromResult<ActionResult<PagedViewModel<SearcherResponse>>>(Ok(viewModel));
     }
 }

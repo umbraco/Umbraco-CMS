@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const documentFolderName = 'TestFolder';
@@ -15,14 +15,14 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create a empty document type folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
-  await umbracoUi.documentType.clickActionsMenuForName('Document Types');
-  await umbracoUi.documentType.clickCreateButton();
+  await umbracoUi.documentType.clickActionsMenuAtRoot();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
   await umbracoUi.documentType.clickCreateFolderButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   const folder = await umbracoApi.documentType.getByName(documentFolderName);
   expect(folder.name).toBe(documentFolderName);
   // Checks if the folder is in the root
@@ -38,10 +38,10 @@ test('can delete a document type folder', {tag: '@smoke'}, async ({umbracoApi, u
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickActionsMenuForName(documentFolderName);
-  await umbracoUi.documentType.deleteFolder();
+  await umbracoUi.documentType.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.waitForDocumentTypeToBeDeleted();
   await umbracoApi.documentType.doesNameExist(documentFolderName);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName, false);
 });
@@ -56,12 +56,12 @@ test('can rename a document type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickActionsMenuForName(oldFolderName);
-  await umbracoUi.documentType.clickRenameFolderButton();
+  await umbracoUi.documentType.clickRenameActionMenuOption();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
-  await umbracoUi.documentType.clickConfirmRenameFolderButton();
+  await umbracoUi.documentType.clickConfirmRenameButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.waitForDocumentTypeToBeRenamed();
   const folder = await umbracoApi.documentType.getByName(documentFolderName);
   expect(folder.name).toBe(documentFolderName);
   await umbracoUi.documentType.isDocumentTreeItemVisible(oldFolderName, false);
@@ -78,13 +78,13 @@ test('can create a document type folder in a folder', async ({umbracoApi, umbrac
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickActionsMenuForName(documentFolderName);
-  await umbracoUi.documentType.clickCreateButton();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(childFolderName);
   await umbracoUi.documentType.clickCreateFolderButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   const folder = await umbracoApi.documentType.getByName(childFolderName);
   expect(folder.name).toBe(childFolderName);
   // Checks if the parentFolder contains the ChildFolder as a child
@@ -109,13 +109,13 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.documentType.clickRootFolderCaretButton();
   await umbracoUi.documentType.clickCaretButtonForName(grandParentFolderName);
   await umbracoUi.documentType.clickActionsMenuForName(parentFolderName);
-  await umbracoUi.documentType.clickCreateButton();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
   await umbracoUi.documentType.clickCreateFolderButton();
 
   // Assert
-  await umbracoUi.documentType.isSuccessNotificationVisible();
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   await umbracoUi.documentType.reloadTree(parentFolderName);
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName);
   const grandParentChildren = await umbracoApi.documentType.getChildren(grandParentFolderId);

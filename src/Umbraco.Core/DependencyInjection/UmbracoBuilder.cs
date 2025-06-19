@@ -26,8 +26,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
@@ -36,10 +34,14 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Preview;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Security.Authorization;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.ImportExport;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.Services.Querying;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
@@ -62,9 +64,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <inheritdoc />
         public ILoggerFactory BuilderLoggerFactory { get; }
 
-        /// <inheritdoc />
-        public IHostingEnvironment? BuilderHostingEnvironment { get; }
-
         public IProfiler Profiler { get; }
 
         public AppCaches AppCaches { get; }
@@ -73,7 +72,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class primarily for testing.
         /// </summary>
         public UmbracoBuilder(IServiceCollection services, IConfiguration config, TypeLoader typeLoader)
-            : this(services, config, typeLoader, NullLoggerFactory.Instance, new NoopProfiler(), AppCaches.Disabled, null)
+            : this(services, config, typeLoader, NullLoggerFactory.Instance, new NoopProfiler(), AppCaches.Disabled)
         { }
 
         /// <summary>
@@ -85,13 +84,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             TypeLoader typeLoader,
             ILoggerFactory loggerFactory,
             IProfiler profiler,
-            AppCaches appCaches,
-            IHostingEnvironment? hostingEnvironment)
+            AppCaches appCaches)
         {
             Services = services;
             Config = config;
             BuilderLoggerFactory = loggerFactory;
-            BuilderHostingEnvironment = hostingEnvironment;
             Profiler = profiler;
             AppCaches = appCaches;
             TypeLoader = typeLoader;
@@ -215,6 +212,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // register published router
             Services.AddUnique<IPublishedRouter, PublishedRouter>();
+            Services.AddUnique<IPublishedUrlInfoProvider, PublishedUrlInfoProvider>();
 
             Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
@@ -356,6 +354,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IMediaNavigationQueryService>(x => x.GetRequiredService<MediaNavigationService>());
             Services.AddUnique<IMediaNavigationManagementService>(x => x.GetRequiredService<MediaNavigationService>());
 
+            Services.AddUnique<PublishStatusService, PublishStatusService>();
+            Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<PublishStatusService>());
+            Services.AddUnique<IPublishStatusQueryService>(x => x.GetRequiredService<PublishStatusService>());
+
+            Services.AddUnique<IPublishedContentStatusFilteringService, PublishedContentStatusFilteringService>();
+            Services.AddUnique<IPublishedMediaStatusFilteringService, PublishedMediaStatusFilteringService>();
+
             // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
             Services.AddUnique<IMarkdownSanitizer, NoopMarkdownSanitizer>();
@@ -365,7 +370,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddUnique<ICultureImpactFactory>(provider => new CultureImpactFactory(provider.GetRequiredService<IOptionsMonitor<ContentSettings>>()));
             Services.AddUnique<IDictionaryService, DictionaryService>();
-            Services.AddUnique<ITemporaryMediaService, TemporaryMediaService>();
             Services.AddUnique<IMediaImportService, MediaImportService>();
 
             // Register filestream security analyzers
@@ -376,7 +380,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookService, WebhookService>();
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
-            Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
+            Services.AddUnique<IWebhookRequestService>(factory => new WebhookRequestService(
+                factory.GetRequiredService<ICoreScopeProvider>(),
+                factory.GetRequiredService<IWebhookRequestRepository>(),
+                factory.GetRequiredService<IWebhookJsonSerializer>()));
 
             // Data type configuration cache
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
@@ -385,10 +392,12 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Two factor providers
             Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
             Services.AddUnique<IUserTwoFactorLoginService, UserTwoFactorLoginService>();
+            Services.AddUnique<IMemberTwoFactorLoginService, MemberTwoFactorLoginService>();
 
             // Add Query services
             Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();
             Services.AddUnique<IMediaRecycleBinQueryService, MediaRecycleBinQueryService>();
+            Services.AddUnique<IContentQueryService, ContentQueryService>();
 
             // Authorizers
             Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
@@ -412,7 +421,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Routing
             Services.AddUnique<IDocumentUrlService, DocumentUrlService>();
-            Services.AddHostedService<DocumentUrlServiceInitializer>();
+            Services.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, DocumentUrlServiceInitializerNotificationHandler>();
         }
     }
 }

@@ -27,7 +27,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         indexingSettings.OnChange(newValue => _indexingSettings = newValue);
     }
 
-    public virtual IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
+    public virtual IEnumerable<IndexValue> GetIndexValues(
         IProperty property,
         string? culture,
         string? segment,
@@ -35,7 +35,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         IEnumerable<string> availableCultures,
         IDictionary<Guid, IContentType> contentTypeDictionary)
     {
-        var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
+        var result = new List<IndexValue>();
 
         var propertyValue = property.GetValue(culture, segment, published);
 
@@ -65,7 +65,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
             }
         }
 
-        IEnumerable<KeyValuePair<string, IEnumerable<object?>>> summary = HandleResume(result, property, culture, segment, published);
+        IEnumerable<IndexValue> summary = HandleResume(result, property, culture, segment, published);
         if (_indexingSettings.ExplicitlyIndexEachNestedProperty || ForceExplicitlyIndexEachNestedProperty)
         {
             result.AddRange(summary);
@@ -78,17 +78,17 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
     /// <summary>
     ///  Method to return a list of summary of the content. By default this returns an empty list
     /// </summary>
-    protected virtual IEnumerable<KeyValuePair<string, IEnumerable<object?>>> HandleResume(
-        List<KeyValuePair<string, IEnumerable<object?>>> result,
+    protected virtual IEnumerable<IndexValue> HandleResume(
+        List<IndexValue> result,
         IProperty property,
         string? culture,
         string? segment,
-        bool published) => Array.Empty<KeyValuePair<string, IEnumerable<object?>>>();
+        bool published) => Array.Empty<IndexValue>();
 
     /// <summary>
     ///  Method that handle the deserialized object.
     /// </summary>
-    protected abstract IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
+    protected abstract IEnumerable<IndexValue> Handle(
         TSerialized deserializedPropertyValue,
         IProperty property,
         string? culture,

@@ -1,17 +1,19 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.ImportExport;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class ImportExistingMediaTypeController : MediaTypeControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;

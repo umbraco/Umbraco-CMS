@@ -7,27 +7,26 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.HybridCache.Services;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTest
+internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTest
 {
-    protected List<string> TestsRequiringAllowEditInvariantFromNonDefault { get; set; } = new();
-
     protected ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     protected IContentService ContentService => GetRequiredService<IContentService>();
@@ -35,6 +34,8 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
     protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     protected PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
+
+    protected IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
     private IUmbracoContextAccessor UmbracoContextAccessor => GetRequiredService<IUmbracoContextAccessor>();
 
@@ -61,8 +62,8 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
         builder.Services.AddUnique(mockHttpContextAccessor.Object);
         builder.AddUmbracoHybridCache();
 
-        builder.Services.Configure<ContentSettings>(config =>
-            config.AllowEditInvariantFromNonDefault = TestsRequiringAllowEditInvariantFromNonDefault.Contains(TestContext.CurrentContext.Test.Name));
+        builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
     }
 
     [SetUp]
@@ -73,19 +74,6 @@ public abstract class BlockEditorElementVariationTestBase : UmbracoIntegrationTe
     {
         var publishResult = ContentService.Publish(content, culturesToPublish);
         Assert.IsTrue(publishResult.Success);
-
-        // ContentCacheRefresher.JsonPayload[] payloads =
-        // [
-        //     new ContentCacheRefresher.JsonPayload
-        //     {
-        //         ChangeTypes = TreeChangeTypes.RefreshNode,
-        //         Key = content.Key,
-        //         Id = content.Id,
-        //         Blueprint = false
-        //     }
-        // ];
-
-
         DocumentCacheService.RefreshContentAsync(content);
     }
 

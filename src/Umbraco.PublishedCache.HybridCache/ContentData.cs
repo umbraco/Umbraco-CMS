@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 /// </summary>
 // This is for cache performance reasons, see https://learn.microsoft.com/en-us/aspnet/core/performance/caching/hybrid?view=aspnetcore-9.0#reuse-objects
 [ImmutableObject(true)]
-internal sealed class ContentData
+public sealed class ContentData
 {
     public ContentData(string? name, string? urlSegment, int versionId, DateTime versionDate, int writerId, int? templateId, bool published, Dictionary<string, PropertyData[]>? properties, IReadOnlyDictionary<string, CultureVariation>? cultureInfos)
     {

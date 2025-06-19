@@ -27,10 +27,18 @@ public class ContentNavigationRepository : INavigationRepository
     private IEnumerable<INavigationModel> FetchNavigationDtos(Guid objectTypeKey, bool trashed)
     {
         Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql()
-            .Select<NavigationDto>()
-            .From<NodeDto>()
-            .Where<NodeDto>(x => x.NodeObjectType == objectTypeKey && x.Trashed == trashed)
-            .OrderBy<NodeDto>(x => x.Path); // make sure that we get the parent items first
+            .Select(
+                $"n.{NodeDto.IdColumnName} as {NodeDto.IdColumnName}",
+                $"n.{NodeDto.KeyColumnName} as {NodeDto.KeyColumnName}",
+                $"ctn.{NodeDto.KeyColumnName} as {NavigationDto.ContentTypeKeyColumnName}",
+                $"n.{NodeDto.ParentIdColumnName} as {NodeDto.ParentIdColumnName}",
+                $"n.{NodeDto.SortOrderColumnName} as {NodeDto.SortOrderColumnName}",
+                $"n.{NodeDto.TrashedColumnName} as {NodeDto.TrashedColumnName}")
+            .From<NodeDto>("n")
+            .InnerJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
+            .InnerJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn")
+            .Where<NodeDto>(n => n.NodeObjectType == objectTypeKey && n.Trashed == trashed, "n")
+            .OrderBy<NodeDto>(n => n.Path, "n"); // make sure that we get the parent items first
 
         return AmbientScope?.Database.Fetch<NavigationDto>(sql) ?? Enumerable.Empty<NavigationDto>();
     }

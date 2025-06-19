@@ -101,6 +101,7 @@ internal class TemplateRenderer : ITemplateRenderer
         else
         {
             requestBuilder.SetCulture(umbracoContext.PublishedRequest.Culture);
+            requestBuilder.SetSegment(umbracoContext.PublishedRequest.Segment);
         }
 
         // set the doc that was found by id

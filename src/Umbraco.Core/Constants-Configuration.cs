@@ -48,10 +48,6 @@ public static partial class Constants
         public const string ConfigRequestHandler = ConfigPrefix + "RequestHandler";
         public const string ConfigRuntime = ConfigPrefix + "Runtime";
         public const string ConfigRuntimeMode = ConfigRuntime + ":Mode";
-        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
-        public const string ConfigRuntimeMinification = ConfigPrefix + "RuntimeMinification";
-        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
-        public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + ":Version";
         public const string ConfigSecurity = ConfigPrefix + "Security";
         public const string ConfigBasicAuth = ConfigPrefix + "BasicAuth";
         public const string ConfigTypeFinder = ConfigPrefix + "TypeFinder";
@@ -65,6 +61,7 @@ public static partial class Constants
         public const string ConfigDataTypes = ConfigPrefix + "DataTypes";
         public const string ConfigPackageManifests = ConfigPrefix + "PackageManifests";
         public const string ConfigWebhook = ConfigPrefix + "Webhook";
+        public const string ConfigWebhookPayloadType = ConfigWebhook + ":PayloadType";
         public const string ConfigCache = ConfigPrefix + "Cache";
 
         public static class NamedOptions

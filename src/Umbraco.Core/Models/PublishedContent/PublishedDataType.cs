@@ -18,12 +18,6 @@ public class PublishedDataType
 {
     private readonly Lazy<object?> _lazyConfiguration;
 
-    [Obsolete("Please use the constructor that accepts editor UI alias too. Scheduled for removal in V16.")]
-    public PublishedDataType(int id, string editorAlias, Lazy<object?> lazyConfiguration)
-        : this(id, editorAlias, editorAlias, lazyConfiguration)
-    {
-    }
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedDataType" /> class.
     /// </summary>

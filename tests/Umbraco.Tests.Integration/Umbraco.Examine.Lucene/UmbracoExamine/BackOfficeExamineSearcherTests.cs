@@ -1,17 +1,15 @@
-﻿using Examine;
+using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Cms.Infrastructure.HostedServices;
@@ -19,15 +17,13 @@ using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
-using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class BackOfficeExamineSearcherTests : ExamineBaseTest
+internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 {
     [SetUp]
     public void Setup()
@@ -37,7 +33,9 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var httpContext = new DefaultHttpContext();
         httpContext.RequestServices = Services;
         Mock.Get(TestHelper.GetHttpContextAccessor()).Setup(x => x.HttpContext).Returns(httpContext);
-    }
+
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+                }
 
     [TearDown]
     public void TearDown()
@@ -48,6 +46,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         Services.DisposeIfDisposable();
     }
 
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
     private IBackOfficeExamineSearcher BackOfficeExamineSearcher => GetRequiredService<IBackOfficeExamineSearcher>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
@@ -79,6 +78,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             pageSize,
             pageIndex,
             out _,
+            null,
+            null,
             ignoreUserStartNodes: true);
 
     private async Task SetupUserIdentity(string userId)

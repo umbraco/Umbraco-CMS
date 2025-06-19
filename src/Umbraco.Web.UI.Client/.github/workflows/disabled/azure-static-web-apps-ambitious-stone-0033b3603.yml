@@ -1,0 +1,82 @@
+name: Storybook CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+      - v*/dev
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+      - release/*
+      - v*/dev
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        type: number
+        description: 'Issue/PR Number to comment on'
+        required: false
+
+env:
+  NODE_OPTIONS: --max_old_space_size=16384
+
+jobs:
+  build_and_deploy_job:
+    if: github.event_name != 'pull_request' || (github.event_name == 'pull_request' && github.event.action != 'closed' && contains(github.event.pull_request.labels.*.name, 'storybook'))
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AMBITIOUS_STONE_0033B3603 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          action: 'upload'
+          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
+          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
+          app_location: '/' # App source code path
+          app_build_command: 'npm run build-storybook'
+          api_location: '' # Api source code path - optional
+          output_location: '/storybook-static' # Built app content directory - optional
+          ###### End of Repository/Build Configurations ######
+      - name: Comment on PR
+        # azure/static-web-apps-deploy doesn't support workflow_dispatch, so we need to manually comment on the PR
+        if: github.event_name == 'workflow_dispatch' && inputs.issue_number != null
+        uses: actions/github-script@v7
+        env:
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          SITE_URL: ${{ steps.builddeploy.outputs.static_web_app_url }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: process.env.ISSUE_NUMBER,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['storybook']
+            })
+            github.rest.issues.createComment({
+              issue_number: process.env.ISSUE_NUMBER,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Storybook is available at: ${process.env.SITE_URL}`
+            })
+
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && contains(github.event.pull_request.labels.*.name, 'storybook')
+    runs-on: ubuntu-latest
+    name: Close Pull Request Job
+    steps:
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          app_location: '/'
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AMBITIOUS_STONE_0033B3603 }}
+          action: 'close'

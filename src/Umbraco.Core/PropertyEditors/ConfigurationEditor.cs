@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
@@ -85,7 +86,7 @@ public class ConfigurationEditor : IConfigurationEditor
         => Fields
             .SelectMany(field =>
                 configuration.TryGetValue(field.Key, out var value)
-                    ? field.Validators.SelectMany(validator => validator.Validate(value, null, null))
+                    ? field.Validators.SelectMany(validator => validator.Validate(value, null, null, PropertyValidationContext.Empty()))
                     : Enumerable.Empty<ValidationResult>())
             .ToArray();
 

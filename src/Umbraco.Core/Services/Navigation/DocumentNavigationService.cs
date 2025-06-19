@@ -1,12 +1,13 @@
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
-internal sealed class DocumentNavigationService : ContentNavigationServiceBase, IDocumentNavigationQueryService, IDocumentNavigationManagementService
+internal sealed class DocumentNavigationService : ContentNavigationServiceBase<IContentType, IContentTypeService>, IDocumentNavigationQueryService, IDocumentNavigationManagementService
 {
-    public DocumentNavigationService(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository)
-        : base(coreScopeProvider, navigationRepository)
+    public DocumentNavigationService(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository, IContentTypeService contentTypeService)
+        : base(coreScopeProvider, navigationRepository, contentTypeService)
     {
     }
 

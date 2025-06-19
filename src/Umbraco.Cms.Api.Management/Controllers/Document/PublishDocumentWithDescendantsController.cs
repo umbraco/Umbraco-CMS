@@ -1,11 +1,11 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -35,7 +35,7 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
 
     [HttpPut("{id:guid}/publish-with-descendants")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PublishWithDescendantsResultModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PublishWithDescendants(CancellationToken cancellationToken, Guid id, PublishDocumentWithDescendantsRequestModel requestModel)
@@ -53,11 +53,27 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
         Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> attempt = await _contentPublishingService.PublishBranchAsync(
             id,
             requestModel.Cultures,
-            requestModel.IncludeUnpublishedDescendants,
-            CurrentUserKey(_backOfficeSecurityAccessor));
+            BuildPublishBranchFilter(requestModel),
+            CurrentUserKey(_backOfficeSecurityAccessor),
+            true);
 
-        return attempt.Success
-            ? Ok()
+        return attempt.Success && attempt.Result.AcceptedTaskId.HasValue
+            ? Ok(new PublishWithDescendantsResultModel
+            {
+                TaskId = attempt.Result.AcceptedTaskId.Value,
+                IsComplete = false
+            })
             : DocumentPublishingOperationStatusResult(attempt.Status, failedBranchItems: attempt.Result.FailedItems);
+    }
+
+    private static PublishBranchFilter BuildPublishBranchFilter(PublishDocumentWithDescendantsRequestModel requestModel)
+    {
+        PublishBranchFilter publishBranchFilter = PublishBranchFilter.Default;
+        if (requestModel.IncludeUnpublishedDescendants)
+        {
+            publishBranchFilter |= PublishBranchFilter.IncludeUnpublished;
+        }
+
+        return publishBranchFilter;
     }
 }

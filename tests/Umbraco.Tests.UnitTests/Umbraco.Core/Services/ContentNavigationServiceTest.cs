@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -23,7 +24,7 @@ public class ContentNavigationServiceTest
         navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(Constants.ObjectTypes.Document))
             .Returns(navigationNodes);
 
-        var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object);
+        var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object, Mock.Of<IContentTypeService>());
         await contentNavigationService.RebuildAsync();
 
         var success = contentNavigationService.TryGetLevel(rootKey, out var level);
@@ -47,7 +48,7 @@ public class ContentNavigationServiceTest
         navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(Constants.ObjectTypes.Document))
             .Returns(navigationNodes);
 
-        var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object);
+        var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object, Mock.Of<IContentTypeService>());
         await contentNavigationService.RebuildAsync();
 
         var success = contentNavigationService.TryGetLevel(childKey, out var level);
@@ -71,7 +72,7 @@ public class ContentNavigationServiceTest
         navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(Constants.ObjectTypes.Document))
             .Returns(navigationNodes);
 
-        var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object);
+        var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object, Mock.Of<IContentTypeService>());
         await contentNavigationService.RebuildAsync();
 
         var success = contentNavigationService.TryGetLevel(grandChildKey, out var level);

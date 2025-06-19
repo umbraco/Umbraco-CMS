@@ -1,27 +1,29 @@
 {
-	"name": "login",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"dev": "vite",
-		"build": "tsc && vite build",
-		"watch": "tsc && vite build --watch",
-		"preview": "vite preview"
-	},
-	"engines": {
-		"node": ">=20.8",
-		"npm": ">=10.1"
-	},
-	"dependencies": {
-	},
-	"devDependencies": {
-    "@umbraco-cms/backoffice": "^14.2.0",
-    "msw": "^2.3.0",
-		"typescript": "^5.4.5",
-		"vite": "^5.4.6",
-		"vite-tsconfig-paths": "^4.3.2"
-	},
-	"msw": {
-		"workerDirectory": "public"
-	}
+  "name": "login",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "watch": "tsc && vite build --watch",
+    "preview": "vite preview",
+    "generate:server-api": "openapi-ts"
+  },
+  "engines": {
+    "node": ">=22",
+    "npm": ">=10.9"
+  },
+  "devDependencies": {
+    "@hey-api/client-fetch": "^0.10.2",
+    "@hey-api/openapi-ts": "^0.67.6",
+    "@umbraco-cms/backoffice": "16.0.0-rc4",
+    "msw": "^2.7.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
 }

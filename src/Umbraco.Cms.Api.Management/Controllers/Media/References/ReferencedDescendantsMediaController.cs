@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -45,6 +45,6 @@ public class ReferencedDescendantsMediaController : MediaControllerBase
             Items = _umbracoMapper.MapEnumerable<RelationItemModel, ReferenceByIdModel>(relationItems.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return pagedViewModel;
     }
 }

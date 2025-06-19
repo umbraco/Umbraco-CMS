@@ -1,13 +1,16 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
 public class DeleteMemberTypeController : MemberTypeControllerBase
 {
     private readonly IMemberTypeService _memberTypeService;

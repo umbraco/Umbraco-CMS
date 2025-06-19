@@ -42,6 +42,8 @@ internal class PublishedContent : PublishedContentBase
         _urlSegment = contentData.UrlSegment;
         _published = contentData.Published;
 
+        IsPreviewing = preview;
+
         var properties = new IPublishedProperty[_contentNode.ContentType.PropertyTypes.Count()];
         var i = 0;
         foreach (IPublishedPropertyType propertyType in _contentNode.ContentType.PropertyTypes)
@@ -127,7 +129,7 @@ internal class PublishedContent : PublishedContentBase
 
     public override DateTime UpdateDate { get; }
 
-    public bool IsPreviewing { get; } = false;
+    public bool IsPreviewing { get; }
 
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
@@ -137,7 +139,7 @@ internal class PublishedContent : PublishedContentBase
     {
         get
         {
-            INavigationQueryService? navigationQueryService = null;
+            INavigationQueryService? navigationQueryService;
             switch (_contentNode.ContentType.ItemType)
             {
                 case PublishedItemType.Content:
@@ -150,8 +152,13 @@ internal class PublishedContent : PublishedContentBase
                     throw new NotImplementedException("Level is not implemented for " + _contentNode.ContentType.ItemType);
             }
 
-            navigationQueryService.TryGetLevel(Key, out int level);
-            return level;
+            // Attempt to retrieve the level, returning 0 if it fails or if level is null.
+            if (navigationQueryService.TryGetLevel(Key, out var level) && level.HasValue)
+            {
+                return level.Value;
+            }
+
+            return 0;
         }
     }
 
@@ -263,22 +270,22 @@ internal class PublishedContent : PublishedContentBase
     private IPublishedContent? GetParent()
     {
         INavigationQueryService? navigationQueryService;
-        IPublishedCache? publishedCache;
+        IPublishedStatusFilteringService? publishedStatusFilteringService;
 
         switch (ContentType.ItemType)
         {
             case PublishedItemType.Content:
-                publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
                 navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+                publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>();
                 break;
             case PublishedItemType.Media:
-                publishedCache = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaCache>();
                 navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+                publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaStatusFilteringService>();
                 break;
             default:
                 throw new NotImplementedException("Level is not implemented for " + ContentType.ItemType);
         }
 
-        return this.Parent<IPublishedContent>(publishedCache, navigationQueryService);
+        return this.Parent<IPublishedContent>(navigationQueryService, publishedStatusFilteringService);
     }
 }

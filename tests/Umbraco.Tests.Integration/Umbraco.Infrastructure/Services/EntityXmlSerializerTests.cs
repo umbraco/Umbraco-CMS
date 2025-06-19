@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class EntityXmlSerializerTests : UmbracoIntegrationTest
+internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
 {
     private IEntityXmlSerializer Serializer => GetRequiredService<IEntityXmlSerializer>();
     private IContentService ContentService => GetRequiredService<IContentService>();

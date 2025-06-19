@@ -6,7 +6,6 @@ namespace Umbraco.Cms.Core.Exceptions;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <seealso cref="System.Exception" />
-[Serializable]
 public class DataOperationException<T> : Exception
     where T : Enum
 {
@@ -58,22 +57,6 @@ public class DataOperationException<T> : Exception
         Operation = operation;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="DataOperationException{T}" /> class.
-    /// </summary>
-    /// <param name="info">
-    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
-    ///     data about the exception being thrown.
-    /// </param>
-    /// <param name="context">
-    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
-    ///     information about the source or destination.
-    /// </param>
-    /// <exception cref="ArgumentNullException">info</exception>
-    protected DataOperationException(SerializationInfo info, StreamingContext context)
-        : base(info, context) =>
-        Operation = (T)Enum.Parse(typeof(T), info.GetString(nameof(Operation)) ?? string.Empty);
-
-    /// <summary>
     ///     Gets the operation.
     /// </summary>
     /// <value>
@@ -83,29 +66,4 @@ public class DataOperationException<T> : Exception
     ///     This object should be serializable to prevent a <see cref="SerializationException" /> to be thrown.
     /// </remarks>
     public T? Operation { get; private set; }
-
-    /// <summary>
-    ///     When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with
-    ///     information about the exception.
-    /// </summary>
-    /// <param name="info">
-    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
-    ///     data about the exception being thrown.
-    /// </param>
-    /// <param name="context">
-    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
-    ///     information about the source or destination.
-    /// </param>
-    /// <exception cref="ArgumentNullException">info</exception>
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-        if (info == null)
-        {
-            throw new ArgumentNullException(nameof(info));
-        }
-
-        info.AddValue(nameof(Operation), Operation is not null ? Enum.GetName(typeof(T), Operation) : string.Empty);
-
-        base.GetObjectData(info, context);
-    }
 }

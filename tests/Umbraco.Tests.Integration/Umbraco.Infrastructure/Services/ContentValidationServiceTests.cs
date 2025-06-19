@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
+internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
 {
     private IContentValidationService ContentValidationService => GetRequiredService<IContentValidationService>();
 
@@ -32,8 +32,8 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             new ContentCreateModel
             {
                 ContentTypeKey = setup.DocumentType.Key,
-                InvariantName = "Test Document",
-                InvariantProperties = new[]
+                Variants = [new () { Name = "Test Document" }],
+                Properties = new[]
                 {
                     new PropertyValueModel
                     {
@@ -102,6 +102,10 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                                         { "alias": "text", "value": "Valid nested setting text)" }
                                                     ]
                                                   }
+                                                ],
+                                                "expose": [
+                                                    { "contentKey": "f36cebfa-d03b-4451-9e60-4bf32c5b1e2f", "culture": null, "segment": null },
+                                                    { "contentKey": "b8173e4a-0618-475c-8277-c3c6af68bee6", "culture": null, "segment": null }
                                                 ]
                                               }
                                           }
@@ -130,6 +134,10 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
                                             { "alias": "text", "value": "Invalid root setting text (ref #3)" }
                                         ]
                                       }
+                                  ],
+                                  "expose": [
+                                      { "contentKey": "9addc377-c02c-4db0-88c2-73b933704f7b", "culture": null, "segment": null },
+                                      { "contentKey": "3af93b5b-5e40-4c64-b142-2564309fc4c7", "culture": null, "segment": null }
                                   ]
                                 }
                                 """
@@ -167,8 +175,8 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             new ContentCreateModel
             {
                 ContentTypeKey = contentType.Key,
-                InvariantName = "Test Document",
-                InvariantProperties = new[]
+                Variants = [new () { Name = "Test Document" }],
+                Properties = new[]
                 {
                     new PropertyValueModel
                     {
@@ -205,8 +213,8 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             new ContentCreateModel
             {
                 ContentTypeKey = contentType.Key,
-                InvariantName = "Test Document",
-                InvariantProperties = new[]
+                Variants = [new () { Name = "Test Document" }],
+                Properties = new[]
                 {
                     new PropertyValueModel
                     {
@@ -242,8 +250,8 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             new ContentCreateModel
             {
                 ContentTypeKey = contentType.Key,
-                InvariantName = "Test Document",
-                InvariantProperties = new[]
+                Variants = [new () { Name = "Test Document" }],
+                Properties = new[]
                 {
                     new PropertyValueModel
                     {
@@ -267,8 +275,8 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             new ContentCreateModel
             {
                 ContentTypeKey = contentType.Key,
-                InvariantName = "Test Document",
-                InvariantProperties = new[]
+                Variants = [new () { Name = "Test Document" }],
+                Properties = new[]
                 {
                     new PropertyValueModel
                     {
@@ -302,8 +310,8 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             new ContentCreateModel
             {
                 ContentTypeKey = contentType.Key,
-                InvariantName = "Test Document",
-                InvariantProperties = new[]
+                Variants = [new () { Name = "Test Document" }],
+                Properties = new[]
                 {
                     new PropertyValueModel
                     {
@@ -341,18 +349,14 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
         var result = await ContentValidationService.ValidateCulturesAsync(
             new ContentCreateModel
             {
-                Variants = new []
-                {
-                    new VariantModel
-                    {
-                        Culture = cultureCode,
-                        Name = "Whatever",
-                        Properties = new []
-                        {
-                            new PropertyValueModel { Alias = "title", Value = "Something" }
-                        }
-                    }
-                }
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "title", Value = "Something", Culture = cultureCode }
+                ],
+                Variants =
+                [
+                    new VariantModel { Culture = cultureCode, Name = "Whatever" }
+                ]
             });
 
         Assert.AreEqual(expectedResult, result);
@@ -367,31 +371,24 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             new ContentCreateModel
             {
                 ContentTypeKey = contentType.Key,
-                Variants = [
+                Properties =
+                [
                     new()
                     {
-                        Name = "Test Document (EN)",
-                        Culture = "en-US",
-                        Properties = [
-                            new()
-                            {
-                                Alias = "title",
-                                Value = "Invalid value in English",
-                            }
-                        ]
+                        Alias = "title",
+                        Value = "Invalid value in English",
+                        Culture = "en-US"
                     },
                     new()
                     {
-                        Name = "Test Document (DA)",
-                        Culture = "da-DK",
-                        Properties = [
-                            new()
-                            {
-                                Alias = "title",
-                                Value = "Invalid value in Danish",
-                            }
-                        ]
+                        Alias = "title",
+                        Value = "Invalid value in Danish",
+                        Culture = "da-DK"
                     }
+                ],
+                Variants = [
+                    new() { Name = "Test Document (EN)", Culture = "en-US" },
+                    new() { Name = "Test Document (DA)", Culture = "da-DK" }
                 ]
             },
             contentType);
@@ -411,31 +408,24 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             new ContentCreateModel
             {
                 ContentTypeKey = contentType.Key,
-                Variants = [
+                Properties =
+                [
                     new()
                     {
-                        Name = "Test Document (EN)",
-                        Culture = "en-US",
-                        Properties = [
-                            new()
-                            {
-                                Alias = "title",
-                                Value = "Invalid value in English",
-                            }
-                        ]
+                        Alias = "title",
+                        Value = "Invalid value in English",
+                        Culture = "en-US"
                     },
                     new()
                     {
-                        Name = "Test Document (DA)",
-                        Culture = "da-DK",
-                        Properties = [
-                            new()
-                            {
-                                Alias = "title",
-                                Value = "Invalid value in Danish",
-                            }
-                        ]
+                        Alias = "title",
+                        Value = "Invalid value in Danish",
+                        Culture = "da-DK"
                     }
+                ],
+                Variants = [
+                    new() { Name = "Test Document (EN)", Culture = "en-US" },
+                    new() { Name = "Test Document (DA)", Culture = "da-DK" }
                 ]
             },
             contentType,
@@ -443,6 +433,98 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
 
         Assert.AreEqual(1, validationResult.ValidationErrors.Count());
         Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Culture == culture && r.JsonPath == string.Empty));
+    }
+
+    [Test]
+    public async Task Can_Validate_All_Segments_Including_Default()
+    {
+        var contentType = await SetupSegmentTest(ContentVariation.Segment);
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties =
+                [
+                    new()
+                    {
+                        Alias = "title",
+                        Value = "Invalid default value",
+                        Segment = null
+                    },
+                    new()
+                    {
+                        Alias = "title",
+                        Value = "Invalid seg-1 value",
+                        Segment = "seg-1"
+                    },
+                    new()
+                    {
+                        Alias = "title",
+                        Value = "Invalid seg-2 value",
+                        Segment = "seg-2"
+                    }
+                ],
+                Variants = [
+                    new() { Name = "Test Document" },
+                    new() { Name = "Test Document", Segment = "seg-1" },
+                    new() { Name = "Test Document", Segment = "seg-2" }
+                ]
+            },
+            contentType);
+
+        Assert.AreEqual(3, validationResult.ValidationErrors.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Segment == null && r.JsonPath == string.Empty));
+            Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Segment == "seg-1" && r.JsonPath == string.Empty));
+            Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Segment == "seg-2" && r.JsonPath == string.Empty));
+        });
+    }
+
+    [Test]
+    public async Task Can_Validate_Single_Invalid_Segment()
+    {
+        var contentType = await SetupSegmentTest(ContentVariation.Segment);
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties =
+                [
+                    new()
+                    {
+                        Alias = "title",
+                        Value = "Valid default value",
+                        Segment = null
+                    },
+                    new()
+                    {
+                        Alias = "title",
+                        Value = "Invalid seg-1 value",
+                        Segment = "seg-1"
+                    },
+                    new()
+                    {
+                        Alias = "title",
+                        Value = "Valid seg-2 value",
+                        Segment = "seg-2"
+                    }
+                ],
+                Variants = [
+                    new() { Name = "Test Document" },
+                    new() { Name = "Test Document", Segment = "seg-1" },
+                    new() { Name = "Test Document", Segment = "seg-2" }
+                ]
+            },
+            contentType);
+
+        Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.Segment == "seg-1" && r.JsonPath == string.Empty));
+        });
     }
 
     private async Task<(IContentType DocumentType, IContentType ElementType)> SetupBlockListTest()
@@ -542,6 +624,24 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
         contentType.Variations = ContentVariation.Culture;
         var titlePropertyType = contentType.PropertyTypes.First(pt => pt.Alias == "title");
         titlePropertyType.Variations = ContentVariation.Culture;
+        titlePropertyType.ValidationRegExp = "^Valid.*$";
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        return contentType;
+    }
+
+    private async Task<IContentType> SetupSegmentTest(ContentVariation variation)
+    {
+        var language = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .Build();
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type");
+        contentType.Variations = variation;
+        var titlePropertyType = contentType.PropertyTypes.First(pt => pt.Alias == "title");
+        titlePropertyType.Variations = variation;
         titlePropertyType.ValidationRegExp = "^Valid.*$";
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);

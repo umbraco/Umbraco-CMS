@@ -59,7 +59,7 @@ public class BlockEditorValues<TValue, TLayout>
         // filter out any content that isn't referenced in the layout references
         IEnumerable<Guid> contentTypeKeys = blockEditorData.BlockValue.ContentData.Select(x => x.ContentTypeKey)
             .Union(blockEditorData.BlockValue.SettingsData.Select(x => x.ContentTypeKey)).Distinct();
-        IDictionary<Guid, IContentType> contentTypesDictionary = _elementTypeCache.GetAll(contentTypeKeys).ToDictionary(x=>x.Key);
+        IDictionary<Guid, IContentType> contentTypesDictionary = _elementTypeCache.GetMany(contentTypeKeys).ToDictionary(x=>x.Key);
 
         foreach (BlockItemData block in blockEditorData.BlockValue.ContentData.Where(x =>
                      blockEditorData.References.Any(r => r.ContentKey == x.Key)))

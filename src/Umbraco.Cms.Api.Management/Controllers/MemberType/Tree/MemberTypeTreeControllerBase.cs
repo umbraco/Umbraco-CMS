@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberType}")]
 [ApiExplorerSettings(GroupName = "Member Type")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMembersOrMemberTypes)]
 public class MemberTypeTreeControllerBase : NamedEntityTreeControllerBase<MemberTypeTreeItemResponseModel>
 {
     private readonly IMemberTypeService _memberTypeService;
@@ -27,7 +27,7 @@ public class MemberTypeTreeControllerBase : NamedEntityTreeControllerBase<Member
     protected override MemberTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var memberTypes = _memberTypeService
-            .GetAll(entities.Select(entity => entity.Id).ToArray())
+            .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
         return entities.Select(entity =>

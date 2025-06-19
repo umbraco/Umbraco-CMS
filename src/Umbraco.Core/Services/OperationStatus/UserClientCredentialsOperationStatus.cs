@@ -4,5 +4,6 @@ public enum UserClientCredentialsOperationStatus
 {
     Success,
     DuplicateClientId,
-    InvalidUser
+    InvalidUser,
+    InvalidClientId
 }

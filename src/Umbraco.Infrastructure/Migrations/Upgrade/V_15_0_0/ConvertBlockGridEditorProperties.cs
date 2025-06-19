@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -19,9 +20,13 @@ public class ConvertBlockGridEditorProperties : ConvertBlockEditorPropertiesBase
         IJsonSerializer jsonSerializer,
         IUmbracoContextFactory umbracoContextFactory,
         ILanguageService languageService,
-        IOptions<ConvertBlockEditorPropertiesOptions> options)
-        : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService)
-        => SkipMigration = options.Value.SkipBlockGridEditors;
+        IOptions<ConvertBlockEditorPropertiesOptions> options,
+        ICoreScopeProvider coreScopeProvider)
+        : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService, coreScopeProvider)
+    {
+        SkipMigration = options.Value.SkipBlockGridEditors;
+        ParallelizeMigration = options.Value.ParallelizeMigration;
+    }
 
     protected override IEnumerable<string> PropertyEditorAliases
         => new[] { Constants.PropertyEditors.Aliases.BlockGrid };
@@ -40,8 +45,9 @@ public class ConvertBlockGridEditorProperties : ConvertBlockEditorPropertiesBase
         IDataTypeService dataTypeService,
         IJsonSerializer jsonSerializer,
         IUmbracoContextFactory umbracoContextFactory,
-        ILanguageService languageService)
-        : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService)
+        ILanguageService languageService,
+        ICoreScopeProvider coreScopeProvider)
+        : base(context, logger, contentTypeService, dataTypeService, jsonSerializer, umbracoContextFactory, languageService, coreScopeProvider)
     {
     }
 }

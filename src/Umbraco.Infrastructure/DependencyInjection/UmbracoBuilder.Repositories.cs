@@ -81,6 +81,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<ILogViewerRepository, LogViewerRepository>();
         builder.Services.AddUnique<IUserDataRepository, UserDataRepository>();
         builder.Services.AddUnique<INavigationRepository, ContentNavigationRepository>();
+        builder.Services.AddUnique<IPublishStatusRepository, PublishStatusRepository>();
 
         return builder;
     }

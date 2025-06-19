@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class CacheInstructionRepositoryTest : UmbracoIntegrationTest
+internal sealed class CacheInstructionRepositoryTest : UmbracoIntegrationTest
 {
     private const string OriginIdentiy = "Test1";
     private const string Instructions = "{}";

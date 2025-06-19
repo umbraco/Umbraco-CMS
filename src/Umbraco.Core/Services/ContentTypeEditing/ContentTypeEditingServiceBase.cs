@@ -1,6 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -18,7 +17,6 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     private readonly IDataTypeService _dataTypeService;
     private readonly IEntityService _entityService;
     private readonly IShortStringHelper _shortStringHelper;
-
     protected ContentTypeEditingServiceBase(
         IContentTypeService contentTypeService,
         TContentTypeService concreteContentTypeService,
@@ -91,7 +89,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
         }
 
-        await AdditionalCreateValidationAsync(model);
+        // perform additional, content type specific validation
+        operationStatus = await AdditionalCreateValidationAsync(model);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
+        }
 
         // get the ID of the parent to create the content type under (we already validated that it exists)
         var parentId = GetParentId(model, containerKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
@@ -319,6 +322,15 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // get the content type keys we want to use for compositions
         Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
 
+        // if the content type keys are already set as compositions, don't perform any additional validation
+        // - this covers an edge case where compositions are configured for a content type before child content types are created
+        if (contentType is not null && contentType.ContentTypeComposition
+            .Select(c => c.Key)
+            .ContainsAll(compositionKeys))
+        {
+            return ContentTypeOperationStatus.Success;
+        }
+
         // verify that all compositions keys are allowed
         Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(contentType, allContentTypeCompositions, isElement: model.IsElement)
             .Results
@@ -414,13 +426,13 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return reservedAliases.InvariantContains(alias);
     }
 
+    protected abstract ISet<string> GetReservedFieldNames();
+
     private bool ContainsReservedPropertyTypeAlias(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
     {
         // Because of models builder you cannot have an alias that already exists in IPublishedContent, for instance Path.
         // Since MyModel.Path would conflict with IPublishedContent.Path.
-        var reservedPropertyTypeNames = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name)
-            .Union(typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name))
-            .ToArray();
+        ISet<string> reservedPropertyTypeNames = GetReservedFieldNames();
 
         return model.Properties.Any(propertyType => reservedPropertyTypeNames.InvariantContains(propertyType.Alias));
     }

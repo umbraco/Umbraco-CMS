@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const mediaFileName = 'TestMediaFile';
@@ -14,8 +14,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
 
-//TODO: It is currently possible to create an empty mediaFile, should not be possible
-test.skip('can not create a empty media file', async ({umbracoApi, umbracoUi}) => {
+test('can not create a empty media file', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
@@ -27,7 +26,7 @@ test.skip('can not create a empty media file', async ({umbracoApi, umbracoUi}) =
 
   // Assert
   await umbracoUi.media.isErrorNotificationVisible();
-  await umbracoUi.media.isTreeItemVisible(mediaFileName, false);
+  await umbracoUi.media.isMediaTreeItemVisible(mediaFileName, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
 });
 
@@ -39,24 +38,23 @@ test('can rename a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Arrange
-  await umbracoUi.waitForTimeout(1000);
-  await umbracoUi.media.clickLabelWithName(wrongMediaFileName, true, true);
+  await umbracoUi.media.goToMediaWithName(wrongMediaFileName);
   await umbracoUi.media.enterMediaItemName(mediaFileName);
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.isSuccessNotificationVisible();
-  await umbracoUi.media.isTreeItemVisible(mediaFileName);
+  await umbracoUi.media.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.media.isMediaTreeItemVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
 });
 
 const mediaFileTypes = [
-  {fileName: 'Article', filePath: 'Article.pdf'},
-  {fileName: 'Audio', filePath: 'Audio.mp3'},
-  {fileName: 'File', filePath: 'File.txt'},
-  {fileName: 'Image', filePath: 'Umbraco.png'},
-  {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg'},
-  {fileName: 'Video', filePath: 'Video.mp4'}
+  {fileName: 'Article', filePath: 'Article.pdf', thumbnail: 'icon-article'},
+  {fileName: 'Audio', filePath: 'Audio.mp3', thumbnail: 'icon-audio-lines'},
+  {fileName: 'File', filePath: 'File.txt', thumbnail: 'icon-document'},
+  {fileName: 'Image', filePath: 'Umbraco.png', thumbnail: 'image'},
+  {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg', thumbnail: 'image'},
+  {fileName: 'Video', filePath: 'Video.mp4', thumbnail: 'icon-video'}
 ];
 
 for (const mediaFileType of mediaFileTypes) {
@@ -66,37 +64,23 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
     // Act
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.media.clickCreateMediaWithType(mediaFileType.fileName);
     await umbracoUi.media.enterMediaItemName(mediaFileType.fileName);
     await umbracoUi.media.uploadFile('./fixtures/mediaLibrary/' + mediaFileType.filePath);
     await umbracoUi.media.clickSaveButton();
 
     // Assert
-    await umbracoUi.media.isSuccessNotificationVisible();
-    await umbracoUi.media.isTreeItemVisible(mediaFileType.fileName);
+    await umbracoUi.media.waitForMediaItemToBeCreated();
+    const mediaData = await umbracoApi.media.getByName(mediaFileType.fileName);
+    const mediaUrl = await umbracoApi.media.getMediaUrl(mediaData.id);
+    await umbracoUi.media.doesMediaHaveThumbnail(mediaData.id, mediaFileType.thumbnail, mediaUrl);
+    await umbracoUi.media.isMediaTreeItemVisible(mediaFileType.fileName);
     expect(await umbracoApi.media.doesNameExist(mediaFileType.fileName)).toBeTruthy();
 
     // Clean
     await umbracoApi.media.ensureNameNotExists(mediaFileType.fileName);
   });
 }
-
-// TODO: Currently there is no delete button for the media, only trash, is this correct?
-test.skip('can delete a media file', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
-  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
-  await umbracoApi.media.doesNameExist(mediaFileName);
-
-  // Act
-  await umbracoUi.media.deleteMediaItem(mediaFileName);
-
-  // Assert
-  await umbracoUi.media.isSuccessNotificationVisible();
-  await umbracoUi.media.isTreeItemVisible(mediaFileName, false);
-  expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
-});
 
 test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
@@ -110,16 +94,15 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.isSuccessNotificationVisible();
-  await umbracoUi.media.isTreeItemVisible(folderName);
+  await umbracoUi.media.waitForMediaItemToBeCreated();
+  await umbracoUi.media.isMediaTreeItemVisible(folderName);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeTruthy();
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(folderName);
 });
 
-// TODO: Currently there is no delete button for the media, only trash, is this correct?
-test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+test('can trash a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.ensureNameNotExists(folderName);
   await umbracoApi.media.createDefaultMediaFolder(folderName);
@@ -128,11 +111,14 @@ test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(folderName);
-  await umbracoUi.media.clickDeleteButton();
-  await umbracoUi.media.clickConfirmToDeleteButton();
+  await umbracoUi.media.clickTrashActionMenuOption();
+  await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
+  await umbracoUi.media.waitForMediaToBeTrashed();
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   await umbracoUi.media.isTreeItemVisible(folderName, false);
+  await umbracoUi.media.isItemVisibleInRecycleBin(folderName);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeFalsy();
 });
 
@@ -145,16 +131,17 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(parentFolderName);
-  await umbracoUi.media.clickCreateModalButton();
+  await umbracoUi.media.clickCreateActionMenuOption();
   await umbracoUi.media.clickMediaTypeName('Folder');
   await umbracoUi.media.enterMediaItemName(folderName);
   await umbracoUi.media.clickSaveButton();
 
   // Assert
-  await umbracoUi.media.isSuccessNotificationVisible();
-  await umbracoUi.media.isTreeItemVisible(parentFolderName);
+  //await umbracoUi.media.waitForMediaItemToBeCreated(); // This is flaky, and Playwright seems to succeed even with its default timeout
+  await umbracoUi.media.isMediaTreeItemVisible(parentFolderName);
+  await umbracoUi.media.isMediaTreeItemVisible(folderName, false);
   await umbracoUi.media.clickMediaCaretButtonForName(parentFolderName);
-  await umbracoUi.media.isTreeItemVisible(folderName);
+  await umbracoUi.media.isMediaTreeItemVisible(folderName, true);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(parentFolderName);
@@ -169,11 +156,11 @@ test('can search for a media file', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.searchForMediaItemByName(mediaFileName);
+  await umbracoUi.media.searchForMediaItemByName(secondMediaFile);
 
   // Assert
   await umbracoUi.media.doesMediaCardsContainAmount(1);
-  await umbracoUi.media.doesMediaCardContainText(mediaFileName);
+  await umbracoUi.media.doesMediaCardContainText(secondMediaFile);
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(secondMediaFile);
@@ -188,10 +175,13 @@ test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.media.clickActionsMenuForName(mediaFileName);
-  await umbracoUi.media.clickTrashButton();
+  await umbracoUi.media.clickTrashActionMenuOption();
   await umbracoUi.media.clickConfirmTrashButton();
 
   // Assert
+  await umbracoUi.media.waitForMediaToBeTrashed();
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  await umbracoUi.media.isMediaTreeItemVisible(mediaFileName, false);
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeTruthy();
@@ -212,9 +202,10 @@ test('can restore a media item from the recycle bin', async ({umbracoApi, umbrac
   await umbracoUi.media.restoreMediaItem(mediaFileName);
 
   // Assert
-  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.restored);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false, false);
   await umbracoUi.media.reloadMediaTree();
-  await umbracoUi.media.isTreeItemVisible(mediaFileName);
+  await umbracoUi.media.isMediaTreeItemVisible(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
 
@@ -234,7 +225,8 @@ test('can delete a media item from the recycle bin', async ({umbracoApi, umbraco
   await umbracoUi.media.deleteMediaItem(mediaFileName);
 
   // Assert
-  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.waitForMediaToBeTrashed();
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false, false);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
 });
@@ -252,8 +244,84 @@ test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.clickConfirmEmptyRecycleBinButton();
 
   // Assert
-  // TODO: fix it
-  //await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, false, false);
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
+});
+
+test('can trash a media node with a relation', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const documentPickerName = ['TestPicker', 'DocumentTypeForPicker'];
+  await umbracoApi.media.emptyRecycleBin();
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
+  await umbracoApi.media.doesNameExist(mediaFileName);
+  // Create a document that have media picker is firstMediaFileName
+  await umbracoApi.document.createDefaultDocumentWithOneMediaLink(documentPickerName[0], mediaFileName, documentPickerName[1]);
+  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+
+  // Act
+  await umbracoUi.media.clickActionsMenuForName(mediaFileName);
+  await umbracoUi.media.clickTrashButton();
+  // Verify the references list
+  await umbracoUi.media.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.referenceHeadline);
+  await umbracoUi.media.doesReferenceItemsHaveCount(1);
+  await umbracoUi.media.isReferenceItemNameVisible(documentPickerName[0]);
+  await umbracoUi.media.clickConfirmTrashButton();
+
+  // Assert
+  await umbracoUi.media.waitForMediaToBeTrashed();
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
+  expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
+  expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.emptyRecycleBin();
+  await umbracoApi.document.ensureNameNotExists(documentPickerName[0]);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName[1]);
+});
+
+test('can bulk trash media nodes with a relation', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const firstMediaFileName = 'FirstMediaFile';
+  const secondMediaFileName = 'SecondMediaFile';
+  const documentPickerName1 = ['TestPicker1', 'DocumentTypeForPicker1'];
+  const documentPickerName2 = ['TestPicker2', 'DocumentTypeForPicker2'];
+  await umbracoApi.media.emptyRecycleBin();
+  await umbracoApi.media.createDefaultMediaFile(firstMediaFileName);
+  await umbracoApi.media.createDefaultMediaFile(secondMediaFileName);
+  // Create a document that has a media picker with firstMediaFileName
+  await umbracoApi.document.createDefaultDocumentWithOneMediaLink(documentPickerName1[0], firstMediaFileName, documentPickerName1[1]);
+  // Create a document that has a media picker with secondMediaFileName
+  await umbracoApi.document.createDefaultDocumentWithOneMediaLink(documentPickerName2[0], secondMediaFileName, documentPickerName2[1]);
+
+  // Act
+  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+  await umbracoUi.media.selectMediaWithName(firstMediaFileName);
+  await umbracoUi.media.selectMediaWithName(secondMediaFileName);
+  await umbracoUi.media.clickBulkTrashButton();
+  // Verify the references list
+  await umbracoUi.media.doesReferenceHeadlineHaveText(ConstantHelper.trashDeleteDialogMessage.bulkReferenceHeadline);
+  await umbracoUi.media.doesReferenceItemsHaveCount(2);
+  await umbracoUi.media.isReferenceItemNameVisible(firstMediaFileName);
+  await umbracoUi.media.isReferenceItemNameVisible(secondMediaFileName);
+  await umbracoUi.media.clickConfirmTrashButton();
+
+  // Assert
+  await umbracoUi.media.waitForMediaToBeTrashed();
+  expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
+  expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
+  expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
+  expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(secondMediaFileName)).toBeTruthy();
+  await umbracoUi.media.isItemVisibleInRecycleBin(firstMediaFileName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName, true, false);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
+  await umbracoApi.media.ensureNameNotExists(secondMediaFileName);
+  await umbracoApi.document.ensureNameNotExists(documentPickerName1[0]);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName1[1]);
+  await umbracoApi.document.ensureNameNotExists(documentPickerName2[0]);
+  await umbracoApi.documentType.ensureNameNotExists(documentPickerName2[1]);
+  await umbracoApi.media.emptyRecycleBin();
 });

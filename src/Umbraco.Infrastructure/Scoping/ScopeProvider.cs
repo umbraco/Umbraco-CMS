@@ -150,7 +150,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             otherScope.Attached = true;
             otherScope.OrigScope = AmbientScope;
             otherScope.OrigContext = AmbientContext;
-            otherScope.CallContext = callContext;
 
             PushAmbientScopeContext(otherScope.Context);
             PushAmbientScope(otherScope);
@@ -264,7 +263,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         {
             lock (s_staticScopeInfosLock)
             {
-                return s_staticScopeInfos.TryGetValue(scope, out ScopeInfo scopeInfo) ? scopeInfo : null;
+                return s_staticScopeInfos.TryGetValue(scope, out ScopeInfo? scopeInfo) ? scopeInfo : null!;
             }
         }
 
@@ -299,7 +298,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
             lock (s_staticScopeInfosLock)
             {
-                if (s_staticScopeInfos.TryGetValue(scope, out ScopeInfo info) == false)
+                if (s_staticScopeInfos.TryGetValue(scope, out ScopeInfo? info) == false)
                 {
                     info = null;
                 }
@@ -324,7 +323,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
                     sb.Append(s.InstanceId.ToString("N").Substring(0, 8));
                     var ss = s as Scope;
-                    s = ss?.ParentScope;
+                    s = ss?.ParentScope!;
                 }
 
                 _logger.LogTrace("Register " + (context ?? "null") + " context " + sb);
@@ -336,7 +335,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
                 _logger.LogTrace("At:\r\n" + Head(Environment.StackTrace, 16));
 
-                info.Context = context;
+                info.Context = context!;
             }
         }
 
@@ -431,15 +430,15 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         public IScope Scope { get; } // the scope itself
 
         // the scope's parent identifier
-        public Guid Parent => ((Scope)Scope).ParentScope == null ? Guid.Empty : ((Scope)Scope).ParentScope.InstanceId;
+        public Guid Parent => ((Scope)Scope).ParentScope == null ? Guid.Empty : ((Scope)Scope).ParentScope!.InstanceId;
 
         public DateTime Created { get; } // the date time the scope was created
         public bool Disposed { get; set; } // whether the scope has been disposed already
-        public string Context { get; set; } // the current 'context' that contains the scope (null, "http" or "lcc")
+        public string Context { get; set; }= string.Empty; // the current 'context' that contains the scope (null, "http" or "lcc")
 
         public string CtorStack { get; } // the stacktrace of the scope ctor
         //public string DisposedStack { get; set; } // the stacktrace when disposed
-        public string NullStack { get; set; } // the stacktrace when the 'context' that contains the scope went null
+        public string NullStack { get; set; } = string.Empty; // the stacktrace when the 'context' that contains the scope went null
 
         public override string ToString() => new StringBuilder()
                 .AppendLine("ScopeInfo:")

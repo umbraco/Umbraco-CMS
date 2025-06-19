@@ -1,8 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -18,21 +20,23 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
-    private readonly IJsonSerializer _jsonSerializer;
-
     protected BlockEditorPropertyValueEditor(
-        DataEditorAttribute attribute,
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeConfigurationCache dataTypeConfigurationCache,
-        ILocalizedTextService textService,
-        ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>> logger,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
+        ILanguageService languageService,
         IIOHelper ioHelper,
-        BlockEditorVarianceHandler blockEditorVarianceHandler)
-        : base(attribute, propertyEditors, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactories, blockEditorVarianceHandler) =>
-        _jsonSerializer = jsonSerializer;
+        DataEditorAttribute attribute)
+        : base(propertyEditors, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, dataValueReferenceFactories, blockEditorVarianceHandler, languageService, ioHelper, attribute) =>
+        JsonSerializer = jsonSerializer;
+
+    /// <summary>
+    /// Gets the <see cref="IJsonSerializer"/>.
+    /// </summary>
+    protected IJsonSerializer JsonSerializer { get; }
 
     /// <inheritdoc />
     public override IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -123,6 +127,6 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         MapBlockValueFromEditor(blockEditorData.BlockValue);
 
         // return json
-        return _jsonSerializer.Serialize(blockEditorData.BlockValue);
+        return JsonSerializer.Serialize(blockEditorData.BlockValue);
     }
 }

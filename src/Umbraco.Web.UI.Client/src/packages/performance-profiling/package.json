@@ -1,0 +1,8 @@
+{
+	"name": "@umbraco-backoffice/performance-profiling",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	}
+}

@@ -23,7 +23,7 @@ public class ByPathPartialViewController : PartialViewControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("{path}")]
+    [HttpGet("{*path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PartialViewResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

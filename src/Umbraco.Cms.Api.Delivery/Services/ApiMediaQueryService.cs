@@ -16,12 +16,18 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     private readonly IPublishedMediaCache _publishedMediaCache;
     private readonly ILogger<ApiMediaQueryService> _logger;
     private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
+    private readonly IPublishedMediaStatusFilteringService _publishedMediaStatusFilteringService;
 
-    public ApiMediaQueryService(IPublishedMediaCache publishedMediaCache, ILogger<ApiMediaQueryService> logger, IMediaNavigationQueryService mediaNavigationQueryService)
+    public ApiMediaQueryService(
+        IPublishedMediaCache publishedMediaCache,
+        ILogger<ApiMediaQueryService> logger,
+        IMediaNavigationQueryService mediaNavigationQueryService,
+        IPublishedMediaStatusFilteringService publishedMediaStatusFilteringService)
     {
         _publishedMediaCache = publishedMediaCache;
         _logger = logger;
         _mediaNavigationQueryService = mediaNavigationQueryService;
+        _publishedMediaStatusFilteringService = publishedMediaStatusFilteringService;
     }
 
     /// <inheritdoc/>
@@ -71,7 +77,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                 break;
             }
 
-            currentChildren = resolvedMedia.Children(null, _publishedMediaCache, _mediaNavigationQueryService);
+            currentChildren = resolvedMedia.Children(_mediaNavigationQueryService, _publishedMediaStatusFilteringService);
         }
 
         return resolvedMedia;
@@ -87,7 +93,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             return null;
         }
 
-        var childrenOf = fetch.TrimStartExact(childrenOfParameter);
+        var childrenOf = fetch.TrimStart(childrenOfParameter);
         if (childrenOf.IsNullOrWhiteSpace())
         {
             // this mirrors the current behavior of the Content Delivery API :-)
@@ -104,7 +110,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             ? mediaCache.GetById(parentKey)
             : TryGetByPath(childrenOf, mediaCache);
 
-        return parent?.Children(null, _publishedMediaCache, _mediaNavigationQueryService) ?? Array.Empty<IPublishedContent>();
+        return parent?.Children(_mediaNavigationQueryService, _publishedMediaStatusFilteringService) ?? Array.Empty<IPublishedContent>();
     }
 
     private IEnumerable<IPublishedContent>? ApplyFilters(IEnumerable<IPublishedContent> source, IEnumerable<string> filters)
@@ -179,7 +185,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     }
 
 
-    private Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> PagedResult(IEnumerable<IPublishedContent> children, int skip, int take)
+    private static Attempt<PagedModel<Guid>, ApiMediaQueryOperationStatus> PagedResult(IEnumerable<IPublishedContent> children, int skip, int take)
     {
         IPublishedContent[] childrenAsArray = children as IPublishedContent[] ?? children.ToArray();
         var result = new PagedModel<Guid>

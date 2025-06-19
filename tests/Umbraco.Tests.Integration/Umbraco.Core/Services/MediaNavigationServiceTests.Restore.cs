@@ -3,7 +3,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaNavigationServiceTests
+internal sealed partial class MediaNavigationServiceTests
 {
     [Test]
     [TestCase("62BCE72F-8C18-420E-BCAC-112B5ECC95FD", "139DC977-E50F-4382-9728-B278C4B7AC6A")] // Image 4 to Sub-album 1
@@ -49,5 +49,34 @@ public partial class MediaNavigationServiceTests
             Assert.AreEqual(beforeRestoreDescendants, afterRestoreDescendants);
             Assert.AreEqual(targetParentKey, restoredItemParentKey);
         });
+    }
+
+    [Test]
+    [TestCase(null)] // Media root
+    [TestCase("139DC977-E50F-4382-9728-B278C4B7AC6A")] // Sub-album 1
+    [TestCase("DBCAFF2F-BFA4-4744-A948-C290C432D564")] // Sub-album 2
+    [TestCase("E0B23D56-9A0E-4FC4-BD42-834B73B4C7AB")] // Sub-sub-album 1
+    public async Task Restoring_Content_Adds_It_Last(Guid? targetParentKey)
+    {
+        // Arrange
+        Guid nodeToRestore = Image1.Key;
+
+        // Move node to recycle bin
+        await MediaEditingService.MoveToRecycleBinAsync(nodeToRestore, Constants.Security.SuperUserKey);
+
+        // Act
+        await MediaEditingService.RestoreAsync(nodeToRestore, targetParentKey, Constants.Security.SuperUserKey);
+
+        // Assert
+        if (targetParentKey is null)
+        {
+            MediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+            Assert.AreEqual(nodeToRestore, rootKeys.Last());
+        }
+        else
+        {
+            MediaNavigationQueryService.TryGetChildrenKeys(targetParentKey.Value, out IEnumerable<Guid> childrenKeys);
+            Assert.AreEqual(nodeToRestore, childrenKeys.Last());
+        }
     }
 }

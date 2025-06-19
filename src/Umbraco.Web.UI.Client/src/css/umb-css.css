@@ -1,0 +1,12 @@
+:root {
+	--umb-footer-layout-height: 54px;
+	--umb-header-layout-height: 70px;
+	--umb-section-sidebar-width: 300px;
+	--umb-card-medium-min-width: 160px;
+}
+
+@font-face {
+	font-display: block;
+	font-family: codicon;
+	src: url('/umbraco/backoffice/assets/fonts/codicon/codicon.ttf') format('truetype');
+}

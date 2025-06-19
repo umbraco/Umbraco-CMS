@@ -1,9 +1,9 @@
 # Umbraco Acceptance Tests
 
-You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended contribution branch rather than v10 that's mentioned in the video.  Alternatively, follow along the instructions below.
+You can watch a video following these instructions [here](https://www.youtube.com/watch?v=N4hBKB0U-d8) and a longer UmbraCollab recording [here](https://www.youtube.com/watch?v=hvoI28s_fDI). Make sure to use the latest recommended `main` branch rather than v10 that's mentioned in the video.  Alternatively, follow along the instructions below.
 
 ### Prerequisites
-- NodeJS 16+
+- NodeJS 22+
 - A running installed Umbraco on url: [https://localhost:44339](https://localhost:44339) (Default development port)
    - Install using a `SqlServer`/`LocalDb` as the tests execute too fast for `Sqlite` to handle.
 
@@ -24,13 +24,21 @@ There are two npm scripts that can be used to execute the test:
 
 ### Executing single tests
 
-If you wish to run a single test, which may be helpful when writing tests you can use the following command. As before, you need to run these tests in the 'tests/Umbraco.Tests.AcceptanceTest' folder.
+If you wish to run a single set of tests, which may be helpful when writing tests you can use the following command. As before, you need to run these tests in the 'tests/Umbraco.Tests.AcceptanceTest' folder.
 
     npx playwright test <testname.ts>
 
-For example to run the Login Test,
+For example to run the Login Test:
 
     npx playwright test tests/DefaultConfig/Login/Login.spec.ts
+
+To run a single test (if you have several in a file), you can use this syntax.
+
+    npx playwright test -g "<name of test>"
+
+For example:
+
+    npx playwright test -g "can create content with the document link"
 
 ### Executing tests in UI Mode
 

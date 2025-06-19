@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/ide.host.json",
+  "order": 0,
+  "icon": "../../icon.png",
+  "description": {
+    "id": "umbraco-extension",
+    "text": "Umbraco Extension - A Razor Class Library project for building Umbraco extensions."
+  },
+  "symbolInfo": [
+    {
+      "id": "UmbracoVersion",
+      "isVisible": true
+    },
+    {
+      "id": "SupportPagesAndViews",
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
+    },
+    {
+      "id": "IncludeExample",
+      "isVisible": true,
+      "description": {
+        "text": "Whether to include an example dashboard and supporting code"
+      }
+    },
+    {
+      "id": "SiteDomain",
+      "isVisible": true,
+      "defaultValue": "https://localhost:5000",
+      "description": {
+        "text": "If using the --include-example then you can supply the domain prefix such as 'https://localhost:5000' to communicate with the Umbraco website for generating the TypeScript OpenAPI client"
+      }
+    }
+  ]
+}

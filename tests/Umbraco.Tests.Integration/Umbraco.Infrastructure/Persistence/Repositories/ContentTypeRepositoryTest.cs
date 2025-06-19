@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ContentTypeRepositoryTest : UmbracoIntegrationTest
+internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpData() => CreateTestData();

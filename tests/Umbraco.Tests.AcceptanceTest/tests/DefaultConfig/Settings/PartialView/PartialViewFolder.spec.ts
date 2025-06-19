@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const partialViewName = 'TestPartialView';
@@ -20,10 +20,10 @@ test('can create a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.partialView.clickActionsMenuAtRoot();
-  await umbracoUi.partialView.createFolder(folderName);
+  await umbracoUi.partialView.createPartialViewFolder(folderName);
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.waitForPartialViewToBeCreated();
   expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeTruthy();
   // Verify the partial view folder is displayed under the Partial Views section
   await umbracoUi.partialView.clickRootFolderCaretButton();
@@ -39,10 +39,10 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-  await umbracoUi.partialView.deleteFolder();
+  await umbracoUi.partialView.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.waitForPartialViewToBeDeleted();
   expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeFalsy();
   // Verify the partial view folder is NOT displayed under the Partial Views section
   await umbracoUi.partialView.clickRootFolderCaretButton();
@@ -59,13 +59,13 @@ test('can create a partial view in a folder', async ({umbracoApi, umbracoUi}) =>
   // Act
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-  await umbracoUi.partialView.clickCreateButton();
+  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.waitForPartialViewToBeCreated();
   const childrenData = await umbracoApi.partialView.getChildren(folderPath);
   expect(childrenData[0].name).toEqual(partialViewFileName);
   // Verify the partial view is displayed in the folder under the Partial Views section
@@ -88,13 +88,13 @@ test('can create a partial view in a folder in a folder', async ({umbracoApi, um
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickCaretButtonForName(folderName);
   await umbracoUi.partialView.clickActionsMenuForPartialView(childFolderName);
-  await umbracoUi.partialView.clickCreateButton();
+  await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
   await umbracoUi.partialView.enterPartialViewName(partialViewName);
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.waitForPartialViewToBeCreated();
   const childFolderChildrenData = await umbracoApi.partialView.getChildren(childFolderPath);
   expect(childFolderChildrenData[0].name).toEqual(partialViewFileName);
 
@@ -111,10 +111,10 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-  await umbracoUi.partialView.createFolder(childFolderName);
+  await umbracoUi.partialView.createPartialViewFolder(childFolderName);
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.waitForPartialViewToBeCreated();
   expect(await umbracoApi.partialView.doesNameExist(childFolderName)).toBeTruthy();
   const partialViewChildren = await umbracoApi.partialView.getChildren('/' + folderName);
   expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName);
@@ -134,10 +134,10 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickCaretButtonForName(folderName);
   await umbracoUi.partialView.clickActionsMenuForPartialView(childFolderName);
-  await umbracoUi.partialView.createFolder(childOfChildFolderName);
+  await umbracoUi.partialView.createPartialViewFolder(childOfChildFolderName);
 
   // Assert
-  await umbracoUi.partialView.isSuccessNotificationVisible();
+  await umbracoUi.partialView.waitForPartialViewToBeCreated();
   expect(await umbracoApi.partialView.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const partialViewChildren = await umbracoApi.partialView.getChildren('/' + folderName + '/' + childFolderName);
   expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName + '/' + childOfChildFolderName);
@@ -155,8 +155,8 @@ test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.partialView.clickRootFolderCaretButton();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-  await umbracoUi.partialView.deleteFolder();
+  await umbracoUi.partialView.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.script.isErrorNotificationVisible();
+  await umbracoUi.partialView.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmpty);
 });

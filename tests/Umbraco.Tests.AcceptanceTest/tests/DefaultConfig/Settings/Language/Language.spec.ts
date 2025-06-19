@@ -1,4 +1,4 @@
-import {test} from '@umbraco/playwright-testhelpers';
+import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const languageName = 'Arabic';
@@ -20,12 +20,12 @@ test('can add language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.language.goToLanguages();
 
   // Act
-  await umbracoUi.language.clickCreateLink();
+  await umbracoUi.language.clickLanguageCreateButton();
   await umbracoUi.language.chooseLanguageByName(languageName);
   await umbracoUi.language.clickSaveButton();
 
   // Assert
-  await umbracoUi.language.isSuccessNotificationVisible();
+  await umbracoUi.language.waitForLanguageToBeCreated();
   expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();
   // Verify the created language displays in the list
   await umbracoUi.language.clickLanguagesMenu();
@@ -44,7 +44,7 @@ test('can update default language option', {tag: '@smoke'}, async ({umbracoApi, 
   await umbracoUi.language.clickSaveButton();
 
   // Assert
-  await umbracoUi.language.isSuccessNotificationVisible();
+  await umbracoUi.language.isSuccessStateVisibleForSaveButton();
   const languageData = await umbracoApi.language.get(isoCode);
   expect(languageData.isDefault).toBe(true);
 
@@ -67,7 +67,7 @@ test('can update mandatory language option', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.language.clickSaveButton();
 
   // Assert
-  await umbracoUi.language.isSuccessNotificationVisible();
+  await umbracoUi.language.isSuccessStateVisibleForSaveButton();
   const languageData = await umbracoApi.language.get(isoCode);
   expect(languageData.isMandatory).toBe(true);
 });
@@ -82,7 +82,7 @@ test('can delete language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.language.removeLanguageByName(languageName);
 
   // Assert
-  await umbracoUi.language.isSuccessNotificationVisible();
+  await umbracoUi.language.waitForLanguageToBeDeleted();
   expect(await umbracoApi.language.doesExist(isoCode)).toBeFalsy();
   await umbracoUi.language.isLanguageNameVisible(languageName, false);
 });
@@ -95,11 +95,11 @@ test('can remove fallback language', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.language.clickLanguageByName(languageName);
-  await umbracoUi.language.removeFallbackLanguageByName(defaultLanguageName);
+  await umbracoUi.language.removeFallbackLanguageByIsoCode(defaultLanguageIsoCode);
   await umbracoUi.language.clickSaveButton();
 
   // Act
-  await umbracoUi.language.isSuccessNotificationVisible();
+  await umbracoUi.language.isSuccessStateVisibleForSaveButton();
   const languageData = await umbracoApi.language.get(isoCode);
   expect(languageData.fallbackIsoCode).toBeFalsy();
 });
@@ -117,7 +117,7 @@ test('can add fallback language', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.language.clickSaveButton();
 
   // Act
-  await umbracoUi.language.isSuccessNotificationVisible();
+  await umbracoUi.language.isSuccessStateVisibleForSaveButton();
   const languageData = await umbracoApi.language.get(isoCode);
   expect(languageData.fallbackIsoCode).toBe(defaultLanguageIsoCode);
 });
@@ -129,10 +129,11 @@ test('cannot add a language with duplicate ISO code', async ({umbracoApi, umbrac
   await umbracoUi.language.goToLanguages();
 
   // Act
-  await umbracoUi.language.clickCreateLink();
+  await umbracoUi.language.clickLanguageCreateButton();
   await umbracoUi.language.chooseLanguageByName(languageName);
   await umbracoUi.language.clickSaveButton();
 
   // Assert
-  await umbracoUi.language.isErrorNotificationVisible();
+  await umbracoUi.language.isFailedStateButtonVisible();
+  await umbracoUi.language.doesErrorNotificationHaveText(NotificationConstantHelper.error.duplicateISOcode);
 });

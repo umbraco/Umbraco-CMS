@@ -9,9 +9,8 @@ schedules:
   branches:
     include:
     - v10/dev
-    - v12/dev
     - v13/dev
-    - v14/dev
+    - main
 
 steps:
 - checkout: none

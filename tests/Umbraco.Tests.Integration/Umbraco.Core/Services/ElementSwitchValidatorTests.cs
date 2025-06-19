@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ElementSwitchValidatorTests : UmbracoIntegrationTest
+internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
 {
     private IElementSwitchValidator ElementSwitchValidator => GetRequiredService<IElementSwitchValidator>();
 

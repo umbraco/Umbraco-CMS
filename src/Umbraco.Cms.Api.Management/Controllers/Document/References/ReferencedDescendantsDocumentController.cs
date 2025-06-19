@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -22,7 +22,7 @@ public class ReferencedDescendantsDocumentController : DocumentControllerBase
     }
 
     /// <summary>
-    ///     Gets a page list of the child nodes of the current item used in any kind of relation.
+    ///     Gets a paged list of the descendant nodes of the current item used in any kind of relation.
     /// </summary>
     /// <remarks>
     ///     Used when deleting and unpublishing a single item to check if this item has any descending items that are in any
@@ -45,6 +45,6 @@ public class ReferencedDescendantsDocumentController : DocumentControllerBase
             Items = _umbracoMapper.MapEnumerable<RelationItemModel, ReferenceByIdModel>(relationItems.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return pagedViewModel;
     }
 }

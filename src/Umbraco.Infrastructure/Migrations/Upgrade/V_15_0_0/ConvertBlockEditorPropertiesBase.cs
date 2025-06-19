@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -23,12 +24,15 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IUmbracoContextFactory _umbracoContextFactory;
     private readonly ILanguageService _languageService;
+    private readonly ICoreScopeProvider _coreScopeProvider;
 
     protected abstract IEnumerable<string> PropertyEditorAliases { get; }
 
     protected abstract EditorValueHandling DetermineEditorValueHandling(object editorValue);
 
     protected bool SkipMigration { get; init; }
+
+    protected bool ParallelizeMigration { get; init; }
 
     protected enum EditorValueHandling
     {
@@ -44,7 +48,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
         IDataTypeService dataTypeService,
         IJsonSerializer jsonSerializer,
         IUmbracoContextFactory umbracoContextFactory,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        ICoreScopeProvider coreScopeProvider)
         : base(context)
     {
         _logger = logger;
@@ -53,6 +58,7 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
         _jsonSerializer = jsonSerializer;
         _umbracoContextFactory = umbracoContextFactory;
         _languageService = languageService;
+        _coreScopeProvider = coreScopeProvider;
     }
 
     protected override void Migrate()
@@ -64,12 +70,14 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
         }
 
         using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
-        var languagesById = _languageService.GetAllAsync().GetAwaiter().GetResult().ToDictionary(language => language.Id);
+        var languagesById = _languageService.GetAllAsync().GetAwaiter().GetResult()
+            .ToDictionary(language => language.Id);
         IContentType[] allContentTypes = _contentTypeService.GetAll().ToArray();
         var allPropertyTypesByEditor = allContentTypes
             .SelectMany(ct => ct.PropertyTypes)
             .GroupBy(pt => pt.PropertyEditorAlias)
             .ToDictionary(group => group.Key, group => group.ToArray());
+
 
         foreach (var propertyEditorAlias in PropertyEditorAliases)
         {
@@ -78,14 +86,20 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 continue;
             }
 
-            _logger.LogInformation("Migration starting for all properties of type: {propertyEditorAlias}", propertyEditorAlias);
+            _logger.LogInformation(
+                "Migration starting for all properties of type: {propertyEditorAlias}",
+                propertyEditorAlias);
             if (Handle(propertyTypes, languagesById))
             {
-                _logger.LogInformation("Migration succeeded for all properties of type: {propertyEditorAlias}", propertyEditorAlias);
+                _logger.LogInformation(
+                    "Migration succeeded for all properties of type: {propertyEditorAlias}",
+                    propertyEditorAlias);
             }
             else
             {
-                _logger.LogError("Migration failed for one or more properties of type: {propertyEditorAlias}", propertyEditorAlias);
+                _logger.LogError(
+                    "Migration failed for one or more properties of type: {propertyEditorAlias}",
+                    propertyEditorAlias);
             }
         }
     }
@@ -98,11 +112,17 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
     {
         var success = true;
 
-        foreach (IPropertyType propertyType in propertyTypes)
+        var propertyTypeCount = propertyTypes.Length;
+        for (var propertyTypeIndex = 0; propertyTypeIndex < propertyTypeCount; propertyTypeIndex++)
         {
+            IPropertyType propertyType = propertyTypes[propertyTypeIndex];
             try
             {
-                _logger.LogInformation("- starting property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias})...", propertyType.Name, propertyType.Id, propertyType.Alias);
+                _logger.LogInformation(
+                    "- starting property type {propertyTypeIndex}/{propertyTypeCount} : {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias})...",
+                    propertyTypeIndex + 1,
+                    propertyTypeCount,
+                    propertyType.Name, propertyType.Id, propertyType.Alias);
                 IDataType dataType = _dataTypeService.GetAsync(propertyType.DataTypeKey).GetAwaiter().GetResult()
                                      ?? throw new InvalidOperationException("The data type could not be fetched.");
 
@@ -113,7 +133,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 }
 
                 IDataValueEditor valueEditor = dataType.Editor?.GetValueEditor()
-                                               ?? throw new InvalidOperationException("The data type value editor could not be fetched.");
+                                               ?? throw new InvalidOperationException(
+                                                   "The data type value editor could not be fetched.");
 
                 Sql<ISqlContext> sql = Sql()
                     .Select<PropertyDataDto>()
@@ -132,109 +153,142 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
                 var progress = 0;
 
-                ExecutionContext.SuppressFlow();
-                Parallel.ForEach(updateBatch, update =>
+                void HandleUpdateBatch(UpdateBatch<PropertyDataDto> update)
                 {
-                    using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
-                    progress++;
-                    if (progress % 100 == 0)
-                    {
-                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress, updateBatch.Count);
-                    }
+                            using UmbracoContextReference umbracoContextReference =
+                                _umbracoContextFactory.EnsureUmbracoContext();
 
-                    PropertyDataDto propertyDataDto = update.Poco;
-
-                    // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
-                    var culture = propertyType.VariesByCulture()
-                                  && propertyDataDto.LanguageId.HasValue
-                                  && languagesById.TryGetValue(propertyDataDto.LanguageId.Value, out ILanguage? language)
-                        ? language.IsoCode
-                        : null;
-
-                    if (culture is null && propertyType.VariesByCulture())
-                    {
-                        // if we end up here, the property DTO is bound to a language that no longer exists. this is an error scenario,
-                        // and we can't really handle it in any other way than logging; in all likelihood this is an old property version,
-                        // and it won't cause any runtime issues
-                        _logger.LogWarning(
-                            "    - property data with id: {propertyDataId} references a language that does not exist - language id: {languageId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
-                            propertyDataDto.Id,
-                            propertyDataDto.LanguageId,
-                            propertyType.Name,
-                            propertyType.Id,
-                            propertyType.Alias);
-                        return;
-                    }
-
-                    var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
-                    var property = new Property(propertyType);
-                    property.SetValue(propertyDataDto.Value, culture, segment);
-                    var toEditorValue = valueEditor.ToEditor(property, culture, segment);
-                    switch (toEditorValue)
-                    {
-                        case null:
-                            _logger.LogWarning(
-                                "    - value editor yielded a null value for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
-                                propertyDataDto.Id,
-                                propertyType.Name,
-                                propertyType.Id,
-                                propertyType.Alias);
-                            updatesToSkip.Add(update);
-                            return;
-
-                        case string str when str.IsNullOrWhiteSpace():
-                            // indicates either an empty block editor or corrupt block editor data - we can't do anything about either here
-                            updatesToSkip.Add(update);
-                            return;
-
-                        default:
-                            switch (DetermineEditorValueHandling(toEditorValue))
+                            progress++;
+                            if (progress % 100 == 0)
                             {
-                                case EditorValueHandling.IgnoreConversion:
-                                    // nothing to convert, continue
-                                    updatesToSkip.Add(update);
-                                    return;
-                                case EditorValueHandling.ProceedConversion:
-                                    // continue the conversion
-                                    break;
-                                case EditorValueHandling.HandleAsError:
-                                    _logger.LogError(
-                                        "    - value editor did not yield a valid ToEditor value for property data with id: {propertyDataId} - the value type was {valueType} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress, updateBatch.Count);
+                            }
+
+                            PropertyDataDto propertyDataDto = update.Poco;
+
+                            // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
+                            var culture = propertyType.VariesByCulture()
+                                          && propertyDataDto.LanguageId.HasValue
+                                          && languagesById.TryGetValue(
+                                              propertyDataDto.LanguageId.Value,
+                                              out ILanguage? language)
+                                ? language.IsoCode
+                                : null;
+
+                            if (culture is null && propertyType.VariesByCulture())
+                            {
+                                // if we end up here, the property DTO is bound to a language that no longer exists. this is an error scenario,
+                                // and we can't really handle it in any other way than logging; in all likelihood this is an old property version,
+                                // and it won't cause any runtime issues
+                                _logger.LogWarning(
+                                    "    - property data with id: {propertyDataId} references a language that does not exist - language id: {languageId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                                    propertyDataDto.Id,
+                                    propertyDataDto.LanguageId,
+                                    propertyType.Name,
+                                    propertyType.Id,
+                                    propertyType.Alias);
+                                return;
+                            }
+
+                            var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
+                            var property = new Property(propertyType);
+                            property.SetValue(propertyDataDto.Value, culture, segment);
+                            var toEditorValue = valueEditor.ToEditor(property, culture, segment);
+                            switch (toEditorValue)
+                            {
+                                case null:
+                                    _logger.LogWarning(
+                                        "    - value editor yielded a null value for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
                                         propertyDataDto.Id,
-                                        toEditorValue.GetType(),
                                         propertyType.Name,
                                         propertyType.Id,
                                         propertyType.Alias);
                                     updatesToSkip.Add(update);
                                     return;
+
+                                case string str when str.IsNullOrWhiteSpace():
+                                    // indicates either an empty block editor or corrupt block editor data - we can't do anything about either here
+                                    updatesToSkip.Add(update);
+                                    return;
+
                                 default:
-                                    throw new ArgumentOutOfRangeException();
+                                    switch (DetermineEditorValueHandling(toEditorValue))
+                                    {
+                                        case EditorValueHandling.IgnoreConversion:
+                                            // nothing to convert, continue
+                                            updatesToSkip.Add(update);
+                                            return;
+                                        case EditorValueHandling.ProceedConversion:
+                                            // continue the conversion
+                                            break;
+                                        case EditorValueHandling.HandleAsError:
+                                            _logger.LogError(
+                                                "    - value editor did not yield a valid ToEditor value for property data with id: {propertyDataId} - the value type was {valueType} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                                                propertyDataDto.Id,
+                                                toEditorValue.GetType(),
+                                                propertyType.Name,
+                                                propertyType.Id,
+                                                propertyType.Alias);
+                                            updatesToSkip.Add(update);
+                                            return;
+                                        default:
+                                            throw new ArgumentOutOfRangeException();
+                                    }
+
+                                    break;
                             }
-                            break;
-                    }
 
-                    toEditorValue = UpdateEditorValue(toEditorValue);
+                            toEditorValue = UpdateEditorValue(toEditorValue);
 
-                    var editorValue = _jsonSerializer.Serialize(toEditorValue);
-                    var dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
-                    if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
+                            var editorValue = _jsonSerializer.Serialize(toEditorValue);
+                            var dbValue = valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+                            if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
+                            {
+                                _logger.LogError(
+                                    "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                                    propertyDataDto.Id,
+                                    propertyType.Name,
+                                    propertyType.Id,
+                                    propertyType.Alias);
+                                updatesToSkip.Add(update);
+                                return;
+                            }
+
+                            stringValue = UpdateDatabaseValue(stringValue);
+
+                            propertyDataDto.TextValue = stringValue;
+                }
+
+                if (ParallelizeMigration is false || DatabaseType == DatabaseType.SQLite)
+                {
+                    // SQLite locks up if we run the migration in parallel, so... let's not.
+                    foreach (UpdateBatch<PropertyDataDto> update in updateBatch)
                     {
-                        _logger.LogError(
-                            "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
-                            propertyDataDto.Id,
-                            propertyType.Name,
-                            propertyType.Id,
-                            propertyType.Alias);
-                        updatesToSkip.Add(update);
-                        return;
+                        HandleUpdateBatch(update);
                     }
+                }
+                else
+                {
+                    Parallel.ForEachAsync(updateBatch, async (update, token) =>
+                    {
+                        //Foreach here, but we need to suppress the flow before each task, but not the actuall await of the task
+                        Task task;
+                        using (ExecutionContext.SuppressFlow())
+                        {
+                            task = Task.Run(
+                                () =>
+                                {
+                                    using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                                    scope.Complete();
+                                    HandleUpdateBatch(update);
+                                },
+                                token);
+                        }
 
-                    stringValue = UpdateDatabaseValue(stringValue);
-
-                    propertyDataDto.TextValue = stringValue;
-                });
-                ExecutionContext.RestoreFlow();
+                        await task;
+                    }).GetAwaiter().GetResult();
+                }
 
                 updateBatch.RemoveAll(updatesToSkip.Contains);
 
@@ -248,7 +302,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                 var result = Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
                 if (result != updateBatch.Count)
                 {
-                    throw new InvalidOperationException($"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
+                    throw new InvalidOperationException(
+                        $"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
                 }
 
                 _logger.LogDebug(

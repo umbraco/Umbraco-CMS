@@ -6,10 +6,18 @@ using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
-
 [TestFixture]
 public class DocumentBreadthFirstKeyProviderTests
 {
+    private IPublishStatusQueryService PublishStatusQueryService
+    {
+        get
+        {
+            var mock = new Mock<IPublishStatusQueryService>();
+            mock.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
+            return mock.Object;
+        }
+    }
 
     [Test]
     public void ZeroSeedCountReturnsZeroKeys()
@@ -22,9 +30,8 @@ public class DocumentBreadthFirstKeyProviderTests
         navigationQueryService.Setup(x => x.TryGetRootKeys(out rootKeyList)).Returns(true);
         navigationQueryService.Setup(x => x.TryGetChildrenKeys(It.IsAny<Guid>(), out rootChildren)).Returns(true);
 
-
         var cacheSettings = new CacheSettings { DocumentBreadthFirstSeedCount = 0 };
-        var sut = new DocumentBreadthFirstKeyProvider(navigationQueryService.Object, Options.Create(cacheSettings));
+        var sut = new DocumentBreadthFirstKeyProvider(navigationQueryService.Object, Options.Create(cacheSettings), PublishStatusQueryService);
 
         var result = sut.GetSeedKeys();
 
@@ -48,7 +55,7 @@ public class DocumentBreadthFirstKeyProviderTests
 
         var expected = 3;
         var cacheSettings = new CacheSettings { DocumentBreadthFirstSeedCount = expected };
-        var sut = new DocumentBreadthFirstKeyProvider(navigationQueryService.Object, Options.Create(cacheSettings));
+        var sut = new DocumentBreadthFirstKeyProvider(navigationQueryService.Object, Options.Create(cacheSettings), PublishStatusQueryService);
 
         var result = sut.GetSeedKeys();
 
@@ -79,7 +86,7 @@ public class DocumentBreadthFirstKeyProviderTests
         // This'll get all children but no grandchildren
         var cacheSettings = new CacheSettings { DocumentBreadthFirstSeedCount = 4 };
 
-        var sut = new DocumentBreadthFirstKeyProvider(navigationQueryService.Object, Options.Create(cacheSettings));
+        var sut = new DocumentBreadthFirstKeyProvider(navigationQueryService.Object, Options.Create(cacheSettings), PublishStatusQueryService);
 
         var result = sut.GetSeedKeys();
 
@@ -107,7 +114,7 @@ public class DocumentBreadthFirstKeyProviderTests
         var settings = new CacheSettings { DocumentBreadthFirstSeedCount = int.MaxValue };
 
 
-        var sut = new DocumentBreadthFirstKeyProvider(navigationQueryService.Object, Options.Create(settings));
+        var sut = new DocumentBreadthFirstKeyProvider(navigationQueryService.Object, Options.Create(settings), PublishStatusQueryService);
 
         var result = sut.GetSeedKeys();
 

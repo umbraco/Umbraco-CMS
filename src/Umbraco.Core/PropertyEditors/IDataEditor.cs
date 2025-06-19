@@ -65,4 +65,7 @@ public interface IDataEditor : IDiscoverable
     /// <param name="culture">The culture (or null for invariant).</param>
     /// <returns>The result of the merge operation.</returns>
     object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture) => sourceValue;
+
+    object? MergeVariantInvariantPropertyValue(object? sourceValue, object? targetValue,
+        bool canUpdateInvariantData, HashSet<string> allowedCultures) => sourceValue;
 }

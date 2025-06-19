@@ -23,7 +23,7 @@ public class ByPathStylesheetController : StylesheetControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpGet("{path}")]
+    [HttpGet("{*path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(StylesheetResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class BlockListPropertyEditorTests : UmbracoIntegrationTest
+internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -27,6 +27,8 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 
     private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
+
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     [Test]
     public async Task Can_Track_References()
@@ -147,9 +149,89 @@ public class BlockListPropertyEditorTests : UmbracoIntegrationTest
 
         var tags = valueEditor.GetTags(content.GetValue("blocks"), null, null).ToArray();
         Assert.AreEqual(3, tags.Length);
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag One"));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Two"));
-        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Three"));
+        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag One" && tag.LanguageId == null));
+        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Two" && tag.LanguageId == null));
+        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Three" && tag.LanguageId == null));
+    }
+
+    [Test]
+    public async Task Can_Track_Tags_For_Block_Level_Variance()
+    {
+        var result = await LanguageService.CreateAsync(
+            new Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        var daDkId = result.Result.Id;
+
+        var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
+        elementType.IsElement = true;
+        elementType.Variations = ContentVariation.Culture;
+        elementType.PropertyTypes.First(p => p.Alias == "tags").Variations = ContentVariation.Culture;
+        ContentTypeService.Save(elementType);
+
+        var blockListContentType = await CreateBlockListContentType(elementType);
+        blockListContentType.Variations = ContentVariation.Culture;
+        ContentTypeService.Save(blockListContentType);
+
+        var contentElementKey = Guid.NewGuid();
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    new IBlockLayoutItem[]
+                    {
+                        new BlockListLayoutItem { ContentKey = contentElementKey }
+                    }
+                }
+            },
+            ContentData =
+            [
+                new()
+                {
+                    Key = contentElementKey,
+                    ContentTypeAlias = elementType.Alias,
+                    ContentTypeKey = elementType.Key,
+                    Values =
+                    [
+                        new ()
+                        {
+                            Alias = "tags",
+                            // this is a little skewed, but the tags editor expects a serialized array of strings
+                            Value = JsonSerializer.Serialize(new[] { "Tag One EN", "Tag Two EN", "Tag Three EN" }),
+                            Culture = "en-US"
+                        },
+                        new ()
+                        {
+                            Alias = "tags",
+                            // this is a little skewed, but the tags editor expects a serialized array of strings
+                            Value = JsonSerializer.Serialize(new[] { "Tag One DA", "Tag Two DA", "Tag Three DA" }),
+                            Culture = "da-DK"
+                        }
+                    ]
+                }
+            ]
+        };
+        var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
+
+        var content = new ContentBuilder()
+            .WithContentType(blockListContentType)
+            .WithCultureName("en-US", "My Blocks EN")
+            .WithCultureName("da-DK", "My Blocks DA")
+            .WithPropertyValues(new { blocks = blocksPropertyValue })
+            .Build();
+        ContentService.Save(content);
+
+        var valueEditor = await GetValueEditor(blockListContentType);
+
+        var tags = valueEditor.GetTags(content.GetValue("blocks"), null, null).ToArray();
+        Assert.AreEqual(6, tags.Length);
+        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag One EN" && tag.LanguageId == 1));
+        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Two EN" && tag.LanguageId == 1));
+        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Three EN" && tag.LanguageId == 1));
+        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag One DA" && tag.LanguageId == daDkId));
+        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Two DA" && tag.LanguageId == daDkId));
+        Assert.IsNotNull(tags.Single(tag => tag.Text == "Tag Three DA" && tag.LanguageId == daDkId));
     }
 
     [Test]

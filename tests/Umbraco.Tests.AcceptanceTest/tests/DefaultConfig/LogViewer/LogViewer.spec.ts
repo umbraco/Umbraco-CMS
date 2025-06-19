@@ -189,7 +189,7 @@ test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.logViewer.goToSettingsTreeItem('Log Viewer');
 
   // Act
-  await umbracoUi.waitForTimeout(4000);
+  await umbracoUi.waitForTimeout(2000);
   await umbracoUi.logViewer.clickSavedSearchByName(searchName);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
 

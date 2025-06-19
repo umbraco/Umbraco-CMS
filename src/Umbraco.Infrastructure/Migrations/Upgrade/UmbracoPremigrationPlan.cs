@@ -65,5 +65,7 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_14_0_0.MigrateTours>("{A08254B6-D9E7-4207-A496-2ED0A87FB4FD}");
         To<V_15_0_0.AddKindToUser>("{69AA6889-8B67-42B4-AA4F-114704487A45}");
         To<V_15_0_0.AddDocumentUrl>("{B9133686-B758-404D-AF12-708AA80C7E44}");
+        To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{EEB1F012-B44D-4AB4-8756-F7FB547345B4}");
+        To<V_14_0_0.AddListViewKeysToDocumentTypes>("{0F49E1A4-AFD8-4673-A91B-F64E78C48174}");
     }
 }

@@ -1,0 +1,44 @@
+<svg width="370" height="250" viewBox="0 0 370 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="9" y="9.00003" width="352" height="232" rx="7" fill="white" stroke="black" stroke-width="2"/>
+<mask id="path-2-inside-1_1_132" fill="white">
+<path d="M10 43H102V240H16C12.6863 240 10 237.314 10 234V43Z"/>
+</mask>
+<path d="M10 43H102V240H16C12.6863 240 10 237.314 10 234V43Z" fill="white"/>
+<path d="M10 43H102H10ZM102 240H10H102ZM10 240V43V240ZM103 43V240H101V43H103Z" fill="black" mask="url(#path-2-inside-1_1_132)"/>
+<path d="M102 40H360V234C360 237.314 357.314 240 354 240H102V40Z" fill="#D9D9D9"/>
+<mask id="path-5-inside-2_1_132" fill="white">
+<path d="M10 40H102V240H16C12.6863 240 10 237.314 10 234V40Z"/>
+</mask>
+<path d="M10 40H102V240H16C12.6863 240 10 237.314 10 234V40Z" fill="white"/>
+<path d="M10 40H102H10ZM102 240H10H102ZM10 240V40V240ZM103 40V240H101V40H103Z" fill="black" mask="url(#path-5-inside-2_1_132)"/>
+<path d="M24 116L27.4641 122H20.5359L24 116Z" fill="#848484"/>
+<rect x="33" y="118" width="40" height="2" fill="#848484"/>
+<path d="M24 100L27.4641 106H20.5359L24 100Z" fill="#848484"/>
+<rect x="33" y="102" width="40" height="2" fill="#848484"/>
+<path d="M24 84L27.4641 90H20.5359L24 84Z" fill="#848484"/>
+<rect x="33" y="86" width="40" height="2" fill="#848484"/>
+<path d="M24 68L27.4641 74H20.5359L24 68Z" fill="#848484"/>
+<rect x="33" y="70" width="40" height="2" fill="#848484"/>
+<rect x="20" y="50" width="58" height="8" fill="#D9D9D9"/>
+<g opacity="0.2">
+<mask id="path-16-inside-3_1_132" fill="white">
+<path d="M102 40H360V63H102V40Z"/>
+</mask>
+<path d="M360 62H102V64H360V62Z" fill="black" mask="url(#path-16-inside-3_1_132)"/>
+</g>
+<mask id="path-18-inside-4_1_132" fill="white">
+<path d="M102 217H360V240H102V217Z"/>
+</mask>
+<path d="M102 218H360V216H102V218Z" fill="black" fill-opacity="0.2" mask="url(#path-18-inside-4_1_132)"/>
+<rect x="308" y="47" width="42" height="8" fill="white"/>
+<path d="M282 60H350V136H282V60Z" fill="white"/>
+<rect x="305" y="120" width="30" height="2" fill="#848484"/>
+<rect x="293" y="118" width="7" height="6" fill="#848484"/>
+<rect x="305" y="104" width="30" height="2" fill="#848484"/>
+<rect x="293" y="102" width="7" height="6" fill="#848484"/>
+<rect x="305" y="88" width="30" height="2" fill="#848484"/>
+<rect x="293" y="86" width="7" height="6" fill="#848484"/>
+<rect x="305" y="72" width="30" height="2" fill="#848484"/>
+<rect x="293" y="70" width="7" height="6" fill="#848484"/>
+<path d="M354 10C357.314 10 360 12.6863 360 16L360 40L10 40L10 16C10 12.6863 12.6863 10 16 10L354 10Z" fill="#1B264F"/>
+</svg>

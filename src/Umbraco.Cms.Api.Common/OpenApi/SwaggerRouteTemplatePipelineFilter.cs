@@ -7,7 +7,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -30,24 +30,21 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
         IOptions<SwaggerGenOptions> swaggerGenOptions = applicationBuilder.ApplicationServices.GetRequiredService<IOptions<SwaggerGenOptions>>();
 
         applicationBuilder.UseSwagger(swaggerOptions =>
-            {
-                swaggerOptions.RouteTemplate = SwaggerRouteTemplate(applicationBuilder);
-            });
+        {
+            swaggerOptions.RouteTemplate = SwaggerRouteTemplate(applicationBuilder);
+        });
 
         applicationBuilder.UseSwaggerUI(swaggerUiOptions => SwaggerUiConfiguration(swaggerUiOptions, swaggerGenOptions.Value, applicationBuilder));
     }
 
     protected virtual bool SwaggerIsEnabled(IApplicationBuilder applicationBuilder)
-    {
-        IWebHostEnvironment webHostEnvironment = applicationBuilder.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
-        return webHostEnvironment.IsProduction() is false;
-    }
+        => applicationBuilder.ApplicationServices.GetRequiredService<IWebHostEnvironment>().IsProduction() is false;
 
     protected virtual string SwaggerRouteTemplate(IApplicationBuilder applicationBuilder)
-        => $"{GetUmbracoPath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger/{{documentName}}/swagger.json";
+        => $"{GetBackOfficePath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger/{{documentName}}/swagger.json";
 
     protected virtual string SwaggerUiRoutePrefix(IApplicationBuilder applicationBuilder)
-        => $"{GetUmbracoPath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger";
+        => $"{GetBackOfficePath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger";
 
     protected virtual void SwaggerUiConfiguration(
         SwaggerUIOptions swaggerUiOptions,
@@ -56,8 +53,7 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
     {
         swaggerUiOptions.RoutePrefix = SwaggerUiRoutePrefix(applicationBuilder);
 
-        foreach ((var name, OpenApiInfo? apiInfo) in swaggerGenOptions.SwaggerGeneratorOptions.SwaggerDocs
-                     .OrderBy(x => x.Value.Title))
+        foreach ((var name, OpenApiInfo? apiInfo) in swaggerGenOptions.SwaggerGeneratorOptions.SwaggerDocs.OrderBy(x => x.Value.Title))
         {
             swaggerUiOptions.SwaggerEndpoint($"{name}/swagger.json", $"{apiInfo.Title}");
         }
@@ -70,11 +66,6 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
         swaggerUiOptions.OAuthUsePkce();
     }
 
-    private string GetUmbracoPath(IApplicationBuilder applicationBuilder)
-    {
-        GlobalSettings settings = applicationBuilder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
-        IHostingEnvironment hostingEnvironment = applicationBuilder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-
-        return settings.GetBackOfficePath(hostingEnvironment);
-    }
+    private string GetBackOfficePath(IApplicationBuilder applicationBuilder)
+        => applicationBuilder.ApplicationServices.GetRequiredService<IHostingEnvironment>().GetBackOfficePath();
 }

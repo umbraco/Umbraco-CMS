@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -14,6 +15,9 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
     private readonly IIdKeyMap _idKeyMap;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+    private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly IDocumentCacheService _documentCacheService;
+    private readonly IMediaCacheService _mediaCacheService;
 
     public DataTypeCacheRefresher(
         AppCaches appCaches,
@@ -22,12 +26,18 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory,
         IPublishedModelFactory publishedModelFactory,
-        IPublishedContentTypeFactory publishedContentTypeFactory)
+        IPublishedContentTypeFactory publishedContentTypeFactory,
+        IPublishedContentTypeCache publishedContentTypeCache,
+        IDocumentCacheService documentCacheService,
+        IMediaCacheService mediaCacheService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
         _publishedModelFactory = publishedModelFactory;
         _publishedContentTypeFactory = publishedContentTypeFactory;
+        _publishedContentTypeCache = publishedContentTypeCache;
+        _documentCacheService = documentCacheService;
+        _mediaCacheService = mediaCacheService;
     }
 
     #region Json
@@ -76,6 +86,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
 
         Attempt<IAppPolicyCache?> dataTypeCache = AppCaches.IsolatedCaches.Get<IDataType>();
 
+        List<IPublishedContentType> removedContentTypes = new();
         foreach (JsonPayload payload in payloads)
         {
             _idKeyMap.ClearCache(payload.Id);
@@ -84,14 +95,25 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
             {
                 dataTypeCache.Result?.Clear(RepositoryCacheKeys.GetKey<IDataType, int>(payload.Id));
             }
-        }
 
-        // TODO: We need to clear the HybridCache of any content using the ContentType, but NOT the database cache here, and this should be done within the "WithSafeLiveFactoryReset" to ensure that the factory is locked in the meantime.
-        _publishedModelFactory.WithSafeLiveFactoryReset(() => { });
+            removedContentTypes.AddRange(_publishedContentTypeCache.ClearByDataTypeId(payload.Id));
+        }
 
         var changedIds = payloads.Select(x => x.Id).ToArray();
         _publishedContentTypeFactory.NotifyDataTypeChanges(changedIds);
 
+        _publishedModelFactory.WithSafeLiveFactoryReset(() =>
+        {
+            IEnumerable<int> documentTypeIds = removedContentTypes
+                .Where(x => x.ItemType == PublishedItemType.Content)
+                .Select(x => x.Id);
+            _documentCacheService.RebuildMemoryCacheByContentTypeAsync(documentTypeIds).GetAwaiter().GetResult();
+
+            IEnumerable<int> mediaTypeIds = removedContentTypes
+                .Where(x => x.ItemType == PublishedItemType.Media)
+                .Select(x => x.Id);
+            _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(mediaTypeIds);
+        });
         base.Refresh(payloads);
     }
 

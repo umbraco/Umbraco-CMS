@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
+internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -50,7 +50,7 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
                 Blocks = JsonSerializer.Deserialize<RichTextBlockValue>($$"""
                                                                   {
                                                                   	"layout": {
-                                                                  		"Umbraco.TinyMCE": [{
+                                                                  		"Umbraco.RichText": [{
                                                                   				"contentKey": "{{elementId:D}}"
                                                                   			}
                                                                   		]
@@ -83,12 +83,13 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType }
-            }).ToDictionary();
+            });
 
-        Assert.IsTrue(indexValues.TryGetValue("bodyText", out var bodyTextIndexValues));
+        var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "bodyText");
+        Assert.IsNotNull(indexValue);
 
-        Assert.AreEqual(1, bodyTextIndexValues.Count());
-        var bodyTextIndexValue = bodyTextIndexValues.First() as string;
+        Assert.AreEqual(1, indexValue.Values.Count());
+        var bodyTextIndexValue = indexValue.Values.First() as string;
         Assert.IsNotNull(bodyTextIndexValue);
 
         Assert.Multiple(() =>
@@ -122,12 +123,13 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { contentType.Key, contentType }
-            }).ToDictionary();
+            });
 
-        Assert.IsTrue(indexValues.TryGetValue("bodyText", out var bodyTextIndexValues));
+        var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "bodyText");
+        Assert.IsNotNull(indexValue);
 
-        Assert.AreEqual(1, bodyTextIndexValues.Count());
-        var bodyTextIndexValue = bodyTextIndexValues.First() as string;
+        Assert.AreEqual(1, indexValue.Values.Count());
+        var bodyTextIndexValue = indexValue.Values.First() as string;
         Assert.IsNotNull(bodyTextIndexValue);
         Assert.IsTrue(bodyTextIndexValue.Contains("This is some markup"));
     }
@@ -205,12 +207,13 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType }
-            }).ToDictionary();
+            });
 
-        Assert.IsTrue(indexValues.TryGetValue("blocks", out var blocksIndexValues));
+        var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "blocks");
+        Assert.IsNotNull(indexValue);
 
-        Assert.AreEqual(1, blocksIndexValues.Count());
-        var blockIndexValue = blocksIndexValues.First() as string;
+        Assert.AreEqual(1, indexValue.Values.Count());
+        var blockIndexValue = indexValue.Values.First() as string;
         Assert.IsNotNull(blockIndexValue);
 
         Assert.Multiple(() =>
@@ -333,12 +336,13 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType }
-            }).ToDictionary();
+            });
 
-        Assert.IsTrue(indexValues.TryGetValue("blocks", out var blocksIndexValues));
+        var indexValue = indexValues.FirstOrDefault(v => v.FieldName == "blocks");
+        Assert.IsNotNull(indexValue);
 
-        Assert.AreEqual(1, blocksIndexValues.Count());
-        var blockIndexValue = blocksIndexValues.First() as string;
+        Assert.AreEqual(1, indexValue.Values.Count());
+        var blockIndexValue = indexValue.Values.First() as string;
         Assert.IsNotNull(blockIndexValue);
 
         Assert.Multiple(() =>
