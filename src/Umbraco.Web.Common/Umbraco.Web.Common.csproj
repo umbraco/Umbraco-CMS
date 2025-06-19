@@ -5,7 +5,6 @@
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
   </PropertyGroup>
-  
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:
