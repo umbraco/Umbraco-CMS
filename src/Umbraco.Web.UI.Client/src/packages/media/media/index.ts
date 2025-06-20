@@ -10,6 +10,5 @@ export * from './search/index.js';
 export * from './tree/index.js';
 export * from './url/index.js';
 
-export { UmbMediaAuditLogRepository } from './audit-log/index.js';
 
 export type * from './types.js';
