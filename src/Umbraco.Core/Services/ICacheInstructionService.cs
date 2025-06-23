@@ -45,7 +45,14 @@ public interface ICacheInstructionService
         CacheRefresherCollection cacheRefreshers,
         CancellationToken cancellationToken,
         string localIdentity,
-        int lastId);
+        int lastId) =>
+        ProcessInstructions(
+            cacheRefreshers,
+            ServerRole.Unknown,
+            cancellationToken,
+            localIdentity,
+            lastPruned: DateTime.UtcNow,
+            lastId);
 
     /// <summary>
     ///     Processes and then prunes pending database cache instructions.
