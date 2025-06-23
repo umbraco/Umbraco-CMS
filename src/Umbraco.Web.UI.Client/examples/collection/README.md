@@ -9,7 +9,8 @@ The example includes:
 - Collection Pagination
 - Table Collection View
 - Card Collection View
-- A Dashboard to present it
+- Collection as a Dashboard
+- Collection as a Workspace View
 
 TODO: This example is not complete, it is missing the following features:
 
@@ -17,4 +18,3 @@ TODO: This example is not complete, it is missing the following features:
 - Collection Filtering
 - Entity Actions
 - Selection + Bulk Actions
-- Collection as a Workspace View
