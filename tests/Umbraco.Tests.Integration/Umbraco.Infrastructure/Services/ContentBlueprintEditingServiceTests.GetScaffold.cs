@@ -106,7 +106,7 @@ public partial class ContentBlueprintEditingServiceTests
 
         foreach (var newKey in newKeys)
         {
-            Assert.IsTrue(!blueprint.BlockKeys.Contains(newKey), "The blocks in a content item generated from a template should have new keys.");
+            Assert.IsFalse(blueprint.BlockKeys.Contains(newKey), "The blocks in a content item generated from a template should have new keys.");
         }
 
         return;
