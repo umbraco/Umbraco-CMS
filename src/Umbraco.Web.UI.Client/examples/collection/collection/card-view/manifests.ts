@@ -4,14 +4,14 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionView',
-		alias: 'Example.CollectionView.Table',
-		name: 'Example Table Collection View',
+		alias: 'Example.CollectionView.Card',
+		name: 'Example Card Collection View',
 		js: () => import('./collection-view.element.js'),
-		weight: 100,
+		weight: 50,
 		meta: {
-			label: 'Table',
-			icon: 'icon-list',
-			pathName: 'table',
+			label: 'Card',
+			icon: 'icon-grid',
+			pathName: 'card',
 		},
 		conditions: [
 			{

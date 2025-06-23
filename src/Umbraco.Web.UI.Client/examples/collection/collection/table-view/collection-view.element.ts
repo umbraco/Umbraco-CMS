@@ -36,11 +36,19 @@ export class ExampleTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#observeCollectionItems() {
-		if (!this.#collectionContext) return;
-		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
+		this.observe(
+			this.#collectionContext?.items,
+			(items) => this.#createTableItems(items),
+			'umbCollectionItemsObserver',
+		);
 	}
 
-	#createTableItems(items: Array<ExampleCollectionItemModel>) {
+	#createTableItems(items: Array<ExampleCollectionItemModel> | undefined) {
+		if (!items) {
+			this._tableItems = [];
+			return;
+		}
+
 		this._tableItems = items.map((item) => {
 			return {
 				id: item.unique,
@@ -72,7 +80,7 @@ export class ExampleTableCollectionViewElement extends UmbLitElement {
 	];
 }
 
-export default ExampleTableCollectionViewElement;
+export { ExampleTableCollectionViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
