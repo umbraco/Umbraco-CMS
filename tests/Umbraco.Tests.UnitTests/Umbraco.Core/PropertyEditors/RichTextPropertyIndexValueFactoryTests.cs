@@ -68,17 +68,15 @@ public class RichTextPropertyIndexValueFactoryTests
                                                && (string)p.GetValue(It.IsAny<string>(), It.IsAny<string>(),
                                                    It.IsAny<bool>()) == testContent);
 
-        // get index values
-        var indexValues = factory.GetIndexValues(property, null, null, true, [], new Dictionary<Guid, IContentType>());
+        // get the index value for the property
+        var indexValue = factory
+            .GetIndexValues(property, null, null, true, [], new Dictionary<Guid, IContentType>())
+            .FirstOrDefault(kvp => kvp.Key == alias);
+        Assert.IsNotNull(indexValue);
 
-        // assert that index values are created correctly
-        var keyValuePairs = indexValues.ToList();
-        Assert.IsNotNull(indexValues);
-        Assert.IsTrue(keyValuePairs.Any());
-        if (!keyValuePairs.Any(kvp => kvp.Key == alias && kvp.Value.FirstOrDefault()?.ToString()?.Contains(expected) == true))
-        {
-            Assert.Fail($"Expected index value for alias '{alias}' to contain '{expected}', but it did not. " +
-                        $"Actual values: {string.Join(", ", keyValuePairs.Select(kvp => $"{kvp.Key}: '{string.Join(", ", kvp.Value)}'"))}");
-        }
+        // assert that index the value is created correctly (it might contain a trailing whitespace, but that's OK)
+        var expectedIndexValue = indexValue.Value.SingleOrDefault() as string;
+        Assert.IsNotNull(expectedIndexValue);
+        Assert.AreEqual(expected, expectedIndexValue.TrimEnd());
     }
 }
