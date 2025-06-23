@@ -20,6 +20,8 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 		this._availableExtensions = this.#context.filterExtensions(query);
 	}, 250);
 
+	#initialized = false;
+
 	@state()
 	private _availableExtensions: Array<UmbTiptapStatusbarExtension> = [];
 
@@ -33,6 +35,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 		this.#value = value;
 	}
 	get value(): UmbTiptapStatusbarValue | undefined {
+		if (this.#value === undefined) return undefined;
 		return this.#context.cloneStatusbarValue(this.#value);
 	}
 	#value?: UmbTiptapStatusbarValue;
@@ -54,14 +57,17 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 			this.observe(this.#context.statusbar, (statusbar) => {
 				if (!statusbar.length) return;
 				this._statusbar = statusbar;
-				this.#value = statusbar.map((area) => [...area.data]);
-				propertyContext?.setValue(this.#value);
+				if (this.#initialized) {
+					this.#value = statusbar.map((area) => [...area.data]);
+					propertyContext?.setValue(this.#value);
+				}
 			});
 		});
 	}
 
 	protected override firstUpdated() {
 		this.#context.setStatusbar(this.#value);
+		this.#initialized = true;
 	}
 
 	#onClick(item: UmbTiptapStatusbarExtension) {
@@ -264,10 +270,6 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 			uui-box {
 				[slot='header-actions'] {
 					margin-bottom: var(--uui-size-2);
-
-					uui-input {
-						align-items: baseline;
-					}
 
 					uui-icon {
 						color: var(--uui-color-border);

@@ -127,7 +127,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
     return html`
       <header id="header">
         <h1 id="greeting">
-          <umb-localize .key=${this.#greetingLocalizationKey}>Welcome</umb-localize>
+          <umb-localize .key=${this.#greetingLocalizationKey}></umb-localize>
         </h1>
         <slot name="subheadline"></slot>
       </header>

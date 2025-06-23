@@ -31,8 +31,7 @@ test('can create content with allowed child node enabled', async ({umbracoApi, u
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 
   // Clean
@@ -76,8 +75,7 @@ test('can create multiple child nodes with different document types', async ({um
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(secondChildContentName)).toBeTruthy();
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData.length).toBe(2);

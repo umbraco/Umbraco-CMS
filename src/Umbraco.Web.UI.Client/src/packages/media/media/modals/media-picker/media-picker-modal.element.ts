@@ -21,7 +21,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
+import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -82,7 +82,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CONTENT_PROPERTY_CONTEXT, (context) => {
+		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
 			this.observe(context?.dataType, (dataType) => {
 				this.#dataType = dataType;
 			});
