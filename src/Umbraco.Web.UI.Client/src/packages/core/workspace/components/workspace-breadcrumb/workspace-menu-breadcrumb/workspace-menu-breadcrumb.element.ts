@@ -79,7 +79,7 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 							>${this.localize.string(structureItem.name)}</uui-breadcrumb-item
 						>`,
 				)}
-				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
+				<uui-breadcrumb-item last-item>${this._name}</uui-breadcrumb-item>
 			</uui-breadcrumbs>
 		`;
 	}

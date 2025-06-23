@@ -126,11 +126,11 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			<uui-breadcrumbs>
 				${this._structure.map(
 					(structureItem) =>
-						html`<uui-breadcrumb-item href="${ifDefined(this.#getHref(structureItem))}"
+						html`<uui-breadcrumb-item href=${ifDefined(this.#getHref(structureItem))}
 							>${this.localize.string(this.#getItemVariantName(structureItem))}</uui-breadcrumb-item
 						>`,
 				)}
-				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
+				<uui-breadcrumb-item last-item>${this._name}</uui-breadcrumb-item>
 			</uui-breadcrumbs>
 		`;
 	}
