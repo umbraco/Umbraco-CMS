@@ -96,12 +96,22 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
 	#getItemVariantName(structureItem: UmbVariantStructureItemModel) {
-		const fallbackName =
-			structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture)?.name ??
-			structureItem.variants[0].name ??
-			'Unknown';
-		const name = structureItem.variants.find((variant) => this._workspaceActiveVariantId?.compare(variant))?.name;
-		return name ?? `(${fallbackName})`;
+		// If the active workspace is a variant, we will try to find the matching variant name.
+		if (!this._workspaceActiveVariantId?.isInvariant()) {
+			const variant = structureItem.variants.find((variantId) => this._workspaceActiveVariantId?.compare(variantId));
+			if (variant) {
+				return variant.name;
+			}
+		}
+
+		// If the active workspace is invariant, we will try to find the variant that matches the app default culture.
+		const variant = structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture);
+		if (variant) {
+			return `(${variant.name})`;
+		}
+
+		// If an active variant can not be found, then we fallback to the first variant name or a generic "unknown" label.
+		return structureItem.variants?.[0]?.name ?? '(#general_unknown)';
 	}
 
 	#getHref(structureItem: any) {
