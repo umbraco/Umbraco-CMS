@@ -27,7 +27,7 @@ public class RichTextPropertyIndexValueFactoryTests
     [TestCase("<p>John Smith<br>Company ABC<branything>London</p>", "John Smith Company ABCLondon")]
     [TestCase("<p>Another sample text with <strong>bold</strong> content</p>", "Another sample text with bold content")]
     [TestCase("<p>Text with <a href=\"https://example.com\">link</a></p>", "Text with link")]
-    [TestCase("<p>Text with <img src=\"image.jpg\" alt=\"image\" /></p>", "Text with ")]
+    [TestCase("<p>Text with <img src=\"image.jpg\" alt=\"image\" /></p>", "Text with")]
     [TestCase("<p>Text with <span style=\"color: red;\">styled text</span></p>", "Text with styled text")]
     [TestCase("<p>Text with <em>emphasized</em> content</p>", "Text with emphasized content")]
     [TestCase("<p>Text with <u>underlined</u> content</p>", "Text with underlined content")]
@@ -35,7 +35,7 @@ public class RichTextPropertyIndexValueFactoryTests
     [TestCase("<p>Text with <pre><code>code block</code></pre></p>", "Text with code block")]
     [TestCase("<p>Text with <blockquote>quoted text</blockquote></p>", "Text with quoted text")]
     [TestCase("<p>Text with <ul><li>list item 1</li><li>list item 2</li></ul></p>",
-        "Text with list item 1list item 2 ")]
+        "Text with list item 1list item 2")]
     [TestCase("<p>Text with <ol><li>ordered item 1</li><li>ordered item 2</li></ol></p>",
         "Text with ordered item 1ordered item 2")]
     [TestCase("<p>Text with <div class=\"class-name\">div content</div></p>", "Text with div content")]
