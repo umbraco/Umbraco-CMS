@@ -40,9 +40,9 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Create Content Template">
-				<uui-box id="tree-box" headline="Create a new Content Template from ${this._documentName}">
-					A Content Template is predefined content that an editor can select to use as the basis for creating new content.
+			<umb-body-layout headline=${this.localize.term('actions_createblueprint')}>
+				<uui-box id="tree-box" headline=${this.localize.term('blueprints_createBlueprintFrom', this._documentName)}>
+					<umb-localize key="blueprints_blueprintDescription"></umb-localize>
 					<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical">
 						<div slot="editor">
 							<uui-input
