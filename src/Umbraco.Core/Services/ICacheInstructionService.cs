@@ -34,7 +34,7 @@ public interface ICacheInstructionService
     void DeliverInstructionsInBatches(IEnumerable<RefreshInstruction> instructions, string localIdentity);
 
     /// <summary>
-    ///     Processes and then prunes pending database cache instructions.
+    ///     Processes pending database cache instructions.
     /// </summary>
     /// <param name="cacheRefreshers">Cache refreshers.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
@@ -55,7 +55,7 @@ public interface ICacheInstructionService
             lastId);
 
     /// <summary>
-    ///     Processes and then prunes pending database cache instructions.
+    ///     Processes pending database cache instructions.
     /// </summary>
     /// <param name="cacheRefreshers">Cache refreshers.</param>
     /// <param name="serverRole">Server role.</param>
