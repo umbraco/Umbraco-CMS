@@ -5,15 +5,27 @@ import type {
 	UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, customElement, property, query, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, query, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // TODO: maybe move this to UI Library.
 @customElement('umb-dropdown')
 export class UmbDropdownElement extends UmbLitElement {
+	#open = false;
+
 	@property({ type: Boolean, reflect: true })
-	open = false;
+	public get open() {
+		return this.#open;
+	}
+	public set open(value) {
+		this.#open = value;
+
+		if (value === true && this.popoverContainerElement) {
+			this.openDropdown();
+		} else {
+			this.closeDropdown();
+		}
+	}
 
 	@property()
 	label?: string;
@@ -36,17 +48,6 @@ export class UmbDropdownElement extends UmbLitElement {
 	@query('#dropdown-popover')
 	popoverContainerElement?: UUIPopoverContainerElement;
 
-	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.updated(_changedProperties);
-		if (_changedProperties.has('open') && this.popoverContainerElement) {
-			if (this.open) {
-				this.openDropdown();
-			} else {
-				this.closeDropdown();
-			}
-		}
-	}
-
 	#onToggle(event: ToggleEvent) {
 		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -59,6 +60,7 @@ export class UmbDropdownElement extends UmbLitElement {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this.popoverContainerElement?.showPopover();
+		this.#open = true;
 	}
 
 	closeDropdown() {
@@ -66,6 +68,7 @@ export class UmbDropdownElement extends UmbLitElement {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this.popoverContainerElement?.hidePopover();
+		this.#open = false;
 	}
 
 	override render() {
@@ -81,13 +84,17 @@ export class UmbDropdownElement extends UmbLitElement {
 				<slot name="label"></slot>
 				${when(
 					!this.hideExpand,
-					() => html`<uui-symbol-expand id="symbol-expand" .open=${this.open}></uui-symbol-expand>`,
+					() => html`<uui-symbol-expand id="symbol-expand" .open=${this.#open}></uui-symbol-expand>`,
 				)}
 			</uui-button>
 			<uui-popover-container id="dropdown-popover" .placement=${this.placement} @toggle=${this.#onToggle}>
-				<umb-popover-layout>
-					<slot></slot>
-				</umb-popover-layout>
+				${this.#open
+					? html`
+							<umb-popover-layout>
+								<slot></slot>
+							</umb-popover-layout>
+						`
+					: nothing}
 			</uui-popover-container>
 		`;
 	}
