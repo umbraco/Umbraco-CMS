@@ -136,7 +136,7 @@ namespace Umbraco.Cms
             }
 
             /// <inheritdoc />
-            [Obsolete("Use the non-obsolete overload. Scheduled for removal in V19.")]
+            [Obsolete("Use the non-obsolete overload. Scheduled for removal in V17.")]
             public ProcessInstructionsResult ProcessInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 ServerRole serverRole,

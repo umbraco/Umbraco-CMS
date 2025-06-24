@@ -64,7 +64,7 @@ public interface ICacheInstructionService
     /// <param name="lastPruned">Date of last prune operation.</param>
     /// <param name="lastId">Id of the latest processed instruction.</param>
     /// <returns>The processing result.</returns>
-    [Obsolete("Use the non-obsolete overload. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete overload. Scheduled for removal in V17.")]
     ProcessInstructionsResult ProcessInstructions(
         CacheRefresherCollection cacheRefreshers,
         ServerRole serverRole,
