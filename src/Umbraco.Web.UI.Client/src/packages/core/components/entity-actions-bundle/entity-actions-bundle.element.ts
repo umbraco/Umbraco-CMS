@@ -48,6 +48,9 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	// TODO: provide the entity context on a higher level, like the root element of this entity, tree-item/workspace/... [NL]
 	#entityContext = new UmbEntityContext(this);
 
+	#scrollContainerElement?: any;
+	#entityActionListElement?: any;
+
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('entityType') && _changedProperties.has('unique')) {
 			this.#entityContext.setEntityType(this.entityType);
@@ -103,6 +106,25 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#onDropdownOpened() {
 		this._isOpen = true;
+
+		if (this.#scrollContainerElement) {
+			return; // Already created
+		}
+
+		// Programmatically create the scroll container and entity action list elements so they are cached if the dropdown is opened again
+		this.#scrollContainerElement = document.createElement('uui-scroll-container');
+		this.#entityActionListElement = document.createElement('umb-entity-action-list');
+		this.#entityActionListElement.addEventListener('action-executed', this.#onActionExecuted.bind(this));
+		this.#entityActionListElement.setAttribute('entity-type', this.entityType!);
+		this.#entityActionListElement.setAttribute('unique', this.unique ?? '');
+		this.#entityActionListElement.setAttribute('label', this.label ?? '');
+		this.#scrollContainerElement.appendChild(this.#entityActionListElement);
+		this._dropdownElement?.appendChild(this.#scrollContainerElement);
+
+		// Hack: Wait for the dropdown to be rendered before requesting position update
+		setTimeout(() => {
+			this._dropdownElement?.requestUpdatePosition();
+		}, 100);
 	}
 
 	#onDropdownClosed() {
@@ -127,20 +149,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 				compact
 				hide-expand>
 				<uui-symbol-more slot="label" .label=${this.label}></uui-symbol-more>
-				${this.#renderDropdownContent()}
 			</umb-dropdown>
 		`;
-	}
-
-	#renderDropdownContent() {
-		if (this._isOpen === false) return nothing;
-		return html`<uui-scroll-container
-			><umb-entity-action-list
-				@action-executed=${this.#onActionExecuted}
-				.entityType=${this.entityType}
-				.unique=${this.unique}
-				.label=${this.label}></umb-entity-action-list
-		></uui-scroll-container>`;
 	}
 
 	#renderFirstAction() {
