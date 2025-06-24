@@ -7,6 +7,7 @@ import type {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, query, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbClosedEvent, UmbOpenedEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: maybe move this to UI Library.
 @customElement('umb-dropdown')
@@ -53,6 +54,12 @@ export class UmbDropdownElement extends UmbLitElement {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this.open = event.newState === 'open';
+
+		if (this.open) {
+			this.dispatchEvent(new UmbOpenedEvent());
+		} else {
+			this.dispatchEvent(new UmbClosedEvent());
+		}
 	}
 
 	openDropdown() {
