@@ -1,6 +1,10 @@
 import { UmbEntityContext } from '../../entity/entity.context.js';
 import type { UmbDropdownElement } from '../dropdown/index.js';
-import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
+import {
+	type UmbEntityAction,
+	type ManifestEntityActionDefaultKind,
+	UmbEntityActionListElement,
+} from '@umbraco-cms/backoffice/entity-action';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import {
 	html,
@@ -15,6 +19,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UUIScrollContainerElement } from '@umbraco-ui/uui';
 
 @customElement('umb-entity-actions-bundle')
 export class UmbEntityActionsBundleElement extends UmbLitElement {
@@ -48,8 +53,31 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	// TODO: provide the entity context on a higher level, like the root element of this entity, tree-item/workspace/... [NL]
 	#entityContext = new UmbEntityContext(this);
 
-	#scrollContainerElement?: any;
-	#entityActionListElement?: any;
+	#scrollContainerElement?: UUIScrollContainerElement;
+	#entityActionListElement?: UmbEntityActionListElement;
+	#inViewport = false;
+
+	constructor() {
+		super();
+
+		// Only observe entity actions when the element is in the viewport
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						this.#inViewport = true;
+						this.#observeEntityActions();
+					}
+				});
+			},
+			{
+				root: null, // Use the viewport as the root
+				threshold: 0.1, // Trigger when at least 10% of the element is visible
+			},
+		);
+
+		observer.observe(this);
+	}
 
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('entityType') && _changedProperties.has('unique')) {
@@ -60,6 +88,10 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	}
 
 	#observeEntityActions() {
+		if (!this.entityType) return;
+		if (this.unique === undefined) return;
+		if (!this.#inViewport) return; // Only observe if the element is in the viewport
+
 		new UmbExtensionsManifestInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -112,11 +144,11 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		}
 
 		// Programmatically create the scroll container and entity action list elements so they are cached if the dropdown is opened again
-		this.#scrollContainerElement = document.createElement('uui-scroll-container');
-		this.#entityActionListElement = document.createElement('umb-entity-action-list');
-		this.#entityActionListElement.addEventListener('action-executed', this.#onActionExecuted.bind(this));
-		this.#entityActionListElement.setAttribute('entity-type', this.entityType!);
-		this.#entityActionListElement.setAttribute('unique', this.unique ?? '');
+		this.#scrollContainerElement = new UUIScrollContainerElement();
+		this.#entityActionListElement = new UmbEntityActionListElement();
+		this.#entityActionListElement.addEventListener('action-executed', this.#onActionExecuted);
+		this.#entityActionListElement.entityType = this.entityType;
+		this.#entityActionListElement.unique = this.unique;
 		this.#entityActionListElement.setAttribute('label', this.label ?? '');
 		this.#scrollContainerElement.appendChild(this.#entityActionListElement);
 		this._dropdownElement?.appendChild(this.#scrollContainerElement);
@@ -162,6 +194,13 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			href="${ifDefined(this._firstActionHref)}">
 			<uui-icon name=${ifDefined(this._firstActionManifest.meta.icon)}></uui-icon>
 		</uui-button>`;
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#entityActionListElement?.removeEventListener('action-executed', this.#onActionExecuted);
+		this.#entityActionListElement?.remove();
+		this.#scrollContainerElement?.remove();
 	}
 
 	static override styles = [
