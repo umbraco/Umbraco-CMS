@@ -39,6 +39,9 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	@state()
 	private _firstActionHref?: string;
 
+	@state()
+	private _isOpen = false;
+
 	@query('#action-modal')
 	private _dropdownElement?: UmbDropdownElement;
 
@@ -98,6 +101,14 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		event.stopPropagation();
 	}
 
+	#onDropdownOpened() {
+		this._isOpen = true;
+	}
+
+	#onDropdownClosed() {
+		this._isOpen = false;
+	}
+
 	override render() {
 		if (this._numberOfActions === 0) return nothing;
 		return html`<uui-action-bar slot="actions">${this.#renderMore()} ${this.#renderFirstAction()} </uui-action-bar>`;
@@ -107,17 +118,29 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (this._numberOfActions === 1) return nothing;
 
 		return html`
-			<umb-dropdown id="action-modal" @click=${this.#onDropdownClick} .label=${this.label} compact hide-expand>
+			<umb-dropdown
+				id="action-modal"
+				@click=${this.#onDropdownClick}
+				@opened=${this.#onDropdownOpened}
+				@closed=${this.#onDropdownClosed}
+				.label=${this.label}
+				compact
+				hide-expand>
 				<uui-symbol-more slot="label" .label=${this.label}></uui-symbol-more>
-				<uui-scroll-container>
-					<umb-entity-action-list
-						@action-executed=${this.#onActionExecuted}
-						.entityType=${this.entityType}
-						.unique=${this.unique}
-						.label=${this.label}></umb-entity-action-list>
-				</uui-scroll-container>
+				${this.#renderDropdownContent()}
 			</umb-dropdown>
 		`;
+	}
+
+	#renderDropdownContent() {
+		if (this._isOpen === false) return nothing;
+		return html`<uui-scroll-container
+			><umb-entity-action-list
+				@action-executed=${this.#onActionExecuted}
+				.entityType=${this.entityType}
+				.unique=${this.unique}
+				.label=${this.label}></umb-entity-action-list
+		></uui-scroll-container>`;
 	}
 
 	#renderFirstAction() {
