@@ -1,20 +1,24 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Data;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
 public class CacheInstructionsPruningJobTests
 {
-    private readonly Mock<IOptions<GlobalSettings>> _globalSettings = new(MockBehavior.Strict);
-    private readonly Mock<ICacheInstructionRepository> _cacheInstructionRepository = new(MockBehavior.Strict);
-    private readonly Mock<TimeProvider> _timeProvider = new(MockBehavior.Strict);
+    private readonly Mock<IOptions<GlobalSettings>> _globalSettingsMock = new(MockBehavior.Strict);
+    private readonly Mock<ICacheInstructionRepository> _cacheInstructionRepositoryMock = new(MockBehavior.Strict);
+    private readonly Mock<ICoreScopeProvider> _scopeProviderMock = new(MockBehavior.Strict);
+    private readonly Mock<TimeProvider> _timeProviderMock = new(MockBehavior.Strict);
 
     [Test]
     public void Run_Period_Is_Retrieved_From_GlobalSettings()
@@ -27,19 +31,21 @@ public class CacheInstructionsPruningJobTests
     [Test]
     public async Task RunJobAsync_Calls_DeleteInstructionsOlderThan_With_Expected_Date()
     {
+        SetupScopeProviderMock();
+
         var timeToRetainInstructions = TimeSpan.FromMinutes(30);
         var now = DateTime.UtcNow;
         var expectedPruneDate = now - timeToRetainInstructions;
 
-        _timeProvider.Setup(tp => tp.GetUtcNow()).Returns(now);
-        _cacheInstructionRepository.Setup(repo => repo
+        _timeProviderMock.Setup(tp => tp.GetUtcNow()).Returns(now);
+        _cacheInstructionRepositoryMock.Setup(repo => repo
                 .DeleteInstructionsOlderThan(expectedPruneDate));
 
         var job = CreateCacheInstructionsPruningJob(timeToRetainInstructions: timeToRetainInstructions);
 
         await job.RunJobAsync();
 
-        _cacheInstructionRepository.Verify(repo => repo.DeleteInstructionsOlderThan(expectedPruneDate), Times.Once);
+        _cacheInstructionRepositoryMock.Verify(repo => repo.DeleteInstructionsOlderThan(expectedPruneDate), Times.Once);
     }
 
     private CacheInstructionsPruningJob CreateCacheInstructionsPruningJob(
@@ -58,10 +64,22 @@ public class CacheInstructionsPruningJobTests
             },
         };
 
-        _globalSettings
+        _globalSettingsMock
             .Setup(g => g.Value)
             .Returns(globalSettings);
 
-        return new CacheInstructionsPruningJob(_globalSettings.Object, _cacheInstructionRepository.Object, _timeProvider.Object);
+        return new CacheInstructionsPruningJob(_globalSettingsMock.Object, _cacheInstructionRepositoryMock.Object, _scopeProviderMock.Object, _timeProviderMock.Object);
     }
+
+    private void SetupScopeProviderMock() =>
+        _scopeProviderMock
+            .Setup(x => x.CreateCoreScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher>(),
+                It.IsAny<IScopedNotificationPublisher>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(Mock.Of<ICoreScope>());
 }
