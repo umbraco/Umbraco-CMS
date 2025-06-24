@@ -145,12 +145,18 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
-    public IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int parentId, int before, int after)
+    public IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int before, int after)
     {
-        // TODO: Try and clean this up a bit, it's obscene...
+        // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
+        // without us also having to do a nested query for the parent ID too.
+        Sql<ISqlContext> parentIdQuery = Sql()
+            .Select<NodeDto>(x => x.ParentId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == targetKey);
+        var parentId = Database.ExecuteScalar<int>(parentIdQuery);
 
         // Get all children of the parent node which is not trashed, ordered by SortOrder, and assign each a row number.
-        // Subquery to assign row numbers to siblings
+        // These row numbers are important, we need them to select the "before" and "after" siblings of the target node.
         Sql<ISqlContext> rowNumberSql = Sql()
             .Select($"ROW_NUMBER() OVER (ORDER BY {SqlContext.SqlSyntax.GetQuotedTableName("umbracoNode")}.{SqlContext.SqlSyntax.GetQuotedColumnName("sortOrder")}) AS rn")
             .AndSelect<NodeDto>(n => n.UniqueId)
@@ -158,21 +164,23 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == false);
 
         // Find the specific row number of the target node.
+        // We need this to determine the bounds of the row numbers to select.
         Sql<ISqlContext> targetRowSql = Sql()
             .Select("rn")
             .From().AppendSubQuery(rowNumberSql, "Target")
             .Where<NodeDto>(x => x.UniqueId == targetKey, "Target");
 
-        // Main query: select siblings within the window
-        // Select the UniqueId of nodes which row number is within the specified range of the target node's row number.
-        var beforeArguments = new List<Object>();
+        // We have to reuse the target row sql arugments, however, we also need to add the "before" and "after" values to the arguments.
+        // If try to do this directly in the params array it'll consider the intial arugment array as a single argument.
+        var beforeArguments = new List<object>();
         beforeArguments.AddRange(targetRowSql.Arguments);
         beforeArguments.Add(before);
 
-        var afterArguments = new List<Object>();
+        var afterArguments = new List<object>();
         afterArguments.AddRange(targetRowSql.Arguments);
         afterArguments.Add(after);
 
+        // Select the UniqueId of nodes which row number is within the specified range of the target node's row number.
         Sql<ISqlContext>? mainSql = Sql()
             .Select("UniqueId")
             .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
@@ -184,7 +192,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
         if (keys is null || keys.Count == 0)
         {
-            return Enumerable.Empty<IEntitySlim>();
+            return [];
         }
 
         return GetAll(objectType, keys.ToArray());

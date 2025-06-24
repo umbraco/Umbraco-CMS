@@ -332,20 +332,11 @@ public class EntityService : RepositoryService, IEntityService
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IEntitySlim? entity = _entityRepository.Get(key, objectType.GetGuid());
-
-        if (entity is null)
-        {
-            scope.Complete();
-            return [];
-        }
-
-        IEntitySlim[] siblings = _entityRepository.GetSiblings(
+        IEnumerable<IEntitySlim> siblings = _entityRepository.GetSiblings(
             objectType.GetGuid(),
             key,
-            entity.ParentId,
             before,
-            after).ToArray();
+            after);
 
         scope.Complete();
         return siblings;
