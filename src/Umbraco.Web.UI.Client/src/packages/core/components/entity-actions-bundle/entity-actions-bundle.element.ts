@@ -19,7 +19,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { UUIScrollContainerElement } from '@umbraco-ui/uui';
+import { UUIScrollContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-entity-actions-bundle')
 export class UmbEntityActionsBundleElement extends UmbLitElement {
@@ -56,6 +56,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#scrollContainerElement?: UUIScrollContainerElement;
 	#entityActionListElement?: UmbEntityActionListElement;
 	#inViewport = false;
+	#observingEntityActions = false;
 
 	constructor() {
 		super();
@@ -91,6 +92,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (!this.entityType) return;
 		if (this.unique === undefined) return;
 		if (!this.#inViewport) return; // Only observe if the element is in the viewport
+		if (this.#observingEntityActions) return;
 
 		new UmbExtensionsManifestInitializer(
 			this,
@@ -105,6 +107,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			},
 			'umbEntityActionsObserver',
 		);
+
+		this.#observingEntityActions = true;
 	}
 
 	async #createFirstActionApi() {
