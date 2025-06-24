@@ -370,6 +370,8 @@ public class BackOfficeController : UmbracoController
             var result = await _userManager.VerifyUserTokenAsync(user, "Default", "ResetPassword", resetCode);
             if (result)
             {
+                HttpContext.StartPasswordResetFlowSession(userId);
+
                 //Add a flag and redirect for it to be displayed
                 TempData[ViewDataExtensions.TokenPasswordResetCode] =
                     _jsonSerializer.Serialize(
