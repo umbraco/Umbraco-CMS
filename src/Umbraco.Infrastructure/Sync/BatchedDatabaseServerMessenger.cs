@@ -50,7 +50,7 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     /// <summary>
     ///     Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger" /> class.
     /// </summary>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V18.")]
     public BatchedDatabaseServerMessenger(
         IMainDom mainDom,
         CacheRefresherCollection cacheRefreshers,

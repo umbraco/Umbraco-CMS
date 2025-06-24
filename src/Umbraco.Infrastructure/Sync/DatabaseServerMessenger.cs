@@ -83,7 +83,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="DatabaseServerMessenger" /> class.
     /// </summary>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V19.")]
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V18.")]
     protected DatabaseServerMessenger(
         IMainDom mainDom,
         CacheRefresherCollection cacheRefreshers,
