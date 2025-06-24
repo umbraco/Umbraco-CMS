@@ -49,19 +49,6 @@ export class UmbDropdownElement extends UmbLitElement {
 	@query('#dropdown-popover')
 	popoverContainerElement?: UUIPopoverContainerElement;
 
-	#onToggle(event: ToggleEvent) {
-		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this.open = event.newState === 'open';
-
-		if (this.open) {
-			this.dispatchEvent(new UmbOpenedEvent());
-		} else {
-			this.dispatchEvent(new UmbClosedEvent());
-		}
-	}
-
 	openDropdown() {
 		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -76,6 +63,25 @@ export class UmbDropdownElement extends UmbLitElement {
 		// @ts-ignore
 		this.popoverContainerElement?.hidePopover();
 		this.#open = false;
+	}
+
+	requestUpdatePosition() {
+		requestAnimationFrame(() => {
+			this.popoverContainerElement?.requestUpdatePosition();
+		});
+	}
+
+	#onToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this.open = event.newState === 'open';
+
+		if (this.open) {
+			this.dispatchEvent(new UmbOpenedEvent());
+		} else {
+			this.dispatchEvent(new UmbClosedEvent());
+		}
 	}
 
 	override render() {
@@ -98,7 +104,7 @@ export class UmbDropdownElement extends UmbLitElement {
 				${this.#open
 					? html`
 							<umb-popover-layout>
-								<slot></slot>
+								<slot @slotchange=${() => this.requestUpdatePosition()}></slot>
 							</umb-popover-layout>
 						`
 					: nothing}
