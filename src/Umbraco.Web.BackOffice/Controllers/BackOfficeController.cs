@@ -402,6 +402,11 @@ public class BackOfficeController : UmbracoController
 
         var result = await _userManager.VerifyUserTokenAsync(user, "Default", "ResetPassword", resetCode);
 
+        if (result)
+        {
+            HttpContext.StartPasswordResetFlowSession(userId);
+        }
+
         return result ?
 
             // Redirect to login with userId and resetCode
