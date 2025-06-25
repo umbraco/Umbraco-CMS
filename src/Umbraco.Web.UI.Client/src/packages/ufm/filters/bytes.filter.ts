@@ -2,9 +2,9 @@ import { UmbUfmFilterBase } from './base.filter.js';
 import { formatBytes } from '@umbraco-cms/backoffice/utils';
 
 class UmbUfmBytesFilterApi extends UmbUfmFilterBase {
-	filter(str?: string) {
+	filter(str?: string, decimals?: number, kilo?: number, culture?: string): string {
 		if (str === undefined || str === null || !str.length) return '';
-		return formatBytes(Number(str));
+		return formatBytes(Number(str), { decimals, kilo, culture });
 	}
 }
 
