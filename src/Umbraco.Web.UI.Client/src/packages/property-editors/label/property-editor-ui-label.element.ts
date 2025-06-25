@@ -16,9 +16,7 @@ export class UmbPropertyEditorUILabelElement extends UmbLitElement implements Um
 	@property()
 	value = '';
 
-	@property()
-	description = '';
-
+	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._labelTemplate = config?.getValueByAlias('labelTemplate');
 	}
