@@ -156,11 +156,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		this.#entityActionListElement.setAttribute('label', this.label ?? '');
 		this.#scrollContainerElement.appendChild(this.#entityActionListElement);
 		this._dropdownElement?.appendChild(this.#scrollContainerElement);
-
-		// Hack: Wait for the dropdown to be rendered before requesting position update
-		setTimeout(() => {
-			this._dropdownElement?.requestUpdatePosition();
-		}, 100);
 	}
 
 	#onDropdownClosed() {
