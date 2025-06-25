@@ -1,5 +1,5 @@
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
@@ -11,17 +11,25 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 @customElement('umb-property-editor-ui-label')
 export class UmbPropertyEditorUILabelElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	@state()
+	private _labelTemplate?: string;
+
 	@property()
 	value = '';
 
 	@property()
 	description = '';
 
-	@property({ attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this._labelTemplate = config?.getValueByAlias('labelTemplate');
+	}
 
 	override render() {
-		return html`${this.value ?? ''}`;
+		return when(
+			this._labelTemplate?.length,
+			() => html`<umb-ufm-render inline .markdown=${this._labelTemplate} .value=${this.value}></umb-ufm-render>`,
+			() => html`${this.value ?? ''}`,
+		);
 	}
 
 	static override styles = [UmbTextStyles];
