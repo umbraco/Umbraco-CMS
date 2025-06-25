@@ -7,7 +7,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import type { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-
+import DOMPurify from 'dompurify';
 interface UmbMediaInfoViewLink {
 	url: string | undefined;
 }
@@ -111,12 +111,16 @@ export class UmbMediaLinksWorkspaceInfoAppElement extends UmbLitElement {
 		const html = `<!doctype html>
 <body style="background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(135deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(135deg, transparent 75%, #ccc 75%); background-size:30px 30px; background-position:0 0, 15px 0, 15px -15px, 0px 15px;">
 	<img src="${imagePath}"/>
-	<script>history.pushState(null, null, "${window.location.href}");</script>
+	<script>history.pushState(null, null, "${this.#sanitizeUrl(window.location.href)}");</script>
 </body>`;
 
 		popup.document.open();
 		popup.document.write(html);
 		popup.document.close();
+	}
+
+	#sanitizeUrl(url: string): string {
+		return DOMPurify.sanitize(url);
 	}
 
 	#renderContent() {
