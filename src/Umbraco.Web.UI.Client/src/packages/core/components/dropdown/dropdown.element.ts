@@ -5,7 +5,7 @@ import type {
 	UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, query, when, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, query, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbClosedEvent, UmbOpenedEvent } from '@umbraco-cms/backoffice/event';
 
@@ -65,12 +65,6 @@ export class UmbDropdownElement extends UmbLitElement {
 		this.#open = false;
 	}
 
-	requestUpdatePosition() {
-		requestAnimationFrame(() => {
-			this.popoverContainerElement?.requestUpdatePosition();
-		});
-	}
-
 	#onToggle(event: ToggleEvent) {
 		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -101,13 +95,9 @@ export class UmbDropdownElement extends UmbLitElement {
 				)}
 			</uui-button>
 			<uui-popover-container id="dropdown-popover" .placement=${this.placement} @toggle=${this.#onToggle}>
-				${this.#open
-					? html`
-							<umb-popover-layout>
-								<slot @slotchange=${() => this.requestUpdatePosition()}></slot>
-							</umb-popover-layout>
-						`
-					: nothing}
+				<umb-popover-layout>
+					<slot></slot>
+				</umb-popover-layout>
 			</uui-popover-container>
 		`;
 	}
