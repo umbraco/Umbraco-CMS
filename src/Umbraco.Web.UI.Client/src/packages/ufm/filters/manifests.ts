@@ -10,10 +10,10 @@ export const manifests: Array<ManifestUfmFilter> = [
 	},
 	{
 		type: 'ufmFilter',
-		alias: 'Umb.Filter.FormatBytes',
-		name: 'Format Bytes UFM Filter',
-		api: () => import('./format-bytes.filter.js'),
-		meta: { alias: 'format-bytes' },
+		alias: 'Umb.Filter.Bytes',
+		name: 'Bytes UFM Filter',
+		api: () => import('./bytes.filter.js'),
+		meta: { alias: 'bytes' },
 	},
 	{
 		type: 'ufmFilter',
