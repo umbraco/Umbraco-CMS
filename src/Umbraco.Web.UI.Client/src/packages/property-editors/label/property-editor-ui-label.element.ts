@@ -1,10 +1,9 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-property-editor-ui-label
@@ -31,11 +30,12 @@ export class UmbPropertyEditorUILabelElement extends UmbLitElement implements Um
 			() => html`${this.value ?? ''}`,
 		);
 	}
-
-	static override styles = [UmbTextStyles];
 }
 
+/** @deprecated Should be exported as `element` only; to be removed in Umbraco 18. */
 export default UmbPropertyEditorUILabelElement;
+
+export { UmbPropertyEditorUILabelElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
