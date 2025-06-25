@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -29,20 +29,22 @@ internal sealed class DeliveryApiContentIndexHelper : IDeliveryApiContentIndexHe
     {
         const int pageSize = 10000;
         var pageIndex = 0;
+        long total;
+
+        IQuery<IContent> query = _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(content => content.Trashed == false);
 
         IContent[] descendants;
-        IQuery<IContent> query = _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(content => content.Trashed == false);
         do
         {
             descendants = _contentService
-                .GetPagedDescendants(rootContentId, pageIndex, pageSize, out _, query, Ordering.By("Path"))
+                .GetPagedDescendants(rootContentId, pageIndex / pageSize, pageSize, out total, query, Ordering.By("Path"))
                 .Where(descendant => _deliveryApiSettings.IsAllowedContentType(descendant.ContentType.Alias))
                 .ToArray();
 
-            actionToPerform(descendants.ToArray());
+            actionToPerform(descendants);
 
-            pageIndex++;
+            pageIndex += pageSize;
         }
-        while (descendants.Length == pageSize);
+        while (descendants.Length > 0 && pageIndex < total);
     }
 }
