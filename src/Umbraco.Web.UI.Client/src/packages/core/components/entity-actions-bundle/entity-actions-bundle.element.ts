@@ -147,7 +147,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			return; // Already created
 		}
 
-		// Programmatically create the scroll container and entity action list elements so they are cached if the dropdown is opened again
+		// First create dropdown content when the dropdown is opened.
+		// Programmatically create the elements so they are cached if the dropdown is opened again
 		this.#scrollContainerElement = new UUIScrollContainerElement();
 		this.#entityActionListElement = new UmbEntityActionListElement();
 		this.#entityActionListElement.addEventListener('action-executed', this.#onActionExecuted);
