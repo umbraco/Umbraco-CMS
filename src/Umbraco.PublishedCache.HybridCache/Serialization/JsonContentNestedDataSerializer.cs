@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Models;
 
@@ -8,7 +8,11 @@ internal class JsonContentNestedDataSerializer : IContentCacheDataSerializer
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Converters =
+        {
+            new JsonObjectConverter(),
+        },
     };
 
     /// <inheritdoc />
