@@ -26,8 +26,7 @@ test('can update preset value state', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'default', true)).toBeTruthy();
 });
 
@@ -35,14 +34,13 @@ test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createDefaultTrueFalseDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
-  
+
   // Act
   await umbracoUi.dataType.clickShowToggleLabelsToggle();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'showLabels', true)).toBeTruthy();
 });
 
@@ -51,14 +49,13 @@ test('can update label on', async ({umbracoApi, umbracoUi}) => {
   const labelOnValue = 'Test Label On';
   await umbracoApi.dataType.createDefaultTrueFalseDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
-  
+
   // Act
   await umbracoUi.dataType.enterLabelOnValue(labelOnValue);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'labelOn', labelOnValue)).toBeTruthy();
 });
 
@@ -67,14 +64,13 @@ test('can update label off', async ({umbracoApi, umbracoUi}) => {
   const labelOffValue = 'Test Label Off';
   await umbracoApi.dataType.createDefaultTrueFalseDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
-  
+
   // Act
   await umbracoUi.dataType.enterLabelOffValue(labelOffValue);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'labelOff', labelOffValue)).toBeTruthy();
 });
 
