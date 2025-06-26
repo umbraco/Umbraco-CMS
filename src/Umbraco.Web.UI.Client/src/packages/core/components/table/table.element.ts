@@ -279,13 +279,13 @@ export class UmbTableElement extends UmbLitElement {
 			<uui-table-head-cell style="--uui-table-cell-padding: 0; text-align: center;">
 				${when(
 					this.config.allowSelection,
-					() =>
-						html` <uui-checkbox
-							label="Select All"
+					() => html`
+						<uui-checkbox
+							aria-label="Select all rows"
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
-							?checked="${this.selection.length === this.items.length}">
-						</uui-checkbox>`,
+							?checked=${this.selection.length === this.items.length}></uui-checkbox>
+					`,
 				)}
 			</uui-table-head-cell>
 		`;
@@ -321,11 +321,10 @@ export class UmbTableElement extends UmbLitElement {
 					this.config.allowSelection,
 					() => html`
 						<uui-checkbox
-							label="Select Row"
+							aria-label="Select row"
 							@click=${(e: PointerEvent) => e.stopPropagation()}
 							@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
-							?checked="${this._isSelected(item.id)}">
-						</uui-checkbox>
+							?checked=${this._isSelected(item.id)}></uui-checkbox>
 					`,
 				)}
 			</uui-table-cell>
