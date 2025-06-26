@@ -1,13 +1,12 @@
 import { UmbMediaItemRepository } from '../../repository/index.js';
+import { UmbMediaSearchProvider } from '../../search/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
-import type { UmbMediaTreeItemModel, UmbMediaSearchItemModel, UmbMediaItemModel } from '../../types.js';
-import { UmbMediaSearchProvider } from '../../search/index.js';
 import type { UmbDropzoneMediaElement } from '../../dropzone/index.js';
+import type { UmbMediaTreeItemModel, UmbMediaSearchItemModel, UmbMediaItemModel } from '../../types.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
-import type { UmbDropzoneChangeEvent, UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
 import {
 	css,
 	html,
@@ -16,16 +15,18 @@ import {
 	repeat,
 	ifDefined,
 	query,
-	type PropertyValues,
 	nothing,
+	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
-import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbDropzoneChangeEvent, UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import '@umbraco-cms/backoffice/imaging';
 
@@ -411,7 +412,13 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		const disabled = !(selectable || canNavigate);
 		return html`
 			<div class="media-card">
-				<uui-checkbox ?checked=${this.#isSelected(item)} @change=${() => this.#onToggleSelect(item)}></uui-checkbox>
+				${when(
+					selectable && (this._isSelectionMode || canNavigate === false),
+					() =>
+						html`<uui-checkbox
+							?checked=${this.#isSelected(item)}
+							@change=${() => this.#onToggleSelect(item)}></uui-checkbox>`,
+				)}
 				<uui-card-media
 					class=${ifDefined(disabled ? 'not-allowed' : undefined)}
 					.name=${item.name}
