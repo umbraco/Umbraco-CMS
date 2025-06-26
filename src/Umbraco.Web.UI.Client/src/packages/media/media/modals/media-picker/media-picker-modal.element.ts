@@ -195,6 +195,18 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this.modalContext?.setValue({ selection });
 	}
 
+	#onToggleSelect(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
+		if (this.#isSelected(item)) {
+			this.#onDeselected(item);
+		} else {
+			this.#onSelected(item);
+		}
+	}
+
+	#isSelected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
+		return !!this.value?.selection?.find((value) => value === item.unique);
+	}
+
 	#clearSearch() {
 		this._searchQuery = '';
 		this._searchResult = [];
@@ -321,13 +333,15 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		return html`
 			${!this._searchResult.length && !this._searching
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
-				: html`<div id="media-grid">
-						${repeat(
-							this._searchResult,
-							(item) => item.unique,
-							(item) => this.#renderCard(item),
-						)}
-					</div>`}
+				: html`
+						<div id="media-grid">
+							${repeat(
+								this._searchResult,
+								(item) => item.unique,
+								(item) => this.#renderCard(item),
+							)}
+						</div>
+					`}
 		`;
 	}
 
@@ -335,7 +349,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		return html`
 			${!this._currentChildren.length
 				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
-				: html`<div id="media-grid">
+				: html`
+						<div id="media-grid">
 							${repeat(
 								this._currentChildren,
 								(item) => item.unique,
@@ -347,11 +362,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 									.current=${this._currentPage}
 									.total=${this._currentTotalPages}
 									firstlabel=${this.localize.term('general_first')}
-                                    previouslabel=${this.localize.term('general_previous')}
-                                    nextlabel=${this.localize.term('general_next')}
-                                    lastlabel=${this.localize.term('general_last')}
+									previouslabel=${this.localize.term('general_previous')}
+									nextlabel=${this.localize.term('general_next')}
+									lastlabel=${this.localize.term('general_last')}
 									@change=${this.#onPageChange}></uui-pagination>`
-							: nothing}`}
+							: nothing}
+					`}
 		`;
 	}
 
@@ -394,21 +410,24 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		const selectable = this._selectableFilter(item);
 		const disabled = !(selectable || canNavigate);
 		return html`
-			<uui-card-media
-				class=${ifDefined(disabled ? 'not-allowed' : undefined)}
-				.name=${item.name}
-				data-mark="${item.entityType}:${item.unique}"
-				@open=${() => this.#onOpen(item)}
-				@selected=${() => this.#onSelected(item)}
-				@deselected=${() => this.#onDeselected(item)}
-				?selected=${this.value?.selection?.find((value) => value === item.unique)}
-				?selectable=${selectable}
-				?select-only=${this._isSelectionMode || canNavigate === false}>
-				<umb-imaging-thumbnail
-					unique=${item.unique}
-					alt=${item.name}
-					icon=${item.mediaType.icon}></umb-imaging-thumbnail>
-			</uui-card-media>
+			<div class="media-card">
+				<uui-checkbox ?checked=${this.#isSelected(item)} @change=${() => this.#onToggleSelect(item)}></uui-checkbox>
+				<uui-card-media
+					class=${ifDefined(disabled ? 'not-allowed' : undefined)}
+					.name=${item.name}
+					data-mark="${item.entityType}:${item.unique}"
+					@open=${() => this.#onOpen(item)}
+					@selected=${() => this.#onSelected(item)}
+					@deselected=${() => this.#onDeselected(item)}
+					?selected=${this.#isSelected(item)}
+					?selectable=${selectable}
+					?select-only=${this._isSelectionMode || canNavigate === false}>
+					<umb-imaging-thumbnail
+						unique=${item.unique}
+						alt=${item.name}
+						icon=${item.mediaType.icon}></umb-imaging-thumbnail>
+				</uui-card-media>
+			</div>
 		`;
 	}
 
@@ -466,6 +485,25 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				grid-auto-rows: var(--umb-card-medium-min-width);
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
+
+				.media-card {
+					display: flex;
+					position: relative;
+
+					> uui-checkbox {
+						position: absolute;
+						top: var(--uui-size-space-4);
+						left: var(--uui-size-space-4);
+						opacity: 0;
+						transition: opacity 120ms;
+						z-index: 2;
+					}
+
+					&:has(:focus, :focus-within, :hover) > uui-checkbox,
+					> uui-checkbox[checked] {
+						opacity: 1;
+					}
+				}
 			}
 
 			umb-icon {
