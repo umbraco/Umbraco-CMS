@@ -13,11 +13,12 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 	private splitViewElement = new UmbMemberWorkspaceSplitViewElement();
 
 	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
-	#variants?: Array<UmbMemberVariantOptionModel>;
-	#isForbidden = false;
 
 	@state()
-	_routes?: Array<UmbRoute>;
+	private _isForbidden = false;
+
+	@state()
+	private _routes?: Array<UmbRoute>;
 
 	constructor() {
 		super();
@@ -33,10 +34,7 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		// TODO: the variantOptions observable is like too broad as this will be triggered then there is any change in the variant options, we need to only update routes when there is a relevant change to them. [NL]
 		this.observe(
 			this.#workspaceContext?.variantOptions,
-			(variants) => {
-				this.#variants = variants;
-				this._generateRoutes();
-			},
+			(variants) => this._generateRoutes(variants ?? []),
 			'_observeVariants',
 		);
 	}
@@ -44,10 +42,7 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 	#observeForbidden() {
 		this.observe(
 			this.#workspaceContext?.forbidden.isOn,
-			(isForbidden) => {
-				this.#isForbidden = isForbidden ?? false;
-				this._generateRoutes();
-			},
+			(isForbidden) => (this._isForbidden = isForbidden ?? false),
 			'_observeForbidden',
 		);
 	}
@@ -59,13 +54,13 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
 	}
 
-	private async _generateRoutes() {
+	private async _generateRoutes(variants: Array<UmbMemberVariantOptionModel>) {
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
 		// Split view routes:
-		this.#variants?.forEach((variantA) => {
-			this.#variants?.forEach((variantB) => {
+		variants.forEach((variantA) => {
+			variants.forEach((variantB) => {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
@@ -82,7 +77,7 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		// Single view:
-		this.#variants?.forEach((variant) => {
+		variants.forEach((variant) => {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 				path: variant.unique,
@@ -95,21 +90,18 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 			});
 		});
 
-		if (routes.length !== 0 && this.#variants?.length) {
+		if (routes.length !== 0) {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
 				pathMatch: 'full',
-				redirectTo: routes[this.#variants.length * this.#variants.length]?.path,
+				redirectTo: routes[variants.length * variants.length]?.path,
 			});
 		}
 
 		routes.push({
 			path: `**`,
-			component: async () => {
-				const router = await import('@umbraco-cms/backoffice/router');
-				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
-			},
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 		});
 
 		this._routes = routes;
@@ -120,7 +112,10 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	override render() {
-		return this._routes && this._routes.length > 0
+		if (this._isForbidden) {
+			return html`<umb-route-forbidden></umb-route-forbidden>`;
+		}
+		return this._routes
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
 			: '';
 	}
