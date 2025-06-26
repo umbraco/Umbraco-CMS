@@ -8,6 +8,9 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-entity-actions-dropdown')
 export class UmbEntityActionsDropdownElement extends UmbLitElement {
+	@property({ type: Boolean })
+	compact = false;
+
 	@property({ type: String })
 	public label?: string;
 
@@ -67,7 +70,7 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 			@click=${this.#onDropdownClick}
 			@opened=${this.#onDropdownOpened}
 			.label=${this.label}
-			compact
+			?compact=${this.compact}
 			hide-expand>
 			<slot name="label" slot="label"></slot>
 			<slot></slot>

@@ -117,7 +117,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (this._numberOfActions === 1) return nothing;
 
 		return html`
-			<umb-entity-actions-dropdown>
+			<umb-entity-actions-dropdown compact>
 				<uui-symbol-more slot="label" .label=${this.label}></uui-symbol-more>
 			</umb-entity-actions-dropdown>
 		`;
