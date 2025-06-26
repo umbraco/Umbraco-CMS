@@ -12,14 +12,23 @@ export class UmbEntityTypeCondition
 		super(host, args);
 
 		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
-			this.observe(
-				context?.entityType,
-				(entityType) => {
-					this.permitted = entityType === this.config.match;
-				},
-				'umbEntityTypeObserver',
-			);
+			this.observe(context?.entityType, (entityType) => this.#check(entityType), 'umbEntityTypeObserver');
 		});
+	}
+
+	#check(value: string | undefined) {
+		if (!value) {
+			this.permitted = false;
+			return;
+		}
+
+		// if the config has a match, we only check that
+		if (this.config.match) {
+			this.permitted = value === this.config.match;
+			return;
+		}
+
+		this.permitted = this.config.oneOf?.some((configValue) => configValue === value) ?? false;
 	}
 }
 
