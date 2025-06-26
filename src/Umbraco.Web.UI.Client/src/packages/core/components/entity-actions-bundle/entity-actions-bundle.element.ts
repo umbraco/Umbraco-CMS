@@ -1,25 +1,10 @@
 import { UmbEntityContext } from '../../entity/entity.context.js';
-import type { UmbDropdownElement } from '../dropdown/index.js';
-import {
-	type UmbEntityAction,
-	type ManifestEntityActionDefaultKind,
-	UmbEntityActionListElement,
-} from '@umbraco-cms/backoffice/entity-action';
+import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import {
-	html,
-	nothing,
-	customElement,
-	property,
-	state,
-	ifDefined,
-	css,
-	query,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { UUIScrollContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-entity-actions-bundle')
 export class UmbEntityActionsBundleElement extends UmbLitElement {
@@ -44,17 +29,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	@state()
 	private _firstActionHref?: string;
 
-	@state()
-	private _isOpen = false;
-
-	@query('#action-modal')
-	private _dropdownElement?: UmbDropdownElement;
-
 	// TODO: provide the entity context on a higher level, like the root element of this entity, tree-item/workspace/... [NL]
 	#entityContext = new UmbEntityContext(this);
-
-	#scrollContainerElement?: UUIScrollContainerElement;
-	#entityActionListElement?: UmbEntityActionListElement;
 	#inViewport = false;
 	#observingEntityActions = false;
 
@@ -132,37 +108,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		await this._firstActionApi?.execute().catch(() => {});
 	}
 
-	#onActionExecuted() {
-		this._dropdownElement?.closeDropdown();
-	}
-
-	#onDropdownClick(event: Event) {
-		event.stopPropagation();
-	}
-
-	#onDropdownOpened() {
-		this._isOpen = true;
-
-		if (this.#scrollContainerElement) {
-			return; // Already created
-		}
-
-		// First create dropdown content when the dropdown is opened.
-		// Programmatically create the elements so they are cached if the dropdown is opened again
-		this.#scrollContainerElement = new UUIScrollContainerElement();
-		this.#entityActionListElement = new UmbEntityActionListElement();
-		this.#entityActionListElement.addEventListener('action-executed', this.#onActionExecuted);
-		this.#entityActionListElement.entityType = this.entityType;
-		this.#entityActionListElement.unique = this.unique;
-		this.#entityActionListElement.setAttribute('label', this.label ?? '');
-		this.#scrollContainerElement.appendChild(this.#entityActionListElement);
-		this._dropdownElement?.appendChild(this.#scrollContainerElement);
-	}
-
-	#onDropdownClosed() {
-		this._isOpen = false;
-	}
-
 	override render() {
 		if (this._numberOfActions === 0) return nothing;
 		return html`<uui-action-bar slot="actions">${this.#renderMore()} ${this.#renderFirstAction()} </uui-action-bar>`;
@@ -172,16 +117,9 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (this._numberOfActions === 1) return nothing;
 
 		return html`
-			<umb-dropdown
-				id="action-modal"
-				@click=${this.#onDropdownClick}
-				@opened=${this.#onDropdownOpened}
-				@closed=${this.#onDropdownClosed}
-				.label=${this.label}
-				compact
-				hide-expand>
+			<umb-entity-actions-dropdown>
 				<uui-symbol-more slot="label" .label=${this.label}></uui-symbol-more>
-			</umb-dropdown>
+			</umb-entity-actions-dropdown>
 		`;
 	}
 
@@ -194,13 +132,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			href="${ifDefined(this._firstActionHref)}">
 			<uui-icon name=${ifDefined(this._firstActionManifest.meta.icon)}></uui-icon>
 		</uui-button>`;
-	}
-
-	override disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this.#entityActionListElement?.removeEventListener('action-executed', this.#onActionExecuted);
-		this.#entityActionListElement?.remove();
-		this.#scrollContainerElement?.remove();
 	}
 
 	static override styles = [
