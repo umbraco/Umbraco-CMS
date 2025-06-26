@@ -22,7 +22,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with the image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// Flaky only on the pipeline, look into why. Can't reproduce on the pipeline, Add smoke tag after fixed
+test('can create content with the image cropper data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
