@@ -1,6 +1,7 @@
+import { UMB_ENTITY_CONTEXT } from '../entity.context-token.js';
+import type { UmbEntityUnique } from '../types.js';
 import type { UmbEntityUniqueConditionConfig } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_ENTITY_CONTEXT, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
