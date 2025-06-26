@@ -205,7 +205,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	}
 
 	#isSelected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
-		return !!this.value?.selection?.find((value) => value === item.unique);
+		return this.value?.selection?.includes(item.unique);
 	}
 
 	#clearSearch() {
