@@ -13,14 +13,18 @@ export interface UmbSelectableItem {
 }
 
 /**
- * Updates the selected state of items based on current selection
+ * Updates the selected state of items based on current selection.
+ * This function is for internal use only within the property-editors package and should not be exposed
+ * to external consumers to avoid unwanted external dependencies.
+ * 
+ * @internal
  * @template T
  * @param {T[]} items - Array of items to update
  * @param {string[]} selection - Array of selected values
  * @param {'selected' | 'checked'} stateProperty - Property name to update ('selected' or 'checked')
  * @returns {T[]} New array with updated state, or original array if no changes needed
  */
-export function updateItemsState<T extends UmbSelectableItem>(
+export function updateItemsSelectedState<T extends UmbSelectableItem>(
 	items: T[],
 	selection: string[],
 	stateProperty: 'selected' | 'checked' = 'selected',

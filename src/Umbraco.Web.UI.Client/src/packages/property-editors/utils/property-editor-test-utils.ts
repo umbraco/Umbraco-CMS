@@ -127,8 +127,13 @@ export function getCheckboxSelection(element: ShadowDOMElement): string[] {
  * @returns {string[]} Array of selected values
  */
 export function getDropdownSelection(element: ShadowDOMElement): string[] {
-	const dropdownElement = getDropdownElement(element) as { value?: string } | null;
-	return dropdownElement?.value ? dropdownElement.value.split(', ') : [];
+	const dropdownElement = getDropdownElement(element) as { value?: string; selection?: string[] } | null;
+	// Prefer selection array if available, fallback to parsing value string
+	if (dropdownElement?.selection) {
+		return dropdownElement.selection;
+	}
+	// Fallback: parse comma-separated string (note: assumes values don't contain commas)
+	return dropdownElement?.value ? dropdownElement.value.split(', ').filter(v => v.trim().length > 0) : [];
 }
 
 /**

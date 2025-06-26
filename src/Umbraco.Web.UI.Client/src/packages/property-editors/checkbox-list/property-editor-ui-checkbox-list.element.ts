@@ -1,4 +1,4 @@
-import { ensureArray, updateItemsState } from '../utils/property-editor-ui-state-manager.js';
+import { ensureArray, updateItemsSelectedState } from '../utils/property-editor-ui-state-manager.js';
 import './components/input-checkbox-list/input-checkbox-list.element.js';
 import type {
 	UmbCheckboxListItem,
@@ -30,7 +30,6 @@ export class UmbPropertyEditorUICheckboxListElement
 	@property({ type: Array })
 	public override set value(value: Array<string> | string | undefined) {
 		this.#selection = ensureArray(value);
-
 		// Update the checked state of existing list items when value changes
 		this.#updateCheckedState();
 	}
@@ -102,7 +101,7 @@ export class UmbPropertyEditorUICheckboxListElement
 		// Only update if we have list items loaded
 		if (this._list.length > 0) {
 			// Update state only if changes are needed
-			const updatedList = updateItemsState(this._list, this.#selection, 'checked');
+			const updatedList = updateItemsSelectedState(this._list, this.#selection, 'checked');
 			if (updatedList !== this._list) {
 				this._list = updatedList;
 				// Trigger a re-render only when state actually changed
