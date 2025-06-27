@@ -1,15 +1,14 @@
-import { UMB_VARIANT_WORKSPACE_CONTEXT, type UmbVariantDatasetWorkspaceContext } from '../../../contexts/index.js';
+import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../../contexts/index.js';
+import type { UmbVariantDatasetWorkspaceContext } from '../../../contexts/index.js';
 import { css, customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/menu';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
-import {
-	UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT,
-	type UmbVariantStructureItemModel,
-} from '@umbraco-cms/backoffice/menu';
+import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-workspace-variant-menu-breadcrumb')
 export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
@@ -96,19 +95,28 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 
 	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
 	#getItemVariantName(structureItem: UmbVariantStructureItemModel) {
-		const fallbackName =
-			structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture)?.name ??
-			structureItem.variants[0].name ??
-			'Unknown';
-		const name = structureItem.variants.find((variant) => this._workspaceActiveVariantId?.compare(variant))?.name;
-		return name ?? `(${fallbackName})`;
+		// If the active workspace is a variant, we will try to find the matching variant name.
+		if (!this._workspaceActiveVariantId?.isInvariant()) {
+			const variant = structureItem.variants.find((variantId) => this._workspaceActiveVariantId?.compare(variantId));
+			if (variant) {
+				return variant.name;
+			}
+		}
+
+		// If the active workspace is invariant, we will try to find the variant that matches the app default culture.
+		const variant = structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture);
+		if (variant) {
+			return `(${variant.name})`;
+		}
+
+		// If an active variant can not be found, then we fallback to the first variant name or a generic "unknown" label.
+		return structureItem.variants?.[0]?.name ?? '(#general_unknown)';
 	}
 
 	#getHref(structureItem: any) {
+		if (structureItem.isFolder) return undefined;
 		const workspaceBasePath = `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit`;
-		return structureItem.isFolder
-			? undefined
-			: `${workspaceBasePath}/${structureItem.unique}/${this._workspaceActiveVariantId?.culture}`;
+		return `${workspaceBasePath}/${structureItem.unique}/${this._workspaceActiveVariantId?.culture}`;
 	}
 
 	override render() {
@@ -116,11 +124,11 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 			<uui-breadcrumbs>
 				${this._structure.map(
 					(structureItem) =>
-						html`<uui-breadcrumb-item href="${ifDefined(this.#getHref(structureItem))}"
+						html`<uui-breadcrumb-item href=${ifDefined(this.#getHref(structureItem))}
 							>${this.localize.string(this.#getItemVariantName(structureItem))}</uui-breadcrumb-item
 						>`,
 				)}
-				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
+				<uui-breadcrumb-item last-item>${this._name}</uui-breadcrumb-item>
 			</uui-breadcrumbs>
 		`;
 	}
