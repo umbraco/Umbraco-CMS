@@ -1,3 +1,4 @@
+import { UmbSectionSidebarMenuContext } from '../menu/section-sidebar-menu/context/section-sidebar-menu.context.js';
 import type { ManifestSection } from './extensions/section.extension.js';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -14,6 +15,7 @@ export class UmbSectionContext extends UmbContextBase {
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SECTION_CONTEXT);
+		new UmbSectionSidebarMenuContext(this);
 	}
 
 	public setManifest(manifest?: ManifestSection) {

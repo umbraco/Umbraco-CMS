@@ -1,6 +1,8 @@
+import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from '../core/menu/section-sidebar-menu/context/section-sidebar-menu.context.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
@@ -27,10 +29,61 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 		},
 	];
 
+	#context?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
+
+	@state()
+	_expansion: Array<UmbEntityModel> = [];
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_CONTEXT, (context) => {
+			this.#context = context;
+			this.#observeExpansion();
+		});
+	}
+
+	#onExpand() {
+		const item: UmbEntityModel = {
+			entityType: 'document',
+			unique: '315c76fd-2446-4a4d-9762-e002ff31a220',
+		};
+		this.#context?.expansion.expandItem(item);
+	}
+
+	#onCollapse(event: PointerEvent, item: UmbEntityModel) {
+		this.#context?.expansion.collapseItem(item);
+	}
+
+	#onCollapseAll() {
+		this.#context?.expansion.collapseAll();
+	}
+
+	#observeExpansion() {
+		this.observe(this.#context?.expansion.expansion, (items) => {
+			this._expansion = items || [];
+		});
+	}
+
 	override render() {
 		return html`
 			<div id="info-links" class="uui-text">
 				<uui-box id="our-umbraco">
+					<div style="margin-bottom: var(--uui-size-space-6);">
+						<button @click=${this.#onExpand}>Expand</button>
+						<button @click=${this.#onCollapseAll}>Collapse All</button>
+						${repeat(
+							this._expansion,
+							(item) => item.unique,
+							(item) =>
+								html`<div style="margin-bottom: var(--uui-size-space-2);">
+									${item.entityType} + ${item.unique}<button
+										@click=${(event: PointerEvent) => this.#onCollapse(event, item)}>
+										Collapse
+									</button>
+								</div> `,
+						)}
+					</div>
+
 					<div>
 						<h2 class="uui-h3">${this.localize.term('welcomeDashboard_ourUmbracoHeadline')}</h2>
 						<p>${this.localize.term('welcomeDashboard_ourUmbracoDescription')}</p>

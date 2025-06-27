@@ -1,8 +1,7 @@
-import type { UmbTreeExpansionModel } from './types.js';
+import type { UmbMenuExpansionModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
-import { UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Manages the expansion state of a tree
@@ -10,7 +9,7 @@ import { UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
  * @class UmbTreeExpansionManager
  * @augments {UmbControllerBase}
  */
-export class UmbTreeExpansionManager extends UmbControllerBase {
+export class UmbMenuExpansionManager extends UmbControllerBase {
 	#expansion = new UmbArrayState<UmbEntityModel>([], (x) => x.entityType + x.unique);
 	expansion = this.#expansion.asObservable();
 
@@ -30,21 +29,25 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 
 	/**
 	 * Sets the expansion state
-	 * @param {UmbTreeExpansionModel | undefined} expansion The expansion state
+	 * @param {UmbMenuExpansionModel | undefined} expansion The expansion state
 	 * @memberof UmbTreeExpansionManager
 	 * @returns {void}
 	 */
-	setExpansion(expansion: UmbTreeExpansionModel): void {
+	setExpansion(expansion: UmbMenuExpansionModel): void {
 		this.#expansion.setValue(expansion);
 	}
 
 	/**
 	 * Gets the expansion state
 	 * @memberof UmbTreeExpansionManager
-	 * @returns {UmbTreeExpansionModel} The expansion state
+	 * @returns {UmbMenuExpansionModel} The expansion state
 	 */
-	getExpansion(): UmbTreeExpansionModel {
+	getExpansion(): UmbMenuExpansionModel {
 		return this.#expansion.getValue();
+	}
+
+	updateExpansion(expansion: UmbMenuExpansionModel): void {
+		this.#expansion.append(expansion);
 	}
 
 	/**
@@ -57,7 +60,6 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 */
 	public async expandItem(entity: UmbEntityModel): Promise<void> {
 		this.#expansion.appendOne(entity);
-		this.getHostElement().dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
@@ -70,7 +72,6 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 */
 	public async collapseItem(entity: UmbEntityModel): Promise<void> {
 		this.#expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
-		this.getHostElement().dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
@@ -80,6 +81,5 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 */
 	public async collapseAll(): Promise<void> {
 		this.#expansion.setValue([]);
-		this.getHostElement().dispatchEvent(new UmbExpansionChangeEvent());
 	}
 }

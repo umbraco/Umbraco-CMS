@@ -5,6 +5,7 @@ import { css, html, customElement, property } from '@umbraco-cms/backoffice/exte
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from './context/section-sidebar-menu.context.token.js';
 
 // TODO: Move to separate file:
 const manifest: UmbExtensionManifestKind = {
@@ -32,6 +33,22 @@ export class UmbSectionSidebarMenuElement<
 		but it does look odd so lets return to this later. I have made a few corrections especially for this component. [NL]
 		*/
 		return html`<h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>`;
+	}
+
+	#context?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_CONTEXT, (context) => {
+			this.#context = context;
+			this.#observeExpansion();
+		});
+	}
+
+	#observeExpansion() {
+		this.observe(this.#context?.expansion.expansion, (items) => {
+			console.log('Expanded items:', items);
+		});
 	}
 
 	override render() {
