@@ -1,20 +1,9 @@
-# Collection Example
+# Tree Example
 
-This example demonstrates how to register a collection with collection views.
+This example demonstrates how to register a tree
 
 The example includes:
 
-- Collection Registration
-- Collection Repository
-- Collection Pagination
-- Table Collection View
-- Card Collection View
-- Collection as a Dashboard
-- Collection as a Workspace View
-
-TODO: This example is not complete, it is missing the following features:
-
-- Collection Action
-- Collection Filtering
-- Entity Actions
-- Selection + Bulk Actions
+- Tree Registration
+- A Dashboard to show how to render a tree anywhere in the backoffice
+- How to use the tree in the sidebar menu
