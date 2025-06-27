@@ -277,7 +277,7 @@ export class UmbTableElement extends UmbLitElement {
 					this.config.allowSelection,
 					() => html`
 						<uui-checkbox
-							aria-label="Select all rows"
+							aria-label=${this.localize.term('general_selectAll')}
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
 							?checked=${this.selection.length === this.items.length}></uui-checkbox>
@@ -319,7 +319,7 @@ export class UmbTableElement extends UmbLitElement {
 					this.config.allowSelection,
 					() => html`
 						<uui-checkbox
-							aria-label="Select row"
+							aria-label=${this.localize.term('buttons_select')}
 							@click=${(e: PointerEvent) => e.stopPropagation()}
 							@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
 							?checked=${this._isSelected(item.id)}></uui-checkbox>
