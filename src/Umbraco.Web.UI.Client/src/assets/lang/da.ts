@@ -65,6 +65,7 @@ export default {
 		editContent: 'Rediger indhold',
 		chooseWhereToImport: 'Vælg hvor du vil importere',
 		viewActionsFor: (name) => (name ? `Se handlinger for '${name}'` : 'Se handlinger'),
+		loadMore: 'Indlæs flere',
 	},
 	actionCategories: {
 		content: 'Indhold',
