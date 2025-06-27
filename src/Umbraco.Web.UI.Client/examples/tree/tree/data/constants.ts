@@ -1,2 +1,2 @@
-export const EXAMPLE_TREE_REPOSITORY_ALIAS = 'Example.Repository.Tree';
-export const EXAMPLE_TREE_STORE_ALIAS = 'Example.Store.Tree';
+export * from './repository/constants.js';
+export * from './store/constants.js';

@@ -1,10 +1,10 @@
-import type { UmbDataTypeEntityType, UmbDataTypeRootEntityType } from '../entity.js';
+import type { ExampleEntityType, ExampleRootEntityType } from '../entity.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface ExampleTreeItemModel extends UmbTreeItemModel {
-	entityType: 'example';
+	entityType: ExampleEntityType;
 }
 
 export interface ExampleTreeRootModel extends UmbTreeRootModel {
-	entityType: 'example-root';
+	entityType: ExampleRootEntityType;
 }

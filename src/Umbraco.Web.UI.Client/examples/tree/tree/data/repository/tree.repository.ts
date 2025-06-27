@@ -1,7 +1,7 @@
-import type { ExampleTreeItemModel, ExampleTreeRootModel } from '../types.js';
-import { EXAMPLE_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { ExampleTreeLocalDataSource } from './tree.local.data-source.js';
-import { EXAMPLE_TREE_STORE_CONTEXT } from './tree.store.context-token.js';
+import type { ExampleTreeItemModel, ExampleTreeRootModel } from '../../types.js';
+import { EXAMPLE_ROOT_ENTITY_TYPE } from '../../../entity.js';
+import { EXAMPLE_TREE_STORE_CONTEXT } from '../store/index.js';
+import { ExampleTreeLocalDataSource } from '../local-data-source/index.js';
 import { UmbTreeRepositoryBase, type UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
