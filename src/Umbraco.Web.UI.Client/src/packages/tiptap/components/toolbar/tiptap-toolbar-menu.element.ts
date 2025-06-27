@@ -4,7 +4,7 @@ import type {
 	UmbTiptapToolbarElementApi,
 } from '../../extensions/index.js';
 import type { UmbCascadingMenuItem } from '../../components/cascading-menu-popover/cascading-menu-popover.element.js';
-import { css, customElement, html, ifDefined, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
@@ -122,7 +122,7 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 				() => html`
 					<uui-button
 						compact
-						label=${ifDefined(label)}
+						label=${label}
 						look=${this.isActive ? 'outline' : 'default'}
 						title=${label}
 						popovertarget="popover-menu">
@@ -137,7 +137,7 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 				() => html`
 					<uui-button
 						compact
-						label=${ifDefined(label)}
+						label=${label}
 						look=${this.isActive ? 'outline' : 'default'}
 						popovertarget="popover-menu">
 						<span>${label}</span>

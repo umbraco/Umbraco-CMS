@@ -42,7 +42,13 @@ export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement impleme
 	}
 
 	override render() {
-		return html`<uui-select .options=${this._list} @change=${this.#onChange}></uui-select>`;
+		return html`
+			<uui-select
+				label=${this.localize.term('rte_config_overlaySize')}
+				.options=${this._list}
+				@change=${this.#onChange}>
+			</uui-select>
+		`;
 	}
 }
 
