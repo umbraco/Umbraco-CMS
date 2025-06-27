@@ -55,8 +55,18 @@ public interface IContentService : IContentServiceBase<IContent>
     void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Creates a new content item from a blueprint.
+    ///     Creates a blueprint from a content item.
     /// </summary>
+    // TODO: Remove the default implementation when CreateContentFromBlueprint is removed.
+    IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
+
+    /// <summary>
+    ///     (Deprecated) Creates a new content item from a blueprint.
+    /// </summary>
+    /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
+    /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
     IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
