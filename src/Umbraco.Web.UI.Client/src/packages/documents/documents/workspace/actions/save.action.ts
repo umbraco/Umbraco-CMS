@@ -7,7 +7,6 @@ import {
 	UmbSaveWorkspaceAction,
 	type MetaWorkspaceAction,
 	type UmbSaveWorkspaceActionArgs,
-	type UmbVariantDatasetWorkspaceContext,
 	type UmbWorkspaceActionDefaultKind,
 } from '@umbraco-cms/backoffice/workspace';
 
@@ -16,7 +15,6 @@ export class UmbDocumentSaveWorkspaceAction
 	implements UmbWorkspaceActionDefaultKind<MetaWorkspaceAction>
 {
 	#variants: Array<UmbDocumentVariantModel> | undefined;
-	#readOnlyRules: Array<any> | undefined;
 
 	constructor(
 		host: UmbControllerHost,
