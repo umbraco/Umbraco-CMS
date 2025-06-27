@@ -235,13 +235,10 @@ export class UmbTableElement extends UmbLitElement {
 	}
 
 	override render() {
+		const style = !(this.config.allowSelection === false && this.config.hideIcon === true) ? 'width: 60px' : undefined;
 		return html`
 			<uui-table class="uui-text">
-				<uui-table-column
-					.style=${when(
-						!(this.config.allowSelection === false && this.config.hideIcon === true),
-						() => 'width: 60px',
-					)}></uui-table-column>
+				<uui-table-column style=${ifDefined(style)}></uui-table-column>
 				<uui-table-head>
 					${this._renderHeaderCheckboxCell()} ${this.columns.map((column) => this._renderHeaderCell(column))}
 				</uui-table-head>
@@ -274,18 +271,17 @@ export class UmbTableElement extends UmbLitElement {
 
 	private _renderHeaderCheckboxCell() {
 		if (this.config.hideIcon && !this.config.allowSelection) return;
-
 		return html`
 			<uui-table-head-cell style="--uui-table-cell-padding: 0; text-align: center;">
 				${when(
 					this.config.allowSelection,
-					() =>
-						html` <uui-checkbox
-							label="Select All"
+					() => html`
+						<uui-checkbox
+							aria-label=${this.localize.term('general_selectAll')}
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
-							?checked="${this.selection.length === this.items.length}">
-						</uui-checkbox>`,
+							?checked=${this.selection.length === this.items.length}></uui-checkbox>
+					`,
 				)}
 			</uui-table-head-cell>
 		`;
@@ -307,9 +303,11 @@ export class UmbTableElement extends UmbLitElement {
 
 	private _renderRowCheckboxCell(item: UmbTableItem) {
 		if (this.sortable === true) {
-			return html`<uui-table-cell style="text-align: center;">
-				<uui-icon name="icon-grip"></uui-icon>
-			</uui-table-cell>`;
+			return html`
+				<uui-table-cell style="text-align: center;">
+					<uui-icon name="icon-grip"></uui-icon>
+				</uui-table-cell>
+			`;
 		}
 
 		if (this.config.hideIcon && !this.config.allowSelection) return;
@@ -321,11 +319,10 @@ export class UmbTableElement extends UmbLitElement {
 					this.config.allowSelection,
 					() => html`
 						<uui-checkbox
-							label="Select Row"
+							aria-label=${this.localize.term('buttons_select')}
 							@click=${(e: PointerEvent) => e.stopPropagation()}
 							@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
-							?checked="${this._isSelected(item.id)}">
-						</uui-checkbox>
+							?checked=${this._isSelected(item.id)}></uui-checkbox>
 					`,
 				)}
 			</uui-table-cell>
