@@ -3,7 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_1_0;
 
 public class AddSortOrderToLanguage : MigrationBase
 {
