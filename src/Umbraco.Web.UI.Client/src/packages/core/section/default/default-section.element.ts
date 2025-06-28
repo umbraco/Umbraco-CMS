@@ -1,6 +1,6 @@
-import type { ManifestSectionRoute } from './extensions/section-route.extension.js';
-import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
-import type { ManifestSection, UmbSectionElement } from './types.js';
+import type { ManifestSectionRoute } from '../extensions/section-route.extension.js';
+import type { UmbSectionMainViewElement } from '../section-main-views/section-main-views.element.js';
+import type { ManifestSection, UmbSectionElement } from '../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -15,13 +15,14 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { aliasToPath } from '@umbraco-cms/backoffice/utils';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
+import { UmbDefaultSectionContext } from './default-section.context.js';
 
 /**
  * @class UmbBaseSectionElement
  * @description - Element hosting sections and section navigation.
  */
 @customElement('umb-section-default')
-export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectionElement {
+export class UmbDefaultSectionElement extends UmbLitElement implements UmbSectionElement {
 	private _manifest?: ManifestSection | undefined;
 
 	@property({ type: Object, attribute: false })
@@ -32,7 +33,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		const oldValue = this._manifest;
 		if (oldValue === value) return;
 		this._manifest = value;
-
+		this.#api.setManifest(value);
 		this.requestUpdate('manifest', oldValue);
 	}
 
@@ -44,6 +45,9 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 
 	@state()
 	_splitPanelPosition = '300px';
+
+	// TODO: v17: Move this to a manifest api. It will have to wait for a major as it will be a breaking change.
+	#api = new UmbDefaultSectionContext(this);
 
 	constructor() {
 		super();
@@ -111,7 +115,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 			...routes,
 			{
 				path: '**',
-				component: () => import('./section-main-views/section-main-views.element.js'),
+				component: () => import('../section-main-views/section-main-views.element.js'),
 				setup: (element) => {
 					(element as UmbSectionMainViewElement).sectionAlias = this.manifest?.alias;
 				},
@@ -177,8 +181,16 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	];
 }
 
+export { UmbDefaultSectionElement as element };
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-default': UmbSectionDefaultElement;
+		'umb-section-default': UmbDefaultSectionElement;
 	}
 }
+
+/**
+ *
+ * @deprecated Since 16. Use UmbDefaultSectionElement instead. UmbSectionDefaultElement will be removed in v18.
+ */
+export { UmbDefaultSectionElement as UmbSectionDefaultElement };
