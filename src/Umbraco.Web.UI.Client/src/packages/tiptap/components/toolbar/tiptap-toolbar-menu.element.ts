@@ -4,7 +4,7 @@ import type {
 	UmbTiptapToolbarElementApi,
 } from '../../extensions/index.js';
 import type { UmbCascadingMenuItem } from '../../components/cascading-menu-popover/cascading-menu-popover.element.js';
-import { css, customElement, html, ifDefined, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
@@ -99,13 +99,18 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 			style: item.appearance?.style ?? item.style,
 			separatorAfter: item.separatorAfter,
 			element,
+			isActive: () => this.api?.isActive(this.editor, item),
 			execute: () => this.api?.execute(this.editor, item),
 		};
 	}
 
+	#isMenuActive(items?: UmbCascadingMenuItem[]): boolean {
+		return !!items?.some((item) => item.isActive?.() || this.#isMenuActive(item.items));
+	}
+
 	readonly #onEditorUpdate = () => {
 		if (this.api && this.editor && this.manifest) {
-			this.isActive = this.api.isActive(this.editor);
+			this.isActive = this.api.isActive(this.editor) || this.#isMenuActive(this.#menu) || false;
 		}
 	};
 
@@ -117,8 +122,8 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 				() => html`
 					<uui-button
 						compact
+						label=${label}
 						look=${this.isActive ? 'outline' : 'default'}
-						label=${ifDefined(label)}
 						title=${label}
 						popovertarget="popover-menu">
 						${when(
@@ -130,7 +135,11 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 					</uui-button>
 				`,
 				() => html`
-					<uui-button compact label=${ifDefined(label)} popovertarget="popover-menu">
+					<uui-button
+						compact
+						label=${label}
+						look=${this.isActive ? 'outline' : 'default'}
+						popovertarget="popover-menu">
 						<span>${label}</span>
 						<uui-symbol-expand slot="extra" open></uui-symbol-expand>
 					</uui-button>
