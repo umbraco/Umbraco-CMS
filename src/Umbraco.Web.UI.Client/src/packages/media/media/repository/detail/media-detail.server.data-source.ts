@@ -57,7 +57,7 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 			],
 		};
 
-		const scaffold = umbDeepMerge(defaultData, preset) as UmbMediaDetailModel;
+		const scaffold = umbDeepMerge(preset, defaultData);
 
 		return { data: scaffold };
 	}
