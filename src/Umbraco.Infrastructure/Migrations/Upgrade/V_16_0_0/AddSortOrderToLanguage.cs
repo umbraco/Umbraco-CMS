@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_0_0;
 
-public class AddSortOrderToLanguage : UnscopedMigrationBase
+public class AddSortOrderToLanguage : MigrationBase
 {
     private const string NewColumnName = "sortOrder";
     private readonly IScopeProvider _scopeProvider;
