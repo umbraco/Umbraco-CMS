@@ -21,7 +21,8 @@ internal static class LanguageFactory
             Id = dto.Id,
             IsDefault = dto.IsDefault,
             IsMandatory = dto.IsMandatory,
-            FallbackIsoCode = fallbackIsoCode
+            SortOrder = dto.SortOrder,
+            FallbackIsoCode = fallbackIsoCode,
         };
 
         // Reset dirty initial properties
