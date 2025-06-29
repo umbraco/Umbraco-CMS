@@ -21,6 +21,7 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
         target.Name = source.CultureName;
         target.IsDefault = source.IsDefault;
         target.IsMandatory = source.IsMandatory;
+        target.SortOrder = source.SortOrder;
     }
 
     // Umbraco.Code.MapAll -Id -Key
@@ -37,6 +38,7 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
         target.IsoCode = source.IsoCode;
         target.UpdateDate = default;
         target.FallbackIsoCode = source.FallbackIsoCode;
+        target.SortOrder = source.SortOrder;
     }
 
     // Umbraco.Code.MapAll -Id -Key -IsoCode -CreateDate
@@ -51,5 +53,6 @@ public class LanguageViewModelsMapDefinition : IMapDefinition
         target.IsMandatory = source.IsMandatory;
         target.UpdateDate = default;
         target.FallbackIsoCode = source.FallbackIsoCode;
+        target.SortOrder = source.SortOrder;
     }
 }
