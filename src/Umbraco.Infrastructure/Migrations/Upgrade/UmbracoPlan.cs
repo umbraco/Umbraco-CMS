@@ -119,6 +119,5 @@ public class UmbracoPlan : MigrationPlan
         // To 16.0.0
         To<V_16_0_0.MigrateTinyMceToTiptap>("{C6681435-584F-4BC8-BB8D-BC853966AF0B}");
         To<V_16_0_0.AddDocumentPropertyPermissions>("{D1568C33-A697-455F-8D16-48060CB954A1}");
-        To<V_16_1_0.AddSortOrderToLanguage>("{B1F2A6D3-4C8B-4E9F-8A5C-7D1B2E3F5A6B}");
     }
 }

@@ -33,13 +33,14 @@ public class AddSortOrderToLanguage : UnscopedMigrationBase
         if (DatabaseType != DatabaseType.SQLite)
         {
             MigrateSqlServer();
-            Context.Complete();
-            return;
+        }
+        else
+        {
+            MigrateSqlite();
         }
 
-        MigrateSqlite();
         Context.Complete();
-
+        scope.Complete();
     }
 
     private void MigrateSqlServer()
