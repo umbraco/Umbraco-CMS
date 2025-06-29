@@ -39,6 +39,10 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 			alias: 'fallbackLanguage',
 		},
 		{
+			name: 'Sort Order',
+			alias: 'sortOrder',
+		},
+		{
 			name: '',
 			alias: 'entityActions',
 			align: 'right',
@@ -95,6 +99,10 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 						value: languages.find((x) => x.unique === language.fallbackIsoCode)?.name,
 					},
 					{
+						columnAlias: 'sortOrder',
+						value: language.sortOrder,
+					},
+					{
 						columnAlias: 'entityActions',
 						value: html`<umb-entity-actions-table-column-view
 							.value=${{
@@ -110,7 +118,8 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
+			<umb-table sortable="true" .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}>
+			</umb-table>
 		`;
 	}
 
