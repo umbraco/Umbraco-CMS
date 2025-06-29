@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/azure-sql-edge:latest
+FROM mcr.microsoft.com/mssql/server:2022-latest
 
 ENV ACCEPT_EULA=Y
 
