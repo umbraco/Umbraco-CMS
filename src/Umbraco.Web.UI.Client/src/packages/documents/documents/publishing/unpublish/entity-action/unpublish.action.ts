@@ -58,6 +58,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 					name: appCulture!,
 					entityType: 'language',
 					fallbackIsoCode: null,
+					sortOrder: 0,
 					isDefault: true,
 					isMandatory: false,
 					unique: appCulture!,

@@ -38,6 +38,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 			fallbackIsoCode: null,
 			isDefault: false,
 			isMandatory: false,
+			sortOrder: 0,
 			name: '',
 			unique: '',
 			...preset,
@@ -72,6 +73,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 			isMandatory: data.isMandatory,
 			name: data.name,
 			unique: data.isoCode,
+			sortOrder: data.sortOrder,
 		};
 
 		return { data: dataType };
