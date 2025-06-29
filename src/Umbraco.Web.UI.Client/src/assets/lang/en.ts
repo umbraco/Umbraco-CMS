@@ -73,6 +73,7 @@ export default {
 		wasDeleted: 'was deleted',
 		wasMovedTo: 'was moved to',
 		viewActionsFor: (name) => (name ? `View actions for '${name}'` : 'View actions'),
+		loadMore: 'Load more',
 	},
 	actionCategories: {
 		content: 'Content',
