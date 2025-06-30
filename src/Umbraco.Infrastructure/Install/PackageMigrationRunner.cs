@@ -122,8 +122,8 @@ public class PackageMigrationRunner
             }
 
             using (_profilingLogger.TraceDuration<PackageMigrationRunner>(
-                       "Starting unattended package migration for " + migrationName,
-                       "Unattended upgrade completed for " + migrationName))
+                       "Starting package migration for " + migrationName,
+                       "Package migration completed for " + migrationName))
             {
                 Upgrader upgrader = new(plan);
 
