@@ -39,8 +39,7 @@ public class StylesheetHelper
                     // Only match first selector when chained together
                     Styles = string.Join(
                         Environment.NewLine,
-                        match.Groups["Styles"].Value.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None)
-                            .Select(x => x.Trim()).ToArray()),
+                        match.Groups["Styles"].Value.Split(new[] { "\r\n", "\n" }, StringSplitOptions.TrimEntries)),
                 });
             }
         }

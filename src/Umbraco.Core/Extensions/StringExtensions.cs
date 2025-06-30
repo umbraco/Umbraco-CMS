@@ -509,8 +509,7 @@ public static class StringExtensions
         var convertToHex = input.ConvertToHex();
         var hexLength = convertToHex.Length < 32 ? convertToHex.Length : 32;
         var hex = convertToHex[..hexLength].PadLeft(32, '0');
-        Guid output = Guid.Empty;
-        return Guid.TryParse(hex, out output) ? output : Guid.Empty;
+        return Guid.TryParse(hex, out Guid output) ? output : Guid.Empty;
     }
 
     /// <summary>
