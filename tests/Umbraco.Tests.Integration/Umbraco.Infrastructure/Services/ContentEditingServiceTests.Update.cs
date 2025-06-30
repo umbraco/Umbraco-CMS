@@ -569,7 +569,7 @@ public partial class ContentEditingServiceTests
     }
 
     [Test]
-    public async Task Updating_Single_Variant_Name_Does_Not_Change_Update_Dates_Of_Other_Vaiants()
+    public async Task Updating_Single_Variant_Name_Does_Not_Change_Update_Dates_Of_Other_Variants()
     {
         var contentType = await CreateVariantContentType(variantTitleAsMandatory: false);
 
