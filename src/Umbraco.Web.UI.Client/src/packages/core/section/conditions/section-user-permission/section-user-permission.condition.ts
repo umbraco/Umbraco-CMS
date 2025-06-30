@@ -1,4 +1,4 @@
-import type { UmbSectionUserPermissionConditionConfig } from './types.js';
+import type { UmbSectionUserPermissionConditionConfig } from '../types.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
