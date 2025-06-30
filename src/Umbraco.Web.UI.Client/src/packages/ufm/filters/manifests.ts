@@ -10,6 +10,13 @@ export const manifests: Array<ManifestUfmFilter> = [
 	},
 	{
 		type: 'ufmFilter',
+		alias: 'Umb.Filter.Bytes',
+		name: 'Bytes UFM Filter',
+		api: () => import('./bytes.filter.js'),
+		meta: { alias: 'bytes' },
+	},
+	{
+		type: 'ufmFilter',
 		alias: 'Umb.Filter.Lowercase',
 		name: 'Lowercase UFM Filter',
 		api: () => import('./lowercase.filter.js'),
