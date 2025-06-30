@@ -13,8 +13,13 @@ import jsdoc from 'eslint-plugin-jsdoc';
 
 export default [
 	// Recommended config applied to all files
-	js.configs.recommended, ...tseslint.configs.recommended, wcPlugin.configs['flat/recommended'], litPlugin.configs['flat/recommended'], // We use the non typescript version to allow types to be defined in the jsdoc comments. This will allow js docs as an alternative to typescript types.
-	jsdoc.configs['flat/recommended'], localRules.configs.all, eslintPluginPrettierRecommended,
+	js.configs.recommended,
+	...tseslint.configs.recommended,
+	wcPlugin.configs['flat/recommended'],
+	litPlugin.configs['flat/recommended'], // We use the non typescript version to allow types to be defined in the jsdoc comments. This will allow js docs as an alternative to typescript types.
+	jsdoc.configs['flat/recommended'],
+	localRules.configs.all,
+	eslintPluginPrettierRecommended,
 
 	// Global ignores
 	{
@@ -98,4 +103,6 @@ export default [
 				...globals.node,
 			},
 		},
-	}, ...storybook.configs["flat/recommended"]];
+	},
+	...storybook.configs['flat/recommended'],
+];
