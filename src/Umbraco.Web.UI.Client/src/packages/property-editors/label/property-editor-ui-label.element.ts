@@ -30,10 +30,7 @@ export class UmbPropertyEditorUILabelElement extends UmbLitElement implements Um
 	}
 }
 
-/** @deprecated Should be exported as `element` only; to be removed in Umbraco 18. */
 export default UmbPropertyEditorUILabelElement;
-
-export { UmbPropertyEditorUILabelElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
