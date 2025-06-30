@@ -42,9 +42,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             new ContentSettings
             {
                 Error404Collection =
-                {
+                [
                     new() { Culture = culture, ContentId = 1 },
-                },
+                ],
                 Imaging =
                 {
                     AutoFillImageProperties =
