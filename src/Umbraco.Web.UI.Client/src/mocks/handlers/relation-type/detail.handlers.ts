@@ -22,6 +22,10 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const response = umbRelationTypeMockDb.detail.read(id);
 		return res(ctx.status(200), ctx.json<GetRelationTypeByIdResponse>(response));
 	}),

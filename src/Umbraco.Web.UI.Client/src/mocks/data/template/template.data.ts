@@ -59,6 +59,14 @@ export const data: Array<UmbMockTemplateModel> = [
 		content:
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = "Test.cshtml";\r\n}',
 	},
+	{
+		id: 'forbidden',
+		parent: null,
+		name: 'Forbidden',
+		hasChildren: false,
+		alias: 'Forbidden',
+		content: `console.log('You are not allowed to see this template!');`,
+	},
 ];
 
 export const createTemplateScaffold = (masterTemplateAlias: string) => {

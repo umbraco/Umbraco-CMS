@@ -12,6 +12,23 @@ export type UmbMockDictionaryModel = DictionaryItemResponseModel &
 
 export const data: Array<UmbMockDictionaryModel> = [
 	{
+		name: 'Forbidden',
+		id: 'forbidden',
+		parent: null,
+		hasChildren: false,
+		translatedIsoCodes: ['en-us'],
+		translations: [
+			{
+				isoCode: 'en-us',
+				translation: 'This is a forbidden dictionary item',
+			},
+			{
+				isoCode: 'da',
+				translation: 'Dette er et forbudt ordbogsobjekt',
+			},
+		],
+	},
+	{
 		name: 'Hello',
 		id: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		parent: null,

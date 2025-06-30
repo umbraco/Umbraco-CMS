@@ -32,6 +32,10 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:path`), (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
+		if (path.endsWith('forbidden')) {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const response = umbScriptMockDb.file.read(decodeURIComponent(path));
 		return res(ctx.status(200), ctx.json(response));
 	}),
@@ -39,6 +43,10 @@ export const detailHandlers = [
 	rest.delete(umbracoPath(`${UMB_SLUG}/:path`), (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
+		if (path.endsWith('forbidden')) {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		umbScriptMockDb.file.delete(decodeURIComponent(path));
 		return res(ctx.status(200));
 	}),
@@ -46,6 +54,10 @@ export const detailHandlers = [
 	rest.put(umbracoPath(`${UMB_SLUG}/:path`), async (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
+		if (path.endsWith('forbidden')) {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const requestBody = (await req.json()) as UpdateScriptRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		umbScriptMockDb.file.update(decodeURIComponent(path), requestBody);

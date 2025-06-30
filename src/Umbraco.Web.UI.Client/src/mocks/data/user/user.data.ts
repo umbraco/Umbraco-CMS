@@ -118,6 +118,28 @@ export const data: Array<UmbMockUserModel> = [
 		userGroupIds: [{ id: 'user-group-editors-id' }, { id: 'user-group-sensitive-data-id' }],
 		userName: '',
 	},
+	{
+		avatarUrls: [],
+		createDate: '2023-10-12T18:30:32.879Z',
+		documentStartNodeIds: [],
+		email: 'forbidden@example.com',
+		failedLoginAttempts: 0,
+		hasDocumentRootAccess: true,
+		hasMediaRootAccess: true,
+		id: 'forbidden',
+		isAdmin: false,
+		kind: UserKindModel.DEFAULT,
+		languageIsoCode: 'en-us',
+		lastLockoutDate: null,
+		lastLoginDate: '2023-10-12T18:30:32.879Z',
+		lastPasswordChangeDate: null,
+		mediaStartNodeIds: [],
+		name: 'Forbidden',
+		state: UserStateModel.ACTIVE,
+		updateDate: '2023-10-12T18:30:32.879Z',
+		userGroupIds: [{ id: 'user-group-editors-id' }, { id: 'user-group-sensitive-data-id' }],
+		userName: '',
+	},
 ];
 
 /**

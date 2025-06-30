@@ -11,6 +11,14 @@ export type UmbMockPartialViewModel = PartialViewResponseModel &
 
 export const data: Array<UmbMockPartialViewModel> = [
 	{
+		name: 'Forbidden',
+		path: '/forbidden',
+		parent: null,
+		isFolder: false,
+		hasChildren: false,
+		content: '',
+	},
+	{
 		name: 'blockgrid',
 		path: '/blockgrid',
 		parent: null,
@@ -44,7 +52,7 @@ export const data: Array<UmbMockPartialViewModel> = [
 		hasChildren: false,
 		content: `@using Umbraco.Extensions
 		@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridArea>
-		
+
 		<div class="umb-block-grid__area"
 			 data-area-col-span="@Model.ColumnSpan"
 			 data-area-row-span="@Model.RowSpan"
@@ -77,7 +85,7 @@ export const data: Array<UmbMockPartialViewModel> = [
 		@{
 			if (Model?.Any() != true) { return; }
 		}
-		
+
 		<div class="umb-block-grid"
 			 data-grid-columns="@(Model.GridColumns?.ToString() ?? "12");"
 			 style="--umb-block-grid--grid-columns: @(Model.GridColumns?.ToString() ?? "12");">
@@ -99,7 +107,7 @@ export const data: Array<UmbMockPartialViewModel> = [
 		{
 		  string embedValue = Convert.ToString(Model.value);
 		  embedValue = embedValue.DetectIsJson() ? Model.value.preview : Model.value;
-		
+
 		  <div class="video-wrapper">
 			@Html.Raw(embedValue)
 		  </div>
@@ -130,18 +138,18 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 		content: `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 		@using Umbraco.Cms.Core.Routing
 		@using Umbraco.Extensions
-		
+
 		@inject IPublishedUrlProvider PublishedUrlProvider
 		@*
 			This snippet makes a breadcrumb of parents using an unordered HTML list.
-		
+
 			How it works:
 			- It uses the Ancestors() method to get all parents and then generates links so the visitor can go back
 			- Finally it outputs the name of the current page (without a link)
 		*@
-		
+
 		@{ var selection = Model.Ancestors().ToArray(); }
-		
+
 		@if (selection?.Length > 0)
 		{
 			<ul class="breadcrumb">
@@ -150,7 +158,7 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 				{
 					<li><a href="@item.Url(PublishedUrlProvider)">@item.Name</a> <span class="divider">/</span></li>
 				}
-		
+
 				@* Display the current page as the last item in the list *@
 				<li class="active">@Model.Name</li>
 			</ul>
@@ -170,7 +178,7 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 		@inject IMemberExternalLoginProviders memberExternalLoginProviders
 		@inject IExternalLoginWithKeyService externalLoginWithKeyService
 		@{
-		
+
 			// Build a profile model to edit
 			var profileModel = await memberModelBuilderFactory
 				.CreateProfileModel()
@@ -179,21 +187,21 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 				// Include editable custom properties on the form
 				.WithCustomProperties(true)
 				.BuildForCurrentMemberAsync();
-		
+
 			var success = TempData["FormSuccess"] != null;
-		
+
 			var loginProviders = await memberExternalLoginProviders.GetMemberProvidersAsync();
 			var externalSignInError = ViewData.GetExternalSignInProviderErrors();
-		
+
 			var currentExternalLogin = profileModel is null
 				? new Dictionary<string, string>()
 				: externalLoginWithKeyService.GetExternalLogins(profileModel.Key).ToDictionary(x=>x.LoginProvider, x=>x.ProviderKey);
 		}
-		
+
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
-		
+
 		@if (profileModel != null)
 		{
 			if (success)
@@ -201,7 +209,7 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 				@* This message will show if profileModel.RedirectUrl is not defined (default) *@
 				<p class="text-success">Profile updated</p>
 			}
-		
+
 			using (Html.BeginUmbracoForm<UmbProfileController>("HandleUpdateProfile", new { RedirectUrl = profileModel.RedirectUrl }))
 			{
 				<h2>Update your account.</h2>
@@ -217,7 +225,7 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 					<input asp-for="@profileModel.Email" class="form-control" autocomplete="username" aria-required="true" />
 					<span asp-validation-for="@profileModel.Email" class="form-text text-danger"></span>
 				</div>
-		
+
 				@if (!string.IsNullOrWhiteSpace(profileModel.UserName))
 				{
 					<div class="mb-3">
@@ -226,7 +234,7 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 						<span asp-validation-for="@profileModel.UserName" class="form-text text-danger"></span>
 					</div>
 				}
-		
+
 				@if (profileModel.MemberProperties != null)
 				{
 					for (var i = 0; i < profileModel.MemberProperties.Count; i++)
@@ -239,19 +247,19 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 						</div>
 					}
 				}
-		
+
 				<button type="submit" class="btn btn-primary">Update</button>
-		
+
 				if (loginProviders.Any())
 				{
 					<hr/>
 					<h4>Link external accounts</h4>
-		
+
 					if (externalSignInError?.AuthenticationType is null && externalSignInError?.Errors.Any() == true)
 					{
 						@Html.DisplayFor(x => externalSignInError.Errors);
 					}
-		
+
 					@foreach (var login in loginProviders)
 					{
 						if (currentExternalLogin.TryGetValue(login.ExternalLoginProvider.AuthenticationType, out var providerKey))
@@ -262,7 +270,7 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 								<button type="submit" name="provider" value="@login.ExternalLoginProvider.AuthenticationType">
 									Un-Link your @login.AuthenticationScheme.DisplayName account
 								</button>
-		
+
 								if (externalSignInError?.AuthenticationType == login.ExternalLoginProvider.AuthenticationType)
 								{
 									@Html.DisplayFor(x => externalSignInError.Errors);
@@ -276,14 +284,14 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 								<button type="submit" name="provider" value="@login.ExternalLoginProvider.AuthenticationType">
 									Link your @login.AuthenticationScheme.DisplayName account
 								</button>
-		
+
 								if (externalSignInError?.AuthenticationType == login.ExternalLoginProvider.AuthenticationType)
 								{
 									@Html.DisplayFor(x => externalSignInError.Errors);
 								}
 							}
 						}
-		
+
 					}
 				}
 			}

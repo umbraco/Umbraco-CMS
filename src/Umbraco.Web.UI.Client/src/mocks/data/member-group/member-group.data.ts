@@ -11,4 +11,8 @@ export const data: Array<UmbMockMemberGroupModel> = [
 		name: 'Member Group 2',
 		id: 'member-group-2-id',
 	},
+	{
+		name: 'Forbidden Member Group',
+		id: 'forbidden',
+	},
 ];

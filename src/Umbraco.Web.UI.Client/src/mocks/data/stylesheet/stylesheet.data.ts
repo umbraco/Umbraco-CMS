@@ -89,4 +89,12 @@ body {
 }
 `,
 	},
+	{
+		name: 'Forbidden',
+		path: '/forbidden',
+		parent: null,
+		isFolder: false,
+		hasChildren: false,
+		content: `console.log('You are not allowed to see this stylesheet!');`,
+	},
 ];
