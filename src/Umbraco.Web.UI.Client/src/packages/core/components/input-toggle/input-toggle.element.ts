@@ -71,14 +71,6 @@ export class UmbInputToggleElement extends UmbFormControlMixin(UmbLitElement, ''
 			><span>${label}</span>
 		</uui-toggle>`;
 	}
-
-	static override styles = [
-		css`
-			uui-toggle {
-				width: 100%;
-			}
-		`,
-	];
 }
 
 export default UmbInputToggleElement;
