@@ -21,6 +21,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 			this.observe(
 				context?.timeoutSignal,
 				() => {
+					console.log('[UmbAppAuthController] Authorization timed out, starting authorization flow');
 					this.makeAuthorizationRequest('timedOut');
 				},
 				'_authState',

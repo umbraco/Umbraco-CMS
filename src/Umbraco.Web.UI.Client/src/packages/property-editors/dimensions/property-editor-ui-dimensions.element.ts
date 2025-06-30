@@ -1,5 +1,4 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -25,6 +24,9 @@ export class UmbPropertyEditorUIDimensionsElement extends UmbLitElement {
 		return html`
 			<uui-input
 				type="number"
+				autocomplete="off"
+				min="0"
+				step="1"
 				label=${this.localize.term('general_width')}
 				placeholder=${this.localize.term('general_width')}
 				@change=${this.#onChangeWidth}
@@ -33,6 +35,9 @@ export class UmbPropertyEditorUIDimensionsElement extends UmbLitElement {
 			<span>&times;</span>
 			<uui-input
 				type="number"
+				autocomplete="off"
+				min="0"
+				step="1"
 				label=${this.localize.term('general_height')}
 				placeholder=${this.localize.term('general_height')}
 				@change=${this.#onChangeHeight}
@@ -42,7 +47,15 @@ export class UmbPropertyEditorUIDimensionsElement extends UmbLitElement {
 		`;
 	}
 
-	static override readonly styles = [UmbTextStyles];
+	static override readonly styles = [
+		css`
+			:host {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-1);
+			}
+		`,
+	];
 }
 
 export { UmbPropertyEditorUIDimensionsElement as element };

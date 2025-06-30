@@ -76,6 +76,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			this.#observeVariants(workspaceContext);
 			this.#observeActiveVariants(workspaceContext);
 			this.#observeCurrentVariant();
+			this.#observeReadOnlyGuardRules(workspaceContext);
 
 			this.observe(
 				workspaceContext?.variesBySegment,
@@ -149,6 +150,14 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				this._activeVariant = option as VariantOptionModelType;
 			},
 			'umbObserveActiveVariant',
+		);
+	}
+
+	#observeReadOnlyGuardRules(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
+		this.observe(
+			workspaceContext?.readOnlyGuard.rules,
+			() => this.#setReadOnlyCultures(workspaceContext),
+			'umbObserveReadOnlyGuardRules',
 		);
 	}
 
@@ -596,8 +605,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			}
 
 			.switch-button:hover {
-				background: var(--uui-palette-sand);
-				color: var(--uui-palette-space-cadet-light);
+				background: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
 			}
 			.switch-button .variant-info {
 				flex-grow: 1;

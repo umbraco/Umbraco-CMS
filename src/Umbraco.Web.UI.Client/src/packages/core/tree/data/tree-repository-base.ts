@@ -7,11 +7,11 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbProblemDetails } from '@umbraco-cms/backoffice/resources';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * Base class for a tree repository.
@@ -61,10 +61,11 @@ export abstract class UmbTreeRepositoryBase<
 		this._treeSource = new treeSourceConstructor(this);
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
-			if (instance) {
-				this._treeStore = instance;
-			}
-		}).asPromise({ preventTimeout: true });
+			this._treeStore = instance;
+		})
+			.asPromise({ preventTimeout: true })
+			// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+			.catch(() => undefined);
 	}
 
 	/**
@@ -72,7 +73,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	abstract requestTreeRoot(): Promise<{ data?: TreeRootType; error?: UmbProblemDetails }>;
+	abstract requestTreeRoot(): Promise<UmbRepositoryResponse<TreeRootType>>;
 
 	/**
 	 * Requests root items of a tree
@@ -84,16 +85,19 @@ export abstract class UmbTreeRepositoryBase<
 		await this._init;
 
 		const { data, error } = await this._treeSource.getRootItems(args);
+
 		if (!this._treeStore) {
 			// If the tree store is not available, then we most likely are in a destructed setting.
-			return {};
-		}
-		if (data) {
-			this._treeStore?.appendItems(data.items);
+			return {
+				asObservable: () => undefined,
+			};
 		}
 
-		// TODO: Notice we are casting the error here, is that right?
-		return { data, error: error as unknown as UmbProblemDetails, asObservable: () => this._treeStore!.rootItems };
+		if (data) {
+			this._treeStore.appendItems(data.items);
+		}
+
+		return { data, error, asObservable: () => this._treeStore?.rootItems };
 	}
 
 	/**
@@ -109,13 +113,20 @@ export abstract class UmbTreeRepositoryBase<
 		if (args.parent.entityType === null) throw new Error('Parent entity type is missing');
 		await this._init;
 
-		const { data, error: _error } = await this._treeSource.getChildrenOf(args);
-		const error: any = _error;
-		if (data) {
-			this._treeStore?.appendItems(data.items);
+		const { data, error } = await this._treeSource.getChildrenOf(args);
+
+		if (!this._treeStore) {
+			// If the tree store is not available, then we most likely are in a destructed setting.
+			return {
+				asObservable: () => undefined,
+			};
 		}
 
-		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parent.unique) };
+		if (data) {
+			this._treeStore.appendItems(data.items);
+		}
+
+		return { data, error, asObservable: () => this._treeStore?.childrenOf(args.parent.unique) };
 	}
 
 	/**
@@ -128,10 +139,11 @@ export abstract class UmbTreeRepositoryBase<
 		if (args.treeItem.unique === undefined) throw new Error('Descendant unique is missing');
 		await this._init;
 
-		const { data, error: _error } = await this._treeSource.getAncestorsOf(args);
-		const error: any = _error;
+		const { data, error } = await this._treeSource.getAncestorsOf(args);
+
 		// TODO: implement observable for ancestor items in the store
-		return { data, error };
+		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
+		return { data, error: error as any };
 	}
 
 	/**
@@ -141,7 +153,8 @@ export abstract class UmbTreeRepositoryBase<
 	 */
 	async rootTreeItems() {
 		await this._init;
-		return this._treeStore!.rootItems;
+
+		return this._treeStore?.rootItems ?? of([]);
 	}
 
 	/**
@@ -153,6 +166,7 @@ export abstract class UmbTreeRepositoryBase<
 	async treeItemsOf(parentUnique: string | null) {
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 		await this._init;
-		return this._treeStore!.childrenOf(parentUnique);
+
+		return this._treeStore?.childrenOf(parentUnique) ?? of([]);
 	}
 }

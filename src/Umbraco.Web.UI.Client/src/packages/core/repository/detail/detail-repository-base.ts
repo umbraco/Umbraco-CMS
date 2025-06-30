@@ -34,13 +34,12 @@ export abstract class UmbDetailRepositoryBase<
 		this.detailDataSource = new detailSource(host) as UmbDetailDataSourceType;
 
 		// TODO: ideally no preventTimeouts here.. [NL]
-		this.#init = Promise.all([
-			this.consumeContext(detailStoreContextAlias, (instance) => {
-				if (instance) {
-					this.#detailStore = instance;
-				}
-			}).asPromise({ preventTimeout: true }),
-		]);
+		this.#init = this.consumeContext(detailStoreContextAlias, (instance) => {
+			this.#detailStore = instance;
+		})
+			.asPromise({ preventTimeout: true })
+			// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+			.catch(() => undefined);
 	}
 
 	/**
@@ -61,7 +60,7 @@ export abstract class UmbDetailRepositoryBase<
 	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType>> {
+	async requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType | undefined>> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
@@ -74,7 +73,7 @@ export abstract class UmbDetailRepositoryBase<
 		return {
 			data,
 			error,
-			asObservable: () => this.#detailStore!.byUnique(unique),
+			asObservable: () => this.#detailStore?.byUnique(unique),
 		};
 	}
 

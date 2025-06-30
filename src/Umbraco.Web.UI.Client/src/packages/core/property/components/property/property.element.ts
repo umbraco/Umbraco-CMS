@@ -334,6 +334,7 @@ export class UmbPropertyElement extends UmbLitElement {
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 				// No need to observe mandatory or label, as we already do so and set it on the _element if present: [NL]
+				this._element.manifest = manifest;
 				this._element.mandatory = this._mandatory;
 				this._element.name = this._label;
 
