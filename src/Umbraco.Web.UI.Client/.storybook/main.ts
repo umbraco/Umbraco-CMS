@@ -50,7 +50,8 @@ const config: StorybookConfig = {
 	refs: {
 		uui: {
 			title: 'Umbraco UI Library',
-			url: 'https://62189360eeb21b003ab2f4ad-vfnpsanjps.chromatic.com/',
+			url: 'https://uui.umbraco.com/',
+			expanded: false,
 		},
 	},
 };
