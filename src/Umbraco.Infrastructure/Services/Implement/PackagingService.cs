@@ -314,8 +314,9 @@ public class PackagingService : IPackagingService
     /// <inheritdoc/>
     public Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
     {
-        IReadOnlyDictionary<string, string?>? keyValues =
-            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+        IReadOnlyDictionary<string, string?> keyValues =
+            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix)
+            ?? new Dictionary<string, string?>();
 
         InstalledPackage[] installedPackages = _packageMigrationPlans
             .GroupBy(plan => (plan.PackageName, plan.PackageId))
@@ -326,15 +327,21 @@ public class PackagingService : IPackagingService
                     PackageName = group.Key.PackageName,
                 };
 
-                var packageKey = Constants.Conventions.Migrations.KeyValuePrefix + (group.Key.PackageId ?? group.Key.PackageName);
-                var currentState = keyValues?
-                    .GetValueOrDefault(packageKey);
-
                 package.PackageMigrationPlans = group
-                    .Select(plan => new InstalledPackageMigrationPlans
+                    .Select(plan =>
                     {
-                        CurrentMigrationId = currentState,
-                        FinalMigrationId = plan.FinalState,
+                        // look for migration states in this order:
+                        // - plan name
+                        // - package identifier
+                        // - package name
+                        var currentState =
+                            keyValues.GetValueOrDefault($"{Constants.Conventions.Migrations.KeyValuePrefix}{plan.Name}")
+                            ?? keyValues.GetValueOrDefault($"{Constants.Conventions.Migrations.KeyValuePrefix}{plan.PackageId ?? plan.PackageName}");
+
+                        return new InstalledPackageMigrationPlans
+                        {
+                            CurrentMigrationId = currentState, FinalMigrationId = plan.FinalState,
+                        };
                     });
 
                 return package;
