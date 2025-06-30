@@ -31,8 +31,7 @@ test('can update pick multiple items', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'multiple', true)).toBeTruthy();
 });
 
@@ -48,8 +47,7 @@ test('can update amount', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesMediaPickerHaveMinAndMaxAmount(customDataTypeName, minValue, maxValue)).toBeTruthy();
 });
 
@@ -63,8 +61,7 @@ test('can update enable focal point', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'enableLocalFocalPoint', true)).toBeTruthy();
 });
 
@@ -85,8 +82,7 @@ test('can add image crop', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropData[0], cropData[1], cropData[2], cropData[3])).toBeTruthy();
 });
 
@@ -100,8 +96,7 @@ test('can update ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'ignoreUserStartNodes', true)).toBeTruthy();
 });
 
@@ -117,8 +112,7 @@ test('can add accepted types', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'filter', mediaTypeData.id)).toBeTruthy();
 });
 
@@ -134,10 +128,7 @@ test('can remove accepted types', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'filter', mediaTypeData.id)).toBeFalsy();
 });
 
@@ -156,8 +147,7 @@ test('can add start node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', mediaId)).toBeTruthy();
 
   // Clean
@@ -179,8 +169,7 @@ test('can remove start node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'startNodeId', mediaId)).toBeFalsy();
 
   // Clean

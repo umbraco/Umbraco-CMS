@@ -175,14 +175,14 @@ export class UmbContentTypeStructureManager<
 	 * @param {string} unique - The unique of the ContentType to load.
 	 * @returns {Promise} - Promise resolved
 	 */
-	public async loadType(unique: string): Promise<UmbRepositoryResponseWithAsObservable<T>> {
+	public async loadType(unique: string): Promise<UmbRepositoryResponseWithAsObservable<T | undefined>> {
 		if (this.#ownerContentTypeUnique === unique) {
 			// Its the same, but we do not know if its done loading jet, so we will wait for the load promise to finish. [NL]
 			await this.#init;
 			return { data: this.getOwnerContentType(), asObservable: () => this.ownerContentType };
 		}
 		await this.#initRepository;
-		this.#clear();
+		this.clear();
 		this.#ownerContentTypeUnique = unique;
 		if (!unique) {
 			this.#initRejection?.(`Content Type structure manager could not load: ${unique}`);
@@ -199,7 +199,7 @@ export class UmbContentTypeStructureManager<
 
 	public async createScaffold(preset?: Partial<T>): Promise<UmbRepositoryResponse<T>> {
 		await this.#initRepository;
-		this.#clear();
+		this.clear();
 
 		const repsonse = await this.#repository!.createScaffold(preset);
 		const { data } = repsonse;
@@ -827,7 +827,7 @@ export class UmbContentTypeStructureManager<
 			.filter(UmbFilterDuplicateStrings);
 	}
 
-	#clear() {
+	public clear() {
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
 		this.#repoManager?.clear();

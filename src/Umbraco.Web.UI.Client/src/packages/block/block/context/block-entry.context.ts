@@ -65,6 +65,16 @@ export abstract class UmbBlockEntryContext<
 	#hasExpose = new UmbBooleanState(undefined);
 	readonly hasExpose = this.#hasExpose.asObservable();
 
+	#actionsVisibility = new UmbBooleanState(true);
+	readonly actionsVisibility = this.#actionsVisibility.asObservable();
+
+	hideActions() {
+		this.#actionsVisibility.setValue(false);
+	}
+	showActions() {
+		this.#actionsVisibility.setValue(true);
+	}
+
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	// Workspace alike methods, to enables editing of data without the need of a workspace (Custom views and block grid inline editing mode for example).
@@ -548,18 +558,27 @@ export abstract class UmbBlockEntryContext<
 	abstract _gotContentType(contentType: UmbContentTypeModel | undefined): void;
 
 	async #observeVariantId() {
-		if (!this._manager) return;
+		if (!this._manager) {
+			this.removeUmbControllerByAlias('observeVariantId');
+			return;
+		}
 		await this.#contentStructurePromise;
 		if (!this.#contentStructure) {
 			throw new Error('No contentStructure found');
+		}
+
+		if (!this._manager) {
+			// The manager maybe got removed while we awaited the promise above.
+			this.removeUmbControllerByAlias('observeVariantId');
+			return;
 		}
 
 		// observe variantId:
 		this.observe(
 			observeMultiple([
 				this._manager.variantId,
-				this.#contentStructure?.ownerContentTypeObservablePart((x) => x?.variesByCulture),
-				this.#contentStructure?.ownerContentTypeObservablePart((x) => x?.variesBySegment),
+				this.#contentStructure.ownerContentTypeObservablePart((x) => x?.variesByCulture),
+				this.#contentStructure.ownerContentTypeObservablePart((x) => x?.variesBySegment),
 			]),
 			([variantId, variesByCulture, variesBySegment]) => {
 				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;

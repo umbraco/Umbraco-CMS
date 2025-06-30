@@ -67,7 +67,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		const { data, error } = await tryExecute(
 			this.#host,
-			ScriptService.getScriptByPath({ path: { path: encodeURIComponent(path) } }),
+			ScriptService.getScriptByPath({ path: { path } }),
 		);
 
 		if (error || !data) {
@@ -97,7 +97,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const { error } = await tryExecute(
 			this.#host,
 			ScriptService.putScriptByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 				body,
 			}),
 		);
@@ -118,7 +118,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		return tryExecute(
 			this.#host,
 			ScriptService.deleteScriptByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 			}),
 		);
 	}

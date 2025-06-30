@@ -52,7 +52,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 		const { data, error } = await tryExecute(
 			this.#host,
 			StylesheetService.getStylesheetFolderByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 			}),
 		);
 
@@ -119,7 +119,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 		return tryExecute(
 			this.#host,
 			StylesheetService.deleteStylesheetFolderByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 			}),
 		);
 	}
