@@ -217,7 +217,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				display: block;
 				flex: 1;
 				flex-direction: column;
-				overflow-y: auto;
+				overflow: hidden auto;
 				padding: var(--uui-size-layout-1);
 			}
 
