@@ -45,21 +45,21 @@ export class UmbExampleValidationContextDashboardElement extends UmbLitElement {
 				},
 				'observeValidationMessages',
 			);
+		});
 
-			// Observe all errors
-			this.validation.messages.messagesOfPathAndDescendant('$.form').subscribe((value) => {
-				this.totalErrorCount = [...new Set(value.map((x) => x.path))].length;
-			});
+		// Observe all errors
+		this.observe(this.validation.messages.messagesOfPathAndDescendant('$.form'), (value) => {
+			this.totalErrorCount = [...new Set(value.map((x) => x.path))].length;
+		});
 
-			// Observe errors for tab1, note that we only use part of the full JSONPath
-			this.validation.messages.messagesOfPathAndDescendant('$.form.tab1').subscribe((value) => {
-				this.tab1ErrorCount = [...new Set(value.map((x) => x.path))].length;
-			});
+		// Observe errors for tab1, note that we only use part of the full JSONPath
+		this.observe(this.validation.messages.messagesOfPathAndDescendant('$.form.tab1'), (value) => {
+			this.tab1ErrorCount = [...new Set(value.map((x) => x.path))].length;
+		});
 
-			// Observe errors for tab2, note that we only use part of the full JSONPath
-			this.validation.messages.messagesOfPathAndDescendant('$.form.tab2').subscribe((value) => {
-				this.tab2ErrorCount = [...new Set(value.map((x) => x.path))].length;
-			});
+		// Observe errors for tab2, note that we only use part of the full JSONPath
+		this.observe(this.validation.messages.messagesOfPathAndDescendant('$.form.tab2'), (value) => {
+			this.tab2ErrorCount = [...new Set(value.map((x) => x.path))].length;
 		});
 	}
 

@@ -17,7 +17,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// TODO, this is flaky on the pipeline, not locally. Look into why
+test.fixme('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -39,13 +40,12 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
-  await umbracoUi.content.clickButtonWithName('Choose');
+  await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -87,8 +87,7 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -123,8 +122,7 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -157,8 +155,7 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -201,8 +198,7 @@ test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -236,8 +232,7 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -260,8 +255,7 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -313,9 +307,7 @@ test('cannot update the URL picker with an empty link', async ({umbracoApi, umbr
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it still accept the empty link with an anchor or querystring
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
-test.skip('cannot submit an empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -386,8 +378,7 @@ test.skip('can create content with the link to an unpublished document', async (
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);

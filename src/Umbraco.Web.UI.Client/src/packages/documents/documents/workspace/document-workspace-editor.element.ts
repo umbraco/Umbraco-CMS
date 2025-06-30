@@ -20,6 +20,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	#workspaceRoute?: string;
 	#appCulture?: string;
 	#variants?: Array<UmbDocumentVariantOptionModel>;
+	#isForbidden = false;
 
 	@state()
 	_routes?: Array<UmbRoute>;
@@ -45,6 +46,15 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				},
 				'_observeVariants',
 			);
+
+			this.observe(
+				this.#workspaceContext?.forbidden.isOn,
+				(isForbidden) => {
+					this.#isForbidden = isForbidden ?? false;
+					this.#generateRoutes();
+				},
+				'_observeForbidden',
+			);
 		});
 	}
 
@@ -56,7 +66,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#generateRoutes() {
-		if (!this.#variants || !this.#appCulture) return;
+		if (!this.#variants || !this.#appCulture) {
+			this._routes = [];
+			return;
+		}
 
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
@@ -97,11 +110,16 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
-				resolve: () => {
+				pathMatch: 'full',
+				resolve: async () => {
+					if (!this.#workspaceContext) {
+						throw new Error('Workspace context is not available when resolving the default route.');
+					}
+
 					const route = routes.find((route) => route.path === this.#appCulture);
 
 					if (!route) {
-						const firstVariantPath = routes.find((route) => route.path === this.#variants?.[0].unique)?.path;
+						const firstVariantPath = routes.find((route) => route.path === this.#variants?.[0]?.unique)?.path;
 
 						if (firstVariantPath) {
 							history.replaceState({}, '', `${this.#workspaceRoute}/${firstVariantPath}`);
@@ -121,8 +139,11 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		}
 
 		routes.push({
-			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			path: '**',
+			component: async () => {
+				const router = await import('@umbraco-cms/backoffice/router');
+				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+			},
 		});
 
 		this._routes = routes;

@@ -41,7 +41,7 @@ test('can publish a rich text editor with a rich text editor', async ({umbracoAp
   const richTextElementTypeName = 'RichTextElementName';
   const richTextElementGroupName = 'RichTextElementGroupName';
   await umbracoApi.dataType.ensureNameNotExists(secondRichTextDataTypeName);
-  await umbracoApi.documentType.ensureNameNotExists(richTextElementGroupName);
+  await umbracoApi.documentType.ensureNameNotExists(richTextElementTypeName);
 
   const secondRichTextEditorDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(secondRichTextDataTypeName);
   const richTextElementTypeId = await umbracoApi.documentType.createDefaultElementType(richTextElementTypeName, richTextElementGroupName, secondRichTextDataTypeName, secondRichTextEditorDataTypeId);
@@ -61,8 +61,7 @@ test('can publish a rich text editor with a rich text editor', async ({umbracoAp
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Asserts that the value in the RTE is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
   const documentValues = documentData.values.find(value => value.alias === AliasHelper.toAlias(richTextDataTypeName));
@@ -73,7 +72,8 @@ test('can publish a rich text editor with a rich text editor', async ({umbracoAp
   expect(secondRTEInBlock.value.markup).toContain(secondExpectedRichTextEditorOutputValue);
 
   // Clean
-  await umbracoApi.documentType.ensureNameNotExists(richTextElementGroupName);
+  await umbracoApi.dataType.ensureNameNotExists(secondRichTextDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(richTextElementTypeName);
 });
 
 test('can publish a rich text editor with a block grid editor', async ({umbracoApi, umbracoUi}) => {
@@ -108,8 +108,7 @@ test('can publish a rich text editor with a block grid editor', async ({umbracoA
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Asserts that the value in the BlockGrid is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
   expect(documentData.values[0].value.blocks.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);
@@ -152,8 +151,7 @@ test('can publish a rich text editor with a block list editor', async ({umbracoA
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Asserts that the value in the BlockGrid is as expected
   const documentData = await umbracoApi.document.getByName(contentName);
   expect(documentData.values[0].value.blocks.contentData[0].values[0].value.contentData[0].values[0].value).toContain(textStringValue);

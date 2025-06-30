@@ -31,8 +31,7 @@ test('can add a label to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
 });
 
@@ -53,8 +52,7 @@ test('can update a label for a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, newLabelText)).toBeTruthy();
 });
 
@@ -74,6 +72,7 @@ test('can remove a label from a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainLabel(blockListEditorName, elementTypeId, "")).toBeTruthy();
 });
 
@@ -92,8 +91,7 @@ test('can update overlay size for a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].editorSize).toEqual(overlaySize);
 });
@@ -129,8 +127,7 @@ test.skip('can remove a content model from a block', async ({umbracoApi, umbraco
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
 });
 
 test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -149,8 +146,7 @@ test('can add a settings model to a block', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeTruthy();
 
   // Clean
@@ -175,8 +171,7 @@ test('can remove a settings model from a block', async ({umbracoApi, umbracoUi})
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeFalsy();
 
   // Clean
@@ -198,8 +193,7 @@ test('can add a background color to a block', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
 });
@@ -222,8 +216,7 @@ test('can update a background color for a block', {tag: '@smoke'}, async ({umbra
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].backgroundColor).toEqual(newBackgroundColor);
 });
@@ -245,8 +238,7 @@ test('can delete a background color from a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].backgroundColor).toEqual('');
 });
@@ -266,8 +258,7 @@ test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umb
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
 });
@@ -290,8 +281,7 @@ test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].iconColor).toEqual(newIconColor);
 });
@@ -313,8 +303,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].iconColor).toEqual('');
 });
@@ -346,8 +335,7 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedSecondStylesheetPath);
 
@@ -378,8 +366,7 @@ test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umb
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].stylesheet[0]).toBeUndefined();
 
@@ -401,8 +388,7 @@ test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(true);
 });
@@ -423,8 +409,7 @@ test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(false);
 });

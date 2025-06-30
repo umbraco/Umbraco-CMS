@@ -219,8 +219,7 @@ export class UmbContextConsumer<
 			this.#raf = undefined;
 		}
 
-		this.#instance = undefined;
-		this.#callback?.(undefined);
+		this.#unprovide();
 		if (this.#promiseRejecter) {
 			const hostElement = this._retrieveHost();
 			this.#promiseRejecter(
