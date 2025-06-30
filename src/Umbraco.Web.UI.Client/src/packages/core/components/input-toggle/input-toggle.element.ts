@@ -1,4 +1,4 @@
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
