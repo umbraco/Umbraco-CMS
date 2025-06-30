@@ -207,7 +207,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     }
 
     /// <summary>
-    /// Provides mefia path.
+    /// Provides media path.
     /// </summary>
     /// <returns>File system relative path</returns>
     protected virtual string GetMediaPath(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
