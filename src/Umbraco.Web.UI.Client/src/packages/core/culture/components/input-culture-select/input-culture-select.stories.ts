@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './input-culture-select.element.js';
 import type { UmbInputCultureSelectElement } from './input-culture-select.element.js';
 
