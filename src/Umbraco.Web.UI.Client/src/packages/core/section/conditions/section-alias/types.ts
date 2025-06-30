@@ -1,6 +1,7 @@
+import type { UMB_SECTION_ALIAS_CONDITION_ALIAS } from './constants.js';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
 
-export type SectionAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.SectionAlias'> & {
+export type SectionAliasConditionConfig = UmbConditionConfigBase<typeof UMB_SECTION_ALIAS_CONDITION_ALIAS> & {
 	/**
 	 * Define the section that this extension should be available in
 	 * @example "Umb.Section.Content"
