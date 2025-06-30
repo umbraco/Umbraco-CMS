@@ -344,6 +344,24 @@ export default {
 		blueprintDescription:
 			'Eine Inhaltsvorlage ist vordefinierter Inhalt,\n      den ein Redakteur als Basis für neuen Inhalt verwenden kann\n    ',
 	},
+	entityDetail: {
+		notFoundTitle: (entityType: string) => {
+			const entityName = entityType ?? 'Element';
+			return `${entityName} nicht gefunden`;
+		},
+		notFoundDescription: (entityType: string) => {
+			const entityName = entityType ?? 'element';
+			return `Der angeforderte ${entityName} konnte nicht gefunden werden. Bitte überprüfen Sie die URL und versuchen Sie es erneut.`;
+		},
+		forbiddenTitle: (entityType: string) => {
+			const entityName = entityType ?? 'Element';
+			return `${entityName} nicht verfügbar`;
+		},
+		forbiddenDescription: (entityType: string) => {
+			const entityName = entityType ?? 'dieses Element';
+			return `Sie haben keine Berechtigung, auf ${entityName} zuzugreifen. Bitte wenden Sie sich an Ihren Administrator, um Unterstützung zu erhalten.`;
+		},
+	},
 	media: {
 		clickToUpload: 'Für Upload klicken',
 		orClickHereToUpload: 'oder klicken Sie hier um eine Datei zu wählen',
@@ -2006,5 +2024,13 @@ export default {
 	treeSearch: {
 		searchResult: 'Element zurückgegeben',
 		searchResults: 'Elemente zurückgegeben',
+	},
+	routing: {
+		routeNotFoundTitle: 'Seite wurde nicht gefunden',
+		routeNotFoundDescription:
+			'Die angeforderte Seite konnte nicht gefunden werden. Bitte überprüfen Sie die URL und versuchen Sie es erneut.',
+		routeForbiddenTitle: 'Zugriff verweigert',
+		routeForbiddenDescription:
+			'Sie haben keine Berechtigung, auf diese Seite zuzugreifen. Bitte wenden Sie sich an Ihren Administrator, um Unterstützung zu erhalten.',
 	},
 } as UmbLocalizationDictionary;
