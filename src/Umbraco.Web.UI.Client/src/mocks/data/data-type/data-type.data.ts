@@ -32,6 +32,18 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 	},
 	{
+		id: 'forbidden',
+		parent: null,
+		name: 'Forbidden Data Type',
+		editorAlias: 'Umbraco.TextBox',
+		editorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+		values: [],
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
+	},
+	{
 		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 		parent: null,
 		name: 'Textstring',
