@@ -93,6 +93,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_unsupported?: boolean;
 
 	@state()
+	_showActions?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -211,6 +214,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				this.#updateBlockViewProps({ unsupported: unsupported });
 				this._unsupported = unsupported;
 				this.toggleAttribute('unsupported', unsupported);
+			},
+			null,
+		);
+		this.observe(
+			this.#context.actionsVisibility,
+			(showActions) => {
+				this._showActions = showActions;
 			},
 			null,
 		);
@@ -546,12 +556,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderActionBar() {
-		return html`
-			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
-				${this.#renderDeleteAction()}</uui-action-bar
-			>
-		`;
+		return this._showActions
+			? html`
+					<uui-action-bar>
+						${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+						${this.#renderDeleteAction()}</uui-action-bar
+					>
+				`
+			: nothing;
 	}
 
 	#renderEditAction() {

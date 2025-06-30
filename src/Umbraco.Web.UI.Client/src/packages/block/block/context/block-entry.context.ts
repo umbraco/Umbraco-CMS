@@ -65,6 +65,16 @@ export abstract class UmbBlockEntryContext<
 	#hasExpose = new UmbBooleanState(undefined);
 	readonly hasExpose = this.#hasExpose.asObservable();
 
+	#actionsVisibility = new UmbBooleanState(true);
+	readonly actionsVisibility = this.#actionsVisibility.asObservable();
+
+	hideActions() {
+		this.#actionsVisibility.setValue(false);
+	}
+	showActions() {
+		this.#actionsVisibility.setValue(true);
+	}
+
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	// Workspace alike methods, to enables editing of data without the need of a workspace (Custom views and block grid inline editing mode for example).

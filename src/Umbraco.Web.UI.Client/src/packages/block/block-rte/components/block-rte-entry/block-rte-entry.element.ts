@@ -60,6 +60,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	_exposed?: boolean;
 
 	@state()
+	_showActions?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -155,6 +158,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			(exposed) => {
 				this.#updateBlockViewProps({ unpublished: !exposed });
 				this._exposed = exposed;
+			},
+			null,
+		);
+
+		this.observe(
+			this.#context.actionsVisibility,
+			(showActions) => {
+				this._showActions = showActions;
 			},
 			null,
 		);
@@ -269,12 +280,18 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 							single>
 							${this.#renderRefBlock()}
 						</umb-extension-slot>
-						<uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()} </uui-action-bar>
+						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 							: nothing}
 					</div>
 				`
+			: nothing;
+	}
+
+	#renderActionBar() {
+		return this._showActions
+			? html` <uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()}</uui-action-bar> `
 			: nothing;
 	}
 

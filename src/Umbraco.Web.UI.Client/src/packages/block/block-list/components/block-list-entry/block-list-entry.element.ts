@@ -85,6 +85,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	_unsupported?: boolean;
 
 	@state()
+	_showActions?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -175,6 +178,13 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				this.#updateBlockViewProps({ unsupported: unsupported });
 				this._unsupported = unsupported;
 				this.toggleAttribute('unsupported', unsupported);
+			},
+			null,
+		);
+		this.observe(
+			this.#context.actionsVisibility,
+			(showActions) => {
+				this._showActions = showActions;
 			},
 			null,
 		);
@@ -412,15 +422,21 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							single
 							>${this.#renderBuiltinBlockView()}</umb-extension-slot
 						>
-						<uui-action-bar>
-							${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()}
-							${this.#renderCopyToClipboardAction()} ${this.#renderDeleteAction()}
-						</uui-action-bar>
+						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 							: nothing}
 					</div>
 				`
+			: nothing;
+	}
+
+	#renderActionBar() {
+		return this._showActions
+			? html`<uui-action-bar>
+					${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+					${this.#renderDeleteAction()}
+				</uui-action-bar>`
 			: nothing;
 	}
 
