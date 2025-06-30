@@ -24,8 +24,7 @@ test('can add allow vary by culture for a document type', {tag: '@smoke'}, async
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentType.isSuccessNotificationVisible();
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.variesByCulture).toBeTruthy();
 });
@@ -43,8 +42,7 @@ test.skip('can add allow segmentation for a document type', async ({umbracoApi, 
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentType.isSuccessNotificationVisible();
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.variesBySegment).toBeTruthy();
 });
@@ -61,8 +59,7 @@ test('can set is an element type for a document type', {tag: '@smoke'}, async ({
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentType.isSuccessNotificationVisible();
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.isElement).toBeTruthy();
 });
@@ -80,8 +77,7 @@ test('can disable history cleanup for a document type', async ({umbracoApi, umbr
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.documentType.isSuccessNotificationVisible();
-  await umbracoUi.documentType.isErrorNotificationVisible(false);
+  await umbracoUi.documentType.isSuccessStateVisibleForSaveButton();
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.cleanup.preventCleanup).toBeTruthy();
 });

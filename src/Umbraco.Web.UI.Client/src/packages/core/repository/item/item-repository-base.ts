@@ -41,22 +41,18 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 		try {
 			await this._init;
 		} catch {
-			return {};
+			return {
+				asObservable: () => undefined,
+			};
 		}
 
 		const { data, error } = await this.#itemSource.getItems(uniques);
 
-		if (!this._itemStore) {
-			// If store is gone, then we are most likely in a disassembled state.
-			return {};
-		}
-
 		if (data) {
-			this._itemStore.appendItems(data);
+			this._itemStore?.appendItems(data);
 		}
 
-		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
-		return { data, error: error as any, asObservable: () => this._itemStore!.items(uniques) };
+		return { data, error, asObservable: () => this._itemStore?.items(uniques) };
 	}
 
 	/**
