@@ -49,15 +49,9 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 
 		// Check if we can extract problem details from the error
 		if (apiError.problemDetails) {
-			if (apiError.problemDetails.status === 401) {
-				// Unauthorized error, show no notification
-				// the user will see a login screen instead
-				return;
-			}
-
-			if (apiError.problemDetails.status === 404) {
-				// Not found error, show no notification
-				// the user will see a 404 page instead, or otherwise the UI will handle it
+			if ([400, 401, 403, 404].includes(apiError.problemDetails.status)) {
+				// Non-fatal errors that the UI can handle gracefully
+				// so we avoid showing a notification
 				return;
 			}
 
