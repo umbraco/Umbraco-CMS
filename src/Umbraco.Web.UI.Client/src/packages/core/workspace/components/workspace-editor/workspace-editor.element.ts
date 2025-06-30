@@ -75,12 +75,14 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 			// Duplicate first workspace and use it for the empty path scenario. [NL]
 			newRoutes.push({ ...newRoutes[0], unique: newRoutes[0].path, path: '' });
-
-			newRoutes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-			});
 		}
+
+		// Add a catch-all route for not found
+		// This will be the last route, so it will only match if no other routes match or if no workspace views are defined.
+		newRoutes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
 		this._routes = newRoutes;
 	}

@@ -67,7 +67,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 
 		const apiBaseUrl = serverContext?.getServerUrl();
 
-		packages.forEach((p) => {
+		packages?.forEach((p) => {
 			p.extensions?.forEach((e) => {
 				// Crudely validate that the extension at least follows a basic manifest structure
 				// Idea: Use `Zod` to validate the manifest
