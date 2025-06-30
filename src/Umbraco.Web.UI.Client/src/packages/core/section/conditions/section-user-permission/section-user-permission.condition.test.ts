@@ -3,8 +3,8 @@ import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCurrentUserContext, UmbCurrentUserStore } from '@umbraco-cms/backoffice/current-user';
-import { UmbSectionUserPermissionCondition } from './section-user-permission.condition';
-import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from './constants.js';
+import { UmbSectionUserPermissionCondition } from './section-user-permission.condition.js';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '../constants.js';
 
 @customElement('test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {

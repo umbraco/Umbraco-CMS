@@ -114,7 +114,7 @@ To declare the Published Cache Status Dashboard as a new manifest, we need to ad
 	},
 	conditions: [
 		{
-			alias: 'Umb.Condition.SectionAlias',
+			alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 			match: 'Umb.Section.Settings',
 		},
 	],
