@@ -33,6 +33,9 @@ internal class DomainDto
     [ResultColumn("languageISOCode")]
     public string IsoCode { get; set; } = null!;
 
+    /// <summary>
+    ///     Gets or sets the sort order of the domain.
+    /// </summary>
     [Column("sortOrder")]
     public int SortOrder { get; set; }
 }
