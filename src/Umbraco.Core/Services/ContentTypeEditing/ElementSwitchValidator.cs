@@ -20,27 +20,27 @@ public class ElementSwitchValidator : IElementSwitchValidator
         _dataTypeService = dataTypeService;
     }
 
-    public async Task<bool> AncestorsAreAlignedAsync(IContentType contentType)
+    public Task<bool> AncestorsAreAlignedAsync(IContentType contentType)
     {
         // this call does not return the system roots
         var ancestorIds = contentType.AncestorIds();
         if (ancestorIds.Length == 0)
         {
             // if there are no ancestors, validation passes
-            return true;
+            return Task.FromResult(true);
         }
 
         // if there are any ancestors where IsElement is different from the contentType, the validation fails
-        return await Task.FromResult(_contentTypeService.GetMany(ancestorIds)
+        return Task.FromResult(_contentTypeService.GetMany(ancestorIds)
             .Any(ancestor => ancestor.IsElement != contentType.IsElement) is false);
     }
 
-    public async Task<bool> DescendantsAreAlignedAsync(IContentType contentType)
+    public Task<bool> DescendantsAreAlignedAsync(IContentType contentType)
     {
         IEnumerable<IContentType> descendants = _contentTypeService.GetDescendants(contentType.Id, false);
 
         // if there are any descendants where IsElement is different from the contentType, the validation fails
-        return await Task.FromResult(descendants.Any(descendant => descendant.IsElement != contentType.IsElement) is false);
+        return Task.FromResult(descendants.Any(descendant => descendant.IsElement != contentType.IsElement) is false);
     }
 
     public async Task<bool> ElementToDocumentNotUsedInBlockStructuresAsync(IContentTypeBase contentType)
@@ -59,8 +59,8 @@ public class ElementSwitchValidator : IElementSwitchValidator
                 .ConfiguredElementTypeKeys().Contains(contentType.Key)) is false;
     }
 
-    public async Task<bool> DocumentToElementHasNoContentAsync(IContentTypeBase contentType) =>
+    public Task<bool> DocumentToElementHasNoContentAsync(IContentTypeBase contentType) =>
 
         // if any content for the content type exists, the validation fails.
-        await Task.FromResult(_contentTypeService.HasContentNodes(contentType.Id) is false);
+        Task.FromResult(_contentTypeService.HasContentNodes(contentType.Id) is false);
 }
