@@ -5,11 +5,10 @@ import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-tok
 import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../../../entity.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 import '@umbraco-cms/backoffice/imaging';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
@@ -64,6 +63,12 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		}
 	}
 
+	#onToggleSelect(item: UmbMediaCollectionItemModel) {
+		if (item.unique) {
+			this.#collectionContext?.selection.toggleSelect(item.unique);
+		}
+	}
+
 	#isSelected(item: UmbMediaCollectionItemModel) {
 		return this.#collectionContext?.selection.isSelected(item.unique);
 	}
@@ -94,46 +99,46 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			return this.#renderPlaceholder(item);
 		}
 		return html`
-			<uui-card-media
-				name=${ifDefined(item.name)}
-				data-mark="${item.entityType}:${item.unique}"
-				selectable
-				?select-only=${this._selection.length > 0}
-				?selected=${this.#isSelected(item)}
-				href=${this.#getEditUrl(item)}
-				@selected=${() => this.#onSelect(item)}
-				@deselected=${() => this.#onDeselect(item)}>
-				<umb-imaging-thumbnail
-					unique=${item.unique}
-					alt=${ifDefined(item.name)}
-					icon=${ifDefined(item.icon)}></umb-imaging-thumbnail>
-			</uui-card-media>
+			<div class="media-card">
+				<uui-checkbox ?checked=${this.#isSelected(item)} @change=${() => this.#onToggleSelect(item)}></uui-checkbox>
+				<uui-card-media
+					name=${ifDefined(item.name)}
+					data-mark="${item.entityType}:${item.unique}"
+					selectable
+					?select-only=${this._selection.length > 0}
+					?selected=${this.#isSelected(item)}
+					href=${this.#getEditUrl(item)}
+					@selected=${() => this.#onSelect(item)}
+					@deselected=${() => this.#onDeselect(item)}>
+					<umb-imaging-thumbnail
+						unique=${item.unique}
+						alt=${ifDefined(item.name)}
+						icon=${ifDefined(item.icon)}></umb-imaging-thumbnail>
+				</uui-card-media>
+			</div>
 		`;
 	}
 
 	#renderPlaceholder(item: UmbMediaCollectionItemModel) {
 		const complete = item.status === UmbFileDropzoneItemStatus.COMPLETE;
 		const error = item.status !== UmbFileDropzoneItemStatus.WAITING && !complete;
-		return html`<uui-card-media disabled class="media-placeholder-item" name=${ifDefined(item.name)}>
-			<umb-temporary-file-badge
-				.progress=${item.progress ?? 0}
-				?complete=${complete}
-				?error=${error}></umb-temporary-file-badge>
-		</uui-card-media>`;
+		return html`
+			<div class="media-card">
+				<uui-card-media disabled class="media-placeholder-item" name=${ifDefined(item.name)}>
+					<umb-temporary-file-badge
+						.progress=${item.progress ?? 0}
+						?complete=${complete}
+						?error=${error}></umb-temporary-file-badge>
+				</uui-card-media>
+			</div>
+		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: flex;
 				flex-direction: column;
-			}
-
-			.container {
-				display: flex;
-				justify-content: center;
-				align-items: center;
 			}
 
 			#media-grid {
@@ -141,6 +146,25 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 				grid-auto-rows: 200px;
 				gap: var(--uui-size-space-5);
+
+				.media-card {
+					display: flex;
+					position: relative;
+
+					> uui-checkbox {
+						position: absolute;
+						top: var(--uui-size-space-4);
+						left: var(--uui-size-space-4);
+						opacity: 0;
+						transition: opacity 120ms;
+						z-index: 2;
+					}
+
+					&:has(:focus, :focus-within, :hover) > uui-checkbox,
+					> uui-checkbox[checked] {
+						opacity: 1;
+					}
+				}
 			}
 		`,
 	];

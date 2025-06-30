@@ -73,6 +73,12 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		this.#collectionContext?.selection.deselect(item.unique);
 	}
 
+	#onToggleSelect(item: UmbDocumentCollectionItemModel) {
+		if (item.unique) {
+			this.#collectionContext?.selection.toggleSelect(item.unique);
+		}
+	}
+
 	#isSelected(item: UmbDocumentCollectionItemModel) {
 		return this.#collectionContext?.selection.isSelected(item.unique);
 	}
@@ -100,17 +106,20 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 
 	#renderItem(item: UmbDocumentCollectionItemModel) {
 		return html`
-			<uui-card-content-node
-				.name=${item.name ?? 'Unnamed Document'}
-				selectable
-				?select-only=${this._selection.length > 0}
-				?selected=${this.#isSelected(item)}
-				href=${this.#getEditUrl(item)}
-				@selected=${() => this.#onSelect(item)}
-				@deselected=${() => this.#onDeselect(item)}>
-				<umb-icon slot="icon" name=${item.icon}></umb-icon>
-				${this.#renderState(item)} ${this.#renderProperties(item)}
-			</uui-card-content-node>
+			<div class="document-card">
+				<uui-checkbox ?checked=${this.#isSelected(item)} @change=${() => this.#onToggleSelect(item)}></uui-checkbox>
+				<uui-card-content-node
+					.name=${item.name ?? 'Unnamed Document'}
+					selectable
+					?select-only=${this._selection.length > 0}
+					?selected=${this.#isSelected(item)}
+					href=${this.#getEditUrl(item)}
+					@selected=${() => this.#onSelect(item)}
+					@deselected=${() => this.#onDeselect(item)}>
+					<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>
+					${this.#renderState(item)} ${this.#renderProperties(item)}
+				</uui-card-content-node>
+			</div>
 		`;
 	}
 
@@ -179,11 +188,30 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 				gap: var(--uui-size-space-4);
+
+				.document-card {
+					display: flex;
+					position: relative;
+
+					> uui-checkbox {
+						position: absolute;
+						top: calc(var(--uui-size-space-4) + var(--uui-size-1));
+						left: var(--uui-size-space-5);
+						opacity: 0;
+						transition: opacity 120ms;
+						z-index: 2;
+					}
+
+					&:has(:focus, :focus-within, :hover) > uui-checkbox,
+					> uui-checkbox[checked] {
+						opacity: 1;
+					}
+				}
 			}
 
 			uui-card-content-node {
 				width: 100%;
-				height: 180px;
+				min-height: 180px;
 			}
 
 			ul {
