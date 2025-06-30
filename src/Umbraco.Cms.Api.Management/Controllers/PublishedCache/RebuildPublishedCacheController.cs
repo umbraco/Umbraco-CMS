@@ -15,7 +15,7 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Rebuild(CancellationToken cancellationToken)
+    public Task<IActionResult> Rebuild(CancellationToken cancellationToken)
     {
         if (_databaseCacheRebuilder.IsRebuilding())
         {
@@ -27,10 +27,10 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
                 Type = "Error",
             };
 
-            return await Task.FromResult(Conflict(problemDetails));
+            return Task.FromResult<IActionResult>(Conflict(problemDetails));
         }
 
         _databaseCacheRebuilder.Rebuild(true);
-        return await Task.FromResult(Ok());
+        return Task.FromResult<IActionResult>(Ok());
     }
 }
