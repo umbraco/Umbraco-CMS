@@ -1,15 +1,15 @@
-import type { UmbMenuExpansionModel } from './types.js';
+import type { UmbEntityExpansionModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
- * Manages the expansion state of a tree
+ * Manages an expansion state
  * @exports
- * @class UmbTreeExpansionManager
+ * @class UmbEntityExpansionManager
  * @augments {UmbControllerBase}
  */
-export class UmbMenuExpansionManager extends UmbControllerBase {
+export class UmbEntityExpansionManager extends UmbControllerBase {
 	#expansion = new UmbArrayState<UmbEntityModel>([], (x) => x.entityType + x.unique);
 	expansion = this.#expansion.asObservable();
 
@@ -19,7 +19,7 @@ export class UmbMenuExpansionManager extends UmbControllerBase {
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
 	 * @returns {Observable<boolean>} True if the entity is expanded
-	 * @memberof UmbTreeExpansionManager
+	 * @memberof UmbEntityExpansionManager
 	 */
 	isExpanded(entity: UmbEntityModel): Observable<boolean> {
 		return this.#expansion.asObservablePart((entries) =>
@@ -29,33 +29,29 @@ export class UmbMenuExpansionManager extends UmbControllerBase {
 
 	/**
 	 * Sets the expansion state
-	 * @param {UmbMenuExpansionModel | undefined} expansion The expansion state
-	 * @memberof UmbTreeExpansionManager
+	 * @param {UmbEntityExpansionModel | undefined} expansion The expansion state
+	 * @memberof UmbEntityExpansionManager
 	 * @returns {void}
 	 */
-	setExpansion(expansion: UmbMenuExpansionModel): void {
+	setExpansion(expansion: UmbEntityExpansionModel): void {
 		this.#expansion.setValue(expansion);
 	}
 
 	/**
 	 * Gets the expansion state
-	 * @memberof UmbTreeExpansionManager
-	 * @returns {UmbMenuExpansionModel} The expansion state
+	 * @memberof UmbEntityExpansionManager
+	 * @returns {UmbEntityExpansionModel} The expansion state
 	 */
-	getExpansion(): UmbMenuExpansionModel {
+	getExpansion(): UmbEntityExpansionModel {
 		return this.#expansion.getValue();
 	}
 
-	updateExpansion(expansion: UmbMenuExpansionModel): void {
-		this.#expansion.append(expansion);
-	}
-
 	/**
-	 * Opens a child tree item
+	 * Expands an entity
 	 * @param {UmbEntityModel} entity The entity to open
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
-	 * @memberof UmbTreeExpansionManager
+	 * @memberof UmbEntityExpansionManager
 	 * @returns {Promise<void>}
 	 */
 	public async expandItem(entity: UmbEntityModel): Promise<void> {
@@ -63,11 +59,11 @@ export class UmbMenuExpansionManager extends UmbControllerBase {
 	}
 
 	/**
-	 * Closes a child tree item
+	 * Collapses an entity
 	 * @param {UmbEntityModel} entity The entity to close
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
-	 * @memberof UmbTreeExpansionManager
+	 * @memberof UmbEntityExpansionManager
 	 * @returns {Promise<void>}
 	 */
 	public async collapseItem(entity: UmbEntityModel): Promise<void> {
@@ -75,8 +71,8 @@ export class UmbMenuExpansionManager extends UmbControllerBase {
 	}
 
 	/**
-	 * Closes all child tree items
-	 * @memberof UmbTreeExpansionManager
+	 * Collapses all expanded entities
+	 * @memberof UmbEntityExpansionManager
 	 * @returns {Promise<void>}
 	 */
 	public async collapseAll(): Promise<void> {
