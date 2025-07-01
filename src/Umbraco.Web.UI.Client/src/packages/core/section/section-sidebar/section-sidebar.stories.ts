@@ -1,5 +1,5 @@
 import type { UmbSectionSidebarElement } from './section-sidebar.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './section-sidebar.element.js';

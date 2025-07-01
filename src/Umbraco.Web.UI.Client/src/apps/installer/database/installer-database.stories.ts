@@ -2,7 +2,7 @@ import './installer-database.element.js';
 
 import { installerContextProvider } from '../shared/utils.story-helpers.js';
 import type { UmbInstallerDatabaseElement } from './installer-database.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
