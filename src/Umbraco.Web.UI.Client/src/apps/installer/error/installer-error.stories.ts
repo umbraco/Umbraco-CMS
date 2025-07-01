@@ -1,7 +1,7 @@
 import { installerContextProvider } from '../shared/utils.story-helpers.js';
 import { UmbInstallerContext } from '../installer.context.js';
 import type { UmbInstallerErrorElement } from './installer-error.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './installer-error.element.js';
