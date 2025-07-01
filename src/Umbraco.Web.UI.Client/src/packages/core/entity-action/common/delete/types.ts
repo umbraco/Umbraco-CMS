@@ -1,7 +1,6 @@
 import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '../../types.js';
 
 export interface ManifestEntityActionDeleteKind extends ManifestEntityAction<MetaEntityActionDeleteKind> {
-	type: 'entityAction';
 	kind: 'delete';
 }
 

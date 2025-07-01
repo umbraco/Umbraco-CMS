@@ -2,7 +2,6 @@ import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco
 
 export interface ManifestEntityActionEmptyRecycleBinKind
 	extends ManifestEntityAction<MetaEntityActionEmptyRecycleBinKind> {
-	type: 'entityAction';
 	kind: 'emptyRecycleBin';
 }
 

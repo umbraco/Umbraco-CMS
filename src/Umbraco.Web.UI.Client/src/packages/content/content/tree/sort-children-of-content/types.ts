@@ -3,7 +3,6 @@ import type { MetaEntityActionSortChildrenOfKind } from '@umbraco-cms/backoffice
 
 export interface ManifestEntityActionSortChildrenOfContentKind
 	extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
-	type: 'entityAction';
 	kind: 'sortChildrenOfContent';
 }
 

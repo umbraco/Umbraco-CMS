@@ -2,7 +2,6 @@ import type { ManifestEntityAction, MetaEntityActionDeleteKind } from '@umbraco-
 
 export interface ManifestEntityActionDeleteWithRelationKind
 	extends ManifestEntityAction<MetaEntityActionDeleteWithRelationKind> {
-	type: 'entityAction';
 	kind: 'deleteWithRelation';
 }
 

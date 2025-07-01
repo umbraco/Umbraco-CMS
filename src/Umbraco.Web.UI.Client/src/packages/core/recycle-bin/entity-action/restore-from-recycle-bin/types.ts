@@ -3,7 +3,6 @@ import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@um
 
 export interface ManifestEntityActionRestoreFromRecycleBinKind
 	extends ManifestEntityAction<MetaEntityActionRestoreFromRecycleBinKind> {
-	type: 'entityAction';
 	kind: 'restoreFromRecycleBin';
 }
 

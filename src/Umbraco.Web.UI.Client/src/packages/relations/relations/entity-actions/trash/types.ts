@@ -3,7 +3,6 @@ import type { MetaEntityActionTrashKind } from '@umbraco-cms/backoffice/recycle-
 
 export interface ManifestEntityActionTrashWithRelationKind
 	extends ManifestEntityAction<MetaEntityActionTrashWithRelationKind> {
-	type: 'entityAction';
 	kind: 'trashWithRelation';
 }
 

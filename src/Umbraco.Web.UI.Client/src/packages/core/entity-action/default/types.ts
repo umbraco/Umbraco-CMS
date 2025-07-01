@@ -1,7 +1,6 @@
 import type { ManifestEntityAction, MetaEntityAction } from '../entity-action.extension.js';
 
 export interface ManifestEntityActionDefaultKind extends ManifestEntityAction<MetaEntityActionDefaultKind> {
-	type: 'entityAction';
 	kind: 'default';
 }
 

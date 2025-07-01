@@ -10,7 +10,6 @@ export interface UmbMoveToRequestArgs {
 }
 
 export interface ManifestEntityActionMoveToKind extends ManifestEntityAction<MetaEntityActionMoveToKind> {
-	type: 'entityAction';
 	kind: 'moveTo';
 }
 

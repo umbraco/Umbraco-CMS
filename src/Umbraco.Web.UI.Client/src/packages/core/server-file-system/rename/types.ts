@@ -17,7 +17,6 @@ export interface UmbRenameServerFileDataSource<DetailType extends UmbEntityModel
 
 export interface ManifestEntityActionRenameServerFileKind
 	extends ManifestEntityAction<MetaEntityActionRenameServerFileKind> {
-	type: 'entityAction';
 	kind: 'renameServerFile';
 }
 

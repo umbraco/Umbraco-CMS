@@ -11,7 +11,6 @@ export interface UmbSortChildrenOfArgs {
 
 export interface ManifestEntityActionSortChildrenOfKind
 	extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
-	type: 'entityAction';
 	kind: 'sortChildrenOf';
 }
 

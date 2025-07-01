@@ -14,7 +14,6 @@ export interface UmbDuplicateToRequestArgs extends UmbDuplicateRequestArgs {
 }
 
 export interface ManifestEntityActionDuplicateToKind extends ManifestEntityAction<MetaEntityActionDuplicateToKind> {
-	type: 'entityAction';
 	kind: 'duplicateTo';
 }
 
