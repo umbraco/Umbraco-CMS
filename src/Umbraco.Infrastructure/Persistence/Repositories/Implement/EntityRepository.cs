@@ -170,8 +170,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             .From().AppendSubQuery(rowNumberSql, "Target")
             .Where<NodeDto>(x => x.UniqueId == targetKey, "Target");
 
-        // We have to reuse the target row sql arugments, however, we also need to add the "before" and "after" values to the arguments.
-        // If try to do this directly in the params array it'll consider the intial arugment array as a single argument.
+        // We have to reuse the target row sql arguments, however, we also need to add the "before" and "after" values to the arguments.
+        // If try to do this directly in the params array it'll consider the initial argument array as a single argument.
         var beforeArguments = new List<object>();
         beforeArguments.AddRange(targetRowSql.Arguments);
         beforeArguments.Add(before);
