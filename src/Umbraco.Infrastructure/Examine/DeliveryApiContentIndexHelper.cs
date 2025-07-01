@@ -28,6 +28,11 @@ internal sealed class DeliveryApiContentIndexHelper : IDeliveryApiContentIndexHe
     public void EnumerateApplicableDescendantsForContentIndex(int rootContentId, Action<IContent[]> actionToPerform)
     {
         const int pageSize = 10000;
+        EnumerateApplicableDescendantsForContentIndex(rootContentId, actionToPerform, pageSize);
+    }
+
+    internal void EnumerateApplicableDescendantsForContentIndex(int rootContentId, Action<IContent[]> actionToPerform, int pageSize)
+    {
         var pageIndex = 0;
         long total;
 
