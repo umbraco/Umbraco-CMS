@@ -6,7 +6,7 @@ import type {
 	UmbDocumentUnpublishModalValue,
 } from './document-unpublish-modal.token.js';
 import type { UmbDocumentUnpublishModalElement } from './document-unpublish-modal.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentUnpublishModalData = {
