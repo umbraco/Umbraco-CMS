@@ -21,7 +21,7 @@ public class DeliveryApiContentIndexHelperTests : UmbracoIntegrationTestWithCont
         base.CreateTestData();
 
         // Save an extra, published content item of a different type to those created via the base class,
-        // that we'll use to test filtering out.
+        // that we'll use to test filtering out disallowed content types.
         var template = TemplateBuilder.CreateTextPageTemplate("textPage2");
         FileService.SaveTemplate(template);
 

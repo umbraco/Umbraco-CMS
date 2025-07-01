@@ -33,7 +33,7 @@ internal sealed class DeliveryApiContentIndexHelper : IDeliveryApiContentIndexHe
 
     internal void EnumerateApplicableDescendantsForContentIndex(int rootContentId, Action<IContent[]> actionToPerform, int pageSize)
     {
-        var pageIndex = 0;
+        var itemIndex = 0;
         long total;
 
         IQuery<IContent> query = _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(content => content.Trashed == false);
@@ -42,14 +42,14 @@ internal sealed class DeliveryApiContentIndexHelper : IDeliveryApiContentIndexHe
         do
         {
             descendants = _contentService
-                .GetPagedDescendants(rootContentId, pageIndex / pageSize, pageSize, out total, query, Ordering.By("Path"))
+                .GetPagedDescendants(rootContentId, itemIndex / pageSize, pageSize, out total, query, Ordering.By("Path"))
                 .Where(descendant => _deliveryApiSettings.IsAllowedContentType(descendant.ContentType.Alias))
                 .ToArray();
 
             actionToPerform(descendants);
 
-            pageIndex += pageSize;
+            itemIndex += pageSize;
         }
-        while (descendants.Length > 0 && pageIndex < total);
+        while (descendants.Length > 0 && itemIndex < total);
     }
 }
