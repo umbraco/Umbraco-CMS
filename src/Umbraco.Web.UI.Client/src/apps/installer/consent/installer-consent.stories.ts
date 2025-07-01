@@ -1,6 +1,6 @@
 import { installerContextProvider } from '../shared/utils.story-helpers.js';
 import type { UmbInstallerConsentElement } from './installer-consent.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import './installer-consent.element.js';
 
