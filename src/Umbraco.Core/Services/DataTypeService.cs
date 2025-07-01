@@ -355,13 +355,13 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
+        public Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAlias.Contains(x.EditorAlias));
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
-            return await Task.FromResult(dataTypes);
+            return Task.FromResult(dataTypes);
         }
 
         /// <inheritdoc />
@@ -396,7 +396,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return;
             }
 
-            ConvertMissingEditorsOfDataTypesToLabels(new[] { dataType });
+            ConvertMissingEditorsOfDataTypesToLabels([dataType]);
         }
 
         private void ConvertMissingEditorsOfDataTypesToLabels(IEnumerable<IDataType> dataTypes)
@@ -763,7 +763,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var totalItems = combinedUsages.Count;
 
             // Create the page of items.
-            IList<(string PropertyAlias, Udi Udi)> pagedUsages = combinedUsages
+            List<(string PropertyAlias, Udi Udi)> pagedUsages = combinedUsages
                 .OrderBy(x => x.Udi.EntityType) // Document types first, then media types, then member types.
                 .ThenBy(x => x.PropertyAlias)
                 .Skip(skip)
@@ -772,7 +772,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             // Get the content types for the UDIs referenced in the page of items to construct the response from.
             // They could be document, media or member types.
-            IList<IContentTypeComposition> contentTypes = GetReferencedContentTypes(pagedUsages);
+            List<IContentTypeComposition> contentTypes = GetReferencedContentTypes(pagedUsages);
 
             IEnumerable<RelationItemModel> relations = pagedUsages
                 .Select(x =>
@@ -807,7 +807,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return Task.FromResult(pagedModel);
         }
 
-        private IList<IContentTypeComposition> GetReferencedContentTypes(IList<(string PropertyAlias, Udi Udi)> pagedUsages)
+        private List<IContentTypeComposition> GetReferencedContentTypes(List<(string PropertyAlias, Udi Udi)> pagedUsages)
         {
             IEnumerable<IContentTypeComposition> documentTypes = GetContentTypes(
                 pagedUsages,
@@ -845,10 +845,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             IConfigurationEditor? configurationEditor = dataType.Editor?.GetConfigurationEditor();
             return configurationEditor == null
-                ? new[]
-                {
+                ?
+                [
                     new ValidationResult($"Data type with editor alias {dataType.EditorAlias} does not have a configuration editor")
-                }
+                ]
                 : configurationEditor.Validate(dataType.ConfigurationData);
         }
 
