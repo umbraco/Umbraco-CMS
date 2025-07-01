@@ -1,8 +1,4 @@
-﻿using System.Globalization;
-using System.Text;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
+using System.Globalization;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
