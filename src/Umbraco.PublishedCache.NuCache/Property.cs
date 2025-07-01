@@ -240,7 +240,7 @@ internal class Property : PublishedPropertyBase
 
         EnsureSourceValuesInitialized();
 
-        var k = new CompositeStringStringKey(culture, segment);
+        var k = new CompositeStringStringKey(culture ?? string.Empty, segment ?? string.Empty); // Null values are not valid when creating a CompositeStringStringKey.
 
         SourceInterValue vvalue = _sourceValues!.GetOrAdd(k, _ =>
             new SourceInterValue
