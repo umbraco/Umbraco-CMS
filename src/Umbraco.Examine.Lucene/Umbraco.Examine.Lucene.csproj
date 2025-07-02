@@ -4,6 +4,7 @@
     <Title>Umbraco CMS - Examine - Lucene</Title>
     <Description>Adds Examine searching support using Lucene to Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Infrastructure.Examine</RootNamespace>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

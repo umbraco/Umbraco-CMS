@@ -2,6 +2,7 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Persistence - SQLite</Title>
     <Description>Adds support for SQLite to Umbraco CMS.</Description>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

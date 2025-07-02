@@ -9,6 +9,7 @@
     <IncludeContentInPack>true</IncludeContentInPack>
     <ContentTargetFolders>.</ContentTargetFolders>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

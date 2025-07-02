@@ -3,6 +3,7 @@
     <RootNamespace>Umbraco.TestData</RootNamespace>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

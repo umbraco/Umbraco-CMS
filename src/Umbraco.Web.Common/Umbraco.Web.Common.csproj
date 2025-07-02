@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>Umbraco.Cms.Web.Common</PackageId>
     <Title>Umbraco CMS - Web</Title>
     <Description>Contains the web assembly needed to run Umbraco CMS.</Description>
     <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,9 @@
     <PackageReference Include="SixLabors.ImageSharp.Web" />
     <PackageReference Include="Smidge.InMemory" />
     <PackageReference Include="Smidge.Nuglify" />
+    <PackageReference Include="IPNetwork2">
+      <Aliases>IPNetwork2</Aliases>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

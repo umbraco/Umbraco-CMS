@@ -4,7 +4,7 @@ using System.Reflection.Emit;
 using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -18,7 +18,7 @@ using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Extensions;
 using File = System.IO.File;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder
+namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 {
     internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
     {
@@ -35,7 +35,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
         private readonly IPublishedValueFallback _publishedValueFallback;
-        private readonly ApplicationPartManager _applicationPartManager;
+        private readonly InMemoryAssemblyLoadContextManager _loadContextManager;
+        private readonly RuntimeCompilationCacheBuster _runtimeCompilationCacheBuster;
         private readonly Lazy<string> _pureLiveDirectory = null!;
         private readonly int _debugLevel;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
@@ -44,7 +45,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private int _ver;
         private int? _skipver;
         private RoslynCompiler? _roslynCompiler;
-        private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
         private ModelsBuilderSettings _config;
         private bool _disposedValue;
 
@@ -56,7 +56,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IPublishedValueFallback publishedValueFallback,
-            ApplicationPartManager applicationPartManager)
+            InMemoryAssemblyLoadContextManager loadContextManager,
+            RuntimeCompilationCacheBuster runtimeCompilationCacheBuster)
         {
             _umbracoServices = umbracoServices;
             _profilingLogger = profilingLogger;
@@ -65,7 +66,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
             _publishedValueFallback = publishedValueFallback;
-            _applicationPartManager = applicationPartManager;
+            _loadContextManager = loadContextManager;
+            _runtimeCompilationCacheBuster = runtimeCompilationCacheBuster;
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
@@ -93,11 +95,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
             // get it here, this need to be fast
             _debugLevel = _config.DebugLevel;
-
-            AssemblyLoadContext.Default.Resolving += OnResolvingDefaultAssemblyLoadContext;
         }
-
-        public event EventHandler? ModelsChanged;
 
         /// <summary>
         /// Gets the currently loaded Live models assembly
@@ -131,18 +129,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
         /// <inheritdoc />
         public bool Enabled => _config.ModelsMode == ModelsMode.InMemoryAuto;
-
-        /// <summary>
-        /// Handle the event when a reference cannot be resolved from the default context and return our custom MB assembly reference if we have one
-        /// </summary>
-        /// <remarks>
-        /// This is required because the razor engine will only try to load things from the default context, it doesn't know anything
-        /// about our context so we need to proxy.
-        /// </remarks>
-        private Assembly? OnResolvingDefaultAssemblyLoadContext(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName)
-            => assemblyName.Name == RoslynCompiler.GeneratedAssemblyName
-                ? _currentAssemblyLoadContext?.LoadFromAssemblyName(assemblyName)
-                : null;
 
         public IPublishedElement CreateModel(IPublishedElement element)
         {
@@ -313,12 +299,20 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
                         CurrentModelsAssembly = assembly;
 
-                        // Raise the model changing event.
-                        // NOTE: That on first load, if there is content, this will execute before the razor view engine
-                        // has loaded which means it hasn't yet bound to this event so there's no need to worry about if
-                        // it will be eagerly re-generated unecessarily on first render. BUT we should be aware that if we
-                        // change this to use the event aggregator that will no longer be the case.
-                        ModelsChanged?.Invoke(this, new EventArgs());
+                        /*
+                         * We used to use an event here, and a RefreshingRazorViewEngine to bust the caches,
+                         * this worked by essentially completely recreating the entire ViewEngine/ViewCompiler every time we generate models.
+                         * There was this note about first load:
+                         * NOTE: That on first load, if there is content, this will execute before the razor view engine
+                         * has loaded which means it hasn't yet bound to this event so there's no need to worry about if
+                         * it will be eagerly re-generated unnecessarily on first render. BUT we should be aware that if we
+                         * change this to use the event aggregator that will no longer be the case.
+                         *
+                         * Now we have our own ViewCompiler, and clear the caches more directly, however what the comment mentioned
+                         * is not really a big problem since this will execute before the razor view engine has loaded,
+                         * which means the cache will be empty already.
+                         */
+                        _runtimeCompilationCacheBuster.BustCache();
 
                         IEnumerable<Type> types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
@@ -364,22 +358,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         // This is NOT thread safe but it is only called from within a lock
         private Assembly ReloadAssembly(string pathToAssembly)
         {
-            // If there's a current AssemblyLoadContext, unload it before creating a new one.
-            if (!(_currentAssemblyLoadContext is null))
-            {
-                _currentAssemblyLoadContext.Unload();
-
-                // we need to remove the current part too
-                ApplicationPart? currentPart = _applicationPartManager.ApplicationParts.FirstOrDefault(x => x.Name == RoslynCompiler.GeneratedAssemblyName);
-                if (currentPart != null)
-                {
-                    _applicationPartManager.ApplicationParts.Remove(currentPart);
-                }
-            }
-
-            // We must create a new assembly load context
-            // as long as theres a reference to the assembly load context we can't delete the assembly it loaded
-            _currentAssemblyLoadContext = new UmbracoAssemblyLoadContext();
+            _loadContextManager.RenewAssemblyLoadContext();
 
             // NOTE: We cannot use in-memory assemblies due to the way the razor engine works which must use
             // application parts in order to add references to it's own CSharpCompiler.
@@ -393,16 +372,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             File.Copy(pathToAssembly, tempFile, true);
 
             // Load it in
-            Assembly assembly = _currentAssemblyLoadContext.LoadFromAssemblyPath(tempFile);
-
-            // Add the assembly to the application parts - this is required because this is how
-            // the razor ReferenceManager resolves what to load, see
-            // https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Razor.RuntimeCompilation/src/RazorReferenceManager.cs#L53
-            var partFactory = ApplicationPartFactory.GetApplicationPartFactory(assembly);
-            foreach (ApplicationPart applicationPart in partFactory.GetApplicationParts(assembly))
-            {
-                _applicationPartManager.ApplicationParts.Add(applicationPart);
-            }
+            Assembly assembly = _loadContextManager.LoadModelsAssembly(tempFile);
 
             return assembly;
         }
