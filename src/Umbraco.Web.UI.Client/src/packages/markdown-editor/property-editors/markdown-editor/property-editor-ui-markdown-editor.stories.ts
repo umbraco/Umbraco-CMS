@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-markdown-editor.element.js';
 
 export default {
-	title: 'Property Editor UIs/Markdown Editor',
+	title: 'Property Editor UI/Markdown Editor',
 	component: 'umb-property-editor-ui-markdown-editor',
 	id: 'umb-property-editor-ui-markdown-editor',
 } as Meta;

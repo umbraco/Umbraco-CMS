@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-checkbox-list.element.js';
 
 export default {
-	title: 'Property Editor UIs/Checkbox List',
+	title: 'Property Editor UI/Checkbox List',
 	component: 'umb-property-editor-ui-checkbox-list',
 	id: 'umb-property-editor-ui-checkbox-list',
 } as Meta;

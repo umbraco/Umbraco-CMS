@@ -88,7 +88,7 @@ const modalValue: UmbDocumentPublishModalValue = {
 };
 
 const meta: Meta<UmbDocumentPublishModalElement> = {
-	title: 'Workspaces/Document/Modals/Publish',
+	title: 'Document/Modals/Publish',
 	component: 'umb-document-publish-modal',
 	id: 'umb-document-publish-modal',
 	args: {

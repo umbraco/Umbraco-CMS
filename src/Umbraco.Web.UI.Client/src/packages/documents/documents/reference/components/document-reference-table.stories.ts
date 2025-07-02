@@ -6,7 +6,7 @@ import './document-reference-table.element.js';
 
 const meta: Meta<UmbDocumentReferenceTableElement> = {
 	id: 'umb-document-reference-table',
-	title: 'Components/Document/Reference Table',
+	title: 'Document/Components/Reference Table',
 	component: 'umb-document-reference-table',
 	args: {
 		unique: '1234',

@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-order-direction.element.js';
 
 export default {
-	title: 'Property Editor UIs/Order Direction',
+	title: 'Property Editor UI/Order Direction',
 	component: 'umb-property-editor-ui-order-direction',
 	id: 'umb-property-editor-ui-order-direction',
 } as Meta;

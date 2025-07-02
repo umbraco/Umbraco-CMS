@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-tags.element.js';
 
 export default {
-	title: 'Property Editor UIs/Tags',
+	title: 'Property Editor UI/Tags',
 	component: 'umb-property-editor-ui-tags',
 	id: 'umb-property-editor-ui-tags',
 } as Meta;

@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-content-picker.element.js';
 
 export default {
-	title: 'Property Editor UIs/Content Picker',
+	title: 'Property Editor UI/Content Picker',
 	component: 'umb-property-editor-ui-content-picker',
 	id: 'umb-property-editor-ui-content-picker',
 } as Meta;

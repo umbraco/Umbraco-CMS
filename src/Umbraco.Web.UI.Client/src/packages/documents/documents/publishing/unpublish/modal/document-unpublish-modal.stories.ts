@@ -91,7 +91,7 @@ const modalValue: UmbDocumentUnpublishModalValue = {
 };
 
 const meta: Meta<UmbDocumentUnpublishModalElement> = {
-	title: 'Workspaces/Document/Modals/Unpublish',
+	title: 'Document/Modals/Unpublish',
 	component: 'umb-document-unpublish-modal',
 	id: 'umb-document-unpublish-modal',
 	args: {

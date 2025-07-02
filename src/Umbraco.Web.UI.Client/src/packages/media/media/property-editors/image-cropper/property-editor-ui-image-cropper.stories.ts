@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-image-cropper.element.js';
 
 export default {
-	title: 'Property Editor UIs/Image Cropper',
+	title: 'Property Editor UI/Image Cropper',
 	component: 'umb-property-editor-ui-image-cropper',
 	id: 'umb-property-editor-ui-image-cropper',
 } as Meta;

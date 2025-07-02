@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-number.element.js';
 
 export default {
-	title: 'Property Editor UIs/Number',
+	title: 'Property Editor UI/Number',
 	component: 'umb-property-editor-ui-number',
 	id: 'umb-property-editor-ui-number',
 } as Meta;

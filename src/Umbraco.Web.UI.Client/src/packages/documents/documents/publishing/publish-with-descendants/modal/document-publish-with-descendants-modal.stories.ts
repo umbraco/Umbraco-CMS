@@ -91,7 +91,7 @@ const modalValue: UmbDocumentPublishWithDescendantsModalValue = {
 };
 
 const meta: Meta<UmbDocumentPublishWithDescendantsModalElement> = {
-	title: 'Workspaces/Document/Modals/Publish With Descendants Modal',
+	title: 'Document/Modals/Publish With Descendants Modal',
 	component: 'umb-document-publish-with-descendants-modal',
 	id: 'umb-document-publish-with-descendants-modal',
 	args: {

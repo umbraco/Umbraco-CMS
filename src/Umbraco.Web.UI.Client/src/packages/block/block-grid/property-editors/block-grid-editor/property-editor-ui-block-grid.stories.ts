@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-block-grid.element.js';
 
 export default {
-	title: 'Property Editor UIs/Block Grid',
+	title: 'Property Editor UI/Block Grid',
 	component: 'umb-property-editor-ui-block-grid',
 	id: 'umb-property-editor-ui-block-grid',
 } as Meta;

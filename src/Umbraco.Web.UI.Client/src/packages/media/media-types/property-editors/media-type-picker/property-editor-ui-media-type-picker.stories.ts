@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-media-type-picker.element.js';
 
 export default {
-	title: 'Property Editor UIs/Media Type Picker',
+	title: 'Property Editor UI/Media Type Picker',
 	component: 'umb-property-editor-ui-media-type-picker',
 	id: 'umb-property-editor-ui-media-type-picker',
 } as Meta;

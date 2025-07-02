@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './section-sidebar-menu.element.js';
 
 export default {
-	title: 'Sections/Shared/Section Sidebar Menu',
+	title: 'Section/Section Sidebar Menu',
 	component: 'umb-section-sidebar-menu',
 	id: 'umb-section-sidebar-menu',
 } as Meta;

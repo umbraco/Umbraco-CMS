@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './permissions.element.js';
 
 export default {
-	title: 'Property Editor UIs/Collection Bulk Action Permissions',
+	title: 'Property Editor UI/Collection Bulk Action Permissions',
 	component: 'umb-property-editor-ui-collection-permissions',
 	id: 'umb-property-editor-ui-collection-permissions',
 } as Meta;

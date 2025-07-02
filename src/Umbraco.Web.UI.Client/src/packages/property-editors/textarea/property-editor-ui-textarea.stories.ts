@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-textarea.element.js';
 
 export default {
-	title: 'Property Editor UIs/Textarea',
+	title: 'Property Editor UI/Textarea',
 	component: 'umb-property-editor-ui-textarea',
 	id: 'umb-property-editor-ui-textarea',
 } as Meta;
