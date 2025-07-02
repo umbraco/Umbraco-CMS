@@ -312,6 +312,7 @@ export class UmbAuthFlow {
 
 		// if the access token is not valid, try to refresh it
 		const success = await this.makeRefreshTokenRequest();
+		const newToken = this.#tokenResponse?.accessToken ?? '';
 
 		if (!success) {
 			// if the refresh token request failed, we need to clear the token state
@@ -319,7 +320,7 @@ export class UmbAuthFlow {
 		}
 
 		// if the refresh token request was successful, return the new access token
-		return Promise.resolve(this.#tokenResponse?.accessToken ?? '');
+		return Promise.resolve(newToken);
 	}
 
 	/**
