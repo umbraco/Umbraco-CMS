@@ -1,7 +1,7 @@
 import './confirm-modal.element.js';
 
 import type { UmbConfirmModalElement } from './confirm-modal.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';

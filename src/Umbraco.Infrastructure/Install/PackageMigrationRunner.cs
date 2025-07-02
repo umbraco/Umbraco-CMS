@@ -77,8 +77,9 @@ public class PackageMigrationRunner
     /// </summary>
     public async Task<Attempt<bool, PackageMigrationOperationStatus>> RunPendingPackageMigrations(string packageName)
     {
-        // Check if there are any migrations
-        if (_packageMigrationPlans.ContainsKey(packageName) == false)
+        // Check if there are any migrations (note that the key for _packageMigrationPlans is the migration plan name, not the package name).
+        if (_packageMigrationPlans.Values
+            .Any(x => x.PackageName.InvariantEquals(packageName)) is false)
         {
             return Attempt.FailWithStatus(PackageMigrationOperationStatus.NotFound, false);
         }
@@ -121,8 +122,8 @@ public class PackageMigrationRunner
             }
 
             using (_profilingLogger.TraceDuration<PackageMigrationRunner>(
-                       "Starting unattended package migration for " + migrationName,
-                       "Unattended upgrade completed for " + migrationName))
+                       "Starting package migration for " + migrationName,
+                       "Package migration completed for " + migrationName))
             {
                 Upgrader upgrader = new(plan);
 

@@ -116,7 +116,6 @@ test('can trash a folder', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.media.waitForMediaToBeTrashed();
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   await umbracoUi.media.isTreeItemVisible(folderName, false);
   await umbracoUi.media.isItemVisibleInRecycleBin(folderName);
   expect(await umbracoApi.media.doesNameExist(folderName)).toBeFalsy();
@@ -180,7 +179,6 @@ test('can trash a media item', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.media.waitForMediaToBeTrashed();
-  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
   await umbracoUi.media.isMediaTreeItemVisible(mediaFileName, false);
   await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
   expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();

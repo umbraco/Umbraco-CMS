@@ -2,7 +2,7 @@ import './icon-picker-modal.element.js';
 
 import type { UmbIconPickerModalElement } from './icon-picker-modal.element.js';
 import type { UmbIconPickerModalValue } from './icon-picker-modal.token.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
