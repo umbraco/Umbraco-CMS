@@ -93,7 +93,6 @@ export class UmbAuthFlow {
 	readonly #postLogoutRedirectUri: string;
 	readonly #clientId: string;
 	readonly #scope: string;
-	readonly #timeoutSignal;
 
 	// tokens
 	#tokenResponse?: TokenResponse;
@@ -113,13 +112,11 @@ export class UmbAuthFlow {
 		openIdConnectUrl: string,
 		redirectUri: string,
 		postLogoutRedirectUri: string,
-		timeoutSignal: Subject<void>,
 		clientId = 'umbraco-back-office',
 		scope = 'offline_access',
 	) {
 		this.#redirectUri = redirectUri;
 		this.#postLogoutRedirectUri = postLogoutRedirectUri;
-		this.#timeoutSignal = timeoutSignal;
 		this.#clientId = clientId;
 		this.#scope = scope;
 
