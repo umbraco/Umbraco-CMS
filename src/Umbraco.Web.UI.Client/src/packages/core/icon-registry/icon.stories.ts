@@ -3,7 +3,7 @@ import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html, repeat } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
-	title: 'API/Icons',
+	title: 'Generic Components/Icons',
 	id: 'umb-icons',
 } as Meta;
 

@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-icon-picker.element.js';
 
 export default {
-	title: 'Property Editor UI/Icon Picker',
+	title: 'Extension Type/Property Editor UI/Icon Picker',
 	component: 'umb-property-editor-ui-icon-picker',
 	id: 'umb-property-editor-ui-icon-picker',
 } as Meta;

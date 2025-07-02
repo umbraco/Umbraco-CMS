@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-value-type.element.js';
 
 export default {
-	title: 'Property Editor UI/Value Type',
+	title: 'Extension Type/Property Editor UI/Value Type',
 	component: 'umb-property-editor-ui-value-type',
 	id: 'umb-property-editor-ui-value-type',
 } as Meta;

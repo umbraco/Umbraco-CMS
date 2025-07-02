@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-select.element.js';
 
 export default {
-	title: 'Property Editor UI/Select',
+	title: 'Extension Type/Property Editor UI/Select',
 	component: 'umb-property-editor-ui-select',
 	id: 'umb-property-editor-ui-select',
 } as Meta;

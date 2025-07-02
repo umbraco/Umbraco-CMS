@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-slider.element.js';
 
 export default {
-	title: 'Property Editor UI/Slider',
+	title: 'Extension Type/Property Editor UI/Slider',
 	component: 'umb-property-editor-ui-slider',
 	id: 'umb-property-editor-ui-slider',
 } as Meta;

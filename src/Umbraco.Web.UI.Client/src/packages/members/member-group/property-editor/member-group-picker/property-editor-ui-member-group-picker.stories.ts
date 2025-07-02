@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-member-group-picker.element.js';
 
 export default {
-	title: 'Property Editor UI/Member Group Picker',
+	title: 'Extension Type/Property Editor UI/Member Group Picker',
 	component: 'umb-property-editor-ui-member-group-picker',
 	id: 'umb-property-editor-ui-member-group-picker',
 } as Meta;

@@ -6,7 +6,7 @@ import './property-editor-ui-date-picker.element.js';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export default {
-	title: 'Property Editor UI/Date Picker',
+	title: 'Extension Type/Property Editor UI/Date Picker',
 	component: 'umb-property-editor-ui-date-picker',
 	id: 'umb-property-editor-ui-date-picker',
 	args: {

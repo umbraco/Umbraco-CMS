@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './ref-property-editor-ui.element.js';
 
 const meta: Meta<UmbRefPropertyEditorUIElement> = {
-	title: 'Components/Ref Property Editor UI',
+	title: 'Extension Type/Property Editor UI/Components/Ref Property Editor UI',
 	component: 'umb-ref-property-editor-ui',
 };
 

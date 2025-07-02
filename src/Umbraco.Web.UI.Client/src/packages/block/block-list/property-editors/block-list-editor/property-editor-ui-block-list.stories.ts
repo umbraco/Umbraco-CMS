@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-block-list.element.js';
 
 export default {
-	title: 'Property Editor UI/Block List',
+	title: 'Extension Type/Property Editor UI/Block List',
 	component: 'umb-property-editor-ui-block-list',
 	id: 'umb-property-editor-ui-block-list',
 } as Meta;

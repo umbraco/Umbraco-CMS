@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-overlay-size.element.js';
 
 export default {
-	title: 'Property Editor UI/Overlay Size',
+	title: 'Extension Type/Property Editor UI/Overlay Size',
 	component: 'umb-property-editor-ui-overlay-size',
 	id: 'umb-property-editor-ui-overlay-size',
 } as Meta;

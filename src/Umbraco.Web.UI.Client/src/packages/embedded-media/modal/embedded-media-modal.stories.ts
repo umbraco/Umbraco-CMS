@@ -5,7 +5,7 @@ import type { Meta } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
-	title: 'API/Modals/Layouts/Embedded Media',
+	title: 'Extension Type/Modal/Embedded Media',
 	component: 'umb-embedded-media-modal',
 	id: 'umb-embedded-media-modal',
 } as Meta;

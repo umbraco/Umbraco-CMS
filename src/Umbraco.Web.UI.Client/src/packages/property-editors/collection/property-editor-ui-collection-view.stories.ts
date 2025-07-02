@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-collection.element.js';
 
 export default {
-	title: 'Property Editor UI/Collection',
+	title: 'Extension Type/Property Editor UI/Collection',
 	component: 'umb-property-editor-ui-collection',
 	id: 'umb-property-editor-ui-collection',
 } as Meta;

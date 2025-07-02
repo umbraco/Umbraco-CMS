@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './property-editor-ui-image-crops.element.js';
 
 const meta: Meta<UmbPropertyEditorUIImageCropsElement> = {
-	title: 'Property Editor UI/Image Crops',
+	title: 'Extension Type/Property Editor UI/Image Crops',
 	id: 'umb-property-editor-ui-image-crops',
 	component: 'umb-property-editor-ui-image-crops',
 };

@@ -6,7 +6,7 @@ import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
-	title: 'API/Modals/Layouts/Icon Picker',
+	title: 'Extension Type/Modal/Icon Picker',
 	component: 'umb-icon-picker-modal',
 	id: 'umb-icon-picker-modal',
 } as Meta;

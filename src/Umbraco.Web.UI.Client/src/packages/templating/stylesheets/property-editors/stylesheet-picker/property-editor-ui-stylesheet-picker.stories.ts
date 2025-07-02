@@ -8,7 +8,7 @@ import './property-editor-ui-stylesheet-picker.element.js';
 const dataTypeData = umbDataTypeMockDb.read('dt-richTextEditor') as unknown as UmbDataTypeDetailModel;
 
 export default {
-	title: 'Property Editor UI/Stylesheet Picker',
+	title: 'Extension Type/Property Editor UI/Stylesheet Picker',
 	component: 'umb-property-editor-ui-stylesheet-picker',
 	id: 'umb-property-editor-ui-stylesheet-picker',
 } as Meta;

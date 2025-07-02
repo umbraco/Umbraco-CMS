@@ -3,7 +3,7 @@ import './input-dropdown-list.element.js';
 import type { UmbInputDropdownListElement } from './input-dropdown-list.element.js';
 
 const meta: Meta<UmbInputDropdownListElement> = {
-	title: 'Components/Inputs/Dropdown List',
+	title: 'Generic Components/Inputs/Dropdown List',
 	component: 'umb-input-dropdown-list',
 };
 

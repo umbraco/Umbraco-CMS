@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-label.element.js';
 
 export default {
-	title: 'Property Editor UI/Label',
+	title: 'Extension Type/Property Editor UI/Label',
 	component: 'umb-property-editor-ui-label',
 	id: 'umb-property-editor-ui-label',
 } as Meta;

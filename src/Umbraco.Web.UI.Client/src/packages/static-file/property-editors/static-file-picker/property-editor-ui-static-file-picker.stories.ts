@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-static-file-picker.element.js';
 
 export default {
-	title: 'Property Editor UI/Static File Picker',
+	title: 'Extension Type/Property Editor UI/Static File Picker',
 	component: 'umb-property-editor-ui-static-file-picker',
 	id: 'umb-property-editor-ui-static-file-picker',
 } as Meta;

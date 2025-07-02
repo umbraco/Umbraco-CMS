@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './layout-configuration.element.js';
 
 export default {
-	title: 'Property Editor UI/Collection Layout Configuration',
+	title: 'Extension Type/Property Editor UI/Collection Layout Configuration',
 	component: 'umb-property-editor-ui-collection-layout-configuration',
 	id: 'umb-property-editor-ui-collection-layout-configuration',
 } as Meta;

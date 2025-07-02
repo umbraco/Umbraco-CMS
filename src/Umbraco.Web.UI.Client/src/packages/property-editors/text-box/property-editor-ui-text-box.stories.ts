@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-text-box.element.js';
 
 export default {
-	title: 'Property Editor UI/Text Box',
+	title: 'Extension Type/Property Editor UI/Text Box',
 	component: 'umb-property-editor-ui-text-box',
 	id: 'umb-property-editor-ui-text-box',
 } as Meta;

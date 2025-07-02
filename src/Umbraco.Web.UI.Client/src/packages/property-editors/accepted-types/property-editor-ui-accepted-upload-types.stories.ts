@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-accepted-upload-types.element.js';
 
 export default {
-	title: 'Property Editor UI/Accepted Upload Types',
+	title: 'Extension Type/Property Editor UI/Accepted Upload Types',
 	component: 'umb-property-editor-ui-accepted-upload-types',
 	id: 'umb-property-editor-ui-accepted-upload-types',
 } as Meta;

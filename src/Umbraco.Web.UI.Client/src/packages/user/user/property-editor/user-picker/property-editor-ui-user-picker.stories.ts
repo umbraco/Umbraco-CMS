@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-user-picker.element.js';
 
 export default {
-	title: 'Property Editor UI/User Picker',
+	title: 'Extension Type/Property Editor UI/User Picker',
 	component: 'umb-property-editor-ui-user-picker',
 	id: 'umb-property-editor-ui-user-picker',
 } as Meta;
