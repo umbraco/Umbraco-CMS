@@ -5,7 +5,7 @@ import './body-layout.element.js';
 import type { UmbBodyLayoutElement } from './body-layout.element.js';
 
 const meta: Meta<UmbBodyLayoutElement> = {
-	title: 'Extension Type/Workspace/Components/Workspace Layout',
+	title: 'Generic Components/Body Layout',
 	component: 'umb-body-layout',
 };
 
