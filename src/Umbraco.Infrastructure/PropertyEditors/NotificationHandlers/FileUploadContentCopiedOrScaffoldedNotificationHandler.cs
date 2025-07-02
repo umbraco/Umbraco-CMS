@@ -16,8 +16,8 @@ using static Umbraco.Cms.Core.Constants.Conventions;
 namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
 /// <summary>
-/// Implements a notification handler that processes file uploads when content is copied or scaffolded from blueprint, making
-/// sure the copied contetnt relates to a new instance of the file.
+/// Implements a notification handler that processes file uploads when content is copied or scaffolded from a blueprint, making
+/// sure the new content references a new instance of the file.
 /// </summary>
 internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : FileUploadNotificationHandlerBase,
     INotificationHandler<ContentCopiedNotification>,
