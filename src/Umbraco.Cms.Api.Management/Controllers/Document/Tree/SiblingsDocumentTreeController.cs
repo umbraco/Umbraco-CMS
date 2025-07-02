@@ -5,17 +5,15 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 
 [ApiVersion("1.0")]
-public class SiblingsTreeController : DocumentTreeControllerBase
+public class SiblingsDocumentTreeController : DocumentTreeControllerBase
 {
-    public SiblingsTreeController(
+    public SiblingsDocumentTreeController(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,

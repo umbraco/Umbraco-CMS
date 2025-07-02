@@ -9,9 +9,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 
-public class SiblingsTreeController : MediaTreeControllerBase
+public class SiblingsMediaTreeController : MediaTreeControllerBase
 {
-    public SiblingsTreeController(IEntityService entityService, IUserStartNodeEntitiesService userStartNodeEntitiesService, IDataTypeService dataTypeService, AppCaches appCaches, IBackOfficeSecurityAccessor backofficeSecurityAccessor, IMediaPresentationFactory mediaPresentationFactory) : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
+    public SiblingsMediaTreeController(IEntityService entityService, IUserStartNodeEntitiesService userStartNodeEntitiesService, IDataTypeService dataTypeService, AppCaches appCaches, IBackOfficeSecurityAccessor backofficeSecurityAccessor, IMediaPresentationFactory mediaPresentationFactory) : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
     {
     }
 

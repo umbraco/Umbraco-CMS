@@ -5,9 +5,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
-public class SiblingsTreeController : DataTypeTreeControllerBase
+public class SiblingsDataTypeTreeController : DataTypeTreeControllerBase
 {
-    public SiblingsTreeController(IEntityService entityService, IDataTypeService dataTypeService) : base(entityService, dataTypeService)
+    public SiblingsDataTypeTreeController(IEntityService entityService, IDataTypeService dataTypeService) : base(entityService, dataTypeService)
     {
     }
 

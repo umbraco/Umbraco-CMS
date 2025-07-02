@@ -6,9 +6,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 
-public class SiblingsTreeController : DocumentBlueprintTreeControllerBase
+public class SiblingsDocumentBlueprintTreeController : DocumentBlueprintTreeControllerBase
 {
-    public SiblingsTreeController(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory) : base(entityService, documentPresentationFactory)
+    public SiblingsDocumentBlueprintTreeController(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory) : base(entityService, documentPresentationFactory)
     {
     }
 

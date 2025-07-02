@@ -5,9 +5,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 
-public class SiblingsTreeController : TemplateTreeControllerBase
+public class SiblingsTemplateTreeController : TemplateTreeControllerBase
 {
-    public SiblingsTreeController(IEntityService entityService) : base(entityService)
+    public SiblingsTemplateTreeController(IEntityService entityService) : base(entityService)
     {
     }
 

@@ -5,9 +5,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 
-public class SiblingsTreeController : DocumentTypeTreeControllerBase
+public class SiblingsDocumentTypeTreeController : DocumentTypeTreeControllerBase
 {
-    public SiblingsTreeController(IEntityService entityService, IContentTypeService contentTypeService) : base(entityService, contentTypeService)
+    public SiblingsDocumentTypeTreeController(IEntityService entityService, IContentTypeService contentTypeService) : base(entityService, contentTypeService)
     {
     }
 
