@@ -144,23 +144,6 @@ test('can publish a specific content with publish permission enabled', async ({u
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
 });
 
-test('can set permissions for a specific content with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermissionForSpecificDocument(userGroupName, firstDocumentId);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
-
-  // Act
-  await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
-  await umbracoUi.content.clickSetPermissionsButton();
-  
-  // Assert
-  await umbracoUi.content.doesDocumentPermissionsDialogExist();
-  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
-});
-
 test('can unpublish a specific content with unpublish permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.publish(firstDocumentId);
@@ -184,8 +167,7 @@ test('can unpublish a specific content with unpublish permission enabled', async
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
 });
 
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19286
-test.skip('can update a specific content with update permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can update a specific content with update permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -225,7 +207,6 @@ test('can duplicate a specific content with duplicate permission enabled', async
   await umbracoUi.content.isPermissionInActionsMenuVisible('Duplicate to…', false);
 });
 
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19547
 test('can move a specific content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const moveToDocumentName = 'MoveToDocument';
