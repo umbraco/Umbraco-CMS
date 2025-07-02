@@ -1,5 +1,6 @@
 import type { UmbVariantStructureItemModel } from './types.js';
 import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from './menu-variant-structure-workspace-context.context-token.js';
+import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from './section-sidebar-menu/context/section-sidebar-menu.context.token.js';
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -29,6 +30,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
+	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
@@ -37,6 +39,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
+
+		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_CONTEXT, (instance) => {
+			this.#sectionSidebarMenuContext = instance;
+		});
 
 		this.consumeContext(UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -108,6 +114,15 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);
 			this.#setAncestorData(data);
+
+			const entities = structureItems.map((item) => {
+				return {
+					unique: item.unique,
+					entityType: item.entityType,
+				};
+			});
+
+			this.#sectionSidebarMenuContext?.expansion.bulkExpandItem(entities);
 		}
 	}
 
