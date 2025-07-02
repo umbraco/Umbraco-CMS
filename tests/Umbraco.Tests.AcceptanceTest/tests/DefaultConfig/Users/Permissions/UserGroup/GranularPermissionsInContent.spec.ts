@@ -144,8 +144,7 @@ test('can publish a specific content with publish permission enabled', async ({u
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
 });
 
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19339
-test.skip('can set permissions for a specific content with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can set permissions for a specific content with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermissionForSpecificDocument(userGroupName, firstDocumentId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -155,11 +154,11 @@ test.skip('can set permissions for a specific content with set permissions permi
 
   // Act
   await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
-  // await umbracoUi.content.clickSetPermissionsButton();
-  //
-  // // Assert
-  // await umbracoUi.content.doesDocumentPermissionsDialogExist();
-  // await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.clickSetPermissionsButton();
+  
+  // Assert
+  await umbracoUi.content.doesDocumentPermissionsDialogExist();
+  await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
 });
 
 test('can unpublish a specific content with unpublish permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -227,7 +226,7 @@ test('can duplicate a specific content with duplicate permission enabled', async
 });
 
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19547
-test.skip('can move a specific content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can move a specific content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const moveToDocumentName = 'MoveToDocument';
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentName, childDocumentTypeId, firstDocumentId);
