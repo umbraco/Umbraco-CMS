@@ -1,4 +1,9 @@
 import type { UmbEntityExpansionModel } from './types.js';
+import {
+	UmbExpansionEntityExpandedEvent,
+	UmbExpansionEntityCollapsedEvent,
+	UmbExpansionChangeEvent,
+} from './events/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
@@ -35,6 +40,7 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 	 */
 	setExpansion(expansion: UmbEntityExpansionModel): void {
 		this.#expansion.setValue(expansion);
+		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
@@ -56,6 +62,8 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 	 */
 	public async expandItem(entity: UmbEntityModel): Promise<void> {
 		this.#expansion.appendOne(entity);
+		this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
+		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
@@ -68,6 +76,8 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 	 */
 	public async collapseItem(entity: UmbEntityModel): Promise<void> {
 		this.#expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
+		this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
+		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
@@ -77,5 +87,6 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 	 */
 	public async collapseAll(): Promise<void> {
 		this.#expansion.setValue([]);
+		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 }
