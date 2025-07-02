@@ -1,9 +1,12 @@
-import type { UmbTreeElement } from '../tree.element.js';
 import type { ManifestMenuItemTreeKind } from './types.js';
 import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MENU_CONTEXT, type UmbMenuItemElement } from '@umbraco-cms/backoffice/menu';
-import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbExpansionEntityCollapsedEvent,
+	UmbExpansionEntityExpandedEvent,
+	type UmbEntityExpansionModel,
+} from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-menu-item-tree-default')
 export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbMenuItemElement {
@@ -30,11 +33,19 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 		});
 	}
 
-	#onExpansionChange(event: UmbExpansionChangeEvent) {
+	#onEntityExpansionChange(event: UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent) {
 		event.stopPropagation();
-		const target = event.target as UmbTreeElement;
-		const expansion = target.getExpansion();
-		debugger;
+		const eventEntity = event.entity;
+
+		if (!eventEntity) {
+			throw new Error('Entity is required to toggle expansion.');
+		}
+
+		if (event.type === UmbExpansionEntityExpandedEvent.TYPE) {
+			this.#menuContext?.expansion.expandItem(eventEntity);
+		} else if (event.type === UmbExpansionEntityCollapsedEvent.TYPE) {
+			this.#menuContext?.expansion.collapseItem(eventEntity);
+		}
 	}
 
 	override render() {
@@ -50,7 +61,8 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 							},
 							expansion: this._menuExpansion,
 						}}
-						@expansion-change=${this.#onExpansionChange}></umb-tree>
+						@expansion-entity-expanded=${this.#onEntityExpansionChange}
+						@expansion-entity-collapsed=${this.#onEntityExpansionChange}></umb-tree>
 				`
 			: nothing;
 	}
