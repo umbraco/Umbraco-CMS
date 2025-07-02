@@ -92,7 +92,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     {
         FileUploadValue? editorModelValue = _valueParser.Parse(editorValue.Value);
 
-        // No change or created from blue print.
+        // No change or created from blueprint.
         if (editorModelValue?.TemporaryFileId.HasValue is not true && string.IsNullOrEmpty(editorModelValue?.Src) is false)
         {
             return editorModelValue.Src;
