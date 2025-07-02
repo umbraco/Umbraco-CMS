@@ -3,7 +3,7 @@ import './input-media.element.js';
 import type { UmbInputMediaElement } from './input-media.element.js';
 
 const meta: Meta<UmbInputMediaElement> = {
-	title: 'Components/Inputs/Media',
+	title: 'Silo/Media/Components/Input Media',
 	component: 'umb-input-media',
 };
 

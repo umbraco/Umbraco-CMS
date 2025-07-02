@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './section-sidebar-menu-with-entity-actions.element.js';
 
 export default {
-	title: 'Section/Section Sidebar Menu With Entity Actions',
+	title: 'Extension Type/Section/Components/Section Sidebar Menu With Entity Actions',
 	component: 'umb-section-sidebar-menu-with-entity-actions',
 	id: 'umb-section-sidebar-menu-with-entity-actions',
 } as Meta;

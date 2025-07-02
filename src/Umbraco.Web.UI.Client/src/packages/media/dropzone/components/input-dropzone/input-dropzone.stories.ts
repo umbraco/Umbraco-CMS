@@ -6,7 +6,7 @@ import './input-dropzone.element.js';
 
 const meta: Meta<UmbInputDropzoneElement> = {
 	id: 'umb-input-dropzone',
-	title: 'Components/Inputs/Dropzone',
+	title: 'Silo/Media/Components/Input Dropzone',
 	component: 'umb-input-dropzone',
 	args: {
 		disabled: false,

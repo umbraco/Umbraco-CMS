@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './section-sidebar.element.js';
 
 export default {
-	title: 'Section/Section Sidebar',
+	title: 'Extension Type/Section/Components/Section Sidebar',
 	component: 'umb-section-sidebar',
 	id: 'umb-section-sidebar',
 } as Meta;

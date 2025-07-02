@@ -3,7 +3,7 @@ import './stack.element.js';
 import type { UmbStackElement } from './stack.element.js';
 
 const meta: Meta<UmbStackElement> = {
-	title: 'Components/Stack',
+	title: 'Generic Components/Stack',
 	component: 'umb-stack',
 };
 

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './user-group-input.element.js';
 
 const meta: Meta<UmbUserGroupInputElement> = {
-	title: 'User Group/Components/User Group Input',
+	title: 'Silo/User Group/Components/User Group Input',
 	component: 'umb-user-group-input',
 	argTypes: {
 		// modalType: {

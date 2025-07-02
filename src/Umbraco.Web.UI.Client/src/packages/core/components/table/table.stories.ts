@@ -5,7 +5,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import './table.element.js';
 
 const meta: Meta<UmbTableElement> = {
-	title: 'Components/Table',
+	title: 'Generic Components/Table',
 	component: 'umb-table',
 };
 

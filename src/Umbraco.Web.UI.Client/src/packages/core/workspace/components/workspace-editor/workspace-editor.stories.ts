@@ -5,7 +5,7 @@ import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
-	title: 'Workspaces/Shared/Workspace Editor',
+	title: 'Extension Type/Workspace/Components/Workspace Editor',
 	component: 'umb-workspace-editor',
 	id: 'umb-workspace-editor',
 } as Meta;

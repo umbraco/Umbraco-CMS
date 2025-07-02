@@ -3,7 +3,7 @@ import './input-slider.element.js';
 import type { UmbInputSliderElement } from './input-slider.element.js';
 
 const meta: Meta<UmbInputSliderElement> = {
-	title: 'Components/Inputs/Slider',
+	title: 'Generic Components/Inputs/Slider',
 	component: 'umb-input-slider',
 };
 

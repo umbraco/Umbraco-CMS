@@ -3,7 +3,7 @@ import './input-member.element.js';
 import type { UmbInputMemberElement } from './input-member.element.js';
 
 const meta: Meta<UmbInputMemberElement> = {
-	title: 'Components/Inputs/Member',
+	title: 'Silo/Member/Components/Input Member',
 	component: 'umb-input-member',
 };
 

@@ -4,7 +4,7 @@ import type { UmbCodeBlockElement } from './code-block.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const meta: Meta<UmbCodeBlockElement> = {
-	title: 'Components/Code Block',
+	title: 'Generic Components/Code Block',
 	component: 'umb-code-block',
 	parameters: {
 		layout: 'centered',

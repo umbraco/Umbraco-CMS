@@ -66,7 +66,7 @@ const modalValue: UmbDocumentScheduleModalValue = {
 };
 
 const meta: Meta<UmbDocumentScheduleModalElement> = {
-	title: 'Document/Modals/Schedule',
+	title: 'Silo/Document/Modals/Schedule',
 	component: 'umb-document-schedule-modal',
 	id: 'umb-document-schedule-modal',
 	args: {

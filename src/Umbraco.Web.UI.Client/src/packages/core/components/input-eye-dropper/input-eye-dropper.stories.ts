@@ -3,7 +3,7 @@ import './input-eye-dropper.element.js';
 import type { UmbInputEyeDropperElement } from './input-eye-dropper.element.js';
 
 const meta: Meta<UmbInputEyeDropperElement> = {
-	title: 'Components/Inputs/Eye Dropper',
+	title: 'Generic Components/Inputs/Eye Dropper',
 	component: 'umb-input-eye-dropper',
 };
 

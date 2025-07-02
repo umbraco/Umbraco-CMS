@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './section-main.element.js';
 
 export default {
-	title: 'Section/Section Main',
+	title: 'Extension Type/Section/Components/Section Main',
 	component: 'umb-section-main',
 	id: 'umb-section-main',
 } as Meta;

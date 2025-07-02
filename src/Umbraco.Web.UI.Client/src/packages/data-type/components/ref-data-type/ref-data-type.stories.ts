@@ -5,7 +5,7 @@ import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffic
 import './ref-data-type.element.js';
 
 const meta: Meta<UmbRefDataTypeElement> = {
-	title: 'Components/Ref Data Type',
+	title: 'Silo/Data Type/Components/Ref Data Type',
 	component: 'umb-ref-property-editor-ui',
 };
 

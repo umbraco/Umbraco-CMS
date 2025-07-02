@@ -5,7 +5,7 @@ import type { Meta } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
-	title: 'Components/Donut chart',
+	title: 'Generic Components/Donut chart',
 	component: 'umb-donut-chart',
 	id: 'umb-donut-chart',
 	tags: ['autodocs'],

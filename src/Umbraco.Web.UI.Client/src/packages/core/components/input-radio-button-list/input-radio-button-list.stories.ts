@@ -3,7 +3,7 @@ import './input-radio-button-list.element.js';
 import type { UmbInputRadioButtonListElement } from './input-radio-button-list.element.js';
 
 const meta: Meta<UmbInputRadioButtonListElement> = {
-	title: 'Components/Inputs/Radio Button List',
+	title: 'Generic Components/Inputs/Radio Button List',
 	component: 'umb-input-radio-button-list',
 };
 

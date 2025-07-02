@@ -88,7 +88,7 @@ const modalValue: UmbDocumentPublishModalValue = {
 };
 
 const meta: Meta<UmbDocumentPublishModalElement> = {
-	title: 'Document/Modals/Publish',
+	title: 'Silo/Document/Modals/Publish',
 	component: 'umb-document-publish-modal',
 	id: 'umb-document-publish-modal',
 	args: {

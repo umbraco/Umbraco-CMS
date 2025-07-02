@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './input-date.element.js';
 
 const meta: Meta<UmbInputDateElement> = {
-	title: 'Components/Inputs/Date',
+	title: 'Generic Components/Inputs/Date',
 	component: 'umb-input-date',
 };
 

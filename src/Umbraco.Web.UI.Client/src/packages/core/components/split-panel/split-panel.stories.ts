@@ -4,7 +4,7 @@ import type { UmbSplitPanelElement } from './split-panel.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const meta: Meta<UmbSplitPanelElement> = {
-	title: 'Components/Split Panel',
+	title: 'Generic Components/Split Panel',
 	component: 'umb-split-panel',
 	argTypes: {
 		lock: { options: ['none', 'start', 'end'] },

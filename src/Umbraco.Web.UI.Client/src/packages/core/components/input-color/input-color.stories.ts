@@ -3,7 +3,7 @@ import './input-color.element.js';
 import type { UmbInputColorElement } from './input-color.element.js';
 
 const meta: Meta<UmbInputColorElement> = {
-	title: 'Components/Inputs/Color',
+	title: 'Generic Components/Inputs/Color',
 	component: 'umb-input-color',
 };
 
