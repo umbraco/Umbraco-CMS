@@ -47,11 +47,13 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     protected Task<ActionResult<IEnumerable<TItem>>> GetSiblings(Guid target, int before, int after)
     {
         IEntitySlim[] siblings = EntityService.GetSiblings(target, ItemObjectType, before, after).ToArray();
-        Guid? parentKey = siblings.FirstOrDefault()?.ParentId > 0 ? siblings.FirstOrDefault()?.Key : null;
-        if (parentKey is null)
+        if (siblings.Length == 0)
         {
             return Task.FromResult<ActionResult<IEnumerable<TItem>>>(NotFound());
         }
+
+        IEntitySlim? entity = siblings.FirstOrDefault();
+        Guid? parentKey = entity?.ParentId > 0 ? entity.Key : null;
 
         TItem[] treeItemsViewModels = MapTreeItemViewModels(parentKey, siblings);
         return Task.FromResult<ActionResult<IEnumerable<TItem>>>(Ok(treeItemsViewModels));
