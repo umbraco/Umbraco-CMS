@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property.element.js';
 
 export default {
-	title: 'Components/Property',
+	title: 'Generic Components/Property',
 	component: 'umb-property',
 	id: 'umb-property',
 } as Meta;

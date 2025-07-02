@@ -98,28 +98,7 @@ export const parameters = {
 		storySort: {
 			method: 'alphabetical',
 			includeNames: true,
-			order: [
-				'Guides',
-				[
-					'Getting started',
-					'Extending the Backoffice',
-					[
-						'Intro',
-						'Registration',
-						'Header Apps',
-						'Sections',
-						['Intro', 'Sidebar', 'Views', '*'],
-						'Entity Actions',
-						'Workspaces',
-						['Intro', 'Views', 'Actions', '*'],
-						'Property Editors',
-						'Repositories',
-						'*',
-					],
-					'*',
-				],
-				'*',
-			],
+			order: ['Getting Started', 'Generic Components', 'Extension Type', 'Silo', 'Guides'],
 		},
 	},
 	controls: {
