@@ -3,6 +3,14 @@ import type { UmbApiResponse, UmbTryExecuteOptions } from '../types.js';
 import { UmbCancelError } from '../umb-error.js';
 import type { UmbApiError } from '../umb-error.js';
 
+/**
+ * Codes that are ignored for notifications.
+ * These are typically non-fatal errors that the UI can handle gracefully,
+ * such as 401 (Unauthorized), 403 (Forbidden), and 404 (Not Found).
+ * The UI should handle these cases without showing a notification.
+ */
+const IGNORED_ERROR_CODES = [401, 403, 404];
+
 export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 	#abortSignal?: AbortSignal;
 
@@ -49,7 +57,7 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 
 		// Check if we can extract problem details from the error
 		if (apiError.problemDetails) {
-			if ([400, 401, 403, 404].includes(apiError.problemDetails.status)) {
+			if (IGNORED_ERROR_CODES.includes(apiError.problemDetails.status)) {
 				// Non-fatal errors that the UI can handle gracefully
 				// so we avoid showing a notification
 				return;
