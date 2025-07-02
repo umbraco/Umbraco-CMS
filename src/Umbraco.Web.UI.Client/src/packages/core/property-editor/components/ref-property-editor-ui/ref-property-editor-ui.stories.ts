@@ -1,6 +1,6 @@
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '../../constants.js';
 import type { UmbRefPropertyEditorUIElement } from './ref-property-editor-ui.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import './ref-property-editor-ui.element.js';
 

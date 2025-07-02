@@ -122,42 +122,29 @@ namespace Umbraco.Cms
             /// <inheritdoc />
             public ProcessInstructionsResult ProcessInstructions(
                 CacheRefresherCollection cacheRefreshers,
-                ServerRole serverRole,
                 CancellationToken cancellationToken,
                 string localIdentity,
-                DateTime lastPruned,
                 int lastId)
             {
                 using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                 using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
                     var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
-
-                    // Check for pruning throttling.
-                    if (cancellationToken.IsCancellationRequested || DateTime.UtcNow - lastPruned <=
-                        _globalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
-                    {
-                        scope.Complete();
-                        return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
-                    }
-
-                    var instructionsWerePruned = false;
-                    switch (serverRole)
-                    {
-                        case ServerRole.Single:
-                        case ServerRole.SchedulingPublisher:
-                            PruneOldInstructions();
-                            instructionsWerePruned = true;
-                            break;
-                    }
-
                     scope.Complete();
-
-                    return instructionsWerePruned
-                        ? ProcessInstructionsResult.AsCompletedAndPruned(numberOfInstructionsProcessed, lastId)
-                        : ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                    return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                 }
             }
+
+            /// <inheritdoc />
+            [Obsolete("Use the non-obsolete overload. Scheduled for removal in V17.")]
+            public ProcessInstructionsResult ProcessInstructions(
+                CacheRefresherCollection cacheRefreshers,
+                ServerRole serverRole,
+                CancellationToken cancellationToken,
+                string localIdentity,
+                DateTime lastPruned,
+                int lastId) =>
+                ProcessInstructions(cacheRefreshers, cancellationToken, localIdentity, lastId);
 
             private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity)
                 => new(
@@ -485,21 +472,6 @@ namespace Umbraco.Cms
                 }
 
                 return jsonRefresher;
-            }
-
-            /// <summary>
-            ///     Remove old instructions from the database
-            /// </summary>
-            /// <remarks>
-            ///     Always leave the last (most recent) record in the db table, this is so that not all instructions are removed which
-            ///     would cause
-            ///     the site to cold boot if there's been no instruction activity for more than TimeToRetainInstructions.
-            ///     See: http://issues.umbraco.org/issue/U4-7643#comment=67-25085
-            /// </remarks>
-            private void PruneOldInstructions()
-            {
-                DateTime pruneDate = DateTime.UtcNow - _globalSettings.DatabaseServerMessenger.TimeToRetainInstructions;
-                _cacheInstructionRepository.DeleteInstructionsOlderThan(pruneDate);
             }
         }
     }

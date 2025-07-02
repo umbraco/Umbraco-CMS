@@ -1,5 +1,5 @@
 import type { UmbSectionMainElement } from './section-main.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './section-main.element.js';

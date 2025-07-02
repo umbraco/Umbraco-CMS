@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './template-field-dropdown-list.element.js';
 import type { UmbTemplateFieldDropdownListElement } from './template-field-dropdown-list.element.js';
 

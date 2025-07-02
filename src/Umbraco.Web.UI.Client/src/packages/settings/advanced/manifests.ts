@@ -1,5 +1,6 @@
 import { UMB_SETTINGS_SECTION_ALIAS } from '../constants.js';
 import { UMB_ADVANCED_SETTINGS_MENU_ALIAS } from './constants.js';
+import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 export const manifests = [
 	{
@@ -19,7 +20,7 @@ export const manifests = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.SectionAlias',
+				alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 				match: UMB_SETTINGS_SECTION_ALIAS,
 			},
 		],

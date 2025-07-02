@@ -12,7 +12,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 	}
 
 	getRoot({ skip = 0, take = 100 }: { skip?: number; take?: number } = {}) {
-		const items = this.#db.getAll().filter((item) => item.parent === null);
+		const items = this.#db.getAll().filter((item) => item.parent === null || item.parent === undefined);
 		return this.#pagedTreeResult({ items, skip, take });
 	}
 
