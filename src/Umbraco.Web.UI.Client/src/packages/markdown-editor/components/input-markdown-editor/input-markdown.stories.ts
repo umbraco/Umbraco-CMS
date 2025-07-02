@@ -3,7 +3,7 @@ import './input-markdown.element.js';
 import type { UmbInputMarkdownElement } from './input-markdown.element.js';
 
 const meta: Meta<UmbInputMarkdownElement> = {
-	title: 'Components/Inputs/Markdown',
+	title: 'Generic Components/Inputs/Markdown',
 	component: 'umb-input-markdown',
 	args: {
 		preview: false,
