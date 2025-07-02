@@ -7,6 +7,6 @@ export class UmbSectionSidebarMenuContext extends UmbContextBase {
 	public readonly expansion = new UmbEntityExpansionManager(this);
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_SECTION_SIDEBAR_MENU_CONTEXT.toString());
+		super(host, UMB_SECTION_SIDEBAR_MENU_CONTEXT);
 	}
 }

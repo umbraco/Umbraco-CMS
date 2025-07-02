@@ -1,11 +1,9 @@
-import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from '../../menu/section-sidebar-menu/context/section-sidebar-menu.context.token.js';
 import type { UmbTreeElement } from '../tree.element.js';
 import type { ManifestMenuItemTreeKind } from './types.js';
 import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbMenuItemElement } from '@umbraco-cms/backoffice/menu';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
+import { UMB_MENU_CONTEXT, type UmbMenuItemElement } from '@umbraco-cms/backoffice/menu';
+import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-menu-item-tree-default')
 export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbMenuItemElement {
@@ -13,22 +11,22 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 	manifest?: ManifestMenuItemTreeKind;
 
 	@state()
-	_expansion: Array<UmbEntityModel> = [];
+	_menuExpansion: UmbEntityExpansionModel = [];
 
-	#context?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
+	#menuContext?: typeof UMB_MENU_CONTEXT.TYPE;
 
 	constructor() {
 		super();
-		// TODO: make another context abstraction UMB_MENU_CONTEXT
-		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_CONTEXT, (context) => {
-			this.#context = context;
+
+		this.consumeContext(UMB_MENU_CONTEXT, (context) => {
+			this.#menuContext = context;
 			this.#observeExpansion();
 		});
 	}
 
 	#observeExpansion() {
-		this.observe(this.#context?.expansion.expansion, (items) => {
-			this._expansion = items || [];
+		this.observe(this.#menuContext?.expansion.expansion, (items) => {
+			this._menuExpansion = items || [];
 		});
 	}
 
@@ -36,7 +34,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 		event.stopPropagation();
 		const target = event.target as UmbTreeElement;
 		const expansion = target.getExpansion();
-		this.#context?.expansion.updateExpansion(expansion);
+		debugger;
 	}
 
 	override render() {
@@ -50,7 +48,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 								selectable: false,
 								multiple: false,
 							},
-							expansion: this._expansion,
+							expansion: this._menuExpansion,
 						}}
 						@expansion-change=${this.#onExpansionChange}></umb-tree>
 				`
