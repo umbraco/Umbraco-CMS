@@ -46,7 +46,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected Task<ActionResult<IEnumerable<TItem>>> GetSiblings(Guid target, int before, int after)
     {
-        IEntitySlim[] siblings = EntityService.GetSiblings(target, ItemObjectType, before, after).ToArray();
+        IEntitySlim[] siblings = EntityService.GetSiblings(target, ItemObjectType, before, after, ItemOrdering).ToArray();
         if (siblings.Length == 0)
         {
             return Task.FromResult<ActionResult<IEnumerable<TItem>>>(NotFound());

@@ -170,7 +170,12 @@ public interface IEntityService
     /// <param name="objectType">The object type of the parent.</param>
     IEntitySlim? GetParent(int id, UmbracoObjectTypes objectType);
 
-    IEnumerable<IEntitySlim> GetSiblings(Guid key, UmbracoObjectTypes objectType, int before, int after) => [];
+    IEnumerable<IEntitySlim> GetSiblings(
+        Guid key,
+        UmbracoObjectTypes objectType,
+        int before,
+        int after,
+        Ordering? ordering = null) => [];
 
     /// <summary>
     ///     Gets the children of an entity.

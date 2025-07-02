@@ -145,7 +145,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
-    public IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int before, int after)
+    public IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int before, int after, Ordering ordering)
     {
         // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
         // without us also having to do a nested query for the parent ID too.
@@ -155,10 +155,13 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             .Where<NodeDto>(x => x.UniqueId == targetKey);
         var parentId = Database.ExecuteScalar<int>(parentIdQuery);
 
+        Sql<ISqlContext> orderingSql = Sql();
+        ApplyOrdering(ref orderingSql, ordering);
+
         // Get all children of the parent node which is not trashed, ordered by SortOrder, and assign each a row number.
         // These row numbers are important, we need them to select the "before" and "after" siblings of the target node.
         Sql<ISqlContext> rowNumberSql = Sql()
-            .Select($"ROW_NUMBER() OVER (ORDER BY {SqlContext.SqlSyntax.GetQuotedTableName("umbracoNode")}.{SqlContext.SqlSyntax.GetQuotedColumnName("sortOrder")}) AS rn")
+            .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS rn")
             .AndSelect<NodeDto>(n => n.UniqueId)
             .From<NodeDto>()
             .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == false);
@@ -195,7 +198,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             return [];
         }
 
-        return GetAll(objectType, keys.ToArray());
+        return PerformGetAll(objectType, ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
     }
 
 
@@ -267,6 +270,20 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         var isMember = objectType == Constants.ObjectTypes.Member;
 
         Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectType, filter);
+        return GetEntities(sql, isContent, isMedia, isMember);
+    }
+
+    private IEnumerable<IEntitySlim> PerformGetAll(
+        Guid objectType,
+        Ordering ordering,
+        Action<Sql<ISqlContext>>? filter = null)
+    {
+        var isContent = objectType == Constants.ObjectTypes.Document ||
+                        objectType == Constants.ObjectTypes.DocumentBlueprint;
+        var isMedia = objectType == Constants.ObjectTypes.Media;
+        var isMember = objectType == Constants.ObjectTypes.Member;
+
+        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectType, ordering, filter);
         return GetEntities(sql, isContent, isMedia, isMember);
     }
 
@@ -504,6 +521,21 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
         return AddGroupBy(isContent, isMedia, isMember, sql, true);
+    }
+
+    protected Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
+        Ordering ordering,
+        Action<Sql<ISqlContext>>? filter)
+    {
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
+        AddGroupBy(isContent, isMedia, isMember, sql, false);
+        ApplyOrdering(ref sql, ordering);
+
+        return sql;
     }
 
     protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, bool isCount = false)
