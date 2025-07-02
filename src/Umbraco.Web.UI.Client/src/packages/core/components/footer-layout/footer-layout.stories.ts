@@ -5,7 +5,7 @@ import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
-	title: 'Extension Type/Workspace/Components/Footer Layout',
+	title: 'Generic Components/Footer Layout',
 	component: 'umb-footer-layout',
 	id: 'umb-footer-layout',
 } as Meta;
