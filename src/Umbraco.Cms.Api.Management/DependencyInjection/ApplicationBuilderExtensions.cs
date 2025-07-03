@@ -43,7 +43,7 @@ internal static class ApplicationBuilderExtensions
 
                     var response = new ProblemDetails
                     {
-                        Title = exception.Message,
+                        Title = isDebug ? exception.Message : null, // ui resolves title in case of null
                         Detail = isDebug ? exception.StackTrace : null,
                         Status = statusCode ?? StatusCodes.Status500InternalServerError,
                         Instance = isDebug ? exception.GetType().Name : null,
