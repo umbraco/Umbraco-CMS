@@ -20,7 +20,7 @@ public interface IPermissionPresentationMapper
     Type PresentationModelToHandle { get; }
 
     /// <summary>
-    /// Maps a granular permission DTO to a granular permission model.
+    /// Maps a granular permission entity to a granular permission model.
     /// </summary>
     IEnumerable<IPermissionPresentationModel> MapManyAsync(IEnumerable<IGranularPermission> granularPermissions);
 
