@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Mapping.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.ViewModels;
@@ -34,8 +35,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly IPasswordConfigurationPresentationFactory _passwordConfigurationPresentationFactory;
     private readonly IBackOfficeExternalLoginProviders _externalLoginProviders;
     private readonly SecuritySettings _securitySettings;
-    private readonly IUserService _userService;
-    private readonly IContentService _contentService;
+    private readonly Dictionary<Type, IPermissionPresentationMapper> _permissionPresentationMappersByType;
 
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
     public UserPresentationFactory(
@@ -50,7 +50,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         IOptionsSnapshot<SecuritySettings> securitySettings,
         IBackOfficeExternalLoginProviders externalLoginProviders)
         : this(
-              entityService,
+            entityService,
             appCaches,
             mediaFileManager,
             imageUrlGenerator,
@@ -61,10 +61,12 @@ public class UserPresentationFactory : IUserPresentationFactory
             securitySettings,
             externalLoginProviders,
             StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentService>())
+            StaticServiceProvider.Instance.GetRequiredService<IContentService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IEnumerable<IPermissionPresentationMapper>>())
     {
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
@@ -78,6 +80,38 @@ public class UserPresentationFactory : IUserPresentationFactory
         IBackOfficeExternalLoginProviders externalLoginProviders,
         IUserService userService,
         IContentService contentService)
+        : this(
+            entityService,
+            appCaches,
+            mediaFileManager,
+            imageUrlGenerator,
+            userGroupPresentationFactory,
+            absoluteUrlBuilder,
+            emailSender,
+            passwordConfigurationPresentationFactory,
+            securitySettings,
+            externalLoginProviders,
+            userService,
+            contentService,
+            StaticServiceProvider.Instance.GetRequiredService<IEnumerable<IPermissionPresentationMapper>>())
+    {
+    }
+
+    // TODO (V17): Remove the unused userService and contentService parameters from the constructor.
+    public UserPresentationFactory(
+        IEntityService entityService,
+        AppCaches appCaches,
+        MediaFileManager mediaFileManager,
+        IImageUrlGenerator imageUrlGenerator,
+        IUserGroupPresentationFactory userGroupPresentationFactory,
+        IAbsoluteUrlBuilder absoluteUrlBuilder,
+        IEmailSender emailSender,
+        IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
+        IOptionsSnapshot<SecuritySettings> securitySettings,
+        IBackOfficeExternalLoginProviders externalLoginProviders,
+        IUserService userService,
+        IContentService contentService,
+        IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers)
     {
         _entityService = entityService;
         _appCaches = appCaches;
@@ -89,8 +123,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         _externalLoginProviders = externalLoginProviders;
         _securitySettings = securitySettings.Value;
         _absoluteUrlBuilder = absoluteUrlBuilder;
-        _userService = userService;
-        _contentService = contentService;
+        _permissionPresentationMappersByType = permissionPresentationMappers.ToDictionary(x => x.PresentationModelToHandle);
     }
 
     public UserResponseModel CreateResponseModel(IUser user)
@@ -263,66 +296,53 @@ public class UserPresentationFactory : IUserPresentationFactory
 
     private HashSet<IPermissionPresentationModel> GetAggregatedGranularPermissions(IUser user, IEnumerable<UserGroupResponseModel> presentationGroups)
     {
-        var aggregatedPermissions = new HashSet<IPermissionPresentationModel>();
-
         var permissions = presentationGroups.SelectMany(x => x.Permissions).ToHashSet();
-
-        AggregateAndAddDocumentPermissions(user, aggregatedPermissions, permissions);
-
-        AggregateAndAddOtherPermissions(aggregatedPermissions, permissions);
-
-        return aggregatedPermissions;
+        return GetAggregatedGranularPermissions(user, permissions);
     }
 
-    private void AggregateAndAddDocumentPermissions(IUser user, HashSet<IPermissionPresentationModel> aggregatedPermissions, HashSet<IPermissionPresentationModel> permissions)
+    private HashSet<IPermissionPresentationModel> GetAggregatedGranularPermissions(IUser user, HashSet<IPermissionPresentationModel> permissions)
     {
-        // The raw permission data consists of several permissions for each document.  We want to aggregate this server-side so
-        // we return one set of aggregate permissions per document that the client will use.
-
-        // Get the unique document keys that have granular permissions.
-        IEnumerable<Guid> documentKeysWithGranularPermissions = permissions
-            .Where(x => x is DocumentPermissionPresentationModel)
-            .Cast<DocumentPermissionPresentationModel>()
-            .Select(x => x.Document.Id)
-            .Distinct();
-
-        foreach (Guid documentKey in documentKeysWithGranularPermissions)
-        {
-            // Retrieve the path of the document.
-            var path = _contentService.GetById(documentKey)?.Path;
-            if (string.IsNullOrEmpty(path))
-            {
-                continue;
-            }
-
-            // With the path we can call the same logic as used server-side for authorizing access to resources.
-            EntityPermissionSet permissionsForPath = _userService.GetPermissionsForPath(user, path);
-            aggregatedPermissions.Add(new DocumentPermissionPresentationModel
-            {
-                Document = new ReferenceByIdModel(documentKey),
-                Verbs = permissionsForPath.GetAllPermissions()
-            });
-        }
-    }
-
-    private static void AggregateAndAddOtherPermissions(HashSet<IPermissionPresentationModel> aggregatedPermissions, HashSet<IPermissionPresentationModel> permissions)
-    {
-        // We also have permissions for document type/property type combinations and packages and implementors
-        // can also register permissions. These also need to be aggregated based on the grouping mechanism defined
-        // by the custom permission presentation model.
+        // The raw permission data consists of several permissions for each entity (e.g. document), as permissions are assigned to user groups
+        // and a user may be part of multiple groups.  We want to aggregate this server-side so we return one set of aggregate permissions per
+        // entity that the client will use.
+        // We need to handle here not just permissions known to core (e.g. document and document property value permissions), but also custom
+        // permissions defined by packages or implemetors.
         IEnumerable<(Type, IEnumerable<IPermissionPresentationModel>)> permissionModelsByType = permissions
-            .Where(x => x is not DocumentPermissionPresentationModel) // these are already handled with special logic to take into account permissions defined on ancestors
             .GroupBy(x => x.GetType())
             .Select(x => (x.Key, x.Select(y => y)));
 
+        var aggregatedPermissions = new HashSet<IPermissionPresentationModel>();
         foreach ((Type Type, IEnumerable<IPermissionPresentationModel> Models) permissionModelByType in permissionModelsByType)
         {
-            IEnumerable<IPermissionPresentationModel> aggregatedModels = permissionModelByType.Models.First().GetAggregatedModels(permissionModelByType.Models);
-            foreach (IPermissionPresentationModel aggregatedModel in aggregatedModels)
+            if (_permissionPresentationMappersByType.TryGetValue(permissionModelByType.Type, out IPermissionPresentationMapper? mapper))
             {
-                aggregatedPermissions.Add(aggregatedModel);
+
+                IEnumerable<IPermissionPresentationModel> aggregatedModels = mapper.GetAggregatedPresentationModels(user, permissionModelByType.Models);
+                foreach (IPermissionPresentationModel aggregatedModel in aggregatedModels)
+                {
+                    aggregatedPermissions.Add(aggregatedModel);
+                }
+            }
+            else
+            {
+                IEnumerable<(string Context, ISet<string> Verbs)> groupedModels = permissionModelByType.Models
+                    .Where(x => x is UnknownTypePermissionPresentationModel)
+                    .Cast<UnknownTypePermissionPresentationModel>()
+                    .GroupBy(x => x.Context)
+                    .Select(x => (x.Key, (ISet<string>)x.SelectMany(y => y.Verbs).Distinct().ToHashSet()));
+
+                foreach ((string context, ISet<string> verbs) in groupedModels)
+                {
+                    aggregatedPermissions.Add(new UnknownTypePermissionPresentationModel
+                    {
+                        Context = context,
+                        Verbs = verbs
+                    });
+                }
             }
         }
+
+        return aggregatedPermissions;
     }
 
     private static bool IsKnownPermission(IPermissionPresentationModel permissionPresentationModel)

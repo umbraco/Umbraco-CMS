@@ -1,6 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
@@ -13,7 +17,25 @@ namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
 /// </remarks>
 public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissionMapper
 {
+    private readonly Lazy<IContentService> _contentService;
+    private readonly Lazy<IUserService> _userService;
+
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
+    public DocumentPermissionMapper()
+        : this(
+              StaticServiceProvider.Instance.GetRequiredService<Lazy<IContentService>>(),
+              StaticServiceProvider.Instance.GetRequiredService<Lazy<IUserService>>())
+    {
+    }
+
+    public DocumentPermissionMapper(Lazy<IContentService> contentService, Lazy<IUserService> userService)
+    {
+        _contentService = contentService;
+        _userService = userService;
+    }
+
     public string Context => DocumentGranularPermission.ContextType;
+
     public IGranularPermission MapFromDto(UserGroup2GranularPermissionDto dto) =>
         new DocumentGranularPermission()
         {
@@ -47,7 +69,7 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
             yield break;
         }
 
-        if(documentPermissionPresentationModel.Verbs.Any() is false || (documentPermissionPresentationModel.Verbs.Count == 1 && documentPermissionPresentationModel.Verbs.Contains(string.Empty)))
+        if (documentPermissionPresentationModel.Verbs.Any() is false || (documentPermissionPresentationModel.Verbs.Count == 1 && documentPermissionPresentationModel.Verbs.Contains(string.Empty)))
         {
             yield return new DocumentGranularPermission
             {
@@ -56,16 +78,45 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
             };
             yield break;
         }
+
         foreach (var verb in documentPermissionPresentationModel.Verbs)
         {
             if (string.IsNullOrEmpty(verb))
             {
                 continue;
             }
+
             yield return new DocumentGranularPermission
             {
                 Key = documentPermissionPresentationModel.Document.Id,
                 Permission = verb,
+            };
+        }
+    }
+
+    public IEnumerable<IPermissionPresentationModel> GetAggregatedPresentationModels(IUser user, IEnumerable<IPermissionPresentationModel> models)
+    {
+        // Get the unique document keys that have granular permissions.
+        IEnumerable<Guid> documentKeysWithGranularPermissions = models
+            .Cast<DocumentPermissionPresentationModel>()
+            .Select(x => x.Document.Id)
+            .Distinct();
+
+        foreach (Guid documentKey in documentKeysWithGranularPermissions)
+        {
+            // Retrieve the path of the document.
+            var path = _contentService.Value.GetById(documentKey)?.Path;
+            if (string.IsNullOrEmpty(path))
+            {
+                continue;
+            }
+
+            // With the path we can call the same logic as used server-side for authorizing access to resources.
+            EntityPermissionSet permissionsForPath = _userService.Value.GetPermissionsForPath(user, path);
+            yield return new DocumentPermissionPresentationModel
+            {
+                Document = new ReferenceByIdModel(documentKey),
+                Verbs = permissionsForPath.GetAllPermissions()
             };
         }
     }

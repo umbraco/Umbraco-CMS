@@ -1,4 +1,5 @@
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
@@ -12,4 +13,6 @@ public interface IPermissionPresentationMapper
     IEnumerable<IPermissionPresentationModel> MapManyAsync(IEnumerable<IGranularPermission> granularPermissions);
 
     IEnumerable<IGranularPermission> MapToGranularPermissions(IPermissionPresentationModel permissionViewModel);
+
+    IEnumerable<IPermissionPresentationModel> GetAggregatedPresentationModels(IUser user, IEnumerable<IPermissionPresentationModel> models) => [];
 }

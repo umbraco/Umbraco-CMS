@@ -1,5 +1,6 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -63,6 +64,24 @@ public class DocumentPropertyValuePermissionMapper : IPermissionPresentationMapp
             {
                 Key = documentTypePermissionPresentationModel.DocumentType.Id,
                 Permission = $"{documentTypePermissionPresentationModel.PropertyType.Id}|{verb}"
+            };
+        }
+    }
+
+    public IEnumerable<IPermissionPresentationModel> GetAggregatedPresentationModels(IUser user, IEnumerable<IPermissionPresentationModel> models)
+    {
+        IEnumerable<((Guid DocumentTypeId, Guid PropertyTypeId) Key, ISet<string> Verbs)> groupedModels = models
+            .Cast<DocumentPropertyValuePermissionPresentationModel>()
+            .GroupBy(x => (x.DocumentType.Id, x.PropertyType.Id))
+            .Select(x => (x.Key, (ISet<string>)x.SelectMany(y => y.Verbs).Distinct().ToHashSet()));
+
+        foreach (((Guid DocumentTypeId, Guid PropertyTypeId) key, ISet<string> verbs) in groupedModels)
+        {
+            yield return new DocumentPropertyValuePermissionPresentationModel
+            {
+                DocumentType = new ReferenceByIdModel(key.DocumentTypeId),
+                PropertyType = new ReferenceByIdModel(key.PropertyTypeId),
+                Verbs = verbs
             };
         }
     }
