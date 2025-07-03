@@ -17,12 +17,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDocumentUrlRepository, UmbDocumentUrlsDataResolver } from '@umbraco-cms/backoffice/document';
 import { UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-input-multi-url
@@ -32,7 +32,7 @@ import { UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
  */
 const elementName = 'umb-input-multi-url';
 @customElement(elementName)
-export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputMultiUrlElement extends UmbFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<UmbLinkPickerLink>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;

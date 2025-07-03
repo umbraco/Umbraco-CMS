@@ -1,18 +1,18 @@
 import type { UmbMultipleColorPickerItemInputElement } from './multiple-color-picker-item-input.element.js';
 import { css, customElement, html, nothing, repeat, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-multiple-color-picker-input
  */
 @customElement('umb-multiple-color-picker-input')
-export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbMultipleColorPickerInputElement extends UmbFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController(this, {
 		getUniqueOfElement: (element: UmbMultipleColorPickerItemInputElement) => {
 			return element.value.toString();

@@ -1,11 +1,11 @@
 import { customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-eye-dropper')
-export class UmbInputEyeDropperElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputEyeDropperElement extends UmbFormControlMixin(UmbLitElement, '') {
 	protected override getFormElement() {
 		return undefined;
 	}

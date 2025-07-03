@@ -2,14 +2,14 @@ import { css, customElement, html, nothing, property, query, when } from '@umbra
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-input-multiple-text-string-item
  */
 @customElement('umb-input-multiple-text-string-item')
-export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputMultipleTextStringItemElement extends UmbFormControlMixin(UmbLitElement, '') {
 	/**
 	 * Disables the input
 	 * @type {boolean}
