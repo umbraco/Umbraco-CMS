@@ -30,6 +30,8 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
             return Task.FromResult<IActionResult>(Conflict(problemDetails));
         }
 
+        // TODO: Adjust this to use the return status of the long operation instead of calling IsRebuilding.
+        // That is thread safe, while this isn't.
         _databaseCacheRebuilder.Rebuild(true);
         return Task.FromResult<IActionResult>(Ok());
     }

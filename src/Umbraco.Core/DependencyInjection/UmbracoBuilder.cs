@@ -33,6 +33,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
@@ -340,6 +341,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));
+            Services.AddUnique<ILongRunningOperationService, LongRunningOperationService>();
 
             Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 

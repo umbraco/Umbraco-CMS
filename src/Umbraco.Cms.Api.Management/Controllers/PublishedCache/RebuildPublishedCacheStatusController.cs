@@ -19,9 +19,11 @@ public class RebuildPublishedCacheStatusController : PublishedCacheControllerBas
     public Task<IActionResult> Status(CancellationToken cancellationToken)
     {
         var isRebuilding = _databaseCacheRebuilder.IsRebuilding();
-        return Task.FromResult((IActionResult)Ok(new RebuildStatusModel
-        {
-            IsRebuilding = isRebuilding
-        }));
+        return Task.FromResult<IActionResult>(
+            Ok(
+                new RebuildStatusModel
+                {
+                    IsRebuilding = isRebuilding,
+                }));
     }
 }

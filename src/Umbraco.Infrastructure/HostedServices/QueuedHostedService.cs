@@ -39,12 +39,14 @@ public class QueuedHostedService : BackgroundService
         {
             Func<CancellationToken, Task>? workItem = await TaskQueue.DequeueAsync(stoppingToken);
 
+            if (workItem is null)
+            {
+                continue;
+            }
+
             try
             {
-                if (workItem is not null)
-                {
-                    await workItem(stoppingToken);
-                }
+                await workItem(stoppingToken);
             }
             catch (Exception ex)
             {
