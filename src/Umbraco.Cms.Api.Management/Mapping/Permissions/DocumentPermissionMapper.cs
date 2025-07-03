@@ -9,8 +9,9 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
+
 /// <summary>
-/// Mapping required for mapping all the way from viewmodel to database and back.
+/// Implements <see cref="IPermissionPresentationMapper" /> for document permissions.
 /// </summary>
 /// <remarks>
 /// This mapping maps all the way from management api to database in one file intentionally, so it is very clear what it takes, if we wanna add permissions to media or other types in the future.
@@ -20,6 +21,9 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     private readonly Lazy<IContentService> _contentService;
     private readonly Lazy<IUserService> _userService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
+    /// </summary>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
     public DocumentPermissionMapper()
         : this(
@@ -28,12 +32,16 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
+    /// </summary>
     public DocumentPermissionMapper(Lazy<IContentService> contentService, Lazy<IUserService> userService)
     {
         _contentService = contentService;
         _userService = userService;
     }
 
+    /// <inheritdoc/>
     public string Context => DocumentGranularPermission.ContextType;
 
     public IGranularPermission MapFromDto(UserGroup2GranularPermissionDto dto) =>
@@ -43,8 +51,10 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
             Permission = dto.Permission,
         };
 
+    /// <inheritdoc/>
     public Type PresentationModelToHandle => typeof(DocumentPermissionPresentationModel);
 
+    /// <inheritdoc/>
     public IEnumerable<IPermissionPresentationModel> MapManyAsync(IEnumerable<IGranularPermission> granularPermissions)
     {
         IEnumerable<IGrouping<Guid?, IGranularPermission>> keyGroups = granularPermissions.GroupBy(x => x.Key);
@@ -62,6 +72,7 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
         }
     }
 
+    /// <inheritdoc/>
     public IEnumerable<IGranularPermission> MapToGranularPermissions(IPermissionPresentationModel permissionViewModel)
     {
         if (permissionViewModel is not DocumentPermissionPresentationModel documentPermissionPresentationModel)
@@ -94,7 +105,8 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
         }
     }
 
-    public IEnumerable<IPermissionPresentationModel> GetAggregatedPresentationModels(IUser user, IEnumerable<IPermissionPresentationModel> models)
+    /// <inheritdoc/>
+    public IEnumerable<IPermissionPresentationModel> AggregatePresentationModels(IUser user, IEnumerable<IPermissionPresentationModel> models)
     {
         // Get the unique document keys that have granular permissions.
         IEnumerable<Guid> documentKeysWithGranularPermissions = models

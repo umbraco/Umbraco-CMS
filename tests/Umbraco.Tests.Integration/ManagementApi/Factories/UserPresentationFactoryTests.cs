@@ -359,23 +359,6 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         public required ISet<string> Verbs { get; set; }
 
         public required Guid Key { get; set; }
-
-        public IEnumerable<IPermissionPresentationModel> GetAggregatedModels(IEnumerable<IPermissionPresentationModel> models)
-        {
-            IEnumerable<(Guid Key, ISet<string> Verbs)> groupedModels = models
-                .Cast<CustomPermissionPresentationModel>()
-                .GroupBy(x => x.Key)
-                .Select(x => (x.Key, (ISet<string>)x.SelectMany(y => y.Verbs).Distinct().ToHashSet()));
-
-            foreach ((Guid key, ISet<string> verbs) in groupedModels)
-            {
-                yield return new CustomPermissionPresentationModel
-                {
-                    Key = key,
-                    Verbs = verbs,
-                };
-            }
-        }
     }
 
     private class CustomPermissionMapper : IPermissionMapper, IPermissionPresentationMapper
@@ -414,6 +397,23 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
                 yield return new CustomGranularPermission
                 {
                     Permission = customPermissionPresentationModel.Key + "|" + verb,
+                };
+            }
+        }
+
+        public IEnumerable<IPermissionPresentationModel> AggregatePresentationModels(IUser user, IEnumerable<IPermissionPresentationModel> models)
+        {
+            IEnumerable<(Guid Key, ISet<string> Verbs)> groupedModels = models
+                .Cast<CustomPermissionPresentationModel>()
+                .GroupBy(x => x.Key)
+                .Select(x => (x.Key, (ISet<string>)x.SelectMany(y => y.Verbs).Distinct().ToHashSet()));
+
+            foreach ((Guid key, ISet<string> verbs) in groupedModels)
+            {
+                yield return new CustomPermissionPresentationModel
+                {
+                    Key = key,
+                    Verbs = verbs,
                 };
             }
         }

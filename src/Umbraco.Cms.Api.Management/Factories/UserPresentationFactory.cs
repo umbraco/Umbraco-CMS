@@ -317,7 +317,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             if (_permissionPresentationMappersByType.TryGetValue(permissionModelByType.Type, out IPermissionPresentationMapper? mapper))
             {
 
-                IEnumerable<IPermissionPresentationModel> aggregatedModels = mapper.GetAggregatedPresentationModels(user, permissionModelByType.Models);
+                IEnumerable<IPermissionPresentationModel> aggregatedModels = mapper.AggregatePresentationModels(user, permissionModelByType.Models);
                 foreach (IPermissionPresentationModel aggregatedModel in aggregatedModels)
                 {
                     aggregatedPermissions.Add(aggregatedModel);

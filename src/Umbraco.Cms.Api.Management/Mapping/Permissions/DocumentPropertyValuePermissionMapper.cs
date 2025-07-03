@@ -8,10 +8,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
 
+/// <summary>
+/// Implements <see cref="IPermissionPresentationMapper" /> for document property value permissions.
+/// </summary>
 public class DocumentPropertyValuePermissionMapper : IPermissionPresentationMapper, IPermissionMapper
 {
+    /// <inheritdoc/>
     public string Context => DocumentPropertyValueGranularPermission.ContextType;
 
+    /// <inheritdoc/>
+    public Type PresentationModelToHandle => typeof(DocumentPropertyValuePermissionPresentationModel);
+
+    /// <inheritdoc/>
     public IGranularPermission MapFromDto(UserGroup2GranularPermissionDto dto) =>
         new DocumentPropertyValueGranularPermission()
         {
@@ -19,8 +27,7 @@ public class DocumentPropertyValuePermissionMapper : IPermissionPresentationMapp
             Permission = dto.Permission,
         };
 
-    public Type PresentationModelToHandle => typeof(DocumentPropertyValuePermissionPresentationModel);
-
+    /// <inheritdoc/>
     public IEnumerable<IPermissionPresentationModel> MapManyAsync(IEnumerable<IGranularPermission> granularPermissions)
     {
         var intermediate = granularPermissions.Where(p => p.Key.HasValue).Select(p =>
@@ -51,6 +58,7 @@ public class DocumentPropertyValuePermissionMapper : IPermissionPresentationMapp
         }
     }
 
+    /// <inheritdoc/>
     public IEnumerable<IGranularPermission> MapToGranularPermissions(IPermissionPresentationModel permissionViewModel)
     {
         if (permissionViewModel is not DocumentPropertyValuePermissionPresentationModel documentTypePermissionPresentationModel)
@@ -68,7 +76,8 @@ public class DocumentPropertyValuePermissionMapper : IPermissionPresentationMapp
         }
     }
 
-    public IEnumerable<IPermissionPresentationModel> GetAggregatedPresentationModels(IUser user, IEnumerable<IPermissionPresentationModel> models)
+    /// <inheritdoc/>
+    public IEnumerable<IPermissionPresentationModel> AggregatePresentationModels(IUser user, IEnumerable<IPermissionPresentationModel> models)
     {
         IEnumerable<((Guid DocumentTypeId, Guid PropertyTypeId) Key, ISet<string> Verbs)> groupedModels = models
             .Cast<DocumentPropertyValuePermissionPresentationModel>()
