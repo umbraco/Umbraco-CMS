@@ -1,8 +1,8 @@
+import type { UmbBodyLayoutElement } from './body-layout.element.js';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './body-layout.element.js';
-import type { UmbBodyLayoutElement } from './body-layout.element.js';
 
 const meta: Meta<UmbBodyLayoutElement> = {
 	title: 'Generic Components/Body Layout',

@@ -1,7 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
-import './code-block.element.js';
 import type { UmbCodeBlockElement } from './code-block.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
+
+import './code-block.element.js';
 
 const meta: Meta<UmbCodeBlockElement> = {
 	title: 'Generic Components/Code Block',
