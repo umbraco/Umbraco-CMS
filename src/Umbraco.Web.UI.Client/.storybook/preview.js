@@ -25,6 +25,7 @@ import icons from '../src/packages/core/icon-registry/icons';
 import '../src/libs/context-api/provide/context-provider.element';
 import '../src/packages/core/components';
 
+import { manifests as coreManifests } from '../src/packages/core/manifests';
 import { manifests as documentManifests } from '../src/packages/documents/manifests';
 import { manifests as localizationManifests } from '../src/packages/core/localization/manifests';
 import { UmbNotificationContext } from '../src/packages/core/notification';
@@ -37,14 +38,13 @@ class UmbStoryBookElement extends UmbLitElement {
 
 	constructor() {
 		super();
+		const manifests = [...coreManifests, ...documentManifests, ...localizationManifests];
 		this._umbIconRegistry.setIcons(icons);
 		this._umbIconRegistry.attach(this);
-		this._registerExtensions(documentManifests);
+		this._registerExtensions(manifests);
 		new UmbModalManagerContext(this);
 		new UmbCurrentUserStore(this);
 		new UmbNotificationContext(this);
-
-		this._registerExtensions(localizationManifests);
 		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
 	}
 
