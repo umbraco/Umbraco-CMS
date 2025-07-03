@@ -1,6 +1,8 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PublishedCache;
@@ -15,9 +17,10 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("rebuild")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public Task<IActionResult> Rebuild(CancellationToken cancellationToken)
+    public async Task<IActionResult> Rebuild(CancellationToken cancellationToken)
     {
-        if (_databaseCacheRebuilder.IsRebuilding())
+        Attempt<DatabaseCacheRebuildResult> attempt = await _databaseCacheRebuilder.RebuildAsync(true);
+        if (attempt is { Success: false, Result: DatabaseCacheRebuildResult.AlreadyRunning })
         {
             var problemDetails = new ProblemDetails
             {
@@ -26,13 +29,9 @@ public class RebuildPublishedCacheController : PublishedCacheControllerBase
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
             };
-
-            return Task.FromResult<IActionResult>(Conflict(problemDetails));
+            return Conflict(problemDetails);
         }
 
-        // TODO: Adjust this to use the return status of the long operation instead of calling IsRebuilding.
-        // That is thread safe, while this isn't.
-        _databaseCacheRebuilder.Rebuild(true);
-        return Task.FromResult<IActionResult>(Ok());
+        return Ok();
     }
 }
