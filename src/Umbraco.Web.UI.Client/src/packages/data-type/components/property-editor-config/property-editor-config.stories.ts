@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-config.element.js';
 
 export default {
-	title: 'Generic Components/Property Editor Config',
+	title: 'Generic Components/Property Editor/Config',
 	component: 'umb-property-editor-config',
 	id: 'umb-property-editor-config',
 } as Meta;
