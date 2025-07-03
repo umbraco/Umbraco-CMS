@@ -114,11 +114,15 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
             .Select(x => x.Document.Id)
             .Distinct();
 
+        // Batch retrieve all documents by their keys.
+        var documents = _contentService.Value.GetByIds(documentKeysWithGranularPermissions)
+            .ToDictionary(doc => doc.Key, doc => doc.Path);
+
+        // Iterate through each document key that has granular permissions.
         foreach (Guid documentKey in documentKeysWithGranularPermissions)
         {
-            // Retrieve the path of the document.
-            var path = _contentService.Value.GetById(documentKey)?.Path;
-            if (string.IsNullOrEmpty(path))
+            // Retrieve the path from the pre-fetched documents.
+            if (!documents.TryGetValue(documentKey, out var path) || string.IsNullOrEmpty(path))
             {
                 continue;
             }
@@ -128,7 +132,7 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
             yield return new DocumentPermissionPresentationModel
             {
                 Document = new ReferenceByIdModel(documentKey),
-                Verbs = permissionsForPath.GetAllPermissions()
+                Verbs = permissionsForPath.GetAllPermissions(),
             };
         }
     }
