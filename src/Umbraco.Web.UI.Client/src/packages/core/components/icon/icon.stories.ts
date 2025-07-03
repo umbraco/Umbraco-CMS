@@ -3,7 +3,7 @@ import './icon.element.js';
 import type { UmbIconElement } from './icon.element.js';
 
 const meta: Meta<UmbIconElement> = {
-	title: 'Generic Components/Inputs/Icon',
+	title: 'Generic Components/Icon/Icon',
 	component: 'umb-icon',
 };
 
