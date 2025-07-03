@@ -91,6 +91,17 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
         Database.Execute(sql);
     }
 
+    /// <inheritdoc/>
+    public void CleanOperations(TimeSpan maxAge)
+    {
+        DateTime oldestPermittedUpdateDate = DateTime.UtcNow.Subtract(maxAge);
+        Sql<ISqlContext> sql = Sql()
+            .Delete<LongRunningOperationDto>()
+            .Where<LongRunningOperationDto>(x => x.UpdateDate < oldestPermittedUpdateDate);
+
+        Database.Execute(sql);
+    }
+
     private static LongRunningOperation MapDtoToEntity(LongRunningOperationDto dto) =>
         new()
         {

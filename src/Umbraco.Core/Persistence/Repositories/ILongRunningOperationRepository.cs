@@ -50,4 +50,10 @@ public interface ILongRunningOperationRepository
     /// <param name="result">The result of the operation.</param>
     /// <typeparam name="T">The type of the result.</typeparam>
     public void SetResult<T>(Guid id, T result);
+
+    /// <summary>
+    /// Cleans up long-running operations that haven't been updated for a certain period of time.
+    /// </summary>
+    /// <param name="maxAge">The maximum age of operations to keep.</param>
+    void CleanOperations(TimeSpan maxAge);
 }

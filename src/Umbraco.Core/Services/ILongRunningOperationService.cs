@@ -12,6 +12,7 @@ public interface ILongRunningOperationService
     /// </summary>
     /// <param name="type">The type of the long-running operation, used for categorization.</param>
     /// <param name="operation">The operation to execute, which should accept a <see cref="CancellationToken"/>.</param>
+    /// <param name="runInBackground">Whether to run the operation in the background.</param>
     /// <param name="allowMultipleRunsOfType">Whether to allow multiple instances of the same operation type to run concurrently.</param>
     /// <returns>An <see cref="Attempt{TStatus}"/> indicating the status of the enqueue operation.</returns>
     Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run(
@@ -25,6 +26,7 @@ public interface ILongRunningOperationService
     /// </summary>
     /// <param name="type">The type of the long-running operation, used for categorization.</param>
     /// <param name="operation">The operation to execute, which should accept a <see cref="CancellationToken"/>.</param>
+    /// <param name="runInBackground">Whether to run the operation in the background.</param>
     /// <param name="allowMultipleRunsOfType">Whether to allow multiple instances of the same operation type to run concurrently.</param>
     /// <returns>An <see cref="Attempt{TStatus}"/> indicating the status of the enqueue operation.</returns>
     /// <typeparam name="T">The type of the result expected from the operation.</typeparam>
