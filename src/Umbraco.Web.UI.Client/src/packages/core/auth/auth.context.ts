@@ -230,8 +230,8 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Sets the initial state of the auth flow.
 	 * @returns {Promise<void>}
 	 */
-	async setInitialState(): Promise<void> {
-		await this.#authFlow.setInitialState();
+	setInitialState(): Promise<void> {
+		return this.#authFlow.setInitialState();
 	}
 
 	/**
