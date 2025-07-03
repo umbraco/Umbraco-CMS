@@ -1,12 +1,12 @@
 import type { UmbStylesheetItemModel } from '../../types.js';
 import { UmbStylesheetPickerInputContext } from './stylesheet-input.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-stylesheet-input')
-export class UmbStylesheetInputElement extends UmbFormControlMixin(UmbLitElement, '') {
+export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}

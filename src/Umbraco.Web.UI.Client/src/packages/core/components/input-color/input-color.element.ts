@@ -1,16 +1,16 @@
 import { html, customElement, property, map, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /*
  * This wraps the UUI library uui-color-swatches component
  * @element umb-input-color
  */
 @customElement('umb-input-color')
-export class UmbInputColorElement extends UmbFormControlMixin(UmbLitElement) {
+export class UmbInputColorElement extends UUIFormControlMixin(UmbLitElement, '') {
 	protected override getFormElement() {
 		return undefined;
 	}

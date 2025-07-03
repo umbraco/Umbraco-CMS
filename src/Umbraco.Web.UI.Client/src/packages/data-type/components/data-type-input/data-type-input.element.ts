@@ -5,11 +5,11 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 // TODO: Rename to 'umb-input-data-type'. [LK]
 @customElement('umb-data-type-input')
-export class UmbDataTypeInputElement extends UmbFormControlMixin(UmbLitElement, '') {
+export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
