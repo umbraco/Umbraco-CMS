@@ -35,7 +35,7 @@ export class UmbIconElement extends UmbLitElement {
 	}
 
 	/**
-	 * The icon name. Can be appended with a color.\
+	 * The icon name. Can be appended with a color.
 	 * Example **icon-heart color-red**
 	 */
 	@property({ type: String })
