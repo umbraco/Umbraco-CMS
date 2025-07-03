@@ -53,7 +53,9 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         }
 
         IEntitySlim? entity = siblings.FirstOrDefault();
-        Guid? parentKey = entity?.ParentId > 0 ? entity.Key : null;
+        Guid? parentKey = entity?.ParentId > 0
+            ? EntityService.GetKey(entity.ParentId, ItemObjectType).Result
+            : Constants.System.RootKey;
 
         TItem[] treeItemsViewModels = MapTreeItemViewModels(parentKey, siblings);
         return Task.FromResult<ActionResult<IEnumerable<TItem>>>(Ok(treeItemsViewModels));
