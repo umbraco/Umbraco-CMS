@@ -69,7 +69,7 @@ test('can read a specific document with read permission enabled', async ({umbrac
   // Assert
   await umbracoUi.content.doesDocumentHaveName(firstDocumentName);
   await umbracoUi.content.goToContentWithName(secondDocumentName);
-  await umbracoUi.content.isErrorNotificationVisible();
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
 });
 
 test('can create document blueprint for a specific document with create document blueprint permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -105,7 +105,7 @@ test('can delete a specific content with delete permission enabled', async ({umb
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  await umbracoUi.content.waitForContentToBeDeleted();
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
 });
 
