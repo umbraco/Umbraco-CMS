@@ -91,7 +91,7 @@ const modalValue: UmbDocumentPublishWithDescendantsModalValue = {
 };
 
 const meta: Meta<UmbDocumentPublishWithDescendantsModalElement> = {
-	title: 'Silo/Document/Modals/Publish With Descendants Modal',
+	title: 'Entity/Document/Modals/Publish With Descendants Modal',
 	component: 'umb-document-publish-with-descendants-modal',
 	id: 'umb-document-publish-with-descendants-modal',
 	args: {

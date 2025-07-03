@@ -3,7 +3,7 @@ import './input-language.element.js';
 import type { UmbInputLanguageElement } from './input-language.element.js';
 
 const meta: Meta<UmbInputLanguageElement> = {
-	title: 'Silo/Language/Components/Input Language Picker',
+	title: 'Entity/Language/Components/Input Language Picker',
 	component: 'umb-input-language-picker',
 };
 

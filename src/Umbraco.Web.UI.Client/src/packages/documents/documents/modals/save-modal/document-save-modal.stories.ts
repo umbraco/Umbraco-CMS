@@ -88,7 +88,7 @@ const modalValue: UmbDocumentSaveModalValue = {
 };
 
 const meta: Meta<UmbDocumentSaveModalElement> = {
-	title: 'Silo/Document/Modals/Save',
+	title: 'Entity/Document/Modals/Save',
 	component: 'umb-document-save-modal',
 	id: 'umb-document-save-modal',
 	args: {
