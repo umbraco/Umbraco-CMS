@@ -318,6 +318,7 @@ public class EntityService : RepositoryService, IEntityService
         return children;
     }
 
+    /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetSiblings(
         Guid key,
         UmbracoObjectTypes objectType,

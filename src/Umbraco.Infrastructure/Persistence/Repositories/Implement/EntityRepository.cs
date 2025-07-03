@@ -145,6 +145,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
+    /// <inheritdoc/>
     public IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int before, int after, Ordering ordering)
     {
         // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough

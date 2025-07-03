@@ -170,6 +170,15 @@ public interface IEntityService
     /// <param name="objectType">The object type of the parent.</param>
     IEntitySlim? GetParent(int id, UmbracoObjectTypes objectType);
 
+    /// <summary>
+    /// Gets sibling entities of a specified target entity, within a given range before and after the target, ordered as specified.
+    /// </summary>
+    /// <param name="key">The key of the target entity whose siblings are to be retrieved.</param>
+    /// <param name="objectType">The object type key of the entities.</param>
+    /// <param name="before">The number of siblings to retrieve before the target entity.</param>
+    /// <param name="after">The number of siblings to retrieve after the target entity.</param>
+    /// <param name="ordering">The ordering to apply to the siblings.</param>
+    /// <returns>Enumerable of sibling entities.</returns>
     IEnumerable<IEntitySlim> GetSiblings(
         Guid key,
         UmbracoObjectTypes objectType,
