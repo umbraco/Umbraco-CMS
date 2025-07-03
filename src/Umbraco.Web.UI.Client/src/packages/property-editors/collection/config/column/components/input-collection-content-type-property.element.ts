@@ -1,5 +1,4 @@
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbMediaTypeDetailRepository, UMB_MEDIA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/media-type';
@@ -9,6 +8,7 @@ import { UMB_ITEM_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/b
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbItemPickerModel, UmbModalToken, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 export type UmbContentTypePropertyValue = {
 	label: string;
@@ -32,7 +32,7 @@ type UmbInputContentTypePropertyConfiguration = {
 };
 
 @customElement('umb-input-collection-content-type-property')
-export class UmbInputCollectionContentTypePropertyElement extends UUIFormControlMixin(UmbLitElement, undefined) {
+export class UmbInputCollectionContentTypePropertyElement extends UmbFormControlMixin(UmbLitElement, undefined) {
 	#configuration: UmbInputContentTypePropertyConfiguration = {
 		documentTypes: {
 			item: {

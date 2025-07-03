@@ -1,11 +1,11 @@
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-slider')
-export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputSliderElement extends UmbFormControlMixin(UmbLitElement, '') {
 	@property()
 	label: string = '';
 
