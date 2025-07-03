@@ -21,6 +21,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
     /// <param name="backgroundTaskQueue">The background task queue to use for enqueuing long-running operations.</param>
     /// <param name="repository">The repository for tracking long-running operations.</param>
     /// <param name="scopeProvider">The scope provider for managing database transactions.</param>
+    /// <param name="logger">The logger for logging information and errors related to long-running operations.</param>
     public LongRunningOperationService(
         IBackgroundTaskQueue backgroundTaskQueue,
         ILongRunningOperationRepository repository,
@@ -46,7 +47,6 @@ internal class LongRunningOperationService : ILongRunningOperationService
                 await operation(cancellationToken);
                 return null!;
             },
-            saveResult: false,
             runInBackground,
             allowMultipleRunsOfType);
 
@@ -59,7 +59,6 @@ internal class LongRunningOperationService : ILongRunningOperationService
         => RunInner(
             type,
             operation,
-            saveResult: true,
             runInBackground,
             allowMultipleRunsOfType);
 
@@ -99,7 +98,6 @@ internal class LongRunningOperationService : ILongRunningOperationService
     private async Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> RunInner<T>(
         string type,
         Func<CancellationToken, Task<T>> operation,
-        bool saveResult,
         bool runInBackground = true,
         bool allowMultipleRunsOfType = true)
     {
@@ -139,20 +137,20 @@ internal class LongRunningOperationService : ILongRunningOperationService
 
         if (runInBackground)
         {
-            _backgroundTaskQueue.QueueBackgroundWorkItem(ct => RunInner(operationId, operation, saveResult, cancellationToken: ct));
+            _logger.LogInformation("Enqueuing long-running operation {Type} with id {OperationId} to run in the background.", type, operationId);
+            _backgroundTaskQueue.QueueBackgroundWorkItem(ct => RunOperation(operationId, operation, cancellationToken: ct));
         }
         else
         {
-            await RunInner(operationId, operation, saveResult);
+            await RunOperation(operationId, operation);
         }
 
         return Attempt.SucceedWithStatus(LongRunningOperationEnqueueStatus.Success, operationId);
     }
 
-    private async Task RunInner<T>(
+    private async Task RunOperation<T>(
         Guid operationId,
         Func<CancellationToken, Task<T>> operation,
-        bool saveResult = true,
         CancellationToken cancellationToken = default)
     {
         Task<T> task;
@@ -190,20 +188,20 @@ internal class LongRunningOperationService : ILongRunningOperationService
             await Task.Delay(1000, cancellationToken); // Wait for 1 second before checking again
         }
 
-        if (task.IsFaulted)
-        {
-            _logger.LogError(task.Exception, "An error occurred while running operation {OperationId}.", operationId);
-        }
-
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             _repository.UpdateStatus(operationId, task.IsCompletedSuccessfully ? LongRunningOperationStatus.Success : LongRunningOperationStatus.Failed);
-            if (saveResult && task.IsCompletedSuccessfully)
+            if (task.Result != null)
             {
                 _repository.SetResult(operationId, task.Result);
             }
 
             scope.Complete();
+        }
+
+        if (task.IsFaulted)
+        {
+            throw task.Exception;
         }
     }
 }

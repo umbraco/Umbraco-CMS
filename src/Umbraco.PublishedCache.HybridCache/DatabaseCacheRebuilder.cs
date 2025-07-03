@@ -1,8 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
@@ -17,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
 {
     private const string NuCacheSerializerKey = "Umbraco.Web.PublishedCache.NuCache.Serializer";
-    private const string RebuildOperationType = $"{nameof(DatabaseCacheRebuilder)}.{nameof(PerformRebuild)}";
+    private const string RebuildOperationName = "DatabaseCacheRebuild";
 
     private readonly IDatabaseCacheRepository _databaseCacheRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
@@ -49,7 +47,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     }
 
     /// <inheritdoc/>
-    public bool IsRebuilding() => _longRunningOperationService.IsRunning(RebuildOperationType).GetAwaiter().GetResult();
+    public bool IsRebuilding() => _longRunningOperationService.IsRunning(RebuildOperationName).GetAwaiter().GetResult();
 
     /// <inheritdoc/>
     public void Rebuild() => Rebuild(false);
@@ -58,7 +56,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     public void Rebuild(bool useBackgroundThread) =>
         // TODO: Add overload that returns an attempt when the operation is already running
         _longRunningOperationService.Run(
-            RebuildOperationType,
+            RebuildOperationName,
             _ =>
             {
                 PerformRebuild();

@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Services;
 
 internal sealed class ContentPublishingService : IContentPublishingService
 {
-    private const string PublishBranchOperationType = $"{nameof(ContentPublishingService)}.{nameof(PerformPublishBranchAsync)}";
+    private const string PublishBranchOperationType = "ContentPublishBranch";
 
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IContentService _contentService;

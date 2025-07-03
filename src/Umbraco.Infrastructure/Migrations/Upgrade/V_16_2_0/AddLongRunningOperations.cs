@@ -1,5 +1,8 @@
+using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_2_0;
 
@@ -13,11 +16,20 @@ public class AddLongRunningOperations : MigrationBase
 
     protected override void Migrate()
     {
-        if (TableExists(Constants.DatabaseSchema.Tables.LongRunningOperation))
+        if (!TableExists(Constants.DatabaseSchema.Tables.LongRunningOperation))
         {
-            return;
+            Create.Table<LongRunningOperationDto>().Do();
         }
 
-        Create.Table<LongRunningOperationDto>().Do();
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
+            .Select<LockDto>()
+            .From<LockDto>()
+            .Where<LockDto>(x => x.Id == Constants.Locks.LongRunningOperations);
+
+        LockDto? longRunningOperationsLock = Database.FirstOrDefault<LockDto>(sql);
+        if (longRunningOperationsLock is null)
+        {
+            Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.LongRunningOperations, Name = "LongRunningOperations" });
+        }
     }
 }
