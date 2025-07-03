@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -46,6 +47,10 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
 
         services.AddSingleton<IPermissionMapper, DocumentPropertyValuePermissionMapper>();
         services.AddSingleton<IPermissionPresentationMapper, DocumentPropertyValuePermissionMapper>();
+
+        services.AddSingleton<IPermissionMapper, CustomPermissionMapper>();
+        services.AddSingleton<IPermissionPresentationMapper, CustomPermissionMapper>();
+
     }
 
     [Test]
@@ -254,12 +259,172 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(propertyTypePermission2.Verbs.ContainsAll(["D"]));
     }
 
+    [Test]
+    public async Task Can_Create_Current_User_Response_Model_With_Aggregated_Custom_Permissions()
+    {
+        var key1 = Guid.NewGuid();
+        var key2 = Guid.NewGuid();
+        var groupOne = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [],
+            [],
+            [
+                new CustomGranularPermission
+                {
+                    Permission = $"{key1}|A",
+                },
+                new CustomGranularPermission
+                {
+                    Permission = $"{key1}|B",
+                },
+                new CustomGranularPermission
+                {
+                    Permission = $"{key2}|C",
+                }
+            ],
+            Constants.System.Root);
+        var groupTwo = await CreateUserGroup(
+            "Group Two",
+            "groupTwo",
+            [],
+            [],
+            [
+                new CustomGranularPermission
+                {
+                    Permission = $"{key1}|A",
+                },
+                new CustomGranularPermission
+                {
+                    Permission = $"{key2}|B",
+                },
+            ],
+            Constants.System.Root);
+        var user = await CreateUser([groupOne.Key, groupTwo.Key]);
+
+        var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+        Assert.AreEqual(2, model.Permissions.Count);
+
+        var customPermissions = model.Permissions
+            .Where(x => x is CustomPermissionPresentationModel)
+            .Cast<CustomPermissionPresentationModel>();
+        Assert.AreEqual(2, customPermissions.Count());
+
+        var customPermission1 = customPermissions
+            .Single(x => x.Key == key1);
+        Assert.AreEqual(2, customPermission1.Verbs.Count);
+        Assert.IsTrue(customPermission1.Verbs.ContainsAll(["A", "B"]));
+
+        var customPermission2 = customPermissions
+            .Single(x => x.Key == key2);
+        Assert.AreEqual(2, customPermission2.Verbs.Count);
+        Assert.IsTrue(customPermission2.Verbs.ContainsAll(["B", "C"]));
+    }
+
+    private class CustomGranularPermission : IGranularPermission
+    {
+        public const string ContextType = "Custom";
+
+        public string Context => ContextType;
+
+        public required string Permission { get; set; }
+
+        protected bool Equals(CustomGranularPermission other) => Permission == other.Permission;
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
+            return Equals((CustomGranularPermission)obj);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Permission);
+    }
+
+    private class CustomPermissionPresentationModel : IPermissionPresentationModel
+    {
+        public required ISet<string> Verbs { get; set; }
+
+        public required Guid Key { get; set; }
+
+        public IEnumerable<IPermissionPresentationModel> GetAggregatedModels(IEnumerable<IPermissionPresentationModel> models)
+        {
+            IEnumerable<(Guid Key, ISet<string> Verbs)> groupedModels = models
+                .Cast<CustomPermissionPresentationModel>()
+                .GroupBy(x => x.Key)
+                .Select(x => (x.Key, (ISet<string>)x.SelectMany(y => y.Verbs).Distinct().ToHashSet()));
+
+            foreach ((Guid key, ISet<string> verbs) in groupedModels)
+            {
+                yield return new CustomPermissionPresentationModel
+                {
+                    Key = key,
+                    Verbs = verbs,
+                };
+            }
+        }
+    }
+
+    private class CustomPermissionMapper : IPermissionMapper, IPermissionPresentationMapper
+    {
+        public string Context => CustomGranularPermission.ContextType;
+
+        public Type PresentationModelToHandle => typeof(CustomPermissionPresentationModel);
+
+        public IGranularPermission MapFromDto(UserGroup2GranularPermissionDto dto)
+        {
+            return new CustomGranularPermission
+            {
+                Permission = dto.Permission,
+            };
+        }
+
+        public IEnumerable<IPermissionPresentationModel> MapManyAsync(IEnumerable<IGranularPermission> granularPermissions)
+            => granularPermissions
+                .Where(x => x is CustomGranularPermission)
+                .Cast<CustomGranularPermission>()
+                .Select(x => new CustomPermissionPresentationModel
+                {
+                    Key = Guid.Parse(x.Permission.Split('|')[0]),
+                    Verbs = new HashSet<string> { x.Permission.Split('|')[1] },
+                });
+
+        public IEnumerable<IGranularPermission> MapToGranularPermissions(IPermissionPresentationModel permissionViewModel)
+        {
+            if (permissionViewModel is not CustomPermissionPresentationModel customPermissionPresentationModel)
+            {
+                yield break;
+            }
+
+            foreach (var verb in customPermissionPresentationModel.Verbs.Distinct().DefaultIfEmpty(string.Empty))
+            {
+                yield return new CustomGranularPermission
+                {
+                    Permission = customPermissionPresentationModel.Key + "|" + verb,
+                };
+            }
+        }
+    }
+
     private async Task<IUserGroup> CreateUserGroup(
         string name,
         string alias,
         int[] allowedLanguages,
         string[] permissions,
-        INodeGranularPermission[] granularPermissions,
+        IGranularPermission[] granularPermissions,
         int startMediaId)
     {
         var userGroup = new UserGroupBuilder()

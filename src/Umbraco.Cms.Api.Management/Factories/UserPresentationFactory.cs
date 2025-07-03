@@ -269,7 +269,7 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         AggregateAndAddDocumentPermissions(user, aggregatedPermissions, permissions);
 
-        AggregateAndAddDocumentPropertyValuePermissions(aggregatedPermissions, permissions);
+        AggregateAndAddOtherPermissions(aggregatedPermissions, permissions);
 
         return aggregatedPermissions;
     }
@@ -305,27 +305,28 @@ public class UserPresentationFactory : IUserPresentationFactory
         }
     }
 
-    private static void AggregateAndAddDocumentPropertyValuePermissions(HashSet<IPermissionPresentationModel> aggregatedPermissions, HashSet<IPermissionPresentationModel> permissions)
+    private static void AggregateAndAddOtherPermissions(HashSet<IPermissionPresentationModel> aggregatedPermissions, HashSet<IPermissionPresentationModel> permissions)
     {
-        // We also have permissions for document type/property type combinations.
-        // These don't have an ancestor relationship that we need to take into account, but should be aggregated
-        // and included in the set.
-        IEnumerable<((Guid DocumentTypeId, Guid PropertyTypeId) Key, ISet<string> Verbs)> documentTypePropertyTypeKeysWithGranularPermissions = permissions
-            .Where(x => x is DocumentPropertyValuePermissionPresentationModel)
-            .Cast<DocumentPropertyValuePermissionPresentationModel>()
-            .GroupBy(x => (x.DocumentType.Id, x.PropertyType.Id))
-            .Select(x => (x.Key, (ISet<string>)x.SelectMany(y => y.Verbs).Distinct().ToHashSet()));
+        // We also have permissions for document type/property type combinations and packages and implementors
+        // can also register permissions. These also need to be aggregated based on the grouping mechanism defined
+        // by the custom permission presentation model.
+        IEnumerable<(Type, IEnumerable<IPermissionPresentationModel>)> permissionModelsByType = permissions
+            .Where(x => x is not DocumentPermissionPresentationModel) // these are already handled with special logic to take into account permissions defined on ancestors
+            .GroupBy(x => x.GetType())
+            .Select(x => (x.Key, x.Select(y => y)));
 
-        foreach (((Guid DocumentTypeId, Guid PropertyTypeId) Key, ISet<string> Verbs) documentTypePropertyTypeKey in documentTypePropertyTypeKeysWithGranularPermissions)
+        foreach ((Type Type, IEnumerable<IPermissionPresentationModel> Models) permissionModelByType in permissionModelsByType)
         {
-            aggregatedPermissions.Add(new DocumentPropertyValuePermissionPresentationModel
+            IEnumerable<IPermissionPresentationModel> aggregatedModels = permissionModelByType.Models.First().GetAggregatedModels(permissionModelByType.Models);
+            foreach (IPermissionPresentationModel aggregatedModel in aggregatedModels)
             {
-                DocumentType = new ReferenceByIdModel(documentTypePropertyTypeKey.Key.DocumentTypeId),
-                PropertyType = new ReferenceByIdModel(documentTypePropertyTypeKey.Key.PropertyTypeId),
-                Verbs = documentTypePropertyTypeKey.Verbs
-            });
+                aggregatedPermissions.Add(aggregatedModel);
+            }
         }
     }
+
+    private static bool IsKnownPermission(IPermissionPresentationModel permissionPresentationModel)
+        => permissionPresentationModel is DocumentPermissionPresentationModel || permissionPresentationModel is DocumentPropertyValuePermissionPresentationModel;
 
     public Task<CalculatedUserStartNodesResponseModel> CreateCalculatedUserStartNodesResponseModelAsync(IUser user)
     {
