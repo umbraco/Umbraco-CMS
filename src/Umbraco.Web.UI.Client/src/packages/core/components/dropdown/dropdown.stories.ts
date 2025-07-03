@@ -6,9 +6,16 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 const meta: Meta<UmbDropdownElement> = {
 	title: 'Generic Components/Dropdown',
 	component: 'umb-dropdown',
-	render: () =>
-		html` <umb-dropdown label="Select">
-			<span slot="label">Select</span>
+	render: (args) =>
+		html` <umb-dropdown
+			.open=${args.open}
+			.label=${args.label}
+			.look=${args.look}
+			.color=${args.color}
+			.placement=${args.placement}
+			.compact=${args.compact}
+			?hide-expand=${args.hideExpand}>
+			<span slot="label">${args.label}</span>
 			<div>Dropdown Content</div>
 		</umb-dropdown>`,
 };
@@ -17,5 +24,13 @@ export default meta;
 type Story = StoryObj<UmbDropdownElement>;
 
 export const Overview: Story = {
-	args: {},
+	args: {
+		open: false,
+		label: 'Dropdown',
+		look: 'default',
+		color: 'default',
+		placement: 'bottom-start',
+		compact: false,
+		hideExpand: false,
+	},
 };
