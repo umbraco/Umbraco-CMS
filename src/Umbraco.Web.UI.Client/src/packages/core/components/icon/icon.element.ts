@@ -21,8 +21,9 @@ export class UmbIconElement extends UmbLitElement {
 	private _style: StyleInfo = {};
 
 	/**
-	 * Color alias or a color code directly.\
+	 * Color alias or a color code directly.
 	 * If a color has been set via the name property, this property will override it.
+	 * Example **color-pink**
 	 */
 	@property({ type: String })
 	public set color(value: string) {

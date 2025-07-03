@@ -13,6 +13,6 @@ type Story = StoryObj<UmbIconElement>;
 export const Overview: Story = {
 	args: {
 		name: 'icon-wand',
-		color: 'color-pink',
+		color: '',
 	},
 };
