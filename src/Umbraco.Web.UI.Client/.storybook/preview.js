@@ -98,7 +98,7 @@ export const parameters = {
 		storySort: {
 			method: 'alphabetical',
 			includeNames: true,
-			order: ['Getting Started', 'Generic Components', 'Extension Type', 'Entity', 'Guides'],
+			order: ['Generic Components', 'Extension Type', 'Entity', 'Guides'],
 		},
 	},
 	controls: {
