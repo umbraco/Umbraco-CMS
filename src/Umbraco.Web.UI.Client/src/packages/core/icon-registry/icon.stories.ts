@@ -38,4 +38,4 @@ const Template: StoryFn = () => {
 	`;
 };
 
-export const Overview = Template.bind({});
+export const Docs = Template.bind({});
