@@ -93,7 +93,6 @@ export class UmbAuthFlow {
 	readonly #postLogoutRedirectUri: string;
 	readonly #clientId: string;
 	readonly #scope: string;
-	readonly #timeoutSignal;
 
 	// tokens
 	#tokenResponse?: TokenResponse;
@@ -113,13 +112,11 @@ export class UmbAuthFlow {
 		openIdConnectUrl: string,
 		redirectUri: string,
 		postLogoutRedirectUri: string,
-		timeoutSignal: Subject<void>,
 		clientId = 'umbraco-back-office',
 		scope = 'offline_access',
 	) {
 		this.#redirectUri = redirectUri;
 		this.#postLogoutRedirectUri = postLogoutRedirectUri;
-		this.#timeoutSignal = timeoutSignal;
 		this.#clientId = clientId;
 		this.#scope = scope;
 
@@ -305,7 +302,7 @@ export class UmbAuthFlow {
 	/**
 	 * This method will check if the token needs to be refreshed and if so, it will refresh it and return the new access token.
 	 * If the token does not need to be refreshed, it will return the current access token.
-	 * @returns The access token for the user.
+	 * @returns {Promise<string>} The access token for the user.
 	 */
 	async performWithFreshTokens(): Promise<string> {
 		// if the access token is valid, return it
@@ -313,17 +310,17 @@ export class UmbAuthFlow {
 			return Promise.resolve(this.#tokenResponse.accessToken);
 		}
 
+		// if the access token is not valid, try to refresh it
 		const success = await this.makeRefreshTokenRequest();
+		const newToken = this.#tokenResponse?.accessToken ?? '';
 
 		if (!success) {
+			// if the refresh token request failed, we need to clear the token state
 			this.clearTokenStorage();
-			this.#timeoutSignal.next();
-			return Promise.reject('Missing tokenResponse.');
 		}
 
-		return this.#tokenResponse
-			? Promise.resolve(this.#tokenResponse.accessToken)
-			: Promise.reject('Missing tokenResponse.');
+		// if the refresh token request was successful, return the new access token
+		return Promise.resolve(newToken);
 	}
 
 	/**
