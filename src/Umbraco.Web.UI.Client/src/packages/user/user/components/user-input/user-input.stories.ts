@@ -1,26 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
-import './user-input.element.js';
 import type { UmbUserInputElement } from './user-input.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+
+import './user-input.element.js';
 
 const meta: Meta<UmbUserInputElement> = {
 	title: 'Entity/User/Components/Input User',
 	component: 'umb-user-input',
-	argTypes: {
-		/*
-		modalType: {
-			control: 'inline-radio',
-			options: ['dialog', 'sidebar'],
-			defaultValue: 'sidebar',
-			description: 'The type of modal to use when selecting users',
-		},
-		modalSize: {
-			control: 'select',
-			options: ['small', 'medium', 'large', 'full'],
-			defaultValue: 'small',
-			description: 'The size of the modal to use when selecting users, only applicable to sidebar not dialog',
-		},
-		*/
-	},
+	render: () => html`<umb-user-input></umb-user-input>`,
 };
 
 export default meta;
