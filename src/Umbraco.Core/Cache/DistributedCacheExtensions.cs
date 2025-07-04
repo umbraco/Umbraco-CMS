@@ -172,7 +172,8 @@ public static class DistributedCacheExtensions
             MemberCacheRefresher.UniqueId,
             GetPayloads(members, true));
 
-    private static IEnumerable<MemberCacheRefresher.JsonPayload> GetPayloads(IEnumerable<IMember> members, bool removed)
+    // Internal for unit test.
+    internal static IEnumerable<MemberCacheRefresher.JsonPayload> GetPayloads(IEnumerable<IMember> members, bool removed)
         => members
             .DistinctBy(x => (x.Id, x.Username))
             .Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, removed)

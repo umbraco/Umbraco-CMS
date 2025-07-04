@@ -780,7 +780,8 @@ namespace Umbraco.Cms.Core.Services
             {
                 // If the user name has changed, populate the previous user name in the additional data, so the cache refreshers
                 // have it available to clear the cache by the old name as well as the new.
-                if (string.Equals(previousUsername, member.Username, StringComparison.OrdinalIgnoreCase) is false)
+                if (string.IsNullOrWhiteSpace(previousUsername) is false &&
+                    string.Equals(previousUsername, member.Username, StringComparison.OrdinalIgnoreCase) is false)
                 {
                     member.AdditionalData![Constants.Entities.AdditionalDataKeys.MemberPreviousUserName] = previousUsername;
                 }
