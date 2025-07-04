@@ -42,6 +42,28 @@ import { manifests as logViewerManifests } from '../src/packages/log-viewer/mani
 import { manifests as markdownEditorManifests } from '../src/packages/markdown-editor/manifests';
 import { manifests as mediaManifests } from '../src/packages/media/manifests';
 import { manifests as memberManifests } from '../src/packages/members/manifests';
+import { manifests as modelsBuilderManifests } from '../src/packages/models-builder/manifests';
+import { manifests as multiUrlPickerManifests } from '../src/packages/multi-url-picker/manifests';
+import { manifests as packageManifests } from '../src/packages/packages/manifests';
+import { manifests as performanceProfilingManifests } from '../src/packages/performance-profiling/manifests';
+import { manifests as propertyEditorManifests } from '../src/packages/property-editors/manifests';
+import { manifests as publishCacheManifests } from '../src/packages/publish-cache/manifests';
+import { manifests as relationsManifests } from '../src/packages/relations/manifests';
+import { manifests as rteManifests } from '../src/packages/rte/manifests';
+import { manifests as searchManifests } from '../src/packages/search/manifests';
+import { manifests as segmentManifests } from '../src/packages/segment/manifests';
+import { manifests as settingsManifests } from '../src/packages/settings/manifests';
+import { manifests as staticFileManifests } from '../src/packages/static-file/manifests';
+import { manifests as sysInfoManifests } from '../src/packages/sysinfo/manifests';
+import { manifests as tagManifests } from '../src/packages/tags/manifests';
+import { manifests as telemetryManifests } from '../src/packages/telemetry/manifests';
+import { manifests as templatingManifests } from '../src/packages/templating/manifests';
+import { manifests as tipTapManifests } from '../src/packages/tiptap/manifests';
+import { manifests as translationManifests } from '../src/packages/translation/manifests';
+import { manifests as ufmManifests } from '../src/packages/ufm/manifests';
+import { manifests as umbracoNewsManifests } from '../src/packages/umbraco-news/manifests';
+import { manifests as userManifests } from '../src/packages/user/manifests';
+import { manifests as webhookManifests } from '../src/packages/webhook/manifests';
 
 import { UmbNotificationContext } from '../src/packages/core/notification';
 
@@ -71,6 +93,28 @@ class UmbStoryBookElement extends UmbLitElement {
 			...markdownEditorManifests,
 			...mediaManifests,
 			...memberManifests,
+			...modelsBuilderManifests,
+			...multiUrlPickerManifests,
+			...packageManifests,
+			...performanceProfilingManifests,
+			...propertyEditorManifests,
+			...publishCacheManifests,
+			...relationsManifests,
+			...rteManifests,
+			...searchManifests,
+			...segmentManifests,
+			...settingsManifests,
+			...staticFileManifests,
+			...sysInfoManifests,
+			...tagManifests,
+			...telemetryManifests,
+			...templatingManifests,
+			...tipTapManifests,
+			...translationManifests,
+			...ufmManifests,
+			...umbracoNewsManifests,
+			...userManifests,
+			...webhookManifests,
 		];
 		this._umbIconRegistry.setIcons(icons);
 		this._umbIconRegistry.attach(this);
