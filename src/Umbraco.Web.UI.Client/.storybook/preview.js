@@ -63,9 +63,20 @@ import { manifests as userManifests } from '../src/packages/user/manifests';
 import { manifests as webhookManifests } from '../src/packages/webhook/manifests';
 
 import { UmbNotificationContext } from '../src/packages/core/notification';
+import { UmbContextBase } from '../src/libs/class-api/index';
+import { UmbBooleanState } from '../src/libs/observable-api/index';
 
 // MSW
 startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?? '/') + 'mockServiceWorker.js' } });
+
+class UmbStoryBookAuthContext extends UmbContextBase {
+	#isAuthorized = new UmbBooleanState(false);
+	isAuthorized = this.#isAuthorized.asObservable();
+
+	constructor(host) {
+		super(host, 'UmbAuthContext');
+	}
+}
 
 class UmbStoryBookElement extends UmbLitElement {
 	_umbIconRegistry = new UmbIconRegistry();
@@ -122,8 +133,11 @@ class UmbStoryBookElement extends UmbLitElement {
 		this._umbIconRegistry.setIcons(icons);
 		this._umbIconRegistry.attach(this);
 		this._registerExtensions(this.#manifests);
+
+		new UmbStoryBookAuthContext(this);
 		new UmbModalManagerContext(this);
 		new UmbNotificationContext(this);
+
 		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
 	}
 
