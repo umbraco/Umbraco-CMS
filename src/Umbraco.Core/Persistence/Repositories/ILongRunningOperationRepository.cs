@@ -26,14 +26,16 @@ public interface ILongRunningOperationRepository
     /// Retrieves a long-running operation by its ID.
     /// </summary>
     /// <param name="operation">The operation to create.</param>
-    public void Create(LongRunningOperation operation);
+    /// <param name="expires">The time span after which the operation is considered expired if its status hasn't been updated.</param>
+    public void Create(LongRunningOperation operation, TimeSpan expires);
 
     /// <summary>
     /// Updates the status of a long-running operation identified by its ID.
     /// </summary>
     /// <param name="id">The unique identifier of the long-running operation.</param>
     /// <param name="status">The new status to set for the operation.</param>
-    public void UpdateStatus(Guid id, LongRunningOperationStatus status);
+    /// <param name="expires">The time span after which the operation is considered expired if its status hasn't been updated.</param>
+    public void UpdateStatus(Guid id, LongRunningOperationStatus status, TimeSpan expires);
 
     /// <summary>
     /// Gets the result of a long-running operation identified by its ID.
@@ -49,11 +51,11 @@ public interface ILongRunningOperationRepository
     /// <param name="id">The unique identifier of the long-running operation.</param>
     /// <param name="result">The result of the operation.</param>
     /// <typeparam name="T">The type of the result.</typeparam>
-    public void SetResult<T>(Guid id, T result);
+    /// <param name="expires">The time span after which the operation is considered expired if its status hasn't been updated.</param>
+    public void SetResult<T>(Guid id, T result, TimeSpan expires);
 
     /// <summary>
     /// Cleans up long-running operations that haven't been updated for a certain period of time.
     /// </summary>
-    /// <param name="maxAge">The maximum age of operations to keep.</param>
-    void CleanOperations(TimeSpan maxAge);
+    void CleanOperations();
 }

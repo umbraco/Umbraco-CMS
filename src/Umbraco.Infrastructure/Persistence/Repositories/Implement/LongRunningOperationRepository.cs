@@ -49,19 +49,20 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     }
 
     /// <inheritdoc/>
-    public void Create(LongRunningOperation operation)
+    public void Create(LongRunningOperation operation, TimeSpan expires)
     {
-        LongRunningOperationDto dto = MapEntityToDto(operation);
+        LongRunningOperationDto dto = MapEntityToDto(operation, expires);
         Database.Insert(dto);
     }
 
     /// <inheritdoc/>
-    public void UpdateStatus(Guid id, LongRunningOperationStatus status)
+    public void UpdateStatus(Guid id, LongRunningOperationStatus status, TimeSpan expires)
     {
         Sql<ISqlContext> sql = Sql()
             .Update<LongRunningOperationDto>(x => x
                 .Set(y => y.Status, status.ToString())
-                .Set(y => y.UpdateDate, DateTime.UtcNow))
+                .Set(y => y.UpdateDate, DateTime.UtcNow)
+                .Set(y => y.ExpireDate, DateTime.UtcNow + expires))
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
         Database.Execute(sql);
@@ -80,24 +81,25 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     }
 
     /// <inheritdoc/>
-    public void SetResult<T>(Guid id, T result)
+    public void SetResult<T>(Guid id, T result, TimeSpan expires)
     {
         Sql<ISqlContext> sql = Sql()
             .Update<LongRunningOperationDto>(x => x
                 .Set(y => y.Result, _jsonSerializer.Serialize(result))
-                .Set(y => y.UpdateDate, DateTime.UtcNow))
+                .Set(y => y.UpdateDate, DateTime.UtcNow)
+                .Set(y => y.ExpireDate, DateTime.UtcNow + expires))
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
         Database.Execute(sql);
     }
 
     /// <inheritdoc/>
-    public void CleanOperations(TimeSpan maxAge)
+    public void CleanOperations()
     {
-        DateTime oldestPermittedUpdateDate = DateTime.UtcNow.Subtract(maxAge);
+        DateTime now = DateTime.UtcNow;
         Sql<ISqlContext> sql = Sql()
             .Delete<LongRunningOperationDto>()
-            .Where<LongRunningOperationDto>(x => x.UpdateDate < oldestPermittedUpdateDate);
+            .Where<LongRunningOperationDto>(x => x.ExpireDate < now);
 
         Database.Execute(sql);
     }
@@ -110,7 +112,7 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             Status = dto.Status.EnumParse<LongRunningOperationStatus>(false),
         };
 
-    private static LongRunningOperationDto MapEntityToDto(LongRunningOperation entity) =>
+    private static LongRunningOperationDto MapEntityToDto(LongRunningOperation entity, TimeSpan expires) =>
         new()
         {
             Id = entity.Id,
@@ -118,5 +120,6 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             Status = entity.Status.ToString(),
             CreateDate = DateTime.UtcNow,
             UpdateDate = DateTime.UtcNow,
+            ExpireDate = DateTime.UtcNow + expires,
         };
 }

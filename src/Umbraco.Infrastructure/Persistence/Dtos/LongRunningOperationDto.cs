@@ -27,7 +27,7 @@ internal class LongRunningOperationDto
     [Column("result")]
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.Null)]
-    public string? Result { get; set; } = null!;
+    public string? Result { get; set; } = null;
 
     [Column("createDate", ForceToUtc = false)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
@@ -38,4 +38,8 @@ internal class LongRunningOperationDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime UpdateDate { get; set; } = DateTime.UtcNow;
+
+    [Column("expireDate", ForceToUtc = false)]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    public DateTime ExpireDate { get; set; }
 }

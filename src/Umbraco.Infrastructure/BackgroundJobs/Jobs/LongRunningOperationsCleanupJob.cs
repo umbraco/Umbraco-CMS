@@ -10,7 +10,6 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILongRunningOperationRepository _longRunningOperationRepository;
-    private readonly TimeSpan _maxAge = TimeSpan.FromMinutes(5);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LongRunningOperationsCleanupJob"/> class.
@@ -35,11 +34,14 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
     /// <inheritdoc />
     public TimeSpan Period => TimeSpan.FromMinutes(2);
 
+    /// <inheritdoc/>
+    public TimeSpan Delay { get; } = TimeSpan.FromSeconds(10);
+
     /// <inheritdoc />
     public Task RunJobAsync()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _longRunningOperationRepository.CleanOperations(_maxAge);
+        _longRunningOperationRepository.CleanOperations();
         scope.Complete();
         return Task.CompletedTask;
     }

@@ -41,7 +41,18 @@ public interface IDatabaseCacheRebuilder
     }
 
     /// <summary>
-    /// Rebuids the database cache if the configured serializer has changed.
+    /// Rebuilds the database cache if the configured serializer has changed.
     /// </summary>
+    [Obsolete("Use the async version. Scheduled for removal in Umbraco 18.")]
     void RebuildDatabaseCacheIfSerializerChanged();
+
+    /// <summary>
+    /// Rebuilds the database cache if the configured serializer has changed.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    Task RebuildDatabaseCacheIfSerializerChangedAsync()
+    {
+        RebuildDatabaseCacheIfSerializerChanged();
+        return Task.CompletedTask;
+    }
 }

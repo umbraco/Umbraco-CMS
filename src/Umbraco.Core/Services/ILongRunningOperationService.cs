@@ -14,12 +14,14 @@ public interface ILongRunningOperationService
     /// <param name="operation">The operation to execute, which should accept a <see cref="CancellationToken"/>.</param>
     /// <param name="runInBackground">Whether to run the operation in the background.</param>
     /// <param name="allowMultipleRunsOfType">Whether to allow multiple instances of the same operation type to run concurrently.</param>
+    /// <param name="expires">The time span after which the operation is considered expired if its status hasn't been updated.</param>
     /// <returns>An <see cref="Attempt{TStatus}"/> indicating the status of the enqueue operation.</returns>
     Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run(
         string type,
         Func<CancellationToken, Task> operation,
         bool runInBackground = true,
-        bool allowMultipleRunsOfType = true);
+        bool allowMultipleRunsOfType = true,
+        TimeSpan? expires = null);
 
     /// <summary>
     ///     Enqueues a long-running operation to be executed in the background.
@@ -34,7 +36,8 @@ public interface ILongRunningOperationService
         string type,
         Func<CancellationToken, Task<T>> operation,
         bool runInBackground = true,
-        bool allowMultipleRunsOfType = true);
+        bool allowMultipleRunsOfType = true,
+        TimeSpan? expires = null);
 
     /// <summary>
     /// Checks if a long-running operation with the specified ID is currently running or enqueued.

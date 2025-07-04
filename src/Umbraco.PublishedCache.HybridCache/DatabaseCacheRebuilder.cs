@@ -95,7 +95,11 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     }
 
     /// <inheritdoc/>
-    public void RebuildDatabaseCacheIfSerializerChanged()
+    public void RebuildDatabaseCacheIfSerializerChanged() =>
+        RebuildDatabaseCacheIfSerializerChangedAsync().GetAwaiter().GetResult();
+
+    /// <inheritdoc/>
+    public async Task RebuildDatabaseCacheIfSerializerChangedAsync()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         NuCacheSerializerType serializer = _nucacheSettings.Value.NuCacheSerializerType;
@@ -113,7 +117,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
 
         using (_profilingLogger.TraceDuration<DatabaseCacheRebuilder>($"Rebuilding database cache with {serializer} serializer"))
         {
-            RebuildAsync(false).GetAwaiter().GetResult();
+            await RebuildAsync(false);
             _keyValueService.SetValue(NuCacheSerializerKey, serializer.ToString());
         }
 
