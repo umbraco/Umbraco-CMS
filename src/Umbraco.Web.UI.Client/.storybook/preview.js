@@ -61,7 +61,7 @@ import { manifests as templatingManifests } from '../src/packages/templating/man
 import { manifests as tipTapManifests } from '../src/packages/tiptap/manifests';
 import { manifests as translationManifests } from '../src/packages/translation/manifests';
 import { manifests as ufmManifests } from '../src/packages/ufm/manifests';
-import { manifests as umbracoNewsManifests } from '../src/packages/umbraco-news/manifests';
+//import { manifests as umbracoNewsManifests } from '../src/packages/umbraco-news/manifests';
 import { manifests as userManifests } from '../src/packages/user/manifests';
 import { manifests as webhookManifests } from '../src/packages/webhook/manifests';
 
