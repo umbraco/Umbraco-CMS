@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -42,6 +42,23 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
         return Task.FromResult<ActionResult<PagedViewModel<TItem>>>(Ok(result));
+    }
+
+    protected Task<ActionResult<IEnumerable<TItem>>> GetSiblings(Guid target, int before, int after)
+    {
+        IEntitySlim[] siblings = EntityService.GetSiblings(target, ItemObjectType, before, after, ItemOrdering).ToArray();
+        if (siblings.Length == 0)
+        {
+            return Task.FromResult<ActionResult<IEnumerable<TItem>>>(NotFound());
+        }
+
+        IEntitySlim? entity = siblings.FirstOrDefault();
+        Guid? parentKey = entity?.ParentId > 0
+            ? EntityService.GetKey(entity.ParentId, ItemObjectType).Result
+            : Constants.System.RootKey;
+
+        TItem[] treeItemsViewModels = MapTreeItemViewModels(parentKey, siblings);
+        return Task.FromResult<ActionResult<IEnumerable<TItem>>>(Ok(treeItemsViewModels));
     }
 
     protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey, bool includeSelf = true)

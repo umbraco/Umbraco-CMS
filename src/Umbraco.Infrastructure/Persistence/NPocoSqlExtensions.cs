@@ -1298,6 +1298,14 @@ namespace Umbraco.Extensions
 
         #region Utilities
 
+        public static Sql<ISqlContext> AppendSubQuery(this Sql<ISqlContext> sql, Sql<ISqlContext> subQuery, string alias)
+        {
+            // Append the subquery as a derived table with an alias
+            sql.Append("(").Append(subQuery.SQL, subQuery.Arguments).Append($") AS {alias}");
+
+            return sql;
+        }
+
         private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string? tableAlias = null, string? referenceName = null, Expression<Func<TDto, object?>>[]? columnExpressions = null, bool withAlias = true, bool forInsert = false)
         {
             PocoData? pd = sql.SqlContext.PocoDataFactory.ForType(typeof (TDto));
