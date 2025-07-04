@@ -65,6 +65,10 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	override async load(unique: string) {
+		// Reset state before load to ensure we don't short-circuit the load method.
+		// Without this on editing a newly created template we won't get the created data,
+		// rather the initial scaffold.
+		super.resetState();
 		const response = await super.load(unique);
 		if (response.data) {
 			this.setMasterTemplate(response.data.masterTemplate?.unique ?? null);
