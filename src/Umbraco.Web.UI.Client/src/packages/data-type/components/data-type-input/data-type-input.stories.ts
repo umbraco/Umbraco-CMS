@@ -1,7 +1,8 @@
 import type { UmbDataTypeInputElement } from './data-type-input.element.js';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
-import './data-type-input.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
+
+import './data-type-input.element.js';
 
 const meta: Meta<UmbDataTypeInputElement> = {
 	title: 'Entity/Data Type/Components/Input Data Type',
