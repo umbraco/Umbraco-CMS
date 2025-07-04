@@ -99,7 +99,7 @@ export default class UmbAuthElement extends LitElement {
 
   @property({attribute: 'return-url'})
   set returnPath(value: string) {
-    umbAuthContext.returnPath = value;
+    umbAuthContext.returnPath = `${value}${encodeURIComponent(window.location.hash)}`;
   }
   get returnPath() {
     return umbAuthContext.returnPath;
