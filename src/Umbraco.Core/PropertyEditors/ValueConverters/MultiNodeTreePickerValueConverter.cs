@@ -205,7 +205,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         {
             Constants.UdiEntityType.Document => entityTypeUdis.Select(udi =>
             {
-                IPublishedContent? content = _contentCache.GetById(udi.Guid);
+                IPublishedContent? content = _contentCache.GetById(preview, udi.Guid);
                 return content != null
                     ? _apiContentBuilder.Build(content)
                     : null;
