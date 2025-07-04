@@ -10,11 +10,8 @@ import { setCustomElements } from '@storybook/web-components-vite';
 import { startMockServiceWorker } from '../src/mocks';
 
 import '../src/libs/controller-api/controller-host-provider.element';
+import { UmbExtensionsApiInitializer } from '../src/libs/extension-api/index';
 import { UmbModalManagerContext } from '../src/packages/core/modal';
-import { UmbDataTypeTreeStore } from '../src/packages/data-type/tree/data-type-tree.store';
-import { UmbDocumentDetailStore } from '../src/packages/documents/documents/repository/detail/document-detail.store';
-import { UmbDocumentTreeStore } from '../src/packages/documents/documents/tree/document-tree.store';
-import { UmbCurrentUserStore } from '../src/packages/user/current-user/repository/current-user.store';
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/packages/core/icon-registry/icon.registry';
 import { UmbLitElement } from '../src/packages/core/lit-element';
@@ -73,54 +70,59 @@ startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?
 class UmbStoryBookElement extends UmbLitElement {
 	_umbIconRegistry = new UmbIconRegistry();
 
+	#manifests = [
+		...blockManifests,
+		...clipboardManifests,
+		...codeEditorManifests,
+		...contentManifests,
+		...coreManifests,
+		...dataTypeManifests,
+		...dictionaryManifests,
+		...documentManifests,
+		...embeddedMediaManifests,
+		...extensionInsightsManifests,
+		...healthCheckManifests,
+		...helpManifests,
+		...languageManifests,
+		...logViewerManifests,
+		...markdownEditorManifests,
+		...mediaManifests,
+		...memberManifests,
+		...modelsBuilderManifests,
+		...multiUrlPickerManifests,
+		...packageManifests,
+		...performanceProfilingManifests,
+		...propertyEditorManifests,
+		...publishCacheManifests,
+		...relationsManifests,
+		...rteManifests,
+		...searchManifests,
+		...segmentManifests,
+		...settingsManifests,
+		...staticFileManifests,
+		...sysInfoManifests,
+		...tagManifests,
+		...telemetryManifests,
+		...templatingManifests,
+		...tipTapManifests,
+		...translationManifests,
+		...ufmManifests,
+		//...umbracoNewsManifests,
+		...userManifests,
+		...webhookManifests,
+	];
+
 	constructor() {
 		super();
-		const manifests = [
-			...blockManifests,
-			...clipboardManifests,
-			...codeEditorManifests,
-			...contentManifests,
-			...coreManifests,
-			...dataTypeManifests,
-			...dictionaryManifests,
-			...documentManifests,
-			...embeddedMediaManifests,
-			...extensionInsightsManifests,
-			...healthCheckManifests,
-			...helpManifests,
-			...languageManifests,
-			...logViewerManifests,
-			...markdownEditorManifests,
-			...mediaManifests,
-			...memberManifests,
-			...modelsBuilderManifests,
-			...multiUrlPickerManifests,
-			...packageManifests,
-			...performanceProfilingManifests,
-			...propertyEditorManifests,
-			...publishCacheManifests,
-			...relationsManifests,
-			...rteManifests,
-			...searchManifests,
-			...segmentManifests,
-			...settingsManifests,
-			...staticFileManifests,
-			...sysInfoManifests,
-			...tagManifests,
-			...telemetryManifests,
-			...templatingManifests,
-			...tipTapManifests,
-			...translationManifests,
-			...ufmManifests,
-			//...umbracoNewsManifests,
-			...userManifests,
-			...webhookManifests,
-		];
+		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'globalContext', [this]);
+		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'store', [this]);
+		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'treeStore', [this]);
+		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'itemStore', [this]);
+
 		this._umbIconRegistry.setIcons(icons);
 		this._umbIconRegistry.attach(this);
-		this._registerExtensions(manifests);
+		this._registerExtensions(this.#manifests);
 		new UmbModalManagerContext(this);
-		new UmbCurrentUserStore(this);
 		new UmbNotificationContext(this);
 		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
 	}
@@ -143,26 +145,8 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
-const dataTypeStoreProvider = (story) => html`
-	<umb-controller-host-provider .create=${(host) => new UmbDataTypeTreeStore(host)}
-		>${story()}</umb-controller-host-provider
-	>
-`;
-
-const documentStoreProvider = (story) => html`
-	<umb-controller-host-provider .create=${(host) => new UmbDocumentDetailStore(host)}
-		>${story()}</umb-controller-host-provider
-	>
-`;
-
-const documentTreeStoreProvider = (story) => html`
-	<umb-controller-host-provider .create=${(host) => new UmbDocumentTreeStore(host)}
-		>${story()}</umb-controller-host-provider
-	>
-`;
-
 // Provide the MSW addon decorator globally
-export const decorators = [documentStoreProvider, documentTreeStoreProvider, dataTypeStoreProvider, storybookProvider];
+export const decorators = [storybookProvider];
 
 export const parameters = {
 	docs: {
