@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-member-group-picker',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIMemberGroupPickerElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIMemberGroupPickerElement> = () =>
 	html`<umb-property-editor-ui-member-group-picker></umb-property-editor-ui-member-group-picker>`;
-AAAOverview.storyName = 'Overview';

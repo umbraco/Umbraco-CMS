@@ -10,7 +10,7 @@ const meta: Meta<UmbInputCultureSelectElement> = {
 export default meta;
 type Story = StoryObj<UmbInputCultureSelectElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		readonly: false,
 		disabled: false,

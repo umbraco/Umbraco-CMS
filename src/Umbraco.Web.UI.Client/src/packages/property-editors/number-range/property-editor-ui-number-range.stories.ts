@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-number-range',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUINumberRangeElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUINumberRangeElement> = () =>
 	html`<umb-property-editor-ui-number-range></umb-property-editor-ui-number-range>`;
-AAAOverview.storyName = 'Overview';

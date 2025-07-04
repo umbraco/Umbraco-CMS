@@ -16,7 +16,7 @@ const meta: Meta<UmbInputEyeDropperElement> = {
 export default meta;
 type Story = StoryObj<UmbInputEyeDropperElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {},
 };
 

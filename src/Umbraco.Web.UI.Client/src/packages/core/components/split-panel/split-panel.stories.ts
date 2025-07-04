@@ -21,7 +21,7 @@ const meta: Meta<UmbSplitPanelElement> = {
 export default meta;
 type Story = StoryObj<UmbSplitPanelElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	render: (props) => html`
 		<umb-split-panel .lock=${props.lock} .snap=${props.snap} .position=${props.position}>
 			<div id="start" slot="start">Start</div>

@@ -13,6 +13,6 @@ const meta: Meta<UmbPopoverLayoutElement> = {
 export default meta;
 type Story = StoryObj<UmbPopoverLayoutElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {},
 };

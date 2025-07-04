@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-collection-order-by',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUICollectionOrderByElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUICollectionOrderByElement> = () =>
 	html`<umb-property-editor-ui-collection-order-by></umb-property-editor-ui-collection-order-by>`;
-AAAOverview.storyName = 'Overview';

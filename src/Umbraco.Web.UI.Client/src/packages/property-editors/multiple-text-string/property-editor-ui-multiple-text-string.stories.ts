@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-multiple-text-string',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIMultipleTextStringElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIMultipleTextStringElement> = () =>
 	html`<umb-property-editor-ui-multiple-text-string></umb-property-editor-ui-multiple-text-string>`;
-AAAOverview.storyName = 'Overview';

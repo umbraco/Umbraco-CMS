@@ -10,6 +10,5 @@ export default {
 	id: 'umb-section-sidebar-menu',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbSectionSidebarMenuElement> = () =>
+export const Docs: StoryFn<UmbSectionSidebarMenuElement> = () =>
 	html` <umb-section-sidebar-menu></umb-section-sidebar-menu>`;
-AAAOverview.storyName = 'Overview';

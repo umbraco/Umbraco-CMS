@@ -10,7 +10,7 @@ const meta: Meta<UmbInputDropdownListElement> = {
 export default meta;
 type Story = StoryObj<UmbInputDropdownListElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		options: [
 			{

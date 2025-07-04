@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-checkbox-list',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUICheckboxListElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUICheckboxListElement> = () =>
 	html`<umb-property-editor-ui-checkbox-list></umb-property-editor-ui-checkbox-list>`;
-AAAOverview.storyName = 'Overview';

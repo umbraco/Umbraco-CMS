@@ -49,7 +49,7 @@ const meta: Meta<UmbPropertyLayoutElement> = {
 export default meta;
 type Story = StoryObj<UmbPropertyLayoutElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
 
 export const Vertical: Story = {
 	args: {

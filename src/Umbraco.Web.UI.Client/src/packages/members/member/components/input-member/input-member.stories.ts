@@ -9,6 +9,6 @@ const meta: Meta<UmbInputMemberElement> = {
 
 export default meta;
 type Story = StoryObj<UmbInputMemberElement>;
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {},
 };

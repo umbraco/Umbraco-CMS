@@ -17,8 +17,7 @@ const data = [
 	},
 ];
 
-export const AAAOverview: StoryFn<UmbPropertyEditorConfigElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorConfigElement> = () =>
 	html`<umb-property-editor-config
 		property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"
 		.data="${data}"></umb-property-editor-config>`;
-AAAOverview.storyName = 'Overview';

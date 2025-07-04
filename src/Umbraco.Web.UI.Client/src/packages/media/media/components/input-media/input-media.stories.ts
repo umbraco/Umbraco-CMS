@@ -10,6 +10,6 @@ const meta: Meta<UmbInputMediaElement> = {
 export default meta;
 type Story = StoryObj<UmbInputMediaElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {},
 };

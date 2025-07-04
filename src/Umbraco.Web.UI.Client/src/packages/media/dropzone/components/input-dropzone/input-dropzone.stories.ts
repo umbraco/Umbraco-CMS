@@ -25,7 +25,7 @@ export default meta;
 
 type Story = StoryObj<UmbInputDropzoneElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
 
 export const WithDisabled: Story = {
 	args: {

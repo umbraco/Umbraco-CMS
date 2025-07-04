@@ -10,6 +10,6 @@ const meta: Meta<UmbInputUploadFieldElement> = {
 export default meta;
 type Story = StoryObj<UmbInputUploadFieldElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {},
 };

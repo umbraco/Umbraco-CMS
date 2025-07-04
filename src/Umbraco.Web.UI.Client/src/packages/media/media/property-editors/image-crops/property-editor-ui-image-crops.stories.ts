@@ -12,4 +12,4 @@ const meta: Meta<UmbPropertyEditorUIImageCropsElement> = {
 export default meta;
 type Story = StoryObj<UmbPropertyEditorUIImageCropsElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};

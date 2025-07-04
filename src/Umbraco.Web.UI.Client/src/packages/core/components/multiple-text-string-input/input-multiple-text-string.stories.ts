@@ -18,7 +18,7 @@ const meta: Meta<UmbInputMultipleTextStringElement> = {
 export default meta;
 type Story = StoryObj<UmbInputMultipleTextStringElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		min: 0,
 		max: 10,

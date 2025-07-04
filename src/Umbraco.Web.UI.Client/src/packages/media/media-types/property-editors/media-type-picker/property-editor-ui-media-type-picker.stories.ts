@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-media-type-picker',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIMediaTypePickerElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIMediaTypePickerElement> = () =>
 	html` <umb-property-editor-ui-media-type-picker></umb-property-editor-ui-media-type-picker>`;
-AAAOverview.storyName = 'Overview';

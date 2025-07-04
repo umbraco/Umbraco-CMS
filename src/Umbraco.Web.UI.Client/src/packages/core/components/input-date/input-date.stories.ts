@@ -12,7 +12,7 @@ const meta: Meta<UmbInputDateElement> = {
 export default meta;
 type Story = StoryObj<UmbInputDateElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		type: 'datetime-local',
 		value: '2023-04-01T10:00:00Z',

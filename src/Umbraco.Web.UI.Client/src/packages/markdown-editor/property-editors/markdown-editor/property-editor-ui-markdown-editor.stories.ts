@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-markdown-editor',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIMarkdownEditorElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIMarkdownEditorElement> = () =>
 	html`<umb-property-editor-ui-markdown-editor></umb-property-editor-ui-markdown-editor>`;
-AAAOverview.storyName = 'Overview';

@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-toggle',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIToggleElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIToggleElement> = () =>
 	html`<umb-property-editor-ui-toggle></umb-property-editor-ui-toggle>`;
-AAAOverview.storyName = 'Overview';

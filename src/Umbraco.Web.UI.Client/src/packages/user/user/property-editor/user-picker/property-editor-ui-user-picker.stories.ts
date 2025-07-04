@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-user-picker',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIUserPickerElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIUserPickerElement> = () =>
 	html`<umb-property-editor-ui-user-picker></umb-property-editor-ui-user-picker>`;
-AAAOverview.storyName = 'Overview';

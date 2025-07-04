@@ -24,6 +24,6 @@ const meta: Meta<UmbUserGroupInputElement> = {
 export default meta;
 type Story = StoryObj<UmbUserGroupInputElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {},
 };

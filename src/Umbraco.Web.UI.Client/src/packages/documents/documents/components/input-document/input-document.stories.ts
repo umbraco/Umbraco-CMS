@@ -1,6 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
-import './input-document.element.js';
 import type { UmbInputDocumentElement } from './input-document.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
+
+import './input-document.element.js';
 
 const meta: Meta<UmbInputDocumentElement> = {
 	title: 'Entity/Document/Components/Input Document',
@@ -9,6 +10,6 @@ const meta: Meta<UmbInputDocumentElement> = {
 
 export default meta;
 type Story = StoryObj<UmbInputDocumentElement>;
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {},
 };

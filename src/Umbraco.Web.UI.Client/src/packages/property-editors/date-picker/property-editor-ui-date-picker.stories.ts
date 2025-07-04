@@ -22,7 +22,7 @@ export default {
 const Template: StoryFn<UmbPropertyEditorUIDatePickerElement> = ({ config, value }) =>
 	html`<umb-property-editor-ui-date-picker .config=${config} .value=${value}></umb-property-editor-ui-date-picker>`;
 
-export const Overview = Template.bind({});
+export const Docs = Template.bind({});
 
 export const WithDateValue = Template.bind({});
 WithDateValue.args = {

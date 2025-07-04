@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-dropdown',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIDropdownElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIDropdownElement> = () =>
 	html`<umb-property-editor-ui-dropdown></umb-property-editor-ui-dropdown>`;
-AAAOverview.storyName = 'Overview';

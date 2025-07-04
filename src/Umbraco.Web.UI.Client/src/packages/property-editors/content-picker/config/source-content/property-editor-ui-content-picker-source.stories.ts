@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-content-picker-source',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIContentPickerSourceElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIContentPickerSourceElement> = () =>
 	html`<umb-property-editor-ui-content-picker-source></umb-property-editor-ui-content-picker-source>`;
-AAAOverview.storyName = 'Overview';

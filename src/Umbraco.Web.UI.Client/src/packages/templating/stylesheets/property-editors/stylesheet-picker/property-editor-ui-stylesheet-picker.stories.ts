@@ -13,9 +13,9 @@ export default {
 	id: 'umb-property-editor-ui-stylesheet-picker',
 } as Meta;
 
-export const AAAOverview = ({ value }: any) =>
+export const Docs = ({ value }: any) =>
 	html`<umb-property-editor-ui-stylesheet-picker .value=${value}></umb-property-editor-ui-stylesheet-picker>`;
-AAAOverview.storyName = 'Overview';
-AAAOverview.args = {
+
+Docs.args = {
 	value: dataTypeData?.values?.find((x) => x.alias === 'stylesheets')?.value ?? [],
 };

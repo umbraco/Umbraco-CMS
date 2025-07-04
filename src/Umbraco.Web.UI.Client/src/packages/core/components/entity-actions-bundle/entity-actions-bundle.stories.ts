@@ -15,7 +15,7 @@ const meta: Meta<UmbEntityActionsBundleElement> = {
 export default meta;
 type Story = StoryObj<UmbEntityActionsBundleElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		entityType: 'document',
 		unique: '1234',

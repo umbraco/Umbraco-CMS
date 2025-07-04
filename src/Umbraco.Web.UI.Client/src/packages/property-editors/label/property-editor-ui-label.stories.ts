@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-label',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUILabelElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUILabelElement> = () =>
 	html`<umb-property-editor-ui-label></umb-property-editor-ui-label>`;
-AAAOverview.storyName = 'Overview';

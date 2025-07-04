@@ -12,7 +12,7 @@ const meta: Meta<UmbRefDataTypeElement> = {
 export default meta;
 type Story = StoryObj<UmbRefDataTypeElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		name: 'Custom Data Type',
 		propertyEditorUiAlias: 'Umb.DataTypeInput.CustomUI',

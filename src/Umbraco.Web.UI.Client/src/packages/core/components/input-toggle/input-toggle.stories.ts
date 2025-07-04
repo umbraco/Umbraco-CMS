@@ -10,7 +10,7 @@ const meta: Meta<UmbInputToggleElement> = {
 export default meta;
 type Story = StoryObj<UmbInputToggleElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		checked: true,
 		showLabels: true,

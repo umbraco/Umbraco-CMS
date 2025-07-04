@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-collection',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUICollectionElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUICollectionElement> = () =>
 	html`<umb-property-editor-ui-collection></umb-property-editor-ui-collection>`;
-AAAOverview.storyName = 'Overview';

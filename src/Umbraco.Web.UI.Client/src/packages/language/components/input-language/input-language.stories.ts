@@ -10,6 +10,6 @@ const meta: Meta<UmbInputLanguageElement> = {
 export default meta;
 type Story = StoryObj<UmbInputLanguageElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {},
 };

@@ -12,7 +12,7 @@ const meta: Meta<UmbRefPropertyEditorUIElement> = {
 export default meta;
 type Story = StoryObj<UmbRefPropertyEditorUIElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		name: 'Custom Property Editor UI',
 		alias: 'Umb.PropertyEditorUi.CustomUI',

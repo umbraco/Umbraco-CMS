@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-document-type-picker',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIDocumentTypePickerElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIDocumentTypePickerElement> = () =>
 	html` <umb-property-editor-ui-document-type-picker></umb-property-editor-ui-document-type-picker>`;
-AAAOverview.storyName = 'Overview';

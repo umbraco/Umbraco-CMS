@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-textarea',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUITextareaElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUITextareaElement> = () =>
 	html` <umb-property-editor-ui-textarea></umb-property-editor-ui-textarea>`;
-AAAOverview.storyName = 'Overview';

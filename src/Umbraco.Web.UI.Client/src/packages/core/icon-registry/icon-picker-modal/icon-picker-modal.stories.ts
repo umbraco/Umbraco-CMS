@@ -16,7 +16,7 @@ const value: UmbIconPickerModalValue = {
 	icon: undefined,
 };
 
-export const Overview: StoryFn<UmbIconPickerModalElement> = () => html`
+export const Docs: StoryFn<UmbIconPickerModalElement> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->

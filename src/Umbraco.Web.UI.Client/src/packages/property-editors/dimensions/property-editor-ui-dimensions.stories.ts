@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-dimensions',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIDimensionsElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIDimensionsElement> = () =>
 	html` <umb-property-editor-ui-dimensions></umb-property-editor-ui-dimensions>`;
-AAAOverview.storyName = 'Overview';

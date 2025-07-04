@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-block-grid-column-span',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIBlockGridColumnSpanElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIBlockGridColumnSpanElement> = () =>
 	html` <umb-property-editor-ui-block-grid-column-span></umb-property-editor-ui-block-grid-column-span>`;
-AAAOverview.storyName = 'Overview';

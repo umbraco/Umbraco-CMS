@@ -13,7 +13,7 @@ const meta: Meta<UmbEntityActionListElement> = {
 export default meta;
 type Story = StoryObj<UmbEntityActionListElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		entityType: 'document',
 		unique: '1234',

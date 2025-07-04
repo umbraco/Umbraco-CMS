@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-image-cropper',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIImageCropperElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIImageCropperElement> = () =>
 	html`<umb-property-editor-ui-image-cropper></umb-property-editor-ui-image-cropper>`;
-AAAOverview.storyName = 'Overview';

@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-block-list-type-configuration',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIBlockListBlockConfigurationElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIBlockListBlockConfigurationElement> = () =>
 	html`<umb-property-editor-ui-block-list-type-configuration></umb-property-editor-ui-block-list-type-configuration>`;
-AAAOverview.storyName = 'Overview';

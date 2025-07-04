@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-overlay-size',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIOverlaySizeElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIOverlaySizeElement> = () =>
 	html`<umb-property-editor-ui-overlay-size></umb-property-editor-ui-overlay-size>`;
-AAAOverview.storyName = 'Overview';

@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-static-file-picker',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIStaticFilePickerElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIStaticFilePickerElement> = () =>
 	html` <umb-property-editor-ui-static-file-picker></umb-property-editor-ui-static-file-picker>`;
-AAAOverview.storyName = 'Overview';

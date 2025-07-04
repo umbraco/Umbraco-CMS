@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-color-picker',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIColorPickerElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIColorPickerElement> = () =>
 	html`<umb-property-editor-ui-color-picker></umb-property-editor-ui-color-picker>`;
-AAAOverview.storyName = 'Overview';

@@ -10,7 +10,7 @@ export default {
 	id: 'umb-workspace-editor',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbWorkspaceEditorElement> = () =>
+export const Docs: StoryFn<UmbWorkspaceEditorElement> = () =>
 	html` <umb-workspace-editor>
 		<div slot="icon"><uui-button color="" look="placeholder">Icon slot</uui-button></div>
 		<div slot="name"><uui-button color="" look="placeholder">Name slot</uui-button></div>
@@ -18,4 +18,3 @@ export const AAAOverview: StoryFn<UmbWorkspaceEditorElement> = () =>
 		<div slot="actions"><uui-button color="" look="placeholder">Actions slot</uui-button></div>
 		<uui-button color="" look="placeholder">Default slot</uui-button>
 	</umb-workspace-editor>`;
-AAAOverview.storyName = 'Overview';

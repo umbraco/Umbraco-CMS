@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-upload-field',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIUploadFieldElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIUploadFieldElement> = () =>
 	html`<umb-property-editor-ui-upload-field></umb-property-editor-ui-upload-field>`;
-AAAOverview.storyName = 'Overview';

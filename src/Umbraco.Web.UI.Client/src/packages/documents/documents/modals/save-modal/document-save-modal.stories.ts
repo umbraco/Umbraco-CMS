@@ -166,4 +166,4 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentSaveModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};

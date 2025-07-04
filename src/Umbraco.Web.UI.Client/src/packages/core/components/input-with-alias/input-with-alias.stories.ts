@@ -10,7 +10,7 @@ const meta: Meta<UmbInputWithAliasElement> = {
 export default meta;
 type Story = StoryObj<UmbInputWithAliasElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		label: 'Input with Alias',
 		value: 'Some value',

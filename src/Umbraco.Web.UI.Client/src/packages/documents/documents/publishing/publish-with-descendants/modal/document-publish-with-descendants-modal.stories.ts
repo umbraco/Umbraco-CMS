@@ -169,7 +169,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentPublishWithDescendantsModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
 
 export const Invariant: Story = {
 	args: {

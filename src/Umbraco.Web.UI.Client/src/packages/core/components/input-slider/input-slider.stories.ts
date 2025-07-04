@@ -19,7 +19,7 @@ const meta: Meta<UmbInputSliderElement> = {
 export default meta;
 type Story = StoryObj<UmbInputSliderElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		min: 0,
 		max: 100,

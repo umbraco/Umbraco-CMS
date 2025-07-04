@@ -10,7 +10,7 @@ const meta: Meta<UmbInputRadioButtonListElement> = {
 export default meta;
 type Story = StoryObj<UmbInputRadioButtonListElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		list: [
 			{ label: 'One', value: '1' },

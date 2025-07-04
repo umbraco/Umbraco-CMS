@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-accepted-upload-types',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIAcceptedUploadTypesElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIAcceptedUploadTypesElement> = () =>
 	html`<umb-property-editor-ui-accepted-upload-types></umb-property-editor-ui-accepted-upload-types>`;
-AAAOverview.storyName = 'Overview';

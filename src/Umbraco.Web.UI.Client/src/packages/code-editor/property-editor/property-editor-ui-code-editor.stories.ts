@@ -14,4 +14,4 @@ const meta: Meta<UmbPropertyEditorUICodeEditorElement> = {
 export default meta;
 type Story = StoryObj<UmbPropertyEditorUICodeEditorElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};

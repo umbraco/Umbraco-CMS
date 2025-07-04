@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-multi-url-picker',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIMultiUrlPickerElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIMultiUrlPickerElement> = () =>
 	html`<umb-property-editor-ui-multi-url-picker></umb-property-editor-ui-multi-url-picker>`;
-AAAOverview.storyName = 'Overview';

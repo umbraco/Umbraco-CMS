@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-block-grid-type-configuration',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIBlockGridTypeConfigurationElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIBlockGridTypeConfigurationElement> = () =>
 	html`<umb-property-editor-ui-block-grid-type-configuration></umb-property-editor-ui-block-grid-type-configuration>`;
-AAAOverview.storyName = 'Overview';

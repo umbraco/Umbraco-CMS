@@ -10,11 +10,10 @@ export default {
 	id: 'umb-property',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyElement> = () =>
+export const Docs: StoryFn<UmbPropertyElement> = () =>
 	html` <umb-property
 		label="Property"
 		description="Description"
 		alias="textProperty"
 		property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"
 		.value="${'Hello'}"></umb-property>`;
-AAAOverview.storyName = 'Overview';

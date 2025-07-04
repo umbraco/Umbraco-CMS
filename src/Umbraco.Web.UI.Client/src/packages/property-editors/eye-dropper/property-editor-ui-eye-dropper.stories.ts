@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-eye-dropper',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIEyeDropperElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIEyeDropperElement> = () =>
 	html`<umb-property-editor-ui-eye-dropper></umb-property-editor-ui-eye-dropper>`;
-AAAOverview.storyName = 'Overview';

@@ -70,7 +70,7 @@ const items: Array<UmbTableItem> = [
 	},
 ];
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		items: items,
 		columns: columns,

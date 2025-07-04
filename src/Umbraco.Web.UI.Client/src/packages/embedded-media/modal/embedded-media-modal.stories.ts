@@ -17,7 +17,7 @@ const data: UmbEmbeddedMediaModalData = {
 	constrain: true,
 };
 
-export const Overview = () => html`
+export const Docs = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->

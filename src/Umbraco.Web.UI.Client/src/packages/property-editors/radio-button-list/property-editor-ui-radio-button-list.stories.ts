@@ -10,6 +10,5 @@ export default {
 	id: 'umb-property-editor-ui-radio-button-list',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIRadioButtonListElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIRadioButtonListElement> = () =>
 	html`<umb-property-editor-ui-radio-button-list></umb-property-editor-ui-radio-button-list>`;
-AAAOverview.storyName = 'Overview';
