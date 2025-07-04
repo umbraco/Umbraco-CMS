@@ -41,6 +41,7 @@ using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
+using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
@@ -341,6 +342,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Data type configuration cache
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
             Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCacheRefresher>();
+
+            // Partial view cache invalidators (no-op, shipped implementation is added in Umbraco.Web.Website, but we
+            // need this to ensure we have a service registered for this interface even in headless setups).
+            // See: https://github.com/umbraco/Umbraco-CMS/issues/19661
+            Services.AddUnique<IMemberPartialViewCacheInvalidator, NoopMemberPartialViewCacheInvalidator>();
         }
     }
 }
