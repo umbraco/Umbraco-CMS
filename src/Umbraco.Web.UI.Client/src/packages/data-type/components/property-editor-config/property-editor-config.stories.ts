@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorConfigElement } from './property-editor-config.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-config.element.js';

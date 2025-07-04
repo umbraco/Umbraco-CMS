@@ -1,4 +1,4 @@
-export type UmbEntityUnique = string | null;
+import type { UmbEntityUnique } from './entity-unique/types.js';
 
 export interface UmbEntityModel {
 	unique: UmbEntityUnique;
@@ -8,3 +8,6 @@ export interface UmbEntityModel {
 export interface UmbNamedEntityModel extends UmbEntityModel {
 	name: string;
 }
+
+export type * from './entity-type/types.js';
+export type * from './entity-unique/types.js';
