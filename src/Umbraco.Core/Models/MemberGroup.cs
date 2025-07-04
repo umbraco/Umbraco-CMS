@@ -35,7 +35,7 @@ _additionalData ??= new Dictionary<string, object?>();
                 // if the name has changed, add the value to the additional data,
                 // this is required purely for event handlers to know the previous name of the group
                 // so we can keep the public access up to date.
-                AdditionalData["previousName"] = _name;
+                AdditionalData[Constants.Entities.AdditionalDataKeys.MemberGroupPreviousName] = _name;
             }
 
             SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
