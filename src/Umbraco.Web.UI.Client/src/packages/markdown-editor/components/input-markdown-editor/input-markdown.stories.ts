@@ -1,6 +1,6 @@
+import type { UmbInputMarkdownElement } from './input-markdown.element.js';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './input-markdown.element.js';
-import type { UmbInputMarkdownElement } from './input-markdown.element.js';
 
 const meta: Meta<UmbInputMarkdownElement> = {
 	title: 'Generic Components/Inputs/Markdown',
@@ -13,4 +13,4 @@ const meta: Meta<UmbInputMarkdownElement> = {
 export default meta;
 type Story = StoryObj<UmbInputMarkdownElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
