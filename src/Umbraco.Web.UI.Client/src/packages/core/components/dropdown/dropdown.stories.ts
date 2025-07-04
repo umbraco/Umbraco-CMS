@@ -23,7 +23,7 @@ const meta: Meta<UmbDropdownElement> = {
 export default meta;
 type Story = StoryObj<UmbDropdownElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		open: false,
 		label: 'Dropdown',

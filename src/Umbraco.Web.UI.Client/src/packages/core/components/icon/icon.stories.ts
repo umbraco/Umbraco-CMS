@@ -10,7 +10,7 @@ const meta: Meta<UmbIconElement> = {
 export default meta;
 type Story = StoryObj<UmbIconElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		name: 'icon-wand',
 		color: '',

@@ -12,7 +12,7 @@ const meta: Meta<UmbBodyLayoutElement> = {
 export default meta;
 type Story = StoryObj<UmbBodyLayoutElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	render: () =>
 		html` <umb-body-layout>
 			<div slot="header"><uui-button color="" look="placeholder">Header slot</uui-button></div>
