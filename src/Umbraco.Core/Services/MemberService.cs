@@ -770,16 +770,26 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("Cannot save member with empty name.");
             }
 
+            var previousUsername = _memberRepository.Get(member.Id)?.Username;
+
             scope.WriteLock(Constants.Locks.MemberTree);
 
             _memberRepository.Save(member);
 
             if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saved))
             {
-                scope.Notifications.Publish(
-                    savingNotification is null
+                // If the user name has changed, populate the previous user name in the additional data, so the cache refreshers
+                // have it available to clear the cache by the old name as well as the new.
+                if (string.Equals(previousUsername, member.Username, StringComparison.OrdinalIgnoreCase) is false)
+                {
+                    member.AdditionalData![Constants.Entities.AdditionalDataKeys.MemberPreviousUserName] = previousUsername;
+                }
+
+                MemberSavedNotification memberSavedNotification = savingNotification is null
                     ? new MemberSavedNotification(member, evtMsgs)
-                    : new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+                    : new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification);
+
+                scope.Notifications.Publish(memberSavedNotification);
             }
 
             Audit(AuditType.Save, 0, member.Id);
