@@ -25,9 +25,24 @@ import icons from '../src/packages/core/icon-registry/icons';
 import '../src/libs/context-api/provide/context-provider.element';
 import '../src/packages/core/components';
 
+import { manifests as blockManifests } from '../src/packages/block/manifests';
+import { manifests as clipboardManifests } from '../src/packages/clipboard/manifests';
+import { manifests as codeEditorManifests } from '../src/packages/code-editor/manifests';
+import { manifests as contentManifests } from '../src/packages/content/manifests';
 import { manifests as coreManifests } from '../src/packages/core/manifests';
+import { manifests as dataTypeManifests } from '../src/packages/data-type/manifests';
+import { manifests as dictionaryManifests } from '../src/packages/dictionary/manifests';
 import { manifests as documentManifests } from '../src/packages/documents/manifests';
-import { manifests as localizationManifests } from '../src/packages/core/localization/manifests';
+import { manifests as embeddedMediaManifests } from '../src/packages/embedded-media/manifests';
+import { manifests as extensionInsightsManifests } from '../src/packages/extension-insights/manifests';
+import { manifests as healthCheckManifests } from '../src/packages/health-check/manifests';
+import { manifests as helpManifests } from '../src/packages/help/manifests';
+import { manifests as languageManifests } from '../src/packages/language/manifests';
+import { manifests as logViewerManifests } from '../src/packages/log-viewer/manifests';
+import { manifests as markdownEditorManifests } from '../src/packages/markdown-editor/manifests';
+import { manifests as mediaManifests } from '../src/packages/media/manifests';
+import { manifests as memberManifests } from '../src/packages/members/manifests';
+
 import { UmbNotificationContext } from '../src/packages/core/notification';
 
 // MSW
@@ -38,7 +53,25 @@ class UmbStoryBookElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		const manifests = [...coreManifests, ...documentManifests, ...localizationManifests];
+		const manifests = [
+			...blockManifests,
+			...clipboardManifests,
+			...codeEditorManifests,
+			...contentManifests,
+			...coreManifests,
+			...dataTypeManifests,
+			...dictionaryManifests,
+			...documentManifests,
+			...embeddedMediaManifests,
+			...extensionInsightsManifests,
+			...healthCheckManifests,
+			...helpManifests,
+			...languageManifests,
+			...logViewerManifests,
+			...markdownEditorManifests,
+			...mediaManifests,
+			...memberManifests,
+		];
 		this._umbIconRegistry.setIcons(icons);
 		this._umbIconRegistry.attach(this);
 		this._registerExtensions(manifests);
