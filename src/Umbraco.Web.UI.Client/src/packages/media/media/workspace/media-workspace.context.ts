@@ -76,7 +76,7 @@ export class UmbMediaWorkspaceContext
 					const mediaTypeUnique = info.match.params.mediaTypeUnique;
 					await this.createScaffold({
 						parent: { entityType: parentEntityType, unique: parentUnique },
-						preset: { mediaType: { unique: mediaTypeUnique, collection: null } },
+						preset: { mediaType: { unique: mediaTypeUnique } },
 					});
 
 					new UmbWorkspaceIsNewRedirectController(
