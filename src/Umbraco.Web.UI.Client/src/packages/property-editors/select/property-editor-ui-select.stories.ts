@@ -5,11 +5,10 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-select.element.js';
 
 export default {
-	title: 'Property Editor UIs/Select',
+	title: 'Extension Type/Property Editor UI/Select',
 	component: 'umb-property-editor-ui-select',
 	id: 'umb-property-editor-ui-select',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUISelectElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUISelectElement> = () =>
 	html`<umb-property-editor-ui-select></umb-property-editor-ui-select>`;
-AAAOverview.storyName = 'Overview';
