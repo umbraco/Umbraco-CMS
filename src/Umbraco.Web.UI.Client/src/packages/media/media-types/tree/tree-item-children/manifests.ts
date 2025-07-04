@@ -6,6 +6,7 @@ import {
 import { UMB_MEDIA_TYPE_ROOT_WORKSPACE_ALIAS } from '../../media-type-root/constants.js';
 import { UMB_MEDIA_TYPE_FOLDER_WORKSPACE_ALIAS } from '../folder/constants.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -28,7 +29,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				oneOf: [UMB_MEDIA_TYPE_ROOT_WORKSPACE_ALIAS, UMB_MEDIA_TYPE_FOLDER_WORKSPACE_ALIAS],
 			},
 		],

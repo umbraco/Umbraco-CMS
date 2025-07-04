@@ -1,6 +1,5 @@
-import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT } from '../index.js';
-import type { UmbWorkspaceEntityIsNewConditionConfig } from './types.js';
-import { UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS } from './const.js';
+import type { UmbWorkspaceEntityIsNewConditionConfig } from '../types.js';
+import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT } from '../../contexts/index.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -28,10 +27,3 @@ export class UmbWorkspaceEntityIsNewCondition
 		});
 	}
 }
-
-export const manifest: UmbExtensionManifest = {
-	type: 'condition',
-	name: 'Workspace Entity Is New Condition',
-	alias: UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
-	api: UmbWorkspaceEntityIsNewCondition,
-};
