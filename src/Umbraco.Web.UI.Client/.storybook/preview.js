@@ -112,7 +112,7 @@ class UmbStoryBookElement extends UmbLitElement {
 			...tipTapManifests,
 			...translationManifests,
 			...ufmManifests,
-			...umbracoNewsManifests,
+			//...umbracoNewsManifests,
 			...userManifests,
 			...webhookManifests,
 		];
