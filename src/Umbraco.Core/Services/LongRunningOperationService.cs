@@ -74,13 +74,12 @@ internal class LongRunningOperationService : ILongRunningOperationService
     public Task<bool> IsRunning(string type, Guid operationId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        LongRunningOperation? operation = _repository.Get(type, operationId);
-        return Task.FromResult(IsRunning(operation));
+        return Task.FromResult(_repository.IsEnqueuedOrRunning(type, operationId));
     }
 
     /// <inheritdoc/>
     public Task<bool> IsRunning(string type)
-        => Task.FromResult(IsRunningSync(type));
+        => Task.FromResult(_repository.IsEnqueuedOrRunning(type));
 
     /// <inheritdoc />
     public Task<Attempt<TResult?>> GetResult<TResult>(Guid operationId)
@@ -93,16 +92,6 @@ internal class LongRunningOperationService : ILongRunningOperationService
             : Attempt.Succeed(result));
     }
 
-    private static bool IsRunning(LongRunningOperation? operation) =>
-        operation is { Status: LongRunningOperationStatus.Enqueued or LongRunningOperationStatus.Running };
-
-    private bool IsRunningSync(string type)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        LongRunningOperation? operation = _repository.GetLatest(type);
-        return IsRunning(operation);
-    }
-
     private async Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> RunInner<T>(
         string type,
         Func<CancellationToken, Task<T>> operation,
@@ -110,7 +99,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
         bool allowMultipleRunsOfType = true,
         TimeSpan? expires = null)
     {
-        if (!allowMultipleRunsOfType && IsRunningSync(type))
+        if (!allowMultipleRunsOfType && await IsRunning(type))
         {
             // If an operation of the type is already enqueued or running, we return an attempt indicating that it is already running.
             // This prevents multiple enqueues of the same operation.
@@ -126,7 +115,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
                 // Acquire a write lock to ensure that no other operations of the same type can be enqueued while this one is being processed.
                 // This is only needed if we do not allow multiple runs of the same type.
                 scope.WriteLock(Constants.Locks.LongRunningOperations);
-                if (IsRunningSync(type))
+                if (await IsRunning(type))
                 {
                     return Attempt.FailWithStatus(LongRunningOperationEnqueueStatus.AlreadyRunning, Guid.Empty);
                 }

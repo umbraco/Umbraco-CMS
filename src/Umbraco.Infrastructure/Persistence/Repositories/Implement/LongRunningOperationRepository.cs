@@ -36,16 +36,31 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     }
 
     /// <inheritdoc/>
-    public LongRunningOperation? GetLatest(string type)
+    public bool IsEnqueuedOrRunning(string type)
     {
         Sql<ISqlContext> sql = Sql()
             .Select<LongRunningOperationDto>()
             .From<LongRunningOperationDto>()
-            .Where<LongRunningOperationDto>(x => x.Type == type)
-            .OrderByDescending<LongRunningOperationDto>(x => x.CreateDate);
+            .Where<LongRunningOperationDto>(x =>
+                x.Type == type && (x.Status == nameof(LongRunningOperationStatus.Enqueued) || x.Status == nameof(LongRunningOperationStatus.Running)));
 
-        LongRunningOperationDto dto = Database.FirstOrDefault<LongRunningOperationDto>(sql);
-        return dto == null ? null : MapDtoToEntity(dto);
+        var count = Database.Count(sql);
+        return count > 0;
+    }
+
+    /// <inheritdoc/>
+    public bool IsEnqueuedOrRunning(string type, Guid id)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<LongRunningOperationDto>()
+            .From<LongRunningOperationDto>()
+            .Where<LongRunningOperationDto>(x =>
+                x.Type == type
+                && x.Id == id
+                && (x.Status == nameof(LongRunningOperationStatus.Enqueued) || x.Status == nameof(LongRunningOperationStatus.Running)));
+
+        var count = Database.Count(sql);
+        return count > 0;
     }
 
     /// <inheritdoc/>

@@ -16,11 +16,19 @@ public interface ILongRunningOperationRepository
     LongRunningOperation? Get(string type, Guid id);
 
     /// <summary>
-    /// Retrieves the latest long-running operation of a specific type.
+    /// Checks if a long-running operation of a specific type is currently enqueued or running.
     /// </summary>
     /// <param name="type">The type of the long-running operation.</param>
     /// <returns>The long-running operation if found; otherwise, null.</returns>
-    LongRunningOperation? GetLatest(string type);
+    bool IsEnqueuedOrRunning(string type);
+
+    /// <summary>
+    /// Checks if a long-running operation of a specific type and ID is currently enqueued or running.
+    /// </summary>
+    /// <param name="type">The type of the long-running operation.</param>
+    /// <param name="id">The unique identifier of the long-running operation.</param>
+    /// <returns>The long-running operation if found; otherwise, null.</returns>
+    bool IsEnqueuedOrRunning(string type, Guid id);
 
     /// <summary>
     /// Retrieves a long-running operation by its ID.
