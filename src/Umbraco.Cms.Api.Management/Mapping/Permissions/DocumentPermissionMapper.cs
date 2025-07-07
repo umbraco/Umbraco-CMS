@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Services;
@@ -18,7 +19,7 @@ namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
 /// </remarks>
 public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissionMapper
 {
-    private readonly Lazy<IContentService> _contentService;
+    private readonly Lazy<IEntityService> _entityService;
     private readonly Lazy<IUserService> _userService;
 
     /// <summary>
@@ -27,7 +28,7 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
     public DocumentPermissionMapper()
         : this(
-              StaticServiceProvider.Instance.GetRequiredService<Lazy<IContentService>>(),
+              StaticServiceProvider.Instance.GetRequiredService<Lazy<IEntityService>>(),
               StaticServiceProvider.Instance.GetRequiredService<Lazy<IUserService>>())
     {
     }
@@ -35,9 +36,9 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
     /// </summary>
-    public DocumentPermissionMapper(Lazy<IContentService> contentService, Lazy<IUserService> userService)
+    public DocumentPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
     {
-        _contentService = contentService;
+        _entityService = entityService;
         _userService = userService;
     }
 
@@ -109,13 +110,14 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     public IEnumerable<IPermissionPresentationModel> AggregatePresentationModels(IUser user, IEnumerable<IPermissionPresentationModel> models)
     {
         // Get the unique document keys that have granular permissions.
-        IEnumerable<Guid> documentKeysWithGranularPermissions = models
+        Guid[] documentKeysWithGranularPermissions = models
             .Cast<DocumentPermissionPresentationModel>()
             .Select(x => x.Document.Id)
-            .Distinct();
+            .Distinct()
+            .ToArray();
 
         // Batch retrieve all documents by their keys.
-        var documents = _contentService.Value.GetByIds(documentKeysWithGranularPermissions)
+        var documents = _entityService.Value.GetAll<IContent>(documentKeysWithGranularPermissions)
             .ToDictionary(doc => doc.Key, doc => doc.Path);
 
         // Iterate through each document key that has granular permissions.
