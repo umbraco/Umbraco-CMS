@@ -4,12 +4,12 @@ import type { TokenResponse } from '@umbraco-cms/backoffice/external/openid';
  * Applies a buffer time before the actual expiration of the token.
  * This is to ensure that we have time to refresh the token before it expires.
  */
-const BUFFER_BEFORE_EXPIRATION = 5; // seconds
+const BUFFER_BEFORE_EXPIRATION = 60; // 1 minute in seconds
 
 /**
  * The interval at which the token will be validated.
  */
-const VALIDATION_INTERVAL = 5000; // 1 minute
+const VALIDATION_INTERVAL = 60000; // 1 minute in milliseconds
 
 const ports: MessagePort[] = [];
 let interval: NodeJS.Timeout | undefined;
@@ -89,7 +89,7 @@ function init(tokenResponse: TokenResponse) {
 			interval = undefined;
 			console.log('[Token Check Worker] Waiting for token refresh...');
 		} else if (result.numberOfSecondsUntilExpiration <= BUFFER_BEFORE_EXPIRATION) {
-			console.log('[Token Check Worker] Token should be refreshed, but not expired yet.');
+			console.log('[Token Check Worker] Token should be refreshed, but it is not expired yet.');
 			// Let the main thread know that the token should be refreshed
 			ports?.[0]?.postMessage({
 				command: 'refreshToken',
