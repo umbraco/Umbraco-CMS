@@ -175,14 +175,9 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             .Where<NodeDto>(x => x.UniqueId == targetKey, "Target");
 
         // We have to reuse the target row sql arguments, however, we also need to add the "before" and "after" values to the arguments.
-        // If try to do this directly in the params array it'll consider the initial argument array as a single argument.
-        var beforeArguments = new List<object>();
-        beforeArguments.AddRange(targetRowSql.Arguments);
-        beforeArguments.Add(before);
-
-        var afterArguments = new List<object>();
-        afterArguments.AddRange(targetRowSql.Arguments);
-        afterArguments.Add(after);
+        // If we try to do this directly in the params array it'll consider the initial argument array as a single argument.
+        IEnumerable<object> beforeArguments = targetRowSql.Arguments.Concat([before]);
+        IEnumerable<object> afterArguments = targetRowSql.Arguments.Concat([after]);
 
         // Select the UniqueId of nodes which row number is within the specified range of the target node's row number.
         Sql<ISqlContext>? mainSql = Sql()
