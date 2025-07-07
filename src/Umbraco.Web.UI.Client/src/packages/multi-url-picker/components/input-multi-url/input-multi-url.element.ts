@@ -395,7 +395,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 		const unique = this.#getUnique(link);
 		const href = this.readonly ? undefined : (this._modalRoute?.({ index }) ?? undefined);
 		const resolvedName = this._resolvedLinkNames.find((name) => name.unique === link.unique)?.name ?? '';
-		const resolvedUrl = this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? '';
+		const resolvedUrl = this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '';
 		return html`
 			<uui-ref-node
 				id=${unique}
