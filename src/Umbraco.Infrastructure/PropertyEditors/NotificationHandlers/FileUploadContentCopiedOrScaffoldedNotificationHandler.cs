@@ -19,10 +19,10 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 /// </summary>
 internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : FileUploadNotificationHandlerBase,
     INotificationHandler<ContentCopiedNotification>,
-    INotificationHandler<ContentScaffoldedNotification>
+    INotificationHandler<ContentScaffoldedNotification>,
+    INotificationHandler<ContentSavedBlueprintNotification>
 {
     private readonly IContentService _contentService;
-
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
     private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockGridEditorValues;
 
@@ -43,12 +43,24 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
     }
 
     /// <inheritdoc/>
-    public void Handle(ContentCopiedNotification notification) => Handle(notification.Original, notification.Copy, true);
+    public void Handle(ContentCopiedNotification notification) => Handle(notification.Original, notification.Copy, (IContent c) => _contentService.Save(c));
 
     /// <inheritdoc/>
     public void Handle(ContentScaffoldedNotification notification) => Handle(notification.Original, notification.Scaffold);
 
-    private void Handle(IContent source, IContent destination, bool saveAfterUpdates = false)
+    /// <inheritdoc/>
+    public void Handle(ContentSavedBlueprintNotification notification)
+    {
+        if (notification.CreatedFromContent is null)
+        {
+            // If there is no original content, we don't need to copy files.
+            return;
+        }
+
+        Handle(notification.CreatedFromContent, notification.SavedBlueprint, (IContent c) => _contentService.SaveBlueprint(c, null));
+    }
+
+    private void Handle(IContent source, IContent destination, Action<IContent>? postUpdateAction = null)
     {
         var isUpdated = false;
 
@@ -83,10 +95,10 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
             }
         }
 
-        // if updated, re-save the copy with the updated value
-        if (saveAfterUpdates && isUpdated)
+        // If updated, re-save the destination with the updated value.
+        if (isUpdated && postUpdateAction is not null)
         {
-            _contentService.Save(destination);
+            postUpdateAction(destination);
         }
     }
 
