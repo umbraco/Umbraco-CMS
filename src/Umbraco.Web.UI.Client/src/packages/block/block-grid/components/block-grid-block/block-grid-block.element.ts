@@ -1,5 +1,5 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
@@ -27,11 +27,6 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	settings?: UmbBlockDataType;
 
 	override render() {
-			${this.unpublished
-				? html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
-						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-					></uui-tag>`
-				: nothing}
 		const blockValue = { ...this.content, $settings: this.settings };
 		return html`
 			<umb-ref-grid-block
@@ -39,6 +34,13 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 				href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
+				${when(
+					this.unpublished,
+					() =>
+						html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
+							><umb-localize key="blockEditor_notExposedLabel"></umb-localize
+						></uui-tag>`,
+				)}
 				<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
 			</umb-ref-grid-block>
 		`;

@@ -1,21 +1,15 @@
 import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../context/index.js';
-import {
-	UMB_BLOCK_WORKSPACE_ALIAS,
-	type UmbBlockDataType,
-	type UMB_BLOCK_WORKSPACE_CONTEXT,
-} from '@umbraco-cms/backoffice/block';
-import {
-	UmbExtensionApiInitializer,
-	UmbExtensionsApiInitializer,
-	type UmbApiConstructorArgumentsMethodType,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbBlockDataType, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
-import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -169,11 +163,13 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				</div>
 			</span>
-			${this.unpublished
-				? html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
+			${when(
+				this.unpublished,
+				() =>
+					html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
 						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-					></uui-tag>`
-				: nothing}
+					></uui-tag>`,
+			)}
 		`;
 	}
 
