@@ -80,5 +80,10 @@ public static partial class Constants
         ///     All webhook logs.
         /// </summary>
         public const int WebhookLogs = -343;
+
+        /// <summary>
+        ///     All Document Urls
+        /// </summary>
+        public const int DocumentUrls = -344;
     }
 }
