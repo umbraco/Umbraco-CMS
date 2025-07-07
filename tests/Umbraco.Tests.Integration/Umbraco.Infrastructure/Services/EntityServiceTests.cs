@@ -965,7 +965,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public void EntityService_Siblings_RespectsOrdering()
     {
-        var children = CreateSiblingsTestData().OrderBy(x => x.Name).ToList();
+        var children = CreateSiblingsTestData();
+
+        // Order the children by name to ensure the ordering works when differing from the default sort order, the name is a GUID.
+        children = children.OrderBy(x => x.Name).ToList();
 
         var taget = children[1];
         var result = EntityService.GetSiblings(taget.Key, UmbracoObjectTypes.Document, 1, 1, Ordering.By(nameof(NodeDto.Text))).ToArray();
