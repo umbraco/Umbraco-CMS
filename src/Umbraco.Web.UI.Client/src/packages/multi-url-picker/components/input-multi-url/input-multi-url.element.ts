@@ -248,6 +248,8 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	#populateLinksNameAndUrl() {
 		// Documents and media have URLs saved in the local link format. Display the actual URL to align with what
 		// the user sees when they selected it initially.
+		this._resolvedLinkNames = [];
+		this._resolvedLinkUrls = []
 		this.#urls.forEach(async (link) => {
 			if (!link.unique) return;
 
