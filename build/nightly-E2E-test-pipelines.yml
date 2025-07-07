@@ -17,6 +17,11 @@ parameters:
     type: boolean
     default: false
 
+  - name: skipDefaultConfigAcceptanceTests
+    displayName: Don't run tests with defaultConfig.
+    type: boolean
+    default: false
+
 variables:
   nodeVersion: 20
   solution: umbraco.sln
@@ -295,6 +300,7 @@ stages:
       - job:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
+        condition: eq(${{parameters.skipDefaultConfigAcceptanceTests}})
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
@@ -497,6 +503,7 @@ stages:
       - job:
         displayName: E2E Tests (SQL Server)
         timeoutInMinutes: 180
+        condition: eq(${{parameters.skipDefaultConfigAcceptanceTests}})
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
@@ -745,7 +752,7 @@ stages:
               testRunTitle: "$(Agent.JobName)"
       - job:
         displayName: E2E Tests with Different App settings (SQL Server)
-        condition: eq(${{parameters.differentAppSettingsAcceptanceTests}}, True)
+        condition: or(eq(${{parameters.differentAppSettingsAcceptanceTests}}, True), eq(${{parameters.skipDefaultConfigAcceptanceTests}}))
         timeoutInMinutes: 180
         variables:
         SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
