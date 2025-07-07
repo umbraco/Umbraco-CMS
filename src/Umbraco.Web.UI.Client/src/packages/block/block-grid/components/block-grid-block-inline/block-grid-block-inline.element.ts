@@ -50,6 +50,9 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
+	@property({ attribute: false })
+	settings?: UmbBlockDataType;
+
 	@state()
 	_inlineProperty?: UmbPropertyTypeModel;
 
@@ -176,13 +179,14 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
+		const blockValue = { ...this.content, $settings: this.settings };
 		return html`
 			<span id="content">
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
-					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
+					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				</div>
 			</span>
 			${this.unpublished

@@ -23,19 +23,25 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
+	@property({ attribute: false })
+	settings?: UmbBlockDataType;
+
 	override render() {
-		return html`<umb-ref-grid-block
-			standalone
-			href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
-			<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-			<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
 			${this.unpublished
 				? html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
 						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
 					></uui-tag>`
 				: nothing}
-			<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
-		</umb-ref-grid-block>`;
+		const blockValue = { ...this.content, $settings: this.settings };
+		return html`
+			<umb-ref-grid-block
+				standalone
+				href=${(this.config?.showContentEdit ? this.config?.editContentPath : undefined) ?? ''}>
+				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
+				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
+				<umb-block-grid-areas-container slot="areas" draggable="false"></umb-block-grid-areas-container>
+			</umb-ref-grid-block>
+		`;
 	}
 
 	static override styles = [
