@@ -1,6 +1,7 @@
 import type { BuildOptions, UserConfig, LibraryOptions } from 'vite';
 
 interface UmbViteDefaultConfigArgs {
+	base?: string;
 	dist: BuildOptions['outDir'];
 	entry?: LibraryOptions['entry'];
 	plugins?: UserConfig['plugins'];
@@ -22,5 +23,6 @@ export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => 
 			},
 		},
 		plugins: args.plugins,
+		base: args.base,
 	};
 };
