@@ -1,5 +1,6 @@
 import { UmbAuthFlow } from './auth-flow.js';
 import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
+import { UmbAuthSessionTimeoutController } from './controllers/auth-session-timeout.controller.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { ManifestAuthProvider } from './auth-provider.extension.js';
 import { UMB_STORAGE_TOKEN_RESPONSE_NAME } from './constants.js';
@@ -18,7 +19,6 @@ import {
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export class UmbAuthContext extends UmbContextBase {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
@@ -32,8 +32,6 @@ export class UmbAuthContext extends UmbContextBase {
 
 	#authWindowProxy?: WindowProxy | null;
 	#previousAuthUrl?: string;
-
-	#tokenCheckWorker?: SharedWorker;
 
 	/**
 	 * Observable that emits true when the auth context is initialized.
@@ -92,71 +90,13 @@ export class UmbAuthContext extends UmbContextBase {
 		// This establishes the tab-to-tab communication
 		window.addEventListener('storage', this.#onStorageEvent.bind(this));
 
-		this.#tokenCheckWorker = new SharedWorker(new URL('./workers/token-check.worker.js', import.meta.url), {
-			name: 'TokenCheckWorker',
-			type: 'module',
-		});
-
-		// Ensure the worker is ready to receive messages
-		this.#tokenCheckWorker.port.start();
-
-		// Listen for messages from the token check worker
-		this.#tokenCheckWorker.port.onmessage = async (event) => {
-			if (event.data?.command === 'logout') {
-				// If the worker signals a logout, we clear the token storage and set the user as unauthorized
-				this.timeOut();
-			} else if (event.data?.command === 'refreshToken') {
-				const secondsUntilLogout = event.data.secondsUntilLogout;
-				console.log(
-					'[Auth Context] Token check worker requested a refresh token. Refreshing in',
-					secondsUntilLogout,
-					'seconds.',
-				);
-				try {
-					await umbConfirmModal(this, {
-						headline: 'Session Expiring',
-						cancelLabel: 'Logout',
-						confirmLabel: 'Stay Logged In',
-						content: `Your session is about to expire in ${secondsUntilLogout} seconds. Do you want to stay logged in?`,
-					});
-					this.validateToken().catch((error) => {
-						console.error('[Auth Context] Error validating token:', error);
-						// If the token validation fails, we clear the token storage and set the user as unauthorized
-						this.timeOut();
-					});
-				} catch {
-					this.timeOut();
-				}
-			}
-		};
-
-		this.observe(
-			this.#authFlow.token$,
-			(tokenResponse) => {
-				// Inform the token check worker about the new token response
-				console.log('[Auth Context] Informing token check worker about new token response.', this.#tokenCheckWorker);
-				// Post the new
-				this.#tokenCheckWorker?.port.postMessage({
-					command: 'init',
-					tokenResponse,
-				});
-			},
-			'_authFlowAuthorizationSignal',
-		);
-
-		this.observe(this.timeoutSignal, () => {
-			// Stop the token check worker when the user has timed out
-			this.#tokenCheckWorker?.port.postMessage({
-				command: 'init',
-			});
-		});
+		// Start the session timeout controller
+		new UmbAuthSessionTimeoutController(this, this.#authFlow);
 	}
 
 	override destroy(): void {
 		super.destroy();
 		window.removeEventListener('storage', this.#onStorageEvent.bind(this));
-		this.#tokenCheckWorker?.port.close();
-		this.#tokenCheckWorker = undefined;
 	}
 
 	async #onStorageEvent(evt: StorageEvent) {
