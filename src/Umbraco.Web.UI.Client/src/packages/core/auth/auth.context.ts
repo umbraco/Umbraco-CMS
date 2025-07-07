@@ -115,6 +115,8 @@ export class UmbAuthContext extends UmbContextBase {
 				try {
 					await umbConfirmModal(this, {
 						headline: 'Session Expiring',
+						cancelLabel: 'Logout',
+						confirmLabel: 'Stay Logged In',
 						content: `Your session is about to expire in ${secondsUntilLogout} seconds. Do you want to stay logged in?`,
 					});
 					this.validateToken().catch((error) => {
