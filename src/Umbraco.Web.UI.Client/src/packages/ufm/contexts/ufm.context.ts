@@ -1,4 +1,4 @@
-import type { ManifestUfmFilter } from '../ufm-filter.extension.js';
+import type { ManifestUfmFilter } from '../extensions/ufm-filter.extension.js';
 import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { Marked } from '@umbraco-cms/backoffice/external/marked';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
