@@ -18,7 +18,7 @@ parameters:
     default: false
 
   - name: skipDefaultConfigAcceptanceTests
-    displayName: Don't run tests with defaultConfig.
+    displayName: Skip tests with DefaultConfig
     type: boolean
     default: false
 
@@ -755,7 +755,7 @@ stages:
         condition: or(eq(${{parameters.differentAppSettingsAcceptanceTests}}, True), eq(${{parameters.skipDefaultConfigAcceptanceTests}}))
         timeoutInMinutes: 180
         variables:
-        SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+          SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
         strategy:
           matrix:
             # UnattendedInstallConfig
