@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 
 public class SiblingsDocumentBlueprintTreeController : DocumentBlueprintTreeControllerBase
 {
-    public SiblingsDocumentBlueprintTreeController(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory) : base(entityService, documentPresentationFactory)
+    public SiblingsDocumentBlueprintTreeController(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
+        : base(entityService, documentPresentationFactory)
     {
     }
 

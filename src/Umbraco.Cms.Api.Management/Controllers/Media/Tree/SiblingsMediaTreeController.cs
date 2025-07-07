@@ -11,7 +11,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 
 public class SiblingsMediaTreeController : MediaTreeControllerBase
 {
-    public SiblingsMediaTreeController(IEntityService entityService, IUserStartNodeEntitiesService userStartNodeEntitiesService, IDataTypeService dataTypeService, AppCaches appCaches, IBackOfficeSecurityAccessor backofficeSecurityAccessor, IMediaPresentationFactory mediaPresentationFactory) : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
+    public SiblingsMediaTreeController(
+        IEntityService entityService,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
+        AppCaches appCaches,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IMediaPresentationFactory mediaPresentationFactory)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
     {
     }
 

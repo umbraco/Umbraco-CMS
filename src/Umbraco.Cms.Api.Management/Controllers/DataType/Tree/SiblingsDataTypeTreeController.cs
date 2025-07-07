@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
 public class SiblingsDataTypeTreeController : DataTypeTreeControllerBase
 {
-    public SiblingsDataTypeTreeController(IEntityService entityService, IDataTypeService dataTypeService) : base(entityService, dataTypeService)
+    public SiblingsDataTypeTreeController(IEntityService entityService, IDataTypeService dataTypeService)
+        : base(entityService, dataTypeService)
     {
     }
 

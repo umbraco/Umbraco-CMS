@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 
 public class SiblingsTemplateTreeController : TemplateTreeControllerBase
 {
-    public SiblingsTemplateTreeController(IEntityService entityService) : base(entityService)
+    public SiblingsTemplateTreeController(IEntityService entityService)
+        : base(entityService)
     {
     }
 
