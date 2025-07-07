@@ -300,7 +300,7 @@ stages:
       - job:
         displayName: E2E Tests (SQLite)
         timeoutInMinutes: 180
-        condition: eq(${{parameters.skipDefaultConfigAcceptanceTests}})
+        condition: ${{ eq(parameters.skipDefaultConfigAcceptanceTests, false) }}
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
@@ -503,7 +503,7 @@ stages:
       - job:
         displayName: E2E Tests (SQL Server)
         timeoutInMinutes: 180
-        condition: eq(${{parameters.skipDefaultConfigAcceptanceTests}})
+        condition: ${{ eq(parameters.skipDefaultConfigAcceptanceTests, false) }}
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
