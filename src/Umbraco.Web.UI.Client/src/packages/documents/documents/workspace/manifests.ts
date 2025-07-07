@@ -5,7 +5,10 @@ import {
 	UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION,
 	UMB_WORKSPACE_HAS_CONTENT_COLLECTION_CONDITION_ALIAS,
 } from '@umbraco-cms/backoffice/content';
-import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_WORKSPACE_CONDITION_ALIAS,
+	UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -35,6 +38,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 			{
 				alias: UMB_WORKSPACE_HAS_CONTENT_COLLECTION_CONDITION_ALIAS,
+			},
+			{
+				alias: UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
+				match: false,
 			},
 		],
 	},
