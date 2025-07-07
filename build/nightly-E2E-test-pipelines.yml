@@ -752,7 +752,7 @@ stages:
               testRunTitle: "$(Agent.JobName)"
       - job:
         displayName: E2E Tests with Different App settings (SQL Server)
-        condition: or(eq(${{parameters.differentAppSettingsAcceptanceTests}}, True), eq(${{parameters.skipDefaultConfigAcceptanceTests}}))
+        condition: ${{ or(eq(parameters.differentAppSettingsAcceptanceTests, true), eq(parameters.skipDefaultConfigAcceptanceTests, true)) }}
         timeoutInMinutes: 180
         variables:
           SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
