@@ -34,9 +34,7 @@ export const UmbMarked = new Marked({
 	gfm: true,
 	breaks: true,
 	hooks: {
-		postprocess: (markup) => {
-			return UmbDomPurify.sanitize(markup, UmbDomPurifyConfig) as string;
-		},
+		postprocess: (markup) => UmbDomPurify.sanitize(markup, UmbDomPurifyConfig),
 	},
 });
 
