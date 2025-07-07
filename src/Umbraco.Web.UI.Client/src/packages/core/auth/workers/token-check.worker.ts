@@ -16,7 +16,9 @@ let interval: NodeJS.Timeout | undefined;
 
 console.log('[Token Check Worker] Token check worker initialized.');
 
-self.onconnect = (event: MessageEvent) => {
+const _self = globalThis as unknown as SharedWorkerGlobalScope & typeof globalThis;
+
+_self.onconnect = (event: MessageEvent) => {
 	console.log('[Token Check Worker] Connected to main thread.');
 	const port = event.ports[0];
 
@@ -35,16 +37,6 @@ self.onconnect = (event: MessageEvent) => {
 			}
 		}
 	};
-};
-
-self.ondisconnect = (event: MessageEvent) => {
-	console.log('[Token Check Worker] Disconnected from main thread.');
-	// Remove the port from the list of ports
-	const port = event.ports[0];
-	const index = ports.indexOf(port);
-	if (index !== -1) {
-		ports.splice(index, 1);
-	}
 };
 
 /**
