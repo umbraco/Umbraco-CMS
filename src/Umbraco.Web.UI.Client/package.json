@@ -119,6 +119,7 @@
 		"./workspace": "./dist-cms/packages/core/workspace/index.js",
 		"./external/backend-api": "./dist-cms/packages/core/backend-api/index.js",
 		"./external/dompurify": "./dist-cms/external/dompurify/index.js",
+		"./external/heximal-expressions": "./dist-cms/external/heximal-expressions/index.js",
 		"./external/lit": "./dist-cms/external/lit/index.js",
 		"./external/marked": "./dist-cms/external/marked/index.js",
 		"./external/monaco-editor": "./dist-cms/external/monaco-editor/index.js",
@@ -200,6 +201,7 @@
 		"npm": ">=10.9"
 	},
 	"dependencies": {
+		"@heximal/expressions": "^0.1.5",
 		"@tiptap/core": "2.11.7",
 		"@tiptap/extension-character-count": "2.11.7",
 		"@tiptap/extension-image": "2.11.7",

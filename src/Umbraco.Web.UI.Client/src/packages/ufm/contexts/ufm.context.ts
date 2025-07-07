@@ -65,6 +65,10 @@ export class UmbUfmContext extends UmbContextBase {
 		});
 	}
 
+	public getFilters() {
+		return Object.fromEntries(this.#filters.getValue().map((x) => [x.alias, x.filter]));
+	}
+
 	public getFilterByAlias(alias: string) {
 		return this.#filters.getValue().find((x) => x.alias === alias)?.filter;
 	}
