@@ -43,6 +43,8 @@ export abstract class UmbUfmElementBase extends UmbLitElement {
 				const filter = this.#ufmContext?.getFilterByAlias(item.alias);
 				if (filter) {
 					values = values.map((value) => filter(value, ...item.args));
+				} else {
+					console.warn(`UFM filter with alias "${item.alias}" was not found.`);
 				}
 			}
 		}
