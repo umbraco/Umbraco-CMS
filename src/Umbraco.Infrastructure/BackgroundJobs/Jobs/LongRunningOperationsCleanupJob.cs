@@ -11,6 +11,8 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILongRunningOperationRepository _longRunningOperationRepository;
 
+    private readonly TimeSpan _deleteTime = TimeSpan.FromDays(1);
+
     /// <summary>
     /// Initializes a new instance of the <see cref="LongRunningOperationsCleanupJob"/> class.
     /// </summary>
@@ -41,7 +43,7 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
     public Task RunJobAsync()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _longRunningOperationRepository.CleanOperations();
+        _longRunningOperationRepository.CleanOperations(_deleteTime);
         scope.Complete();
         return Task.CompletedTask;
     }

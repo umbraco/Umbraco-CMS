@@ -30,6 +30,7 @@ public interface ILongRunningOperationService
     /// <param name="operation">The operation to execute, which should accept a <see cref="CancellationToken"/>.</param>
     /// <param name="runInBackground">Whether to run the operation in the background.</param>
     /// <param name="allowMultipleRunsOfType">Whether to allow multiple instances of the same operation type to run concurrently.</param>
+    /// <param name="expires">The time span after which the operation is considered expired if its status hasn't been updated.</param>
     /// <returns>An <see cref="Attempt{TStatus}"/> indicating the status of the enqueue operation.</returns>
     /// <typeparam name="T">The type of the result expected from the operation.</typeparam>
     Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run<T>(
@@ -57,9 +58,10 @@ public interface ILongRunningOperationService
     /// <summary>
     /// Gets the result of a long-running operation.
     /// </summary>
+    /// <param name="type">The type of the long-running operation.</param>
     /// <param name="operationId">The unique identifier of the long-running operation.</param>
     /// <typeparam name="TResult">The type of the result expected from the operation.</typeparam>
     /// <returns>An <see cref="Attempt{TResult}"/> containing the result of the operation
     /// and its status. If the operation is not found or has not completed, the result will be null.</returns>
-    Task<Attempt<TResult?>> GetResult<TResult>(Guid operationId);
+    Task<Attempt<TResult?>> GetResult<TResult>(string type, Guid operationId);
 }

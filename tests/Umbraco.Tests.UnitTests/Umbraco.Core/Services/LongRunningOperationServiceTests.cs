@@ -100,7 +100,7 @@ public class LongRunningOperationServiceTests
         var updateStatusArgsQueue = new Queue<LongRunningOperationStatus>();
         updateStatusArgsQueue.Enqueue(LongRunningOperationStatus.Running);
         updateStatusArgsQueue.Enqueue(LongRunningOperationStatus.Success);
-        _longRunningOperationRepositoryMock.Setup(repo => repo.UpdateStatus(It.IsAny<Guid>(), It.IsAny<LongRunningOperationStatus>(), It.IsAny<TimeSpan>()))
+        _longRunningOperationRepositoryMock.Setup(repo => repo.UpdateStatus(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<LongRunningOperationStatus>(), It.IsAny<TimeSpan>()))
             .Callback<Guid, LongRunningOperationStatus, TimeSpan>((id, status, exp) =>
             {
                 Assert.AreEqual(updateStatusArgsQueue.Dequeue(), status);
@@ -204,14 +204,15 @@ public class LongRunningOperationServiceTests
     public async Task GetResult_ReturnsExpectedResult_WhenOperationExists()
     {
         SetupScopeProviderMock();
+        const string operationType = "Test";
         var operationId = Guid.NewGuid();
-        var expectedResult = "TestResult";
+        const string expectedResult = "TestResult";
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.GetResult<string>(operationId))
+            .Setup(repo => repo.GetResult<string>(operationType, operationId))
             .Returns(expectedResult)
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetResult<string>(operationId);
+        var result = await _longRunningOperationService.GetResult<string>(operationType, operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsTrue(result.Success);
@@ -222,13 +223,14 @@ public class LongRunningOperationServiceTests
     public async Task GetResult_ReturnsFailedAttempt_WhenOperationDoesNotExist()
     {
         SetupScopeProviderMock();
+        const string operationType = "Test";
         var operationId = Guid.NewGuid();
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.GetResult<string>(operationId))
+            .Setup(repo => repo.GetResult<string>(operationType, operationId))
             .Returns((string?)null)
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetResult<string>(operationId);
+        var result = await _longRunningOperationService.GetResult<string>(operationType, operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsFalse(result.Success);

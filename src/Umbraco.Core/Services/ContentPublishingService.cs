@@ -372,7 +372,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         // TODO: This is not working at the moment as the result is not being serialized properly. NEEDS FIXING.
         Attempt<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> result =
             await _longRunningOperationService
-                .GetResult<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>>(taskId);
+                .GetResult<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>>(PublishBranchOperationType, taskId);
 
         return result.Success
             ? result.Result

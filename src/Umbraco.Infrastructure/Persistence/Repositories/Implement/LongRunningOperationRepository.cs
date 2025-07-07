@@ -71,52 +71,65 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     }
 
     /// <inheritdoc/>
-    public void UpdateStatus(Guid id, LongRunningOperationStatus status, TimeSpan expires)
+    public void UpdateStatus(string type, Guid id, LongRunningOperationStatus status, TimeSpan expires)
     {
         Sql<ISqlContext> sql = Sql()
             .Update<LongRunningOperationDto>(x => x
                 .Set(y => y.Status, status.ToString())
                 .Set(y => y.UpdateDate, DateTime.UtcNow)
                 .Set(y => y.ExpireDate, DateTime.UtcNow + expires))
-            .Where<LongRunningOperationDto>(x => x.Id == id);
+            .Where<LongRunningOperationDto>(x => x.Type == type && x.Id == id);
 
         Database.Execute(sql);
     }
 
     /// <inheritdoc/>
-    public T? GetResult<T>(Guid id)
+    public T? GetResult<T>(string type, Guid id)
     {
         Sql<ISqlContext> sql = Sql()
             .Select<LongRunningOperationDto>()
             .From<LongRunningOperationDto>()
-            .Where<LongRunningOperationDto>(x => x.Id == id);
+            .Where<LongRunningOperationDto>(x => x.Type == type && x.Id == id);
 
         LongRunningOperationDto dto = Database.FirstOrDefault<LongRunningOperationDto>(sql);
         return dto?.Result == null ? default : _jsonSerializer.Deserialize<T>(dto.Result);
     }
 
     /// <inheritdoc/>
-    public void SetResult<T>(Guid id, T result, TimeSpan expires)
+    public void SetResult<T>(string type, Guid id, T result, TimeSpan expires)
     {
         Sql<ISqlContext> sql = Sql()
             .Update<LongRunningOperationDto>(x => x
                 .Set(y => y.Result, _jsonSerializer.Serialize(result))
                 .Set(y => y.UpdateDate, DateTime.UtcNow)
                 .Set(y => y.ExpireDate, DateTime.UtcNow + expires))
-            .Where<LongRunningOperationDto>(x => x.Id == id);
+            .Where<LongRunningOperationDto>(x => x.Type == type && x.Id == id);
 
         Database.Execute(sql);
     }
 
     /// <inheritdoc/>
-    public void CleanOperations()
+    public void CleanOperations(TimeSpan maxAgeOfOperations)
     {
+        // Set operations that have expired and are still marked as enqueued or running to Failed status
         DateTime now = DateTime.UtcNow;
-        Sql<ISqlContext> sql = Sql()
-            .Delete<LongRunningOperationDto>()
-            .Where<LongRunningOperationDto>(x => x.ExpireDate < now);
+        Sql<ISqlContext> sql1 = Sql()
+            .Update<LongRunningOperationDto>(x => x
+                .Set(y => y.Status, nameof(LongRunningOperationStatus.Failed))
+                .Set(y => y.UpdateDate, now))
+            .Where<LongRunningOperationDto>(x =>
+                x.ExpireDate < now
+                && (x.Status == nameof(LongRunningOperationStatus.Enqueued) || x.Status == nameof(LongRunningOperationStatus.Running)));
 
-        Database.Execute(sql);
+        Database.Execute(sql1);
+
+        // Delete operations that haven't been updated for longer than the specified max age
+        DateTime olderThan = now - maxAgeOfOperations;
+        Sql<ISqlContext> sql2 = Sql()
+            .Delete<LongRunningOperationDto>()
+            .Where<LongRunningOperationDto>(x => x.UpdateDate < olderThan);
+
+        Database.Execute(sql2);
     }
 
     private static LongRunningOperation MapDtoToEntity(LongRunningOperationDto dto) =>

@@ -58,32 +58,41 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetLatest_ReturnsNull_WhenThereIsNoOperationOfThatType()
+    public void IsEnqueuedOrRunning_ReturnsFalse_WhenThereIsNoOperationOfThatType()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository(provider);
         CreateTestData(repository);
 
-        var result = repository.GetLatest("NonExisting");
-        Assert.IsNull(result);
+        var result = repository.IsEnqueuedOrRunning("NonExisting");
+        Assert.IsFalse(result);
     }
 
     [Test]
-    public void GetLatest_ReturnsExpectedOperation_WhenOperationExists()
+    public void IsEnqueuedOrRunning_ReturnsFalse_WhenOperationExistsButIsNotRunning()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository(provider);
         CreateTestData(repository);
 
-        var expectedOperation = _operations[1];
-        var result = repository.GetLatest("Test");
+        var result = repository.IsEnqueuedOrRunning("AnotherTest");
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(expectedOperation.Id, result.Id);
-        Assert.AreEqual(expectedOperation.Type, result.Type);
-        Assert.AreEqual(expectedOperation.Status, result.Status);
+        Assert.IsFalse(result);
+    }
+
+    [Test]
+    public void IsEnqueuedOrRunning_ReturnsTrue_WhenOperationExistsAndIsRunning()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider);
+        CreateTestData(repository);
+
+        var result = repository.IsEnqueuedOrRunning("Test");
+
+        Assert.IsTrue(result);
     }
 
     [Test]
@@ -134,8 +143,8 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         var repository = CreateRepository(provider);
         CreateTestData(repository);
 
-        var testOperation = _operations[0];
-        repository.UpdateStatus(testOperation.Id, LongRunningOperationStatus.Failed, TimeSpan.Zero);
+        var testOperation = _operations[1];
+        repository.UpdateStatus(testOperation.Type, testOperation.Id, LongRunningOperationStatus.Failed, TimeSpan.Zero);
 
         var result = repository.Get(testOperation.Type, testOperation.Id);
         Assert.IsNotNull(result);
@@ -150,17 +159,17 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         var repository = CreateRepository(provider);
         CreateTestData(repository);
 
-        var testOperation = _operations[0];
+        var testOperation = _operations[1];
         var opResult = new LongRunningOperationResult { Result = true };
-        repository.SetResult(testOperation.Id, opResult, TimeSpan.FromMinutes(5));
+        repository.SetResult(testOperation.Type, testOperation.Id, opResult, TimeSpan.FromMinutes(5));
 
-        var result = repository.GetResult<LongRunningOperationResult>(testOperation.Id);
+        var result = repository.GetResult<LongRunningOperationResult>(testOperation.Type, testOperation.Id);
         Assert.IsNotNull(result);
         Assert.AreEqual(result.Result, opResult.Result);
     }
 
     [Test]
-    public void CleanOperations_RemovesExpiredOperationsFromDatabase()
+    public async Task CleanOperations_MarksOperationsAsFailedIfExpired()
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
@@ -180,10 +189,34 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         var result = repository.Get(expiredOperation.Type, expiredOperation.Id);
         Assert.IsNotNull(result);
 
-        repository.CleanOperations();
+        repository.CleanOperations(TimeSpan.Zero);
 
         // Check that the expired operation is removed after cleaning
         result = repository.Get(expiredOperation.Type, expiredOperation.Id);
+        Assert.IsNotNull(result);
+        Assert.AreEqual(LongRunningOperationStatus.Failed, result.Status);
+    }
+
+    [Test]
+    public async Task CleanOperations_RemovesOldOperationsFromTheDatabase()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider);
+        CreateTestData(repository);
+
+        await Task.Delay(TimeSpan.FromSeconds(10));
+
+        var oldOperation = _operations[0];
+
+        // Check that the operation is present before cleaning
+        var result = repository.Get(oldOperation.Type, oldOperation.Id);
+        Assert.IsNotNull(result);
+
+        repository.CleanOperations(TimeSpan.FromSeconds(2));
+
+        // Check that the expired operation is removed after cleaning
+        result = repository.Get(oldOperation.Type, oldOperation.Id);
         Assert.IsNull(result);
     }
 

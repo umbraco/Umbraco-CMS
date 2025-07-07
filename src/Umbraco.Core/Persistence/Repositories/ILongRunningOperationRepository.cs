@@ -40,30 +40,34 @@ public interface ILongRunningOperationRepository
     /// <summary>
     /// Updates the status of a long-running operation identified by its ID.
     /// </summary>
+    /// <param name="type">The type of the long-running operation.</param>
     /// <param name="id">The unique identifier of the long-running operation.</param>
     /// <param name="status">The new status to set for the operation.</param>
     /// <param name="expires">The time span after which the operation is considered expired if its status hasn't been updated.</param>
-    public void UpdateStatus(Guid id, LongRunningOperationStatus status, TimeSpan expires);
+    public void UpdateStatus(string type, Guid id, LongRunningOperationStatus status, TimeSpan expires);
 
     /// <summary>
-    /// Gets the result of a long-running operation identified by its ID.
+    /// Gets the result of a long-running operation identified by its type and ID.
     /// </summary>
+    /// <param name="type">The type of the long-running operation.</param>
     /// <param name="id">The unique identifier of the long-running operation.</param>
     /// <typeparam name="T">The type of the result.</typeparam>
     /// <returns>The result of the operation if found; otherwise, default value of T.</returns>
-    public T? GetResult<T>(Guid id);
+    public T? GetResult<T>(string type, Guid id);
 
     /// <summary>
     /// Sets the result of a long-running operation identified by its ID.
     /// </summary>
+    /// <param name="type">The type of the long-running operation.</param>
     /// <param name="id">The unique identifier of the long-running operation.</param>
     /// <param name="result">The result of the operation.</param>
     /// <typeparam name="T">The type of the result.</typeparam>
     /// <param name="expires">The time span after which the operation is considered expired if its status hasn't been updated.</param>
-    public void SetResult<T>(Guid id, T result, TimeSpan expires);
+    public void SetResult<T>(string type, Guid id, T result, TimeSpan expires);
 
     /// <summary>
     /// Cleans up long-running operations that haven't been updated for a certain period of time.
     /// </summary>
-    void CleanOperations();
+    /// <param name="maxAgeOfOperations">Maximum age of operations to keep.</param>
+    void CleanOperations(TimeSpan maxAgeOfOperations);
 }
