@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.UmbracoContext;
 
 namespace Umbraco.Cms.Web.BackOffice.Filters;
 
@@ -48,6 +51,7 @@ internal sealed class FilterAllowedOutgoingContentFilter : FilterAllowedOutgoing
     private readonly IEntityService _entityService;
     private readonly char _permissionToCheck;
     private readonly IUserService _userService;
+    private readonly IEventAggregator _eventAggregator;
 
     public FilterAllowedOutgoingContentFilter(
         Type outgoingType,
@@ -56,19 +60,26 @@ internal sealed class FilterAllowedOutgoingContentFilter : FilterAllowedOutgoing
         IUserService userService,
         IEntityService entityService,
         AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IEventAggregator eventAggregator)
         : base(entityService, backofficeSecurityAccessor, appCaches, outgoingType, propertyName)
     {
         _permissionToCheck = permissionToCheck;
         _userService = userService;
         _entityService = entityService;
         _appCaches = appCaches;
+        _eventAggregator = eventAggregator;
     }
 
     protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
     protected override void FilterItems(IUser user, IList items)
     {
+        // Runs first to ensure any items added in handlers
+        // are still included in the filtering
+        SendingChildrenNotification notification = new(items);
+        _eventAggregator.Publish(notification);
+
         base.FilterItems(user, items);
 
         FilterBasedOnPermissions(items, user);
