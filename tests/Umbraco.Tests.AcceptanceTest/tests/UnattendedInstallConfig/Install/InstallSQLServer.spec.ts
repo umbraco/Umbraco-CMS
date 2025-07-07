@@ -17,7 +17,7 @@ test('Install Umbraco using SQLServer Express', async ({umbracoUi}) => {
   await umbracoUi.install.clickNextButton();
   await umbracoUi.install.clickNextButton();
   await umbracoUi.install.setDatabaseType('SQL Server Express LocalDB');
-  await umbracoUi.install.doesDataBaseHaveType('SQL Server Express LocalDB');
+  await umbracoUi.install.doesDatabaseHaveType('SQL Server Express LocalDB');
   await umbracoUi.install.clickInstallButton();
 
   // Assert

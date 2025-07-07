@@ -16,7 +16,7 @@ test('Install Umbraco using SQLite', async ({umbracoUi}) => {
   await umbracoUi.install.enterPassword(password);
   await umbracoUi.install.clickNextButton();
   await umbracoUi.install.clickNextButton();
-  await umbracoUi.install.doesDataBaseHaveType('SQLite');
+  await umbracoUi.install.doesDatabaseHaveType('SQLite');
   await umbracoUi.install.clickInstallButton();
 
   // Assert
