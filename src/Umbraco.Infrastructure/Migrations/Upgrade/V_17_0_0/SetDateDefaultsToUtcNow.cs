@@ -34,7 +34,11 @@ public class SetDateDefaultsToUtcNow : UnscopedMigrationBase
 
     private void MigrateSqlite()
     {
-        // TODO: SQLite version of migration.
+        // SQLite doesn't fully support ALTER TABLE so to migrate we would need to create a new table and copy in the data.
+        // However the previous defaults have been set to "DATE()", which isn't a sensible choice anyway as it has no time component.
+        // Given that, it seems very unlikely we are using these database defaults in any meaningful way, and are instead providing
+        // values for all date fields when saving.
+        // As such we don't need to migrate these.
     }
 
     private void MigrateSqlServer()
