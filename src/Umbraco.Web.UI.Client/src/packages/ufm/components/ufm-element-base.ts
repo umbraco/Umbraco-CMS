@@ -39,13 +39,19 @@ export abstract class UmbUfmElementBase extends UmbLitElement {
 		let values = Array.isArray(this.value) ? this.value : [this.value];
 
 		if (this.#filterFuncArgs) {
+			const missing = new Set<string>();
+
 			for (const item of this.#filterFuncArgs) {
 				const filter = this.#ufmContext?.getFilterByAlias(item.alias);
 				if (filter) {
 					values = values.map((value) => filter(value, ...item.args));
 				} else {
-					console.warn(`UFM filter with alias "${item.alias}" was not found.`);
+					missing.add(item.alias);
 				}
+			}
+
+			if (missing.size > 0) {
+				console.warn(`UFM filters with aliases "${Array.from(missing).join('", "')}" were not found.`);
 			}
 		}
 
