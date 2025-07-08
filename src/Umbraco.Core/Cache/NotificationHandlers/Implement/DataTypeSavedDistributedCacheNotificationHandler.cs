@@ -24,7 +24,7 @@ public sealed class DataTypeSavedDistributedCacheNotificationHandler : SavedDist
     /// <inheritdoc />
     protected override void Handle(IEnumerable<IDataType> entities, IDictionary<string, object?> state)
     {
-        _distributedCache.RemoveDataTypeCache(entities);
+        _distributedCache.RefreshDataTypeCache(entities);
         _distributedCache.RefreshValueEditorCache(entities);
     }
 }
