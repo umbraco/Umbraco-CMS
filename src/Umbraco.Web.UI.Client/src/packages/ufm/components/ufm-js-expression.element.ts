@@ -2,11 +2,12 @@ import { UMB_UFM_CONTEXT } from '../contexts/ufm.context.js';
 import { UMB_UFM_RENDER_CONTEXT } from './ufm-render/ufm-render.context.js';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { EvalAstFactory, Parser } from '@umbraco-cms/backoffice/external/heximal-expressions';
+import { UmbLruCache } from '@umbraco-cms/backoffice/cache';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Expression, Scope } from '@umbraco-cms/backoffice/external/heximal-expressions';
 
 const astFactory = new EvalAstFactory();
-const expressionCache = new Map<string, Expression | undefined>();
+const expressionCache = new UmbLruCache<string, Expression | undefined>(1000);
 
 @customElement('umb-ufm-js-expression')
 export class UmbUfmJsExpressionElement extends UmbLitElement {

@@ -25,6 +25,7 @@
 		"./block-rte": "./dist-cms/packages/block/block-rte/index.js",
 		"./block-type": "./dist-cms/packages/block/block-type/index.js",
 		"./block": "./dist-cms/packages/block/block/index.js",
+		"./cache": "./dist-cms/packages/core/cache/index.js",
 		"./clipboard": "./dist-cms/packages/clipboard/index.js",
 		"./code-editor": "./dist-cms/packages/code-editor/index.js",
 		"./collection": "./dist-cms/packages/core/collection/index.js",
