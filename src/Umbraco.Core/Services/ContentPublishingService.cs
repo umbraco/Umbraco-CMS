@@ -284,13 +284,15 @@ internal sealed class ContentPublishingService : IContentPublishingService
     {
         if (!useBackgroundThread)
         {
-            return await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey);
+            Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus> minimalAttempt
+                = await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: true);
+            return MapInternalPublishingAttempt(minimalAttempt);
         }
 
         _logger.LogInformation("Starting async background thread for publishing branch.");
         Attempt<Guid, LongRunningOperationEnqueueStatus> enqueueAttempt = await _longRunningOperationService.Run(
             PublishBranchOperationType,
-            async _ => await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey));
+            async _ => await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: false));
         if (enqueueAttempt.Success)
         {
             return Attempt.SucceedWithStatus(
@@ -313,11 +315,12 @@ internal sealed class ContentPublishingService : IContentPublishingService
             });
     }
 
-    private async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PerformPublishBranchAsync(
+    private async Task<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>> PerformPublishBranchAsync(
         Guid key,
         IEnumerable<string> cultures,
         PublishBranchFilter publishBranchFilter,
-        Guid userKey)
+        Guid userKey,
+        bool returnContent)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
@@ -325,7 +328,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         {
             return Attempt.FailWithStatus(
                 ContentPublishingOperationStatus.ContentNotFound,
-                new ContentPublishingBranchResult
+                new ContentPublishingBranchInternalResult
                 {
                     FailedItems =
                     [
@@ -343,9 +346,10 @@ internal sealed class ContentPublishingService : IContentPublishingService
         scope.Complete();
 
         var itemResults = result.ToDictionary(r => r.Content.Key, ToContentPublishingOperationStatus);
-        var branchResult = new ContentPublishingBranchResult
+        var branchResult = new ContentPublishingBranchInternalResult
         {
-            Content = content,
+            ContentKey = content.Key,
+            Content = returnContent ? content : null,
             SucceededItems = itemResults
                 .Where(i => i.Value is ContentPublishingOperationStatus.Success)
                 .Select(i => new ContentPublishingBranchItemResult { Key = i.Key, OperationStatus = i.Value })
@@ -356,7 +360,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 .ToArray(),
         };
 
-        Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> attempt = branchResult.FailedItems.Any() is false
+        Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus> attempt = branchResult.FailedItems.Any() is false
             ? Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, branchResult)
             : Attempt.FailWithStatus(ContentPublishingOperationStatus.FailedBranch, branchResult);
 
@@ -369,16 +373,18 @@ internal sealed class ContentPublishingService : IContentPublishingService
     /// <inheritdoc/>
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> GetPublishBranchResultAsync(Guid taskId)
     {
-        // TODO: This is not working at the moment as the result is not being serialized properly. NEEDS FIXING.
-        Attempt<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> result =
+        Attempt<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>> result =
             await _longRunningOperationService
-                .GetResult<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>>(PublishBranchOperationType, taskId);
+                .GetResult<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>>(PublishBranchOperationType, taskId);
 
-        return result.Success
-            ? result.Result
-            : Attempt.FailWithStatus(
+        if (!result.Success)
+        {
+            return Attempt.FailWithStatus(
                 ContentPublishingOperationStatus.TaskResultNotFound,
                 new ContentPublishingBranchResult());
+        }
+
+        return MapInternalPublishingAttempt(result.Result);
     }
 
     /// <inheritdoc/>
@@ -546,5 +552,20 @@ internal sealed class ContentPublishingService : IContentPublishingService
             PublishResultType.FailedUnpublish => ContentPublishingOperationStatus.Failed,
             PublishResultType.FailedUnpublishCancelledByEvent => ContentPublishingOperationStatus.CancelledByEvent,
             _ => throw new ArgumentOutOfRangeException()
+        };
+
+    private Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> MapInternalPublishingAttempt(
+        Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus> minimalAttempt) =>
+        minimalAttempt.Success
+            ? Attempt.SucceedWithStatus(minimalAttempt.Status, MapMinimalPublishingBranchResult(minimalAttempt.Result))
+            : Attempt.FailWithStatus(minimalAttempt.Status, MapMinimalPublishingBranchResult(minimalAttempt.Result));
+
+    private ContentPublishingBranchResult MapMinimalPublishingBranchResult(ContentPublishingBranchInternalResult internalResult) =>
+        new()
+        {
+            Content = internalResult.Content
+                      ?? (internalResult.ContentKey is null ? null : _contentService.GetById(internalResult.ContentKey.Value)),
+            SucceededItems = internalResult.SucceededItems,
+            FailedItems = internalResult.FailedItems,
         };
 }

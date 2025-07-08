@@ -85,6 +85,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
     public Task<Attempt<TResult?>> GetResult<TResult>(string type, Guid operationId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        // TODO: Check the status of the operation before returning the result.
         TResult? result = _repository.GetResult<TResult>(type, operationId);
         return Task.FromResult(
             result == null
