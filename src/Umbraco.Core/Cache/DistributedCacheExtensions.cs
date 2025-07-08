@@ -182,7 +182,7 @@ public static class DistributedCacheExtensions
 
     private static string? GetPreviousUsername(IMember x, IDictionary<string, object?> state)
     {
-        if (state.TryGetValue(MemberSavedNotification.PreviousUserNameStateKey, out object? previousUserNames) is false)
+        if (state.TryGetValue(MemberSavedNotification.PreviousUsernameStateKey, out object? previousUserNames) is false)
         {
             return null;
         }

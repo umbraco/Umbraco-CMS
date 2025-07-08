@@ -813,7 +813,7 @@ namespace Umbraco.Cms.Core.Services
                     string.Equals(previousUsername, member.Username, StringComparison.OrdinalIgnoreCase) is false)
                 {
                     memberSavedNotification.State.Add(
-                        MemberSavedNotification.PreviousUserNameStateKey,
+                        MemberSavedNotification.PreviousUsernameStateKey,
                         new Dictionary<Guid, string> { { member.Key, previousUsername } });
                 }
 

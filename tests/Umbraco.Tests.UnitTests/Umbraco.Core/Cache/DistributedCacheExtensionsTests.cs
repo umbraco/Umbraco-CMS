@@ -30,7 +30,7 @@ public class DistributedCacheExtensionsTests
         var state = new Dictionary<string, object>
         {
             {
-                MemberSavedNotification.PreviousUserNameStateKey,
+                MemberSavedNotification.PreviousUsernameStateKey,
                 new Dictionary<Guid, string> { { member3Key, "janeold" } }
             },
         };
