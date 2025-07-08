@@ -30,7 +30,7 @@ public class ConsentDto
     public string? Action { get; set; }
 
     [Column("createDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
     [Column("state")]

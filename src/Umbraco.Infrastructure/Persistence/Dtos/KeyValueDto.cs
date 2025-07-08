@@ -24,7 +24,7 @@ internal class KeyValueDto
     public string? Value { get; set; }
 
     [Column("updated", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 
     //NOTE that changes to this file needs to be backward compatible. Otherwise our upgrader cannot work, as it uses this to read from the db

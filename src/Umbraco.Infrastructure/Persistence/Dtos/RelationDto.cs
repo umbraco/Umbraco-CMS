@@ -28,7 +28,7 @@ internal class RelationDto
     public int RelationType { get; set; }
 
     [Column("datetime", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime Datetime { get; set; }
 
     [Column("comment")]

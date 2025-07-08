@@ -32,7 +32,7 @@ internal class ExternalLoginTokenDto
     public string Value { get; set; } = null!;
 
     [Column("createDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
     [ResultColumn]

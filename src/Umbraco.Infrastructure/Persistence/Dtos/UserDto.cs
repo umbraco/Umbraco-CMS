@@ -95,12 +95,12 @@ public class UserDto
 
     [Column("createDate", ForceToUtc = false)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; } = DateTime.Now;
 
     [Column("updateDate", ForceToUtc = false)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; } = DateTime.Now;
 
     [Column("kind")]

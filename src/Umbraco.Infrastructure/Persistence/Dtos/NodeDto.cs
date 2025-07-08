@@ -71,6 +71,6 @@ public class NodeDto
     public Guid? NodeObjectType { get; set; }
 
     [Column("createDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 }

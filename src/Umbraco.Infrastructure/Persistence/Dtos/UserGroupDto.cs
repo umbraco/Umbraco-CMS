@@ -46,12 +46,12 @@ public class UserGroupDto
 
     [Column("createDate", ForceToUtc = false)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
     [Column("updateDate", ForceToUtc = false)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 
     [Column("icon")]

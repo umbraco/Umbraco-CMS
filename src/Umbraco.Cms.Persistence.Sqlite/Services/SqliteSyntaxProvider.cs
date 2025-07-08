@@ -203,13 +203,14 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// <inheritdoc />
     protected override string? FormatSystemMethods(SystemMethods systemMethod)
     {
-        // TODO: SQLite
         switch (systemMethod)
         {
             case SystemMethods.NewGuid:
-                return "NEWID()"; // No NEWID() in SQLite perhaps try RANDOM()
+                return null; // Not availble in SQLite.
             case SystemMethods.CurrentDateTime:
-                return "DATE()"; // No GETDATE() trying DATE()
+                return null; // Not availble in SQLite.
+            case SystemMethods.CurrentUTCDateTime:
+                return "CURRENT_DATE";
         }
 
         return null;

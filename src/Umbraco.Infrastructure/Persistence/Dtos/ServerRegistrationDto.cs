@@ -24,7 +24,7 @@ internal class ServerRegistrationDto
     public string? ServerIdentity { get; set; }
 
     [Column("registeredDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime DateRegistered { get; set; }
 
     [Column("lastNotifiedDate", ForceToUtc = false)]
