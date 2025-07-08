@@ -34,8 +34,9 @@ export class UmbUfmJsExpressionElement extends UmbLitElement {
 	}
 
 	#labelTemplate(expression: string, model?: any): string {
-		const filters = this.#ufmContext?.getFilters() ?? {};
-		const scope: Scope = { ...model, ...filters };
+		const filters = this.#ufmContext?.getFilters() ?? [];
+		const functions = Object.fromEntries(filters.map((x) => [x.alias, x.filter]));
+		const scope: Scope = { ...model, ...functions };
 
 		let ast = expressionCache.get(expression);
 
