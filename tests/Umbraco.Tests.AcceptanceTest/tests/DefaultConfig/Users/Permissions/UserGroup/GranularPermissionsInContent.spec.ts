@@ -69,7 +69,7 @@ test('can read a specific document with read permission enabled', async ({umbrac
   // Assert
   await umbracoUi.content.doesDocumentHaveName(firstDocumentName);
   await umbracoUi.content.goToContentWithName(secondDocumentName);
-  await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
 });
 
 test('can create document blueprint for a specific document with create document blueprint permission enabled', async ({umbracoApi, umbracoUi}) => {
