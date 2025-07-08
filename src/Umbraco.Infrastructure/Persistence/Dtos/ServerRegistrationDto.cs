@@ -23,11 +23,11 @@ internal class ServerRegistrationDto
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_computerName")] // server identity is unique
     public string? ServerIdentity { get; set; }
 
-    [Column("registeredDate", ForceToUtc = false)]
+    [Column("registeredDate")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime DateRegistered { get; set; }
 
-    [Column("lastNotifiedDate", ForceToUtc = false)]
+    [Column("lastNotifiedDate")]
     public DateTime DateAccessed { get; set; }
 
     [Column("isActive")]

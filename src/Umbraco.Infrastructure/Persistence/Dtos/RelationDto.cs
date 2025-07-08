@@ -27,7 +27,7 @@ internal class RelationDto
     [ForeignKey(typeof(RelationTypeDto))]
     public int RelationType { get; set; }
 
-    [Column("datetime", ForceToUtc = false)]
+    [Column("datetime")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime Datetime { get; set; }
 

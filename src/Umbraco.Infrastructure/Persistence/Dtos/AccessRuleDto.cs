@@ -25,11 +25,11 @@ internal class AccessRuleDto
     [Column("ruleType")]
     public string? RuleType { get; set; }
 
-    [Column("createDate", ForceToUtc = false)]
+    [Column("createDate")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
-    [Column("updateDate", ForceToUtc = false)]
+    [Column("updateDate")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 }

@@ -44,12 +44,12 @@ public class UserGroupDto
     [Obsolete("Is not used anymore Use UserGroup2PermissionDtos instead. This will be removed in Umbraco 18.")]
     public string? DefaultPermissions { get; set; }
 
-    [Column("createDate", ForceToUtc = false)]
+    [Column("createDate")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
-    [Column("updateDate", ForceToUtc = false)]
+    [Column("updateDate")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }

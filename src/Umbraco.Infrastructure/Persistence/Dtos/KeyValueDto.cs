@@ -23,7 +23,7 @@ internal class KeyValueDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Value { get; set; }
 
-    [Column("updated", ForceToUtc = false)]
+    [Column("updated")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 

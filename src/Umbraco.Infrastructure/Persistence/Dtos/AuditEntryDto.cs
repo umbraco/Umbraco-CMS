@@ -34,7 +34,7 @@ internal class AuditEntryDto
     [Length(Constants.Audit.IpLength)]
     public string? PerformingIp { get; set; }
 
-    [Column("eventDateUtc", ForceToUtc = false)]
+    [Column("eventDateUtc")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime EventDateUtc { get; set; }
 

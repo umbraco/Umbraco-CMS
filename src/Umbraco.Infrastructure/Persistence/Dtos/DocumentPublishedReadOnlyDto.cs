@@ -20,6 +20,6 @@ internal class DocumentPublishedReadOnlyDto
     [Column("newest")]
     public bool Newest { get; set; }
 
-    [Column("updateDate", ForceToUtc = false)]
+    [Column("updateDate")]
     public DateTime VersionDate { get; set; }
 }
