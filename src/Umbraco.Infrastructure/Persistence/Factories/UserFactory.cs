@@ -47,16 +47,16 @@ internal static class UserFactory
             // Dates stored in the database are local server time, but for SQL Server, will be considered
             // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
             user.LastLockoutDate = dto.LastLockoutDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLockoutDate.Value, DateTimeKind.Local)
+                ? dto.LastLockoutDate.Value
                 : null;
             user.LastLoginDate = dto.LastLoginDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLoginDate.Value, DateTimeKind.Local)
+                ? dto.LastLoginDate.Value
                 : null;
             user.LastPasswordChangeDate = dto.LastPasswordChangeDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastPasswordChangeDate.Value, DateTimeKind.Local)
+                ? dto.LastPasswordChangeDate.Value
                 : null;
-            user.CreateDate = DateTime.SpecifyKind(dto.CreateDate, DateTimeKind.Local);
-            user.UpdateDate = DateTime.SpecifyKind(dto.UpdateDate, DateTimeKind.Local);
+            user.CreateDate = dto.CreateDate;
+            user.UpdateDate = dto.UpdateDate;
 
             // reset dirty initial properties (U4-1946)
             user.ResetDirtyProperties(false);

@@ -400,7 +400,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             foreach (ContentVariation v in contentVariation)
             {
-                content.SetCultureInfo(v.Culture, v.Name, DateTime.SpecifyKind(v.Date, DateTimeKind.Local));
+                content.SetCultureInfo(v.Culture, v.Name, v.Date);
             }
         }
 
@@ -410,7 +410,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             foreach (ContentVariation v in contentVariation)
             {
-                content.SetPublishInfo(v.Culture, v.Name, DateTime.SpecifyKind(v.Date, DateTimeKind.Local));
+                content.SetPublishInfo(v.Culture, v.Name, v.Date);
             }
         }
 

@@ -40,10 +40,8 @@ internal class ContentBaseFactory
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
 
-            // Dates stored in the database are local server time, but for SQL Server, will be considered
-            // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
-            content.CreateDate = DateTime.SpecifyKind(nodeDto.CreateDate, DateTimeKind.Local);
-            content.UpdateDate = DateTime.SpecifyKind(contentVersionDto.VersionDate, DateTimeKind.Local);
+            content.CreateDate = nodeDto.CreateDate;
+            content.UpdateDate = contentVersionDto.VersionDate;
 
             content.Published = dto.Published;
             content.Edited = dto.Edited;
@@ -55,7 +53,7 @@ internal class ContentBaseFactory
                 content.PublishedVersionId = publishedVersionDto.Id;
                 if (dto.Published)
                 {
-                    content.PublishDate = DateTime.SpecifyKind(publishedVersionDto.ContentVersionDto.VersionDate, DateTimeKind.Local);
+                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
                     content.PublishName = publishedVersionDto.ContentVersionDto.Text;
                     content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
                 }
@@ -100,8 +98,8 @@ internal class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = DateTime.SpecifyKind(nodeDto.CreateDate, DateTimeKind.Local);
-            content.UpdateDate = DateTime.SpecifyKind(contentVersionDto.VersionDate, DateTimeKind.Local);
+            content.CreateDate = nodeDto.CreateDate;
+            content.UpdateDate = contentVersionDto.VersionDate;
 
             // reset dirty initial properties (U4-1946)
             content.ResetDirtyProperties(false);
@@ -130,7 +128,7 @@ internal class ContentBaseFactory
             content.Id = dto.NodeId;
             content.SecurityStamp = dto.SecurityStampToken;
             content.EmailConfirmedDate = dto.EmailConfirmedDate.HasValue
-                ? DateTime.SpecifyKind(dto.EmailConfirmedDate.Value, DateTimeKind.Local)
+                ? dto.EmailConfirmedDate.Value
                 : null;
             content.PasswordConfiguration = dto.PasswordConfig;
             content.Key = nodeDto.UniqueId;
@@ -145,19 +143,19 @@ internal class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = DateTime.SpecifyKind(nodeDto.CreateDate, DateTimeKind.Local);
-            content.UpdateDate = DateTime.SpecifyKind(contentVersionDto.VersionDate, DateTimeKind.Local);
+            content.CreateDate = nodeDto.CreateDate;
+            content.UpdateDate = contentVersionDto.VersionDate;
             content.FailedPasswordAttempts = dto.FailedPasswordAttempts ?? default;
             content.IsLockedOut = dto.IsLockedOut;
             content.IsApproved = dto.IsApproved;
             content.LastLockoutDate = dto.LastLockoutDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLockoutDate.Value, DateTimeKind.Local)
+                ? dto.LastLockoutDate.Value
                 : null;
             content.LastLoginDate = dto.LastLoginDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLoginDate.Value, DateTimeKind.Local)
+                ? dto.LastLoginDate.Value
                 : null;
             content.LastPasswordChangeDate = dto.LastPasswordChangeDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastPasswordChangeDate.Value, DateTimeKind.Local)
+                ? dto.LastPasswordChangeDate.Value
                 : null;
 
             // reset dirty initial properties (U4-1946)
@@ -197,7 +195,7 @@ internal class ContentBaseFactory
                 new ContentScheduleDto
                 {
                     Action = x.Action.ToString(),
-                    Date = DateTime.SpecifyKind(x.Date, DateTimeKind.Local),
+                    Date = x.Date,
                     NodeId = entity.Id,
                     LanguageId = languageRepository.GetIdByIsoCode(x.Culture, false),
                     Id = x.Id,
@@ -272,7 +270,7 @@ internal class ContentBaseFactory
             UserId = entity.CreatorId,
             Text = entity.Name,
             NodeObjectType = objectType,
-            CreateDate = DateTime.SpecifyKind(entity.CreateDate, DateTimeKind.Local),
+            CreateDate = entity.CreateDate,
         };
 
         return dto;
@@ -286,7 +284,7 @@ internal class ContentBaseFactory
         {
             Id = entity.VersionId,
             NodeId = entity.Id,
-            VersionDate = DateTime.SpecifyKind(entity.UpdateDate, DateTimeKind.Local),
+            VersionDate = entity.UpdateDate,
             UserId = entity.WriterId,
             Current = true, // always building the current one
             Text = entity.Name,
