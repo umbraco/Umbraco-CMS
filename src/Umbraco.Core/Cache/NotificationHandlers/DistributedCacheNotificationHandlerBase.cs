@@ -10,11 +10,20 @@ public abstract class DistributedCacheNotificationHandlerBase<TEntity, TNotifica
 {
     /// <inheritdoc />
     public void Handle(TNotification notification)
-        => Handle(GetEntities(notification));
+        => Handle(
+            GetEntities(notification),
+            notification is StatefulNotification statefulNotification
+                ? statefulNotification.State
+                : new Dictionary<string, object?>());
 
     /// <inheritdoc />
     public void Handle(IEnumerable<TNotification> notifications)
-        => Handle(notifications.SelectMany(GetEntities));
+    {
+        foreach (TNotification notification in notifications)
+        {
+            Handle(notification);
+        }
+    }
 
     /// <summary>
     /// Gets the entities from the specified notification.
@@ -29,5 +38,13 @@ public abstract class DistributedCacheNotificationHandlerBase<TEntity, TNotifica
     /// Handles the specified entities.
     /// </summary>
     /// <param name="entities">The entities.</param>
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected abstract void Handle(IEnumerable<TEntity> entities);
+
+    /// <summary>
+    /// Handles the specified entities.
+    /// </summary>
+    /// <param name="entities">The entities.</param>
+    /// <param name="state">The notification state.</param>
+    protected abstract void Handle(IEnumerable<TEntity> entities, IDictionary<string, object?> state);
 }
