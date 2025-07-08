@@ -40,7 +40,11 @@ export class UmbUfmJsExpressionElement extends UmbLitElement {
 		let ast = expressionCache.get(expression);
 
 		if (ast === undefined && !expressionCache.has(expression)) {
-			ast = new Parser(expression, astFactory).parse();
+			try {
+				ast = new Parser(expression, astFactory).parse();
+			} catch {
+				console.error(`Error parsing expression: \`${expression}\``);
+			}
 			expressionCache.set(expression, ast);
 		}
 
