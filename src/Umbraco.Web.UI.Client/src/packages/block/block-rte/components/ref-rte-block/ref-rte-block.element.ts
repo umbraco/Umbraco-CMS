@@ -1,6 +1,7 @@
-import { UMB_BLOCK_ENTRY_CONTEXT, type UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
 /**
  * @element umb-ref-rte-block
@@ -20,6 +21,9 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
+	@property({ attribute: false })
+	settings?: UmbBlockDataType;
+
 	@state()
 	_workspaceEditPath?: string;
 
@@ -38,10 +42,11 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	}
 
 	override render() {
+		const blockValue = { ...this.content, $settings: this.settings };
 		return html`
 			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
-				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
+				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 			</uui-ref-node>
 		`;
 	}
