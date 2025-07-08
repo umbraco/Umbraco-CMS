@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './input-number-range.element.js';
 import type { UmbInputNumberRangeElement } from './input-number-range.element.js';
 

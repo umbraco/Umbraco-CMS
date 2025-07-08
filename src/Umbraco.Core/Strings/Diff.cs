@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Strings;
 ///     Copyright (c) by Matthias Hertel, http://www.mathertel.de
 ///     This work is licensed under a BSD style license. See http://www.mathertel.de/License.aspx
 /// </summary>
-internal class Diff
+internal sealed class Diff
 {
     /// <summary>
     ///     Find the difference in 2 texts, comparing by text lines.
