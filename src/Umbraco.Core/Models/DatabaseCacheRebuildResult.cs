@@ -14,9 +14,4 @@ public enum DatabaseCacheRebuildResult
     /// A cache rebuild operation is already in progress.
     /// </summary>
     AlreadyRunning,
-
-    /// <summary>
-    /// The cache rebuild operation failed with an unknown error.
-    /// </summary>
-    Unknown,
 }
