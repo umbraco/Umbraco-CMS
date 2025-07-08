@@ -775,33 +775,31 @@ public class BackOfficeUserStore :
         var anythingChanged = false;
 
         // don't assign anything if nothing has changed as this will trigger the track changes of the model
-        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastLoginDateUtc))
-            || (user.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
-            || (identityUser.LastLoginDateUtc.HasValue &&
-                user.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
+        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastLoginDate))
+            || (user.LastLoginDate != default && identityUser.LastLoginDate.HasValue == false)
+            || (identityUser.LastLoginDate.HasValue &&
+                user.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDate.Value))
         {
             anythingChanged = true;
 
-            // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-            DateTime? dt = identityUser.LastLoginDateUtc?.ToLocalTime();
-            user.LastLoginDate = dt;
+            user.LastLoginDate = identityUser.LastLoginDate;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.InviteDateUtc))
             || user.InvitedDate?.ToUniversalTime() != identityUser.InviteDateUtc)
         {
             anythingChanged = true;
-            user.InvitedDate = identityUser.InviteDateUtc?.ToLocalTime();
+            user.InvitedDate = identityUser.InviteDateUtc;
         }
 
-        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDateUtc))
+        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDate))
             || (user.LastPasswordChangeDate.HasValue && user.LastPasswordChangeDate.Value != default &&
-                identityUser.LastPasswordChangeDateUtc.HasValue == false)
-            || (identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate?.ToUniversalTime() !=
-                identityUser.LastPasswordChangeDateUtc.Value))
+                identityUser.LastPasswordChangeDate.HasValue == false)
+            || (identityUser.LastPasswordChangeDate.HasValue && user.LastPasswordChangeDate?.ToUniversalTime() !=
+                identityUser.LastPasswordChangeDate.Value))
         {
             anythingChanged = true;
-            user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc ?? DateTime.UtcNow;
+            user.LastPasswordChangeDate = identityUser.LastPasswordChangeDate ?? DateTime.UtcNow;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.EmailConfirmed))
