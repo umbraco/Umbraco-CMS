@@ -101,7 +101,7 @@ public class LongRunningOperationServiceTests
         updateStatusArgsQueue.Enqueue(LongRunningOperationStatus.Running);
         updateStatusArgsQueue.Enqueue(LongRunningOperationStatus.Success);
         _longRunningOperationRepositoryMock.Setup(repo => repo.UpdateStatus(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<LongRunningOperationStatus>(), It.IsAny<TimeSpan>()))
-            .Callback<Guid, LongRunningOperationStatus, TimeSpan>((id, status, exp) =>
+            .Callback<string, Guid, LongRunningOperationStatus, TimeSpan>((type, id, status, exp) =>
             {
                 Assert.AreEqual(updateStatusArgsQueue.Dequeue(), status);
                 Assert.AreEqual(expires, exp);
