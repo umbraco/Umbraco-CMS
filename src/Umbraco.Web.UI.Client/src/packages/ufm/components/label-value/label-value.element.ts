@@ -2,7 +2,6 @@ import { UMB_UFM_RENDER_CONTEXT } from '../ufm-render/ufm-render.context.js';
 import { UmbUfmElementBase } from '../ufm-element-base.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
-// eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
 @customElement('ufm-label-value')
 export class UmbUfmLabelValueElement extends UmbUfmElementBase {
 	@property()
