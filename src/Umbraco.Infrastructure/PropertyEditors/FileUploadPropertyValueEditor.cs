@@ -92,13 +92,10 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     {
         FileUploadValue? editorModelValue = _valueParser.Parse(editorValue.Value);
 
-        // no change?
+        // No change or created from blueprint.
         if (editorModelValue?.TemporaryFileId.HasValue is not true && string.IsNullOrEmpty(editorModelValue?.Src) is false)
         {
-            // since current value can be json string, we have to parse value
-            FileUploadValue? currentModelValue = _valueParser.Parse(currentValue);
-
-            return currentModelValue?.Src;
+            return editorModelValue.Src;
         }
 
         // the current editor value (if any) is the path to the file
@@ -189,8 +186,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         }
 
         // get the filepath
-        // in case we are using the old path scheme, try to re-use numbers (bah...)
-        var filepath = _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey); // fs-relative path
+        string filepath = GetMediaPath(file, dataTypeConfiguration, contentKey, propertyTypeKey);
 
         using (Stream filestream = file.OpenReadStream())
         {
@@ -201,9 +197,19 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods
-            _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!
+            _mediaFileManager.FileSystem.AddFile(filepath, filestream, overrideIfExists: true); // must overwrite!
         }
 
         return filepath;
+    }
+
+    /// <summary>
+    /// Provides media path.
+    /// </summary>
+    /// <returns>File system relative path</returns>
+    protected virtual string GetMediaPath(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
+    {
+        // in case we are using the old path scheme, try to re-use numbers (bah...)
+        return _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey);
     }
 }
