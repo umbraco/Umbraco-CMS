@@ -260,7 +260,7 @@ public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     {
         get
         {
-            var isLocked = LockoutEnabled && LockoutEnd.HasValue && LockoutEnd.Value.ToLocalTime() >= DateTime.Now;
+            var isLocked = LockoutEnabled && LockoutEnd.HasValue && LockoutEnd.Value >= DateTime.UtcNow;
             return isLocked;
         }
     }

@@ -23,7 +23,7 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
 
     public void DeactiveStaleServers(TimeSpan staleTimeout)
     {
-        DateTime timeoutDate = DateTime.Now.Subtract(staleTimeout);
+        DateTime timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);
 
         Database.Update<ServerRegistrationDto>(
             "SET isActive=0, isSchedulingPublisher=0 WHERE lastNotifiedDate < @timeoutDate", new

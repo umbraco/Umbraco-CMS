@@ -725,7 +725,7 @@ internal sealed class UserServiceTests : UmbracoIntegrationTest
     public void Count_All_Online_Users()
     {
         var users = UserBuilder.CreateMulipleUsers(10,
-            (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
+            (i, member) => member.LastLoginDate = DateTime.UtcNow.AddMinutes(i * -2));
         UserService.Save(users);
 
         var customUser = UserBuilder.CreateUser();

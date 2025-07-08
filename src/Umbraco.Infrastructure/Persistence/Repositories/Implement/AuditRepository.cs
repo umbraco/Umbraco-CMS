@@ -34,7 +34,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
 
     public void CleanLogs(int maximumAgeOfLogsInMinutes)
     {
-        DateTime oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
+        DateTime oldestPermittedLogEntry = DateTime.UtcNow.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
 
         Database.Execute(
             "delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
@@ -119,7 +119,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         Database.Insert(new LogDto
         {
             Comment = entity.Comment,
-            Datestamp = DateTime.Now,
+            Datestamp = DateTime.UtcNow,
             Header = entity.AuditType.ToString(),
             NodeId = entity.Id,
             UserId = entity.UserId,
@@ -133,7 +133,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         Database.Insert(new LogDto
         {
             Comment = entity.Comment,
-            Datestamp = DateTime.Now,
+            Datestamp = DateTime.UtcNow,
             Header = entity.AuditType.ToString(),
             NodeId = entity.Id,
             UserId = entity.UserId,

@@ -56,7 +56,7 @@ internal static class ExternalLoginFactory
             LoginProvider = entity.LoginProvider,
             ProviderKey = entity.ProviderKey,
             UserData = entity.UserData,
-            CreateDate = DateTime.Now,
+            CreateDate = DateTime.UtcNow,
         };
 
         return dto;
@@ -70,7 +70,7 @@ internal static class ExternalLoginFactory
             ExternalLoginId = externalLoginId,
             Name = token.Name,
             Value = token.Value,
-            CreateDate = DateTime.Now,
+            CreateDate = DateTime.UtcNow,
         };
 
         return dto;

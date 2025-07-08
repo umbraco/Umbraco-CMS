@@ -683,7 +683,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             Database.Execute(delete, new { id = entity.Id, key = GetEntityId(entity) });
         }
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     protected override void PersistNewItem(IUser entity)

@@ -192,8 +192,8 @@ public class MemberUserStoreTests
         Assert.AreEqual(fakeUser.Email, mockMember.Email);
         Assert.AreEqual(fakeUser.UserName, mockMember.Username);
         Assert.AreEqual(fakeUser.Comments, mockMember.Comments);
-        Assert.AreEqual(fakeUser.LastPasswordChangeDateUtc.Value.ToLocalTime(), mockMember.LastPasswordChangeDate);
-        Assert.AreEqual(fakeUser.LastLoginDateUtc.Value.ToLocalTime(), mockMember.LastLoginDate);
+        Assert.AreEqual(fakeUser.LastPasswordChangeDateUtc, mockMember.LastPasswordChangeDate);
+        Assert.AreEqual(fakeUser.LastLoginDateUtc, mockMember.LastLoginDate);
         Assert.AreEqual(fakeUser.AccessFailedCount, mockMember.FailedPasswordAttempts);
         Assert.AreEqual(fakeUser.IsLockedOut, mockMember.IsLockedOut);
         Assert.AreEqual(fakeUser.IsApproved, mockMember.IsApproved);

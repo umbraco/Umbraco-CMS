@@ -801,7 +801,7 @@ public class BackOfficeUserStore :
                 identityUser.LastPasswordChangeDateUtc.Value))
         {
             anythingChanged = true;
-            user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
+            user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc ?? DateTime.UtcNow;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.EmailConfirmed))
@@ -811,7 +811,7 @@ public class BackOfficeUserStore :
                 identityUser.EmailConfirmed))
         {
             anythingChanged = true;
-            user.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.Now : null;
+            user.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.UtcNow : null;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Name))
@@ -849,7 +849,7 @@ public class BackOfficeUserStore :
             if (user.IsLockedOut)
             {
                 // need to set the last lockout date
-                user.LastLockoutDate = DateTime.Now;
+                user.LastLockoutDate = DateTime.UtcNow;
             }
         }
 

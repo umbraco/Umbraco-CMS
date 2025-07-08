@@ -1815,7 +1815,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             if (publishing && (content.PublishCultureInfos?.ContainsKey(cultureInfo.Culture) ?? false))
             {
                 content.SetPublishInfo(cultureInfo.Culture, uniqueName,
-                    DateTime.Now); //TODO: This is weird, this call will have already been made in the SetCultureName
+                    DateTime.UtcNow); //TODO: This is weird, this call will have already been made in the SetCultureName
             }
         }
     }

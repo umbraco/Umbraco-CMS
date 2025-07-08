@@ -362,7 +362,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             UniqueId = key,
             Text = "RESERVED.ID",
             NodeObjectType = Constants.ObjectTypes.IdReservation,
-            CreateDate = DateTime.Now,
+            CreateDate = DateTime.UtcNow,
             UserId = null,
             ParentId = -1,
             Level = 1,

@@ -748,7 +748,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 identityUser.LastPasswordChangeDateUtc.Value))
         {
             updatedProperties.Add(nameof(MemberIdentityUser.LastPasswordChangeDateUtc));
-            member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
+            member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc ?? DateTime.UtcNow;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
@@ -765,7 +765,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 identityUser.EmailConfirmed))
         {
             updatedProperties.Add(nameof(MemberIdentityUser.EmailConfirmed));
-            member.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.Now : null;
+            member.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.UtcNow : null;
         }
 
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Name))
@@ -797,7 +797,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             if (member.IsLockedOut)
             {
                 // need to set the last lockout date
-                member.LastLockoutDate = DateTime.Now;
+                member.LastLockoutDate = DateTime.UtcNow;
             }
         }
 
