@@ -9,11 +9,9 @@ export class UmbUfmjsMarkedExtensionApi implements UmbMarkedExtensionApi {
 				{
 					name: 'ufmjs',
 					level: 'inline',
-					start: (src: string) => {
-						return src.indexOf('${');
-					},
+					start: (src: string) => src.search(/(?<!\\)\$\{/),
 					tokenizer: (src: string) => {
-						const pattern = '^\\$\\{([^}]*)\\}';
+						const pattern = /^\$\{((?:[^{}]|\{[^{}]*\})*)\}/;
 						const regex = new RegExp(pattern);
 						const match = src.match(regex);
 
