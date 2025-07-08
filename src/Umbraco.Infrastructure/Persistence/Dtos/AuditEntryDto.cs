@@ -36,7 +36,7 @@ internal class AuditEntryDto
 
     [Column("eventDateUtc")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
-    public DateTime EventDateUtc { get; set; }
+    public DateTime EventDate { get; set; }
 
     [Column("affectedUserId")]
     public int AffectedUserId { get; set; }
