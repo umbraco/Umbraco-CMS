@@ -82,15 +82,26 @@ internal class LongRunningOperationService : ILongRunningOperationService
         => Task.FromResult(_repository.IsEnqueuedOrRunning(type));
 
     /// <inheritdoc />
-    public Task<Attempt<TResult?>> GetResult<TResult>(string type, Guid operationId)
+    public Task<Attempt<TResult?, LongRunningOperationResultStatus>> GetResult<TResult>(string type, Guid operationId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        // TODO: Check the status of the operation before returning the result.
+        LongRunningOperation? operation = _repository.Get(type, operationId);
+        if (operation?.Status is not LongRunningOperationStatus.Success)
+        {
+            return Task.FromResult(
+                Attempt.FailWithStatus<TResult?, LongRunningOperationResultStatus>(
+                    operation?.Status switch
+                    {
+                        LongRunningOperationStatus.Enqueued or LongRunningOperationStatus.Running => LongRunningOperationResultStatus.OperationStillRunning,
+                        LongRunningOperationStatus.Failed => LongRunningOperationResultStatus.OperationFailed,
+                        null => LongRunningOperationResultStatus.OperationNotFound,
+                        _ => throw new ArgumentOutOfRangeException(nameof(operation.Status), operation.Status, "Unknown operation status."),
+                    },
+                    default));
+        }
+
         TResult? result = _repository.GetResult<TResult>(type, operationId);
-        return Task.FromResult(
-            result == null
-            ? Attempt.Fail(result)
-            : Attempt.Succeed(result));
+        return Task.FromResult(Attempt.SucceedWithStatus(LongRunningOperationResultStatus.Success, result));
     }
 
     private async Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> RunInner<T>(
@@ -104,7 +115,6 @@ internal class LongRunningOperationService : ILongRunningOperationService
         {
             // If an operation of the type is already enqueued or running, we return an attempt indicating that it is already running.
             // This prevents multiple enqueues of the same operation.
-            // TODO: Should we return the id of the already running operation?
             return Attempt.FailWithStatus(LongRunningOperationEnqueueStatus.AlreadyRunning, Guid.Empty);
         }
 
@@ -233,7 +243,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
 
             status = newStatus;
 
-            // Update the status in the database, which will also update the update date.
+            // Update the status in the database and increase the expiration time.
             // That way, even if the status has not changed, we know that the operation is still being processed.
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
             _repository.UpdateStatus(type, operationId, status, expires);

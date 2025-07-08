@@ -63,5 +63,5 @@ public interface ILongRunningOperationService
     /// <typeparam name="TResult">The type of the result expected from the operation.</typeparam>
     /// <returns>An <see cref="Attempt{TResult}"/> containing the result of the operation
     /// and its status. If the operation is not found or has not completed, the result will be null.</returns>
-    Task<Attempt<TResult?>> GetResult<TResult>(string type, Guid operationId);
+    Task<Attempt<TResult?, LongRunningOperationResultStatus>> GetResult<TResult>(string type, Guid operationId);
 }

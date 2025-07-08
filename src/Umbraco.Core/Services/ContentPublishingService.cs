@@ -373,14 +373,19 @@ internal sealed class ContentPublishingService : IContentPublishingService
     /// <inheritdoc/>
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> GetPublishBranchResultAsync(Guid taskId)
     {
-        Attempt<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>> result =
+        Attempt<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>, LongRunningOperationResultStatus> result =
             await _longRunningOperationService
                 .GetResult<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>>(PublishBranchOperationType, taskId);
 
         if (!result.Success)
         {
             return Attempt.FailWithStatus(
-                ContentPublishingOperationStatus.TaskResultNotFound,
+                result.Status switch
+                {
+                    LongRunningOperationResultStatus.OperationNotFound => ContentPublishingOperationStatus.TaskResultNotFound,
+                    LongRunningOperationResultStatus.OperationFailed => ContentPublishingOperationStatus.Failed,
+                    _ => ContentPublishingOperationStatus.Unknown,
+                },
                 new ContentPublishingBranchResult());
         }
 
