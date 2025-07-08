@@ -14,24 +14,26 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 
 /// <summary>
-/// Implements a notification handler that processes file uploads when content is copied, making sure the copied contetnt relates to a new instance
-/// of the file.
+/// Implements a notification handler that processes file uploads when content is copied or scaffolded from a blueprint, making
+/// sure the new content references a new instance of the file.
 /// </summary>
-internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNotificationHandlerBase, INotificationHandler<ContentCopiedNotification>
+internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : FileUploadNotificationHandlerBase,
+    INotificationHandler<ContentCopiedNotification>,
+    INotificationHandler<ContentScaffoldedNotification>,
+    INotificationHandler<ContentSavedBlueprintNotification>
 {
     private readonly IContentService _contentService;
-
     private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockListEditorValues;
     private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockGridEditorValues;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FileUploadContentCopiedNotificationHandler"/> class.
+    /// Initializes a new instance of the <see cref="FileUploadContentCopiedOrScaffoldedNotificationHandler"/> class.
     /// </summary>
-    public FileUploadContentCopiedNotificationHandler(
+    public FileUploadContentCopiedOrScaffoldedNotificationHandler(
         IJsonSerializer jsonSerializer,
         MediaFileManager mediaFileManager,
         IBlockEditorElementTypeCache elementTypeCache,
-        ILogger<FileUploadContentCopiedNotificationHandler> logger,
+        ILogger<FileUploadContentCopiedOrScaffoldedNotificationHandler> logger,
         IContentService contentService)
         : base(jsonSerializer, mediaFileManager, elementTypeCache)
     {
@@ -41,51 +43,66 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
     }
 
     /// <inheritdoc/>
-    public void Handle(ContentCopiedNotification notification)
-    {
-        ArgumentNullException.ThrowIfNull(notification);
+    public void Handle(ContentCopiedNotification notification) => Handle(notification.Original, notification.Copy, (IContent c) => _contentService.Save(c));
 
+    /// <inheritdoc/>
+    public void Handle(ContentScaffoldedNotification notification) => Handle(notification.Original, notification.Scaffold);
+
+    /// <inheritdoc/>
+    public void Handle(ContentSavedBlueprintNotification notification)
+    {
+        if (notification.CreatedFromContent is null)
+        {
+            // If there is no original content, we don't need to copy files.
+            return;
+        }
+
+        Handle(notification.CreatedFromContent, notification.SavedBlueprint, (IContent c) => _contentService.SaveBlueprint(c, null));
+    }
+
+    private void Handle(IContent source, IContent destination, Action<IContent>? postUpdateAction = null)
+    {
         var isUpdated = false;
 
-        foreach (IProperty property in notification.Original.Properties)
+        foreach (IProperty property in source.Properties)
         {
             if (IsUploadFieldPropertyType(property.PropertyType))
             {
-                isUpdated |= UpdateUploadFieldProperty(notification, property);
+                isUpdated |= UpdateUploadFieldProperty(destination, property);
 
                 continue;
             }
 
             if (IsBlockListPropertyType(property.PropertyType))
             {
-                isUpdated |= UpdateBlockProperty(notification, property, _blockListEditorValues);
+                isUpdated |= UpdateBlockProperty(destination, property, _blockListEditorValues);
 
                 continue;
             }
 
             if (IsBlockGridPropertyType(property.PropertyType))
             {
-                isUpdated |= UpdateBlockProperty(notification, property, _blockGridEditorValues);
+                isUpdated |= UpdateBlockProperty(destination, property, _blockGridEditorValues);
 
                 continue;
             }
 
             if (IsRichTextPropertyType(property.PropertyType))
             {
-                isUpdated |= UpdateRichTextProperty(notification, property);
+                isUpdated |= UpdateRichTextProperty(destination, property);
 
                 continue;
             }
         }
 
-        // if updated, re-save the copy with the updated value
-        if (isUpdated)
+        // If updated, re-save the destination with the updated value.
+        if (isUpdated && postUpdateAction is not null)
         {
-            _contentService.Save(notification.Copy);
+            postUpdateAction(destination);
         }
     }
 
-    private bool UpdateUploadFieldProperty(ContentCopiedNotification notification, IProperty property)
+    private bool UpdateUploadFieldProperty(IContent content, IProperty property)
     {
         var isUpdated = false;
 
@@ -98,9 +115,9 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
                 continue;
             }
 
-            var copyUrl = CopyFile(sourceUrl, notification.Copy, property.PropertyType);
+            var copyUrl = CopyFile(sourceUrl, content, property.PropertyType);
 
-            notification.Copy.SetValue(property.Alias, copyUrl, propertyValue.Culture, propertyValue.Segment);
+            content.SetValue(property.Alias, copyUrl, propertyValue.Culture, propertyValue.Segment);
 
             isUpdated = true;
         }
@@ -108,7 +125,7 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
         return isUpdated;
     }
 
-    private bool UpdateBlockProperty<TValue, TLayout>(ContentCopiedNotification notification, IProperty property, BlockEditorValues<TValue, TLayout> blockEditorValues)
+    private bool UpdateBlockProperty<TValue, TLayout>(IContent content, IProperty property, BlockEditorValues<TValue, TLayout> blockEditorValues)
         where TValue : BlockValue<TLayout>, new()
         where TLayout : class, IBlockLayoutItem, new()
     {
@@ -120,11 +137,11 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
 
             BlockEditorData<TValue, TLayout>? blockEditorData = GetBlockEditorData(rawBlockPropertyValue, blockEditorValues);
 
-            (bool hasUpdates, string? updatedValue) = UpdateBlockEditorData(notification, blockEditorData);
+            (bool hasUpdates, string? updatedValue) = UpdateBlockEditorData(content, blockEditorData);
 
             if (hasUpdates)
             {
-                notification.Copy.SetValue(property.Alias, updatedValue, blockPropertyValue.Culture, blockPropertyValue.Segment);
+                content.SetValue(property.Alias, updatedValue, blockPropertyValue.Culture, blockPropertyValue.Segment);
             }
 
             isUpdated |= hasUpdates;
@@ -133,7 +150,7 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
         return isUpdated;
     }
 
-    private (bool, string?) UpdateBlockEditorData<TValue, TLayout>(ContentCopiedNotification notification, BlockEditorData<TValue, TLayout>? blockEditorData)
+    private (bool, string?) UpdateBlockEditorData<TValue, TLayout>(IContent content, BlockEditorData<TValue, TLayout>? blockEditorData)
         where TValue : BlockValue<TLayout>, new()
         where TLayout : class, IBlockLayoutItem, new()
     {
@@ -148,14 +165,14 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
             .Concat(blockEditorData.BlockValue.SettingsData)
             .SelectMany(x => x.Values);
 
-        isUpdated = UpdateBlockPropertyValues(notification, isUpdated, blockPropertyValues);
+        isUpdated = UpdateBlockPropertyValues(content, isUpdated, blockPropertyValues);
 
         var updatedValue = JsonSerializer.Serialize(blockEditorData.BlockValue);
 
         return (isUpdated, updatedValue);
     }
 
-    private bool UpdateRichTextProperty(ContentCopiedNotification notification, IProperty property)
+    private bool UpdateRichTextProperty(IContent content, IProperty property)
     {
         var isUpdated = false;
 
@@ -165,7 +182,7 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
 
             RichTextBlockValue? richTextBlockValue = GetRichTextBlockValue(rawBlockPropertyValue);
 
-            (bool hasUpdates, string? updatedValue) = UpdateBlockEditorData(notification, richTextBlockValue);
+            (bool hasUpdates, string? updatedValue) = UpdateBlockEditorData(content, richTextBlockValue);
 
             if (hasUpdates && string.IsNullOrEmpty(updatedValue) is false)
             {
@@ -173,7 +190,7 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
                 if (richTextEditorValue is not null)
                 {
                     richTextEditorValue.Blocks = JsonSerializer.Deserialize<RichTextBlockValue>(updatedValue);
-                    notification.Copy.SetValue(property.Alias, JsonSerializer.Serialize(richTextEditorValue), blockPropertyValue.Culture, blockPropertyValue.Segment);
+                    content.SetValue(property.Alias, JsonSerializer.Serialize(richTextEditorValue), blockPropertyValue.Culture, blockPropertyValue.Segment);
                 }
             }
 
@@ -183,7 +200,7 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
         return isUpdated;
     }
 
-    private (bool, string?) UpdateBlockEditorData(ContentCopiedNotification notification, RichTextBlockValue? richTextBlockValue)
+    private (bool, string?) UpdateBlockEditorData(IContent content, RichTextBlockValue? richTextBlockValue)
     {
         var isUpdated = false;
 
@@ -196,14 +213,14 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
             .Concat(richTextBlockValue.SettingsData)
             .SelectMany(x => x.Values);
 
-        isUpdated = UpdateBlockPropertyValues(notification, isUpdated, blockPropertyValues);
+        isUpdated = UpdateBlockPropertyValues(content, isUpdated, blockPropertyValues);
 
         var updatedValue = JsonSerializer.Serialize(richTextBlockValue);
 
         return (isUpdated, updatedValue);
     }
 
-    private bool UpdateBlockPropertyValues(ContentCopiedNotification notification, bool isUpdated, IEnumerable<BlockPropertyValue> blockPropertyValues)
+    private bool UpdateBlockPropertyValues(IContent content, bool isUpdated, IEnumerable<BlockPropertyValue> blockPropertyValues)
     {
         foreach (BlockPropertyValue blockPropertyValue in blockPropertyValues)
         {
@@ -221,14 +238,14 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
 
             if (IsUploadFieldPropertyType(propertyType))
             {
-                isUpdated |= UpdateUploadFieldBlockPropertyValue(blockPropertyValue, notification, propertyType);
+                isUpdated |= UpdateUploadFieldBlockPropertyValue(blockPropertyValue, content, propertyType);
 
                 continue;
             }
 
             if (IsBlockListPropertyType(propertyType))
             {
-                (bool hasUpdates, string? newValue) = UpdateBlockPropertyValue(blockPropertyValue, notification, _blockListEditorValues);
+                (bool hasUpdates, string? newValue) = UpdateBlockPropertyValue(blockPropertyValue, content, _blockListEditorValues);
 
                 isUpdated |= hasUpdates;
 
@@ -239,7 +256,7 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
 
             if (IsBlockGridPropertyType(propertyType))
             {
-                (bool hasUpdates, string? newValue) = UpdateBlockPropertyValue(blockPropertyValue, notification, _blockGridEditorValues);
+                (bool hasUpdates, string? newValue) = UpdateBlockPropertyValue(blockPropertyValue, content, _blockGridEditorValues);
 
                 isUpdated |= hasUpdates;
 
@@ -250,7 +267,7 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
 
             if (IsRichTextPropertyType(propertyType))
             {
-                (bool hasUpdates, string? newValue) = UpdateRichTextPropertyValue(blockPropertyValue, notification);
+                (bool hasUpdates, string? newValue) = UpdateRichTextPropertyValue(blockPropertyValue, content);
 
                 if (hasUpdates && string.IsNullOrEmpty(newValue) is false)
                 {
@@ -271,7 +288,7 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
         return isUpdated;
     }
 
-    private bool UpdateUploadFieldBlockPropertyValue(BlockPropertyValue blockItemDataValue, ContentCopiedNotification notification, IPropertyType propertyType)
+    private bool UpdateUploadFieldBlockPropertyValue(BlockPropertyValue blockItemDataValue, IContent content, IPropertyType propertyType)
     {
         FileUploadValue? fileUploadValue = FileUploadValueParser.Parse(blockItemDataValue.Value);
 
@@ -281,26 +298,26 @@ internal sealed class FileUploadContentCopiedNotificationHandler : FileUploadNot
             return false;
         }
 
-        var copyFileUrl = CopyFile(fileUploadValue.Src, notification.Copy, propertyType);
+        var copyFileUrl = CopyFile(fileUploadValue.Src, content, propertyType);
 
         blockItemDataValue.Value = copyFileUrl;
 
         return true;
     }
 
-    private (bool, string?) UpdateBlockPropertyValue<TValue, TLayout>(BlockPropertyValue blockItemDataValue, ContentCopiedNotification notification, BlockEditorValues<TValue, TLayout> blockEditorValues)
+    private (bool, string?) UpdateBlockPropertyValue<TValue, TLayout>(BlockPropertyValue blockItemDataValue, IContent content, BlockEditorValues<TValue, TLayout> blockEditorValues)
         where TValue : BlockValue<TLayout>, new()
         where TLayout : class, IBlockLayoutItem, new()
     {
         BlockEditorData<TValue, TLayout>? blockItemEditorDataValue = GetBlockEditorData(blockItemDataValue.Value, blockEditorValues);
 
-        return UpdateBlockEditorData(notification, blockItemEditorDataValue);
+        return UpdateBlockEditorData(content, blockItemEditorDataValue);
     }
 
-    private (bool, string?) UpdateRichTextPropertyValue(BlockPropertyValue blockItemDataValue, ContentCopiedNotification notification)
+    private (bool, string?) UpdateRichTextPropertyValue(BlockPropertyValue blockItemDataValue, IContent content)
     {
         RichTextBlockValue? richTextBlockValue = GetRichTextBlockValue(blockItemDataValue.Value);
-        return UpdateBlockEditorData(notification, richTextBlockValue);
+        return UpdateBlockEditorData(content, richTextBlockValue);
     }
 
     private string CopyFile(string sourceUrl, IContent destinationContent, IPropertyType propertyType)

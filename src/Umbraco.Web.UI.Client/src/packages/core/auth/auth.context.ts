@@ -73,12 +73,7 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#serverUrl = serverUrl;
 		this.#backofficePath = backofficePath;
 
-		this.#authFlow = new UmbAuthFlow(
-			serverUrl,
-			this.getRedirectUrl(),
-			this.getPostLogoutRedirectUrl(),
-			this.#isTimeout,
-		);
+		this.#authFlow = new UmbAuthFlow(serverUrl, this.getRedirectUrl(), this.getPostLogoutRedirectUrl());
 
 		// Observe the authorization signal and close the auth window
 		this.observe(
