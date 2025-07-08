@@ -1,5 +1,5 @@
 import type { UmbInstallerLayoutElement } from './installer-layout.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './installer-layout.element.js';

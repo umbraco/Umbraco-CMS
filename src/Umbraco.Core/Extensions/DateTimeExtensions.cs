@@ -5,6 +5,9 @@ using System.Globalization;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides Extensions for <see cref="DateTime"/>.
+/// </summary>
 public static class DateTimeExtensions
 {
     /// <summary>
@@ -18,6 +21,7 @@ public static class DateTimeExtensions
         Hour,
         Minute,
         Second,
+        Millisecond,
     }
 
     /// <summary>
@@ -35,32 +39,15 @@ public static class DateTimeExtensions
     /// <param name="truncateTo">The level to truncate the date to.</param>
     /// <returns>The truncated date.</returns>
     public static DateTime TruncateTo(this DateTime dt, DateTruncate truncateTo)
-    {
-        if (truncateTo == DateTruncate.Year)
+        => truncateTo switch
         {
-            return new DateTime(dt.Year, 1, 1, 0, 0, 0, dt.Kind);
-        }
-
-        if (truncateTo == DateTruncate.Month)
-        {
-            return new DateTime(dt.Year, dt.Month, 1, 0, 0, 0, dt.Kind);
-        }
-
-        if (truncateTo == DateTruncate.Day)
-        {
-            return new DateTime(dt.Year, dt.Month, dt.Day, 0, 0, 0, dt.Kind);
-        }
-
-        if (truncateTo == DateTruncate.Hour)
-        {
-            return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, 0, 0, dt.Kind);
-        }
-
-        if (truncateTo == DateTruncate.Minute)
-        {
-            return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0, dt.Kind);
-        }
-
-        return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Kind);
-    }
+            DateTruncate.Year => new DateTime(dt.Year, 1, 1, 0, 0, 0, dt.Kind),
+            DateTruncate.Month => new DateTime(dt.Year, dt.Month, 1, 0, 0, 0, dt.Kind),
+            DateTruncate.Day => new DateTime(dt.Year, dt.Month, dt.Day, 0, 0, 0, dt.Kind),
+            DateTruncate.Hour => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, 0, 0, dt.Kind),
+            DateTruncate.Minute => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0, dt.Kind),
+            DateTruncate.Second => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Kind),
+            DateTruncate.Millisecond => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind),
+            _ => throw new ArgumentOutOfRangeException(nameof(truncateTo), truncateTo, "Invalid truncation level"),
+        };
 }

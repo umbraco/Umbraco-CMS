@@ -53,16 +53,6 @@ public class MoveDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
-            User,
-            ContentPermissionResource.WithKeys(ActionMove.ActionLetter, new[] { moveDocumentRequestModel.Target?.Id, id }),
-            AuthorizationPolicies.ContentPermissionByResource);
-
-        if (!authorizationResult.Succeeded)
-        {
-            return Forbidden();
-        }
-
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.MoveAsync(
             id,
             moveDocumentRequestModel.Target?.Id,

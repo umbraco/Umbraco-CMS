@@ -20,6 +20,8 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 		this._availableExtensions = this.#context.filterExtensions(query);
 	}, 250);
 
+	#initialized = false;
+
 	@state()
 	private _availableExtensions: Array<UmbTiptapStatusbarExtension> = [];
 
@@ -33,6 +35,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 		this.#value = value;
 	}
 	get value(): UmbTiptapStatusbarValue | undefined {
+		if (this.#value === undefined) return undefined;
 		return this.#context.cloneStatusbarValue(this.#value);
 	}
 	#value?: UmbTiptapStatusbarValue;
@@ -54,14 +57,17 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 			this.observe(this.#context.statusbar, (statusbar) => {
 				if (!statusbar.length) return;
 				this._statusbar = statusbar;
-				this.#value = statusbar.map((area) => [...area.data]);
-				propertyContext?.setValue(this.#value);
+				if (this.#initialized) {
+					this.#value = statusbar.map((area) => [...area.data]);
+					propertyContext?.setValue(this.#value);
+				}
 			});
 		});
 	}
 
 	protected override firstUpdated() {
 		this.#context.setStatusbar(this.#value);
+		this.#initialized = true;
 	}
 
 	#onClick(item: UmbTiptapStatusbarExtension) {
@@ -122,14 +128,11 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 	}
 
 	#renderAvailableItems() {
+		const label = this.localize.term('placeholders_filter');
 		return html`
 			<uui-box id="toolbox" headline=${this.localize.term('tiptap_statusbar_availableItems')}>
 				<div slot="header-actions">
-					<uui-input
-						type="search"
-						autocomplete="off"
-						placeholder=${this.localize.term('placeholders_filter')}
-						@input=${this.#onFilterInput}>
+					<uui-input type="search" autocomplete="off" label=${label} placeholder=${label} @input=${this.#onFilterInput}>
 						<div slot="prepend">
 							<uui-icon name="search"></uui-icon>
 						</div>
@@ -155,12 +158,14 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 		const forbidden = !this.#context.isExtensionEnabled(item.alias);
 		const inUse = this.#context.isExtensionInUse(item.alias);
 		if (inUse || forbidden) return nothing;
+		const label = this.localize.string(item.label);
 		return html`
 			<uui-button
 				compact
 				class=${forbidden ? 'forbidden' : ''}
 				data-mark="tiptap-toolbar-item:${item.alias}"
 				draggable="true"
+				label=${label}
 				look=${forbidden ? 'placeholder' : 'outline'}
 				?disabled=${forbidden || inUse}
 				@click=${() => this.#onClick(item)}
@@ -168,7 +173,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 				@dragend=${this.#onDragEnd}>
 				<div class="inner">
 					${when(item.icon, () => html`<umb-icon .name=${item.icon}></umb-icon>`)}
-					<span>${this.localize.string(item.label)}</span>
+					<span>${label}</span>
 				</div>
 			</uui-button>
 		`;
@@ -212,6 +217,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 		if (!item) return nothing;
 
 		const forbidden = !this.#context?.isExtensionEnabled(item.alias);
+		const label = this.localize.string(item.label);
 
 		return html`
 			<uui-button
@@ -219,15 +225,16 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 				class=${forbidden ? 'forbidden' : ''}
 				data-mark="tiptap-toolbar-item:${item.alias}"
 				draggable="true"
+				label=${label}
 				look=${forbidden ? 'placeholder' : 'outline'}
-				title=${this.localize.string(item.label)}
+				title=${label}
 				?disabled=${forbidden}
 				@click=${() => this.#context.removeStatusbarItem([areaIndex, itemIndex])}
 				@dragend=${this.#onDragEnd}
 				@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [areaIndex, itemIndex])}>
 				<div class="inner">
 					${when(item.icon, (icon) => html`<umb-icon .name=${icon}></umb-icon>`)}
-					<span>${this.localize.string(item.label)}</span>
+					<span>${label}</span>
 				</div>
 			</uui-button>
 		`;

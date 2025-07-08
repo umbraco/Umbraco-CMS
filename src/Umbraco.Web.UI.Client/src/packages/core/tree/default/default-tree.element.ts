@@ -170,7 +170,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			return nothing;
 		}
 
-		return html` <uui-button id="load-more" @click=${this.#onLoadMoreClick} label="Load more"></uui-button> `;
+		return html` <umb-tree-load-more-button @click=${this.#onLoadMoreClick}></umb-tree-load-more-button> `;
 	}
 
 	static override styles = css`
