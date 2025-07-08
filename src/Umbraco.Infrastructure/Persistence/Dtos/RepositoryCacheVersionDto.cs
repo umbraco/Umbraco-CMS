@@ -11,10 +11,10 @@ public class RepositoryCacheVersionDto
 {
     internal const string TableName = Constants.DatabaseSchema.Tables.RepositoryCacheVersion;
 
-    [Column("cacheIdentifier")]
+    [Column("identifier")]
     [Length(256)]
     [PrimaryKeyColumn(AutoIncrement = false, Clustered = true)]
-    public required string CacheIdentifier { get; set; }
+    public required string Identifier { get; set; }
 
     [Column("version")]
     [Length(256)]
