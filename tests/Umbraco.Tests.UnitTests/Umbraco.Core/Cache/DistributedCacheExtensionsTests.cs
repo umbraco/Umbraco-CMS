@@ -13,8 +13,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache;
 [TestFixture]
 public class DistributedCacheExtensionsTests
 {
-    [Test]
-    public void Member_GetPayloads_CorrectlyCreatesPayloads()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void Member_GetPayloads_CorrectlyCreatesPayloads(bool removed)
     {
         var member1Key = Guid.NewGuid();
         var member2Key = Guid.NewGuid();
@@ -35,23 +36,26 @@ public class DistributedCacheExtensionsTests
             },
         };
 
-        var payloads = DistributedCacheExtensions.GetPayloads(members, state, false);
+        var payloads = DistributedCacheExtensions.GetPayloads(members, state, removed);
         Assert.AreEqual(3, payloads.Count());
 
         var payloadForFred = payloads.First();
         Assert.AreEqual("fred", payloadForFred.Username);
         Assert.AreEqual(1, payloadForFred.Id);
         Assert.IsNull(payloadForFred.PreviousUsername);
+        Assert.AreEqual(removed, payloadForFred.Removed);
 
         var payloadForSally = payloads.Skip(1).First();
         Assert.AreEqual("sally", payloadForSally.Username);
         Assert.AreEqual(2, payloadForSally.Id);
         Assert.IsNull(payloadForSally.PreviousUsername);
+        Assert.AreEqual(removed, payloadForSally.Removed);
 
         var payloadForJane = payloads.Skip(2).First();
         Assert.AreEqual("jane", payloadForJane.Username);
         Assert.AreEqual(3, payloadForJane.Id);
         Assert.AreEqual("janeold", payloadForJane.PreviousUsername);
+        Assert.AreEqual(removed, payloadForJane.Removed);
     }
 
     private static IMember CreateMember(int id, Guid key, string name, string username, string email)
