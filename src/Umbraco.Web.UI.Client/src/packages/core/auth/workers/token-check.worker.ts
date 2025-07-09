@@ -24,7 +24,13 @@ let interval: any;
 
 console.log('[Token Check Worker] Token check worker initialized.');
 
-const _self = globalThis as unknown as SharedWorkerGlobalScope & typeof globalThis;
+/**
+ * Define the globalThis object to handle the onconnect event as SharedWorkerGlobalScope.
+ * This must be defined manually because TypeScript does not recognize the SharedWorkerGlobalScope type on all environments.
+ */
+const _self = globalThis as typeof globalThis & {
+	onconnect: (event: MessageEvent) => void;
+};
 
 _self.onconnect = (event: MessageEvent) => {
 	console.log('[Token Check Worker] Connected to main thread.');
