@@ -17,6 +17,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
 
     private readonly TimeSpan _timeToWaitBetweenBackgroundTaskStatusChecks = TimeSpan.FromSeconds(1);
     private readonly TimeSpan _defaultExpirationTime = TimeSpan.FromMinutes(5);
+
     private readonly TimeSpan _defaultExpirationTimeWhenInBackground = TimeSpan.FromMinutes(2);
 
     /// <summary>
@@ -42,91 +43,89 @@ internal class LongRunningOperationService : ILongRunningOperationService
     public Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run(
         string type,
         Func<CancellationToken, Task> operation,
+        bool allowConcurrentExecution = true,
         bool runInBackground = true,
-        bool allowMultipleRunsOfType = true,
-        TimeSpan? expires = null)
-        => RunInner<object>(
+        TimeSpan? expiryTimeout = null)
+        => RunInner<object?>(
             type,
             async cancellationToken =>
             {
                 await operation(cancellationToken);
-                return null!;
+                return null;
             },
+            allowConcurrentExecution,
             runInBackground,
-            allowMultipleRunsOfType,
-            expires);
+            expiryTimeout);
 
     /// <inheritdoc />
     public Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run<T>(
         string type,
         Func<CancellationToken, Task<T>> operation,
+        bool allowConcurrentExecution = true,
         bool runInBackground = true,
-        bool allowMultipleRunsOfType = true,
-        TimeSpan? expires = null)
+        TimeSpan? expiryTimeout = null)
         => RunInner(
             type,
             operation,
+            allowConcurrentExecution,
             runInBackground,
-            allowMultipleRunsOfType,
-            expires);
+            expiryTimeout);
 
-    /// <inheritdoc />
-    public Task<bool> IsRunning(string type, Guid operationId)
+    /// <inheritdoc/>
+    public Task<LongRunningOperationStatus?> GetStatus(Guid operationId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return Task.FromResult(_repository.IsEnqueuedOrRunning(type, operationId));
+        return Task.FromResult(_repository.GetStatus(operationId));
     }
 
     /// <inheritdoc/>
-    public Task<bool> IsRunning(string type)
-        => Task.FromResult(_repository.IsEnqueuedOrRunning(type));
-
-    /// <inheritdoc />
-    public Task<Attempt<TResult?, LongRunningOperationResultStatus>> GetResult<TResult>(string type, Guid operationId)
+    public Task<IEnumerable<LongRunningOperation>> GetByType(string type, LongRunningOperationStatus[]? statuses = null)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        LongRunningOperation? operation = _repository.Get(type, operationId);
+        return Task.FromResult(
+            _repository.GetByType(
+                type,
+                statuses ?? [LongRunningOperationStatus.Enqueued, LongRunningOperationStatus.Running]));
+    }
+
+    /// <inheritdoc />
+    public Task<Attempt<TResult?, LongRunningOperationResultStatus>> GetResult<TResult>(Guid operationId)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        LongRunningOperation<TResult>? operation = _repository.Get<TResult>(operationId);
         if (operation?.Status is not LongRunningOperationStatus.Success)
         {
             return Task.FromResult(
                 Attempt.FailWithStatus<TResult?, LongRunningOperationResultStatus>(
                     operation?.Status switch
                     {
-                        LongRunningOperationStatus.Enqueued or LongRunningOperationStatus.Running => LongRunningOperationResultStatus.OperationStillRunning,
+                        LongRunningOperationStatus.Enqueued or LongRunningOperationStatus.Running => LongRunningOperationResultStatus.OperationPending,
                         LongRunningOperationStatus.Failed => LongRunningOperationResultStatus.OperationFailed,
                         null => LongRunningOperationResultStatus.OperationNotFound,
-                        _ => throw new ArgumentOutOfRangeException(nameof(operation.Status), operation.Status, "Unknown operation status."),
+                        _ => throw new ArgumentOutOfRangeException(nameof(operation.Status), operation.Status, "Unhandled operation status."),
                     },
                     default));
         }
 
-        TResult? result = _repository.GetResult<TResult>(type, operationId);
-        return Task.FromResult(Attempt.SucceedWithStatus(LongRunningOperationResultStatus.Success, result));
+        return Task.FromResult(Attempt.SucceedWithStatus(LongRunningOperationResultStatus.Success, operation.Result));
     }
 
     private async Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> RunInner<T>(
         string type,
         Func<CancellationToken, Task<T>> operation,
+        bool allowConcurrentExecution = true,
         bool runInBackground = true,
-        bool allowMultipleRunsOfType = true,
         TimeSpan? expires = null)
     {
-        if (!allowMultipleRunsOfType && await IsRunning(type))
-        {
-            // If an operation of the type is already enqueued or running, we return an attempt indicating that it is already running.
-            // This prevents multiple enqueues of the same operation.
-            return Attempt.FailWithStatus(LongRunningOperationEnqueueStatus.AlreadyRunning, Guid.Empty);
-        }
-
         Guid operationId;
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            if (!allowMultipleRunsOfType)
+            if (!allowConcurrentExecution)
             {
                 // Acquire a write lock to ensure that no other operations of the same type can be enqueued while this one is being processed.
                 // This is only needed if we do not allow multiple runs of the same type.
                 scope.WriteLock(Constants.Locks.LongRunningOperations);
-                if (await IsRunning(type))
+                if (OperationOfTypeIsAlreadyRunning(type))
                 {
                     scope.Complete();
                     return Attempt.FailWithStatus(LongRunningOperationEnqueueStatus.AlreadyRunning, Guid.Empty);
@@ -146,7 +145,6 @@ internal class LongRunningOperationService : ILongRunningOperationService
                 expires.Value);
             scope.Complete();
         }
-
 
         if (runInBackground)
         {
@@ -176,33 +174,45 @@ internal class LongRunningOperationService : ILongRunningOperationService
         TimeSpan expires,
         CancellationToken cancellationToken = default)
     {
+        _logger.LogDebug("Running long-running operation {Type} with id {OperationId}.", type, operationId);
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            _repository.UpdateStatus(type, operationId, LongRunningOperationStatus.Running, expires);
+            _repository.UpdateStatus(operationId, LongRunningOperationStatus.Running, expires);
             scope.Complete();
+        }
+
+
+        T result;
+        try
+        {
+            result = await operation(cancellationToken);
+        }
+        catch (Exception)
+        {
+            _logger.LogDebug(
+                "Finished long-running operation {Type} with id {OperationId} and status {Status}.",
+                type,
+                operationId,
+                LongRunningOperationStatus.Failed);
+
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            _repository.UpdateStatus(operationId, LongRunningOperationStatus.Failed, expires);
+            scope.Complete();
+
+            throw;
         }
 
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            try
-            {
-                T result = await operation(cancellationToken);
-                _repository.UpdateStatus(type, operationId, LongRunningOperationStatus.Success, expires);
+            _logger.LogDebug("Finished long-running operation {Type} with id {OperationId} and status {Status}.", type, operationId, LongRunningOperationStatus.Success);
+            _repository.UpdateStatus(operationId, LongRunningOperationStatus.Success, expires);
 
-                if (result != null)
-                {
-                    _repository.SetResult(type, operationId, result, expires);
-                }
-            }
-            catch (Exception)
+            if (result != null)
             {
-                _repository.UpdateStatus(type, operationId, LongRunningOperationStatus.Failed, expires);
-                throw;
+                _repository.SetResult(operationId, result);
             }
-            finally
-            {
-                scope.Complete();
-            }
+
+            scope.Complete();
         }
     }
 
@@ -213,7 +223,14 @@ internal class LongRunningOperationService : ILongRunningOperationService
         TimeSpan expires,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogDebug("Enqueued long-running operation {Type} with id {OperationId}.", type, operationId);
+        _logger.LogDebug("Running long-running operation {Type} with id {OperationId}.", type, operationId);
+
+        // Update the status to Running and increase the expiration time.
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        {
+            _repository.UpdateStatus(operationId, LongRunningOperationStatus.Running, expires);
+            scope.Complete();
+        }
 
         Task<T> task;
         using (ExecutionContext.SuppressFlow())
@@ -221,59 +238,46 @@ internal class LongRunningOperationService : ILongRunningOperationService
             task = Task.Run(async () => await operation(cancellationToken), cancellationToken);
         }
 
-        LongRunningOperationStatus status = LongRunningOperationStatus.Enqueued;
-        while (true)
+        try
         {
-            TaskStatus taskStatus = task.Status;
-            if (task.IsCompleted)
+            while (!task.IsCompleted)
             {
-                break;
+                // Update the status in the database and increase the expiration time.
+                // That way, even if the status has not changed, we know that the operation is still being processed.
+                using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                _repository.UpdateStatus(operationId, LongRunningOperationStatus.Running, expires);
+                scope.Complete();
+
+                await Task.WhenAny(task, Task.Delay(_timeToWaitBetweenBackgroundTaskStatusChecks, cancellationToken)).ConfigureAwait(false);
             }
-
-            LongRunningOperationStatus newStatus = taskStatus switch
-            {
-                TaskStatus.Running or TaskStatus.WaitingForChildrenToComplete => LongRunningOperationStatus.Running,
-                _ => LongRunningOperationStatus.Enqueued,
-            };
-
-            if (status != newStatus)
-            {
-                _logger.LogDebug("Long-running operation {Type} with id {OperationId} status changed to {Status}.", type, operationId, newStatus);
-            }
-
-            status = newStatus;
-
-            // Update the status in the database and increase the expiration time.
-            // That way, even if the status has not changed, we know that the operation is still being processed.
+        }
+        catch (Exception)
+        {
+            // If an exception occurs, we update the status to Failed and rethrow the exception.
+            _logger.LogDebug("Finished long-running operation {Type} with id {OperationId} and status {Status}.", type, operationId, LongRunningOperationStatus.Failed);
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
-            _repository.UpdateStatus(type, operationId, status, expires);
+            _repository.UpdateStatus(operationId, LongRunningOperationStatus.Failed, expires);
             scope.Complete();
-
-            await Task.Delay(_timeToWaitBetweenBackgroundTaskStatusChecks, cancellationToken);
+            throw;
         }
 
-        status = task.IsCompletedSuccessfully
-            ? LongRunningOperationStatus.Success
-            : LongRunningOperationStatus.Failed;
-
-        _logger.LogDebug("Finished long-running operation {Type} with id {OperationId} and status {Status}.", type, operationId, status);
+        T result = await task.ConfigureAwait(false);
+        _logger.LogDebug("Finished long-running operation {Type} with id {OperationId} and status {Status}.", type, operationId, LongRunningOperationStatus.Success);
 
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            _repository.UpdateStatus(type, operationId, status, expires);
-            if (task.Result != null)
+            _repository.UpdateStatus(operationId, LongRunningOperationStatus.Success, expires);
+            if (result != null)
             {
-                _repository.SetResult(type, operationId, task.Result, expires);
+                _repository.SetResult(operationId, result);
             }
 
             scope.Complete();
         }
-
-        if (task.IsFaulted)
-        {
-            throw task.Exception;
-        }
     }
+
+    private bool OperationOfTypeIsAlreadyRunning(string type)
+        => _repository.GetByType(type, [LongRunningOperationStatus.Enqueued, LongRunningOperationStatus.Running]).Any();
 }
 
 

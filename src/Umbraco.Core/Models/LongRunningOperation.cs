@@ -3,10 +3,10 @@ namespace Umbraco.Cms.Core.Models;
 /// <summary>
 /// Represents a long-running operation.
 /// </summary>
-public sealed class LongRunningOperation
+public class LongRunningOperation
 {
     /// <summary>
-    /// Gets or sets the unique identifier for the long-running operation.
+    /// Gets the unique identifier for the long-running operation.
     /// </summary>
     public required Guid Id { get; init; }
 

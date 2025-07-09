@@ -50,7 +50,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     }
 
     /// <inheritdoc/>
-    public bool IsRebuilding() => _longRunningOperationService.IsRunning(RebuildOperationName).GetAwaiter().GetResult();
+    public bool IsRebuilding() => _longRunningOperationService.GetByType(RebuildOperationName).GetAwaiter().GetResult().Any();
 
     /// <inheritdoc/>
     [Obsolete("Use the overload with the useBackgroundThread parameter. Scheduled for removal in Umbraco 17.")]
@@ -71,7 +71,6 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
                     PerformRebuild();
                     return Task.CompletedTask;
                 },
-                allowMultipleRunsOfType: false,
                 runInBackground: useBackgroundThread);
 
         if (attempt.Success)

@@ -18,7 +18,7 @@ public enum LongRunningOperationResultStatus
     /// <summary>
     /// The operation is still running and the result is not yet available.
     /// </summary>
-    OperationStillRunning,
+    OperationPending,
 
     /// <summary>
     /// The operation has failed, and the result is not available.
