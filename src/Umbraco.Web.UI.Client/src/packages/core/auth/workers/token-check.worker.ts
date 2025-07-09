@@ -103,11 +103,15 @@ function init(tokenResponse: TokenResponse) {
 			console.log('[Token Check Worker] Waiting for token refresh...');
 		} else if (result.numberOfSecondsUntilExpiration <= BUFFER_BEFORE_EXPIRATION) {
 			console.log('[Token Check Worker] Token should be refreshed, but it is not expired yet.');
-			// Let the main thread know that the token should be refreshed
-			ports?.[0]?.postMessage({
-				command: 'refreshToken',
-				secondsUntilLogout: result.numberOfSecondsUntilExpiration,
-			});
+			// Let all connected clients know that the token should be refreshed
+			for (const port of ports) {
+				if (port) {
+					port.postMessage({
+						command: 'refreshToken',
+						secondsUntilLogout: result.numberOfSecondsUntilExpiration,
+					});
+				}
+			}
 		}
 	}, VALIDATION_INTERVAL);
 }
