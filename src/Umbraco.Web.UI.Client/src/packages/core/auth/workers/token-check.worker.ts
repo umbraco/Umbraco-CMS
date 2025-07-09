@@ -18,7 +18,9 @@ const VALIDATION_INTERVAL = 30000; // 30 seconds in milliseconds
 const TOKEN_EXPIRY_MULTIPLIER = 4;
 
 const ports: MessagePort[] = [];
-let interval: NodeJS.Timeout | undefined;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let interval: any;
 
 console.log('[Token Check Worker] Token check worker initialized.');
 
