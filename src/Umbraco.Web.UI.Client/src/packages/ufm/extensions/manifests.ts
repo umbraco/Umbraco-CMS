@@ -10,4 +10,13 @@ export const manifests: Array<ManifestMarkedExtension> = [
 			alias: 'ufm',
 		},
 	},
+	{
+		type: 'markedExtension',
+		alias: 'Umb.MarkedExtension.Ufmjs',
+		name: 'UFM JS Marked Extension',
+		api: () => import('./ufmjs-marked-extension.api.js'),
+		meta: {
+			alias: 'ufmjs',
+		},
+	},
 ];
