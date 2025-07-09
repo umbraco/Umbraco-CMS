@@ -9,7 +9,7 @@ const BUFFER_BEFORE_EXPIRATION = 60; // 1 minute in seconds
 /**
  * The interval at which the token will be validated.
  */
-const VALIDATION_INTERVAL = 60000; // 1 minute in milliseconds
+const VALIDATION_INTERVAL = 30000; // 30 seconds in milliseconds
 
 const ports: MessagePort[] = [];
 let interval: NodeJS.Timeout | undefined;
