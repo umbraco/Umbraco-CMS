@@ -1,4 +1,4 @@
-import type { UfmToken } from '../../plugins/marked-ufm.plugin.js';
+import type { UfmToken } from '../../plugins/types.js';
 import { UmbUfmComponentBase } from '../ufm-component-base.js';
 
 import './content-name.element.js';
