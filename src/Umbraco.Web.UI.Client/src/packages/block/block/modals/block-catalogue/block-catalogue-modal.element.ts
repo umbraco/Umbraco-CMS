@@ -202,7 +202,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		if (this._loading) return html`<div id="loader"><uui-loader></uui-loader></div>`;
 		return html`
 			${when(
-				this.data?.blocks && this.data?.blocks.length > 1, // 8
+				this.data?.blocks && this.data?.blocks.length > 8,
 				() => html`
 					<uui-input
 						id="search"
