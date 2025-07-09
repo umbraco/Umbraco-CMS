@@ -36,9 +36,11 @@ export const UmbMarked = new Marked({
 	},
 });
 
-type UmbUfmFilterType = {
+export type UmbUfmFilterFunction = ((...args: Array<unknown>) => string | undefined | null) | undefined;
+
+export type UmbUfmFilterType = {
 	alias: string;
-	filter: ((...args: Array<unknown>) => string | undefined | null) | undefined;
+	filter: UmbUfmFilterFunction;
 };
 
 export class UmbUfmContext extends UmbContextBase {
@@ -63,11 +65,30 @@ export class UmbUfmContext extends UmbContextBase {
 		});
 	}
 
-	public getFilterByAlias(alias: string) {
+	/**
+	 * Get the filters registered in the UFM context.
+	 * @returns {Array<UmbUfmFilterType>} An array of filters with their aliases and filter functions.
+	 */
+	public getFilters(): Array<UmbUfmFilterType> {
+		return this.#filters.getValue();
+	}
+
+	/**
+	 * Get a filter by its alias.
+	 * @param alias The alias of the filter to retrieve.
+	 * @returns {UmbUfmFilterFunction} The filter function associated with the alias, or undefined if not found.
+	 */
+	public getFilterByAlias(alias: string): UmbUfmFilterFunction {
 		return this.#filters.getValue().find((x) => x.alias === alias)?.filter;
 	}
 
-	public async parse(markdown: string, inline: boolean) {
+	/**
+	 * Parse markdown content, optionally inline.
+	 * @param markdown The markdown string to parse.
+	 * @param inline If true, parse inline markdown; otherwise, parse block markdown.
+	 * @returns {Promise<string>} A promise that resolves to the parsed HTML string.
+	 */
+	public async parse(markdown: string, inline: boolean): Promise<string> {
 		return !inline ? await UmbMarked.parse(markdown) : await UmbMarked.parseInline(markdown);
 	}
 }
