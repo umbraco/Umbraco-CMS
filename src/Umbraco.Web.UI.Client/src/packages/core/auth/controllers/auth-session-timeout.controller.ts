@@ -1,13 +1,17 @@
-import type { UmbAuthContext } from '../auth.context.js';
 import type { UmbAuthFlow } from '../auth-flow.js';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import type { UmbAuthContext } from '../auth.context.js';
+import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	#tokenCheckWorker?: SharedWorker;
+	#host: UmbAuthContext;
 
 	constructor(host: UmbAuthContext, authFlow: UmbAuthFlow) {
 		super(host, 'UmbAuthSessionTimeoutController');
+
+		this.#host = host;
 
 		this.#tokenCheckWorker = new SharedWorker(new URL('../workers/token-check.worker.js', import.meta.url), {
 			name: 'TokenCheckWorker',
@@ -23,27 +27,8 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				// If the worker signals a logout, we clear the token storage and set the user as unauthorized
 				host.timeOut();
 			} else if (event.data?.command === 'refreshToken') {
-				const secondsUntilLogout = event.data.secondsUntilLogout;
-				console.log(
-					'[Auth Context] Token check worker requested a refresh token. Refreshing in',
-					secondsUntilLogout,
-					'seconds.',
-				);
-				try {
-					await umbConfirmModal(this, {
-						headline: 'Session Expiring',
-						cancelLabel: 'Logout',
-						confirmLabel: 'Stay Logged In',
-						content: `Your session is about to expire in ${secondsUntilLogout} seconds. Do you want to stay logged in?`,
-					});
-					host.validateToken().catch((error) => {
-						console.error('[Auth Context] Error validating token:', error);
-						// If the token validation fails, we clear the token storage and set the user as unauthorized
-						host.timeOut();
-					});
-				} catch {
-					host.timeOut();
-				}
+				// If the worker signals a token refresh, we let the user decide whether to continue or logout
+				this.#timeoutModal(event.data.secondsUntilLogout);
 			}
 		};
 
@@ -52,7 +37,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			authFlow.token$,
 			(tokenResponse) => {
 				// Inform the token check worker about the new token response
-				console.log('[Auth Context] Informing token check worker about new token response.', this.#tokenCheckWorker);
+				console.log('[Auth Context] Informing token check worker about new token response.');
 				// Post the new
 				this.#tokenCheckWorker?.port.postMessage({
 					command: 'init',
@@ -63,18 +48,54 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		);
 
 		// Listen for the timeout signal to stop the token check worker
-		// TODO: Close the timeout modal if it is open
-		this.observe(host.timeoutSignal, () => {
-			// Stop the token check worker when the user has timed out
-			this.#tokenCheckWorker?.port.postMessage({
-				command: 'init',
-			});
-		});
+		this.observe(
+			host.timeoutSignal,
+			async () => {
+				// Stop the token check worker when the user has timed out
+				this.#tokenCheckWorker?.port.postMessage({
+					command: 'init',
+				});
+
+				// Close the modal if it is open
+				const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+				modalManager?.close('auth-timeout');
+			},
+			'_authFlowTimeoutSignal',
+		);
 	}
 
 	override destroy(): void {
 		super.destroy();
 		this.#tokenCheckWorker?.port.close();
 		this.#tokenCheckWorker = undefined;
+	}
+
+	async #timeoutModal(remainingTimeInSeconds: number) {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager
+			?.open(this, UMB_MODAL_AUTH_TIMEOUT, {
+				modal: {
+					key: 'auth-timeout',
+				},
+				data: {
+					remainingTimeInSeconds,
+					onLogout: () => {
+						this.#host.timeOut();
+					},
+					onContinue: () => {
+						// If the user chooses to stay logged in, we validate the token
+						this.#host.validateToken().catch((error) => {
+							console.error('[Auth Context] Error validating token:', error);
+							// If the token validation fails, we clear the token storage and set the user as unauthorized
+							this.#host.timeOut();
+						});
+					},
+				},
+			})
+			.onSubmit()
+			.catch(() => {
+				// If the modal is forced closed or an error occurs, we handle it gracefully
+				this.#host.timeOut();
+			});
 	}
 }
