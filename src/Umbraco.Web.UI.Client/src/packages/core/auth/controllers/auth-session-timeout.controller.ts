@@ -80,22 +80,28 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				data: {
 					remainingTimeInSeconds,
 					onLogout: () => {
-						this.#host.timeOut();
+						this.#host.signOut();
 					},
 					onContinue: () => {
 						// If the user chooses to stay logged in, we validate the token
-						this.#host.validateToken().catch((error) => {
-							console.error('[Auth Context] Error validating token:', error);
-							// If the token validation fails, we clear the token storage and set the user as unauthorized
-							this.#host.timeOut();
-						});
+						this.#tryValidateToken();
 					},
 				},
 			})
 			.onSubmit()
 			.catch(() => {
 				// If the modal is forced closed or an error occurs, we handle it gracefully
-				this.#host.timeOut();
+				this.#tryValidateToken();
 			});
+	}
+
+	async #tryValidateToken() {
+		try {
+			await this.#host.validateToken();
+		} catch (error) {
+			console.error('[Auth Context] Error validating token:', error);
+			// If the token validation fails, we clear the token storage and set the user as unauthorized
+			this.#host.timeOut();
+		}
 	}
 }
