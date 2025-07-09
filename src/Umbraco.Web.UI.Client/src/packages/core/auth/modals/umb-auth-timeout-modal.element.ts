@@ -30,36 +30,41 @@ export class UmbAuthTimeoutModalElement extends UmbModalBaseElement<UmbModalAuth
 				this._remainingTimeInSeconds--;
 			} else {
 				clearInterval(this.#interval);
-				this._handleLogout();
+				this.#handleLogout();
 			}
 		}, 1000);
 	}
 
-	private _handleLogout() {
+	#handleLogout() {
 		this.data?.onLogout?.();
 		this.modalContext?.submit();
 	}
 
-	private _handleConfirm() {
+	#handleConfirm() {
 		this.data?.onContinue?.();
 		this.modalContext?.submit();
 	}
 
 	override render() {
 		return html`
-			<uui-dialog-layout class="uui-text" .headline=${this.localize.term('Session Timeout')}>
-				<umb-localize key="auth_timeoutMessage" .args=${[this._remainingTimeInSeconds]}>
-					You have been inactive and will be logged out in ${this._remainingTimeInSeconds} seconds.
+			<uui-dialog-layout class="uui-text" .headline=${this.localize.term('timeout_warningHeadline')}>
+				<umb-localize key="timeout_warningText" .args=${[this._remainingTimeInSeconds]}>
+					Your session is about to expire and you will be logged out in
+					<strong>${this._remainingTimeInSeconds} seconds</strong>.
 				</umb-localize>
 
-				<uui-button slot="actions" label=${this.localize.term('Log out')} @click=${this._handleLogout}></uui-button>
+				<uui-button
+					slot="actions"
+					look="secondary"
+					label=${this.localize.term('timeout_warningLogoutAction')}
+					@click=${this.#handleLogout}></uui-button>
 				<uui-button
 					slot="actions"
 					id="confirm"
 					color="positive"
 					look="primary"
-					label=${this.localize.term('Stay logged in')}
-					@click=${this._handleConfirm}
+					label=${this.localize.term('timeout_warningContinueAction')}
+					@click=${this.#handleConfirm}
 					${umbFocus()}></uui-button>
 			</uui-dialog-layout>
 		`;
