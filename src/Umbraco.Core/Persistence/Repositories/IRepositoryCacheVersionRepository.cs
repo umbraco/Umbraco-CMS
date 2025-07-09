@@ -17,6 +17,14 @@ public interface IRepositoryCacheVersionRepository : IRepository
     Task<RepositoryCacheVersion?> GetAsync(string identifier);
 
     /// <summary>
+    /// Gets all <see cref="RepositoryCacheVersion"/> entities.
+    /// </summary>
+    /// <returns>
+    /// An <see cref="IEnumerable{RepositoryCacheVersion}"/> containing all cache versions.
+    /// </returns>
+    Task<IEnumerable<RepositoryCacheVersion>> GetAllAsync();
+
+    /// <summary>
     /// Saves the specified <see cref="RepositoryCacheVersion"/>.
     /// </summary>
     /// <param name="repositoryCacheVersion">The cache version entity to save.</param>

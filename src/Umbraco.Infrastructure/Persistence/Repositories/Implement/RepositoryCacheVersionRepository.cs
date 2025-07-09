@@ -34,6 +34,16 @@ internal class RepositoryCacheVersionRepository : RepositoryBase, IRepositoryCac
         return Map(dto);
     }
 
+    public async Task<IEnumerable<RepositoryCacheVersion>> GetAllAsync()
+    {
+        Sql<ISqlContext> query = Sql()
+            .Select<RepositoryCacheVersionDto>()
+            .From<RepositoryCacheVersionDto>();
+
+        IEnumerable<RepositoryCacheVersionDto> dtos = await Database.FetchAsync<RepositoryCacheVersionDto>(query);
+        return dtos.Select(Map).Where(x => x is not null)!;
+    }
+
     /// <inheritdoc/>
     public async Task SaveAsync(RepositoryCacheVersion repositoryCacheVersion)
     {
