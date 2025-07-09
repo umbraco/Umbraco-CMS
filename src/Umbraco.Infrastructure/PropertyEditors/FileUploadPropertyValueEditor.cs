@@ -92,13 +92,10 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     {
         FileUploadValue? editorModelValue = _valueParser.Parse(editorValue.Value);
 
-        // no change?
+        // No change or created from blueprint.
         if (editorModelValue?.TemporaryFileId.HasValue is not true && string.IsNullOrEmpty(editorModelValue?.Src) is false)
         {
-            // since current value can be json string, we have to parse value
-            FileUploadValue? currentModelValue = _valueParser.Parse(currentValue);
-
-            return currentModelValue?.Src;
+            return editorModelValue.Src;
         }
 
         // the current editor value (if any) is the path to the file

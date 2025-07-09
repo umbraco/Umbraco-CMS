@@ -16,6 +16,7 @@ export default defineConfig({
 			'audit-log/index': './audit-log/index.ts',
 			'auth/index': './auth/index.ts',
 			'backend-api/index': './backend-api/index.ts',
+			'cache/index': './cache/index.ts',
 			'collection/index': './collection/index.ts',
 			'components/index': './components/index.ts',
 			'const/index': './const/index.ts',
