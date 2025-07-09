@@ -9,7 +9,8 @@ export class UmbAuthTimeoutModalElement extends UmbModalBaseElement<UmbModalAuth
 	@state()
 	private _remainingTimeInSeconds = 60;
 
-	#interval?: NodeJS.Timeout;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	#interval?: any;
 
 	override connectedCallback() {
 		super.connectedCallback();
