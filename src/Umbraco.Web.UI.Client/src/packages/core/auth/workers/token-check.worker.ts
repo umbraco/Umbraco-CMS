@@ -11,6 +11,12 @@ const BUFFER_BEFORE_EXPIRATION = 60; // 1 minute in seconds
  */
 const VALIDATION_INTERVAL = 30000; // 30 seconds in milliseconds
 
+/**
+ * The multiplier for the token expiry time.
+ * In Umbraco, access_tokens live for a quarter of the time of the refresh_token.
+ */
+const TOKEN_EXPIRY_MULTIPLIER = 4;
+
 const ports: MessagePort[] = [];
 let interval: NodeJS.Timeout | undefined;
 
@@ -42,10 +48,14 @@ _self.onconnect = (event: MessageEvent) => {
 /**
  * Checks if the provided token is expired.
  * If the token is not provided, it is considered expired.
+ * @param {TokenResponse} token - The token response to check.
+ * @returns {object} An object containing:
+ * - tokenIsExpired: A boolean indicating if the token is expired.
+ * - numberOfSecondsUntilExpiration: The number of seconds until the token expires, or 0 if it is expired.
  */
 function isTokenExpired(token: TokenResponse) {
 	const currentTime = Math.floor(Date.now() / 1000);
-	const tokenExpiresAt = token.issuedAt + (token.expiresIn ?? 1) * 4; // Multiply by 4 because the token is refreshed 4 times before it expires
+	const tokenExpiresAt = token.issuedAt + (token.expiresIn ?? 1) * TOKEN_EXPIRY_MULTIPLIER;
 	const tokenExpiresInSeconds = tokenExpiresAt - currentTime;
 
 	console.log('[Token Check Worker] Token expires in', tokenExpiresInSeconds, 'seconds');
@@ -66,6 +76,7 @@ function isTokenExpired(token: TokenResponse) {
 /**
  * This worker checks the token expiration at regular intervals.
  * If the token is expired or missing, it will trigger a logout.
+ * @param {TokenResponse} tokenResponse - The token response to check.
  */
 function init(tokenResponse: TokenResponse) {
 	console.log('[Token Check Worker] Initializing token check worker...');
