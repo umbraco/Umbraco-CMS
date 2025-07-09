@@ -11,8 +11,8 @@ public interface ILongRunningOperationRepository
     /// Creates a new long-running operation.
     /// </summary>
     /// <param name="operation">The operation to create.</param>
-    /// <param name="expires">The time span after which the operation is considered expired if its status hasn't been updated.</param>
-    public void Create(LongRunningOperation operation, TimeSpan expires);
+    /// <param name="expiryTimeout">The time span after which the operation is considered expired if it hasn't been updated in that time.</param>
+    public void Create(LongRunningOperation operation, TimeSpan expiryTimeout);
 
     /// <summary>
     /// Retrieves a long-running operation by its ID.
@@ -49,8 +49,8 @@ public interface ILongRunningOperationRepository
     /// </summary>
     /// <param name="id">The unique identifier of the long-running operation.</param>
     /// <param name="status">The new status to set for the operation.</param>
-    /// <param name="expires">The time span after which the operation is considered expired if its status hasn't been updated.</param>
-    public void UpdateStatus(Guid id, LongRunningOperationStatus status, TimeSpan expires);
+    /// <param name="expiryTimeout">The time span after which the operation is considered expired if its status hasn't been updated.</param>
+    public void UpdateStatus(Guid id, LongRunningOperationStatus status, TimeSpan expiryTimeout);
 
     /// <summary>
     /// Sets the result of a long-running operation identified by its ID.

@@ -25,9 +25,9 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
         _jsonSerializer = jsonSerializer;
 
     /// <inheritdoc/>
-    public void Create(LongRunningOperation operation, TimeSpan expires)
+    public void Create(LongRunningOperation operation, TimeSpan expiryTimeout)
     {
-        LongRunningOperationDto dto = MapEntityToDto(operation, expires);
+        LongRunningOperationDto dto = MapEntityToDto(operation, expiryTimeout);
         Database.Insert(dto);
     }
 
@@ -85,13 +85,13 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     }
 
     /// <inheritdoc/>
-    public void UpdateStatus(Guid id, LongRunningOperationStatus status, TimeSpan expires)
+    public void UpdateStatus(Guid id, LongRunningOperationStatus status, TimeSpan expiryTimeout)
     {
         Sql<ISqlContext> sql = Sql()
             .Update<LongRunningOperationDto>(x => x
                 .Set(y => y.Status, status.ToString())
                 .Set(y => y.UpdateDate, DateTime.UtcNow)
-                .Set(y => y.ExpireDate, DateTime.UtcNow + expires))
+                .Set(y => y.ExpireDate, DateTime.UtcNow + expiryTimeout))
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
         Database.Execute(sql);
