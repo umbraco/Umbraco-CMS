@@ -73,7 +73,7 @@ test('can delete a document blueprint', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, false, false);
 });
 
-test('can create a document blueprint from the content menu', async ({umbracoApi, umbracoUi}) => {
+test('can create a document blueprint from the content menu', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeName = 'DocumentTypeForContent';
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);

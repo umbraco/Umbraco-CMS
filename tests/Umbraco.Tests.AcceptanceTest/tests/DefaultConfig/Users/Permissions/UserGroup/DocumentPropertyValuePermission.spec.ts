@@ -43,7 +43,7 @@ test('cannot see property values without UI read permission', async ({umbracoApi
   await umbracoUi.content.isPropertyEditorUiWithNameVisible('text-box', false);
 });
 
-test('can see property values with UI read but not UI write permission', async ({umbracoApi, umbracoUi}) => {
+test('can see property values with UI read but not UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionAndReadPropertyValuePermission(userGroupName, true, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -58,7 +58,7 @@ test('can see property values with UI read but not UI write permission', async (
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-test('cannot open content without document read permission even with UI read permission', async ({umbracoApi, umbracoUi}) => {
+test('cannot open content without document read permission even with UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionAndReadPropertyValuePermission(userGroupName, false, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -91,7 +91,7 @@ test('cannot edit property values without UI write permission', async ({umbracoA
 
 // Remove .skip when the front-end is ready. 
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
-test.skip('can edit property values with UI write permission', async ({umbracoApi, umbracoUi}) => {
+test.skip('can edit property values with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionAndWritePropertyValuePermission(userGroupName, true, false);

@@ -169,7 +169,7 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
 
-test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) => {
+test('can add multiple links in the content', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -266,7 +266,7 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   expect(contentData.values[0].value[0].url).toEqual(link);
 });
 
-test('cannot submit an empty link', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -287,7 +287,7 @@ test('cannot submit an empty link', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-test('cannot update the URL picker with an empty link', async ({umbracoApi, umbracoUi}) => {
+test('cannot update the URL picker with an empty link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);

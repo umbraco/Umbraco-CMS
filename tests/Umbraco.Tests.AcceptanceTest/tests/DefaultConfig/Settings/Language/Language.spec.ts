@@ -122,7 +122,7 @@ test('can add fallback language', async ({umbracoApi, umbracoUi}) => {
   expect(languageData.fallbackIsoCode).toBe(defaultLanguageIsoCode);
 });
 
-test('cannot add a language with duplicate ISO code', async ({umbracoApi, umbracoUi}) => {
+test('cannot add a language with duplicate ISO code', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.language.create(languageName, false, false, isoCode);
   expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();

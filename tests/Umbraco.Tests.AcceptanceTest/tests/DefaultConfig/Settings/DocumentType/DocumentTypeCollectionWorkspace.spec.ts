@@ -34,7 +34,7 @@ test('can create a document type using create options', async ({umbracoApi, umbr
   await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveIcon(documentTypeName, 'icon-document');
 });
 
-test('can create a document type with a template using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a document type with a template using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypesMenu();
@@ -61,7 +61,7 @@ test('can create a document type with a template using create options', async ({
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
 });
 
-test('can create a element type using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a element type using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.documentType.clickDocumentTypesMenu();
 
@@ -82,7 +82,7 @@ test('can create a element type using create options', async ({umbracoApi, umbra
   await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveIcon(documentTypeName, 'icon-plugin');
 });
 
-test('can create a document type folder using create options', async ({umbracoApi, umbracoUi}) => {
+test('can create a document type folder using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.documentType.clickDocumentTypesMenu();
 

@@ -85,7 +85,7 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false, false);
 });
 
-test('can set a template as master template', async ({umbracoApi, umbracoUi}) => {
+test('can set a template as master template', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childTemplateName = 'ChildTemplate';
   await umbracoApi.template.ensureNameNotExists(childTemplateName);

@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const dataTypeName = 'List View - Media';
 let dataTypeDefaultData = null;
@@ -96,7 +96,7 @@ test('can disable one view in the media section', async ({umbracoApi, umbracoUi}
   await umbracoUi.media.isMediaGridViewVisible(false);
 });
 
-test('can allow bulk trash in the media section', async ({umbracoApi, umbracoUi}) => {
+test('can allow bulk trash in the media section', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoUi.media.selectMediaWithName(firstMediaFileName);
