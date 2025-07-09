@@ -1,7 +1,6 @@
-import { UMB_MODAL_MANAGER_CONTEXT } from '../../modal/context/modal-manager.context.js';
 import type { UmbAuthFlow } from '../auth-flow.js';
 import type { UmbAuthContext } from '../auth.context.js';
-import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/index.js';
+import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/umb-auth-timeout-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
@@ -28,7 +27,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				host.timeOut();
 			} else if (event.data?.command === 'refreshToken') {
 				// If the worker signals a token refresh, we let the user decide whether to continue or logout
-				this.#timeoutModal(event.data.secondsUntilLogout);
+				this.#openTimeoutModal(event.data.secondsUntilLogout);
 			}
 		};
 
@@ -57,8 +56,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				});
 
 				// Close the modal if it is open
-				const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-				modalManager?.close('auth-timeout');
+				await this.#closeTimeoutModal();
 			},
 			'_authFlowTimeoutSignal',
 		);
@@ -70,8 +68,15 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		this.#tokenCheckWorker = undefined;
 	}
 
-	async #timeoutModal(remainingTimeInSeconds: number) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+	async #closeTimeoutModal() {
+		const contextToken = (await import('@umbraco-cms/backoffice/modal')).UMB_MODAL_MANAGER_CONTEXT;
+		const modalManager = await this.getContext(contextToken);
+		modalManager?.close('auth-timeout');
+	}
+
+	async #openTimeoutModal(remainingTimeInSeconds: number) {
+		const contextToken = (await import('@umbraco-cms/backoffice/modal')).UMB_MODAL_MANAGER_CONTEXT;
+		const modalManager = await this.getContext(contextToken);
 		modalManager
 			?.open(this, UMB_MODAL_AUTH_TIMEOUT, {
 				modal: {

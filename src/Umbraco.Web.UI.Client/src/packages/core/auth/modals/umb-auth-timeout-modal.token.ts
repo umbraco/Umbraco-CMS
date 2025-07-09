@@ -1,4 +1,4 @@
-import { UmbModalToken } from '../../modal/token/index.js';
+import { UmbModalToken } from '../../modal/token/modal-token.js';
 
 export type UmbModalAuthTimeoutConfig = {
 	remainingTimeInSeconds: number;
