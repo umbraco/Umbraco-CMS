@@ -1,7 +1,7 @@
+import { UmbModalBaseElement } from '../../modal/index.js';
 import type { UmbModalAuthTimeoutConfig } from './umb-auth-timeout-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-auth-timeout-modal')
