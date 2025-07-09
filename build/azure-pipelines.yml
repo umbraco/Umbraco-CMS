@@ -703,13 +703,13 @@ stages:
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --grep \"@smoke|@release\" --shard=1/3"
+              testCommand: "npm run test -- --grep --% \"@smoke^|@release\" --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --grep \"@smoke|@release\" --shard=2/3"
+              testCommand: "npm run test -- --grep --% \"@smoke^|@release\" --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --grep \"@smoke|@release\" --shard=3/3"
+              testCommand: "npm run test -- --grep --% \"@smoke^|@release\" --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
