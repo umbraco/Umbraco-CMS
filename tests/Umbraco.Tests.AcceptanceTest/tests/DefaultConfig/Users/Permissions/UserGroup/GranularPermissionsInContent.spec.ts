@@ -27,6 +27,7 @@ const documentBlueprintName = 'TestBlueprintName';
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
+// User Group
 const userGroupName = 'TestUserGroup';
 let userGroupId = null;
 
