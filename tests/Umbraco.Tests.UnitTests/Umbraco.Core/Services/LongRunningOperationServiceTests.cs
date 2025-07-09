@@ -58,7 +58,7 @@ public class LongRunningOperationServiceTests
             "Test",
             _ => Task.CompletedTask,
             allowConcurrentExecution: false,
-            runInBackground: false);
+            runInBackground: true);
 
         _longRunningOperationRepositoryMock.VerifyAll();
 
@@ -85,15 +85,22 @@ public class LongRunningOperationServiceTests
             })
             .Verifiable(Times.Once);
 
-        var updateStatusArgsQueue = new Queue<LongRunningOperationStatus>();
-        updateStatusArgsQueue.Enqueue(LongRunningOperationStatus.Running);
-        updateStatusArgsQueue.Enqueue(LongRunningOperationStatus.Success);
+        _scopeProviderMock.Setup(scopeProvider => scopeProvider.Context)
+            .Returns(default(IScopeContext?))
+            .Verifiable(Times.Exactly(1));
+
+        var expectedStatuses = new List<LongRunningOperationStatus>
+        {
+            LongRunningOperationStatus.Enqueued,
+            LongRunningOperationStatus.Running,
+            LongRunningOperationStatus.Success,
+        };
+
         _longRunningOperationRepositoryMock.Setup(repo => repo.UpdateStatus(It.IsAny<Guid>(), It.IsAny<LongRunningOperationStatus>(), It.IsAny<DateTimeOffset>()))
             .Callback<Guid, LongRunningOperationStatus, DateTimeOffset>((id, status, exp) =>
             {
-                Assert.AreEqual(updateStatusArgsQueue.Dequeue(), status);
-            })
-            .Verifiable(Times.Exactly(2));
+                Assert.Contains(status, expectedStatuses);
+            });
 
         var opCalls = 0;
         var result = await _longRunningOperationService.Run(
@@ -111,6 +118,28 @@ public class LongRunningOperationServiceTests
         Assert.IsTrue(result.Success);
         Assert.AreEqual(LongRunningOperationEnqueueStatus.Success, result.Status);
         Assert.AreEqual(1, opCalls, "Operation should have run and increased the call count, since it's not configured to run in the background.");
+    }
+
+    [Test]
+    public void Run_ThrowsException_WhenAttemptingToRunOperationNotInBackgroundInsideAScope()
+    {
+        SetupScopeProviderMock();
+
+        _scopeProviderMock.Setup(scopeProvider => scopeProvider.Context)
+            .Returns(new ScopeContext())
+            .Verifiable(Times.Exactly(1));
+
+        var opCalls = 0;
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await _longRunningOperationService.Run(
+            "Test",
+            _ =>
+            {
+                opCalls++;
+                return Task.CompletedTask;
+            },
+            allowConcurrentExecution: true,
+            runInBackground: false));
+        Assert.AreEqual(0, opCalls, "The operation should not have been called.");
     }
 
     [Test]

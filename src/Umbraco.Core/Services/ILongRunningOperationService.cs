@@ -16,7 +16,7 @@ public interface ILongRunningOperationService
     /// <param name="allowConcurrentExecution">Whether to allow multiple instances of the same operation type to run concurrently.</param>
     /// <param name="runInBackground">Whether to run the operation in the background.</param>
     /// <returns>An <see cref="Attempt{TStatus}"/> indicating the status of the enqueue operation.</returns>
-    /// <remarks>Be aware that the current context will not flow to the operation.</remarks>
+    /// <exception cref="InvalidOperationException">Thrown if attempting to run an operation in the foreground within a scope.</exception>
     Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run(
         string type,
         Func<CancellationToken, Task> operation,
@@ -32,7 +32,7 @@ public interface ILongRunningOperationService
     /// <param name="runInBackground">Whether to run the operation in the background.</param>
     /// <returns>An <see cref="Attempt{TStatus}"/> indicating the status of the enqueue operation.</returns>
     /// <typeparam name="T">The type of the result expected from the operation.</typeparam>
-    /// <remarks>Be aware that the current context will not flow to the operation.</remarks>
+    /// <exception cref="InvalidOperationException">Thrown if attempting to run an operation in the foreground within a scope.</exception>
     Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run<T>(
         string type,
         Func<CancellationToken, Task<T>> operation,

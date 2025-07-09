@@ -25,6 +25,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
     /// <param name="backgroundTaskQueue">The background task queue to use for enqueuing long-running operations.</param>
     /// <param name="repository">The repository for tracking long-running operations.</param>
     /// <param name="scopeProvider">The scope provider for managing database transactions.</param>
+    /// <param name="timeProvider">The time provider for getting the current UTC time.</param>
     /// <param name="logger">The logger for logging information and errors related to long-running operations.</param>
     public LongRunningOperationService(
         IBackgroundTaskQueue backgroundTaskQueue,
@@ -114,6 +115,11 @@ internal class LongRunningOperationService : ILongRunningOperationService
         bool runInBackground = true,
         CancellationToken cancellationToken = default)
     {
+        if (!runInBackground && _scopeProvider.Context is not null)
+        {
+            throw new InvalidOperationException("Long running operations cannot be executed in the foreground within an existing scope.");
+        }
+
         Guid operationId;
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
@@ -157,11 +163,6 @@ internal class LongRunningOperationService : ILongRunningOperationService
         }
         else
         {
-            if (_scopeProvider.Context is not null)
-            {
-                throw new InvalidOperationException("Long running operations cannot be executed in the foreground within an existing scope.");
-            }
-
             await RunOperation(
                  operationId,
                  type,
