@@ -66,11 +66,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     {
         Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.Run(
                 RebuildOperationName,
-                _ =>
-                {
-                    PerformRebuild();
-                    return Task.CompletedTask;
-                },
+                _ => PerformRebuild(),
                 runInBackground: useBackgroundThread);
 
         if (attempt.Success)
@@ -86,11 +82,21 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         };
     }
 
-    private void PerformRebuild()
+    private Task PerformRebuild()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         _databaseCacheRepository.Rebuild();
+
+        // If the serializer type has changed, we also need to update it in the key value store.
+        var currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
+        if (!Enum.TryParse(currentSerializerValue, out NuCacheSerializerType currentSerializer) ||
+            _nucacheSettings.Value.NuCacheSerializerType != currentSerializer)
+        {
+            _keyValueService.SetValue(NuCacheSerializerKey, _nucacheSettings.Value.NuCacheSerializerType.ToString());
+        }
+
         scope.Complete();
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
@@ -100,9 +106,12 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     /// <inheritdoc/>
     public async Task RebuildDatabaseCacheIfSerializerChangedAsync()
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         NuCacheSerializerType serializer = _nucacheSettings.Value.NuCacheSerializerType;
-        var currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
+        string? currentSerializerValue;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
+        }
 
         if (Enum.TryParse(currentSerializerValue, out NuCacheSerializerType currentSerializer) && serializer == currentSerializer)
         {
@@ -117,9 +126,6 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         using (_profilingLogger.TraceDuration<DatabaseCacheRebuilder>($"Rebuilding database cache with {serializer} serializer"))
         {
             await RebuildAsync(false);
-            _keyValueService.SetValue(NuCacheSerializerKey, serializer.ToString());
         }
-
-        scope.Complete();
     }
 }

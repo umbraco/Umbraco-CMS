@@ -46,7 +46,13 @@ public class QueuedHostedService : BackgroundService
 
             try
             {
-                await workItem(stoppingToken);
+                Task task;
+                using (ExecutionContext.SuppressFlow())
+                {
+                    task = Task.Run(async () => await workItem(stoppingToken), stoppingToken);
+                }
+
+                await task;
             }
             catch (Exception ex)
             {

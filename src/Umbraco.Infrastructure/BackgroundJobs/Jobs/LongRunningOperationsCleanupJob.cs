@@ -10,6 +10,7 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILongRunningOperationRepository _longRunningOperationRepository;
+    private readonly TimeProvider _timeProvider;
 
     private readonly TimeSpan _deleteTime = TimeSpan.FromDays(1);
 
@@ -20,10 +21,12 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
     /// <param name="longRunningOperationRepository">The repository for managing long-running operations.</param>
     public LongRunningOperationsCleanupJob(
         ICoreScopeProvider scopeProvider,
-        ILongRunningOperationRepository longRunningOperationRepository)
+        ILongRunningOperationRepository longRunningOperationRepository,
+        TimeProvider timeProvider)
     {
         _scopeProvider = scopeProvider;
         _longRunningOperationRepository = longRunningOperationRepository;
+        _timeProvider = timeProvider;
     }
 
     /// <inheritdoc />
@@ -43,7 +46,7 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
     public Task RunJobAsync()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _longRunningOperationRepository.CleanOperations(_deleteTime);
+        _longRunningOperationRepository.CleanOperations(_timeProvider.GetUtcNow() - _deleteTime);
         scope.Complete();
         return Task.CompletedTask;
     }

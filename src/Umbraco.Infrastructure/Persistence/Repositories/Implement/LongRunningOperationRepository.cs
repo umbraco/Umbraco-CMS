@@ -1,5 +1,4 @@
 using NPoco;
-using NPoco.Expressions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -16,18 +15,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOperationRepository
 {
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly TimeProvider _timeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LongRunningOperationRepository"/> class.
+    /// </summary>
     public LongRunningOperationRepository(
         IJsonSerializer jsonSerializer,
         IScopeAccessor scopeAccessor,
-        AppCaches appCaches)
-        : base(scopeAccessor, appCaches) =>
+        AppCaches appCaches,
+        TimeProvider timeProvider)
+        : base(scopeAccessor, appCaches)
+    {
         _jsonSerializer = jsonSerializer;
+        _timeProvider = timeProvider;
+    }
 
     /// <inheritdoc/>
-    public void Create(LongRunningOperation operation, TimeSpan expiryTimeout)
+    public void Create(LongRunningOperation operation, DateTimeOffset expirationDate)
     {
-        LongRunningOperationDto dto = MapEntityToDto(operation, expiryTimeout);
+        LongRunningOperationDto dto = MapEntityToDto(operation, expirationDate);
         Database.Insert(dto);
     }
 
@@ -58,7 +65,6 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     /// <inheritdoc/>
     public IEnumerable<LongRunningOperation> GetByType(string type, LongRunningOperationStatus[] statuses)
     {
-        IEnumerable<string> statusList = statuses.Select(s => s.ToString());
         Sql<ISqlContext> sql = Sql()
             .Select<LongRunningOperationDto>()
             .From<LongRunningOperationDto>()
@@ -66,7 +72,14 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
 
         if (statuses.Length > 0)
         {
-            sql = sql.Where<LongRunningOperationDto>(x => statusList.Contains(x.Status));
+            bool includeStale = statuses.Contains(LongRunningOperationStatus.Stale);
+            string[] possibleStaleStatuses = [nameof(LongRunningOperationStatus.Enqueued), nameof(LongRunningOperationStatus.Running)];
+            IEnumerable<string> statusList = statuses.Except([LongRunningOperationStatus.Stale]).Select(s => s.ToString());
+
+            DateTime now = _timeProvider.GetUtcNow().UtcDateTime;
+            sql = sql.Where<LongRunningOperationDto>(x =>
+                (statusList.Contains(x.Status) && (!possibleStaleStatuses.Contains(x.Status) || x.ExpirationDate >= now))
+                || (includeStale && possibleStaleStatuses.Contains(x.Status) && x.ExpirationDate < now));
         }
 
         IEnumerable<LongRunningOperationDto> dtos = Database.Query<LongRunningOperationDto>(sql);
@@ -85,13 +98,13 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     }
 
     /// <inheritdoc/>
-    public void UpdateStatus(Guid id, LongRunningOperationStatus status, TimeSpan expiryTimeout)
+    public void UpdateStatus(Guid id, LongRunningOperationStatus status, DateTimeOffset expirationTime)
     {
         Sql<ISqlContext> sql = Sql()
             .Update<LongRunningOperationDto>(x => x
                 .Set(y => y.Status, status.ToString())
                 .Set(y => y.UpdateDate, DateTime.UtcNow)
-                .Set(y => y.ExpireDate, DateTime.UtcNow + expiryTimeout))
+                .Set(y => y.ExpirationDate, expirationTime.DateTime))
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
         Database.Execute(sql);
@@ -110,22 +123,8 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     }
 
     /// <inheritdoc/>
-    public void CleanOperations(TimeSpan maxAgeOfOperations)
+    public void CleanOperations(DateTimeOffset olderThan)
     {
-        // Set operations that have expired and are still marked as enqueued or running to Failed status
-        DateTime now = DateTime.UtcNow;
-        Sql<ISqlContext> sql1 = Sql()
-            .Update<LongRunningOperationDto>(x => x
-                .Set(y => y.Status, nameof(LongRunningOperationStatus.Failed))
-                .Set(y => y.UpdateDate, now))
-            .Where<LongRunningOperationDto>(x =>
-                x.ExpireDate < now
-                && (x.Status == nameof(LongRunningOperationStatus.Enqueued) || x.Status == nameof(LongRunningOperationStatus.Running)));
-
-        Database.Execute(sql1);
-
-        // Delete operations that haven't been updated for longer than the specified max age
-        DateTime olderThan = now - maxAgeOfOperations;
         Sql<ISqlContext> sql2 = Sql()
             .Delete<LongRunningOperationDto>()
             .Where<LongRunningOperationDto>(x => x.UpdateDate < olderThan);
@@ -133,43 +132,44 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
         Database.Execute(sql2);
     }
 
+    private LongRunningOperation MapDtoToEntity(LongRunningOperationDto dto) =>
+        new()
+        {
+            Id = dto.Id,
+            Type = dto.Type,
+            Status = DetermineStatus(dto),
+        };
+
+    private static LongRunningOperationDto MapEntityToDto(LongRunningOperation entity, DateTimeOffset expirationTime) =>
+        new()
+        {
+            Id = entity.Id,
+            Type = entity.Type,
+            Status = entity.Status.ToString(),
+            CreateDate = DateTime.UtcNow,
+            UpdateDate = DateTime.UtcNow,
+            ExpirationDate = expirationTime.UtcDateTime,
+        };
+
     private LongRunningOperation<T> MapDtoToEntity<T>(LongRunningOperationDto dto) =>
         new()
         {
             Id = dto.Id,
             Type = dto.Type,
-            Status = dto.Status.EnumParse<LongRunningOperationStatus>(false),
+            Status = DetermineStatus(dto),
             Result = dto.Result == null ? default : _jsonSerializer.Deserialize<T>(dto.Result),
         };
 
-    private static LongRunningOperation MapDtoToEntity(LongRunningOperationDto dto) =>
-        new()
+    private LongRunningOperationStatus DetermineStatus(LongRunningOperationDto dto)
+    {
+        LongRunningOperationStatus status = dto.Status.EnumParse<LongRunningOperationStatus>(false);
+        DateTimeOffset now = _timeProvider.GetUtcNow();
+        if (status is LongRunningOperationStatus.Enqueued or LongRunningOperationStatus.Running
+            && now.UtcDateTime >= dto.ExpirationDate)
         {
-            Id = dto.Id,
-            Type = dto.Type,
-            Status = dto.Status.EnumParse<LongRunningOperationStatus>(false),
-        };
+            status = LongRunningOperationStatus.Stale;
+        }
 
-    private static LongRunningOperationDto MapEntityToDto(LongRunningOperation entity, TimeSpan expires) =>
-        new()
-        {
-            Id = entity.Id,
-            Type = entity.Type,
-            Status = entity.Status.ToString(),
-            CreateDate = DateTime.UtcNow,
-            UpdateDate = DateTime.UtcNow,
-            ExpireDate = DateTime.UtcNow + expires,
-        };
-
-    private LongRunningOperationDto MapEntityToDto<T>(LongRunningOperation<T> entity, TimeSpan expires) =>
-        new()
-        {
-            Id = entity.Id,
-            Type = entity.Type,
-            Status = entity.Status.ToString(),
-            CreateDate = DateTime.UtcNow,
-            UpdateDate = DateTime.UtcNow,
-            ExpireDate = DateTime.UtcNow + expires,
-            Result = entity.Result == null ? null : _jsonSerializer.Serialize(entity.Result),
-        };
+        return status;
+    }
 }

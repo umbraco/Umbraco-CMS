@@ -39,7 +39,7 @@ internal class LongRunningOperationDto
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime UpdateDate { get; set; } = DateTime.UtcNow;
 
-    [Column("expireDate", ForceToUtc = false)]
+    [Column("expirationDate", ForceToUtc = false)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    public DateTime ExpireDate { get; set; }
+    public DateTime ExpirationDate { get; set; }
 }

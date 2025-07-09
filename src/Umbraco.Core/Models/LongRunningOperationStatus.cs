@@ -24,4 +24,9 @@ public enum LongRunningOperationStatus
     /// The operation is currently running.
     /// </summary>
     Running,
+
+    /// <summary>
+    /// The operation wasn't updated within the expected time frame and is considered stale.
+    /// </summary>
+    Stale,
 }

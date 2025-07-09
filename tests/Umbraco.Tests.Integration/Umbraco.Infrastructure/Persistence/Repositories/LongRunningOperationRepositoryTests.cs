@@ -1,9 +1,7 @@
 using System.Data.Common;
-using Bogus;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -37,47 +35,33 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         CreateTestData(repository);
 
         var testOperation = _operations[1];
-        var result = repository.Get(testOperation.Id);
+        var result = repository.Get(testOperation.Operation.Id);
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(testOperation.Id, result.Id);
-        Assert.AreEqual(testOperation.Type, result.Type);
-        Assert.AreEqual(testOperation.Status, result.Status);
+        Assert.AreEqual(testOperation.Operation.Id, result.Id);
+        Assert.AreEqual(testOperation.Operation.Type, result.Type);
+        Assert.AreEqual(testOperation.Operation.Status, result.Status);
     }
 
-    [Test]
-    public void GetByType_ReturnsOperationsOfType()
+    [TestCase("Test", new LongRunningOperationStatus[] { }, 5)]
+    [TestCase("Test", new[] { LongRunningOperationStatus.Enqueued }, 1)]
+    [TestCase("Test", new[] { LongRunningOperationStatus.Running }, 1)]
+    [TestCase("Test", new[] { LongRunningOperationStatus.Enqueued, LongRunningOperationStatus.Running }, 2)]
+    [TestCase("Test", new[] { LongRunningOperationStatus.Stale }, 1)]
+    [TestCase("Test", new[] { LongRunningOperationStatus.Running, LongRunningOperationStatus.Stale }, 2)]
+    [TestCase("Test", new[] { LongRunningOperationStatus.Success, LongRunningOperationStatus.Stale }, 2)]
+    [TestCase("AnotherTest", new LongRunningOperationStatus[] { }, 1)]
+    public void GetByType_ReturnsExpectedOperations(string type, LongRunningOperationStatus[] statuses, int expectedCount)
     {
         var provider = ScopeProvider;
         using var scope = provider.CreateScope();
         var repository = CreateRepository(provider);
         CreateTestData(repository);
 
-        var testOperation = _operations[1];
-        var result = repository.GetByType(testOperation.Type, []).ToList();
+        var result = repository.GetByType(type, statuses).ToList();
 
         Assert.IsNotNull(result);
-        Assert.AreEqual(2, result.Count);
-        Assert.IsTrue(result.All(o => o.Type == testOperation.Type));
-    }
-
-    [Test]
-    public void GetByType_ReturnsFilteredOperationsOfType_WhenFilterIsProvided()
-    {
-        var provider = ScopeProvider;
-        using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
-        CreateTestData(repository);
-
-        var testOperation = _operations[1];
-        var result = repository.GetByType(testOperation.Type, [LongRunningOperationStatus.Running]).ToList();
-
-        var expectedOperations = _operations
-            .Where(o => o.Type == testOperation.Type && o.Status == LongRunningOperationStatus.Running)
-            .ToList();
-        Assert.IsNotNull(result);
-        Assert.AreEqual(expectedOperations.Count, result.Count);
-        Assert.IsTrue(expectedOperations.All(o1 => result.Any(o2 => o1.Id == o2.Id)));
+        Assert.AreEqual(expectedCount, result.Count);
     }
 
     [Test]
@@ -100,8 +84,8 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         var repository = CreateRepository(provider);
         CreateTestData(repository);
 
-        var result = repository.GetStatus(_operations[0].Id);
-        Assert.AreEqual(_operations[0].Status, result);
+        var result = repository.GetStatus(_operations[0].Operation.Id);
+        Assert.AreEqual(_operations[0].Operation.Status, result);
     }
 
     [Test]
@@ -118,7 +102,7 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
             Type = "NewTest",
             Status = LongRunningOperationStatus.Enqueued,
         };
-        repository.Create(newOperation, TimeSpan.FromMinutes(5));
+        repository.Create(newOperation, DateTimeOffset.UtcNow.AddMinutes(5));
 
         var result = repository.Get(newOperation.Id);
         Assert.IsNotNull(result);
@@ -137,11 +121,11 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
 
         var newOperation = new LongRunningOperation
         {
-            Id = _operations[0].Id,
+            Id = _operations[0].Operation.Id,
             Type = "NewTest",
             Status = LongRunningOperationStatus.Enqueued,
         };
-        Assert.Throws(Is.InstanceOf<DbException>(), () => repository.Create(newOperation, TimeSpan.FromMinutes(5)));
+        Assert.Throws(Is.InstanceOf<DbException>(), () => repository.Create(newOperation, DateTimeOffset.UtcNow.AddMinutes(5)));
     }
 
     [Test]
@@ -153,9 +137,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         CreateTestData(repository);
 
         var testOperation = _operations[1];
-        repository.UpdateStatus(testOperation.Id, LongRunningOperationStatus.Failed, TimeSpan.Zero);
+        repository.UpdateStatus(testOperation.Operation.Id, LongRunningOperationStatus.Failed, DateTimeOffset.UtcNow);
 
-        var result = repository.Get(testOperation.Id);
+        var result = repository.Get(testOperation.Operation.Id);
         Assert.IsNotNull(result);
         Assert.AreEqual(LongRunningOperationStatus.Failed, result.Status);
     }
@@ -170,41 +154,12 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
 
         var testOperation = _operations[1];
         var opResult = new LongRunningOperationResult { Result = true };
-        repository.SetResult(testOperation.Id, opResult);
+        repository.SetResult(testOperation.Operation.Id, opResult);
 
-        var result = repository.Get<LongRunningOperationResult>(testOperation.Id);
+        var result = repository.Get<LongRunningOperationResult>(testOperation.Operation.Id);
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.Result);
         Assert.AreEqual(opResult.Result, result.Result.Result);
-    }
-
-    [Test]
-    public async Task CleanOperations_MarksOperationsAsFailedIfExpired()
-    {
-        var provider = ScopeProvider;
-        using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
-        CreateTestData(repository);
-
-        // Create an expired operation
-        var expiredOperation = new LongRunningOperation
-        {
-            Id = Guid.NewGuid(),
-            Type = "ExpiredTest",
-            Status = LongRunningOperationStatus.Running,
-        };
-        repository.Create(expiredOperation, TimeSpan.FromMinutes(-5));
-
-        // Check that the expired operation is present before cleaning
-        var result = repository.Get(expiredOperation.Id);
-        Assert.IsNotNull(result);
-
-        repository.CleanOperations(TimeSpan.Zero);
-
-        // Check that the expired operation is removed after cleaning
-        result = repository.Get(expiredOperation.Id);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(LongRunningOperationStatus.Failed, result.Status);
     }
 
     [Test]
@@ -220,27 +175,42 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         var oldOperation = _operations[0];
 
         // Check that the operation is present before cleaning
-        var result = repository.Get(oldOperation.Id);
+        var result = repository.Get(oldOperation.Operation.Id);
         Assert.IsNotNull(result);
 
-        repository.CleanOperations(TimeSpan.FromSeconds(2));
+        repository.CleanOperations(DateTimeOffset.UtcNow.AddSeconds(-2));
 
         // Check that the expired operation is removed after cleaning
-        result = repository.Get(oldOperation.Id);
+        result = repository.Get(oldOperation.Operation.Id);
         Assert.IsNull(result);
     }
 
     private LongRunningOperationRepository CreateRepository(IScopeProvider provider)
-        => new(GetRequiredService<IJsonSerializer>(), (IScopeAccessor)provider, AppCaches.Disabled);
+        => new(GetRequiredService<IJsonSerializer>(), (IScopeAccessor)provider, AppCaches.Disabled, TimeProvider.System);
 
-    private void CreateTestData(ILongRunningOperationRepository repository) =>
-        _operations.ForEach(op => repository.Create(op, TimeSpan.FromMinutes(5)));
+    private void CreateTestData(LongRunningOperationRepository repository) =>
+        _operations.ForEach(op => repository.Create(op.Operation, op.ExpiresIn));
 
-    private readonly List<LongRunningOperation> _operations =
+    private readonly List<(LongRunningOperation Operation, DateTimeOffset ExpiresIn)> _operations =
     [
-        new() { Id = Guid.NewGuid(), Type = "Test", Status = LongRunningOperationStatus.Success },
-        new() { Id = Guid.NewGuid(), Type = "Test", Status = LongRunningOperationStatus.Running },
-        new() { Id = Guid.NewGuid(), Type = "AnotherTest", Status = LongRunningOperationStatus.Success, }
+        (
+            Operation: new LongRunningOperation { Id = Guid.NewGuid(), Type = "Test", Status = LongRunningOperationStatus.Success },
+            ExpiresIn: DateTimeOffset.UtcNow.AddMinutes(5)),
+        (
+            Operation: new LongRunningOperation { Id = Guid.NewGuid(), Type = "Test", Status = LongRunningOperationStatus.Enqueued },
+            ExpiresIn: DateTimeOffset.UtcNow.AddMinutes(5)),
+        (
+            Operation: new LongRunningOperation { Id = Guid.NewGuid(), Type = "Test", Status = LongRunningOperationStatus.Running },
+            ExpiresIn: DateTimeOffset.UtcNow.AddMinutes(5)),
+        (
+            Operation: new LongRunningOperation { Id = Guid.NewGuid(), Type = "Test", Status = LongRunningOperationStatus.Running },
+            ExpiresIn: DateTimeOffset.UtcNow.AddMinutes(-1)),
+        (
+            Operation: new LongRunningOperation { Id = Guid.NewGuid(), Type = "Test", Status = LongRunningOperationStatus.Failed },
+            ExpiresIn: DateTimeOffset.UtcNow.AddMinutes(-1)),
+        (
+            Operation: new LongRunningOperation { Id = Guid.NewGuid(), Type = "AnotherTest", Status = LongRunningOperationStatus.Success, },
+            ExpiresIn: DateTimeOffset.UtcNow.AddMinutes(5)),
     ];
 
     private class LongRunningOperationResult
@@ -248,4 +218,3 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         public bool Result { get; init; }
     }
 }
-

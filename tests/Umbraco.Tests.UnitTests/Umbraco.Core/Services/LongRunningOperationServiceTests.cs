@@ -2,7 +2,6 @@ using System.Data;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
@@ -20,6 +19,7 @@ public class LongRunningOperationServiceTests
     private Mock<ICoreScopeProvider> _scopeProviderMock;
     private Mock<IBackgroundTaskQueue> _backgroundTaskQueueMock;
     private Mock<ILongRunningOperationRepository> _longRunningOperationRepositoryMock;
+    private Mock<TimeProvider> _timeProviderMock;
     private Mock<ICoreScope> _scopeMock;
 
     [SetUp]
@@ -28,12 +28,14 @@ public class LongRunningOperationServiceTests
         _scopeProviderMock = new Mock<ICoreScopeProvider>(MockBehavior.Strict);
         _backgroundTaskQueueMock = new Mock<IBackgroundTaskQueue>(MockBehavior.Strict);
         _longRunningOperationRepositoryMock = new Mock<ILongRunningOperationRepository>(MockBehavior.Strict);
+        _timeProviderMock = new Mock<TimeProvider>(MockBehavior.Strict);
         _scopeMock = new Mock<ICoreScope>();
 
         _longRunningOperationService = new LongRunningOperationService(
             _backgroundTaskQueueMock.Object,
             _longRunningOperationRepositoryMock.Object,
             _scopeProviderMock.Object,
+            _timeProviderMock.Object,
             Mock.Of<ILogger<LongRunningOperationService>>());
     }
 
@@ -67,27 +69,29 @@ public class LongRunningOperationServiceTests
     [Test]
     public async Task Run_CreatesAndRunsOperation_WhenNotInBackground()
     {
-        var expires = TimeSpan.FromMinutes(10);
         SetupScopeProviderMock();
+
+        _timeProviderMock.Setup(repo => repo.GetUtcNow())
+            .Returns(() => DateTime.UtcNow)
+            .Verifiable(Times.Exactly(2));
+
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.Create(It.IsAny<LongRunningOperation>(), It.IsAny<TimeSpan>()))
-            .Callback<LongRunningOperation, TimeSpan>((op, exp) =>
+            .Setup(repo => repo.Create(It.IsAny<LongRunningOperation>(), It.IsAny<DateTimeOffset>()))
+            .Callback<LongRunningOperation, DateTimeOffset>((op, exp) =>
             {
                 Assert.AreEqual("Test", op.Type);
                 Assert.IsNotNull(op.Id);
                 Assert.AreEqual(LongRunningOperationStatus.Enqueued, op.Status);
-                Assert.AreEqual(expires, exp);
             })
             .Verifiable(Times.Once);
 
         var updateStatusArgsQueue = new Queue<LongRunningOperationStatus>();
         updateStatusArgsQueue.Enqueue(LongRunningOperationStatus.Running);
         updateStatusArgsQueue.Enqueue(LongRunningOperationStatus.Success);
-        _longRunningOperationRepositoryMock.Setup(repo => repo.UpdateStatus(It.IsAny<Guid>(), It.IsAny<LongRunningOperationStatus>(), It.IsAny<TimeSpan>()))
-            .Callback<Guid, LongRunningOperationStatus, TimeSpan>((id, status, exp) =>
+        _longRunningOperationRepositoryMock.Setup(repo => repo.UpdateStatus(It.IsAny<Guid>(), It.IsAny<LongRunningOperationStatus>(), It.IsAny<DateTimeOffset>()))
+            .Callback<Guid, LongRunningOperationStatus, DateTimeOffset>((id, status, exp) =>
             {
                 Assert.AreEqual(updateStatusArgsQueue.Dequeue(), status);
-                Assert.AreEqual(expires, exp);
             })
             .Verifiable(Times.Exactly(2));
 
@@ -100,8 +104,7 @@ public class LongRunningOperationServiceTests
                 return Task.CompletedTask;
             },
             allowConcurrentExecution: true,
-            runInBackground: false,
-            expires);
+            runInBackground: false);
 
         _longRunningOperationRepositoryMock.VerifyAll();
 
@@ -113,16 +116,19 @@ public class LongRunningOperationServiceTests
     [Test]
     public async Task Run_CreatesAndQueuesOperation_WhenInBackground()
     {
-        var expires = TimeSpan.FromMinutes(10);
         SetupScopeProviderMock();
+
+        _timeProviderMock.Setup(repo => repo.GetUtcNow())
+            .Returns(() => DateTime.UtcNow)
+            .Verifiable(Times.Exactly(2));
+
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.Create(It.IsAny<LongRunningOperation>(), It.IsAny<TimeSpan>()))
-            .Callback<LongRunningOperation, TimeSpan>((op, exp) =>
+            .Setup(repo => repo.Create(It.IsAny<LongRunningOperation>(), It.IsAny<DateTimeOffset>()))
+            .Callback<LongRunningOperation, DateTimeOffset>((op, exp) =>
             {
                 Assert.AreEqual("Test", op.Type);
                 Assert.IsNotNull(op.Id);
                 Assert.AreEqual(LongRunningOperationStatus.Enqueued, op.Status);
-                Assert.AreEqual(expires, exp);
             })
             .Verifiable(Times.Once);
 
@@ -139,8 +145,7 @@ public class LongRunningOperationServiceTests
                 return Task.CompletedTask;
             },
             allowConcurrentExecution: true,
-            runInBackground: true,
-            expires);
+            runInBackground: true);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         _backgroundTaskQueueMock.VerifyAll();
