@@ -293,7 +293,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				align-items: center;
 				margin-bottom: var(--uui-size-layout-1);
 
-				uui-icon {
+				> uui-icon {
 					padding-left: var(--uui-size-space-3);
 				}
 			}
