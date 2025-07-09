@@ -1405,7 +1405,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		id: 'coffee-umbraco-demo-block-id',
 		alias: 'coffeeUmbracoDemoBlock',
 		name: 'Favorite Coffee',
-		description: null,
+		description: 'The delicious taste of coffee.',
 		icon: 'icon-coffee',
 		allowedAsRoot: true,
 		variesByCulture: false,
