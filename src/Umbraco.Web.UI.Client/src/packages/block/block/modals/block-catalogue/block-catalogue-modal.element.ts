@@ -86,33 +86,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		});
 
 		this.observe(this.#itemManager.items, async (items) => {
-			if (!items?.length) return;
-
-			const lookup = items.reduce(
-				(acc, item) => {
-					acc[item.unique] = item;
-					return acc;
-				},
-				{} as { [key: string]: UmbDocumentTypeItemModel },
-			);
-
-			const blocks: Array<UmbBlockTypeItemWithGroupKey> =
-				this.data?.blocks?.map((block) => ({ ...(lookup[block.contentElementTypeKey] ?? {}), ...block })) ?? [];
-
-			const blockGroups: Array<UmbBlockTypeGroup> = this.data?.blockGroups ?? [];
-
-			const noGroupBlocks = blocks.filter((block) => !blockGroups.find((group) => group.key === block.groupKey));
-
-			const grouped = blockGroups.map((group) => ({
-				name: group.name,
-				blocks: blocks.filter((block) => block.groupKey === group.key),
-			}));
-
-			this._groupedBlocks = [{ blocks: noGroupBlocks }, ...grouped];
-
-			this.#updateFiltered();
-
-			this._loading = false;
+			this.#observeBlockTypes(items);
 		});
 	}
 
@@ -123,6 +97,36 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		this._openClipboard = this.data.openClipboard ?? false;
 
 		this.#itemManager.setUniques(this.data.blocks.map((block) => block.contentElementTypeKey));
+	}
+
+	#observeBlockTypes(items: Array<UmbDocumentTypeItemModel> | undefined) {
+		if (!items?.length) return;
+
+		const lookup = items.reduce(
+			(acc, item) => {
+				acc[item.unique] = item;
+				return acc;
+			},
+			{} as { [key: string]: UmbDocumentTypeItemModel },
+		);
+
+		const blocks: Array<UmbBlockTypeItemWithGroupKey> =
+			this.data?.blocks?.map((block) => ({ ...(lookup[block.contentElementTypeKey] ?? {}), ...block })) ?? [];
+
+		const blockGroups: Array<UmbBlockTypeGroup> = this.data?.blockGroups ?? [];
+
+		const noGroupBlocks = blocks.filter((block) => !blockGroups.find((group) => group.key === block.groupKey));
+
+		const grouped = blockGroups.map((group) => ({
+			name: group.name,
+			blocks: blocks.filter((block) => block.groupKey === group.key),
+		}));
+
+		this._groupedBlocks = [{ blocks: noGroupBlocks }, ...grouped];
+
+		this.#updateFiltered();
+
+		this._loading = false;
 	}
 
 	#updateFiltered() {
