@@ -624,7 +624,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 						label: 'Mocked Block Type for Block List',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 						settingsElementTypeKey: 'all-property-editors-document-type-id',
-						icon: 'icon-server-alt',
+						iconColor: '#F5C1BC',
+						backgroundColor: '#1B264F',
 					},
 					{
 						label: 'Mocked Coffee Block',
@@ -632,7 +633,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 						iconColor: '#FFFDD0',
 						backgroundColor: '#633f32',
 						editorSize: 'medium',
-						icon: 'icon-coffee',
 					},
 					{
 						label: 'Headline',
@@ -640,25 +640,21 @@ export const data: Array<UmbMockDataTypeModel> = [
 						settingsElementTypeKey: 'headline-settings-demo-block-id',
 						backgroundColor: 'gold',
 						editorSize: 'medium',
-						icon: 'icon-edit',
 					},
 					{
 						label: 'Image',
 						contentElementTypeKey: 'image-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-picture',
 					},
 					{
 						label: 'Rich Text',
 						contentElementTypeKey: 'rich-text-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-diploma',
 					},
 					{
 						label: 'Two Column Layout',
 						contentElementTypeKey: 'two-column-layout-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-book-alt',
 					},
 				],
 			},
