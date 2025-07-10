@@ -290,7 +290,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
 
         _logger.LogInformation("Starting async background thread for publishing branch.");
-        Attempt<Guid, LongRunningOperationEnqueueStatus> enqueueAttempt = await _longRunningOperationService.Run(
+        Attempt<Guid, LongRunningOperationEnqueueStatus> enqueueAttempt = await _longRunningOperationService.RunAsync(
             PublishBranchOperationType,
             async _ => await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: false),
             allowConcurrentExecution: true);
@@ -370,14 +370,14 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
     /// <inheritdoc/>
     public async Task<bool> IsPublishingBranchAsync(Guid taskId)
-        => await _longRunningOperationService.GetStatus(taskId) is LongRunningOperationStatus.Enqueued or LongRunningOperationStatus.Running;
+        => await _longRunningOperationService.GetStatusAsync(taskId) is LongRunningOperationStatus.Enqueued or LongRunningOperationStatus.Running;
 
     /// <inheritdoc/>
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> GetPublishBranchResultAsync(Guid taskId)
     {
         Attempt<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>, LongRunningOperationResultStatus> result =
             await _longRunningOperationService
-                .GetResult<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>>(taskId);
+                .GetResultAsync<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>>(taskId);
 
         if (result.Success is false)
         {

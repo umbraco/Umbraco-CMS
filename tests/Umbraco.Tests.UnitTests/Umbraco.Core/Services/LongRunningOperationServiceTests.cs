@@ -55,7 +55,7 @@ public class LongRunningOperationServiceTests
                 })
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.Run(
+        var result = await _longRunningOperationService.RunAsync(
             "Test",
             _ => Task.CompletedTask,
             allowConcurrentExecution: false,
@@ -106,7 +106,7 @@ public class LongRunningOperationServiceTests
             .Returns(Task.CompletedTask);
 
         var opCalls = 0;
-        var result = await _longRunningOperationService.Run(
+        var result = await _longRunningOperationService.RunAsync(
             "Test",
             _ =>
             {
@@ -133,7 +133,7 @@ public class LongRunningOperationServiceTests
             .Verifiable(Times.Exactly(1));
 
         var opCalls = 0;
-        Assert.ThrowsAsync<InvalidOperationException>(async () => await _longRunningOperationService.Run(
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await _longRunningOperationService.RunAsync(
             "Test",
             _ =>
             {
@@ -165,7 +165,7 @@ public class LongRunningOperationServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.Run(
+        var result = await _longRunningOperationService.RunAsync(
             "Test",
             _ => Task.CompletedTask,
             allowConcurrentExecution: true,
@@ -187,7 +187,7 @@ public class LongRunningOperationServiceTests
             .ReturnsAsync(LongRunningOperationStatus.Running)
             .Verifiable(Times.Once);
 
-        var status = await _longRunningOperationService.GetStatus(operationId);
+        var status = await _longRunningOperationService.GetStatusAsync(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsTrue(status.HasValue);
@@ -204,7 +204,7 @@ public class LongRunningOperationServiceTests
             .ReturnsAsync((LongRunningOperationStatus?)null)
             .Verifiable(Times.Once);
 
-        var status = await _longRunningOperationService.GetStatus(operationId);
+        var status = await _longRunningOperationService.GetStatusAsync(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsFalse(status.HasValue);
@@ -236,7 +236,7 @@ public class LongRunningOperationServiceTests
                 })
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetByType(operationType, 0, 100);
+        var result = await _longRunningOperationService.GetByTypeAsync(operationType, 0, 100);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsNotNull(result);
@@ -269,7 +269,7 @@ public class LongRunningOperationServiceTests
                 })
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetByType(operationType, 0, 30, [LongRunningOperationStatus.Failed]);
+        var result = await _longRunningOperationService.GetByTypeAsync(operationType, 0, 30, [LongRunningOperationStatus.Failed]);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsNotNull(result);
@@ -297,7 +297,7 @@ public class LongRunningOperationServiceTests
                 })
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetResult<string>(operationId);
+        var result = await _longRunningOperationService.GetResultAsync<string>(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsTrue(result.Success);
@@ -315,7 +315,7 @@ public class LongRunningOperationServiceTests
             .ReturnsAsync(default(LongRunningOperation<string>))
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetResult<string>(operationId);
+        var result = await _longRunningOperationService.GetResultAsync<string>(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsFalse(result.Success);
@@ -340,7 +340,7 @@ public class LongRunningOperationServiceTests
                 })
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetResult<string>(operationId);
+        var result = await _longRunningOperationService.GetResultAsync<string>(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsFalse(result.Success);
@@ -365,7 +365,7 @@ public class LongRunningOperationServiceTests
                 })
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetResult<string>(operationId);
+        var result = await _longRunningOperationService.GetResultAsync<string>(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsFalse(result.Success);
@@ -390,7 +390,7 @@ public class LongRunningOperationServiceTests
                 })
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetResult<string>(operationId);
+        var result = await _longRunningOperationService.GetResultAsync<string>(operationId);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsFalse(result.Success);
