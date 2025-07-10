@@ -5,6 +5,7 @@ import type { UmbRoute } from './route.interface.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 
 const EmptyDiv = document.createElement('div');
@@ -14,6 +15,7 @@ type UmbRoutePlusModalKey = UmbRoute & { __modalKey: string };
 export class UmbRouteContext extends UmbContextBase {
 	#modalRouter: IRouterSlot;
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
+	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#modalRoutes: UmbRoutePlusModalKey[] = [];
 	#activeModalPath?: string;
 
@@ -29,7 +31,10 @@ export class UmbRouteContext extends UmbContextBase {
 	constructor(host: UmbControllerHost, mainRouter: IRouterSlot, modalRouter: IRouterSlot) {
 		super(host, UMB_ROUTE_CONTEXT);
 		this.#modalRouter = modalRouter;
-		this.#generateModalRoutes();
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
+			this.#modalContext = context;
+			this.#generateModalRoutes();
+		});
 	}
 
 	getBasePath() {
@@ -59,10 +64,12 @@ export class UmbRouteContext extends UmbContextBase {
 			path: '/' + modalRegistration.generateModalPath(),
 			component: EmptyDiv,
 			setup: async (component, info) => {
-				const modalContextToken = (await import('@umbraco-cms/backoffice/modal')).UMB_MODAL_MANAGER_CONTEXT;
-				const context = await this.getContext(modalContextToken);
-				if (!context) return;
-				const modalContext = await modalRegistration.routeSetup(this.#modalRouter, context, info.match.params);
+				if (!this.#modalContext) return;
+				const modalContext = await modalRegistration.routeSetup(
+					this.#modalRouter,
+					this.#modalContext,
+					info.match.params,
+				);
 				if (modalContext) {
 					modalContext._internal_setCurrentModalPath(info.match.fragments.consumed);
 				}
@@ -78,7 +85,7 @@ export class UmbRouteContext extends UmbContextBase {
 		}
 	}
 
-	async #generateModalRoutes() {
+	#generateModalRoutes() {
 		const newModals = this.#modalRegistrations.filter(
 			(x) => !this.#modalRoutes.find((route) => x.key === route.__modalKey),
 		);
@@ -86,11 +93,9 @@ export class UmbRouteContext extends UmbContextBase {
 			(route) => !this.#modalRegistrations.find((x) => x.key === route.__modalKey),
 		);
 		// If one the of the removed modals are active we should close it.
-		const modalContextToken = (await import('@umbraco-cms/backoffice/modal')).UMB_MODAL_MANAGER_CONTEXT;
-		const context = await this.getContext(modalContextToken);
 		routesToRemove.some((route) => {
 			if (route.path === this.#activeModalPath) {
-				context?.close(route.__modalKey);
+				this.#modalContext?.close(route.__modalKey);
 				return true;
 			}
 			return false;
@@ -131,7 +136,7 @@ export class UmbRouteContext extends UmbContextBase {
 	}
 
 	// Also notice each registration should now hold its handler when its active.
-	public async _internal_modalRouterChanged(activeModalPath: string | undefined) {
+	public _internal_modalRouterChanged(activeModalPath: string | undefined) {
 		if (this.#activeModalPath === activeModalPath) return;
 		if (this.#activeModalPath) {
 			// If if there is a modal using the old path.
@@ -139,9 +144,7 @@ export class UmbRouteContext extends UmbContextBase {
 				return '/' + registration.generateModalPath() === this.#activeModalPath;
 			});
 			if (activeModal) {
-				const modalContextToken = (await import('@umbraco-cms/backoffice/modal')).UMB_MODAL_MANAGER_CONTEXT;
-				const context = await this.getContext(modalContextToken);
-				context?.close(activeModal.key);
+				this.#modalContext?.close(activeModal.key);
 			}
 		}
 		this.#activeModalPath = activeModalPath;
