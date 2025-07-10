@@ -17,7 +17,7 @@ public interface ILongRunningOperationService
     /// <param name="runInBackground">Whether to run the operation in the background.</param>
     /// <returns>An <see cref="Attempt{TStatus}"/> indicating the status of the enqueue operation.</returns>
     /// <exception cref="InvalidOperationException">Thrown if attempting to run an operation in the foreground within a scope.</exception>
-    Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run(
+    Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> RunAsync(
         string type,
         Func<CancellationToken, Task> operation,
         bool allowConcurrentExecution = false,
@@ -33,7 +33,7 @@ public interface ILongRunningOperationService
     /// <returns>An <see cref="Attempt{TStatus}"/> indicating the status of the enqueue operation.</returns>
     /// <typeparam name="T">The type of the result expected from the operation.</typeparam>
     /// <exception cref="InvalidOperationException">Thrown if attempting to run an operation in the foreground within a scope.</exception>
-    Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run<T>(
+    Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> RunAsync<T>(
         string type,
         Func<CancellationToken, Task<T>> operation,
         bool allowConcurrentExecution = false,
@@ -44,7 +44,7 @@ public interface ILongRunningOperationService
     /// </summary>
     /// <param name="operationId">The unique identifier for the operation.</param>
     /// <returns>True if the operation is running or enqueued; otherwise, false.</returns>
-    Task<LongRunningOperationStatus?> GetStatus(Guid operationId);
+    Task<LongRunningOperationStatus?> GetStatusAsync(Guid operationId);
 
     /// <summary>
     /// Gets the active long-running operations of a specific type.
@@ -55,7 +55,7 @@ public interface ILongRunningOperationService
     /// <param name="statuses">Optional array of statuses to filter the operations by. If null, only enqueued and running
     /// operations are returned.</param>
     /// <returns>True if the operation is running or enqueued; otherwise, false.</returns>
-    Task<PagedModel<LongRunningOperation>> GetByType(
+    Task<PagedModel<LongRunningOperation>> GetByTypeAsync(
         string type,
         int skip,
         int take,
@@ -68,5 +68,5 @@ public interface ILongRunningOperationService
     /// <typeparam name="TResult">The type of the result expected from the operation.</typeparam>
     /// <returns>An <see cref="Attempt{TResult}"/> containing the result of the operation
     /// and its status. If the operation is not found or has not completed, the result will be null.</returns>
-    Task<Attempt<TResult?, LongRunningOperationResultStatus>> GetResult<TResult>(Guid operationId);
+    Task<Attempt<TResult?, LongRunningOperationResultStatus>> GetResultAsync<TResult>(Guid operationId);
 }

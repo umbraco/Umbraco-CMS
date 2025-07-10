@@ -37,7 +37,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
     }
 
     /// <inheritdoc />
-    public Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run(
+    public Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> RunAsync(
         string type,
         Func<CancellationToken, Task> operation,
         bool allowConcurrentExecution = false,
@@ -53,7 +53,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
             runInBackground);
 
     /// <inheritdoc />
-    public Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run<T>(
+    public Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> RunAsync<T>(
         string type,
         Func<CancellationToken, Task<T>> operation,
         bool allowConcurrentExecution = false,
@@ -65,14 +65,14 @@ internal class LongRunningOperationService : ILongRunningOperationService
             runInBackground);
 
     /// <inheritdoc/>
-    public async Task<LongRunningOperationStatus?> GetStatus(Guid operationId)
+    public async Task<LongRunningOperationStatus?> GetStatusAsync(Guid operationId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         return await _repository.GetStatusAsync(operationId);
     }
 
     /// <inheritdoc/>
-    public async Task<PagedModel<LongRunningOperation>> GetByType(
+    public async Task<PagedModel<LongRunningOperation>> GetByTypeAsync(
         string type,
         int skip,
         int take,
@@ -87,7 +87,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<TResult?, LongRunningOperationResultStatus>> GetResult<TResult>(Guid operationId)
+    public async Task<Attempt<TResult?, LongRunningOperationResultStatus>> GetResultAsync<TResult>(Guid operationId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         LongRunningOperation<TResult>? operation = await _repository.GetAsync<TResult>(operationId);
