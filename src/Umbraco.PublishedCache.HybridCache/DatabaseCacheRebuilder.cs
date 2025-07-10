@@ -67,6 +67,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.Run(
                 RebuildOperationName,
                 _ => PerformRebuild(),
+                allowConcurrentExecution: false,
                 runInBackground: useBackgroundThread);
 
         if (attempt.Success)

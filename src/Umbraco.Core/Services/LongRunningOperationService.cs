@@ -45,7 +45,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
     public Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run(
         string type,
         Func<CancellationToken, Task> operation,
-        bool allowConcurrentExecution = true,
+        bool allowConcurrentExecution = false,
         bool runInBackground = true)
         => RunInner<object?>(
             type,
@@ -61,7 +61,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
     public Task<Attempt<Guid, LongRunningOperationEnqueueStatus>> Run<T>(
         string type,
         Func<CancellationToken, Task<T>> operation,
-        bool allowConcurrentExecution = true,
+        bool allowConcurrentExecution = false,
         bool runInBackground = true)
         => RunInner(
             type,
