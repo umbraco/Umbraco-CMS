@@ -50,7 +50,11 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     }
 
     /// <inheritdoc/>
-    public bool IsRebuilding() => _longRunningOperationService.GetByTypeAsync(RebuildOperationName, 0, 0).GetAwaiter().GetResult().Total != 0;
+    public bool IsRebuilding() => IsRebuildingAsync().GetAwaiter().GetResult();
+
+    /// <inheritdoc/>
+    public async Task<bool> IsRebuildingAsync()
+        => (await _longRunningOperationService.GetByTypeAsync(RebuildOperationName, 0, 0)).Total != 0;
 
     /// <inheritdoc/>
     [Obsolete("Use the overload with the useBackgroundThread parameter. Scheduled for removal in Umbraco 17.")]
@@ -83,23 +87,6 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         };
     }
 
-    private Task PerformRebuild()
-    {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        _databaseCacheRepository.Rebuild();
-
-        // If the serializer type has changed, we also need to update it in the key value store.
-        var currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
-        if (!Enum.TryParse(currentSerializerValue, out NuCacheSerializerType currentSerializer) ||
-            _nucacheSettings.Value.NuCacheSerializerType != currentSerializer)
-        {
-            _keyValueService.SetValue(NuCacheSerializerKey, _nucacheSettings.Value.NuCacheSerializerType.ToString());
-        }
-
-        scope.Complete();
-        return Task.CompletedTask;
-    }
-
     /// <inheritdoc/>
     public void RebuildDatabaseCacheIfSerializerChanged() =>
         RebuildDatabaseCacheIfSerializerChangedAsync().GetAwaiter().GetResult();
@@ -128,5 +115,22 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         {
             await RebuildAsync(false);
         }
+    }
+
+    private Task PerformRebuild()
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        _databaseCacheRepository.Rebuild();
+
+        // If the serializer type has changed, we also need to update it in the key value store.
+        var currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
+        if (!Enum.TryParse(currentSerializerValue, out NuCacheSerializerType currentSerializer) ||
+            _nucacheSettings.Value.NuCacheSerializerType != currentSerializer)
+        {
+            _keyValueService.SetValue(NuCacheSerializerKey, _nucacheSettings.Value.NuCacheSerializerType.ToString());
+        }
+
+        scope.Complete();
+        return Task.CompletedTask;
     }
 }

@@ -14,6 +14,12 @@ public interface IDatabaseCacheRebuilder
     bool IsRebuilding() => false;
 
     /// <summary>
+    /// Indicates if the database cache is in the process of being rebuilt.
+    /// </summary>
+    /// <returns></returns>
+    Task<bool> IsRebuildingAsync() => Task.FromResult(IsRebuilding());
+
+    /// <summary>
     /// Rebuilds the database cache.
     /// </summary>
     [Obsolete("Use the overload with the useBackgroundThread parameter. Scheduled for removal in Umbraco 17.")]
