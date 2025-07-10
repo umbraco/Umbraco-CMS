@@ -50,10 +50,16 @@ public interface ILongRunningOperationService
     /// Gets the active long-running operations of a specific type.
     /// </summary>
     /// <param name="type">The type of the long-running operation.</param>
+    /// <param name="skip">Number of operations to skip.</param>
+    /// <param name="take">Number of operations to take.</param>
     /// <param name="statuses">Optional array of statuses to filter the operations by. If null, only enqueued and running
     /// operations are returned.</param>
     /// <returns>True if the operation is running or enqueued; otherwise, false.</returns>
-    Task<IEnumerable<LongRunningOperation>> GetByType(string type, LongRunningOperationStatus[]? statuses = null);
+    Task<PagedModel<LongRunningOperation>> GetByType(
+        string type,
+        int skip,
+        int take,
+        LongRunningOperationStatus[]? statuses = null);
 
     /// <summary>
     /// Gets the result of a long-running operation.

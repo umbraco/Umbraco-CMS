@@ -32,14 +32,15 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     }
 
     /// <inheritdoc/>
-    public void Create(LongRunningOperation operation, DateTimeOffset expirationDate)
+    public Task CreateAsync(LongRunningOperation operation, DateTimeOffset expirationDate)
     {
         LongRunningOperationDto dto = MapEntityToDto(operation, expirationDate);
         Database.Insert(dto);
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public LongRunningOperation? Get(Guid id)
+    public Task<LongRunningOperation?> GetAsync(Guid id)
     {
         Sql<ISqlContext> sql = Sql()
             .Select<LongRunningOperationDto>()
@@ -47,11 +48,11 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
         LongRunningOperationDto dto = Database.FirstOrDefault<LongRunningOperationDto>(sql);
-        return dto == null ? null : MapDtoToEntity(dto);
+        return Task.FromResult(dto == null ? null : MapDtoToEntity(dto));
     }
 
     /// <inheritdoc />
-    public LongRunningOperation<T>? Get<T>(Guid id)
+    public Task<LongRunningOperation<T>?> GetAsync<T>(Guid id)
     {
         Sql<ISqlContext> sql = Sql()
             .Select<LongRunningOperationDto>()
@@ -59,11 +60,30 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
         LongRunningOperationDto dto = Database.FirstOrDefault<LongRunningOperationDto>(sql);
-        return dto == null ? null : MapDtoToEntity<T>(dto);
+        return Task.FromResult(dto == null ? null : MapDtoToEntity<T>(dto));
     }
 
     /// <inheritdoc/>
-    public IEnumerable<LongRunningOperation> GetByType(string type, LongRunningOperationStatus[] statuses)
+    public Task<PagedModel<LongRunningOperation>> GetByTypeAsync(
+        string type,
+        LongRunningOperationStatus[] statuses,
+        int skip,
+        int take)
+    {
+        List<LongRunningOperationDto> results = Database.Fetch<LongRunningOperationDto>(
+            GetByTypeQuery(type, statuses)
+                .Append("LIMIT @0 OFFSET @1", take, skip));
+
+        var totalCount = Database.Count(GetByTypeQuery(type, statuses));
+        return Task.FromResult(
+            new PagedModel<LongRunningOperation>
+            {
+                Total = totalCount,
+                Items = results.Select(MapDtoToEntity),
+            });
+    }
+
+    private Sql<ISqlContext> GetByTypeQuery(string type, LongRunningOperationStatus[] statuses)
     {
         Sql<ISqlContext> sql = Sql()
             .Select<LongRunningOperationDto>()
@@ -72,33 +92,31 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
 
         if (statuses.Length > 0)
         {
-            bool includeStale = statuses.Contains(LongRunningOperationStatus.Stale);
+            var includeStale = statuses.Contains(LongRunningOperationStatus.Stale);
             string[] possibleStaleStatuses = [nameof(LongRunningOperationStatus.Enqueued), nameof(LongRunningOperationStatus.Running)];
             IEnumerable<string> statusList = statuses.Except([LongRunningOperationStatus.Stale]).Select(s => s.ToString());
 
             DateTime now = _timeProvider.GetUtcNow().UtcDateTime;
-            sql = sql.Where<LongRunningOperationDto>(x =>
-                (statusList.Contains(x.Status) && (!possibleStaleStatuses.Contains(x.Status) || x.ExpirationDate >= now))
-                || (includeStale && possibleStaleStatuses.Contains(x.Status) && x.ExpirationDate < now));
+            sql = sql.Where<LongRunningOperationDto>(x => (statusList.Contains(x.Status) && (!possibleStaleStatuses.Contains(x.Status) || x.ExpirationDate >= now)) || (includeStale && possibleStaleStatuses.Contains(x.Status) && x.ExpirationDate < now));
         }
 
-        IEnumerable<LongRunningOperationDto> dtos = Database.Query<LongRunningOperationDto>(sql);
-        return dtos.Select(MapDtoToEntity);
+        sql = sql.OrderBy<LongRunningOperationDto>(x => x.CreateDate);
+        return sql;
     }
 
     /// <inheritdoc/>
-    public LongRunningOperationStatus? GetStatus(Guid id)
+    public Task<LongRunningOperationStatus?> GetStatusAsync(Guid id)
     {
         Sql<ISqlContext> sql = Sql()
             .Select<LongRunningOperationDto>(x => x.Status)
             .From<LongRunningOperationDto>()
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
-        return Database.ExecuteScalar<string>(sql)?.EnumParse<LongRunningOperationStatus>(false);
+        return Task.FromResult(Database.ExecuteScalar<string>(sql)?.EnumParse<LongRunningOperationStatus>(false));
     }
 
     /// <inheritdoc/>
-    public void UpdateStatus(Guid id, LongRunningOperationStatus status, DateTimeOffset expirationTime)
+    public Task UpdateStatusAsync(Guid id, LongRunningOperationStatus status, DateTimeOffset expirationTime)
     {
         Sql<ISqlContext> sql = Sql()
             .Update<LongRunningOperationDto>(x => x
@@ -108,10 +126,11 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
         Database.Execute(sql);
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public void SetResult<T>(Guid id, T result)
+    public Task SetResultAsync<T>(Guid id, T result)
     {
         Sql<ISqlContext> sql = Sql()
             .Update<LongRunningOperationDto>(x => x
@@ -120,16 +139,18 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
         Database.Execute(sql);
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public void CleanOperations(DateTimeOffset olderThan)
+    public Task CleanOperationsAsync(DateTimeOffset olderThan)
     {
         Sql<ISqlContext> sql2 = Sql()
             .Delete<LongRunningOperationDto>()
             .Where<LongRunningOperationDto>(x => x.UpdateDate < olderThan);
 
         Database.Execute(sql2);
+        return Task.CompletedTask;
     }
 
     private LongRunningOperation MapDtoToEntity(LongRunningOperationDto dto) =>
