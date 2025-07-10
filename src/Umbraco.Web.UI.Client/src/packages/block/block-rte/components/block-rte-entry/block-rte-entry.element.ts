@@ -301,7 +301,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-ref-rte-block>`;
+			.settings=${this._blockViewProps.settings}
+			.config=${this._blockViewProps.config}></umb-ref-rte-block>`;
 	}
 
 	#renderEditAction() {
