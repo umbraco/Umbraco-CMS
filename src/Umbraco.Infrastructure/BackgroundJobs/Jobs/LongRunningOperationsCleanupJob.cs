@@ -19,6 +19,7 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
     /// </summary>
     /// <param name="scopeProvider">The scope provider for managing database transactions.</param>
     /// <param name="longRunningOperationRepository">The repository for managing long-running operations.</param>
+    /// <param name="timeProvider">The time provider for getting the current time.</param>
     public LongRunningOperationsCleanupJob(
         ICoreScopeProvider scopeProvider,
         ILongRunningOperationRepository longRunningOperationRepository,
@@ -43,11 +44,10 @@ public class LongRunningOperationsCleanupJob : IRecurringBackgroundJob
     public TimeSpan Delay { get; } = TimeSpan.FromSeconds(10);
 
     /// <inheritdoc />
-    public Task RunJobAsync()
+    public async Task RunJobAsync()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _longRunningOperationRepository.CleanOperations(_timeProvider.GetUtcNow() - _deleteTime);
+        await _longRunningOperationRepository.CleanOperationsAsync(_timeProvider.GetUtcNow() - _deleteTime);
         scope.Complete();
-        return Task.CompletedTask;
     }
 }

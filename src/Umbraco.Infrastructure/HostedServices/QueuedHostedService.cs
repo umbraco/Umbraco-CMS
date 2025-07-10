@@ -58,7 +58,7 @@ public class QueuedHostedService : BackgroundService
             {
                 _logger.LogError(
                     ex,
-                    "Error occurred executing {WorkItem}.", nameof(workItem));
+                    "Error occurred executing workItem.");
             }
         }
     }

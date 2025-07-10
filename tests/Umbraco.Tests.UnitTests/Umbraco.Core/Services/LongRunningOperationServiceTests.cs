@@ -40,14 +40,19 @@ public class LongRunningOperationServiceTests
     {
         SetupScopeProviderMock();
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.GetByType("Test", It.IsAny<LongRunningOperationStatus[]>()))
-            .Callback<string, LongRunningOperationStatus[]>((type, statuses) =>
+            .Setup(repo => repo.GetByTypeAsync("Test", It.IsAny<LongRunningOperationStatus[]>(), 0, 0))
+            .Callback<string, LongRunningOperationStatus[], int, int>((_, statuses, _, _) =>
             {
                 Assert.AreEqual(2, statuses.Length);
                 Assert.Contains(LongRunningOperationStatus.Enqueued, statuses);
                 Assert.Contains(LongRunningOperationStatus.Running, statuses);
             })
-            .Returns(new List<LongRunningOperation> { new() { Id = Guid.NewGuid(), Type = "Test", Status = LongRunningOperationStatus.Running } })
+            .ReturnsAsync(
+                new PagedModel<LongRunningOperation>
+                {
+                    Total = 1,
+                    Items = new List<LongRunningOperation> { new() { Id = Guid.NewGuid(), Type = "Test", Status = LongRunningOperationStatus.Running } },
+                })
             .Verifiable(Times.Once);
 
         var result = await _longRunningOperationService.Run(
@@ -72,13 +77,14 @@ public class LongRunningOperationServiceTests
             .Verifiable(Times.Exactly(2));
 
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.Create(It.IsAny<LongRunningOperation>(), It.IsAny<DateTimeOffset>()))
+            .Setup(repo => repo.CreateAsync(It.IsAny<LongRunningOperation>(), It.IsAny<DateTimeOffset>()))
             .Callback<LongRunningOperation, DateTimeOffset>((op, exp) =>
             {
                 Assert.AreEqual("Test", op.Type);
                 Assert.IsNotNull(op.Id);
                 Assert.AreEqual(LongRunningOperationStatus.Enqueued, op.Status);
             })
+            .Returns(Task.CompletedTask)
             .Verifiable(Times.Once);
 
         _scopeProviderMock.Setup(scopeProvider => scopeProvider.Context)
@@ -92,11 +98,12 @@ public class LongRunningOperationServiceTests
             LongRunningOperationStatus.Success,
         };
 
-        _longRunningOperationRepositoryMock.Setup(repo => repo.UpdateStatus(It.IsAny<Guid>(), It.IsAny<LongRunningOperationStatus>(), It.IsAny<DateTimeOffset>()))
+        _longRunningOperationRepositoryMock.Setup(repo => repo.UpdateStatusAsync(It.IsAny<Guid>(), It.IsAny<LongRunningOperationStatus>(), It.IsAny<DateTimeOffset>()))
             .Callback<Guid, LongRunningOperationStatus, DateTimeOffset>((id, status, exp) =>
             {
                 Assert.Contains(status, expectedStatuses);
-            });
+            })
+            .Returns(Task.CompletedTask);
 
         var opCalls = 0;
         var result = await _longRunningOperationService.Run(
@@ -148,13 +155,14 @@ public class LongRunningOperationServiceTests
             .Verifiable(Times.Exactly(2));
 
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.Create(It.IsAny<LongRunningOperation>(), It.IsAny<DateTimeOffset>()))
+            .Setup(repo => repo.CreateAsync(It.IsAny<LongRunningOperation>(), It.IsAny<DateTimeOffset>()))
             .Callback<LongRunningOperation, DateTimeOffset>((op, exp) =>
             {
                 Assert.AreEqual("Test", op.Type);
                 Assert.IsNotNull(op.Id);
                 Assert.AreEqual(LongRunningOperationStatus.Enqueued, op.Status);
             })
+            .Returns(Task.CompletedTask)
             .Verifiable(Times.Once);
 
         var result = await _longRunningOperationService.Run(
@@ -175,8 +183,8 @@ public class LongRunningOperationServiceTests
         SetupScopeProviderMock();
         var operationId = Guid.NewGuid();
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.GetStatus(operationId))
-            .Returns(LongRunningOperationStatus.Running)
+            .Setup(repo => repo.GetStatusAsync(operationId))
+            .ReturnsAsync(LongRunningOperationStatus.Running)
             .Verifiable(Times.Once);
 
         var status = await _longRunningOperationService.GetStatus(operationId);
@@ -192,8 +200,8 @@ public class LongRunningOperationServiceTests
         SetupScopeProviderMock();
         var operationId = Guid.NewGuid();
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.GetStatus(operationId))
-            .Returns((LongRunningOperationStatus?)null)
+            .Setup(repo => repo.GetStatusAsync(operationId))
+            .ReturnsAsync((LongRunningOperationStatus?)null)
             .Verifiable(Times.Once);
 
         var status = await _longRunningOperationService.GetStatus(operationId);
@@ -213,22 +221,28 @@ public class LongRunningOperationServiceTests
             new() { Id = Guid.NewGuid(), Type = operationType, Status = LongRunningOperationStatus.Enqueued },
         };
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.GetByType(operationType, It.IsAny<LongRunningOperationStatus[]>()))
-            .Callback<string, LongRunningOperationStatus[]>((type, statuses) =>
+            .Setup(repo => repo.GetByTypeAsync(operationType, It.IsAny<LongRunningOperationStatus[]>(), 0, 100))
+            .Callback<string, LongRunningOperationStatus[], int, int>((_, statuses, _, _) =>
             {
                 Assert.AreEqual(2, statuses.Length);
                 Assert.Contains(LongRunningOperationStatus.Enqueued, statuses);
                 Assert.Contains(LongRunningOperationStatus.Running, statuses);
             })
-            .Returns(operations)
+            .ReturnsAsync(
+                new PagedModel<LongRunningOperation>
+                {
+                    Total = 2,
+                    Items = operations,
+                })
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetByType(operationType);
+        var result = await _longRunningOperationService.GetByType(operationType, 0, 100);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsNotNull(result);
-        Assert.AreEqual(2, result.Count());
-        Assert.IsTrue(result.All(op => op.Type == operationType));
+        Assert.AreEqual(2, result.Items.Count());
+        Assert.AreEqual(2, result.Total);
+        Assert.IsTrue(result.Items.All(op => op.Type == operationType));
     }
 
     [Test]
@@ -241,21 +255,27 @@ public class LongRunningOperationServiceTests
             new() { Id = Guid.NewGuid(), Type = operationType, Status = LongRunningOperationStatus.Failed },
         };
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.GetByType(operationType, It.IsAny<LongRunningOperationStatus[]>()))
-            .Callback<string, LongRunningOperationStatus[]>((type, statuses) =>
+            .Setup(repo => repo.GetByTypeAsync(operationType, It.IsAny<LongRunningOperationStatus[]>(), 0, 30))
+            .Callback<string, LongRunningOperationStatus[], int, int>((type, statuses, _, _) =>
             {
                 Assert.AreEqual(1, statuses.Length);
                 Assert.Contains(LongRunningOperationStatus.Failed, statuses);
             })
-            .Returns(operations)
+            .ReturnsAsync(
+                new PagedModel<LongRunningOperation>
+                {
+                    Total = 1,
+                    Items = operations,
+                })
             .Verifiable(Times.Once);
 
-        var result = await _longRunningOperationService.GetByType(operationType, [LongRunningOperationStatus.Failed]);
+        var result = await _longRunningOperationService.GetByType(operationType, 0, 30, [LongRunningOperationStatus.Failed]);
 
         _longRunningOperationRepositoryMock.VerifyAll();
         Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Count());
-        Assert.IsTrue(result.All(op => op.Type == operationType));
+        Assert.AreEqual(1, result.Total);
+        Assert.AreEqual(1, result.Items.Count());
+        Assert.IsTrue(result.Items.All(op => op.Type == operationType));
     }
 
     [Test]
@@ -266,8 +286,8 @@ public class LongRunningOperationServiceTests
         var operationId = Guid.NewGuid();
         const string expectedResult = "TestResult";
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.Get<string>(operationId))
-            .Returns(
+            .Setup(repo => repo.GetAsync<string>(operationId))
+            .ReturnsAsync(
                 new LongRunningOperation<string>
                 {
                     Id = operationId,
@@ -289,11 +309,10 @@ public class LongRunningOperationServiceTests
     public async Task GetResult_ReturnsFailedAttempt_WhenOperationDoesNotExist()
     {
         SetupScopeProviderMock();
-        const string operationType = "Test";
         var operationId = Guid.NewGuid();
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.Get<string>(operationId))
-            .Returns(default(LongRunningOperation<string>))
+            .Setup(repo => repo.GetAsync<string>(operationId))
+            .ReturnsAsync(default(LongRunningOperation<string>))
             .Verifiable(Times.Once);
 
         var result = await _longRunningOperationService.GetResult<string>(operationId);
@@ -311,8 +330,8 @@ public class LongRunningOperationServiceTests
         const string operationType = "Test";
         var operationId = Guid.NewGuid();
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.Get<string>(operationId))
-            .Returns(
+            .Setup(repo => repo.GetAsync<string>(operationId))
+            .ReturnsAsync(
                 new LongRunningOperation<string>
                 {
                     Id = operationId,
@@ -336,8 +355,8 @@ public class LongRunningOperationServiceTests
         const string operationType = "Test";
         var operationId = Guid.NewGuid();
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.Get<string>(operationId))
-            .Returns(
+            .Setup(repo => repo.GetAsync<string>(operationId))
+            .ReturnsAsync(
                 new LongRunningOperation<string>
                 {
                     Id = operationId,
@@ -361,8 +380,8 @@ public class LongRunningOperationServiceTests
         const string operationType = "Test";
         var operationId = Guid.NewGuid();
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.Get<string>(operationId))
-            .Returns(
+            .Setup(repo => repo.GetAsync<string>(operationId))
+            .ReturnsAsync(
                 new LongRunningOperation<string>
                 {
                     Id = operationId,
@@ -391,4 +410,5 @@ public class LongRunningOperationServiceTests
                 It.IsAny<bool>()))
             .Returns(_scopeMock.Object);
 }
+
 
