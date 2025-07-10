@@ -1,9 +1,9 @@
-namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
+namespace Umbraco.Cms.Core.Extensions;
 
 /// <summary>
-/// Provides extensions on <see cref="DateTime"/> purely when building entities from persistence DTOs,
+/// Provides extensions on <see cref="DateTime"/> purely when building entities from persistence DTOs.
 /// </summary>
-internal static class EntityFactoryDateTimeExtensions
+public static class EntityFactoryDateTimeExtensions
 {
     /// <summary>
     /// Ensures the provided DateTime is in UTC format.

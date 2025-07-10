@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 
@@ -28,7 +29,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             contentCacheNode.Id,
             contentCacheNode.Key,
             contentCacheNode.SortOrder,
-            contentCacheNode.CreateDate,
+            contentCacheNode.CreateDate.EnsureUtc(),
             contentCacheNode.CreatorId,
             contentType,
             preview ? contentCacheNode.Data : null,
@@ -51,7 +52,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             contentCacheNode.Id,
             contentCacheNode.Key,
             contentCacheNode.SortOrder,
-            contentCacheNode.CreateDate,
+            contentCacheNode.CreateDate.EnsureUtc(),
             contentCacheNode.CreatorId,
             contentType,
             null,
@@ -64,12 +65,12 @@ internal class PublishedContentFactory : IPublishedContentFactory
     {
         IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
 
-        // Members are only "mapped" never cached, so these default values are a bit wierd, but they are not used.
+        // Members are only "mapped" never cached, so these default values are a bit weird, but they are not used.
         var contentData = new ContentData(
             member.Name,
             null,
             0,
-            member.UpdateDate,
+            member.UpdateDate.EnsureUtc(),
             member.CreatorId,
             null,
             true,
@@ -80,7 +81,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
             member.Id,
             member.Key,
             member.SortOrder,
-            member.UpdateDate,
+            member.UpdateDate.EnsureUtc(),
             member.CreatorId,
             contentType,
             null,

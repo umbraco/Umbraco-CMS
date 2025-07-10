@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;

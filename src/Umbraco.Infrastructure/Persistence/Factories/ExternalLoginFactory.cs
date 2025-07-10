@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
