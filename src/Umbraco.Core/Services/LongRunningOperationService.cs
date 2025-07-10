@@ -146,7 +146,19 @@ internal class LongRunningOperationService : ILongRunningOperationService
         {
             using (ExecutionContext.SuppressFlow())
             {
-                _ = Task.Run(() => RunOperation(operationId, type, operation, cancellationToken), cancellationToken);
+                _ = Task.Run(
+                    async () =>
+                    {
+                        try
+                        {
+                            await RunOperation(operationId, type, operation, cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "An error occurred while running long-running background operation {Type} with id {OperationId}.", type, operationId);
+                        }
+                    },
+                    cancellationToken);
             }
         }
         else
