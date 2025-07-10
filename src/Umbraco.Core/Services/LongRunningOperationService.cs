@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -10,7 +9,6 @@ namespace Umbraco.Cms.Core.Services;
 /// <inheritdoc />
 internal class LongRunningOperationService : ILongRunningOperationService
 {
-    private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly ILongRunningOperationRepository _repository;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly TimeProvider _timeProvider;
@@ -22,19 +20,16 @@ internal class LongRunningOperationService : ILongRunningOperationService
     /// <summary>
     /// Initializes a new instance of the <see cref="LongRunningOperationService"/> class.
     /// </summary>
-    /// <param name="backgroundTaskQueue">The background task queue to use for enqueuing long-running operations.</param>
     /// <param name="repository">The repository for tracking long-running operations.</param>
     /// <param name="scopeProvider">The scope provider for managing database transactions.</param>
     /// <param name="timeProvider">The time provider for getting the current UTC time.</param>
     /// <param name="logger">The logger for logging information and errors related to long-running operations.</param>
     public LongRunningOperationService(
-        IBackgroundTaskQueue backgroundTaskQueue,
         ILongRunningOperationRepository repository,
         ICoreScopeProvider scopeProvider,
         TimeProvider timeProvider,
         ILogger<LongRunningOperationService> logger)
     {
-        _backgroundTaskQueue = backgroundTaskQueue;
         _repository = repository;
         _scopeProvider = scopeProvider;
         _timeProvider = timeProvider;
@@ -149,25 +144,14 @@ internal class LongRunningOperationService : ILongRunningOperationService
 
         if (runInBackground)
         {
-            _logger.LogDebug("Enqueuing long-running operation {Type} with id {OperationId}.", type, operationId);
-            _backgroundTaskQueue.QueueBackgroundWorkItem(async ct =>
+            using (ExecutionContext.SuppressFlow())
             {
-                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, ct);
-
-                await RunOperation(
-                    operationId,
-                    type,
-                    operation,
-                    cancellationToken: linkedCts.Token);
-            });
+                _ = Task.Run(() => RunOperation(operationId, type, operation, cancellationToken), cancellationToken);
+            }
         }
         else
         {
-            await RunOperation(
-                 operationId,
-                 type,
-                 operation,
-                 cancellationToken);
+            await RunOperation(operationId, type, operation, cancellationToken);
         }
 
         return Attempt.SucceedWithStatus(LongRunningOperationEnqueueStatus.Success, operationId);
@@ -246,5 +230,3 @@ internal class LongRunningOperationService : ILongRunningOperationService
     private bool OperationOfTypeIsAlreadyRunning(string type)
         => _repository.GetByType(type, [LongRunningOperationStatus.Enqueued, LongRunningOperationStatus.Running]).Any();
 }
-
-
