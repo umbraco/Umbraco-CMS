@@ -30,19 +30,24 @@ public class IndexPresentationFactory : IIndexPresentationFactory
 
     [Obsolete("Use the non obsolete method instead. Scheduled for removal in v17")]
     public IndexPresentationFactory(IIndexDiagnosticsFactory indexDiagnosticsFactory, IIndexRebuilder indexRebuilder, IIndexingRebuilderService indexingRebuilderService)
-    :this(
-        indexDiagnosticsFactory,
-        indexRebuilder,
-        indexingRebuilderService,
-        StaticServiceProvider.Instance.GetRequiredService<ILogger<IndexPresentationFactory>>())
+        : this(
+            indexDiagnosticsFactory,
+            indexRebuilder,
+            indexingRebuilderService,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<IndexPresentationFactory>>())
     {
     }
 
+    /// <inheritdoc />
     public IndexResponseModel Create(IIndex index)
+        => CreateAsync(index).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async Task<IndexResponseModel> CreateAsync(IIndex index)
     {
         var isCorrupt = !TryGetSearcherName(index, out var searcherName);
 
-        if (_indexingRebuilderService.IsRebuilding(index.Name))
+        if (await _indexingRebuilderService.IsRebuildingAsync(index.Name))
         {
             return new IndexResponseModel
             {
@@ -63,7 +68,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
 
         var properties = new Dictionary<string, object?>();
 
-        foreach (var property in indexDiag.Metadata)
+        foreach (KeyValuePair<string, object?> property in indexDiag.Metadata)
         {
             if (property.Value is null)
             {
@@ -71,7 +76,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
             }
             else
             {
-                var propertyType = property.Value.GetType();
+                Type propertyType = property.Value.GetType();
                 properties[property.Key] = propertyType.IsClass && !propertyType.IsArray ? property.Value?.ToString() : property.Value;
             }
         }
