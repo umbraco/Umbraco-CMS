@@ -63,6 +63,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     }
 
     /// <inheritdoc />
+    [Obsolete("Use IsRebuildingAsync() instead. Scheduled for removal in Umbraco 18.")]
     public bool IsRebuilding(string indexName)
         => IsRebuildingAsync(indexName).GetAwaiter().GetResult();
 
