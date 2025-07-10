@@ -19,6 +19,7 @@ import {
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
 
 export class UmbAuthContext extends UmbContextBase {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
@@ -90,8 +91,10 @@ export class UmbAuthContext extends UmbContextBase {
 		// This establishes the tab-to-tab communication
 		window.addEventListener('storage', this.#onStorageEvent.bind(this));
 
-		// Start the session timeout controller
-		new UmbAuthSessionTimeoutController(this, this.#authFlow);
+		if (!isTestEnvironment()) {
+			// Start the session timeout controller
+			new UmbAuthSessionTimeoutController(this, this.#authFlow);
+		}
 	}
 
 	override destroy(): void {
