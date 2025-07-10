@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -17,7 +16,6 @@ public class LongRunningOperationServiceTests
 {
     private ILongRunningOperationService _longRunningOperationService;
     private Mock<ICoreScopeProvider> _scopeProviderMock;
-    private Mock<IBackgroundTaskQueue> _backgroundTaskQueueMock;
     private Mock<ILongRunningOperationRepository> _longRunningOperationRepositoryMock;
     private Mock<TimeProvider> _timeProviderMock;
     private Mock<ICoreScope> _scopeMock;
@@ -26,13 +24,11 @@ public class LongRunningOperationServiceTests
     public void Setup()
     {
         _scopeProviderMock = new Mock<ICoreScopeProvider>(MockBehavior.Strict);
-        _backgroundTaskQueueMock = new Mock<IBackgroundTaskQueue>(MockBehavior.Strict);
         _longRunningOperationRepositoryMock = new Mock<ILongRunningOperationRepository>(MockBehavior.Strict);
         _timeProviderMock = new Mock<TimeProvider>(MockBehavior.Strict);
         _scopeMock = new Mock<ICoreScope>();
 
         _longRunningOperationService = new LongRunningOperationService(
-            _backgroundTaskQueueMock.Object,
             _longRunningOperationRepositoryMock.Object,
             _scopeProviderMock.Object,
             _timeProviderMock.Object,
@@ -161,27 +157,16 @@ public class LongRunningOperationServiceTests
             })
             .Verifiable(Times.Once);
 
-        _backgroundTaskQueueMock
-            .Setup(b => b.QueueBackgroundWorkItem(It.IsAny<Func<CancellationToken, Task>>()))
-            .Verifiable(Times.Once);
-
-        var opCalls = 0;
         var result = await _longRunningOperationService.Run(
             "Test",
-            _ =>
-            {
-                opCalls++;
-                return Task.CompletedTask;
-            },
+            _ => Task.CompletedTask,
             allowConcurrentExecution: true,
             runInBackground: true);
 
         _longRunningOperationRepositoryMock.VerifyAll();
-        _backgroundTaskQueueMock.VerifyAll();
 
         Assert.IsTrue(result.Success);
         Assert.AreEqual(LongRunningOperationEnqueueStatus.Success, result.Status);
-        Assert.AreEqual(0, opCalls, "Operation should not be called immediately when run in background, it will be executed later by the background task queue.");
     }
 
     [Test]
