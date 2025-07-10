@@ -126,7 +126,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
 
     /// <inheritdoc/>
     public async Task<bool> IsRebuilding(string indexName)
-        => (await _longRunningOperationService.GetByType(GetRebuildOperationTypeName(indexName))).Any();
+        => (await _longRunningOperationService.GetByType(GetRebuildOperationTypeName(indexName), 0, 0)).Total != 0;
 
     private static string GetRebuildOperationTypeName(string indexName) => $"RebuildExamineIndex-{indexName}";
 
