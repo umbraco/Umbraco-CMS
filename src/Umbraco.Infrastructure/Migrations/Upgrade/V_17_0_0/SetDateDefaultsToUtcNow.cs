@@ -75,7 +75,7 @@ public class SetDateDefaultsToUtcNow : UnscopedMigrationBase
     private static void ModifySqlServerDefaultDateConstraint(IScope scope, string tableName, string columnName)
     {
         var constraintName = $"DF_{tableName}_{columnName}";
-        scope.Database.Execute($"ALTER TABLE {tableName} DROP CONSTRAINT {constraintName} GO");
-        scope.Database.Execute($"ALTER TABLE {tableName} ADD CONSTRAINT {constraintName} DEFAULT GETUTCDATE() FOR {columnName} GO");
+        scope.Database.Execute($"ALTER TABLE {tableName} DROP CONSTRAINT {constraintName}");
+        scope.Database.Execute($"ALTER TABLE {tableName} ADD CONSTRAINT {constraintName} DEFAULT GETUTCDATE() FOR {columnName}");
     }
 }
