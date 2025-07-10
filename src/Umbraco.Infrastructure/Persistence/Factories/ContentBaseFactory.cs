@@ -40,8 +40,8 @@ internal class ContentBaseFactory
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
 
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
 
             content.Published = dto.Published;
             content.Edited = dto.Edited;
@@ -53,7 +53,7 @@ internal class ContentBaseFactory
                 content.PublishedVersionId = publishedVersionDto.Id;
                 if (dto.Published)
                 {
-                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
+                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate.EnsureUtc();
                     content.PublishName = publishedVersionDto.ContentVersionDto.Text;
                     content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
                 }
@@ -98,8 +98,8 @@ internal class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
 
             // reset dirty initial properties (U4-1946)
             content.ResetDirtyProperties(false);
@@ -128,7 +128,7 @@ internal class ContentBaseFactory
             content.Id = dto.NodeId;
             content.SecurityStamp = dto.SecurityStampToken;
             content.EmailConfirmedDate = dto.EmailConfirmedDate.HasValue
-                ? dto.EmailConfirmedDate.Value
+                ? dto.EmailConfirmedDate.Value.EnsureUtc()
                 : null;
             content.PasswordConfiguration = dto.PasswordConfig;
             content.Key = nodeDto.UniqueId;
@@ -143,19 +143,19 @@ internal class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
             content.FailedPasswordAttempts = dto.FailedPasswordAttempts ?? default;
             content.IsLockedOut = dto.IsLockedOut;
             content.IsApproved = dto.IsApproved;
             content.LastLockoutDate = dto.LastLockoutDate.HasValue
-                ? dto.LastLockoutDate.Value
+                ? dto.LastLockoutDate.Value.EnsureUtc()
                 : null;
             content.LastLoginDate = dto.LastLoginDate.HasValue
-                ? dto.LastLoginDate.Value
+                ? dto.LastLoginDate.Value.EnsureUtc()
                 : null;
             content.LastPasswordChangeDate = dto.LastPasswordChangeDate.HasValue
-                ? dto.LastPasswordChangeDate.Value
+                ? dto.LastPasswordChangeDate.Value.EnsureUtc()
                 : null;
 
             // reset dirty initial properties (U4-1946)

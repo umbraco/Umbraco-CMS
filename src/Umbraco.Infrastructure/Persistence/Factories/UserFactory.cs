@@ -40,23 +40,15 @@ internal static class UserFactory
             user.SecurityStamp = dto.SecurityStampToken;
             user.FailedPasswordAttempts = dto.FailedLoginAttempts ?? 0;
             user.Avatar = dto.Avatar;
-            user.EmailConfirmedDate = dto.EmailConfirmedDate;
-            user.InvitedDate = dto.InvitedDate;
+            user.EmailConfirmedDate = dto.EmailConfirmedDate?.EnsureUtc();
+            user.InvitedDate = dto.InvitedDate?.EnsureUtc();
             user.Kind = (UserKind)dto.Kind;
 
-            // Dates stored in the database are local server time, but for SQL Server, will be considered
-            // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
-            user.LastLockoutDate = dto.LastLockoutDate.HasValue
-                ? dto.LastLockoutDate.Value
-                : null;
-            user.LastLoginDate = dto.LastLoginDate.HasValue
-                ? dto.LastLoginDate.Value
-                : null;
-            user.LastPasswordChangeDate = dto.LastPasswordChangeDate.HasValue
-                ? dto.LastPasswordChangeDate.Value
-                : null;
-            user.CreateDate = dto.CreateDate;
-            user.UpdateDate = dto.UpdateDate;
+            user.LastLockoutDate = dto.LastLockoutDate?.EnsureUtc();
+            user.LastLoginDate = dto.LastLoginDate?.EnsureUtc();
+            user.LastPasswordChangeDate = dto.LastPasswordChangeDate?.EnsureUtc();
+            user.CreateDate = dto.CreateDate.EnsureUtc();
+            user.UpdateDate = dto.UpdateDate.EnsureUtc();
 
             // reset dirty initial properties (U4-1946)
             user.ResetDirtyProperties(false);

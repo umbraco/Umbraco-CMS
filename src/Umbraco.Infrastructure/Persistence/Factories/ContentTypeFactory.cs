@@ -149,8 +149,8 @@ internal static class ContentTypeFactory
         entity.Thumbnail = dto.Thumbnail;
         entity.SortOrder = dto.NodeDto.SortOrder;
         entity.Description = dto.Description;
-        entity.CreateDate = dto.NodeDto.CreateDate;
-        entity.UpdateDate = dto.NodeDto.CreateDate;
+        entity.CreateDate = dto.NodeDto.CreateDate.EnsureUtc();
+        entity.UpdateDate = dto.NodeDto.CreateDate.EnsureUtc();
         entity.Path = dto.NodeDto.Path;
         entity.Level = dto.NodeDto.Level;
         entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;

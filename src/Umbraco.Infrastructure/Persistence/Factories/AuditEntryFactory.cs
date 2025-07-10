@@ -17,7 +17,7 @@ internal static class AuditEntryFactory
             PerformingUserKey = dto.PerformingUserKey,
             PerformingDetails = dto.PerformingDetails,
             PerformingIp = dto.PerformingIp,
-            EventDate = dto.EventDate,
+            EventDate = dto.EventDate.EnsureUtc(),
             AffectedUserId = dto.AffectedUserId,
             AffectedUserKey = dto.AffectedUserKey,
             AffectedDetails = dto.AffectedDetails,

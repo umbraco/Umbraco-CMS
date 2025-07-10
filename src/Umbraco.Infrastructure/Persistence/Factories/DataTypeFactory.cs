@@ -29,12 +29,12 @@ internal static class DataTypeFactory
         {
             dataType.DisableChangeTracking();
 
-            dataType.CreateDate = dto.NodeDto.CreateDate;
+            dataType.CreateDate = dto.NodeDto.CreateDate.EnsureUtc();
             dataType.DatabaseType = dto.DbType.EnumParse<ValueStorageType>(true);
             dataType.Id = dto.NodeId;
             dataType.Key = dto.NodeDto.UniqueId;
             dataType.Level = dto.NodeDto.Level;
-            dataType.UpdateDate = dto.NodeDto.CreateDate;
+            dataType.UpdateDate = dto.NodeDto.CreateDate.EnsureUtc();
             dataType.Name = dto.NodeDto.Text;
             dataType.ParentId = dto.NodeDto.ParentId;
             dataType.Path = dto.NodeDto.Path;

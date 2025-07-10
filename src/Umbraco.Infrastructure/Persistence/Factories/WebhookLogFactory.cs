@@ -28,7 +28,7 @@ internal static class WebhookLogFactory
     public static WebhookLog DtoToEntity(WebhookLogDto dto) =>
         new()
         {
-            Date = dto.Date,
+            Date = dto.Date.EnsureUtc(),
             EventAlias = dto.EventAlias,
             RequestBody = dto.RequestBody,
             ResponseBody = dto.ResponseBody,
