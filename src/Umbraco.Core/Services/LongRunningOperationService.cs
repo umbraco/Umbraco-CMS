@@ -118,7 +118,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
         Guid operationId;
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            if (!allowConcurrentExecution)
+            if (allowConcurrentExecution is false)
             {
                 // Acquire a write lock to ensure that no other operations of the same type can be enqueued while this one is being processed.
                 // This is only needed if we do not allow multiple runs of the same type.
@@ -187,7 +187,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
 
         try
         {
-            while (!operationTask.IsCompleted)
+            while (operationTask.IsCompleted is false)
             {
                 // Update the status in the database and increase the expiration time.
                 // That way, even if the status has not changed, we know that the operation is still being processed.

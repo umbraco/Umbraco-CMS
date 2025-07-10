@@ -282,7 +282,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         Guid userKey,
         bool useBackgroundThread)
     {
-        if (!useBackgroundThread)
+        if (useBackgroundThread is false)
         {
             Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus> minimalAttempt
                 = await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: true);
@@ -379,7 +379,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             await _longRunningOperationService
                 .GetResult<Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus>>(taskId);
 
-        if (!result.Success)
+        if (result.Success is false)
         {
             return Attempt.FailWithStatus(
                 result.Status switch
