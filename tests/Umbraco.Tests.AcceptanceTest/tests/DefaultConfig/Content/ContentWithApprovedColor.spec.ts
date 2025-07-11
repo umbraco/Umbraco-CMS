@@ -58,7 +58,7 @@ test('can publish content with the approved color data type', async ({umbracoApi
   expect(contentData.values).toEqual([]);
 });
 
-test('can create content with the custom approved color data type', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the custom approved color data type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'CustomApprovedColor';
   const colorValue = 'd73737';

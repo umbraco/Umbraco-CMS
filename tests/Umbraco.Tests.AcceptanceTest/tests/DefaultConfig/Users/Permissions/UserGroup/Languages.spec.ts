@@ -1,4 +1,4 @@
-import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
@@ -102,7 +102,7 @@ test('can not rename content with language not set in userGroup', async ({umbrac
   await umbracoUi.content.isDocumentNameInputEditable(false);
 });
 
-test('can update content property with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
+test('can update content property with language set in userGroup', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);

@@ -141,7 +141,7 @@ test('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbr
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, true, false);
 });
 
-test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
+test('cannot delete non-empty folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childFolderName = 'ChildFolderName';
   await umbracoApi.stylesheet.createFolder(stylesheetFolderName);

@@ -66,7 +66,7 @@ const uploadFiles = [
   {fileExtension: 'doc', fileName: 'ArticleDOC.doc'}
 ];
 for (const uploadFile of uploadFiles) {
-  test(`can upload an article with the ${uploadFile.fileExtension} extension in the content`, async ({umbracoApi, umbracoUi}) => {
+  test(`can upload an article with the ${uploadFile.fileExtension} extension in the content`, {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);

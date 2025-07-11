@@ -41,7 +41,7 @@ test('can create content with one tag', async ({umbracoApi, umbracoUi}) => {
   expect(contentData.values[0].value).toEqual([tagsName[0]]);
 });
 
-test('can publish content with multiple tags', async ({umbracoApi, umbracoUi}) => {
+test('can publish content with multiple tags', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

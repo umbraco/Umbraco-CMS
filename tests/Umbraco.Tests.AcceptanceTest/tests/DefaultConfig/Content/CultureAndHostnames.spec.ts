@@ -105,7 +105,7 @@ test('can delete culture and hostname', async ({umbracoApi, umbracoUi}) => {
   expect(domainsData.domains.length).toBe(0);
 });
 
-test('can add culture and hostname for multiple languages', async ({umbracoApi, umbracoUi}) => {
+test('can add culture and hostname for multiple languages', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondDomainName = 'testdomain2';
   const secondLanguageName = 'Vietnamese';
