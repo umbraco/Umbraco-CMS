@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Tests.Common;
@@ -142,5 +143,73 @@ public class ContentBuilderTests : DeliveryApiTests
         var result = builder.Build(content.Object);
 
         Assert.Null(result);
+    }
+
+    [TestCase("Shared value", "Segmented value", false)]
+    [TestCase(null, "Segmented value", false)]
+    [TestCase("Shared value", null, true)]
+    [TestCase(null, null, true)]
+    public void ContentBuilder_ReturnsNullForRequestedSegmentThatIsNotCreated(object? sharedValue, object? segmentedValue, bool expectNull)
+    {
+        var content = new Mock<IPublishedContent>();
+
+        var sharedPropertyValueConverter = new Mock<IDeliveryApiPropertyValueConverter>();
+        sharedPropertyValueConverter.Setup(p => p.ConvertIntermediateToDeliveryApiObject(
+            It.IsAny<IPublishedElement>(),
+            It.IsAny<IPublishedPropertyType>(),
+            It.IsAny<PropertyCacheLevel>(),
+            It.IsAny<object?>(),
+            It.IsAny<bool>(),
+            It.IsAny<bool>())).Returns(sharedValue);
+        sharedPropertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
+        sharedPropertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        sharedPropertyValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+
+        var sharedPropertyType = SetupPublishedPropertyType(sharedPropertyValueConverter.Object, "sharedMessage", "Umbraco.Textstring");
+        var sharedProperty = new PublishedElementPropertyBase(sharedPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
+
+        var segmentedPropertyValueConverter = new Mock<IDeliveryApiPropertyValueConverter>();
+        segmentedPropertyValueConverter.Setup(p => p.ConvertIntermediateToDeliveryApiObject(
+            It.IsAny<IPublishedElement>(),
+            It.IsAny<IPublishedPropertyType>(),
+            It.IsAny<PropertyCacheLevel>(),
+            It.IsAny<object?>(),
+            It.IsAny<bool>(),
+            It.IsAny<bool>())).Returns(segmentedValue);
+        segmentedPropertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
+        segmentedPropertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        segmentedPropertyValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+
+        var segmentedPropertyType = SetupPublishedPropertyType(segmentedPropertyValueConverter.Object, "segmentedMessage", "Umbraco.Textstring", contentVariation: ContentVariation.Segment);
+        var segmentedProperty = new PublishedElementPropertyBase(segmentedPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
+
+        var contentType = new Mock<IPublishedContentType>();
+        contentType.SetupGet(c => c.Alias).Returns("thePageType");
+        contentType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
+
+        var key = Guid.NewGuid();
+        var urlSegment = "url-segment";
+        var name = "The page";
+        ConfigurePublishedContentMock(content, key, name, urlSegment, contentType.Object, [sharedProperty, segmentedProperty]);
+
+        var routeBuilderMock = new Mock<IApiContentRouteBuilder>();
+        routeBuilderMock
+            .Setup(r => r.Build(content.Object, It.IsAny<string?>()))
+            .Returns(new ApiContentRoute(content.Object.UrlSegment!, new ApiContentStartItem(Guid.NewGuid(), "/")));
+
+        var variationContextAccessorMock = new Mock<IVariationContextAccessor>();
+        variationContextAccessorMock.Setup(v => v.VariationContext).Returns(new VariationContext(segment: "missingSegment"));
+
+        var builder = new ApiContentBuilder(new ApiContentNameProvider(), routeBuilderMock.Object, CreateOutputExpansionStrategyAccessor(), variationContextAccessorMock.Object);
+        var result = builder.Build(content.Object);
+
+        if (expectNull)
+        {
+            Assert.IsNull(result);
+        }
+        else
+        {
+            Assert.IsNotNull(result);
+        }
     }
 }
