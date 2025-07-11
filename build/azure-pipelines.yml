@@ -863,7 +863,7 @@ stages:
               testRunTitle: "$(Agent.JobName)"
 
       - job:
-        displayName: E2E Regression Tests (SQL Server)
+        displayName: E2E Release Tests (SQL Server)
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
