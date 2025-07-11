@@ -60,5 +60,5 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
     }
 
     /// <inheritdoc/>
-    public string? RequestedStartItem() => GetHeaderValue("Start-Item");
+    public string? RequestedStartItem() => GetHeaderValue(Constants.DeliveryApi.HeaderNames.StartItem);
 }
