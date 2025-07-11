@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Routing;
 ///     Used to determine the node to display when content is not found based on the configured error404 elements in
 ///     umbracoSettings.config
 /// </summary>
-internal class NotFoundHandlerHelper
+internal sealed class NotFoundHandlerHelper
 {
     internal static int? GetCurrentNotFoundPageId(
         ContentErrorPage[] error404Collection,

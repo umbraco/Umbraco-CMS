@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
 /// </summary>
-internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserRepository
+internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserRepository
 {
     private readonly IMapperCollection _mapperCollection;
     private readonly GlobalSettings _globalSettings;
@@ -36,8 +36,6 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     private bool _passwordConfigInitialized;
     private readonly Lock _sqliteValidateSessionLock = new();
     private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
-    private readonly IAppPolicyCache _globalCache;
-    private readonly IScopeAccessor _scopeAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -54,7 +52,6 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
     /// <param name="permissionMappers">The permission mappers.</param>
-    /// <param name="globalCache">The app policy cache.</param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -71,18 +68,15 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
-        IEnumerable<IPermissionMapper> permissionMappers,
-        IAppPolicyCache globalCache)
+        IEnumerable<IPermissionMapper> permissionMappers)
         : base(scopeAccessor, appCaches, logger)
     {
-        _scopeAccessor = scopeAccessor;
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         _passwordConfiguration =
             passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         _jsonSerializer = jsonSerializer;
         _runtimeState = runtimeState;
-        _globalCache = globalCache;
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 

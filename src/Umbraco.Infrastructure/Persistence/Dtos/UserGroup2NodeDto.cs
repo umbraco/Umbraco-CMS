@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [Obsolete("Will be removed in Umbraco 18.")]
 [TableName(TableName)]
 [ExplicitColumns]
-internal class UserGroup2NodeDto
+internal sealed class UserGroup2NodeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2Node;
 

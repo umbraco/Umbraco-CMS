@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IMemberType" />
 /// </summary>
-internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
+internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
 {
     private readonly IShortStringHelper _shortStringHelper;
 

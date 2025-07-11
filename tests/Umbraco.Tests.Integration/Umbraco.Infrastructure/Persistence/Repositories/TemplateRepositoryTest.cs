@@ -63,7 +63,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     private IOptionsMonitor<RuntimeSettings> RuntimeSettings => GetRequiredService<IOptionsMonitor<RuntimeSettings>>();
 
     private ITemplateRepository CreateRepository(IScopeProvider provider) =>
-        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, ViewHelper, RuntimeSettings);
+        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, ShortStringHelper, ViewHelper, RuntimeSettings);
 
     [Test]
     public void Can_Instantiate_Repository()

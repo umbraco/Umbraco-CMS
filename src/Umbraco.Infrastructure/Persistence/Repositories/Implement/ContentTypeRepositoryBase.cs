@@ -1564,7 +1564,7 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
             ?? Array.Empty<(TEntity, int)>();
     }
 
-    private class NameCompareDto
+    private sealed class NameCompareDto
     {
         public int NodeId { get; set; }
 
@@ -1583,7 +1583,7 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
         public bool Edited { get; set; }
     }
 
-    private class PropertyValueVersionDto
+    private sealed class PropertyValueVersionDto
     {
         private decimal? _decimalValue;
 

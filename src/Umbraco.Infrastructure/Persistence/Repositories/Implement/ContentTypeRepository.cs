@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IContentType" />
 /// </summary>
-internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
+internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
 {
     public ContentTypeRepository(
         IScopeAccessor scopeAccessor,

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.LogViewerQuery)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class LogViewerQueryDto
+internal sealed class LogViewerQueryDto
 {
     [Column("id")]
     [PrimaryKeyColumn]
