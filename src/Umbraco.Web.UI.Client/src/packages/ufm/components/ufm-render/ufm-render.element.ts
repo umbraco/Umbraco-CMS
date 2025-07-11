@@ -59,6 +59,14 @@ export class UmbUfmRenderElement extends UmbLitElement {
 				overflow: auto;
 			}
 
+			code {
+				font-family: var(--uui-font-monospace);
+				white-space: pre-wrap;
+				background-color: var(--uui-color-background);
+				border-radius: var(--uui-border-radius);
+				padding: 0.2em 0.4em;
+			}
+
 			:host > :first-child {
 				margin-block-start: 0;
 			}
