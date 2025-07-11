@@ -75,7 +75,14 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	async #setPreviewAlias(): Promise<void> {
-		this._previewAlias = await this.#getPreviewElementAlias();
+		// Store current src to detect changes during async operation
+		const currentSrc = this.#src;
+		const alias = await this.#getPreviewElementAlias();
+
+		// Only update if src hasn't changed in the meantime (prevents race conditions)
+		if (this.#src === currentSrc) {
+			this._previewAlias = alias;
+		}
 	}
 
 	async #getPreviewElementAlias() {
