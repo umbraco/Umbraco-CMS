@@ -5,7 +5,7 @@ import 'element-internals-polyfill';
 import '@umbraco-ui/uui';
 
 import { html } from 'lit';
-import { setCustomElements } from '@storybook/web-components';
+import { setCustomElements } from '@storybook/web-components-vite';
 
 import { startMockServiceWorker } from '../src/mocks';
 

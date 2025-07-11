@@ -1,7 +1,7 @@
 import './workspace-view-data-type-info.element.js';
 
 import type { UmbWorkspaceViewDataTypeInfoElement } from './workspace-view-data-type-info.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 //import { data } from '../../../../../core/mocks/data/data-type.data.js';

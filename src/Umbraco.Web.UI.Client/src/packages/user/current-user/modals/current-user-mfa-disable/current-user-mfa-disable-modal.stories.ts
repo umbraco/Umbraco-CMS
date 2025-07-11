@@ -1,5 +1,5 @@
 import type { UmbCurrentUserMfaDisableModalElement } from './current-user-mfa-disable-modal.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './current-user-mfa-disable-modal.element.js';

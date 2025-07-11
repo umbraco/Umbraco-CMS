@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './split-panel.element.js';
 import type { UmbSplitPanelElement } from './split-panel.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';

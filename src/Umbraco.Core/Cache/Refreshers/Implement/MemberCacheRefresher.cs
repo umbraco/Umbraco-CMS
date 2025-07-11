@@ -62,6 +62,8 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
 
         public string? Username { get; }
 
+        public string? PreviousUsername { get; set; }
+
         public bool Removed { get; }
     }
 
@@ -112,6 +114,13 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
             // https://github.com/umbraco/Umbraco-CMS/pull/17350
             // https://github.com/umbraco/Umbraco-CMS/pull/17815
             memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, string>(CacheKeys.MemberUserNameCachePrefix + p.Username));
+
+            // If provided, clear the cache by the previous user name too.
+            if (string.IsNullOrEmpty(p.PreviousUsername) is false)
+            {
+                memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, string>(p.PreviousUsername));
+                memberCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMember, string>(CacheKeys.MemberUserNameCachePrefix + p.PreviousUsername));
+            }
         }
     }
 }

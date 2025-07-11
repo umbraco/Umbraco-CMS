@@ -343,6 +343,24 @@ export default {
 		blueprintDescription:
 			'En indholdskabelon er foruddefineret indhold, som en redaktør kan vælge at bruge\n      som grundlag for at oprette nyt indhold\n    ',
 	},
+	entityDetail: {
+		notFoundTitle: (entityType: string) => {
+			const entityName = entityType ?? 'Elementet';
+			return `${entityName} blev ikke fundet`;
+		},
+		notFoundDescription: (entityType: string) => {
+			const entityName = entityType ?? 'element';
+			return `Den/det ønskede ${entityName} kunne ikke findes. Dette kan skyldes, at den/det er blevet slettet, eller at du ikke har adgang. Kontakt din administrator for hjælp.`;
+		},
+		forbiddenTitle: (entityType: string) => {
+			const entityName = entityType ?? 'Elementet';
+			return `${entityName} er ikke tilgængelig`;
+		},
+		forbiddenDescription: (entityType: string) => {
+			const entityName = entityType ?? 'element';
+			return `Du har ikke adgang til den/det ønskede ${entityName}. Kontakt din administrator for hjælp.`;
+		},
+	},
 	media: {
 		clickToUpload: 'Klik for at uploade',
 		orClickHereToUpload: 'eller klik her for at vælge filer',
@@ -1069,6 +1087,12 @@ export default {
 	lockout: {
 		lockoutWillOccur: 'Du har været inaktiv, og du vil blive logget ud om',
 		renewSession: 'Forny for at gemme dine ændringer',
+	},
+	timeout: {
+		warningHeadline: 'Session udløber',
+		warningText: 'Din session er ved at udløbe, og du vil blive logget ud om <strong>{0} sekunder</strong>.',
+		warningLogoutAction: 'Log ud',
+		warningContinueAction: 'Forbliv logget ind',
 	},
 	login: {
 		greeting0: 'Velkommen',
@@ -2606,6 +2630,9 @@ export default {
 	routing: {
 		routeNotFoundTitle: 'Ikke fundet',
 		routeNotFoundDescription: 'Den side du leder efter kunne ikke findes. Kontroller adressen og prøv igen.',
+		routeForbiddenTitle: 'Adgang nægtet',
+		routeForbiddenDescription:
+			'Du har ikke tilladelse til at få adgang til denne ressource. Kontakt venligst din administrator for hjælp.',
 	},
 	codeEditor: {
 		label: 'Code editor',

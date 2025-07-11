@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './input-slider.element.js';
 import type { UmbInputSliderElement } from './input-slider.element.js';
 

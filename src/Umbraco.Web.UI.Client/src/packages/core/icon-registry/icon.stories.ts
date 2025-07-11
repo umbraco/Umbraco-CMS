@@ -1,5 +1,5 @@
 import icons from './icons.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html, repeat } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
