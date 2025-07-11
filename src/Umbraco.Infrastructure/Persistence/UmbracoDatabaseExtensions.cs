@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
@@ -94,9 +95,10 @@ internal static class UmbracoDatabaseExtensions
 
     public static async Task<PagedModel<TResult>> PagedAsync<TDto, TResult>(
         this IUmbracoDatabase database,
-        Sql sql,
+        Sql<ISqlContext> sql,
         int skip,
         int take,
+        Expression<Func<TDto, object?>> orderBy,
         Func<TDto, TResult> mapper)
     {
         if (skip < 0)
@@ -109,6 +111,18 @@ internal static class UmbracoDatabaseExtensions
             throw new ArgumentOutOfRangeException(nameof(take), "Take must be greater than zero.");
         }
 
+        var count = await database.CountAsync(sql);
+        if (count == 0)
+        {
+            return new PagedModel<TResult>
+            {
+                Total = 0,
+                Items = [],
+            };
+        }
+
+        sql = sql.OrderBy(field: orderBy);
+
         List<TDto> results = await database.SkipTakeAsync<TDto>(
             skip,
             take,
@@ -116,7 +130,7 @@ internal static class UmbracoDatabaseExtensions
 
         return new PagedModel<TResult>
         {
-            Total = await database.CountAsync(sql),
+            Total = count,
             Items = results.Select(mapper),
         };
     }

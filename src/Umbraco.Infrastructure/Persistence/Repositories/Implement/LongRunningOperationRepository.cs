@@ -85,9 +85,12 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             sql = sql.Where<LongRunningOperationDto>(x => (statusList.Contains(x.Status) && (!possibleStaleStatuses.Contains(x.Status) || x.ExpirationDate >= now)) || (includeStale && possibleStaleStatuses.Contains(x.Status) && x.ExpirationDate < now));
         }
 
-        sql = sql.OrderBy<LongRunningOperationDto>(x => x.CreateDate);
-
-        return await Database.PagedAsync<LongRunningOperationDto, LongRunningOperation>(sql, skip, take, MapDtoToEntity);
+        return await Database.PagedAsync<LongRunningOperationDto, LongRunningOperation>(
+            sql,
+            skip,
+            take,
+            orderBy: x => x.CreateDate,
+            mapper: MapDtoToEntity);
     }
 
     /// <inheritdoc/>
