@@ -78,9 +78,16 @@ public abstract class ApiContentBuilderBase<T>
         IPublishedContent content,
         IDictionary<string, object?> properties)
     {
-        IEnumerable<string> segmentedProperties = content.Properties
+        var segmentedProperties = content.Properties
             .Where(x => x.PropertyType.Variations.HasFlag(Models.ContentVariation.Segment))
-            .Select(x => x.Alias);
+            .Select(x => x.Alias)
+            .ToList();
+
+        if (segmentedProperties.Count == 0)
+        {
+            return true;
+        }
+
         return segmentedProperties.All(x => properties.ContainsKey(x) is false || properties[x] is null);
     }
 }
