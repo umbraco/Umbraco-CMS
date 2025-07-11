@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -29,7 +30,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
 
         List<LogDto>? dtos = Database.Fetch<LogDto>(sql);
 
-        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters, x.Datestamp)).ToList();
+        return AuditItemFactory.BuildEntities(dtos);
     }
 
     public void CleanLogs(int maximumAgeOfLogsInMinutes)
@@ -103,43 +104,16 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         Page<LogDto>? page = Database.Page<LogDto>(pageIndex + 1, pageSize, sql);
         totalRecords = page.TotalItems;
 
-        var items = page.Items.Select(
-            dto => new AuditItem(dto.NodeId, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters, dto.Datestamp)).ToList();
-
-        // map the DateStamp
-        for (var i = 0; i < items.Count; i++)
-        {
-            items[i].CreateDate = page.Items[i].Datestamp;
-        }
-
-        return items;
+        return AuditItemFactory.BuildEntities(page.Items);
     }
 
     protected override void PersistNewItem(IAuditItem entity) =>
-        Database.Insert(new LogDto
-        {
-            Comment = entity.Comment,
-            Datestamp = DateTime.UtcNow,
-            Header = entity.AuditType.ToString(),
-            NodeId = entity.Id,
-            UserId = entity.UserId,
-            EntityType = entity.EntityType,
-            Parameters = entity.Parameters,
-        });
+        Database.Insert(AuditItemFactory.BuildDto(entity));
 
     protected override void PersistUpdatedItem(IAuditItem entity) =>
 
         // inserting when updating because we never update a log entry, perhaps this should throw?
-        Database.Insert(new LogDto
-        {
-            Comment = entity.Comment,
-            Datestamp = DateTime.UtcNow,
-            Header = entity.AuditType.ToString(),
-            NodeId = entity.Id,
-            UserId = entity.UserId,
-            EntityType = entity.EntityType,
-            Parameters = entity.Parameters,
-        });
+        Database.Insert(AuditItemFactory.BuildDto(entity));
 
     protected override IAuditItem? PerformGet(int id)
     {
@@ -149,7 +123,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
         LogDto? dto = Database.First<LogDto>(sql);
         return dto == null
             ? null
-            : new AuditItem(dto.NodeId, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters, dto.Datestamp);
+            : AuditItemFactory.BuildEntity(dto);
     }
 
     protected override IEnumerable<IAuditItem> PerformGetAll(params int[]? ids) => throw new NotImplementedException();
@@ -162,7 +136,7 @@ internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRe
 
         List<LogDto>? dtos = Database.Fetch<LogDto>(sql);
 
-        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType,  x.Comment, x.Parameters, x.Datestamp)).ToList();
+        return AuditItemFactory.BuildEntities(dtos);
     }
 
     protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
