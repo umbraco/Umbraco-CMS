@@ -96,7 +96,7 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
         }
     }
 
-    private class DocumentTypeElementSwitchInformation
+    private sealed class DocumentTypeElementSwitchInformation
     {
         public bool WasElement { get; set; }
     }

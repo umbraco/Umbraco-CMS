@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Webhook)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class WebhookDto
+internal sealed class WebhookDto
 {
     [Column("id")]
     [PrimaryKeyColumn(AutoIncrement = true)]

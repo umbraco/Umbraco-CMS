@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Implements <see cref="IContentTypeCommonRepository" />.
 /// </summary>
-internal class ContentTypeCommonRepository : IContentTypeCommonRepository
+internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
 {
     private const string CacheKey =
         "Umbraco.Core.Persistence.Repositories.Implement.ContentTypeCommonRepository::AllTypes";
@@ -369,7 +369,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
         }
     }
 
-    private PropertyGroup MapPropertyGroup(PropertyTypeGroupDto dto, bool isPublishing) =>
+    private static PropertyGroup MapPropertyGroup(PropertyTypeGroupDto dto, bool isPublishing) =>
         new(new PropertyTypeCollection(isPublishing))
         {
             Id = dto.Id,

@@ -71,7 +71,7 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
         _logger.LogInformation("Completed stopping recurring background jobs hosted services");
     }
 
-    private class NamedServiceJob
+    private sealed class NamedServiceJob
     {
         public NamedServiceJob(string name, IHostedService hostedService)
         {

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.RedirectUrl)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class RedirectUrlDto
+internal sealed class RedirectUrlDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.RedirectUrl;
 

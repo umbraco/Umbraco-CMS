@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 // note
 // the whole PublishedMember thing should be refactored because as soon as a member
 // is wrapped on in a model, the inner IMember and all associated properties are lost
-internal class PublishedMember : PublishedContent, IPublishedMember
+internal sealed class PublishedMember : PublishedContent, IPublishedMember
 {
     private readonly IMember _member;
 

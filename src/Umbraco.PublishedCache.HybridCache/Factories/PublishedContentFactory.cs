@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Factories;
 
-internal class PublishedContentFactory : IPublishedContentFactory
+internal sealed class PublishedContentFactory : IPublishedContentFactory
 {
     private readonly IElementsCache _elementsCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
@@ -88,7 +88,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
         return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor);
     }
 
-    private Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
+    private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
     {
         var properties = member
             .Properties
@@ -111,7 +111,7 @@ internal class PublishedContentFactory : IPublishedContentFactory
         return properties;
     }
 
-    private void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object? value)
+    private static void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object? value)
     {
         IPublishedPropertyType? propertyType = contentType.GetPropertyType(alias);
         if (propertyType == null || propertyType.IsUserProperty)
@@ -135,14 +135,14 @@ internal class PublishedContentFactory : IPublishedContentFactory
     }
 
 
-    private IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content) =>
+    private static IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content) =>
         content == null ? null :
             // an object in the cache is either an IPublishedContentOrMedia,
             // or a model inheriting from PublishedContentExtended - in which
             // case we need to unwrap to get to the original IPublishedContentOrMedia.
             UnwrapIPublishedContent(content);
 
-    private PublishedContent UnwrapIPublishedContent(IPublishedContent content)
+    private static PublishedContent UnwrapIPublishedContent(IPublishedContent content)
     {
         while (content is PublishedContentWrapped wrapped)
         {

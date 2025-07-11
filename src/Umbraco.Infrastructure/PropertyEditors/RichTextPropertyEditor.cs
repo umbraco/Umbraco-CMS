@@ -89,7 +89,7 @@ public class RichTextPropertyEditor : DataEditor
     ///     A custom value editor to ensure that images and blocks are parsed when being persisted and formatted correctly for
     ///     display in the editor
     /// </summary>
-    internal class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
+    internal sealed class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IHtmlSanitizer _htmlSanitizer;
@@ -320,7 +320,7 @@ public class RichTextPropertyEditor : DataEditor
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(mergedEditorValue, _jsonSerializer);
         }
 
-        private string MergeMarkupValue(
+        private static string MergeMarkupValue(
             string source,
             string target,
             RichTextBlockValue? mergedBlockValue,

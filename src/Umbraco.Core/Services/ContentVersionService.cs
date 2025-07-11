@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Core.Services;
 
-internal class ContentVersionService : IContentVersionService
+internal sealed class ContentVersionService : IContentVersionService
 {
     private readonly IAuditRepository _auditRepository;
     private readonly IContentVersionCleanupPolicy _contentVersionCleanupPolicy;

@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-internal class ContentDataBuilder : BuilderBase<ContentData>, IWithNameBuilder
+internal sealed class ContentDataBuilder : BuilderBase<ContentData>, IWithNameBuilder
 {
     private Dictionary<string, CultureVariation> _cultureInfos;
     private string _name;

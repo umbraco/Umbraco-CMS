@@ -12,7 +12,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRepository
+internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRepository
 {
     public AuditRepository(IScopeAccessor scopeAccessor, ILogger<AuditRepository> logger)
         : base(scopeAccessor, AppCaches.NoCache, logger)

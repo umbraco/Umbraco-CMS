@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase<RichTextBlockModel, RichTextBlockItem, RichTextBlockLayoutItem, RichTextConfiguration.RichTextBlockConfiguration, RichTextBlockValue>
+internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase<RichTextBlockModel, RichTextBlockItem, RichTextBlockLayoutItem, RichTextConfiguration.RichTextBlockConfiguration, RichTextBlockValue>
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
@@ -39,7 +39,7 @@ internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase
 
     protected override BlockItemActivator<RichTextBlockItem> CreateBlockItemActivator() => new RichTextBlockItemActivator(BlockEditorConverter, _constructorCache);
 
-    private class RichTextBlockItemActivator : BlockItemActivator<RichTextBlockItem>
+    private sealed class RichTextBlockItemActivator : BlockItemActivator<RichTextBlockItem>
     {
         public RichTextBlockItemActivator(BlockEditorConverter blockConverter, RichTextBlockPropertyValueConstructorCache constructorCache)
             : base(blockConverter, constructorCache)

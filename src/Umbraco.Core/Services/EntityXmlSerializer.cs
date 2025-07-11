@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Serializes entities to XML
 /// </summary>
-internal class EntityXmlSerializer : IEntityXmlSerializer
+internal sealed class EntityXmlSerializer : IEntityXmlSerializer
 {
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
     private readonly IContentService _contentService;

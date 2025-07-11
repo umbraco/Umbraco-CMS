@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class LanguageDto
+internal sealed class LanguageDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Language;
 

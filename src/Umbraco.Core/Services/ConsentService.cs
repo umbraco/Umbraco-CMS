@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Implements <see cref="IConsentService" />.
 /// </summary>
-internal class ConsentService : RepositoryService, IConsentService
+internal sealed class ConsentService : RepositoryService, IConsentService
 {
     private readonly IConsentRepository _consentRepository;
 

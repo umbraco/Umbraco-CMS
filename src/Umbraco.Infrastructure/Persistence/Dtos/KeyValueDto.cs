@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.KeyValue)]
 [PrimaryKey("key", AutoIncrement = false)]
 [ExplicitColumns]
-internal class KeyValueDto
+internal sealed class KeyValueDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.KeyValue;
 

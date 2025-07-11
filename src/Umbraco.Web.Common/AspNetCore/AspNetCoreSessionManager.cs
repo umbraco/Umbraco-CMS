@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore;
 
-internal class AspNetCoreSessionManager : ISessionIdResolver, ISessionManager
+internal sealed class AspNetCoreSessionManager : ISessionIdResolver, ISessionManager
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 

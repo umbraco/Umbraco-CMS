@@ -4,7 +4,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Repositories;
 
-internal class WebProfilerRepository : IWebProfilerRepository
+internal sealed class WebProfilerRepository : IWebProfilerRepository
 {
     private const string CookieName = "UMB-DEBUG";
     private const string HeaderName = "X-UMB-DEBUG";

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.RelationType)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class RelationTypeDto
+internal sealed class RelationTypeDto
 {
     public const int NodeIdSeed = 10;
 

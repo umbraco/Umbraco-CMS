@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// <remarks>
     /// Introduced to avoid inconsistencies with nullability of dependencies for type repositories for content, media and members.
     /// </remarks>
-    internal class MemberTypeContainerRepository : IMemberTypeContainerRepository
+    internal sealed class MemberTypeContainerRepository : IMemberTypeContainerRepository
     {
         public void Delete(EntityContainer entity)
         {

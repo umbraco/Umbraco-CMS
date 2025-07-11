@@ -13,7 +13,7 @@ internal sealed class ContextualizeFromAcceptHeadersAttribute : TypeFilterAttrib
     {
     }
 
-    private class LocalizeFromAcceptLanguageHeaderAttributeFilter : IActionFilter
+    private sealed class LocalizeFromAcceptLanguageHeaderAttributeFilter : IActionFilter
     {
         private readonly IRequestCultureService _requestCultureService;
         private readonly IRequestSegmmentService _requestSegmentService;

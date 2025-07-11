@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IMediaType" />
 /// </summary>
-internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
+internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
 {
     public MediaTypeRepository(
         IScopeAccessor scopeAccessor,

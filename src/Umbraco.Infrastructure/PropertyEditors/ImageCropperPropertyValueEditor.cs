@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the image cropper property editor.
 /// </summary>
-internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
+internal sealed class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
 {
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;

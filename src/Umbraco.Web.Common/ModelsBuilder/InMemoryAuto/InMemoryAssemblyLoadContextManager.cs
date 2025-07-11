@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.ModelsBuilder;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
-internal class InMemoryAssemblyLoadContextManager
+internal sealed class InMemoryAssemblyLoadContextManager
 {
     private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
 

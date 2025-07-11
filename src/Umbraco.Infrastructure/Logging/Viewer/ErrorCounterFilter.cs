@@ -2,7 +2,7 @@ using Serilog.Events;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
-internal class ErrorCounterFilter : ILogFilter
+internal sealed class ErrorCounterFilter : ILogFilter
 {
     public int Count { get; private set; }
 

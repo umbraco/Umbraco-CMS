@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Web.Website.Routing;
 /// <summary>
 ///     Used to handle 404 routes that haven't been handled by the end user
 /// </summary>
-internal class NotFoundSelectorPolicy : MatcherPolicy, IEndpointSelectorPolicy
+internal sealed class NotFoundSelectorPolicy : MatcherPolicy, IEndpointSelectorPolicy
 {
     private readonly EndpointDataSource _endpointDataSource;
     private readonly Lazy<Endpoint> _notFound;

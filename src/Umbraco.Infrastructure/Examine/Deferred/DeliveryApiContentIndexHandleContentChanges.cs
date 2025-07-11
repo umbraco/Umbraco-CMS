@@ -136,7 +136,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
                 }
             });
 
-    private class CulturePublishStatus : IEquatable<CulturePublishStatus>
+    private sealed class CulturePublishStatus : IEquatable<CulturePublishStatus>
     {
         public required string Culture { get; set; }
 

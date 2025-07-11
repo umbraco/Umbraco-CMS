@@ -150,7 +150,7 @@ public static class UmbracoBuilderExtensions
     }
 
     // replace the default so there is no background index rebuilder
-    private class TestBackgroundIndexRebuilder : ExamineIndexRebuilder
+    private sealed class TestBackgroundIndexRebuilder : ExamineIndexRebuilder
     {
         public TestBackgroundIndexRebuilder(
             IMainDom mainDom,

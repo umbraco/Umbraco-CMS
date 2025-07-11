@@ -6,7 +6,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
-internal class NotificationHeaderFilter : IOperationFilter
+internal sealed class NotificationHeaderFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {

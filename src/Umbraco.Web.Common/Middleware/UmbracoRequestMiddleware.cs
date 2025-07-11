@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Web.Common.Middleware;
 ///         This is responsible for creating and assigning an <see cref="IUmbracoContext" />
 ///     </para>
 /// </remarks>
-internal class UmbracoRequestMiddleware : IMiddleware
+internal sealed class UmbracoRequestMiddleware : IMiddleware
 {
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
     private readonly IEventAggregator _eventAggregator;
@@ -158,7 +158,7 @@ internal class UmbracoRequestMiddleware : IMiddleware
         _profiler?.UmbracoApplicationEndRequest(context, _runtimeState.Level);
     }
 
-    private Uri? GetApplicationUrlFromCurrentRequest(HttpRequest request)
+    private static Uri? GetApplicationUrlFromCurrentRequest(HttpRequest request)
     {
         // We only consider GET and POST.
         // Especially the DEBUG sent when debugging the application is annoying because it uses http, even when the https is available.
@@ -173,7 +173,7 @@ internal class UmbracoRequestMiddleware : IMiddleware
     /// <summary>
     ///     Dispose some request scoped objects that we are maintaining the lifecycle for.
     /// </summary>
-    private void DisposeHttpContextItems(HttpRequest request)
+    private static void DisposeHttpContextItems(HttpRequest request)
     {
         // do not process if client-side request
         if (request.IsClientSideRequest())

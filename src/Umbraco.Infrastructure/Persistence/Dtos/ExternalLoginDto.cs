@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [ExplicitColumns]
 [PrimaryKey("Id")]
-internal class ExternalLoginDto
+internal sealed class ExternalLoginDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ExternalLogin;
 

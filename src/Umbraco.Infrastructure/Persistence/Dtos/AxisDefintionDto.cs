@@ -2,7 +2,7 @@ using NPoco;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-internal class AxisDefintionDto
+internal sealed class AxisDefintionDto
 {
     [Column("nodeId")]
     public int NodeId { get; set; }

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("contentTypeId", AutoIncrement = false)]
 [ExplicitColumns]
-internal class ContentVersionCleanupPolicyDto
+internal sealed class ContentVersionCleanupPolicyDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCleanupPolicy;
 

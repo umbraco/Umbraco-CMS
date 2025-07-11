@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 /// <summary>
 ///     Serializes/deserializes <see cref="ContentCacheDataModel" /> documents to the SQL Database as JSON.
 /// </summary>
-internal class JsonContentNestedDataSerializer : IContentCacheDataSerializer
+internal sealed class JsonContentNestedDataSerializer : IContentCacheDataSerializer
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
@@ -47,7 +47,7 @@ internal class JsonContentNestedDataSerializer : IContentCacheDataSerializer
     /// <summary>
     /// Provides a converter for handling JSON objects that can be of various types (string, number, boolean, null, or complex types).
     /// </summary>
-    internal class JsonObjectConverter : JsonConverter<object>
+    internal sealed class JsonObjectConverter : JsonConverter<object>
     {
         /// <inheritdoc/>
         public override object? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -65,5 +65,4 @@ internal class JsonContentNestedDataSerializer : IContentCacheDataSerializer
         public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
             => JsonSerializer.Serialize(writer, value, value.GetType(), options);
     }
-
 }

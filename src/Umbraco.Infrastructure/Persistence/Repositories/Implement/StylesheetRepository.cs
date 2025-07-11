@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents the Stylesheet Repository
 /// </summary>
-internal class StylesheetRepository : FileRepository<string, IStylesheet>, IStylesheetRepository
+internal sealed class StylesheetRepository : FileRepository<string, IStylesheet>, IStylesheetRepository
 {
     public StylesheetRepository(FileSystems fileSystems)
         : base(fileSystems.StylesheetsFileSystem)

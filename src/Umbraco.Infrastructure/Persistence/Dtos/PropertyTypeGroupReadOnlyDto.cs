@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.PropertyTypeGroup)]
 [PrimaryKey("id", AutoIncrement = true)]
 [ExplicitColumns]
-internal class PropertyTypeGroupReadOnlyDto
+internal sealed class PropertyTypeGroupReadOnlyDto
 {
     [Column("PropertyTypeGroupId")]
     public int? Id { get; set; }

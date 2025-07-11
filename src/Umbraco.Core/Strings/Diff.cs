@@ -500,7 +500,7 @@ internal sealed class Diff
     /// <summary>
     ///     Data on one input file being compared.
     /// </summary>
-    internal class DiffData
+    internal sealed class DiffData
     {
         /// <summary>Buffer of numbers that will be compared.</summary>
         internal int[] Data;

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Lock)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class LockDto
+internal sealed class LockDto
 {
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoLock", AutoIncrement = false)]

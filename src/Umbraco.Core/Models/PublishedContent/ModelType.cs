@@ -373,7 +373,7 @@ public class ModelType : Type
 }
 
 /// <inheritdoc />
-internal class ModelTypeArrayType : Type
+internal sealed class ModelTypeArrayType : Type
 {
     private readonly Type _elementType;
 

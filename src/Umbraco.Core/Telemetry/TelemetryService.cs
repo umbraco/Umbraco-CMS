@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Telemetry;
 
 /// <inheritdoc />
-internal class TelemetryService : ITelemetryService
+internal sealed class TelemetryService : ITelemetryService
 {
     private readonly IPackagingService _packagingService;
     private readonly IMetricsConsentService _metricsConsentService;

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents the configuration editor for the image cropper value editor.
 /// </summary>
-internal class ImageCropperConfigurationEditor : ConfigurationEditor<ImageCropperConfiguration>
+internal sealed class ImageCropperConfigurationEditor : ConfigurationEditor<ImageCropperConfiguration>
 {
     public ImageCropperConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)

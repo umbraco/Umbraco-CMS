@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
 // Log Expression Filters (pass in filter exp string)
-internal class ExpressionFilter : ILogFilter
+internal sealed class ExpressionFilter : ILogFilter
 {
     private const string ExpressionOperators = "()+=*<>%-";
     private readonly Func<LogEvent, bool>? _filter;
@@ -57,7 +57,7 @@ internal class ExpressionFilter : ILogFilter
 
     public bool TakeLogEvent(LogEvent e) => _filter == null || _filter(e);
 
-    private Func<LogEvent, bool>? PerformMessageLikeFilter(string filterExpression, SerilogLegacyNameResolver serilogLegacyNameResolver)
+    private static Func<LogEvent, bool>? PerformMessageLikeFilter(string filterExpression, SerilogLegacyNameResolver serilogLegacyNameResolver)
     {
         var filterSearch = $"@Message like '%{SerilogExpression.EscapeLikeExpressionContent(filterExpression)}%'";
         if (SerilogExpression.TryCompile(filterSearch, null, serilogLegacyNameResolver, out CompiledExpression? compiled, out var error))

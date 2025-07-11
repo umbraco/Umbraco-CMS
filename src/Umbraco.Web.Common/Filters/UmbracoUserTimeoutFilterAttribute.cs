@@ -17,7 +17,7 @@ public class UmbracoUserTimeoutFilterAttribute : TypeFilterAttribute
     {
     }
 
-    private class UmbracoUserTimeoutFilter : IActionFilter
+    private sealed class UmbracoUserTimeoutFilter : IActionFilter
     {
         public void OnActionExecuted(ActionExecutedContext context)
         {

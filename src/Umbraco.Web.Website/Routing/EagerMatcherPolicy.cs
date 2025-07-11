@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Web.Website.Routing;
  * This also handles rerouting under install/upgrade states.
  */
 
-internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
+internal sealed class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
 {
     private readonly IRuntimeState _runtimeState;
     private readonly EndpointDataSource _endpointDataSource;

@@ -2,7 +2,7 @@ using NPoco;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-internal class UserNotificationDto
+internal sealed class UserNotificationDto
 {
     [Column("nodeId")]
     public int NodeId { get; set; }

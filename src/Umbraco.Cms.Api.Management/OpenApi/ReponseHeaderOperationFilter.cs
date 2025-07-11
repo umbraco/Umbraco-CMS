@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
-internal class ResponseHeaderOperationFilter : IOperationFilter
+internal sealed class ResponseHeaderOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
@@ -29,7 +29,7 @@ internal class ResponseHeaderOperationFilter : IOperationFilter
         }
     }
 
-    private void SetHeader(OpenApiResponse value, string headerName, string description, string type, string? format = null)
+    private static void SetHeader(OpenApiResponse value, string headerName, string description, string type, string? format = null)
     {
 
         if (value.Headers is null)
