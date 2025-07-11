@@ -54,7 +54,7 @@ internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
 
     /// <inheritdoc/>
     public async Task<bool> IsRebuildingAsync()
-        => (await _longRunningOperationService.GetByTypeAsync(RebuildOperationName, 0, 0)).Total != 0;
+        => (await _longRunningOperationService.GetByTypeAsync(RebuildOperationName, 0, 1)).Total != 0;
 
     /// <inheritdoc/>
     [Obsolete("Use the overload with the useBackgroundThread parameter. Scheduled for removal in Umbraco 17.")]

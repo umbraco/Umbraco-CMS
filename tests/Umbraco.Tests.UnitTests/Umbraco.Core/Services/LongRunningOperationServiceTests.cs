@@ -43,7 +43,7 @@ public class LongRunningOperationServiceTests
     {
         SetupScopeProviderMock();
         _longRunningOperationRepositoryMock
-            .Setup(repo => repo.GetByTypeAsync("Test", It.IsAny<LongRunningOperationStatus[]>(), 0, 0))
+            .Setup(repo => repo.GetByTypeAsync("Test", It.IsAny<LongRunningOperationStatus[]>(), 0, 1))
             .Callback<string, LongRunningOperationStatus[], int, int>((_, statuses, _, _) =>
             {
                 Assert.AreEqual(2, statuses.Length);

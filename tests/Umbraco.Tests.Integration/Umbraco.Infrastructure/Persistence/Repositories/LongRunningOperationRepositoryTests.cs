@@ -51,7 +51,6 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     [TestCase("Test", new[] { LongRunningOperationStatus.Running, LongRunningOperationStatus.Stale }, 0, 100, 2, 2)]
     [TestCase("Test", new[] { LongRunningOperationStatus.Success, LongRunningOperationStatus.Stale }, 0, 100, 2, 2)]
     [TestCase("AnotherTest", new LongRunningOperationStatus[] { }, 0, 100, 1, 1)]
-    [TestCase("Test", new LongRunningOperationStatus[] { }, 0, 0, 0, 5)]
     [TestCase("Test", new LongRunningOperationStatus[] { }, 0, 1, 1, 5)]
     [TestCase("Test", new LongRunningOperationStatus[] { }, 2, 2, 2, 5)]
     [TestCase("Test", new LongRunningOperationStatus[] { }, 5, 1, 0, 5)]

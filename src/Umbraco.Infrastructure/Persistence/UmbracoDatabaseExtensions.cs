@@ -99,6 +99,16 @@ internal static class UmbracoDatabaseExtensions
         int take,
         Func<TDto, TResult> mapper)
     {
+        if (skip < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(skip), "Skip must be zero or greater.");
+        }
+
+        if (take <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(take), "Take must be greater than zero.");
+        }
+
         List<TDto> results = await database.SkipTakeAsync<TDto>(
             skip,
             take,
