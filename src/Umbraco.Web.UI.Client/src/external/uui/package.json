@@ -4,5 +4,9 @@
 	"type": "module",
 	"scripts": {
 		"build": "vite build"
+	},
+	"dependencies": {
+		"@umbraco-ui/uui": "^1.14.2",
+		"@umbraco-ui/uui-css": "^1.14.1"
 	}
 }
