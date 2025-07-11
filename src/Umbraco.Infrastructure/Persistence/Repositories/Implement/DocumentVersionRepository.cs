@@ -48,7 +48,9 @@ internal class DocumentVersionRepository : IDocumentVersionRepository
             .Where<ContentVersionDto>(x => !x.PreventCleanup) // Never delete "pinned" versions
             .Where<DocumentVersionDto>(x => !x.Published); // Never delete published version
 
-        return _scopeAccessor.AmbientScope?.Database.Fetch<ContentVersionMeta>(query);
+        List<ContentVersionMeta>? results = _scopeAccessor.AmbientScope?.Database.Fetch<ContentVersionMeta>(query);
+        EnsureUtcDates(results);
+        return results;
     }
 
     /// <inheritdoc />
@@ -101,7 +103,9 @@ internal class DocumentVersionRepository : IDocumentVersionRepository
 
         totalRecords = page?.TotalItems ?? 0;
 
-        return page?.Items;
+        List<ContentVersionMeta>? results = page?.Items;
+        EnsureUtcDates(results);
+        return results;
     }
 
     /// <inheritdoc />
@@ -176,6 +180,31 @@ internal class DocumentVersionRepository : IDocumentVersionRepository
             .On<UserDto, ContentVersionDto>(left => left.Id, right => right.UserId)
             .Where<ContentVersionDto>(x => x.Id == versionId);
 
-        return _scopeAccessor.AmbientScope?.Database.Single<ContentVersionMeta>(query);
+        ContentVersionMeta? result = _scopeAccessor.AmbientScope?.Database.Single<ContentVersionMeta>(query);
+        EnsureUtcDate(result);
+        return result;
+    }
+
+    private static void EnsureUtcDate(ContentVersionMeta? version)
+    {
+        if (version is null)
+        {
+            return;
+        }
+
+        EnsureUtcDates([version]);
+    }
+
+    private static void EnsureUtcDates(IEnumerable<ContentVersionMeta>? versions)
+    {
+        if (versions is null)
+        {
+            return;
+        }
+
+        foreach (ContentVersionMeta version in versions)
+        {
+            version.EnsureUtc();
+        }
     }
 }

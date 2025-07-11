@@ -1,6 +1,7 @@
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -892,8 +893,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     private static void BuildEntity(EntitySlim entity, BaseDto dto)
     {
         entity.Trashed = dto.Trashed;
-        entity.CreateDate = dto.CreateDate;
-        entity.UpdateDate = dto.VersionDate;
+        entity.CreateDate = dto.CreateDate.EnsureUtc();
+        entity.UpdateDate = dto.VersionDate.EnsureUtc();
         entity.CreatorId = dto.UserId ?? Constants.Security.UnknownUserId;
         entity.Id = dto.NodeId;
         entity.Key = dto.UniqueId;
