@@ -351,14 +351,17 @@ Use this directive to generate a thumbnail grid of media items.
             // sort function
             scope.sortBy = function (item) {
                 if (scope.sortColumn === "updateDate") {
-                    return [-item['isFolder'],item['updateDate']];
+                    return [-item['isFolder'],parseUpdateDate(item['updateDate'])];
                 }
                 else {
                     return [-item['isFolder'],item['name']];
                 }
             };
 
-
+            function parseUpdateDate(date) {
+                var parsedDate = Date.parse(date);
+                return isNaN(parsedDate) ? date : parsedDate;
+            }
         }
 
         var directive = {
