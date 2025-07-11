@@ -206,11 +206,11 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         switch (systemMethod)
         {
             case SystemMethods.NewGuid:
-                return null; // Not availble in SQLite.
+                return null; // Not available in SQLite.
             case SystemMethods.CurrentDateTime:
-                return null; // Not availble in SQLite.
+                return null; // Not available in SQLite.
             case SystemMethods.CurrentUTCDateTime:
-                return "CURRENT_DATE";
+                return "CURRENT_TIMESTAMP";
         }
 
         return null;
