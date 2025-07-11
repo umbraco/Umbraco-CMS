@@ -240,22 +240,21 @@ test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
 
-// TODO: Remove skip when the code is updated due to UI changes
-test.skip('can add a thumbnail to a block', async ({umbracoApi, umbracoUi}) => {
+test('can add a thumbnail to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
-  await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
-  const mediaUrl = await umbracoApi.media.getMediaPathByName(mediaName);
+  const mediaUrl = await umbracoApi.media.getMediaUrl(mediaId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
-  await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl.fileName, mediaUrl.mediaPath);
+  await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
