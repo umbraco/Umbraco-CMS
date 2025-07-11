@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -9,13 +11,11 @@ namespace Umbraco.Cms.Core.Services;
 /// <inheritdoc />
 internal class LongRunningOperationService : ILongRunningOperationService
 {
+    private readonly IOptions<LongRunningOperationsSettings> _options;
     private readonly ILongRunningOperationRepository _repository;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<LongRunningOperationService> _logger;
-
-    private readonly TimeSpan _timeToWaitBetweenBackgroundTaskStatusChecks = TimeSpan.FromSeconds(10);
-    private readonly TimeSpan _defaultExpirationTime = TimeSpan.FromMinutes(2);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LongRunningOperationService"/> class.
@@ -25,11 +25,13 @@ internal class LongRunningOperationService : ILongRunningOperationService
     /// <param name="timeProvider">The time provider for getting the current UTC time.</param>
     /// <param name="logger">The logger for logging information and errors related to long-running operations.</param>
     public LongRunningOperationService(
+        IOptions<LongRunningOperationsSettings> options,
         ILongRunningOperationRepository repository,
         ICoreScopeProvider scopeProvider,
         TimeProvider timeProvider,
         ILogger<LongRunningOperationService> logger)
     {
+        _options = options;
         _repository = repository;
         _scopeProvider = scopeProvider;
         _timeProvider = timeProvider;
@@ -142,7 +144,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
                     Type = type,
                     Status = LongRunningOperationStatus.Enqueued,
                 },
-                _timeProvider.GetUtcNow() + _defaultExpirationTime);
+                _timeProvider.GetUtcNow() + _options.Value.ExpirationTime);
             scope.Complete();
         }
 
@@ -209,11 +211,11 @@ internal class LongRunningOperationService : ILongRunningOperationService
                 // That way, even if the status has not changed, we know that the operation is still being processed.
                 using (ICoreScope scope = _scopeProvider.CreateCoreScope())
                 {
-                    await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Running, _timeProvider.GetUtcNow() + _defaultExpirationTime);
+                    await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Running, _timeProvider.GetUtcNow() + _options.Value.ExpirationTime);
                     scope.Complete();
                 }
 
-                await Task.WhenAny(operationTask, Task.Delay(_timeToWaitBetweenBackgroundTaskStatusChecks)).ConfigureAwait(false);
+                await Task.WhenAny(operationTask, Task.Delay(_options.Value.TimeBetweenStatusChecks)).ConfigureAwait(false);
             }
         }
         catch (Exception)
@@ -222,7 +224,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
             _logger.LogDebug("Finished long-running operation {Type} with id {OperationId} and status {Status}.", type, operationId, LongRunningOperationStatus.Failed);
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
-                await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Failed, _timeProvider.GetUtcNow() + _defaultExpirationTime);
+                await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Failed, _timeProvider.GetUtcNow() + _options.Value.ExpirationTime);
                 scope.Complete();
             }
 
@@ -233,7 +235,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
 
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Success, _timeProvider.GetUtcNow() + _defaultExpirationTime);
+            await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Success, _timeProvider.GetUtcNow() + _options.Value.ExpirationTime);
             if (operationTask.Result != null)
             {
                 await _repository.SetResultAsync(operationId, operationTask.Result);

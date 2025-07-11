@@ -1,7 +1,9 @@
 using System.Data;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -29,6 +31,7 @@ public class LongRunningOperationServiceTests
         _scopeMock = new Mock<ICoreScope>();
 
         _longRunningOperationService = new LongRunningOperationService(
+            Options.Create(new LongRunningOperationsSettings()),
             _longRunningOperationRepositoryMock.Object,
             _scopeProviderMock.Object,
             _timeProviderMock.Object,
