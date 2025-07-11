@@ -43,7 +43,7 @@ test('can create content using an invariant document blueprint', async ({umbraco
   const dataTypeName = 'Textstring';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.documentBlueprint.createDocumentBlueprintWithText(documentBlueprintName, documentTypeId, textContent, dataTypeName);
+  await umbracoApi.documentBlueprint.createDocumentBlueprintWithTextBoxValue(documentBlueprintName, documentTypeId, dataTypeName, textContent);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -67,7 +67,7 @@ test('can create content using a variant document blueprint', async ({umbracoApi
   await umbracoApi.language.createDanishLanguage();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.documentBlueprint.createDocumenBlueprintWithEnglishCultureAndDanishCultureAndTextContent(documentBlueprintName, documentBlueprintDanishName, documentTypeId, textContent, dataTypeName);
+  await umbracoApi.documentBlueprint.createDocumenBlueprintWithEnglishCultureAndDanishCultureAndTextBoxValue(documentBlueprintName, documentBlueprintDanishName, documentTypeId, dataTypeName, textContent);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -96,7 +96,7 @@ test('can create content with different name using an invariant document bluepri
   const dataTypeName = 'Textstring';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.documentBlueprint.createDocumentBlueprintWithText(documentBlueprintName, documentTypeId, textContent, dataTypeName);
+  await umbracoApi.documentBlueprint.createDocumentBlueprintWithTextBoxValue(documentBlueprintName, documentTypeId, dataTypeName, textContent);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -122,7 +122,7 @@ test('can create content with different name using a variant document blueprint'
   await umbracoApi.language.createDanishLanguage();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.documentBlueprint.createDocumenBlueprintWithEnglishCultureAndDanishCultureAndTextContent(documentBlueprintName, documentBlueprintDanishName, documentTypeId, textContent, dataTypeName);
+  await umbracoApi.documentBlueprint.createDocumenBlueprintWithEnglishCultureAndDanishCultureAndTextBoxValue(documentBlueprintName, documentBlueprintDanishName, documentTypeId, dataTypeName, textContent);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -153,7 +153,7 @@ test('can create content using a document blueprint with block list', async ({um
   const tipTapDataType = await umbracoApi.dataType.getByName(richTextDataTypeUiAlias);
   const tipTapDataTypeId = tipTapDataType.id;
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, elementGroupName, elementPropertyName, tipTapDataTypeId);
-  await umbracoApi.documentBlueprint.createDefaultDocumentBlueprintWithABlockListEditorAndBlockWithValue(documentBlueprintName, documentTypeName, blockDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), textContent, elementDataTypeUiAlias, groupName);
+  await umbracoApi.documentBlueprint.createDefaultDocumentBlueprintWithABlockListEditorAndBlockWithValue(documentBlueprintName, documentTypeName, blockDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), elementDataTypeUiAlias, textContent, groupName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -179,7 +179,7 @@ test('can create content using a document blueprint with block grid', async ({um
   const tipTapDataType = await umbracoApi.dataType.getByName(richTextDataTypeUiAlias);
   const tipTapDataTypeId = tipTapDataType.id;
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, elementGroupName, elementPropertyName, tipTapDataTypeId);
-  await umbracoApi.documentBlueprint.createDefaultDocumentBlueprintWithABlockGridEditorAndBlockWithValue(documentBlueprintName, documentTypeName, blockDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), textContent, richTextDataTypeUiAlias);
+  await umbracoApi.documentBlueprint.createDefaultDocumentBlueprintWithABlockGridEditorAndBlockWithValue(documentBlueprintName, documentTypeName, blockDataTypeName, elementTypeId, AliasHelper.toAlias(elementPropertyName), richTextDataTypeUiAlias, textContent);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
