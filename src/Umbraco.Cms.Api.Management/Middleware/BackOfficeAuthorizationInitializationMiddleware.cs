@@ -65,12 +65,20 @@ public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
             return;
         }
 
-        if (_knownHosts.Add($"{context.Request.Scheme}://{context.Request.Host}") is false)
+        var host = $"{context.Request.Scheme}://{context.Request.Host}";
+        if (_knownHosts.Contains(host))
         {
             return;
         }
 
         await _firstBackOfficeRequestLocker.WaitAsync();
+
+        // NOTE: _knownHosts is not thread safe; check again after entering the semaphore
+        if (_knownHosts.Add(host) is false)
+        {
+            _firstBackOfficeRequestLocker.Release();
+            return;
+        }
 
         // ensure we explicitly add UmbracoApplicationUrl if configured (https://github.com/umbraco/Umbraco-CMS/issues/16179)
         if (_webRoutingSettings.UmbracoApplicationUrl.IsNullOrWhiteSpace() is false)

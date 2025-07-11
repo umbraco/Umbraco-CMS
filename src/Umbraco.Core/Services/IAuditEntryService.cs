@@ -27,42 +27,12 @@ public interface IAuditEntryService : IService
     /// </param>
     /// <param name="eventDetails">Free-form details about the audited event.</param>
     /// <returns>The created audit entry.</returns>
-    public Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
-        Guid performingUserKey,
+    public Task<IAuditEntry> WriteAsync(
+        Guid? performingUserKey,
         string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
-        Guid affectedUserKey,
-        string? affectedDetails,
-        string eventType,
-        string eventDetails);
-
-    /// <summary>
-    ///     Writes an audit entry for an audited event.
-    /// </summary>
-    /// <param name="performingUserId">The identifier of the user triggering the audited event.</param>
-    /// <param name="performingDetails">Free-form details about the user triggering the audited event.</param>
-    /// <param name="performingIp">The IP address or the request triggering the audited event.</param>
-    /// <param name="eventDateUtc">The date and time of the audited event.</param>
-    /// <param name="affectedUserId">The identifier of the user affected by the audited event.</param>
-    /// <param name="affectedDetails">Free-form details about the entity affected by the audited event.</param>
-    /// <param name="eventType">
-    ///     The type of the audited event - must contain only alphanumeric chars and hyphens with forward slashes separating
-    ///     categories.
-    ///     <example>
-    ///         The eventType will generally be formatted like: {application}/{entity-type}/{category}/{sub-category}
-    ///         Example: umbraco/user/sign-in/failed
-    ///     </example>
-    /// </param>
-    /// <param name="eventDetails">Free-form details about the audited event.</param>
-    /// <returns>The created audit entry.</returns>
-    [Obsolete("Use the overload that takes user keys. Scheduled for removal in Umbraco 19.")]
-    public Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
-        int performingUserId,
-        string performingDetails,
-        string performingIp,
-        DateTime eventDateUtc,
-        int affectedUserId,
+        Guid? affectedUserKey,
         string? affectedDetails,
         string eventType,
         string eventDetails);

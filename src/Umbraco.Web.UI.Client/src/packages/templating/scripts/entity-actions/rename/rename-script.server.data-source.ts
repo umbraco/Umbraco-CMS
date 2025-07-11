@@ -39,7 +39,7 @@ export class UmbRenameScriptServerDataSource {
 		const { data, error } = await tryExecute(
 			this.#host,
 			ScriptService.putScriptByPathRename({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 				body,
 			}),
 		);

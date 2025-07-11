@@ -6,12 +6,12 @@ const documentTypeName = 'TestDocumentTypeForContent';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
 // TODO: Skip this test as TinyMCE is replaced by Tiptap. This test should be updated.
@@ -26,15 +26,14 @@ test.skip('can create content with the Rich Text Editor datatype', {tag: '@smoke
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.enterRichTextArea(contentText);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.markup).toEqual('<p>' + contentText + '</p>');
@@ -52,15 +51,14 @@ test.skip('can create content with the upload file datatype', async ({umbracoApi
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.uploadFile('./fixtures/mediaLibrary/' + uploadFilePath);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.src).toContainEqual(uploadFilePath);
@@ -76,18 +74,17 @@ test.skip('can create content with the list view - content datatype', async ({um
   const contentPickerId = await umbracoApi.document.createDefaultDocument(contentListViewName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-  
+
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   // TODO: add step to interact with the list
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 
   // Clean

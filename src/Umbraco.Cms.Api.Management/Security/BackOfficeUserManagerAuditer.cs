@@ -1,7 +1,4 @@
-﻿using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
+using System.Globalization;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -102,9 +99,6 @@ internal sealed class BackOfficeUserManagerAuditer :
             "umbraco/user/password/reset",
             "password reset");
 
-    private static string FormatEmail(IMembershipUser? user) =>
-        user is null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{user.Email}>";
-
     private async Task WriteAudit(
         string performingId,
         string? affectedId,
@@ -112,8 +106,8 @@ internal sealed class BackOfficeUserManagerAuditer :
         string eventType,
         string eventDetails)
     {
-        int? performingIdAsInt = ParseUserId(performingId);
-        int? affectedIdAsInt = ParseUserId(affectedId);
+        var performingIdAsInt = ParseUserId(performingId);
+        var affectedIdAsInt = ParseUserId(affectedId);
 
         await WriteAudit(performingIdAsInt, affectedIdAsInt, ipAddress, eventType, eventDetails);
     }
@@ -128,36 +122,29 @@ internal sealed class BackOfficeUserManagerAuditer :
         string eventType,
         string eventDetails)
     {
-        Guid? performingKey = null;
-        var performingDetails = "User UNKNOWN:0";
-        if (performingId.HasValue)
-        {
-            IUser? performingUser = _userService.GetUserById(performingId.Value);
-            performingKey = performingUser?.Key;
-            performingDetails = performingUser is null
-                ? $"User UNKNOWN:{performingId.Value}"
-                : $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}";
-        }
-
-        Guid? affectedKey = null;
-        var affectedDetails = "User UNKNOWN:0";
-        if (affectedId.HasValue)
-        {
-            IUser? affectedUser = _userService.GetUserById(affectedId.Value);
-            affectedKey = affectedUser?.Key;
-            affectedDetails = affectedUser is null
-                ? $"User UNKNOWN:{affectedId.Value}"
-                : $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}";
-        }
+        IUser? performingUser = performingId is not null ? _userService.GetUserById(performingId.Value) : null;
+        IUser? affectedUser = affectedId is not null ? _userService.GetUserById(affectedId.Value) : null;
 
         await _auditEntryService.WriteAsync(
-            performingKey ?? Constants.Security.UnknownUserKey,
-            performingDetails,
+            performingUser?.Key,
+            FormatDetails(performingId, performingUser),
             ipAddress,
             DateTime.UtcNow,
-            affectedKey ?? Constants.Security.UnknownUserKey,
-            affectedDetails,
+            affectedUser?.Key,
+            FormatDetails(affectedId, affectedUser),
             eventType,
             eventDetails);
+    }
+
+    private static string FormatDetails(int? id, IUser? user)
+    {
+        if (user == null)
+        {
+            return $"User UNKNOWN:{id ?? 0}";
+        }
+
+        return user.Email.IsNullOrWhiteSpace()
+            ? $"User \"{user.Name}\""
+            : $"User \"{user.Name}\" <{user.Email}>";
     }
 }

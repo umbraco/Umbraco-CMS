@@ -79,7 +79,7 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 			strong,
 			uui-label,
 			uui-input {
-				display: block;
+				width: 100%;
 			}
 
 			uui-label {

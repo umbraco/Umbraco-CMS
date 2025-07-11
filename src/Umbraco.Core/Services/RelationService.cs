@@ -793,9 +793,7 @@ public class RelationService : RepositoryService, IRelationService
 
     private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
     {
-        Guid userKey = await _userIdKeyResolver.TryGetAsync(userId) is { Success: true } userKeyAttempt
-            ? userKeyAttempt.Result
-            : Constants.Security.UnknownUserKey;
+        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
 
         await AuditAsync(type, userKey, objectId, message, parameters);
     }

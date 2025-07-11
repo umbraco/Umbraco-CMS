@@ -1,13 +1,8 @@
-// <copyright file="AuditEntryService.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -16,8 +11,6 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
 {
     private readonly IAuditEntryRepository _auditEntryRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly Lock _isAvailableLock = new();
-    private bool _isAvailable;
 
     /// <summary>
     ///    Initializes a new instance of the <see cref="AuditEntryService" /> class.
@@ -35,18 +28,19 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
-        Guid performingUserKey,
+    public async Task<IAuditEntry> WriteAsync(
+        Guid? performingUserKey,
         string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
-        Guid affectedUserKey,
+        Guid? affectedUserKey,
         string? affectedDetails,
         string eventType,
         string eventDetails)
     {
         var performingUserId = await GetUserId(performingUserKey);
         var affectedUserId = await GetUserId(affectedUserKey);
+
         return WriteInner(
             performingUserId,
             performingUserKey,
@@ -58,46 +52,15 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             affectedDetails,
             eventType,
             eventDetails);
-
-        async Task<int> GetUserId(Guid userKey)
-        {
-            return userKey switch
-            {
-                _ when userKey == Constants.Security.UnknownUserKey => Constants.Security.UnknownUserId,
-                _ when await _userIdKeyResolver.TryGetAsync(userKey) is { Success: true } attempt => attempt.Result,
-                _ => Constants.Security.UnknownUserId,
-            };
-        }
     }
 
-    /// <inheritdoc />
-    [Obsolete("Use the overload that takes user keys. Scheduled for removal in Umbraco 19.")]
-    public async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteAsync(
-        int performingUserId,
-        string perfomingDetails,
-        string performingIp,
-        DateTime eventDateUtc,
-        int affectedUserId,
-        string? affectedDetails,
-        string eventType,
-        string eventDetails) =>
-        await WriteInner(
-            performingUserId,
-            perfomingDetails,
-            performingIp,
-            eventDateUtc,
-            affectedUserId,
-            affectedDetails,
-            eventType,
-            eventDetails);
-
     // This method is used by the AuditService while the AuditService.Write() method is not removed.
-    internal async Task<Attempt<IAuditEntry, AuditEntryOperationStatus>> WriteInner(
-        int performingUserId,
+    internal async Task<IAuditEntry> WriteInner(
+        int? performingUserId,
         string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
-        int affectedUserId,
+        int? affectedUserId,
         string? affectedDetails,
         string eventType,
         string eventDetails)
@@ -116,31 +79,24 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             affectedDetails,
             eventType,
             eventDetails);
-
-        async Task<Guid?> GetUserKey(int userId)
-        {
-            return userId switch
-            {
-                Constants.Security.UnknownUserId => Constants.Security.UnknownUserKey,
-                _ when await _userIdKeyResolver.TryGetAsync(userId) is { Success: true } attempt => attempt.Result,
-                _ => Constants.Security.UnknownUserKey,
-            };
-        }
     }
 
-    private Attempt<IAuditEntry, AuditEntryOperationStatus> WriteInner(
-        int performingUserId,
+    private IAuditEntry WriteInner(
+        int? performingUserId,
         Guid? performingUserKey,
         string performingDetails,
         string performingIp,
         DateTime eventDateUtc,
-        int affectedUserId,
+        int? affectedUserId,
         Guid? affectedUserKey,
         string? affectedDetails,
         string eventType,
         string eventDetails)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(performingUserId, Constants.Security.SuperUserId);
+        if (performingUserId < Constants.Security.SuperUserId)
+        {
+            throw new ArgumentOutOfRangeException(nameof(performingUserId));
+        }
 
         if (string.IsNullOrWhiteSpace(performingDetails))
         {
@@ -183,22 +139,17 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
 
         var entry = new AuditEntry
         {
-            PerformingUserId = performingUserId,
+            PerformingUserId = performingUserId ?? Constants.Security.UnknownUserId, // Default to UnknownUserId as it is non-nullable
             PerformingUserKey = performingUserKey,
             PerformingDetails = performingDetails,
             PerformingIp = performingIp,
             EventDateUtc = eventDateUtc,
-            AffectedUserId = affectedUserId,
+            AffectedUserId = affectedUserId ?? Constants.Security.UnknownUserId, // Default to UnknownUserId as it is non-nullable
             AffectedUserKey = affectedUserKey,
             AffectedDetails = affectedDetails,
             EventType = eventType,
             EventDetails = eventDetails,
         };
-
-        if (!IsAvailable())
-        {
-            return Attempt.FailWithStatus(AuditEntryOperationStatus.RepositoryNotAvailable, (IAuditEntry)entry);
-        }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -206,43 +157,25 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             scope.Complete();
         }
 
-        return Attempt.SucceedWithStatus(AuditEntryOperationStatus.Success, (IAuditEntry)entry);
+        return entry;
     }
+
+    internal async Task<int?> GetUserId(Guid? key) =>
+        key is not null && await _userIdKeyResolver.TryGetAsync(key.Value) is { Success: true } attempt
+            ? attempt.Result
+            : null;
+
+    internal async Task<Guid?> GetUserKey(int? id) =>
+        id is not null && await _userIdKeyResolver.TryGetAsync(id.Value) is { Success: true } attempt
+            ? attempt.Result
+            : null;
 
     // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
     internal IEnumerable<IAuditEntry> GetAll()
     {
-        if (!IsAvailable())
-        {
-            return [];
-        }
-
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _auditEntryRepository.GetMany();
         }
-    }
-
-    private bool IsAvailable()
-    {
-        if (_isAvailable)
-        {
-            return true;
-        }
-
-        lock (_isAvailableLock)
-        {
-            if (_isAvailable)
-            {
-                return true;
-            }
-
-            using (ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                _isAvailable = _auditEntryRepository.IsAvailable();
-            }
-        }
-
-        return _isAvailable;
     }
 }

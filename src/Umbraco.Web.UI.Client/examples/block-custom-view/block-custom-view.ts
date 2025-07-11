@@ -29,13 +29,21 @@ export class ExampleBlockCustomView extends UmbElementMixin(LitElement) implemen
 		UmbTextStyles,
 		css`
 			:host {
+				position: relative;
 				display: block;
+				z-index: 10000;
 				height: 100%;
 				box-sizing: border-box;
 				background-color: red;
 				color: white;
 				border-radius: 9px;
 				padding: 12px;
+			}
+
+			:host > div {
+				position: relative;
+				display: block;
+				z-index: 10000;
 			}
 
 			.align-center {

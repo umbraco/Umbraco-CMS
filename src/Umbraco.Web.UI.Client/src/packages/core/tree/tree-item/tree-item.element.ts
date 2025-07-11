@@ -31,7 +31,7 @@ export class UmbTreeItemElement extends UmbExtensionElementAndApiSlotElementBase
 			// This method gets all extensions based on a type, then filters them based on the entity type. and then we get the alias of the first one [NL]
 			createObservablePart(
 				umbExtensionsRegistry.byTypeAndFilter(this.getExtensionType(), filterByEntityType),
-				(x) => x[0].alias,
+				(x) => x[0]?.alias,
 			),
 			(alias) => {
 				this.alias = alias;

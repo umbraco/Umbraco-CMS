@@ -15,7 +15,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: '#defaultdialogs_externalLoginProviders',
 			icon: 'icon-lock',
-			look: 'secondary',
 		},
 		conditions: [
 			{

@@ -1,9 +1,11 @@
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_TYPE_SEARCH_PROVIDER_ALIAS } from './constants.js';
+import { manifests as globalSearchManifests } from './global-search/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		name: 'Media Type Search Provider',
-		alias: 'Umb.SearchProvider.MediaType',
+		alias: UMB_MEDIA_TYPE_SEARCH_PROVIDER_ALIAS,
 		type: 'searchProvider',
 		api: () => import('./media-type.search-provider.js'),
 		weight: 500,
@@ -17,4 +19,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'searchResultItem',
 		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 	},
+	...globalSearchManifests,
 ];

@@ -105,22 +105,17 @@ public sealed class AuditNotificationsHandler :
     {
     }
 
-    private IUser? CurrentPerformingUser
-    {
-        get
-        {
-            IUser? identity = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-            IUser? user = identity == null ? null : _userService.GetAsync(identity.Key).GetAwaiter().GetResult();
-            return user;
-        }
-    }
+    private async Task<IUser?> GetCurrentPerformingUser() =>
+        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is { } identity
+            ? await _userService.GetAsync(identity.Key)
+            : null;
 
     private string PerformingIp => _ipResolver.GetCurrentRequestIpAddress();
 
     /// <inheritdoc />
     public async Task HandleAsync(AssignedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         var roles = string.Join(", ", notification.Roles);
         var members = _memberService.GetAllMembers(notification.MemberIds).ToDictionary(x => x.Id, x => x);
         foreach (var id in notification.MemberIds)
@@ -130,7 +125,7 @@ public sealed class AuditNotificationsHandler :
             await Audit(
                 performingUser,
                 null,
-                $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
+                affectedDetails: FormatDetails(id, member, appendType: true),
                 "umbraco/member/roles/assigned",
                 $"roles modified, assigned {roles}");
         }
@@ -145,7 +140,7 @@ public sealed class AuditNotificationsHandler :
         AssignedUserGroupPermissionsNotification notification,
         CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<EntityPermission> perms = notification.EntityPermissions;
         foreach (EntityPermission perm in perms)
         {
@@ -169,13 +164,13 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(ExportedMemberNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IMember member = notification.Member;
 
         await Audit(
             performingUser,
             null,
-            $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+            affectedDetails: FormatDetails(member, appendType: true),
             "umbraco/member/exported",
             "exported member data");
     }
@@ -186,16 +181,16 @@ public sealed class AuditNotificationsHandler :
 
     public async Task HandleAsync(MemberDeletedNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IMember> members = notification.DeletedEntities;
         foreach (IMember member in members)
         {
             await Audit(
                 performingUser,
                 null,
-                $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+                affectedDetails: FormatDetails(member, appendType: true),
                 "umbraco/member/delete",
-                $"delete member id:{member.Id} \"{member.Name}\" {FormatEmail(member)}");
+                $"delete member id:{FormatDetails(member)}");
         }
     }
 
@@ -206,7 +201,7 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(MemberSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IMember> members = notification.SavedEntities;
         foreach (IMember member in members)
         {
@@ -215,7 +210,7 @@ public sealed class AuditNotificationsHandler :
             await Audit(
                 performingUser,
                 null,
-                $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+                affectedDetails: FormatDetails(member, appendType: true),
                 "umbraco/member/save",
                 $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
         }
@@ -228,7 +223,7 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(RemovedMemberRolesNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         var roles = string.Join(", ", notification.Roles);
         var members = _memberService.GetAllMembers(notification.MemberIds).ToDictionary(x => x.Id, x => x);
         foreach (var id in notification.MemberIds)
@@ -238,7 +233,7 @@ public sealed class AuditNotificationsHandler :
             await Audit(
                 performingUser,
                 null,
-                $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
+                affectedDetails: FormatDetails(id, member, appendType: true),
                 "umbraco/member/roles/removed",
                 $"roles modified, removed {roles}");
         }
@@ -251,7 +246,7 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(UserDeletedNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IUser> affectedUsers = notification.DeletedEntities;
         foreach (IUser affectedUser in affectedUsers)
         {
@@ -270,7 +265,7 @@ public sealed class AuditNotificationsHandler :
 
     public async Task HandleAsync(UserGroupWithUsersSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         foreach (UserGroupWithUsers groupWithUser in notification.SavedEntities)
         {
             IUserGroup group = groupWithUser.UserGroup;
@@ -303,7 +298,7 @@ public sealed class AuditNotificationsHandler :
             await Audit(
                 performingUser,
                 null,
-                $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
+                $"User Group {FormatDetails(group)}",
                 "umbraco/user-group/save",
                 $"{sb}");
 
@@ -315,7 +310,7 @@ public sealed class AuditNotificationsHandler :
                     user,
                     null,
                     "umbraco/user-group/save",
-                    $"Removed user \"{user.Name}\" {FormatEmail(user)} from group {group.Id} \"{group.Name}\" ({group.Alias})");
+                    $"Removed user {FormatDetails(user)} from group {FormatDetails(group)}");
             }
 
             foreach (IUser user in groupWithUser.AddedUsers)
@@ -325,7 +320,7 @@ public sealed class AuditNotificationsHandler :
                     user,
                     null,
                     "umbraco/user-group/save",
-                    $"Added user \"{user.Name}\" {FormatEmail(user)} to group {group.Id} \"{group.Name}\" ({group.Alias})");
+                    $"Added user {FormatDetails(user)} to group {FormatDetails(group)}");
             }
         }
     }
@@ -337,7 +332,7 @@ public sealed class AuditNotificationsHandler :
     /// <inheritdoc />
     public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken)
     {
-        IUser? performingUser = CurrentPerformingUser;
+        IUser? performingUser = await GetCurrentPerformingUser();
         IEnumerable<IUser> affectedUsers = notification.SavedEntities;
         foreach (IUser affectedUser in affectedUsers)
         {
@@ -356,6 +351,7 @@ public sealed class AuditNotificationsHandler :
         }
     }
 
+    [Obsolete("Use HandleAsync() instead. Scheduled for removal in V19.")]
     public void Handle(UserSavedNotification notification)
         => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -366,22 +362,44 @@ public sealed class AuditNotificationsHandler :
         string eventType,
         string eventDetails)
     {
-        affectedDetails ??= affectedUser is null ? string.Empty : $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}";
+        affectedDetails ??= affectedUser is null ? string.Empty : FormatDetails(affectedUser, appendType: true);
         await _auditEntryService.WriteAsync(
-            performingUser?.Key ?? Constants.Security.UnknownUserKey,
-            $"User \"{performingUser?.Name ?? Constants.Security.UnknownUserName}\" {FormatEmail(performingUser)}",
+            performingUser?.Key,
+            FormatDetails(performingUser, appendType: true),
             PerformingIp,
             DateTime.UtcNow,
-            affectedUser?.Key ?? Constants.Security.SuperUserKey,
+            affectedUser?.Key,
             affectedDetails,
             eventType,
             eventDetails);
     }
 
-    private string FormatEmail(IMember? member) =>
-        member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{member.Email}>";
+    private static string FormatDetails(IUser? user, bool appendType = false)
+    {
+        var userName = user?.Name ?? Constants.Security.UnknownUserName;
+        var details = appendType ? $"User \"{userName}\"" : $"\"{userName}\"";
+        var email = FormatEmail(user?.Email);
 
-    private string FormatEmail(IUser? user) => user is not null && !user.Email.IsNullOrWhiteSpace()
-        ? $"<{user.Email}>"
-        : string.Empty;
+        return email is not null
+            ? $"{details} {email}"
+            : details;
+    }
+
+    private static string FormatDetails(IMember member, bool appendType = false)
+        => FormatDetails(member.Id, member, appendType);
+
+    private static string FormatDetails(int id, IMember? member, bool appendType = false)
+    {
+        var userName = member?.Name ?? "(unknown)";
+        var details = appendType ? $"Member {id} \"{userName}\"" : $"{id} \"{userName}\"";
+        var email = FormatEmail(member?.Email);
+
+        return email is not null
+            ? $"{details} {email}"
+            : details;
+    }
+
+    private static string FormatDetails(IUserGroup group) => $"{group.Id} \"{group.Name}\" ({group.Alias})";
+
+    private static string? FormatEmail(string? email) => !email.IsNullOrWhiteSpace() ? $"<{email}>" : null;
 }

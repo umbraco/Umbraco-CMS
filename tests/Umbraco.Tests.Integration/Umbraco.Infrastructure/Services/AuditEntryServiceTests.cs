@@ -31,9 +31,9 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
             expected.AffectedDetails,
             expected.EventType,
             expected.EventDetails);
-        Assert.IsTrue(result.Success);
+        Assert.NotNull(result);
 
-        var actual = result.Result;
+        var actual = result;
 
         var entries = sut.GetAll().ToArray();
 
@@ -64,13 +64,13 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
             "performingDetails",
             "performingIp",
             eventDateUtc,
-            Constants.Security.UnknownUserKey,
+            null,
             "affectedDetails",
             "umbraco/test",
             "eventDetails");
-        Assert.IsTrue(result.Success);
+        Assert.NotNull(result);
 
-        var actual = result.Result;
+        var actual = result;
 
         var entries = sut.GetAll().ToArray();
 
@@ -82,7 +82,7 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
             Assert.AreEqual("performingIp", actual.PerformingIp);
             Assert.AreEqual(eventDateUtc, actual.EventDateUtc);
             Assert.AreEqual(Constants.Security.UnknownUserId, actual.AffectedUserId);
-            Assert.AreEqual(Constants.Security.UnknownUserKey, actual.AffectedUserKey);
+            Assert.AreEqual(null, actual.AffectedUserKey);
             Assert.AreEqual("affectedDetails", actual.AffectedDetails);
             Assert.AreEqual("umbraco/test", actual.EventType);
             Assert.AreEqual("eventDetails", actual.EventDetails);

@@ -25,7 +25,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UMB_ENTITY_CONTEXT, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
@@ -83,6 +83,7 @@ export class UmbDefaultCollectionContext<
 	});
 
 	#actionEventContext: UmbActionEventContext | undefined;
+	#parentEntityContext = new UmbParentEntityContext(this);
 
 	constructor(host: UmbControllerHost, defaultViewAlias: string, defaultFilter: Partial<FilterModelType> = {}) {
 		super(host, UMB_COLLECTION_CONTEXT);
@@ -92,6 +93,23 @@ export class UmbDefaultCollectionContext<
 
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 		this.#listenToEntityEvents();
+
+		// The parent entity context is used to get the parent entity for the collection items
+		// All items in the collection are children of the current entity context
+		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
+			const currentEntityUnique = context?.getUnique();
+			const currentEntityType = context?.getEntityType();
+
+			const parent: UmbEntityModel | undefined =
+				currentEntityUnique && currentEntityType
+					? {
+							unique: currentEntityUnique,
+							entityType: currentEntityType,
+						}
+					: undefined;
+
+			this.#parentEntityContext?.setParent(parent);
+		});
 	}
 
 	setupView(viewElement: UmbControllerHost) {
@@ -225,6 +243,10 @@ export class UmbDefaultCollectionContext<
 		return this._manifest;
 	}
 
+	public getEmptyLabel(): string {
+		return this.manifest?.meta.noItemsLabel ?? this.#config?.noItemsLabel ?? '#collection_noItemsTitle';
+	}
+
 	/**
 	 * Requests the collection from the repository.
 	 * @returns {*}
@@ -259,6 +281,10 @@ export class UmbDefaultCollectionContext<
 	public setFilter(filter: Partial<FilterModelType>) {
 		this._filter.setValue({ ...this._filter.getValue(), ...filter });
 		this.requestCollection();
+	}
+
+	public updateFilter(filter: Partial<FilterModelType>) {
+		this._filter.setValue({ ...this._filter.getValue(), ...filter });
 	}
 
 	public getLastSelectedView(unique: string | undefined): string | undefined {

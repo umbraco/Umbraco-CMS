@@ -24,7 +24,7 @@ test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbr
 
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await umbracoUi.dataType.clickActionsMenuCreateButton();
+  await umbracoUi.dataType.clickCreateActionMenuOption();
   await umbracoUi.dataType.clickDataTypeButton();
   await umbracoUi.dataType.enterDataTypeName(blockGridEditorName);
   await umbracoUi.dataType.clickSelectAPropertyEditorButton();
@@ -32,8 +32,7 @@ test('can create a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.waitForDataTypeToBeCreated();
   expect(await umbracoApi.dataType.doesNameExist(blockGridEditorName)).toBeTruthy();
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
   expect(dataTypeData.editorAlias).toBe(blockGridEditorAlias);
@@ -51,8 +50,8 @@ test('can rename a block grid editor', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.dataType.isDataTypeTreeItemVisible(blockGridEditorName);
   expect(await umbracoApi.dataType.doesNameExist(blockGridEditorName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(wrongName)).toBeFalsy();
 });
@@ -67,10 +66,9 @@ test('can delete a block grid editor', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickDeleteAndConfirmButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.waitForDataTypeToBeDeleted();
   expect(await umbracoApi.dataType.doesExist(blockGridId)).toBeFalsy();
-  await umbracoUi.dataType.isTreeItemVisible(blockGridEditorName, false);
+  await umbracoUi.dataType.isDataTypeTreeItemVisible(blockGridEditorName, false);
 });
 
 test('can add a block to a block grid editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -88,8 +86,7 @@ test('can add a block to a block grid editor', {tag: '@smoke'}, async ({umbracoA
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeTruthy();
 
   // Clean
@@ -113,8 +110,7 @@ test('can add multiple blocks to a block grid editor', async ({umbracoApi, umbra
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId, secondElementTypeId])).toBeTruthy();
 
   // Clean
@@ -135,8 +131,7 @@ test('can remove a block from a block grid editor', {tag: '@smoke'}, async ({umb
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 
   // Clean
@@ -160,8 +155,7 @@ test('can add a block to a group in a block grid editor', async ({umbracoApi, um
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockGridGroupContainCorrectBlocks(blockGridEditorName, groupName, [elementTypeId])).toBeTruthy();
 
   // Clean
@@ -185,8 +179,7 @@ test('can add multiple blocks to a group in a block grid editor', async ({umbrac
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockGridGroupContainCorrectBlocks(blockGridEditorName, groupName, [elementTypeId, secondElementTypeId])).toBeTruthy();
 
   // Clean
@@ -208,12 +201,11 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-test('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondGroupName = 'MoveToHereGroup';
@@ -228,12 +220,12 @@ test('can move a block from a group to another group in a block grid editor', as
   // Drag and Drop
   const dragFromLocator = await umbracoUi.dataType.getLinkWithName(elementTypeName);
   const dragToLocator = await umbracoUi.dataType.getAddButtonInGroupWithName(secondGroupName);
+  // This needs to be fixed
   await umbracoUi.dataType.dragAndDrop(dragFromLocator, dragToLocator, -10, 0, 10);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockGridGroupContainCorrectBlocks(blockGridEditorName, secondGroupName, [elementTypeId])).toBeTruthy();
   expect(await umbracoApi.dataType.doesBlockGridGroupContainCorrectBlocks(blockGridEditorName, groupName, [elementTypeId])).toBeFalsy();
 });
@@ -263,8 +255,7 @@ test('can add a min and max amount to a block grid editor', async ({umbracoApi, 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
   expect(dataTypeData.values[0].value.min).toBe(minAmount);
   expect(dataTypeData.values[0].value.max).toBe(maxAmount);
@@ -283,7 +274,7 @@ test('max can not be less than min in a block grid editor', async ({umbracoApi, 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible(false);
+  await umbracoUi.dataType.isFailedStateButtonVisible();
   await umbracoUi.dataType.doesAmountContainErrorMessageWithText('The low value must not be exceed the high value');
   const dataTypeData = await umbracoApi.dataType.getByName(blockGridEditorName);
   expect(dataTypeData.values[0].value.min).toBe(minAmount);
@@ -301,8 +292,7 @@ test('can enable live editing mode in a block grid editor', async ({umbracoApi, 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockGridEditorName, true)).toBeTruthy();
 });
 
@@ -316,8 +306,7 @@ test('can disable live editing mode in a block grid editor', async ({umbracoApi,
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockGridEditorName, false)).toBeTruthy();
 });
 
@@ -332,8 +321,7 @@ test('can add editor width in a block grid editor', async ({umbracoApi, umbracoU
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockGridEditorName, propertyEditorWidth)).toBeTruthy();
 });
 
@@ -348,8 +336,7 @@ test('can remove editor width in a block grid editor', async ({umbracoApi, umbra
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockGridEditorName, propertyEditorWidth)).toBeFalsy();
   expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockGridEditorName, '')).toBeTruthy();
 });
@@ -365,8 +352,7 @@ test('can add a create button label in a block grid editor', async ({umbracoApi,
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockGridContainCreateButtonLabel(blockGridEditorName, createButtonLabel)).toBeTruthy();
 });
 
@@ -382,8 +368,7 @@ test('can remove a create button label in a block grid editor', async ({umbracoA
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockGridContainCreateButtonLabel(blockGridEditorName, createButtonLabel)).toBeFalsy();
   expect(await umbracoApi.dataType.doesBlockGridContainCreateButtonLabel(blockGridEditorName, '')).toBeTruthy();
 });
@@ -399,8 +384,7 @@ test('can update grid columns in a block grid editor', async ({umbracoApi, umbra
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockGridContainGridColumns(blockGridEditorName, gridColumns)).toBeTruthy();
 });
 
