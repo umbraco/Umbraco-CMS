@@ -147,7 +147,8 @@
 		"url": "https://umbraco.com"
 	},
 	"workspaces": [
-		"./src/packages/*"
+		"./src/packages/*",
+		"./src/external/*"
 	],
 	"scripts": {
 		"backoffice:test:e2e": "npx playwright test",
@@ -158,7 +159,7 @@
 		"build:vite": "tsc && vite build --mode staging",
 		"build:workspaces": "npm run build -ws --if-present",
 		"build": "tsc --project ./src/tsconfig.build.json",
-		"postbuild": "rollup -c ./src/rollup.config.js && node ./devops/build/global-types.js",
+		"postbuild": "node ./devops/build/global-types.js",
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
 		"check:paths": "node ./devops/build/check-path-length.js dist-cms 120",
 		"check:circular": "node ./devops/circular/index.js src",
