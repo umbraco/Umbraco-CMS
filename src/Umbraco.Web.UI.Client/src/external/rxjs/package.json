@@ -1,0 +1,11 @@
+{
+	"name": "@umbraco-backoffice/rxjs",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	},
+	"dependencies": {
+		"rxjs": "^7.8.2"
+	}
+}

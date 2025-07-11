@@ -1,4 +1,4 @@
-import { globSync } from 'glob';
+import glob from 'tiny-glob';
 import { packageJsonExports } from './meta.js';
 
 const validateExports = async () => {
@@ -7,7 +7,7 @@ const validateExports = async () => {
 	// Iterate over the exports in package.json
 	for (const [key, value] of Object.entries(packageJsonExports || {})) {
 		if (value) {
-			const jsFiles = await globSync(value);
+			const jsFiles = await glob(value, { filesOnly: true });
 
 			// Log an error if the export from the package.json does not exist in the build output
 			if (jsFiles.length === 0) {
