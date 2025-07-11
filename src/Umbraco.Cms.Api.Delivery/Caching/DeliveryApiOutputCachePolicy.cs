@@ -10,11 +10,6 @@ internal sealed class DeliveryApiOutputCachePolicy : IOutputCachePolicy
     private readonly TimeSpan _duration;
     private readonly StringValues _varyByHeaderNames;
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public DeliveryApiOutputCachePolicy(TimeSpan duration)
-        : this(duration, StringValues.Empty)
-        => _duration = duration;
-
     public DeliveryApiOutputCachePolicy(TimeSpan duration, StringValues varyByHeaderNames)
     {
         _duration = duration;
