@@ -357,11 +357,11 @@ Use this directive to generate a thumbnail grid of media items.
                     return [-item['isFolder'],item['name']];
                 }
             };
-        }
 
-        function parseUpdateDate(date) {
-            var parsedDate = Date.parse(date);
-            return isNaN(parsedDate) ? date : parsedDate;
+            function parseUpdateDate(date) {
+                var parsedDate = Date.parse(date);
+                return isNaN(parsedDate) ? date : parsedDate;
+            }
         }
 
         var directive = {
