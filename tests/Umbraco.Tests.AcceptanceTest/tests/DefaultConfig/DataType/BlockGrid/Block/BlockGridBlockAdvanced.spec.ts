@@ -240,7 +240,7 @@ test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
 
-test('can add a thumbnail to a block', async ({umbracoApi, umbracoUi}) => {
+test('can add a thumbnail to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
@@ -260,6 +260,7 @@ test('can add a thumbnail to a block', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.dataType.doesBlockHaveThumbnailImage(mediaUrl);
 });
 
 // TODO: Remove skip when the code is updated. Currently it is missing the assertion steps
