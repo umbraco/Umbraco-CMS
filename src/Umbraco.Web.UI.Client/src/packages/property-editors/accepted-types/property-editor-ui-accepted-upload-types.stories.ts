@@ -5,11 +5,10 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-accepted-upload-types.element.js';
 
 export default {
-	title: 'Property Editor UIs/Accepted Upload Types',
+	title: 'Extension Type/Property Editor UI/Accepted Upload Types',
 	component: 'umb-property-editor-ui-accepted-upload-types',
 	id: 'umb-property-editor-ui-accepted-upload-types',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIAcceptedUploadTypesElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIAcceptedUploadTypesElement> = () =>
 	html`<umb-property-editor-ui-accepted-upload-types></umb-property-editor-ui-accepted-upload-types>`;
-AAAOverview.storyName = 'Overview';
