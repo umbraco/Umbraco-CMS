@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -20,7 +22,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     where TRepository : IContentTypeRepositoryBase<TItem>
     where TItem : class, IContentTypeComposition
 {
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IEntityContainerRepository _containerRepository;
     private readonly IEntityRepository _entityRepository;
     private readonly IEventAggregator _eventAggregator;
@@ -32,7 +34,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         TRepository repository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IEntityContainerRepository containerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
@@ -41,12 +43,38 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         Repository = repository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _containerRepository = containerRepository;
         _entityRepository = entityRepository;
         _eventAggregator = eventAggregator;
         _userIdKeyResolver = userIdKeyResolver;
         _contentTypeFilters = contentTypeFilters;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    protected ContentTypeServiceBase(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        TRepository repository,
+        IAuditRepository auditRepository,
+        IEntityContainerRepository containerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            containerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
+    {
     }
 
     protected TRepository Repository { get; }
@@ -1398,9 +1426,18 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Audit
 
-    private void Audit(AuditType type, int userId, int objectId)
+    private void Audit(AuditType type, int userId, int objectId) =>
+        AuditAsync(type, userId, objectId).GetAwaiter().GetResult();
+
+    private async Task AuditAsync(AuditType type, int userId, int objectId)
     {
-        _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetUmbracoObjectType(ContainedObjectType).GetName()));
+        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            ObjectTypes.GetUmbracoObjectType(ContainedObjectType).GetName());
     }
 
     #endregion

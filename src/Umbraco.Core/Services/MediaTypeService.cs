@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -19,7 +21,7 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
         IEventMessagesFactory eventMessagesFactory,
         IMediaService mediaService,
         IMediaTypeRepository mediaTypeRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IMediaTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
@@ -30,13 +32,72 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
             loggerFactory,
             eventMessagesFactory,
             mediaTypeRepository,
-            auditRepository,
+            auditService,
             entityContainerRepository,
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
-            contentTypeFilters) => MediaService = mediaService;
+            contentTypeFilters)
+    {
+        MediaService = mediaService;
+    }
 
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public MediaTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMediaService mediaService,
+        IMediaTypeRepository mediaTypeRepository,
+        IAuditRepository auditRepository,
+        IMediaTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            mediaService,
+            mediaTypeRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public MediaTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMediaService mediaService,
+        IMediaTypeRepository mediaTypeRepository,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        IMediaTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            mediaService,
+            mediaTypeRepository,
+            auditService,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
+    {
+    }
 
     protected override int[] ReadLockIds => MediaTypeLocks.ReadLockIds;
 
