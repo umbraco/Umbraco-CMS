@@ -109,12 +109,20 @@ public static class UmbracoBuilderExtensions
 
             if (outputCacheSettings.ContentDuration.TotalSeconds > 0)
             {
-                options.AddPolicy(Constants.DeliveryApi.OutputCache.ContentCachePolicy, new DeliveryApiOutputCachePolicy(outputCacheSettings.ContentDuration, new StringValues(["Accept-Language", "Start-Item"])));
+                options.AddPolicy(
+                    Constants.DeliveryApi.OutputCache.ContentCachePolicy,
+                    new DeliveryApiOutputCachePolicy(
+                        outputCacheSettings.ContentDuration,
+                        new StringValues([Constants.DeliveryApi.HeaderNames.AcceptLanguage, Constants.DeliveryApi.HeaderNames.StartItem])));
             }
 
             if (outputCacheSettings.MediaDuration.TotalSeconds > 0)
             {
-                options.AddPolicy(Constants.DeliveryApi.OutputCache.MediaCachePolicy, new DeliveryApiOutputCachePolicy(outputCacheSettings.MediaDuration, "Start-Item"));
+                options.AddPolicy(
+                    Constants.DeliveryApi.OutputCache.MediaCachePolicy,
+                    new DeliveryApiOutputCachePolicy(
+                        outputCacheSettings.MediaDuration,
+                        Constants.DeliveryApi.HeaderNames.StartItem));
             }
         });
 
