@@ -12,7 +12,7 @@ export default defineConfig({
 		dist,
 		base: '/umbraco/backoffice/external/openid',
 		entry: {
-			index: './src/index.ts',
+			index: './index.ts',
 		},
 	}),
 });
