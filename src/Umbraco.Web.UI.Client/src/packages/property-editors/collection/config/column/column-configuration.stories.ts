@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUICollectionColumnConfigurationElement } from './column-configuration.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './column-configuration.element.js';

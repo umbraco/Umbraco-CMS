@@ -267,7 +267,7 @@ public class RelationService : RepositoryService, IRelationService
         }
 
         return relationTypeIds.Count == 0
-            ? Enumerable.Empty<IRelation>()
+            ? []
             : GetRelationsByListOfTypeIds(relationTypeIds);
     }
 
@@ -277,8 +277,8 @@ public class RelationService : RepositoryService, IRelationService
         IRelationType? relationType = GetRelationType(relationTypeAlias);
 
         return relationType == null
-            ? Enumerable.Empty<IRelation>()
-            : GetRelationsByListOfTypeIds(new[] { relationType.Id });
+            ? []
+            : GetRelationsByListOfTypeIds([relationType.Id]);
     }
 
     /// <inheritdoc />
@@ -641,7 +641,7 @@ public class RelationService : RepositoryService, IRelationService
 
             EventMessages eventMessages = EventMessagesFactory.Get();
             var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
+            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(RelationTypeOperationStatus.CancelledByNotification, relationType);
@@ -705,7 +705,7 @@ public class RelationService : RepositoryService, IRelationService
 
         EventMessages eventMessages = EventMessagesFactory.Get();
         var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
-        if (scope.Notifications.PublishCancelable(deletingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.CancelledByNotification, null);
@@ -715,7 +715,7 @@ public class RelationService : RepositoryService, IRelationService
         await AuditAsync(AuditType.Delete, userKey, relationType.Id, "Deleted relation type");
         scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
         scope.Complete();
-        return await Task.FromResult(Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType));
+        return Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType);
     }
 
     /// <inheritdoc />
@@ -771,7 +771,7 @@ public class RelationService : RepositoryService, IRelationService
         return _relationTypeRepository.Get(query).FirstOrDefault();
     }
 
-    private IEnumerable<IRelation> GetRelationsByListOfTypeIds(IEnumerable<int> relationTypeIds)
+    private List<IRelation> GetRelationsByListOfTypeIds(IEnumerable<int> relationTypeIds)
     {
         var relations = new List<IRelation>();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))

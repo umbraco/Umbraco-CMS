@@ -31,11 +31,9 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
      */
 
     private readonly IMainDom _mainDom;
-    private readonly IServerRoleAccessor _serverRoleAccessor;
     private readonly ISyncBootStateAccessor _syncBootStateAccessor;
     private readonly ManualResetEvent _syncIdle;
     private bool _disposedValue;
-    private DateTime _lastPruned;
     private DateTime _lastSync;
     private bool _syncing;
 
@@ -45,7 +43,6 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     protected DatabaseServerMessenger(
         IMainDom mainDom,
         CacheRefresherCollection cacheRefreshers,
-        IServerRoleAccessor serverRoleAccessor,
         ILogger<DatabaseServerMessenger> logger,
         bool distributedEnabled,
         ISyncBootStateAccessor syncBootStateAccessor,
@@ -59,7 +56,6 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         _cancellationToken = _cancellationTokenSource.Token;
         _mainDom = mainDom;
         _cacheRefreshers = cacheRefreshers;
-        _serverRoleAccessor = serverRoleAccessor;
         _hostingEnvironment = hostingEnvironment;
         Logger = logger;
         _syncBootStateAccessor = syncBootStateAccessor;
@@ -67,7 +63,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         JsonSerializer = jsonSerializer;
         _lastSyncedFileManager = lastSyncedFileManager;
         GlobalSettings = globalSettings.CurrentValue;
-        _lastPruned = _lastSync = DateTime.UtcNow;
+        _lastSync = DateTime.UtcNow;
         _syncIdle = new ManualResetEvent(true);
 
         globalSettings.OnChange(x => GlobalSettings = x);
@@ -82,6 +78,36 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         }
 
         _initialized = new Lazy<SyncBootState?>(InitializeWithMainDom);
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DatabaseServerMessenger" /> class.
+    /// </summary>
+    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V18.")]
+    protected DatabaseServerMessenger(
+        IMainDom mainDom,
+        CacheRefresherCollection cacheRefreshers,
+        IServerRoleAccessor serverRoleAccessor,
+        ILogger<DatabaseServerMessenger> logger,
+        bool distributedEnabled,
+        ISyncBootStateAccessor syncBootStateAccessor,
+        IHostingEnvironment hostingEnvironment,
+        ICacheInstructionService cacheInstructionService,
+        IJsonSerializer jsonSerializer,
+        LastSyncedFileManager lastSyncedFileManager,
+        IOptionsMonitor<GlobalSettings> globalSettings)
+        : this(
+            mainDom,
+            cacheRefreshers,
+            logger,
+            distributedEnabled,
+            syncBootStateAccessor,
+            hostingEnvironment,
+            cacheInstructionService,
+            jsonSerializer,
+            lastSyncedFileManager,
+            globalSettings)
+    {
     }
 
     public GlobalSettings GlobalSettings { get; private set; }
@@ -146,16 +172,9 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         {
             ProcessInstructionsResult result = CacheInstructionService.ProcessInstructions(
                 _cacheRefreshers,
-                _serverRoleAccessor.CurrentServerRole,
                 _cancellationToken,
                 LocalIdentity,
-                _lastPruned,
                 _lastSyncedFileManager.LastSyncedId);
-
-            if (result.InstructionsWerePruned)
-            {
-                _lastPruned = _lastSync;
-            }
 
             if (result.LastId > 0)
             {

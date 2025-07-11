@@ -29,6 +29,11 @@ export class UmbTiptapToolbarTableExtensionApi extends UmbTiptapToolbarElementAp
 		tableProperties: (editor) => this.#tableProperties(editor),
 	};
 
+	override isActive(editor?: Editor, item?: unknown) {
+		if (!item) return super.isActive(editor);
+		return false;
+	}
+
 	async #tableProperties(editor?: Editor) {
 		if (!editor || !editor.isActive('table')) return;
 

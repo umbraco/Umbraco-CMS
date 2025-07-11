@@ -61,6 +61,12 @@ export class UmbUserWorkspaceContext
 	override async load(unique: string) {
 		const response = await super.load(unique);
 
+		if (!response.data) {
+			// Return early if there is no user	data
+			this.removeUmbControllerByAlias('umbUserStoreObserver');
+			return response;
+		}
+
 		this.observe(
 			(response as UmbRepositoryResponseWithAsObservable<EntityType>).asObservable?.(),
 			(user) => this.onUserStoreChanges(user),

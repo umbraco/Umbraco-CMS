@@ -46,7 +46,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         string? comment = null,
         string? parameters = null)
     {
-        int? userId =  await _userIdKeyResolver.TryGetAsync(userKey) is { Success: true } userIdAttempt 
+        int? userId = await _userIdKeyResolver.TryGetAsync(userKey) is { Success: true } userIdAttempt
             ? userIdAttempt.Result
             : null;
         if (userId is null)
@@ -397,7 +397,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null)
     {
-        if (userId is < Constants.Security.SuperUserId)
+        if (userId < Constants.Security.SuperUserId)
         {
             return new PagedModel<IAuditItem> { Items = [], Total = 0 };
         }

@@ -1,17 +1,7 @@
 import { UmbEntityContext } from '../../entity/entity.context.js';
-import type { UmbDropdownElement } from '../dropdown/index.js';
 import type { UmbEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/entity-action';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import {
-	html,
-	nothing,
-	customElement,
-	property,
-	state,
-	ifDefined,
-	css,
-	query,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
@@ -39,11 +29,32 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	@state()
 	private _firstActionHref?: string;
 
-	@query('#action-modal')
-	private _dropdownElement?: UmbDropdownElement;
-
 	// TODO: provide the entity context on a higher level, like the root element of this entity, tree-item/workspace/... [NL]
 	#entityContext = new UmbEntityContext(this);
+	#inViewport = false;
+	#observingEntityActions = false;
+
+	constructor() {
+		super();
+
+		// Only observe entity actions when the element is in the viewport
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						this.#inViewport = true;
+						this.#observeEntityActions();
+					}
+				});
+			},
+			{
+				root: null, // Use the viewport as the root
+				threshold: 0.1, // Trigger when at least 10% of the element is visible
+			},
+		);
+
+		observer.observe(this);
+	}
 
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('entityType') && _changedProperties.has('unique')) {
@@ -54,6 +65,11 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	}
 
 	#observeEntityActions() {
+		if (!this.entityType) return;
+		if (this.unique === undefined) return;
+		if (!this.#inViewport) return; // Only observe if the element is in the viewport
+		if (this.#observingEntityActions) return;
+
 		new UmbExtensionsManifestInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -67,6 +83,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			},
 			'umbEntityActionsObserver',
 		);
+
+		this.#observingEntityActions = true;
 	}
 
 	async #createFirstActionApi() {
@@ -90,14 +108,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		await this._firstActionApi?.execute().catch(() => {});
 	}
 
-	#onActionExecuted() {
-		this._dropdownElement?.closeDropdown();
-	}
-
-	#onDropdownClick(event: Event) {
-		event.stopPropagation();
-	}
-
 	override render() {
 		if (this._numberOfActions === 0) return nothing;
 		return html`<uui-action-bar slot="actions">${this.#renderMore()} ${this.#renderFirstAction()} </uui-action-bar>`;
@@ -107,16 +117,9 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (this._numberOfActions === 1) return nothing;
 
 		return html`
-			<umb-dropdown id="action-modal" @click=${this.#onDropdownClick} .label=${this.label} compact hide-expand>
-				<uui-symbol-more slot="label" .label=${this.label}></uui-symbol-more>
-				<uui-scroll-container>
-					<umb-entity-action-list
-						@action-executed=${this.#onActionExecuted}
-						.entityType=${this.entityType}
-						.unique=${this.unique}
-						.label=${this.label}></umb-entity-action-list>
-				</uui-scroll-container>
-			</umb-dropdown>
+			<umb-entity-actions-dropdown .label=${this.label} compact>
+				<uui-symbol-more slot="label"></uui-symbol-more>
+			</umb-entity-actions-dropdown>
 		`;
 	}
 
