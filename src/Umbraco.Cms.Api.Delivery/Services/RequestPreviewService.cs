@@ -11,5 +11,5 @@ internal sealed class RequestPreviewService : RequestHeaderHandler, IRequestPrev
     }
 
     /// <inheritdoc />
-    public bool IsPreview() => string.Equals(GetHeaderValue("Preview"), "true", StringComparison.OrdinalIgnoreCase);
+    public bool IsPreview() => string.Equals(GetHeaderValue(Core.Constants.DeliveryApi.HeaderNames.Preview), "true", StringComparison.OrdinalIgnoreCase);
 }
