@@ -139,6 +139,11 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 		this.temporaryFile = (file as UmbUploadableFile).temporaryFile;
 
+		if (!this.temporaryFile?.file) {
+			console.error('No file available for upload');
+			return;
+		}
+
 		this.#clearObjectUrl();
 
 		const blobUrl = URL.createObjectURL(this.temporaryFile.file);
