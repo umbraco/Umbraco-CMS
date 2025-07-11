@@ -37,23 +37,11 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	 * @type {Array<string>}
 	 * @default
 	 */
-	@property({
-		type: Array,
-		attribute: 'allowed-file-extensions',
-		converter(value) {
-			if (typeof value === 'string') {
-				return value.split(',').map((ext) => ext.trim());
-			}
-			return value;
-		},
-	})
+	@property({ type: Array, attribute: 'allowed-file-extensions' })
 	allowedFileExtensions?: Array<string>;
 
 	@state()
 	public temporaryFile?: UmbTemporaryFileModel;
-
-	@state()
-	private _extensions?: string[];
 
 	@state()
 	private _previewAlias?: string;
@@ -176,7 +164,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			<umb-input-dropzone
 				standalone
 				disable-folder-upload
-				accept=${ifDefined(this._extensions?.join(','))}
+				accept=${ifDefined(this.allowedFileExtensions ? this.allowedFileExtensions.join(',') : undefined)}
 				@change=${this.#onUpload}></umb-input-dropzone>
 		`;
 	}
