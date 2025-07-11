@@ -102,9 +102,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		if (!mimeType) return fallbackAlias;
 
 		// Check for an exact match
-		const exactMatch = manifests.find((manifest) => {
-			return stringOrStringArrayContains(manifest.forMimeTypes, mimeType);
-		});
+		const exactMatch = manifests.find((manifest) => stringOrStringArrayContains(manifest.forMimeTypes, mimeType));
 		if (exactMatch) return exactMatch.alias;
 
 		// Check for wildcard match (e.g. image/*)
