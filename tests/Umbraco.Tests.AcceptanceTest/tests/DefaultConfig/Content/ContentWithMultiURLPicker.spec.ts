@@ -350,9 +350,7 @@ test.skip('cannot submit an empty link using spacebar', async ({umbracoApi, umbr
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17974
-test.skip('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
