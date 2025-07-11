@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Umbraco.Cms.Core;
 
 /// <summary>
@@ -9,6 +11,7 @@ namespace Umbraco.Cms.Core;
 public struct Attempt<TResult, TStatus>
 {
     // private - use Succeed() or Fail() methods to create attempts
+    [JsonConstructor]
     private Attempt(bool success, TResult result, TStatus status, Exception? exception)
     {
         Success = success;
