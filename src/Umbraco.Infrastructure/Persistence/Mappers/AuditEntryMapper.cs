@@ -22,7 +22,7 @@ public sealed class AuditEntryMapper : BaseMapper
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingUserKey), nameof(AuditEntryDto.PerformingUserKey));
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingDetails), nameof(AuditEntryDto.PerformingDetails));
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingIp), nameof(AuditEntryDto.PerformingIp));
-        DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.EventDateUtc), nameof(AuditEntryDto.EventDateUtc));
+        DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.EventDate), nameof(AuditEntryDto.EventDate));
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.AffectedUserId), nameof(AuditEntryDto.AffectedUserId));
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.AffectedUserKey), nameof(AuditEntryDto.AffectedUserKey));
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.AffectedDetails), nameof(AuditEntryDto.AffectedDetails));

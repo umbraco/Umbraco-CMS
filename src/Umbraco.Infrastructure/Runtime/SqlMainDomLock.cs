@@ -381,7 +381,7 @@ public class SqlMainDomLock : IMainDomLock
     ///     Inserts or updates the key/value row
     /// </summary>
     private RecordPersistenceType InsertLockRecord(string id, IUmbracoDatabase db) =>
-        db.InsertOrUpdate(new KeyValueDto { Key = MainDomKey, Value = id, UpdateDate = DateTime.Now });
+        db.InsertOrUpdate(new KeyValueDto { Key = MainDomKey, Value = id, UpdateDate = DateTime.UtcNow });
 
     /// <summary>
     ///     Checks if the DB row value is equals the value

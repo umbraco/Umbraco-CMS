@@ -52,7 +52,7 @@ internal class ConsentService : RepositoryService, IConsentService
             Source = source,
             Context = context,
             Action = action,
-            CreateDate = DateTime.Now,
+            CreateDate = DateTime.UtcNow,
             State = state,
             Comment = comment,
         };

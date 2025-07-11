@@ -178,9 +178,9 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
 
     protected Guid GetKey() => _key ?? Guid.NewGuid();
 
-    protected DateTime GetCreateDate() => _createDate ?? DateTime.Now;
+    protected DateTime GetCreateDate() => _createDate ?? DateTime.UtcNow;
 
-    protected DateTime GetUpdateDate() => _updateDate ?? DateTime.Now;
+    protected DateTime GetUpdateDate() => _updateDate ?? DateTime.UtcNow;
 
     protected string GetName() => _name ?? Guid.NewGuid().ToString();
 

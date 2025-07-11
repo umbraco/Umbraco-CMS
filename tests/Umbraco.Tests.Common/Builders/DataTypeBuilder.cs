@@ -129,8 +129,8 @@ public class DataTypeBuilder
         var parentId = _parentId ?? -1;
         var id = _id ?? 1;
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var deleteDate = _deleteDate;
         var name = _name ?? Guid.NewGuid().ToString();
         var level = _level ?? 0;

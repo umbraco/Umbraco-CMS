@@ -1,4 +1,4 @@
-using System.Globalization;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Strings;
@@ -24,8 +24,8 @@ internal static class UserGroupFactory
             userGroup.DisableChangeTracking();
             userGroup.Id = dto.Id;
             userGroup.Key = dto.Key;
-            userGroup.CreateDate = dto.CreateDate;
-            userGroup.UpdateDate = dto.UpdateDate;
+            userGroup.CreateDate = dto.CreateDate.EnsureUtc();
+            userGroup.UpdateDate = dto.UpdateDate.EnsureUtc();
             userGroup.StartContentId = dto.StartContentId;
             userGroup.StartMediaId = dto.StartMediaId;
             userGroup.Permissions = dto.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet();

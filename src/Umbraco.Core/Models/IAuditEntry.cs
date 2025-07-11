@@ -46,7 +46,7 @@ public interface IAuditEntry : IEntity, IRememberBeingDirty
     /// <summary>
     ///     Gets or sets the date and time of the audited event.
     /// </summary>
-    DateTime EventDateUtc { get; set; }
+    DateTime EventDate { get; set; }
 
     /// <summary>
     ///     Gets or sets the identifier of the user affected by the audited event.

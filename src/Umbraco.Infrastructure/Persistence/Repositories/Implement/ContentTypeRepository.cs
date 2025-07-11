@@ -308,7 +308,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
             var dto = new ContentVersionCleanupPolicyDto
             {
                 ContentTypeId = entity.Id,
-                Updated = DateTime.Now,
+                Updated = DateTime.UtcNow,
                 PreventCleanup = entityWithHistoryCleanup.HistoryCleanup?.PreventCleanup ?? false,
                 KeepAllVersionsNewerThanDays =
                     entityWithHistoryCleanup.HistoryCleanup?.KeepAllVersionsNewerThanDays,
