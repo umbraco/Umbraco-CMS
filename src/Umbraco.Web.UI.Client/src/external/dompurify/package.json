@@ -4,5 +4,8 @@
 	"type": "module",
 	"scripts": {
 		"build": "vite build"
+	},
+	"dependencies": {
+		"dompurify": "^3.2.5"
 	}
 }

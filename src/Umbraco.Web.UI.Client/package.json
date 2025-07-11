@@ -203,27 +203,7 @@
 		"npm": ">=10.9"
 	},
 	"dependencies": {
-		"@heximal/expressions": "^0.1.5",
-		"@tiptap/core": "2.11.7",
-		"@tiptap/extension-character-count": "2.11.7",
-		"@tiptap/extension-image": "2.11.7",
-		"@tiptap/extension-link": "2.11.7",
-		"@tiptap/extension-placeholder": "2.11.7",
-		"@tiptap/extension-subscript": "2.11.7",
-		"@tiptap/extension-superscript": "2.11.7",
-		"@tiptap/extension-table": "2.11.7",
-		"@tiptap/extension-table-cell": "2.11.7",
-		"@tiptap/extension-table-header": "2.11.7",
-		"@tiptap/extension-table-row": "2.11.7",
-		"@tiptap/extension-text-align": "2.11.7",
-		"@tiptap/extension-underline": "2.11.7",
-		"@tiptap/pm": "2.11.7",
-		"@tiptap/starter-kit": "2.11.7",
-		"dompurify": "^3.2.5",
-		"element-internals-polyfill": "^3.0.2",
-		"lit": "^3.3.0",
-		"marked": "^15.0.9",
-		"rxjs": "^7.8.2"
+		"element-internals-polyfill": "^3.0.2"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.26.10",
