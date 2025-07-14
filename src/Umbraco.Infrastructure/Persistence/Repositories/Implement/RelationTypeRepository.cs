@@ -19,8 +19,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>, IRelationTypeRepository
 {
-    public RelationTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RelationTypeRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public RelationTypeRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<RelationTypeRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
     {
     }
 

@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -24,9 +26,26 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
-    public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
-        : base(cache, scopeAccessor) =>
+    public DefaultRepositoryCachePolicy(
+        IAppPolicyCache cache,
+        IScopeAccessor scopeAccessor,
+        RepositoryCachePolicyOptions options,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(cache, scopeAccessor, repositoryCacheVersionService) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
+
+    [Obsolete("Use the constructor with RepositoryCachePolicyOptions parameter instead.")]
+    public DefaultRepositoryCachePolicy(
+        IAppPolicyCache cache,
+        IScopeAccessor scopeAccessor,
+        RepositoryCachePolicyOptions options)
+        : this(
+            cache,
+            scopeAccessor,
+            options,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+    {
+    }
 
     protected string EntityTypeCacheKey { get; } = $"uRepo_{typeof(TEntity).Name}_";
 

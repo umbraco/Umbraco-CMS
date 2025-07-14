@@ -1,8 +1,10 @@
 using System.Collections;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
@@ -35,13 +37,41 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         ILogger<UserGroupRepository> logger,
         ILoggerFactory loggerFactory,
         IShortStringHelper shortStringHelper,
-        IEnumerable<IPermissionMapper> permissionMappers)
-        : base(scopeAccessor, appCaches, logger)
+        IEnumerable<IPermissionMapper> permissionMappers,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, appCaches, logger, repositoryCacheVersionService)
     {
         _shortStringHelper = shortStringHelper;
-        _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, appCaches, loggerFactory.CreateLogger<UserGroupWithUsersRepository>());
-        _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches, loggerFactory.CreateLogger<PermissionRepository<IContent>>());
+        _userGroupWithUsersRepository = new UserGroupWithUsersRepository(
+            this,
+            scopeAccessor,
+            appCaches,
+            loggerFactory.CreateLogger<UserGroupWithUsersRepository>(),
+            repositoryCacheVersionService);
+        _permissionRepository = new PermissionRepository<IContent>(
+            scopeAccessor,
+            appCaches,
+            loggerFactory.CreateLogger<PermissionRepository<IContent>>(),
+            repositoryCacheVersionService);
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
+    }
+
+    public UserGroupRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<UserGroupRepository> logger,
+        ILoggerFactory loggerFactory,
+        IShortStringHelper shortStringHelper,
+        IEnumerable<IPermissionMapper> permissionMappers)
+        : this(
+            scopeAccessor,
+            appCaches,
+            logger,
+            loggerFactory,
+            shortStringHelper,
+            permissionMappers,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+    {
     }
 
     public IUserGroup? Get(string alias)
@@ -205,8 +235,17 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     {
         private readonly UserGroupRepository _userGroupRepo;
 
-        public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger<UserGroupWithUsersRepository> logger)
-            : base(scopeAccessor, cache, logger) =>
+        public UserGroupWithUsersRepository(
+            UserGroupRepository userGroupRepo,
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<UserGroupWithUsersRepository> logger,
+            IRepositoryCacheVersionService repositoryCacheVersionService)
+            : base(
+                scopeAccessor,
+                cache,
+                logger,
+                repositoryCacheVersionService) =>
             _userGroupRepo = userGroupRepo;
 
         protected override void PersistNewItem(UserGroupWithUsers entity)

@@ -14,8 +14,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerRegistration>,
     IServerRegistrationRepository
 {
-    public ServerRegistrationRepository(IScopeAccessor scopeAccessor, ILogger<ServerRegistrationRepository> logger)
-        : base(scopeAccessor, AppCaches.NoCache, logger)
+    public ServerRegistrationRepository(
+        IScopeAccessor scopeAccessor,
+        ILogger<ServerRegistrationRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, AppCaches.NoCache, logger, repositoryCacheVersionService)
     {
     }
 

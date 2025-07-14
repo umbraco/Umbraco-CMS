@@ -1,7 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -21,40 +23,63 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILanguageRepository _languageRepository;
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
 
-    public DictionaryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<DictionaryRepository> logger,
-        ILoggerFactory loggerFactory, ILanguageRepository languageRepository)
+    public DictionaryRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<DictionaryRepository> logger,
+        ILoggerFactory loggerFactory,
+        ILanguageRepository languageRepository,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
         : base(scopeAccessor, cache, logger)
     {
         _loggerFactory = loggerFactory;
         _languageRepository = languageRepository;
+        _repositoryCacheVersionService = repositoryCacheVersionService;
     }
 
     public IDictionaryItem? Get(Guid uniqueId)
     {
-        var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, ScopeAccessor, AppCaches,
-            _loggerFactory.CreateLogger<DictionaryByUniqueIdRepository>());
+        var uniqueIdRepo = new DictionaryByUniqueIdRepository(
+            this,
+            ScopeAccessor,
+            AppCaches,
+            _loggerFactory.CreateLogger<DictionaryByUniqueIdRepository>(),
+            _repositoryCacheVersionService);
         return uniqueIdRepo.Get(uniqueId);
     }
 
     public IEnumerable<IDictionaryItem> GetMany(params Guid[] uniqueIds)
     {
-        var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, ScopeAccessor, AppCaches,
-            _loggerFactory.CreateLogger<DictionaryByUniqueIdRepository>());
+        var uniqueIdRepo = new DictionaryByUniqueIdRepository(
+            this,
+            ScopeAccessor,
+            AppCaches,
+            _loggerFactory.CreateLogger<DictionaryByUniqueIdRepository>(),
+            _repositoryCacheVersionService);
         return uniqueIdRepo.GetMany(uniqueIds);
     }
 
     public IDictionaryItem? Get(string key)
     {
-        var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches,
-            _loggerFactory.CreateLogger<DictionaryByKeyRepository>());
+        var keyRepo = new DictionaryByKeyRepository(
+            this,
+            ScopeAccessor,
+            AppCaches,
+            _loggerFactory.CreateLogger<DictionaryByKeyRepository>(),
+            _repositoryCacheVersionService);
         return keyRepo.Get(key);
     }
 
     public IEnumerable<IDictionaryItem> GetManyByKeys(string[] keys)
     {
-        var keyRepo = new DictionaryByKeyRepository(this, ScopeAccessor, AppCaches,
-            _loggerFactory.CreateLogger<DictionaryByKeyRepository>());
+        var keyRepo = new DictionaryByKeyRepository(
+            this,
+            ScopeAccessor,
+            AppCaches,
+            _loggerFactory.CreateLogger<DictionaryByKeyRepository>(),
+            _repositoryCacheVersionService);
         return keyRepo.GetMany(keys);
     }
 
@@ -125,7 +150,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             GetAllCacheAllowZeroCount = true
         };
 
-        return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor, options);
+        return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor, options, _repositoryCacheVersionService);
     }
 
     private IDictionaryItem ConvertFromDto(DictionaryDto dto, IDictionary<int, ILanguage> languagesById)
@@ -184,13 +209,19 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
     private class DictionaryByUniqueIdRepository : SimpleGetRepository<Guid, IDictionaryItem, DictionaryDto>
     {
         private readonly DictionaryRepository _dictionaryRepository;
+        private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
         private readonly IDictionary<int, ILanguage> _languagesById;
 
-        public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
-            AppCaches cache, ILogger<DictionaryByUniqueIdRepository> logger)
-            : base(scopeAccessor, cache, logger)
+        public DictionaryByUniqueIdRepository(
+            DictionaryRepository dictionaryRepository,
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<DictionaryByUniqueIdRepository> logger,
+            IRepositoryCacheVersionService repositoryCacheVersionService)
+            : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
         {
             _dictionaryRepository = dictionaryRepository;
+            _repositoryCacheVersionService = repositoryCacheVersionService;
             _languagesById = dictionaryRepository.GetLanguagesById();
         }
 
@@ -219,7 +250,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
                 GetAllCacheAllowZeroCount = true
             };
 
-            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor, options);
+            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor, options, _repositoryCacheVersionService);
         }
 
         protected override IEnumerable<IDictionaryItem> PerformGetAll(params Guid[]? ids)
@@ -239,13 +270,19 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
     private class DictionaryByKeyRepository : SimpleGetRepository<string, IDictionaryItem, DictionaryDto>
     {
         private readonly DictionaryRepository _dictionaryRepository;
+        private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
         private readonly IDictionary<int, ILanguage> _languagesById;
 
-        public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
-            AppCaches cache, ILogger<DictionaryByKeyRepository> logger)
-            : base(scopeAccessor, cache, logger)
+        public DictionaryByKeyRepository(
+            DictionaryRepository dictionaryRepository,
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<DictionaryByKeyRepository> logger,
+            IRepositoryCacheVersionService repositoryCacheVersionService)
+            : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
         {
             _dictionaryRepository = dictionaryRepository;
+            _repositoryCacheVersionService = repositoryCacheVersionService;
             _languagesById = dictionaryRepository.GetLanguagesById();
         }
 
@@ -276,7 +313,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
                 GetAllCacheAllowZeroCount = true
             };
 
-            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, options);
+            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, options, _repositoryCacheVersionService);
         }
 
         protected override IEnumerable<IDictionaryItem> PerformGetAll(params string[]? ids)

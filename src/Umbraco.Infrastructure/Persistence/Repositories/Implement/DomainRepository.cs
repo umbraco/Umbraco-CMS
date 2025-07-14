@@ -15,8 +15,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal class DomainRepository : EntityRepositoryBase<int, IDomain>, IDomainRepository
 {
-    public DomainRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<DomainRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public DomainRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<DomainRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
     { }
 
     public IDomain? GetByName(string domainName)

@@ -21,8 +21,16 @@ internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IA
     /// <summary>
     ///     Initializes a new instance of the <see cref="AuditEntryRepository" /> class.
     /// </summary>
-    public AuditEntryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<AuditEntryRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public AuditEntryRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<AuditEntryRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService)
     {
     }
 

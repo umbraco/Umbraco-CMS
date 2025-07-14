@@ -38,8 +38,9 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         IIOHelper ioHelper,
         IShortStringHelper shortStringHelper,
         IViewHelper viewHelper,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings)
-        : base(scopeAccessor, cache, logger)
+        IOptionsMonitor<RuntimeSettings> runtimeSettings,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
     {
         _ioHelper = ioHelper;
         _shortStringHelper = shortStringHelper;

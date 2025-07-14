@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -18,11 +20,25 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
 {
     private readonly IAppPolicyCache _globalCache;
     private readonly IScopeAccessor _scopeAccessor;
+    private readonly IRepositoryCacheVersionService _cacheVersionService;
 
-    protected RepositoryCachePolicyBase(IAppPolicyCache globalCache, IScopeAccessor scopeAccessor)
+    protected RepositoryCachePolicyBase(
+        IAppPolicyCache globalCache,
+        IScopeAccessor scopeAccessor,
+        IRepositoryCacheVersionService cacheVersionService)
     {
         _globalCache = globalCache ?? throw new ArgumentNullException(nameof(globalCache));
         _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
+        _cacheVersionService = cacheVersionService;
+    }
+
+    [Obsolete("Use the constructor with IRepositoryCacheVersionService parameter instead. Scheduled for removal in V18.")]
+    protected RepositoryCachePolicyBase(IAppPolicyCache globalCache, IScopeAccessor scopeAccessor)
+    : this(
+        globalCache,
+        scopeAccessor,
+        StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+    {
     }
 
     protected IAppPolicyCache Cache
@@ -68,4 +84,21 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
 
     /// <inheritdoc />
     public abstract void ClearAll();
+
+    /// <summary>
+    /// Ensures that the cache is synced with the database.
+    /// </summary>
+    protected void EsnureCacheIsSynced()
+    {
+        var synced = _cacheVersionService.IsCacheSyncedAsync<TEntity>().GetAwaiter().GetResult();
+        if (synced is false)
+        {
+            // TODO: Trigger a cache refresh
+        }
+    }
+
+    /// <summary>
+    /// Registers a change in the cache.
+    /// </summary>
+    protected void RegisterCacheChange() => _cacheVersionService.SetCacheUpdatedAsync<TEntity>().Wait();
 }

@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using System.Runtime.Versioning;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -6,7 +7,25 @@ namespace Umbraco.Cms.Core.Cache;
 
 public class MemberRepositoryUsernameCachePolicy : DefaultRepositoryCachePolicy<IMember, string>
 {
-    public MemberRepositoryUsernameCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options) : base(cache, scopeAccessor, options)
+    public MemberRepositoryUsernameCachePolicy(
+        IAppPolicyCache cache,
+        IScopeAccessor scopeAccessor,
+        RepositoryCachePolicyOptions options,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(
+            cache,
+            scopeAccessor,
+            options,
+            repositoryCacheVersionService)
+    {
+    }
+
+    [Obsolete("Use the constructor with IRepositoryCacheVersionService instead. Scheuled for removal in V18.")]
+    public MemberRepositoryUsernameCachePolicy(
+        IAppPolicyCache cache,
+        IScopeAccessor scopeAccessor,
+        RepositoryCachePolicyOptions options)
+        : base(cache, scopeAccessor, options)
     {
     }
 

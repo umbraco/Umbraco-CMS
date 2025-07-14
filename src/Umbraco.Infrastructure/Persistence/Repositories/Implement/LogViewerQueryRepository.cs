@@ -14,8 +14,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQuery>, ILogViewerQueryRepository
 {
-    public LogViewerQueryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LogViewerQueryRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public LogViewerQueryRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<LogViewerQueryRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
     {
     }
 
