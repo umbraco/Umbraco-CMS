@@ -4,9 +4,7 @@ import { css, customElement, nothing, property, unsafeHTML, until } from '@umbra
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-const elementName = 'umb-ufm-render';
-
-@customElement(elementName)
+@customElement('umb-ufm-render')
 export class UmbUfmRenderElement extends UmbLitElement {
 	#context = new UmbUfmRenderContext(this);
 
@@ -16,7 +14,8 @@ export class UmbUfmRenderElement extends UmbLitElement {
 	@property()
 	markdown?: string;
 
-	// No reactive property declaration cause its causing a re-render that is not needed. This just works as a shortcut to set the values on the context. [NL]
+	// No reactive property declaration because it's causing a re-render that is not needed.
+	// This just works as a shortcut to set the values on the context. [NL]
 	public set value(value: string | unknown | undefined) {
 		this.#context.setValue(value);
 	}
@@ -60,6 +59,14 @@ export class UmbUfmRenderElement extends UmbLitElement {
 				overflow: auto;
 			}
 
+			code {
+				font-family: var(--uui-font-monospace);
+				white-space: pre-wrap;
+				background-color: var(--uui-color-background);
+				border-radius: var(--uui-border-radius);
+				padding: 0.2em 0.4em;
+			}
+
 			:host > :first-child {
 				margin-block-start: 0;
 			}
@@ -75,6 +82,6 @@ export { UmbUfmRenderElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUfmRenderElement;
+		'umb-ufm-render': UmbUfmRenderElement;
 	}
 }

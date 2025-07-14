@@ -1133,6 +1133,12 @@ export default {
 		lockoutWillOccur: "You've been idle and logout will automatically occur in",
 		renewSession: 'Renew now to save your work',
 	},
+	timeout: {
+		warningHeadline: 'Session timeout',
+		warningText: 'Your session is about to expire and you will be logged out in <strong>{0} seconds</strong>.',
+		warningLogoutAction: 'Log out',
+		warningContinueAction: 'Stay logged in',
+	},
 	login: {
 		greeting0: 'Welcome',
 		greeting1: 'Welcome',
