@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -78,18 +79,21 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
         if (statuses.Length > 0)
         {
             var includeStale = statuses.Contains(LongRunningOperationStatus.Stale);
-            string[] possibleStaleStatuses = [nameof(LongRunningOperationStatus.Enqueued), nameof(LongRunningOperationStatus.Running)];
+            string[] possibleStaleStatuses =
+                [nameof(LongRunningOperationStatus.Enqueued), nameof(LongRunningOperationStatus.Running)];
             IEnumerable<string> statusList = statuses.Except([LongRunningOperationStatus.Stale]).Select(s => s.ToString());
 
             DateTime now = _timeProvider.GetUtcNow().UtcDateTime;
-            sql = sql.Where<LongRunningOperationDto>(x => (statusList.Contains(x.Status) && (!possibleStaleStatuses.Contains(x.Status) || x.ExpirationDate >= now)) || (includeStale && possibleStaleStatuses.Contains(x.Status) && x.ExpirationDate < now));
+            sql = sql.Where<LongRunningOperationDto>(x =>
+                (statusList.Contains(x.Status) && (!possibleStaleStatuses.Contains(x.Status) || x.ExpirationDate >= now))
+                || (includeStale && possibleStaleStatuses.Contains(x.Status) && x.ExpirationDate < now));
         }
 
         return await Database.PagedAsync<LongRunningOperationDto, LongRunningOperation>(
             sql,
             skip,
             take,
-            orderBy: x => x.CreateDate,
+            sortingAction: sql2 => sql2.OrderBy<LongRunningOperationDto>(x => x.CreateDate),
             mapper: MapDtoToEntity);
     }
 

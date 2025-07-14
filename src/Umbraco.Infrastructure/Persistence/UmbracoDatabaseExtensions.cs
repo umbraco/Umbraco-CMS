@@ -98,30 +98,23 @@ internal static class UmbracoDatabaseExtensions
         Sql<ISqlContext> sql,
         int skip,
         int take,
-        Expression<Func<TDto, object?>> orderBy,
+        Action<Sql<ISqlContext>> sortingAction,
         Func<TDto, TResult> mapper)
     {
-        if (skip < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(skip), "Skip must be zero or greater.");
-        }
-
-        if (take <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(take), "Take must be greater than zero.");
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(skip, 0, nameof(skip));
+        ArgumentOutOfRangeException.ThrowIfLessThan(take, 0, nameof(take));
 
         var count = await database.CountAsync(sql);
-        if (count == 0)
+        if (take == 0 || skip >= count)
         {
             return new PagedModel<TResult>
             {
-                Total = 0,
+                Total = count,
                 Items = [],
             };
         }
 
-        sql = sql.OrderBy(field: orderBy);
+        sortingAction(sql);
 
         List<TDto> results = await database.SkipTakeAsync<TDto>(
             skip,

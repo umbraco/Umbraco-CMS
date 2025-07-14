@@ -246,5 +246,5 @@ internal class LongRunningOperationService : ILongRunningOperationService
     }
 
     private async Task<bool> IsAlreadyRunning(string type)
-        => (await _repository.GetByTypeAsync(type, [LongRunningOperationStatus.Enqueued, LongRunningOperationStatus.Running], 0, 1)).Total != 0;
+        => (await _repository.GetByTypeAsync(type, [LongRunningOperationStatus.Enqueued, LongRunningOperationStatus.Running], 0, 0)).Total != 0;
 }
