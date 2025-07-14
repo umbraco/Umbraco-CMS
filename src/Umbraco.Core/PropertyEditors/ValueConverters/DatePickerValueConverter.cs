@@ -20,19 +20,16 @@ public class DatePickerValueConverter : PropertyValueConverterBase
 
     internal static DateTime ParseDateTimeValue(object? source)
     {
-        if (source is null)
-        {
-            return DateTime.MinValue;
-        }
-
         if (source is DateTime dateTimeValue)
         {
-            return dateTimeValue;
+            return DateTime.SpecifyKind(dateTimeValue, DateTimeKind.Unspecified);
         }
 
-        Attempt<DateTime> attempt = source.TryConvertTo<DateTime>();
-        return attempt.Success
-            ? attempt.Result
-            : DateTime.MinValue;
+        if (source.TryConvertTo<DateTime>() is { Success: true } attempt)
+        {
+            return DateTime.SpecifyKind(attempt.Result, DateTimeKind.Unspecified);
+        }
+
+        return DateTime.MinValue;
     }
 }
