@@ -365,6 +365,17 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	#getResolvedItemName(link: UmbLinkPickerLink): string {
+		return (link.name || this._resolvedLinkNames.find((name) => name.unique === link.unique)?.name) ?? '';
+	}
+
+	#getResolvedItemUrl(link: UmbLinkPickerLink): string {
+		return (
+			(this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '') +
+			(link.queryString || '')
+		);
+	}
+
 	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
@@ -401,14 +412,15 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	#renderItem(link: UmbLinkPickerLink, index: number) {
 		const unique = this.#getUnique(link);
 		const href = this.readonly ? undefined : (this._modalRoute?.({ index }) ?? undefined);
-		const resolvedName = this._resolvedLinkNames.find((name) => name.unique === link.unique)?.name ?? '';
-		const resolvedUrl = this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '';
+		const name = this.#getResolvedItemName(link);
+		const url = this.#getResolvedItemUrl(link);
+
 		return html`
 			<uui-ref-node
 				id=${unique}
 				href=${ifDefined(href)}
-				name=${link.name || resolvedName}
-				detail=${resolvedUrl + (link.queryString || '')}
+				name=${name || url}
+				detail=${ifDefined(name ? url : undefined)}
 				?readonly=${this.readonly}>
 				<umb-icon slot="icon" name=${link.icon || 'icon-link'}></umb-icon>
 				${when(
