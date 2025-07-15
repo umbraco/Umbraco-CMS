@@ -1,7 +1,7 @@
 import type { ManifestDashboardApp } from '../dashboard-app.extension.js';
 import { UMB_DASHBOARD_APP_PICKER_MODAL } from '../app/picker/picker-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, nothing, ifDefined, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, nothing, ifDefined, state, repeat, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UmbExtensionsElementInitializer,
@@ -9,6 +9,10 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
+import type { DashboardAppInstance } from './types.js';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 @customElement('umb-dashboard')
 export class UmbDashboardElement extends UmbLitElement {
@@ -20,16 +24,41 @@ export class UmbDashboardElement extends UmbLitElement {
 		['large', 'large'],
 	]);
 
+	#gridSizeMap = new Map([
+		['small',{columns:1, rows: 1}],
+		['medium',{columns:2, rows: 2}],
+		['large',{columns:2, rows: 2}],
+	]);
+
+	#sorter? : UmbSorterController<DashboardAppInstance>;
+
 	#extensionsController?: UmbExtensionsElementInitializer<UmbExtensionManifest, 'dashboardApp', ManifestDashboardApp>;
 
 	@state()
-	_appElements: Array<any> = [];
+	_appElements: Array<DashboardAppInstance> = [];
 
 	@state()
 	_appUniques: Array<string> = [];
 
 	constructor() {
 		super();
+
+		this.#sorter = new UmbSorterController<DashboardAppInstance>(this, {
+			itemSelector: '.dashboard-app',
+			containerSelector: '.grid-container',
+			getUniqueOfElement: (element) => element.getAttribute('data-sorter-id'),
+			getUniqueOfModel: (modelEntry) => modelEntry.key,
+			onChange: ({ model }) => {
+				const oldValue = this._appElements;
+				this._appElements = model;
+				this.requestUpdate('_appElements', oldValue);
+			},
+		});
+
+		this.#sorter.setModel(this._appElements);
+
+		this.#observeDashboardApps();
+
 	}
 
 	#observeDashboardApps(): void {
@@ -42,22 +71,45 @@ export class UmbDashboardElement extends UmbLitElement {
 			this,
 			umbExtensionsRegistry,
 			'dashboardApp',
-			(manifest) => this._appUniques.includes(manifest.alias),
+			// If no _appUniques, return all
+			(manifest) => this._appUniques.length == 0 || this._appUniques.includes(manifest.alias),
 			(extensionControllers) => {
-				this._appElements = extensionControllers.map((controller) => {
+
+				let newAppElements : DashboardAppInstance[] = [];
+
+				extensionControllers.forEach((controller)=>{
+
 					if (controller.component && controller.manifest) {
 						const size = this.#sizeMap.get(controller.manifest.meta?.size) ?? this.#defaultSize;
 						const headline = controller.manifest?.meta?.headline
 							? this.localize.string(controller.manifest?.meta?.headline)
 							: undefined;
 
-						return html`<uui-box part="umb-dashboard-app-${size}" headline=${ifDefined(headline)}
-							>${controller.component}</uui-box
-						>`;
+						let gridSize = this.#gridSizeMap.get(size)!;
+
+						newAppElements.push({
+							key : UmbId.new(),
+							columns : gridSize.columns,
+							rows : gridSize?.rows,
+							headline : headline,
+							component : controller.component,
+						});
+
+
 					} else {
-						return html`<uui-box part="umb-dashboard-app-${this.#defaultSize}">Not Found</uui-box>`;
+						newAppElements.push({
+							key : UmbId.new(),
+							columns : 1,
+							rows : 1,
+							}
+						);
 					}
 				});
+
+				this._appElements = newAppElements;
+
+				this.#sorter?.setModel(this._appElements);
+
 			},
 			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 		);
@@ -86,60 +138,109 @@ export class UmbDashboardElement extends UmbLitElement {
 				<div class="grid-container">
 					${repeat(
 						this._appElements,
-						(element) => element,
-						(element) => element,
+						(element) => element.key,
+						(element) =>
+							html`
+								<div
+									style=${styleMap({gridColumn:`span ${element.columns}`,gridRow:`span ${element.rows}`})}
+									class="dashboard-app"
+									data-sorter-id=${element.key}>
+									<uui-box headline=${element.headline ?? ""}>
+										${element.component}
+									</uui-box>
+								</div>`,
 					)}
 				</div>
-				<umb-extension-slot
-					type="dashboardApp"
-					.renderMethod=${this.#extensionSlotRenderMethod}
-					class="grid-container"></umb-extension-slot>
 			</section>
 		`;
 	}
 
-	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestDashboardApp>) => {
-		if (ext.component && ext.manifest) {
-			const size = this.#sizeMap.get(ext.manifest.meta?.size) ?? this.#defaultSize;
-			const headline = ext.manifest?.meta?.headline ? this.localize.string(ext.manifest?.meta?.headline) : undefined;
-			return html`<uui-box part="umb-dashboard-app-${size}" headline=${ifDefined(headline)}>${ext.component}</uui-box>`;
-		}
-
-		return nothing;
-	};
-
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				container-type: inline-size;
+			}
+
+			uui-box {
+				height:100%;
+				position:relative;
+			}
+
 			#content {
 				padding: var(--uui-size-layout-1);
+				container-type: inline-size;
 			}
 
 			.grid-container {
+				margin-top:var(--uui-size-layout-1);
 				display: grid;
 				grid-template-columns: repeat(4, 1fr);
-				//grid-template-rows: repeat(100, 225px);
-				margin: calc(var(--uui-size-space-3) * -1);
-				margin-bottom: 20px;
+				grid-auto-rows: 225px;
+				gap: 20px;
 			}
 
-			umb-extension-slot::part(umb-dashboard-app-small) {
-				grid-column: span 1;
-				grid-row: span 1;
-				margin: var(--uui-size-space-3);
+			@container (inline-size < 900px) {
+				.grid-container {
+					grid-template-columns: repeat(3, 1fr);
+				}
 			}
 
-			umb-extension-slot::part(umb-dashboard-app-medium) {
-				grid-column: span 2;
-				grid-row: span 2;
-				margin: var(--uui-size-space-3);
+			@container (inline-size < 601px) {
+				.grid-container {
+					grid-template-columns: repeat(1, 1fr);
+				}
+				.grid-container > * {
+					grid-column: span 1 !important;
+				}
 			}
 
-			umb-extension-slot::part(umb-dashboard-app-large) {
-				grid-column: span 2;
-				grid-row: span 3;
-				margin: var(--uui-size-space-3);
+			.dashboard-app {
+				position:relative;
+				display:block;
+				height:100%;
 			}
+
+			.dashboard-app::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+
+			.dashboard-app[drag-placeholder] {
+				position: relative;
+				display: block;
+				--umb-block-grid-entry-actions-opacity: 0;
+			}
+
+			.dashboard-app[drag-placeholder]::after {
+				display: block;
+				border-width: 2px;
+				border-color: var(--uui-color-interactive-emphasis);
+				animation: ${UUIBlinkAnimationValue};
+			}
+
+			.dashboard-app[drag-placeholder]::before {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-interactive-emphasis);
+				opacity: 0.12;
+			}
+
+			.dashboard-app[drag-placeholder] > * {
+				transition: opacity 50ms 16ms;
+				opacity: 0;
+			}
+
 		`,
 	];
 }
