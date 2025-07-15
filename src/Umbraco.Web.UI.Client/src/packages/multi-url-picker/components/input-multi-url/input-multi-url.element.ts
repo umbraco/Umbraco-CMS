@@ -142,12 +142,12 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 	#urls: Array<UmbLinkPickerLink> = [];
 
-	#documentUrlRepository = new UmbDocumentUrlRepository(this);
-	#mediaUrlRepository = new UmbMediaUrlRepository(this);
 	#documentItemRepository = new UmbDocumentItemRepository(this);
-	#mediaItemRepository = new UmbMediaItemRepository(this);
-
+	#documentUrlRepository = new UmbDocumentUrlRepository(this);
 	#documentUrlsDataResolver = new UmbDocumentUrlsDataResolver(this);
+
+	#mediaItemRepository = new UmbMediaItemRepository(this);
+	#mediaUrlRepository = new UmbMediaUrlRepository(this);
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -249,15 +249,17 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#populateLinksNameAndUrl() {
-		// Documents and media have URLs saved in the local link format. Display the actual URL to align with what
-		// the user sees when they selected it initially.
 		this._resolvedLinkNames = [];
-		this._resolvedLinkUrls = []
+		this._resolvedLinkUrls = [];
+
+		// Documents and media have URLs saved in the local link format.
+		// Display the actual URL to align with what the user sees when they selected it initially.
 		this.#urls.forEach(async (link) => {
 			if (!link.unique) return;
 
 			let name: string | undefined = undefined;
 			let url: string | undefined = undefined;
+
 			switch (link.type) {
 				case 'document': {
 					if (!link.name || link.name.length === 0) {
