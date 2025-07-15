@@ -9,7 +9,8 @@ const config = new UmbPropertyEditorConfigCollection([
 		alias: 'hideLabel',
 		value: true,
 	},
-	{ alias: 'dimensions', value: { height: 500 } },
+	{ alias: 'maxDimensions', value: { height: 500 } },
+	{ alias: 'minDimensions', value: { height: 500 } },
 	{ alias: 'maxImageSize', value: 500 },
 	{ alias: 'ignoreUserStartNodes', value: false },
 	{
