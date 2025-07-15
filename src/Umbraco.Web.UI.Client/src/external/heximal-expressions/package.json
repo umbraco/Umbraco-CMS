@@ -1,0 +1,11 @@
+{
+	"name": "@umbraco-backoffice/heximal-expressions",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	},
+	"dependencies": {
+		"@heximal/expressions": "^0.1.5"
+	}
+}
