@@ -31,6 +31,8 @@ public class MemberRepositoryUsernameCachePolicy : DefaultRepositoryCachePolicy<
 
     public IMember? GetByUserName(string key, string? username, Func<string?, IMember?> performGetByUsername, Func<string[]?, IEnumerable<IMember>?> performGetAll)
     {
+        EnsureCacheIsSynced();
+
         var cacheKey = GetEntityCacheKey(key + username);
         IMember? fromCache = Cache.GetCacheItem<IMember>(cacheKey);
 
@@ -52,6 +54,9 @@ public class MemberRepositoryUsernameCachePolicy : DefaultRepositoryCachePolicy<
 
     public void DeleteByUserName(string key, string? username)
     {
+        // We've removed an entity, register cache change for other servers.
+        RegisterCacheChange();
+
         var cacheKey = GetEntityCacheKey(key + username);
         Cache.ClearByKey(cacheKey);
     }

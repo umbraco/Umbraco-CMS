@@ -117,6 +117,10 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
 
             throw;
         }
+
+        // We've changed the entity, register cache change for other servers.
+        // We assume that if something goes wrong, we'll roll back, so don't need to register the change.
+        RegisterCacheChange();
     }
 
     /// <inheritdoc />
@@ -141,11 +145,16 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
             Cache.Clear(EntityTypeCacheKey);
         }
+
+        // We've removed an entity, register cache change for other servers.
+        RegisterCacheChange();
     }
 
     /// <inheritdoc />
     public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
+
         var cacheKey = GetEntityCacheKey(id);
 
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
@@ -182,6 +191,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     /// <inheritdoc />
     public override TEntity? GetCached(TId id)
     {
+        EnsureCacheIsSynced();
         var cacheKey = GetEntityCacheKey(id);
         return Cache.GetCacheItem<TEntity>(cacheKey);
     }
@@ -189,6 +199,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     /// <inheritdoc />
     public override bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
         // if found in cache the return else check
         var cacheKey = GetEntityCacheKey(id);
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
@@ -198,6 +209,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     /// <inheritdoc />
     public override TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
+        EnsureCacheIsSynced();
         if (ids?.Length > 0)
         {
             // try to get each entity from the cache

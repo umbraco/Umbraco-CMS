@@ -88,7 +88,7 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
     /// <summary>
     /// Ensures that the cache is synced with the database.
     /// </summary>
-    protected void EsnureCacheIsSynced()
+    protected void EnsureCacheIsSynced()
     {
         var synced = _cacheVersionService.IsCacheSyncedAsync<TEntity>().GetAwaiter().GetResult();
         if (synced is false)
