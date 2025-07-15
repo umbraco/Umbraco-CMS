@@ -1088,6 +1088,12 @@ export default {
 		lockoutWillOccur: 'Du har været inaktiv, og du vil blive logget ud om',
 		renewSession: 'Forny for at gemme dine ændringer',
 	},
+	timeout: {
+		warningHeadline: 'Session udløber',
+		warningText: 'Din session er ved at udløbe, og du vil blive logget ud om <strong>{0} sekunder</strong>.',
+		warningLogoutAction: 'Log ud',
+		warningContinueAction: 'Forbliv logget ind',
+	},
 	login: {
 		greeting0: 'Velkommen',
 		greeting1: 'Velkommen',
