@@ -178,10 +178,9 @@ public class DataTypeBuilder
             elementSettingKey,
             editorAlias == Constants.PropertyEditors.Aliases.BlockGrid ? true : null);
 
-
         var dataTypeBuilder = new DataTypeBuilder()
             .WithId(0)
-            .WithDatabaseType(ValueStorageType.Nvarchar)
+            .WithDatabaseType(ValueStorageType.Ntext)
             .AddEditor()
             .WithAlias(editorAlias);
 
