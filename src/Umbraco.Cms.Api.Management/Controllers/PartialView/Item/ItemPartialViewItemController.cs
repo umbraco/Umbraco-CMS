@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
@@ -18,17 +18,17 @@ public class ItemPartialViewItemController : PartialViewItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<PartialViewItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item(
+    public Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "path")] HashSet<string> paths)
     {
         if (paths.Count is 0)
         {
-            return Ok(Enumerable.Empty<PartialViewItemResponseModel>());
+            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<PartialViewItemResponseModel>()));
         }
 
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
         IEnumerable<PartialViewItemResponseModel> responseModels = _fileItemPresentationFactory.CreatePartialViewItemResponseModels(paths);
-        return await Task.FromResult(Ok(responseModels));
+        return Task.FromResult<IActionResult>(Ok(responseModels));
     }
 }

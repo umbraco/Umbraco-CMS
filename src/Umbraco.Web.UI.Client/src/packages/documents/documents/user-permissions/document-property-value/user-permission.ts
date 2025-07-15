@@ -1,0 +1,3 @@
+export const UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_TYPE = 'document-property-value';
+
+export type UmbDocumentPropertyValueUserPermissionType = typeof UMB_DOCUMENT_PROPERTY_VALUE_USER_PERMISSION_TYPE;

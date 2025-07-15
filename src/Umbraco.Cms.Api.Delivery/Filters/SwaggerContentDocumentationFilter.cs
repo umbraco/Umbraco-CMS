@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Delivery.Configuration;
@@ -21,7 +21,7 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
 
         operation.Parameters.Add(new OpenApiParameter
         {
-            Name = "Accept-Language",
+            Name = Core.Constants.DeliveryApi.HeaderNames.AcceptLanguage,
             In = ParameterLocation.Header,
             Required = false,
             Description = "Defines the language to return. Use this when querying language variant content items.",
@@ -33,11 +33,25 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
             }
         });
 
+        operation.Parameters.Add(new OpenApiParameter
+        {
+            Name = Core.Constants.DeliveryApi.HeaderNames.AcceptSegment,
+            In = ParameterLocation.Header,
+            Required = false,
+            Description = "Defines the segment to return. Use this when querying segment variant content items.",
+            Schema = new OpenApiSchema { Type = "string" },
+            Examples = new Dictionary<string, OpenApiExample>
+            {
+                { "Default", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
+                { "Segment One", new OpenApiExample { Value = new OpenApiString("segment-one") } }
+            }
+        });
+
         AddApiKey(operation);
 
         operation.Parameters.Add(new OpenApiParameter
         {
-            Name = "Preview",
+            Name = Core.Constants.DeliveryApi.HeaderNames.Preview,
             In = ParameterLocation.Header,
             Required = false,
             Description = "Whether to request draft content.",
@@ -46,7 +60,7 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
 
         operation.Parameters.Add(new OpenApiParameter
         {
-            Name = "Start-Item",
+            Name = Core.Constants.DeliveryApi.HeaderNames.StartItem,
             In = ParameterLocation.Header,
             Required = false,
             Description = "URL segment or GUID of a root content item.",

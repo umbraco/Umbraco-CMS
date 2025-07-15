@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class LegacyScopeProviderTests : UmbracoIntegrationTest
+internal sealed class LegacyScopeProviderTests : UmbracoIntegrationTest
 {
     [Test]
     public void CreateScope_Always_ReturnsLegacyIScope()

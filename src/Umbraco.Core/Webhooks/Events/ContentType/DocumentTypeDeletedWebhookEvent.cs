@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -21,5 +22,5 @@ public class DocumentTypeDeletedWebhookEvent : WebhookEventBase<ContentTypeDelet
     public override string Alias => Constants.WebhookEvents.Aliases.DocumentTypeDeleted;
 
     public override object? ConvertNotificationToRequestPayload(ContentTypeDeletedNotification notification)
-        => notification.DeletedEntities;
+        => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

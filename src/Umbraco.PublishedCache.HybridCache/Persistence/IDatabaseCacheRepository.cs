@@ -7,11 +7,7 @@ internal interface IDatabaseCacheRepository
 {
     Task DeleteContentItemAsync(int id);
 
-    Task<ContentCacheNode?> GetContentSourceAsync(int id, bool preview = false);
-
     Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
-
-    Task<ContentCacheNode?> GetMediaSourceAsync(int id);
 
     Task<ContentCacheNode?> GetMediaSourceAsync(Guid key);
 
@@ -56,15 +52,4 @@ internal interface IDatabaseCacheRepository
         IReadOnlyCollection<int>? contentTypeIds = null,
         IReadOnlyCollection<int>? mediaTypeIds = null,
         IReadOnlyCollection<int>? memberTypeIds = null);
-
-    /// <summary>
-    ///     Verifies the content cache by asserting that every document should have a corresponding row for edited properties and if published,
-    ///     may have a corresponding row for published properties
-    /// </summary>
-    bool VerifyContentDbCache();
-
-    /// <summary>
-    ///     Rebuilds the caches for content, media and/or members based on the content type ids specified
-    /// </summary>
-    bool VerifyMediaDbCache();
 }

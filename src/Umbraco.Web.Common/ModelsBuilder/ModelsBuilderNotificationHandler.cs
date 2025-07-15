@@ -100,12 +100,11 @@ internal class ModelsBuilderNotificationHandler :
     {
         IDictionary<string, object> serverVars = notification.ServerVariables;
 
-        if (!serverVars.ContainsKey("umbracoUrls"))
+        if (!serverVars.TryGetValue("umbracoUrls", out object? umbracoUrlsObject))
         {
             throw new ArgumentException("Missing umbracoUrls.");
         }
 
-        var umbracoUrlsObject = serverVars["umbracoUrls"];
         if (umbracoUrlsObject == null)
         {
             throw new ArgumentException("Null umbracoUrls");
@@ -116,12 +115,12 @@ internal class ModelsBuilderNotificationHandler :
             throw new ArgumentException("Invalid umbracoUrls");
         }
 
-        if (!serverVars.ContainsKey("umbracoPlugins"))
+        if (!serverVars.TryGetValue("umbracoPlugins", out object? umbracoPluginsObject))
         {
             throw new ArgumentException("Missing umbracoPlugins.");
         }
 
-        if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
+        if (!(umbracoPluginsObject is Dictionary<string, object> umbracoPlugins))
         {
             throw new ArgumentException("Invalid umbracoPlugins");
         }

@@ -28,7 +28,7 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
     protected IDictionaryItemService DictionaryItemService { get; }
 
     protected async Task<IEnumerable<NamedEntityTreeItemResponseModel>> MapTreeItemViewModels(IEnumerable<IDictionaryItem> dictionaryItems)
-        => await Task.WhenAll(dictionaryItems.Select(CreateEntityTreeItemViewModelAsync));
+        => await MapTreeItemViewModelsAsync(dictionaryItems).ToArrayAsync();
 
     protected override async Task<ActionResult<IEnumerable<NamedEntityTreeItemResponseModel>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
     {
@@ -54,8 +54,17 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
             }
         }
 
-        NamedEntityTreeItemResponseModel[] viewModels = await Task.WhenAll(ancestors.Select(CreateEntityTreeItemViewModelAsync));
+        NamedEntityTreeItemResponseModel[] viewModels = await MapTreeItemViewModelsAsync(ancestors).ToArrayAsync();
+
         return Ok(viewModels.Reverse());
+    }
+
+    private async IAsyncEnumerable<NamedEntityTreeItemResponseModel> MapTreeItemViewModelsAsync(IEnumerable<IDictionaryItem> dictionaryItems)
+    {
+        foreach (IDictionaryItem dictionaryItem in dictionaryItems)
+        {
+            yield return await CreateEntityTreeItemViewModelAsync(dictionaryItem);
+        }
     }
 
     private async Task<NamedEntityTreeItemResponseModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)

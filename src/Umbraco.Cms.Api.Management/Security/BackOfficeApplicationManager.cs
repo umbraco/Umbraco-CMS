@@ -32,7 +32,11 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
     }
 
+    [Obsolete("Please use the overload that allows for multiple back-office hosts. Will be removed in V17.")]
     public async Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default)
+        => await EnsureBackOfficeApplicationAsync([backOfficeUrl], cancellationToken);
+
+    public async Task EnsureBackOfficeApplicationAsync(IEnumerable<Uri> backOfficeHosts, CancellationToken cancellationToken = default)
     {
         // Install is okay without this, because we do not need a token to install,
         // but upgrades do, so we need to execute for everything higher then or equal to upgrade.
@@ -41,13 +45,14 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             return;
         }
 
-        if (backOfficeUrl.IsAbsoluteUri is false)
+        Uri[] backOfficeHostsAsArray = backOfficeHosts as Uri[] ?? backOfficeHosts.ToArray();
+        if (backOfficeHostsAsArray.Any(url => url.IsAbsoluteUri) is false)
         {
-            throw new ArgumentException($"Expected an absolute URL, got: {backOfficeUrl}", nameof(backOfficeUrl));
+            throw new ArgumentException($"Expected absolute URLs, got: {string.Join(", ", backOfficeHostsAsArray.Select(url => url.ToString()))}", nameof(backOfficeHosts));
         }
 
         await CreateOrUpdate(
-            BackofficeOpenIddictApplicationDescriptor(backOfficeUrl),
+            BackofficeOpenIddictApplicationDescriptor(backOfficeHostsAsArray),
             cancellationToken);
 
         if (_webHostEnvironment.IsProduction())
@@ -57,88 +62,20 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
         else
         {
-            var developerClientTimeOutValue = new GlobalSettings().TimeOut.ToString("c", CultureInfo.InvariantCulture);
-
             await CreateOrUpdate(
-                new OpenIddictApplicationDescriptor
-                {
-                    DisplayName = "Umbraco Swagger access",
-                    ClientId = Constants.OAuthClientIds.Swagger,
-                    RedirectUris =
-                    {
-                        CallbackUrlFor(backOfficeUrl, "/umbraco/swagger/oauth2-redirect.html")
-                    },
-                    ClientType = OpenIddictConstants.ClientTypes.Public,
-                    Permissions =
-                    {
-                        OpenIddictConstants.Permissions.Endpoints.Authorization,
-                        OpenIddictConstants.Permissions.Endpoints.Token,
-                        OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                        OpenIddictConstants.Permissions.ResponseTypes.Code
-                    },
-                    Settings =
-                    {
-                        // use a fixed access token lifetime for tokens issued to the Swagger application.
-                        [OpenIddictConstants.Settings.TokenLifetimes.AccessToken] = developerClientTimeOutValue
-                    }
-                },
+                DeveloperOpenIddictApplicationDescriptor(
+                    "Umbraco Swagger access",
+                    Constants.OAuthClientIds.Swagger,
+                    backOfficeHostsAsArray.Select(backOfficeUrl => CallbackUrlFor(backOfficeUrl, "/umbraco/swagger/oauth2-redirect.html")).ToArray()),
                 cancellationToken);
 
             await CreateOrUpdate(
-                new OpenIddictApplicationDescriptor
-                {
-                    DisplayName = "Umbraco Postman access",
-                    ClientId = Constants.OAuthClientIds.Postman,
-                    RedirectUris =
-                    {
-                        new Uri("https://oauth.pstmn.io/v1/callback"), new Uri("https://oauth.pstmn.io/v1/browser-callback")
-                    },
-                    ClientType = OpenIddictConstants.ClientTypes.Public,
-                    Permissions =
-                    {
-                        OpenIddictConstants.Permissions.Endpoints.Authorization,
-                        OpenIddictConstants.Permissions.Endpoints.Token,
-                        OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                        OpenIddictConstants.Permissions.ResponseTypes.Code
-                    },
-                    Settings =
-                    {
-                        // use a fixed access token lifetime for tokens issued to the Postman application.
-                        [OpenIddictConstants.Settings.TokenLifetimes.AccessToken] = developerClientTimeOutValue
-                    }
-                },
+                DeveloperOpenIddictApplicationDescriptor(
+                    "Umbraco Postman access",
+                    Constants.OAuthClientIds.Postman,
+                    [new Uri("https://oauth.pstmn.io/v1/callback"), new Uri("https://oauth.pstmn.io/v1/browser-callback")]),
                 cancellationToken);
         }
-    }
-
-    public OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl)
-    {
-        Uri CallbackUrl(string path) => CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, path);
-        return new OpenIddictApplicationDescriptor
-        {
-            DisplayName = "Umbraco back-office access",
-            ClientId = Constants.OAuthClientIds.BackOffice,
-            RedirectUris =
-            {
-                CallbackUrl(_authorizeCallbackPathName),
-            },
-            ClientType = OpenIddictConstants.ClientTypes.Public,
-            PostLogoutRedirectUris =
-            {
-                CallbackUrl(_authorizeCallbackPathName),
-                CallbackUrl(_authorizeCallbackLogoutPathName),
-            },
-            Permissions =
-            {
-                OpenIddictConstants.Permissions.Endpoints.Authorization,
-                OpenIddictConstants.Permissions.Endpoints.Token,
-                OpenIddictConstants.Permissions.Endpoints.EndSession,
-                OpenIddictConstants.Permissions.Endpoints.Revocation,
-                OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                OpenIddictConstants.Permissions.ResponseTypes.Code,
-            },
-        };
     }
 
     public async Task EnsureBackOfficeClientCredentialsApplicationAsync(string clientId, string clientSecret, CancellationToken cancellationToken = default)
@@ -162,6 +99,75 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
 
     public async Task DeleteBackOfficeClientCredentialsApplicationAsync(string clientId, CancellationToken cancellationToken = default)
         => await Delete(clientId, cancellationToken);
+
+    [Obsolete("Do not use - for internal usage only. Will be made internal in V17.")]
+    public OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl)
+        => BackofficeOpenIddictApplicationDescriptor([backOfficeUrl]);
+
+    internal OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri[] backOfficeHosts)
+    {
+        if (_backOfficeHost is not null)
+        {
+            backOfficeHosts = [_backOfficeHost];
+        }
+
+        var descriptor = new OpenIddictApplicationDescriptor
+        {
+            DisplayName = "Umbraco back-office access",
+            ClientId = Constants.OAuthClientIds.BackOffice,
+            ClientType = OpenIddictConstants.ClientTypes.Public,
+            Permissions =
+            {
+                OpenIddictConstants.Permissions.Endpoints.Authorization,
+                OpenIddictConstants.Permissions.Endpoints.Token,
+                OpenIddictConstants.Permissions.Endpoints.EndSession,
+                OpenIddictConstants.Permissions.Endpoints.Revocation,
+                OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                OpenIddictConstants.Permissions.ResponseTypes.Code,
+            },
+        };
+
+        foreach (Uri backOfficeHost in backOfficeHosts)
+        {
+            descriptor.RedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackPathName));
+            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackPathName));
+            descriptor.PostLogoutRedirectUris.Add(CallbackUrlFor(backOfficeHost, _authorizeCallbackLogoutPathName));
+        }
+
+        return descriptor;
+    }
+
+    internal OpenIddictApplicationDescriptor DeveloperOpenIddictApplicationDescriptor(string name, string clientId, Uri[] redirectUrls)
+    {
+        var developerClientTimeOutValue = new GlobalSettings().TimeOut.ToString("c", CultureInfo.InvariantCulture);
+
+        var descriptor = new OpenIddictApplicationDescriptor
+        {
+            DisplayName = name,
+            ClientId = clientId,
+            ClientType = OpenIddictConstants.ClientTypes.Public,
+            Permissions =
+            {
+                OpenIddictConstants.Permissions.Endpoints.Authorization,
+                OpenIddictConstants.Permissions.Endpoints.Token,
+                OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                OpenIddictConstants.Permissions.ResponseTypes.Code
+            },
+            Settings =
+            {
+                // use a fixed access token lifetime for tokens issued to the developer applications.
+                [OpenIddictConstants.Settings.TokenLifetimes.AccessToken] = developerClientTimeOutValue
+            }
+        };
+
+        foreach (Uri redirectUrl in redirectUrls)
+        {
+            descriptor.RedirectUris.Add(redirectUrl);
+        }
+
+        return descriptor;
+    }
 
     private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri($"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
 }

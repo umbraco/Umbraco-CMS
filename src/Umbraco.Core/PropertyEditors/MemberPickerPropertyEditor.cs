@@ -21,7 +21,7 @@ public class MemberPickerPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MemberPickerPropertyValueEditor>(Attribute!);
 
-    private class MemberPickerPropertyValueEditor : DataValueEditor
+    private class MemberPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IMemberService _memberService;
 
@@ -61,5 +61,20 @@ public class MemberPickerPropertyEditor : DataEditor
             => editorValue.Value is string stringValue && Guid.TryParse(stringValue, out Guid memberKey)
                 ? new GuidUdi(Constants.UdiEntityType.Member, memberKey)
                 : null;
+
+        public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
+        {
+            var asString = value is string str ? str : value?.ToString();
+
+            if (string.IsNullOrEmpty(asString))
+            {
+                yield break;
+            }
+
+            if (UdiParser.TryParse(asString, out Udi? udi))
+            {
+                yield return new UmbracoEntityReference(udi);
+            }
+        }
     }
 }

@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -16,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public abstract class DocumentNavigationServiceTestsBase : UmbracoIntegrationTest
+internal abstract class DocumentNavigationServiceTestsBase : UmbracoIntegrationTest
 {
     protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -45,12 +44,12 @@ public abstract class DocumentNavigationServiceTestsBase : UmbracoIntegrationTes
 
     protected IContent Grandchild4 { get; set; }
 
-    protected ContentCreateModel CreateContentCreateModel(string name, Guid key, Guid? parentKey = null)
+    protected ContentCreateModel CreateContentCreateModel(string name, Guid key, Guid? contentTypeKey = null, Guid? parentKey = null)
         => new()
         {
-            ContentTypeKey = ContentType.Key,
+            ContentTypeKey = contentTypeKey ?? ContentType.Key,
             ParentKey = parentKey ?? Constants.System.RootKey,
-            InvariantName = name,
+            Variants = [new () { Name = name }],
             Key = key,
         };
 

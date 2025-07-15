@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class UserGroupRepositoryTest : UmbracoIntegrationTest
+internal sealed class UserGroupRepositoryTest : UmbracoIntegrationTest
 {
     private IEnumerable<IPermissionMapper> PermissionMappers => GetRequiredService<IEnumerable<IPermissionMapper>>();
 

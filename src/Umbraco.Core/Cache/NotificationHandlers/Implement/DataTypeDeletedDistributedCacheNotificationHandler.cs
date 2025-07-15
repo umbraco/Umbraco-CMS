@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
@@ -17,7 +18,12 @@ public sealed class DataTypeDeletedDistributedCacheNotificationHandler : Deleted
         => _distributedCache = distributedCache;
 
     /// <inheritdoc />
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     protected override void Handle(IEnumerable<IDataType> entities)
+        => Handle(entities, new Dictionary<string, object?>());
+
+    /// <inheritdoc />
+    protected override void Handle(IEnumerable<IDataType> entities, IDictionary<string, object?> state)
     {
         _distributedCache.RemoveDataTypeCache(entities);
         _distributedCache.RefreshValueEditorCache(entities);

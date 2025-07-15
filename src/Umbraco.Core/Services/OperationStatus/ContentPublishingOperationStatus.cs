@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services.OperationStatus;
+namespace Umbraco.Cms.Core.Services.OperationStatus;
 
 public enum ContentPublishingOperationStatus
 {
@@ -26,4 +26,7 @@ public enum ContentPublishingOperationStatus
     FailedBranch,
     Failed, // unspecified failure (can happen on unpublish at the time of writing)
     Unknown,
+    CannotUnpublishWhenReferenced,
+    Accepted,
+    TaskResultNotFound,
 }

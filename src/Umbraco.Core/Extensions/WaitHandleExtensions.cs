@@ -12,7 +12,7 @@ public static class WaitHandleExtensions
     public static Task WaitOneAsync(this WaitHandle handle, int millisecondsTimeout = Timeout.Infinite)
     {
         var tcs = new TaskCompletionSource<object?>();
-        var callbackHandleInitLock = new object();
+        var callbackHandleInitLock = new Lock();
         lock (callbackHandleInitLock)
         {
             RegisteredWaitHandle? callbackHandle = null;

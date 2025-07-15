@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerFixture)]
-    public class ScopeTests : UmbracoIntegrationTest
+    internal sealed class ScopeTests : UmbracoIntegrationTest
     {
         private new ScopeProvider ScopeProvider => (ScopeProvider)base.ScopeProvider;
 

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
@@ -17,7 +17,7 @@ public class SettingsTemplateQueryController : TemplateQueryControllerBase
     [HttpGet("settings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateQuerySettingsResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<TemplateQuerySettingsResponseModel>> Settings(CancellationToken cancellationToken)
+    public Task<ActionResult<TemplateQuerySettingsResponseModel>> Settings(CancellationToken cancellationToken)
     {
         var contentTypeAliases = _contentTypeService
             .GetAll()
@@ -29,7 +29,7 @@ public class SettingsTemplateQueryController : TemplateQueryControllerBase
 
         IEnumerable<TemplateQueryOperatorViewModel> operators = GetOperators();
 
-        return await Task.FromResult(Ok(new TemplateQuerySettingsResponseModel
+        return Task.FromResult<ActionResult<TemplateQuerySettingsResponseModel>>(Ok(new TemplateQuerySettingsResponseModel
         {
             DocumentTypeAliases = contentTypeAliases,
             Properties = properties,

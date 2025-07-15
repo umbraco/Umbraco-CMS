@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class BackOfficeExamineSearcherTests : ExamineBaseTest
+internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
 {
     [SetUp]
     public void Setup()
@@ -78,6 +78,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             pageSize,
             pageIndex,
             out _,
+            null,
+            null,
             ignoreUserStartNodes: true);
 
     private async Task SetupUserIdentity(string userId)

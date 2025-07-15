@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class CachedDataTypeServiceTests : UmbracoIntegrationTest
+internal sealed class CachedDataTypeServiceTests : UmbracoIntegrationTest
 {
     private IDataValueEditorFactory DataValueEditorFactory => GetRequiredService<IDataValueEditorFactory>();
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();

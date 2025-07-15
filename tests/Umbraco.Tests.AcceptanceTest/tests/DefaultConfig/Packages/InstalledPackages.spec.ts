@@ -1,8 +1,6 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-// We can't install any packages so we do not have any installed.
-//TODO: Remove skip when the frontend is ready
-test.skip('can see no package have been installed', async ({page, umbracoUi}) => {
+test.skip('can see the umbraco package is installed', async ({umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.package.goToSection(ConstantHelper.sections.packages);
@@ -11,5 +9,5 @@ test.skip('can see no package have been installed', async ({page, umbracoUi}) =>
   await umbracoUi.package.clickInstalledTab();
 
   // Assert
-  await umbracoUi.package.isTextNoPackagesHaveBeenInstalledVisible();
+  await umbracoUi.package.isUmbracoBackofficePackageVisible();
 });

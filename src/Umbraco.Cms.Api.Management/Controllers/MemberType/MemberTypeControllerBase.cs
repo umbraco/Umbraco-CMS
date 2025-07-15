@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType;
 
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.MemberType)]
 [ApiExplorerSettings(GroupName = "Member Type")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMembersOrMemberTypes)]
 public abstract class MemberTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -34,46 +34,46 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     }
 
     /// <inheritdoc />
-    public async Task<ILanguage?> GetAsync(string isoCode)
+    public Task<ILanguage?> GetAsync(string isoCode)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_languageRepository.GetByIsoCode(isoCode));
+            return Task.FromResult(_languageRepository.GetByIsoCode(isoCode));
         }
     }
 
     /// <inheritdoc />
-    public async Task<ILanguage?> GetDefaultLanguageAsync()
+    public Task<ILanguage?> GetDefaultLanguageAsync()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_languageRepository.GetByIsoCode(_languageRepository.GetDefaultIsoCode()));
+            return Task.FromResult(_languageRepository.GetByIsoCode(_languageRepository.GetDefaultIsoCode()));
         }
     }
 
     /// <inheritdoc />
-    public async Task<string> GetDefaultIsoCodeAsync()
+    public Task<string> GetDefaultIsoCodeAsync()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_languageRepository.GetDefaultIsoCode());
+            return Task.FromResult(_languageRepository.GetDefaultIsoCode());
         }
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<ILanguage>> GetAllAsync()
+    public Task<IEnumerable<ILanguage>> GetAllAsync()
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return await Task.FromResult(_languageRepository.GetMany());
+            return Task.FromResult(_languageRepository.GetMany());
         }
     }
 
-    public async Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids)
+    public Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
 
-        return await Task.FromResult(_languageRepository.GetIsoCodesByIds(ids, throwOnNotFound: true));
+        return Task.FromResult(_languageRepository.GetIsoCodesByIds(ids, throwOnNotFound: true));
     }
 
     public async Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes) => (await GetAllAsync()).Where(x => isoCodes.Contains(x.IsoCode));
@@ -163,7 +163,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
             Audit(AuditType.Delete, "Delete Language", currentUserId, language.Id, UmbracoObjectTypes.Language.GetName());
             scope.Complete();
-            return await Task.FromResult(Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language));
+            return Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language);
         }
     }
 
@@ -217,7 +217,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             Audit(auditType, auditMessage, currentUserId, language.Id, UmbracoObjectTypes.Language.GetName());
 
             scope.Complete();
-            return await Task.FromResult(Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language));
+            return Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language);
         }
     }
 

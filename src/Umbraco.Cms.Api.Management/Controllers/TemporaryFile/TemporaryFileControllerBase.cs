@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
@@ -16,6 +16,9 @@ public abstract class TemporaryFileControllerBase : ManagementApiControllerBase
             TemporaryFileOperationStatus.FileExtensionNotAllowed => BadRequest(problemDetailsBuilder
                 .WithTitle("File extension not allowed")
                 .WithDetail("The file extension is not allowed.")
+                .Build()),
+            TemporaryFileOperationStatus.InvalidFileName => BadRequest(problemDetailsBuilder
+                .WithTitle("The provided file name is not valid")
                 .Build()),
             TemporaryFileOperationStatus.KeyAlreadyUsed => BadRequest(problemDetailsBuilder
                 .WithTitle("Key already used")

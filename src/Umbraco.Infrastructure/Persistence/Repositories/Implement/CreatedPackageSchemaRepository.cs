@@ -1,12 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO.Compression;
 using System.Xml.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -78,81 +74,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         _xmlParser = new PackageDefinitionXmlParser();
         _createdPackagesFolderPath = mediaFolderPath ?? Constants.SystemDirectories.CreatedPackages;
         _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData + "/PackageFiles";
-    }
-
-    [Obsolete("use ctor with all dependencies instead")]
-    public CreatedPackageSchemaRepository(
-        IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IHostingEnvironment hostingEnvironment,
-        IOptions<GlobalSettings> globalSettings,
-        FileSystems fileSystems,
-        IEntityXmlSerializer serializer,
-        IDataTypeService dataTypeService,
-        ILocalizationService localizationService,
-        IFileService fileService,
-        IMediaService mediaService,
-        IMediaTypeService mediaTypeService,
-        IContentService contentService,
-        MediaFileManager mediaFileManager,
-        IContentTypeService contentTypeService,
-        IScopeAccessor scopeAccessor,
-        string? mediaFolderPath = null,
-        string? tempFolderPath = null)
-        : this(
-            hostingEnvironment,
-            fileSystems,
-            serializer,
-            dataTypeService,
-            fileService,
-            mediaService,
-            mediaTypeService,
-            contentService,
-            mediaFileManager,
-            contentTypeService,
-            scopeAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDictionaryItemService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            mediaFolderPath,
-            tempFolderPath)
-    {
-    }
-
-    [Obsolete("use ctor with all dependencies instead")]
-    public CreatedPackageSchemaRepository(
-        IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IHostingEnvironment hostingEnvironment,
-        IOptions<GlobalSettings> globalSettings,
-        FileSystems fileSystems,
-        IEntityXmlSerializer serializer,
-        IDataTypeService dataTypeService,
-        ILocalizationService localizationService,
-        IFileService fileService,
-        IMediaService mediaService,
-        IMediaTypeService mediaTypeService,
-        IContentService contentService,
-        MediaFileManager mediaFileManager,
-        IContentTypeService contentTypeService,
-        string? mediaFolderPath = null,
-        string? tempFolderPath = null)
-        : this(
-            umbracoDatabaseFactory,
-            hostingEnvironment,
-            globalSettings,
-            fileSystems,
-            serializer,
-            dataTypeService,
-            localizationService,
-            fileService,
-            mediaService,
-            mediaTypeService,
-            contentService,
-            mediaFileManager,
-            contentTypeService,
-            StaticServiceProvider.Instance.GetRequiredService<IScopeAccessor>(),
-            mediaFolderPath,
-            tempFolderPath)
-    {
     }
 
     private IUmbracoDatabase Database => _scopeAccessor.AmbientScope?.Database ?? throw new InvalidOperationException("A scope is required to query the database");

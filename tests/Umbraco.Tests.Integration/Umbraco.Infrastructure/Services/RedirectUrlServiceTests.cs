@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RedirectUrlServiceTests : UmbracoIntegrationTestWithContent
+internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithContent
 {
     private IContent _firstSubPage;
     private IContent _secondSubPage;

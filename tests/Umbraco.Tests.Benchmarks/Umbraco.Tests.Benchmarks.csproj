@@ -5,11 +5,18 @@
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
+  
   <PropertyGroup>
-    <!--  TODO: Fix [SYSLIB0021] API supports obsolete serialization, [IDE0060] removed unused parameters,
-          [CS0618] update obsolete references, CS0649 field not assigned too, and remove overrides -->
-    <WarningsNotAsErrors>SYSLIB0021,IDE0060,CS0618,CS0649</WarningsNotAsErrors>
+    <!--
+      TODO: Fix and remove overrides:
+      [SYSLIB0021] API supports obsolete serialization
+      [IDE0060] removed unused parameters
+      [CS0618] update obsolete references
+      [CS0649] field not assigned too
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors),SYSLIB0021,IDE0060,CS0618,CS0649</WarningsNotAsErrors>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" />

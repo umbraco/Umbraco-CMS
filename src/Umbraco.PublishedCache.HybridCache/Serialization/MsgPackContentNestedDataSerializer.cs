@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using K4os.Compression.LZ4;
 using MessagePack;
 using MessagePack.Resolvers;
@@ -8,14 +8,17 @@ using Umbraco.Cms.Core.PropertyEditors;
 namespace Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
 /// <summary>
-///     Serializes/Deserializes <see cref="ContentCacheDataModel" /> document to the SQL Database as bytes using
-///     MessagePack
+///     Serializes/deserializes <see cref="ContentCacheDataModel" /> documents to the SQL Database as bytes using
+///     MessagePack.
 /// </summary>
 internal sealed class MsgPackContentNestedDataSerializer : IContentCacheDataSerializer
 {
     private readonly MessagePackSerializerOptions _options;
     private readonly IPropertyCacheCompression _propertyOptions;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MsgPackContentNestedDataSerializer"/> class.
+    /// </summary>
     public MsgPackContentNestedDataSerializer(IPropertyCacheCompression propertyOptions)
     {
         _propertyOptions = propertyOptions ?? throw new ArgumentNullException(nameof(propertyOptions));
@@ -40,6 +43,7 @@ internal sealed class MsgPackContentNestedDataSerializer : IContentCacheDataSeri
             .WithSecurity(MessagePackSecurity.UntrustedData);
     }
 
+    /// <inheritdoc/>
     public ContentCacheDataModel? Deserialize(IReadOnlyContentBase content, string? stringData, byte[]? byteData, bool published)
     {
         if (byteData != null)
@@ -62,6 +66,7 @@ internal sealed class MsgPackContentNestedDataSerializer : IContentCacheDataSeri
         return null;
     }
 
+    /// <inheritdoc/>
     public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model, bool published)
     {
         Compress(content, model, published);
@@ -69,11 +74,10 @@ internal sealed class MsgPackContentNestedDataSerializer : IContentCacheDataSeri
         return new ContentCacheDataSerializationResult(null, bytes);
     }
 
-    public string ToJson(byte[] bin)
-    {
-        var json = MessagePackSerializer.ConvertToJson(bin, _options);
-        return json;
-    }
+    /// <summary>
+    /// Converts the binary MessagePack data to a JSON string representation.
+    /// </summary>
+    public string ToJson(byte[] bin) => MessagePackSerializer.ConvertToJson(bin, _options);
 
     /// <summary>
     ///     Used during serialization to compress properties

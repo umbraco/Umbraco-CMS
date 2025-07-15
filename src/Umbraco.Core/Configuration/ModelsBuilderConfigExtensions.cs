@@ -1,6 +1,7 @@
+using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Extensions;
 
 namespace Umbraco.Extensions;
 
@@ -10,12 +11,12 @@ public static class ModelsBuilderConfigExtensions
 
     public static string ModelsDirectoryAbsolute(
         this ModelsBuilderSettings modelsBuilderConfig,
-        IHostingEnvironment hostingEnvironment)
+        IHostEnvironment hostEnvironment)
     {
         if (_modelsDirectoryAbsolute is null)
         {
             var modelsDirectory = modelsBuilderConfig.ModelsDirectory;
-            var root = hostingEnvironment.MapPathContentRoot("~/");
+            var root = hostEnvironment.MapPathContentRoot("~/");
 
             _modelsDirectoryAbsolute = GetModelsDirectory(root, modelsDirectory, modelsBuilderConfig.AcceptUnsafeModelsDirectory);
         }
@@ -35,7 +36,7 @@ public static class ModelsBuilderConfigExtensions
 
         if (config.StartsWith("~/"))
         {
-            var dir = Path.Combine(root, config.TrimStartExact("~/"));
+            var dir = Path.Combine(root, config.TrimStart("~/"));
 
             // sanitize - GetFullPath will take care of any relative
             // segments in path, eg '../../foo.tmp' - it may throw a SecurityException

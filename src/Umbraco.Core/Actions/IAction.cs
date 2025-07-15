@@ -37,6 +37,7 @@ public interface IAction : IDiscoverable
     /// <summary>
     ///     Gets the icon to display for this action
     /// </summary>
+    [Obsolete("No longer used. Scheduled for removal in V17.")]
     string Icon { get; }
 
     /// <summary>
@@ -51,5 +52,6 @@ public interface IAction : IDiscoverable
     /// <remarks>
     ///     Used in the UI when assigning permissions
     /// </remarks>
+    [Obsolete("No longer used. Scheduled for removal in V17.")]
     string? Category { get; }
 }

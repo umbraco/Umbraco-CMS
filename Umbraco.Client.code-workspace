@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "src/Umbraco.Web.UI.Client"
+		},
+		{
+			"path": "src/Umbraco.Web.UI.Login"
+		}		
+	]
+}

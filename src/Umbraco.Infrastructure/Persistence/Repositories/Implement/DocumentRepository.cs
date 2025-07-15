@@ -117,7 +117,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             result.Add(new ContentSchedule(
                 scheduleDto.Id,
-                LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? string.Empty,
+                LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
                 scheduleDto.Date,
                 scheduleDto.Action == ContentScheduleAction.Release.ToString()
                     ? ContentScheduleAction.Release
@@ -400,15 +400,17 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             foreach (ContentVariation v in contentVariation)
             {
-                content.SetCultureInfo(v.Culture, v.Name, v.Date);
+                content.SetCultureInfo(v.Culture, v.Name, DateTime.SpecifyKind(v.Date, DateTimeKind.Local));
             }
         }
 
+        // Dates stored in the database are local server time, but for SQL Server, will be considered
+        // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
         if (content.PublishedState is PublishedState.Published && content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
         {
             foreach (ContentVariation v in contentVariation)
             {
-                content.SetPublishInfo(v.Culture, v.Name, v.Date);
+                content.SetPublishInfo(v.Culture, v.Name, DateTime.SpecifyKind(v.Date, DateTimeKind.Local));
             }
         }
 
@@ -916,9 +918,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         NodeDto parent = GetParentNodeDto(entity.ParentId);
         var level = parent.Level + 1;
 
-        var sortOrderExists = SortorderExists(entity.ParentId, entity.SortOrder);
+        var calculateSortOrder = (entity is { HasIdentity: false, SortOrder: 0 } && entity.IsPropertyDirty(nameof(entity.SortOrder)) is false) // SortOrder was not updated from it's default value
+                                 || SortorderExists(entity.ParentId, entity.SortOrder);
         // if the sortorder of the entity already exists get a new one, else use the sortOrder of the entity
-        var sortOrder = sortOrderExists ? GetNewChildSortOrder(entity.ParentId, 0) : entity.SortOrder;
+        var sortOrder = calculateSortOrder ? GetNewChildSortOrder(entity.ParentId, 0) : entity.SortOrder;
 
         // persist the node dto
         NodeDto nodeDto = dto.ContentDto.NodeDto;

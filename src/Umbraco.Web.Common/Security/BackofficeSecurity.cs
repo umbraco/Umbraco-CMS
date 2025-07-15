@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Web.Common.Security;
 
 public class BackOfficeSecurity : IBackOfficeSecurity
 {
-    private readonly object _currentUserLock = new();
+    private readonly Lock _currentUserLock = new();
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserService _userService;
     private IUser? _currentUser;

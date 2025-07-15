@@ -18,7 +18,13 @@ public interface IBlockReference
     /// <value>
     ///     The content UDI.
     /// </value>
+    [Obsolete("Use ContentKey instead. Will be removed in V18.")]
     Udi ContentUdi { get; }
+
+    /// <summary>
+    /// Gets the content key.
+    /// </summary>
+    public Guid ContentKey { get; set; }
 }
 
 /// <summary>

@@ -3,6 +3,7 @@
 
 using System.Text.Json.Nodes;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -22,7 +23,8 @@ public class EnsureUniqueValuesValidatorTest
         var result = validator.Validate(
             "hello",
             null,
-            null);
+            null,
+            PropertyValidationContext.Empty());
         Assert.AreEqual(1, result.Count());
     }
 
@@ -34,7 +36,8 @@ public class EnsureUniqueValuesValidatorTest
             validator.Validate(
                 new JsonArray("hello", "world"),
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(0, result.Count());
     }
 
@@ -46,7 +49,8 @@ public class EnsureUniqueValuesValidatorTest
             validator.Validate(
                 new JsonArray("one", "two", "three"),
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(0, result.Count());
     }
 
@@ -58,7 +62,8 @@ public class EnsureUniqueValuesValidatorTest
             validator.Validate(
                 new JsonArray("one", "one"),
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(1, result.Count());
     }
 
@@ -70,7 +75,8 @@ public class EnsureUniqueValuesValidatorTest
             validator.Validate(
                 new JsonArray("one", "two", "three", "one", "two"),
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(2, result.Count());
     }
 
@@ -82,7 +88,8 @@ public class EnsureUniqueValuesValidatorTest
             validator.Validate(
                 null,
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(0, result.Count());
     }
 
@@ -95,7 +102,8 @@ public class EnsureUniqueValuesValidatorTest
             validator.Validate(
                 value,
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(0, result.Count());
     }
 
@@ -108,7 +116,8 @@ public class EnsureUniqueValuesValidatorTest
             validator.Validate(
                 value,
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(0, result.Count());
     }
 
@@ -121,7 +130,8 @@ public class EnsureUniqueValuesValidatorTest
             validator.Validate(
                 value,
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(0, result.Count());
     }
 }

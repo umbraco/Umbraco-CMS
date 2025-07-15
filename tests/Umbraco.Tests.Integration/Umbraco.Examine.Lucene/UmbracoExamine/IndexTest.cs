@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class IndexTest : ExamineBaseTest
+internal sealed class IndexTest : ExamineBaseTest
 {
     private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
 

@@ -18,12 +18,11 @@ using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.SyntaxProvider;
 
 [TestFixture]
-public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
+internal sealed class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
 {
     private ISqlContext SqlContext => GetRequiredService<IUmbracoDatabaseFactory>().SqlContext;
     private SqlServerSyntaxProvider GetSqlSyntax() => new(Options.Create(new GlobalSettings()));

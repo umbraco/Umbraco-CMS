@@ -144,9 +144,9 @@ public abstract class WeightedCollectionBuilderBase<TBuilder, TCollection, TItem
 
     protected virtual int GetWeight(Type type)
     {
-        if (_customWeights.ContainsKey(type))
+        if (_customWeights.TryGetValue(type, out int weight))
         {
-            return _customWeights[type];
+            return weight;
         }
 
         WeightAttribute? attr = type.GetCustomAttributes(typeof(WeightAttribute), false).OfType<WeightAttribute>()

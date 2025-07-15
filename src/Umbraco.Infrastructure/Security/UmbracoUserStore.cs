@@ -32,23 +32,6 @@ public abstract class UmbracoUserStore<TUser, TRole>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-    [Obsolete("Use TryConvertIdentityIdToInt instead. Scheduled for removal in V15.")]
-    protected static int UserIdToInt(string? userId)
-    {
-        if (int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
-        {
-            return result;
-        }
-
-        if (Guid.TryParse(userId, out Guid key))
-        {
-            // Reverse the IntExtensions.ToGuid
-            return BitConverter.ToInt32(key.ToByteArray(), 0);
-        }
-
-        throw new InvalidOperationException($"Unable to convert user ID ({userId})to int using InvariantCulture");
-    }
-
     protected abstract Task<int> ResolveEntityIdFromIdentityId(string? identityId);
 
     protected static bool TryConvertIdentityIdToInt(string? userId, out int intId)

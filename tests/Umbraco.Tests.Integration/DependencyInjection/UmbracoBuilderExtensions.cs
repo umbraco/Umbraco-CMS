@@ -10,7 +10,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
@@ -20,6 +22,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
@@ -41,6 +44,8 @@ public static class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddTestServices(this IUmbracoBuilder builder, TestHelper testHelper)
     {
         builder.Services.AddUnique(AppCaches.NoCache);
+        builder.Services.AddUnique(Mock.Of<IMemberPartialViewCacheInvalidator>());
+
         builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
         builder.Services.AddUnique(testHelper.MainDom);
 
@@ -94,6 +99,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism<TestUmbracoDbContext>>();
         builder.Services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<TestUmbracoDbContext>>();
 
+        builder.Services.AddSingleton<IReservedFieldNamesService, ReservedFieldNamesService>();
+
         return builder;
     }
 
@@ -104,7 +111,6 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     private static ILocalizedTextService GetLocalizedTextService(IServiceProvider factory)
     {
-        var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
         var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
         var appCaches = factory.GetRequiredService<AppCaches>();
 
@@ -129,7 +135,7 @@ public static class UmbracoBuilderExtensions
                     uiProject.Create();
                 }
 
-                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, globalSettings.Value.UmbracoPath.TrimStartExact("~/"), "config", "lang"));
+                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash), "config", "lang"));
 
                 return new LocalizedTextServiceFileSources(
                     loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),

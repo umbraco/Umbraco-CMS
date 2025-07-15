@@ -59,6 +59,27 @@ public static class HttpContextExtensions
                 await httpContext.AuthenticateAsync(Constants.Security.BackOfficeExternalAuthenticationType);
         }
 
+        // Update the HttpContext's user with the authenticated user's principal to ensure
+        // that subsequent requests within the same context will recognize the user
+        // as authenticated.
+        if (result is { Succeeded: true, Principal.Identity: not null })
+        {
+            // We need to get existing identities that are not the backoffice kind and flow them to the new identity
+            // Otherwise we can't log in as both a member and a backoffice user
+            // For instance if you've enabled basic auth.
+            ClaimsPrincipal? authenticatedPrincipal = result.Principal;
+
+            // Make sure to copy into a list before attempting to update the authenticated principal, so we don't attempt to modify
+            // the collection while iterating it.
+            // See: https://github.com/umbraco/Umbraco-CMS/issues/18509
+            var existingIdentities = httpContext.User.Identities
+                .Where(x => x.IsAuthenticated && x.AuthenticationType != authenticatedPrincipal.Identity.AuthenticationType)
+                .ToList();
+            authenticatedPrincipal.AddIdentities(existingIdentities);
+
+            httpContext.User = authenticatedPrincipal;
+        }
+
         return result;
     }
 

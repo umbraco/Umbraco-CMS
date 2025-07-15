@@ -70,6 +70,11 @@ public abstract class MigrationExpressionBase : IMigrationExpression
                     }
                     else
                     {
+                        if (stmtBuilder.Length > 0)
+                        {
+                            stmtBuilder.Append(Environment.NewLine);
+                        }
+
                         stmtBuilder.Append(line);
                     }
                 }

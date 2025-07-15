@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ContentServicePerformanceTest : UmbracoIntegrationTest
+internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpData() => CreateTestData();

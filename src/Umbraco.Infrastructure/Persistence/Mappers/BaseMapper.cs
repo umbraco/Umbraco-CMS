@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
 public abstract class BaseMapper
 {
-    private readonly object _definedLock = new();
+    private readonly Lock _definedLock = new();
 
     private readonly MapperConfigurationStore _maps;
 

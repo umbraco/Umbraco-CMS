@@ -1,7 +1,5 @@
 using Examine;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -32,35 +30,6 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     private readonly IDocumentUrlService _documentUrlService;
     private readonly ILanguageService _languageService;
 
-    [Obsolete("Use the non-obsolete constructor. This will be removed in Umbraco 16.")]
-    public ContentValueSetBuilder(
-        PropertyEditorCollection propertyEditors,
-        UrlSegmentProviderCollection urlSegmentProviders,
-        IUserService userService,
-        IShortStringHelper shortStringHelper,
-        ICoreScopeProvider scopeProvider,
-        bool publishedValuesOnly,
-        ILocalizationService localizationService,
-        IContentTypeService contentTypeService,
-        ILogger<ContentValueSetBuilder> logger)
-        : this(
-            propertyEditors,
-            urlSegmentProviders,
-            userService,
-            shortStringHelper,
-            scopeProvider,
-            publishedValuesOnly,
-            localizationService,
-            contentTypeService,
-            logger,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>()
-            )
-    {
-
-    }
-
-    [Obsolete("Use the non-obsolete constructor. This will be removed in Umbraco 16.")]
     public ContentValueSetBuilder(
         PropertyEditorCollection propertyEditors,
         UrlSegmentProviderCollection urlSegmentProviders,
@@ -85,6 +54,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         _documentUrlService = documentUrlService;
         _languageService = languageService;
     }
+
     /// <inheritdoc />
     public override IEnumerable<ValueSet> GetValueSets(params IContent[] content)
     {

@@ -1,10 +1,12 @@
 using System.Collections.Specialized;
 using System.Web;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -41,6 +43,25 @@ internal class PackagePresentationFactory : IPackagePresentationFactory
         {
             MarketplaceUrl = GetMarketplaceUrl(),
         };
+
+    public PagedViewModel<PackageMigrationStatusResponseModel> CreatePackageMigrationStatusResponseModel(PagedModel<InstalledPackage> installedPackages)
+    {
+        InstalledPackage[] installedPackagesAsArray = installedPackages.Items as InstalledPackage[] ?? installedPackages.Items.ToArray();
+
+        return new PagedViewModel<PackageMigrationStatusResponseModel>
+        {
+            Total = installedPackages.Total,
+            Items = installedPackagesAsArray
+                .GroupBy(package => package.PackageName)
+                .Select(packages => packages.OrderByDescending(package => package.HasPendingMigrations).First())
+                .Select(package => new PackageMigrationStatusResponseModel
+                {
+                    PackageName = package.PackageName ?? string.Empty,
+                    HasPendingMigrations = package.HasPendingMigrations,
+                })
+                .ToArray(),
+        };
+    }
 
     private string GetMarketplaceUrl()
     {

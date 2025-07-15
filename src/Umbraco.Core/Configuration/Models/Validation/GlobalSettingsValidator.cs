@@ -32,16 +32,14 @@ public class GlobalSettingsValidator
 
     private bool ValidateSqlWriteLockTimeOutSetting(TimeSpan configuredTimeOut, out string message)
     {
-        // Only apply this setting if it's not excessively high or low
+        // Only apply this setting if it's not excessively low
         const int minimumTimeOut = 100;
-        const int maximumTimeOut = 20000;
 
         // between 0.1 and 20 seconds
-        if (configuredTimeOut.TotalMilliseconds < minimumTimeOut ||
-            configuredTimeOut.TotalMilliseconds > maximumTimeOut)
+        if (configuredTimeOut.TotalMilliseconds < minimumTimeOut)
         {
             message =
-                $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.DistributedLockingWriteLockDefaultTimeout)}` setting is not between the minimum of {minimumTimeOut} ms and maximum of {maximumTimeOut} ms";
+                $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.DistributedLockingWriteLockDefaultTimeout)}` should not be configured as less than {minimumTimeOut} ms";
             return false;
         }
 

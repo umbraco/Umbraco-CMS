@@ -12,7 +12,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice;
 
 [TestFixture]
-public class UmbracoBackOfficeServiceCollectionExtensionsTests : UmbracoIntegrationTest
+internal sealed class UmbracoBackOfficeServiceCollectionExtensionsTests : UmbracoIntegrationTest
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddBackOfficeIdentity();
 

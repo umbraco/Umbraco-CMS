@@ -11,4 +11,10 @@ public class BlockGridLayoutAreaItem
 
     public BlockGridLayoutAreaItem(Guid key)
         => Key = key;
+
+    public bool ContainsContent(Guid key)
+        => Items.Any(item => item.ReferencesContent(key));
+
+    public bool ContainsSetting(Guid key)
+        => Items.Any(item => item.ReferencesSetting(key));
 }

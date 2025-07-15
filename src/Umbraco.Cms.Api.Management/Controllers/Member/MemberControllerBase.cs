@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -58,7 +58,8 @@ public class MemberControllerBase : ContentControllerBase
                 .WithTitle("Invalid name supplied")
                 .Build()),
             MemberEditingOperationStatus.InvalidUsername => BadRequest(problemDetailsBuilder
-                .WithTitle("Invalid username supplied")
+                .WithTitle("Invalid username")
+                .WithDetail("The username is either empty or contains one or more invalid characters.")
                 .Build()),
             MemberEditingOperationStatus.InvalidEmail => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid email supplied")

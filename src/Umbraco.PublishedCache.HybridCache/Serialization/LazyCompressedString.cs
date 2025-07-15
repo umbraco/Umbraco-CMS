@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 [DebuggerDisplay("{Display}")]
 internal struct LazyCompressedString
 {
-    private readonly object _locker;
+    private readonly Lock _locker;
     private byte[]? _bytes;
     private string? _str;
 
@@ -21,7 +21,7 @@ internal struct LazyCompressedString
     /// <param name="bytes">LZ4 Pickle compressed UTF8 String</param>
     public LazyCompressedString(byte[] bytes)
     {
-        _locker = new object();
+        _locker = new Lock();
         _bytes = bytes;
         _str = null;
     }

@@ -29,30 +29,6 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
     protected const string UmbracoSignInMgrXsrfKey = "XsrfId";
 
-
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V15.")]
-    public UmbracoSignInManager(
-        UserManager<TUser> userManager,
-        IHttpContextAccessor contextAccessor,
-        IUserClaimsPrincipalFactory<TUser> claimsFactory,
-        IOptions<IdentityOptions> optionsAccessor,
-        ILogger<SignInManager<TUser>> logger,
-        IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<TUser> confirmation,
-        IOptions<SecuritySettings> securitySettingsOptions)
-        : this(
-            userManager,
-            contextAccessor,
-            claimsFactory,
-            optionsAccessor,
-            logger,
-            schemes,
-            confirmation,
-            securitySettingsOptions,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestCache>())
-    {
-    }
-
     public UmbracoSignInManager(
         UserManager<TUser> userManager,
         IHttpContextAccessor contextAccessor,

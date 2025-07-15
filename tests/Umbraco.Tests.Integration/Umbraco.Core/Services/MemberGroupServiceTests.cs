@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MemberGroupServiceTests : UmbracoIntegrationTest
+internal sealed class MemberGroupServiceTests : UmbracoIntegrationTest
 {
     private IMemberGroupService MemberGroupService => GetRequiredService<IMemberGroupService>();
 

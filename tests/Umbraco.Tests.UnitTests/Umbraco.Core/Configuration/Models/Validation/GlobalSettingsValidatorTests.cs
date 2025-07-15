@@ -40,16 +40,6 @@ public class GlobalSettingsValidatorTests
     }
 
     [Test]
-    public void Returns_Fail_For_Configuration_With_Excessive_SqlWriteLockTimeOut()
-    {
-        var validator = new GlobalSettingsValidator();
-        var options = new GlobalSettings { DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:21") };
-
-        var result = validator.Validate("settings", options);
-        Assert.False(result.Succeeded);
-    }
-
-    [Test]
     public void Returns_Success_For_Configuration_With_Valid_SqlWriteLockTimeOut()
     {
         var validator = new GlobalSettingsValidator();

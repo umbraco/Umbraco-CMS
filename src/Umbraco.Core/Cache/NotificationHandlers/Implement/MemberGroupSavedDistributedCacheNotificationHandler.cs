@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Extensions;
 
@@ -17,6 +17,11 @@ public sealed class MemberGroupSavedDistributedCacheNotificationHandler : SavedD
         => _distributedCache = distributedCache;
 
     /// <inheritdoc />
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     protected override void Handle(IEnumerable<IMemberGroup> entities)
+        => Handle(entities, new Dictionary<string, object?>());
+
+    /// <inheritdoc />
+    protected override void Handle(IEnumerable<IMemberGroup> entities, IDictionary<string, object?> state)
         => _distributedCache.RefreshMemberGroupCache(entities);
 }

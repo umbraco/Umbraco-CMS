@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
+internal sealed class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
 {
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
@@ -27,6 +27,8 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     [Test]
     public async Task Only_Supplied_Cultures_Are_Updated()
@@ -41,33 +43,16 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
         {
             Key = documentKey,
             ContentTypeKey = variantTestData.contentType.Key,
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Name = variantTestData.LangEn.CultureName,
-                    Culture = variantTestData.LangEn.IsoCode,
-                    Properties = new[]
-                    {
-                        new PropertyValueModel
-                        {
-                            Alias = propertyAlias, Value = originalPropertyValue
-                        }
-                    }
-                },
-                new VariantModel
-                {
-                    Name = variantTestData.LangDa.CultureName,
-                    Culture = variantTestData.LangDa.IsoCode,
-                    Properties = new[]
-                    {
-                        new PropertyValueModel
-                        {
-                            Alias = propertyAlias, Value = originalPropertyValue
-                        }
-                    }
-                }
-            }
+            Properties =
+            [
+                new () { Alias = propertyAlias, Value = originalPropertyValue, Culture = variantTestData.LangEn.IsoCode },
+                new () { Alias = propertyAlias, Value = originalPropertyValue, Culture = variantTestData.LangDa.IsoCode },
+            ],
+            Variants =
+            [
+                new () { Name = variantTestData.LangEn.CultureName, Culture = variantTestData.LangEn.IsoCode },
+                new () { Name = variantTestData.LangDa.CultureName, Culture = variantTestData.LangDa.IsoCode }
+            ]
         };
 
         await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -76,15 +61,14 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
 
         var updateModel = new ContentUpdateModel
         {
-            Variants = new[]
-            {
-                new VariantModel
-                {
-                    Name = updatedPropertyValue,
-                    Culture = variantTestData.LangEn.IsoCode,
-                    Properties = new[] { new PropertyValueModel { Alias = propertyAlias, Value = updatedPropertyValue } }
-                }
-            }
+            Properties =
+            [
+                new () { Alias = propertyAlias, Value = updatedPropertyValue, Culture = variantTestData.LangEn.IsoCode },
+            ],
+            Variants =
+            [
+                new () { Name = updatedPropertyValue, Culture = variantTestData.LangEn.IsoCode }
+            ]
         };
 
         await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
@@ -92,7 +76,7 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
         var updatedContent = ContentService.GetById(documentKey)!;
 
         Assert.AreEqual(originalPropertyValue, updatedContent.GetValue(propertyAlias,variantTestData.LangDa.IsoCode));
-        Assert.AreEqual(updatedPropertyValue, updatedContent.GetValue(propertyAlias,variantTestData.LangEn.IsoCode));
+        Assert.AreEqual(updatedPropertyValue, updatedContent.GetValue(propertyAlias, variantTestData.LangEn.IsoCode));
 
         Assert.AreEqual(variantTestData.LangDa.CultureName, updatedContent.GetCultureName(variantTestData.LangDa.IsoCode));
         Assert.AreEqual(updatedPropertyValue, updatedContent.GetCultureName(variantTestData.LangEn.IsoCode));
@@ -107,7 +91,7 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
         await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("variantContent")
@@ -127,7 +111,7 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
             .Build();
 
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return (langEn, langDa, contentType);
     }

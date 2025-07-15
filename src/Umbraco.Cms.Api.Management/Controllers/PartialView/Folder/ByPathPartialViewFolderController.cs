@@ -22,7 +22,7 @@ public class ByPathPartialViewFolderController : PartialViewFolderControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("{path}")]
+    [HttpGet("{*path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PartialViewFolderResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

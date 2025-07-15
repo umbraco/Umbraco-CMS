@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,12 +42,16 @@ public class CopyDocumentController : DocumentControllerBase
         Guid id,
         CopyDocumentRequestModel copyDocumentRequestModel)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+        AuthorizationResult sourceAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, new[] { copyDocumentRequestModel.Target?.Id, id }),
+            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, [id]),
+            AuthorizationPolicies.ContentPermissionByResource);
+        AuthorizationResult destinationAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionNew.ActionLetter, [copyDocumentRequestModel.Target?.Id]),
             AuthorizationPolicies.ContentPermissionByResource);
 
-        if (!authorizationResult.Succeeded)
+        if (sourceAuthorizationResult.Succeeded is false || destinationAuthorizationResult.Succeeded is false)
         {
             return Forbidden();
         }

@@ -1,11 +1,9 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Services;
@@ -17,23 +15,16 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
 {
     private readonly TContentTypeService _contentTypeService;
     private readonly IDataTypeService _dataTypeService;
-    private readonly ISqlContext _sqlContext;
+    private readonly IContentSearchService<TContent> _contentSearchService;
 
-    protected ContentListViewServiceBase(TContentTypeService contentTypeService, IDataTypeService dataTypeService, ISqlContext sqlContext)
+    protected ContentListViewServiceBase(TContentTypeService contentTypeService, IDataTypeService dataTypeService, IContentSearchService<TContent> contentSearchService)
     {
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
-        _sqlContext = sqlContext;
+        _contentSearchService = contentSearchService;
     }
 
     protected abstract Guid DefaultListViewKey { get; }
-
-    protected abstract Task<PagedModel<TContent>> GetPagedChildrenAsync(
-        int id,
-        IQuery<TContent>? filter,
-        Ordering? ordering,
-        int skip,
-        int take);
 
     protected abstract Task<bool> HasAccessToListViewItemAsync(IUser user, Guid key);
 
@@ -62,7 +53,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             return Attempt.FailWithStatus<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>(orderingAttempt.Status, null);
         }
 
-        PagedModel<TContent> items = await GetAllowedListViewItemsAsync(user, content?.Id ?? Constants.System.Root, filter, orderingAttempt.Result, skip, take);
+        PagedModel<TContent> items = await GetAllowedListViewItemsAsync(user, content?.Key, filter, orderingAttempt.Result, skip, take);
 
         var result = new ListViewPagedModel<TContent>
         {
@@ -216,20 +207,13 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         return await _dataTypeService.GetAsync(configuredListViewKey);
     }
 
-    private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, int contentId, string? filter, Ordering? ordering, int skip, int take)
+    private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, Guid? contentId, string? filter, Ordering? ordering, int skip, int take)
     {
-        var queryFilter = ParseQueryFilter(filter);
-
-        var pagedChildren = await GetPagedChildrenAsync(
-            contentId,
-            queryFilter,
-            ordering,
-            skip,
-            take);
+        PagedModel<TContent> pagedChildren = await _contentSearchService.SearchChildrenAsync(filter, contentId, ordering, skip, take);
 
         // Filtering out child nodes after getting a paged result is an active choice here, even though the pagination might get off.
         // This has been the case with this functionality in Umbraco for a long time.
-        var items = await FilterItemsBasedOnAccessAsync(user, pagedChildren.Items);
+        IEnumerable<TContent> items = await FilterItemsBasedOnAccessAsync(user, pagedChildren.Items);
 
         var pagedResult = new PagedModel<TContent>
         {
@@ -238,18 +222,6 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         };
 
         return pagedResult;
-    }
-
-    private IQuery<TContent>? ParseQueryFilter(string? filter)
-    {
-        // Adding multiple conditions - considering key (as Guid) & name as filter param
-        Guid.TryParse(filter, out Guid filterAsGuid);
-
-        return filter.IsNullOrWhiteSpace()
-            ? null
-            : _sqlContext.Query<TContent>()
-                .Where(c => (c.Name != null && c.Name.Contains(filter)) ||
-                            c.Key == filterAsGuid);
     }
 
     // TODO: Optimize the way we filter out only the nodes the user is allowed to see - instead of checking one by one

@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.IO
 
         // shadow support
         private readonly List<ShadowWrapper> _shadowWrappers = new();
-        private readonly object _shadowLocker = new();
+        private readonly Lock _shadowLocker = new();
         private static string? _shadowCurrentId; // static - unique!!
         #region Constructor
 

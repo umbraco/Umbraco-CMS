@@ -21,8 +21,6 @@ public static partial class Constants
         public static string OsLanguage = "OsLanguage";
         public static string WebServer = "WebServer";
         public static string ModelsBuilderMode = "ModelBuilderMode";
-        [Obsolete($"UmbracoPath is no longer configurable, scheduled for removal in V12")]
-        public static string CustomUmbracoPath = "CustomUmbracoPath";
         public static string AspEnvironment = "AspEnvironment";
         public static string IsDebug = "IsDebug";
         public static string DatabaseProvider = "DatabaseProvider";

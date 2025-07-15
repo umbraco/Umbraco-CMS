@@ -23,6 +23,9 @@ public class RelationItem
     [DataMember(Name = "published")]
     public bool? NodePublished { get; set; }
 
+    [DataMember(Name = "contentTypeKey")]
+    public Guid ContentTypeKey { get; set; }
+
     [DataMember(Name = "icon")]
     public string? ContentTypeIcon { get; set; }
 

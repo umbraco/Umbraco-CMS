@@ -49,9 +49,8 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
 
         _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
         IEnumerable<IPublishedContent> rootContent = rootKeys
-            .Select(_publishedContentCache.GetById)
-            .WhereNotNull()
-            .Where(x => x.IsPublished() != _requestPreviewService.IsPreview());
+            .Select(rootKey => _publishedContentCache.GetById(_requestPreviewService.IsPreview(), rootKey))
+            .WhereNotNull();
 
         _requestedStartContent = Guid.TryParse(headerValue, out Guid key)
             ? rootContent.FirstOrDefault(c => c.Key == key)
@@ -61,5 +60,5 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
     }
 
     /// <inheritdoc/>
-    public string? RequestedStartItem() => GetHeaderValue("Start-Item");
+    public string? RequestedStartItem() => GetHeaderValue(Constants.DeliveryApi.HeaderNames.StartItem);
 }

@@ -220,6 +220,9 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         // Delete all PropertyData where propertytypeid EXISTS in the subquery above
         Database.Execute(SqlSyntax.GetDeleteSubquery(Constants.DatabaseSchema.Tables.PropertyData, "propertytypeid", sql));
 
+        // delete all granular permissions for this content type
+        Database.Delete<UserGroup2GranularPermissionDto>(Sql().Where<UserGroup2GranularPermissionDto>(dto => dto.UniqueId == entity.Key));
+
         base.PersistDeletedItem(entity);
     }
 

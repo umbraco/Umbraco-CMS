@@ -33,12 +33,10 @@ public class HealthChecksNotificationSettings
     /// <summary>
     ///     Gets or sets a value for the collection of health check notification methods.
     /// </summary>
-    public IDictionary<string, HealthChecksNotificationMethodSettings> NotificationMethods { get; set; } =
-        new Dictionary<string, HealthChecksNotificationMethodSettings>();
+    public IDictionary<string, HealthChecksNotificationMethodSettings> NotificationMethods { get; set; } = new Dictionary<string, HealthChecksNotificationMethodSettings>();
 
     /// <summary>
     ///     Gets or sets a value for the collection of health checks that are disabled for notifications.
     /// </summary>
-    public List<DisabledHealthCheckSettings> DisabledChecks { get; set; } =
-        new List<DisabledHealthCheckSettings>();
+    public IList<DisabledHealthCheckSettings> DisabledChecks { get; set; } = new List<DisabledHealthCheckSettings>();
 }

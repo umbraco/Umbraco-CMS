@@ -441,4 +441,33 @@ public class JsonBlockValueConverterTests
             Assert.AreEqual(settingsElementKey1, layoutItems.First().SettingsKey);
         });
     }
+
+    [Test]
+    public void Try_Deserialize_Unknown_Block_Layout_With_Nested_Array()
+    {
+        var json = """
+        {
+            "layout": {
+                "Umbraco.BlockGrid": [{
+                        "contentUdi": "umb://element/1304E1DDAC87439684FE8A399231CB3D",
+                        "rowSpan": 1,
+                        "areas": [],
+                        "columnSpan": 12
+                    }
+                ],
+                "Umbraco.BlockList": [{
+                        "contentUdi": "umb://element/1304E1DDAC87439684FE8A399231CB3D"
+                    }
+                ],
+                "Some.Custom.BlockEditor": [{
+                        "contentUdi": "umb://element/1304E1DDAC87439684FE8A399231CB3D"
+                    }
+                ]
+            }
+        }
+""";
+
+        var serializer = new SystemTextJsonSerializer();
+        Assert.DoesNotThrow(() => serializer.Deserialize<BlockListValue>(json));
+    }
 }

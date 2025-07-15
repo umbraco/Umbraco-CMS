@@ -53,7 +53,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
         return new SqliteDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout.Value);
     }
 
-    private class SqliteDistributedLock : IDistributedLock
+    private sealed class SqliteDistributedLock : IDistributedLock
     {
         private readonly SqliteDistributedLockingMechanism _parent;
         private readonly TimeSpan _timeout;

@@ -1,11 +1,7 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
-public class DefaultReferenceResponseModel : IReferenceResponseModel
+public class DefaultReferenceResponseModel : ReferenceResponseModel
 {
-    public Guid Id { get; set; }
-
-    public string? Name { get; set; }
-
     public string? Type { get; set; }
 
     public string? Icon { get; set; }

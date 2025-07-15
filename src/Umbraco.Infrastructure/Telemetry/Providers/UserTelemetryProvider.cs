@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
@@ -12,13 +10,6 @@ public class UserTelemetryProvider : IDetailedTelemetryProvider
     private readonly IUserGroupService _userGroupService;
     private readonly IUserService _userService;
 
-    [Obsolete("Use constructor that takes IUserGroupService, scheduled for removal in V15")]
-    public UserTelemetryProvider(IUserService userService)
-        : this(userService, StaticServiceProvider.Instance.GetRequiredService<IUserGroupService>())
-    {
-    }
-
-    [Obsolete("Use constructor that only takes IUserGroupService, scheduled for removal in V15")]
     public UserTelemetryProvider(IUserService userService, IUserGroupService userGroupService)
     {
         _userService = userService;

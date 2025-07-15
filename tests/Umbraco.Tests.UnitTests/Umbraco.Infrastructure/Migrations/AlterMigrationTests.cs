@@ -32,14 +32,14 @@ public class AlterMigrationTests
     }
 
     [Test]
-    public void Drop_Foreign_Key()
+    public async Task Drop_Foreign_Key()
     {
         // Arrange
         var context = GetMigrationContext(out var database);
         var stub = new DropForeignKeyMigrationStub(context);
 
         // Act
-        stub.Run();
+        await stub.RunAsync().ConfigureAwait(false);
 
         foreach (var op in database.Operations)
         {
@@ -48,18 +48,16 @@ public class AlterMigrationTests
 
         // Assert
         Assert.That(database.Operations.Count, Is.EqualTo(1));
-        Assert.That(
-            database.Operations[0].Sql,
-            Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
+        Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
     }
 
     [Test]
-    public void CreateColumn()
+    public async Task CreateColumn()
     {
         var context = GetMigrationContext(out var database);
         var migration = new CreateColumnMigration(context);
 
-        migration.Run();
+        await migration.RunAsync().ConfigureAwait(false);
 
         foreach (var op in database.Operations)
         {
@@ -83,12 +81,12 @@ public class AlterMigrationTests
     }
 
     [Test]
-    public void AlterColumn()
+    public async Task AlterColumn()
     {
         var context = GetMigrationContext(out var database);
         var migration = new AlterColumnMigration(context);
 
-        migration.Run();
+        await migration.RunAsync().ConfigureAwait(false);
 
         foreach (var op in database.Operations)
         {
@@ -117,14 +115,14 @@ public class AlterMigrationTests
 
     [Ignore("this doesn't actually test anything")]
     [Test]
-    public void Can_Get_Up_Migration_From_MigrationStub()
+    public async Task Can_Get_Up_Migration_From_MigrationStub()
     {
         // Arrange
         var context = GetMigrationContext(out var database);
         var stub = new AlterUserTableMigrationStub(context);
 
         // Act
-        stub.Run();
+        await stub.RunAsync().ConfigureAwait(false);
 
         // Assert
         Assert.That(database.Operations.Any(), Is.True);

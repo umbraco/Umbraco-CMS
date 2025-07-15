@@ -2,7 +2,7 @@ namespace Umbraco.Cms.Core.Extensions;
 
 public static class CollectionExtensions
 {
-    // Easiest way to return a collection with 1 item, probably not the most performant
+    [Obsolete("Please replace uses of this extension method with collection expression. This method will be removed in Umbraco 17.")]
     public static ICollection<T> ToSingleItemCollection<T>(this T item) =>
         new T[] { item };
 }

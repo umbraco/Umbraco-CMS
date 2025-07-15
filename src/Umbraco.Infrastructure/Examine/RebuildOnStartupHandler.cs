@@ -28,27 +28,6 @@ public sealed class RebuildOnStartupHandler : INotificationHandler<UmbracoReques
     private readonly ISyncBootStateAccessor _syncBootStateAccessor;
     private readonly IIndexRebuilder _indexRebuilder;
 
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in Umbraco 15.")]
-    public RebuildOnStartupHandler(
-        ISyncBootStateAccessor syncBootStateAccessor,
-        ExamineIndexRebuilder backgroundIndexRebuilder,
-        IRuntimeState runtimeState)
-        : this(syncBootStateAccessor, (IIndexRebuilder) backgroundIndexRebuilder, runtimeState)
-    {
-
-    }
-
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in Umbraco 15.")]
-    public RebuildOnStartupHandler(
-        ISyncBootStateAccessor syncBootStateAccessor,
-        ExamineIndexRebuilder backgroundIndexRebuilder,
-        IIndexRebuilder indexRebuilder,
-        IRuntimeState runtimeState)
-        : this(syncBootStateAccessor, indexRebuilder, runtimeState)
-    {
-
-    }
-
     public RebuildOnStartupHandler(
         ISyncBootStateAccessor syncBootStateAccessor,
         IIndexRebuilder indexRebuilder,

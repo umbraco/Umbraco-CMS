@@ -20,22 +20,23 @@ public class SiteDynamicRootOriginFinder : RootDynamicRootOriginFinder
 
     public override Guid? FindOriginKey(DynamicRootNodeQuery query)
     {
-        if (query.OriginAlias != SupportedOriginType || query.Context.CurrentKey.HasValue is false)
+        if (query.OriginAlias != SupportedOriginType)
         {
             return null;
         }
 
-        IEntitySlim? entity = _entityService.Get(query.Context.CurrentKey.Value);
+        // when creating new content, CurrentKey will be null - fallback to using ParentKey
+        Guid entityKey = query.Context.CurrentKey ?? query.Context.ParentKey;
+        IEntitySlim? entity = _entityService.Get(entityKey);
         if (entity is null || entity.NodeObjectType != Constants.ObjectTypes.Document)
         {
             return null;
         }
 
-
-        IEnumerable<string> reversePath = entity.Path.Split(",").Reverse();
-        foreach (var contentIdString in reversePath)
+        string[] contentIdStrings = entity.Path.Split(',');
+        for (int i = contentIdStrings.Length - 1; i >= 0; i--)
         {
-            var contentId = int.Parse(contentIdString, NumberStyles.Integer, CultureInfo.InvariantCulture);
+            var contentId = int.Parse(contentIdStrings[i], NumberStyles.Integer, CultureInfo.InvariantCulture);
             IEnumerable<IDomain> domains = _domainService.GetAssignedDomains(contentId, true);
             if (!domains.Any())
             {

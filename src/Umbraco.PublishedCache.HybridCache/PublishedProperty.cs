@@ -27,7 +27,7 @@ internal class PublishedProperty : PublishedPropertyBase
     private CacheValues? _cacheValues;
 
     // the variant source and inter values
-    private readonly object _locko = new();
+    private readonly Lock _locko = new();
     private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
 
     // initializes a published content property with a value
@@ -270,11 +270,17 @@ internal class PublishedProperty : PublishedPropertyBase
 
     private class CacheValues : CacheValue
     {
-        private readonly object _locko = new();
+        private readonly Lock _locko = new();
         private ConcurrentDictionary<CompositeStringStringKey, CacheValue>? _values;
 
         public CacheValue For(string? culture, string? segment)
         {
+            // As noted on IPropertyValue, null value means invariant
+            // But as we need an actual string value to build a CompositeStringStringKey
+            // We need to convert null to empty
+            culture ??= string.Empty;
+            segment ??= string.Empty;
+
             if (culture == string.Empty && segment == string.Empty)
             {
                 return this;

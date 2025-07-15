@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DictionaryRepositoryTest : UmbracoIntegrationTest
+internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public async Task SetUp() => await CreateTestData();

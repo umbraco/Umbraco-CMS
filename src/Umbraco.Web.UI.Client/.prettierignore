@@ -1,0 +1,4 @@
+# Ignore auto-generated backend-api files
+src/external/backend-api/src
+src/packages/core/icon-registry/icons.ts
+src/packages/core/icon-registry/icons

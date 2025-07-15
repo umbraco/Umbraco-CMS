@@ -82,7 +82,7 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
         return connectionString;
     }
 
-    private string HandleIntegratedAuthentication(string connectionString, DatabaseModel databaseModel)
+    private static string HandleIntegratedAuthentication(string connectionString, DatabaseModel databaseModel)
     {
         if (databaseModel.IntegratedAuth)
         {
@@ -96,7 +96,7 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
         return connectionString;
     }
 
-    private string HandleTrustServerCertificate(string connectionString, DatabaseModel databaseModel)
+    private static string HandleTrustServerCertificate(string connectionString, DatabaseModel databaseModel)
     {
         if (databaseModel.TrustServerCertificate)
         {

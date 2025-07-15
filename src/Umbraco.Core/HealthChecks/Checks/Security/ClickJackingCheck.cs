@@ -20,7 +20,7 @@ public class ClickJackingCheck : BaseHttpHeaderCheck
     ///     Initializes a new instance of the <see cref="ClickJackingCheck" /> class.
     /// </summary>
     public ClickJackingCheck(IHostingEnvironment hostingEnvironment, ILocalizedTextService textService)
-        : base(hostingEnvironment, textService, "X-Frame-Options", "clickJacking", true)
+        : base(hostingEnvironment, textService, "X-Frame-Options", "clickJacking", true, false)
     {
     }
 

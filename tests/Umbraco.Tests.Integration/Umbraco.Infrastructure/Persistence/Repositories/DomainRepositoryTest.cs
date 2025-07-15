@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DomainRepositoryTest : UmbracoIntegrationTest
+internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
 {
     private ILanguageRepository LanguageRepository => GetRequiredService<ILanguageRepository>();
 

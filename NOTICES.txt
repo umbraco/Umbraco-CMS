@@ -1,0 +1,571 @@
+Third-Party Notices
+===================
+
+This file contains notices and attributions for third-party software used in the Umbraco CMS project.
+
+It is not a license and does not grant any rights to use the third-party software.
+
+Umbraco CMS is licensed under the MIT License, which can be found in the LICENSE file.
+
+---
+
+@openid/AppAuth-JS: An OpenID Connect and OAuth 2.0 client library for JavaScript
+
+URL: https://github.com/openid/AppAuth-JS
+License: Apache License, Version 2.0
+Copyright: 2017 Google Inc.
+
+---
+
+AutoFixture: Write maintainable unit tests, faster
+
+URL: https://github.com/AutoFixture/AutoFixture
+License: MIT License
+Copyright: 2013 Mark Seemann
+
+---
+
+Asp.Versioning.Mvc: A library for ASP.NET Core versioning
+
+URL: https://github.com/dotnet/aspnet-api-versioning
+License: MIT License
+Copyright: .NET Foundation and contributors
+
+---
+
+Babel: A JavaScript compiler
+
+URL: https://babeljs.io/
+License: MIT License
+Copyright: 2014-present Sebastian McKenzie and other contributors
+
+---
+
+BenchmarkDotNet: Powerful .NET library for benchmarking
+
+URL: https://github.com/dotnet/BenchmarkDotNet
+License: MIT License
+Copyright: .NET Foundation and Contributors
+
+---
+
+Bogus: A simple and sane data generator for populating objects that supports different locales.
+
+URL: https://github.com/bchavez/Bogus
+License: MIT License
+Copyright: 2015 Brian Chavez
+
+---
+
+CommandLineParser: Terse syntax C# command line parser for .NET
+
+URL: https://github.com/commandlineparser/commandline
+License: MIT License
+Copyright: 2005-2015 Giacomo Stelluti Scala & Contributors
+
+---
+
+cross-env: A CLI tool to set environment variables across platforms
+
+URL: https://github.com/kentcdodds/cross-env
+License: MIT License
+Copyright: 2017 Kent C. Dodds
+
+---
+
+Dazinator.Extensions.FileProviders: A library for file provider extensions
+
+URL: https://github.com/dazinator/Dazinator.Extensions.FileProviders
+License: MIT License
+Copyright: 2016 Darrell
+
+---
+
+DOMPurify: A DOM-only XSS sanitizer for HTML, MathML and SVG
+
+URL: https://github.com/cure53/DOMPurify
+License: Apache License, Version 2.0
+Copyright: 2025 Dr.-Ing. Mario Heiderich, Cure53
+
+---
+
+Element Internals Polyfill: A polyfill for the Element Internals API
+
+URL: https://github.com/calebdwilliams/element-internals-polyfill
+License: MIT License
+Copyright: 2021 Caleb Williams
+
+---
+
+Eslint: A tool for identifying and reporting on patterns in JavaScript
+
+URL: https://eslint.org/
+License: MIT License
+Copyright: OpenJS Foundation and other contributors
+
+---
+
+Examine: A search and indexing library for .NET
+
+URL: https://github.com/Shazwazza/Examine
+License: Microsoft Public License (Ms-PL)
+Copyright: 2023 Shannon Deminick
+
+---
+
+Glob: A library for matching file paths using glob patterns
+
+URL: https://github.com/isaacs/node-glob
+License: ISC License
+Copyright: 2009-2023 Isaac Z. Schlueter and Contributors
+
+---
+
+Globals: A library for managing global variables in JavaScript
+
+URL: https://github.com/sindresorhus/globals
+License: MIT License
+Copyright: Sindre Sorhus
+
+---
+
+Html Agility Pack: An HTML parser for .NET
+
+URL: https://html-agility-pack.net/
+License: MIT License
+Copyright: ZZZ Projects Inc.
+
+---
+
+ImageSharp: A cross-platform library for processing images in .NET
+
+URL: https://github.com/SixLabors/ImageSharp
+License: Apache License, Version 2.0 under the Six Labors Split License
+Copyright: Six Labors
+
+---
+
+jsdiff: A JavaScript text differencing implementation
+
+URL: https://github.com/kpdecker/jsdiff
+License: BSD 3-Clause License
+Copyright: 2009-2015 Kevin Decker <kpdecker@gmail.com>
+
+---
+
+JsonPatch.Net: A library for JSON Patch (RFC 6902) in .NET
+
+URL: https://github.com/json-everything/json-everything
+License: MIT License
+Copyright: .NET Foundation and Contributors
+
+---
+
+K4os.Compression.LZ4: A fast LZ4 compression library for .NET
+
+URL: https://github.com/MiloszKrajewski/K4os.Compression.LZ4
+License: MIT License
+Copyright: 2017 Milosz Krajewski
+
+---
+
+Lit: A simple library for building fast, lightweight web components
+
+URL: https://lit.dev
+License: BSD 3-Clause License
+Copyright: 2020 Google LLC. All rights reserved.
+
+---
+
+Lucide: Beautiful & consistent icons for the web
+
+URL: https://lucide.dev/
+License: ISC License
+Copyright: 2013-2022 Cole Bemis
+Copyright: 2022 Lucide Contributors
+
+---
+
+Madge: A dependency graph generator for JavaScript
+
+URL: https://github.com/pahen/madge
+License: MIT License
+Copyright: 2017 Patrik Henningsson
+
+---
+
+MailKit: A library for sending email in .NET
+
+URL: https://github.com/jstedfast/MailKit
+License: MIT License
+Copyright: 2013-2024 .NET Foundation and Contributors
+
+---
+
+Markdown: A library for parsing and compiling Markdown
+
+URL: https://github.com/hey-red/Markdown
+License: MIT License
+Copyright: 2018 red
+
+---
+
+marked: A markdown parser and compiler
+
+URL: https://marked.js.org/
+License: MIT License
+Copyright: 2011-2018, Christopher Jeffrey (https://github.com/chjj/)
+Copyright: 2018+, MarkedJS (https://github.com/markedjs/)
+
+---
+
+Message Pack: The extremely fast MessagePack serializer for C#
+
+URL: https://github.com/MessagePack-CSharp/MessagePack-CSharp
+License: MIT License
+Copyright: 2017 Yoshifumi Kawai and contributors
+
+---
+
+Miniprofiler: A mini profiler for .NET
+
+URL: https://github.com/MiniProfiler/dotnet
+License: MIT License
+Copyright: .NET MiniProfiler Contributors
+
+---
+
+Monaco Editor: A browser-based code editor
+
+URL: https://microsoft.github.io/monaco-editor/
+License: MIT License
+Copyright: 2016-present Microsoft Corporation
+
+---
+
+Moq: A mocking library for .NET
+
+URL: https://github.com/moq/moq
+License: BSD 3-Clause License
+Copyright: 2007 Clarius Consulting, Manas Technology Solutions, InSTEDD, and Contributors.
+
+---
+
+Mock Service Worker (MSW): A library for mocking API requests in JavaScript
+
+URL: https://mswjs.io/
+License: MIT License
+Copyright: 2018–present Artem Zakharchenko
+
+---
+
+NCrontab: A cron schedule parser for .NET
+
+URL: https://github.com/atifaziz/NCrontab
+License: Apache License, Version 2.0
+Copyright: 2001 The OpenSymphony Group
+Copyright: 2008 Atif Aziz
+
+---
+
+Nerdbank.GitVersioning: A library for versioning .NET projects
+
+URL: https://github.com/dotnet/Nerdbank.GitVersioning
+License: MIT License
+Copyright: .NET Foundation and Contributors
+
+---
+
+NJsonSchema: A JSON schema validator for .NET
+
+URL: https://github.com/RicoSuter/NJsonSchema
+License: MIT License
+Copyright: 2022 Rico Suter
+
+---
+
+NPoco: A micro ORM for .NET
+
+URL: https://github.com/schotime/NPoco
+License: Apache License, Version 2.0
+Copyright: Schotime
+
+---
+
+NUnit: A unit testing framework for .NET
+
+URL: https://github.com/nunit/nunit
+License: MIT License
+Copyright: Charlie Poole, Rob Prouse and Contributors
+
+---
+
+Open Web Components: A set of standards and libraries for building web components
+
+URL: https://open-wc.org/
+License: MIT License
+Copyright: 2018 open-wc
+
+---
+
+Openapi-ts: The OpenAPI to TypeScript codegen
+
+URL: https://github.com/hey-api/openapi-ts
+License: MIT License
+Copyright: Hey API
+
+---
+
+OpenIddict: A simple and flexible OpenID Connect server for ASP.NET Core
+
+URL: https://github.com/openiddict/openiddict-core
+License: Apache License, Version 2.0
+Copyright: Kévin Chalet
+
+---
+
+Playwright: A Node.js library to automate browser testing
+
+URL: https://playwright.dev/
+License: Apache License, Version 2.0
+Copyright: 2025 Microsoft Corporation
+
+---
+
+Playwright-msw: A library to wrap Mock Service Worker with Playwright
+
+URL: https://github.com/valendres/playwright-msw
+License: MIT License
+Copyright: 2022 Peter Weller
+
+---
+
+Prettier: An opinionated code formatter
+
+URL: https://prettier.io/
+License: MIT License
+Copyright: James Long and contributors
+
+---
+
+Remark-gfm: A GitHub Flavored Markdown plugin for Remark
+
+URL: https://github.com/remarkjs/remark-gfm
+License: MIT License
+Copyright: Titus Wormer
+
+---
+
+Rollup: A module bundler for JavaScript
+
+URL: https://rollupjs.org/
+License: MIT License
+Copyright: 2015-present Rollup contributors
+
+---
+
+Rollup Plugins: A collection of Rollup plugins
+
+URL: https://github.com/rollup/plugins
+License: MIT License
+Copyright: 2019-present Rollup Plugins contributors
+
+---
+
+Rollup-plugin-esbuild: A Rollup plugin for using esbuild
+
+URL: https://github.com/egoist/rollup-plugin-esbuild
+License: MIT License
+Copyright: 2020 EGOIST
+
+---
+
+Rollup-plugin-import-css: A Rollup plugin for importing CSS files
+
+URL: https://github.com/jleeson/rollup-plugin-import-css
+License: MIT License
+Copyright: 2020 Jacob Leeson
+
+---
+
+rxjs: Reactive Extensions for JavaScript
+
+URL: https://rxjs.dev/
+License: Apache License, Version 2.0
+Copyright: 2015-present Ben Lesh <ben@benlesh.com>, Google, Inc., Netflix, Inc., Microsoft Corp., and contributors
+
+---
+
+Serilog: A diagnostic logging library for .NET
+
+URL: https://github.com/serilog/serilog
+License: Apache License, Version 2.0
+Copyright: Serilog Contributors
+
+---
+
+Simple Icons: A set of SVG icons for popular brands
+
+URL: https://simpleicons.org/
+License: CC0 1.0 Universal License
+Copyright: Simple Icons Contributors
+
+---
+
+Storybook: A UI component explorer for Web Components
+
+URL: https://storybook.js.org/
+License: MIT License
+Copyright: 2024 Storybook
+
+---
+
+StyleCop.Analyzers: Analyzers for StyleCop
+
+URL: https://github.com/DotNetAnalyzers/StyleCopAnalyzers
+License: MIT License
+Copyright: Tunnel Vision Laboratories, LLC
+
+---
+
+SVGO: A tool for optimizing SVG files
+
+URL: https://svgo.dev/
+License: MIT License
+Copyright: Kir Belevich
+
+---
+
+Swashbuckle.AspNetCore: A library for generating Swagger documentation for ASP.NET Core APIs
+
+URL: https://github.com/domaindrivendev/Swashbuckle.AspNetCore
+License: MIT License
+Copyright: 2016 Richard Morris
+
+---
+
+Tiny Glob: A tiny globbing library for Node.js
+
+URL: https://github.com/terkelg/tiny-glob
+License: MIT License
+Copyright: 2018 Terkel
+
+---
+
+Tiptap: A renderless rich-text editor for the web
+
+URL: https://tiptap.dev/
+License: MIT License
+Copyright: 2025 Tiptap GmbH
+
+---
+
+Tsc-alias: A TypeScript compiler plugin for aliasing module paths
+
+URL: https://github.com/justkey007/tsc-alias
+License: MIT License
+Copyright: 2018 Justkey
+
+---
+
+Typedoc: A documentation generator for TypeScript projects
+
+URL: https://typedoc.org/
+License: Apache License, Version 2.0
+Copyright: Gerrit Birkeland and Contributors
+
+---
+
+Typescript: A typed superset of JavaScript that compiles to plain JavaScript
+
+URL: https://www.typescriptlang.org/
+License: Apache License, Version 2.0
+Copyright: 2012-present Microsoft Corporation
+
+---
+
+Typescript-eslint: A set of tools for linting TypeScript code
+
+URL: https://github.com/typescript-eslint/typescript-eslint
+License: MIT License
+Copyright: 2019 typescript-eslint and other contributors
+
+---
+
+Typescript-json-schema: A library for generating JSON schema from TypeScript types
+
+URL: https://github.com/YousefED/typescript-json-schema
+License: BSD 3-Clause License
+Copyright: 2016 typescript-json-schema contributors
+
+---
+
+Umbraco.Code: Provides code-level tools for Umbraco
+
+URL: https://github.com/umbraco/Umbraco-Code
+License: MIT License
+Copyright: 2005-present Umbraco A/S
+
+---
+
+Umbraco.GitVersioning.Extensions: Utilities for Nerdbank.GitVersioning
+
+URL: https://github.com/umbraco/Umbraco.GitVersioning.Extensions
+License: MIT License
+Copyright: 2005-present Umbraco A/S
+
+---
+
+Umbraco.JsonSchema.Extensions: Utilities for JSON schema generation
+
+URL: https://github.com/umbraco/Umbraco.JsonSchema.Extensions
+License: MIT License
+Copyright: 2005-present Umbraco A/S
+
+---
+
+Umbraco UI Library: A set of UI components for building web applications
+
+URL: https://uui.umbraco.com/
+License: MIT License
+Copyright: 2005-present Umbraco A/S
+
+---
+
+uuid: A library for generating unique identifiers
+
+URL: https://github.com/uuidjs/uuid
+License: MIT License
+Copyright: 2010-2020 Robert Kieffer and other contributors
+
+---
+
+Vite: A fast build tool and development server for modern web projects
+
+URL: https://vite.dev/
+License: MIT License
+Copyright: 2019-present VoidZero Inc. and Vite contributors
+
+---
+
+Vite-plugin-static-copy: A Vite plugin for copying static files
+
+URL: https://github.com/sapphi-red/vite-plugin-static-copy
+License: MIT License
+Copyright: 2021 sapphi-red
+
+---
+
+Vite-tsconfig-paths: A Vite plugin for resolving TypeScript paths
+
+URL: https://github.com/aleclarson/vite-tsconfig-paths
+License: MIT License
+Copyright: Alec Larson
+
+---
+
+Web Component Analyzer: A tool for analyzing web components
+
+URL: https://github.com/runem/web-component-analyzer
+License: MIT License
+Copyright: 2019 Rune Mehlsen

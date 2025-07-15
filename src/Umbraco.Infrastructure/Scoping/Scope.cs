@@ -196,17 +196,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         {
         }
 
-        [Obsolete("Scopes are never stored on HttpContext.Items anymore, so CallContext is always true.")]
-        // a value indicating whether to force call-context
-        public bool CallContext
-        {
-            get => true;
-            set
-            {
-                // NOOP - always true.
-            }
-        }
-
         // a value indicating whether the scope is detachable
         // ie whether it was created by CreateDetachedScope
         public bool Detachable { get; }

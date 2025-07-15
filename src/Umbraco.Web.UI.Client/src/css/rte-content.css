@@ -1,0 +1,21 @@
+/* General RTEs styles */
+
+.umb-macro-holder {
+	border: 3px dotted red;
+	padding: 7px;
+	margin: 3px;
+	display: block;
+	position: relative;
+}
+
+.umb-macro-holder::after {
+	content: 'Macros are no longer supported. Please use the block picker instead.';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: white;
+	background-color: rgba(0, 0, 0, 0.7);
+	padding: 10px;
+	border-radius: 5px;
+}

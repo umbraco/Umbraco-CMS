@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="RelationType" />
 /// </summary>
-internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>, IRelationTypeRepository
+internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>, IRelationTypeRepository
 {
     public RelationTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RelationTypeRepository> logger)
         : base(scopeAccessor, cache, logger)
@@ -27,7 +27,7 @@ internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>
     protected override IRepositoryCachePolicy<IRelationType, int> CreateCachePolicy() =>
         new FullDataSetRepositoryCachePolicy<IRelationType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
 
-    private void CheckNullObjectTypeValues(IRelationType entity)
+    private static void CheckNullObjectTypeValues(IRelationType entity)
     {
         if (entity.ParentObjectType.HasValue && entity.ParentObjectType == Guid.Empty)
         {
@@ -66,12 +66,12 @@ internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>
     public IEnumerable<IRelationType> GetMany(params Guid[]? ids)
     {
         // should not happen due to the cache policy
-        if (ids?.Any() ?? false)
+        if (ids is { Length: not 0 })
         {
             throw new NotImplementedException();
         }
 
-        return GetMany(new int[0]);
+        return GetMany(Array.Empty<int>());
     }
 
     protected override IEnumerable<IRelationType> PerformGetByQuery(IQuery<IRelationType> query)

@@ -1,5 +1,6 @@
 namespace Umbraco.Cms.Core.Models.TemplateQuery;
 
+[Obsolete("No longer used. Scheduled for removal in V17.")]
 public class QueryResultModel
 {
     public string? QueryExpression { get; set; }

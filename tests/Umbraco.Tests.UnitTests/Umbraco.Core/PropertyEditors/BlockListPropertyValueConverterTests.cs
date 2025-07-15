@@ -24,7 +24,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
     private BlockListPropertyValueConverter CreateConverter()
     {
         var publishedModelFactory = new NoopPublishedModelFactory();
-        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>());
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>());
         var editor = new BlockListPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
             new BlockEditorConverter(GetPublishedContentTypeCache(), Mock.Of<ICacheManager>(), publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
@@ -82,7 +82,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForMany();
 
-        var dataType = new PublishedDataType(1, "test", new Lazy<object>(() => config));
+        var dataType = new PublishedDataType(1, "test", "test", new Lazy<object>(() => config));
         var propType = Mock.Of<IPublishedPropertyType>(x => x.DataType == dataType);
 
         var valueType = editor.GetPropertyValueType(propType);
@@ -97,7 +97,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForSingle();
 
-        var dataType = new PublishedDataType(1, "test", new Lazy<object>(() => config));
+        var dataType = new PublishedDataType(1, "test", "test", new Lazy<object>(() => config));
         var propType = Mock.Of<IPublishedPropertyType>(x => x.DataType == dataType);
 
         var valueType = editor.GetPropertyValueType(propType);
@@ -112,7 +112,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = CreateConverter();
         var config = ConfigForSingleBlockMode();
 
-        var dataType = new PublishedDataType(1, "test", new Lazy<object>(() => config));
+        var dataType = new PublishedDataType(1, "test", "test", new Lazy<object>(() => config));
         var propType = Mock.Of<IPublishedPropertyType>(x => x.DataType == dataType);
 
         var valueType = editor.GetPropertyValueType(propType);

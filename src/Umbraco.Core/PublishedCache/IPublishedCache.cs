@@ -95,37 +95,4 @@ public interface IPublishedCache
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
     [Obsolete("Scheduled for removal in v17")]
     bool HasContent();
-
-    /// <summary>
-    ///     Gets a content type identified by its unique identifier.
-    /// </summary>
-    /// <param name="id">The content type unique identifier.</param>
-    /// <returns>The content type, or null.</returns>
-    [Obsolete("Please use the IContentTypeCacheService instead, scheduled for removal in V16")]
-    IPublishedContentType? GetContentType(int id);
-
-    /// <summary>
-    ///     Gets a content type identified by its alias.
-    /// </summary>
-    /// <param name="alias">The content type alias.</param>
-    /// <returns>The content type, or null.</returns>
-    /// <remarks>The alias is case-insensitive.</remarks>
-    [Obsolete("Please use the IContentTypeCacheService instead, scheduled for removal in V16")]
-    IPublishedContentType? GetContentType(string alias);
-
-    /// <summary>
-    ///     Gets contents of a given content type.
-    /// </summary>
-    /// <param name="contentType">The content type.</param>
-    /// <returns>The contents.</returns>
-    [Obsolete]
-    IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
-
-    /// <summary>
-    ///     Gets a content type identified by its alias.
-    /// </summary>
-    /// <param name="key">The content type key.</param>
-    /// <returns>The content type, or null.</returns>
-    [Obsolete("Please use the IContentTypeCacheService instead, scheduled for removal in V16")]
-    IPublishedContentType? GetContentType(Guid key);
 }

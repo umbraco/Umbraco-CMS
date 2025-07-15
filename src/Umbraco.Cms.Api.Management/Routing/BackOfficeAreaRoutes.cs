@@ -1,11 +1,8 @@
-using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Controllers.Security;
+using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
@@ -13,52 +10,28 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Routing;
 
 /// <summary>
-///     Creates routes for the back office area
+/// Creates routes for the back office area.
 /// </summary>
 public sealed class BackOfficeAreaRoutes : IAreaRoutes
 {
     private readonly IRuntimeState _runtimeState;
-    private readonly string _umbracoPathSegment;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
+    /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
     /// </summary>
-    public BackOfficeAreaRoutes(
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment,
-        IRuntimeState runtimeState)
-    {
-        _runtimeState = runtimeState;
-        _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
-    }
+    public BackOfficeAreaRoutes(IRuntimeState runtimeState)
+        => _runtimeState = runtimeState;
 
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
-    public BackOfficeAreaRoutes(
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment,
-        IRuntimeState runtimeState,
-        UmbracoApiControllerTypeCollection apiControllers) : this(globalSettings, hostingEnvironment, runtimeState)
-    {
-
-    }
 
     /// <inheritdoc />
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
-
-
-        switch (_runtimeState.Level)
+        if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Run)
         {
-            case RuntimeLevel.Install:
-            case RuntimeLevel.Upgrade:
-            case RuntimeLevel.Run:
-                MapMinimalBackOffice(endpoints);
-                endpoints.MapHub<BackofficeHub>(_umbracoPathSegment + Constants.Web.BackofficeSignalRHub);
-                break;
-            case RuntimeLevel.BootFailed:
-            case RuntimeLevel.Unknown:
-            case RuntimeLevel.Boot:
-                break;
+            MapMinimalBackOffice(endpoints);
+
+            endpoints.MapHub<BackofficeHub>(Constants.System.UmbracoPathSegment + Constants.Web.BackofficeSignalRHub);
+            endpoints.MapHub<ServerEventHub>(Constants.System.UmbracoPathSegment + Constants.Web.ServerEventSignalRHub);
         }
     }
 
@@ -68,7 +41,7 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
     private void MapMinimalBackOffice(IEndpointRouteBuilder endpoints)
     {
         endpoints.MapUmbracoRoute<BackOfficeDefaultController>(
-            _umbracoPathSegment,
+            Constants.System.UmbracoPathSegment,
             null!,
             string.Empty,
             "Index",
@@ -80,7 +53,7 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
 
         endpoints.MapControllerRoute(
             "catch-all-sections-to-client",
-            new StringBuilder(_umbracoPathSegment).Append("/{**slug}").ToString(),
+            $"{Constants.System.UmbracoPathSegment}/{{**slug}}",
             new
             {
                 Controller = ControllerExtensions.GetControllerName<BackOfficeDefaultController>(),

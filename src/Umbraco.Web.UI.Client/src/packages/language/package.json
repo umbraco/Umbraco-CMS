@@ -1,0 +1,8 @@
+{
+	"name": "@umbraco-backoffice/language",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	}
+}

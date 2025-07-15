@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
@@ -315,6 +316,39 @@ public class EntityService : RepositoryService, IEntityService
         IEnumerable<IEntitySlim> children = GetChildren(parentId, objectType);
 
         return children;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<IEntitySlim> GetSiblings(
+        Guid key,
+        UmbracoObjectTypes objectType,
+        int before,
+        int after,
+        Ordering? ordering = null)
+    {
+        if (before < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(before), "The 'before' parameter must be greater than or equal to 0.");
+        }
+
+        if (after < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(after), "The 'after' parameter must be greater than or equal to 0.");
+        }
+
+        ordering ??= new Ordering("sortOrder");
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IEnumerable<IEntitySlim> siblings = _entityRepository.GetSiblings(
+            objectType.GetGuid(),
+            key,
+            before,
+            after,
+            ordering);
+
+        scope.Complete();
+        return siblings;
     }
 
     /// <inheritdoc />
@@ -758,5 +792,26 @@ public class EntityService : RepositoryService, IEntityService
             return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuids, pageNumber, pageSize, out totalRecords, filter, ordering);
         }
     }
-}
 
+    /// <inheritdoc/>>
+    public Guid[] GetPathKeys(ITreeEntity entity, bool omitSelf = false)
+    {
+        IEnumerable<int> ids = entity.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : -1)
+            .Where(x => x != -1);
+
+        Guid[] keys = ids
+            .Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.Document))
+            .Where(x => x.Success)
+            .Select(x => x.Result)
+            .ToArray();
+
+        if (omitSelf)
+        {
+            // Omit the last path key as that will be for the item itself.
+            return keys.Take(keys.Length - 1).ToArray();
+        }
+
+        return keys;
+    }
+}

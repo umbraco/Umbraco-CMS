@@ -4,6 +4,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Extensions;
 
@@ -27,8 +28,6 @@ public static class UdiGetterExtensions
         {
             // Concrete types
             EntityContainer container => container.GetUdi(),
-            Script script => script.GetUdi(),
-            Stylesheet stylesheet => stylesheet.GetUdi(),
             // Interfaces
             IContentBase contentBase => contentBase.GetUdi(),
             IContentTypeComposition contentTypeComposition => contentTypeComposition.GetUdi(),
@@ -37,8 +36,13 @@ public static class UdiGetterExtensions
             ILanguage language => language.GetUdi(),
             IMemberGroup memberGroup => memberGroup.GetUdi(),
             IPartialView partialView => partialView.GetUdi(),
+            IRelation relation => relation.GetUdi(),
             IRelationType relationType => relationType.GetUdi(),
+            IScript script => script.GetUdi(),
+            IStylesheet stylesheet => stylesheet.GetUdi(),
             ITemplate template => template.GetUdi(),
+            IUser user => user.GetUdi(),
+            IUserGroup userGroup => userGroup.GetUdi(),
             IWebhook webhook => webhook.GetUdi(),
             _ => throw new NotSupportedException($"Entity type {entity.GetType().FullName} is not supported."),
         };
@@ -78,34 +82,6 @@ public static class UdiGetterExtensions
         }
 
         return new GuidUdi(entityType, entity.Key).EnsureClosed();
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    public static StringUdi GetUdi(this Script entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        return GetUdiFromPath(Constants.UdiEntityType.Script, entity.Path);
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
-    public static StringUdi GetUdi(this Stylesheet entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        return GetUdiFromPath(Constants.UdiEntityType.Stylesheet, entity.Path);
     }
 
     /// <summary>
@@ -311,6 +287,20 @@ public static class UdiGetterExtensions
     /// <returns>
     /// The entity identifier of the entity.
     /// </returns>
+    public static GuidUdi GetUdi(this IRelation entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return new GuidUdi(Constants.UdiEntityType.Relation, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
     public static GuidUdi GetUdi(this IRelationType entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
@@ -325,11 +315,67 @@ public static class UdiGetterExtensions
     /// <returns>
     /// The entity identifier of the entity.
     /// </returns>
+    public static StringUdi GetUdi(this IScript entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return GetUdiFromPath(Constants.UdiEntityType.Script, entity.Path);
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static StringUdi GetUdi(this IStylesheet entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return GetUdiFromPath(Constants.UdiEntityType.Stylesheet, entity.Path);
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
     public static GuidUdi GetUdi(this ITemplate entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
         return new GuidUdi(Constants.UdiEntityType.Template, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IUser entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return new GuidUdi(Constants.UdiEntityType.User, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IUserGroup entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return new GuidUdi(Constants.UdiEntityType.UserGroup, entity.Key).EnsureClosed();
     }
 
     /// <summary>

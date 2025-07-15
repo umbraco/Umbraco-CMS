@@ -32,7 +32,12 @@ public interface IProperty : IEntity, IRememberBeingDirty
     /// <summary>
     ///     Sets a value.
     /// </summary>
-    void SetValue(object? value, string? culture = null, string? segment = null);
+    /// <returns>true if the value was set (updated), false otherwise.</returns>
+    /// <remarks>
+    /// A false return value does not indicate failure, but rather that the property value was not changed
+    /// (i.e. the value passed in was equal to the current property value).
+    /// </remarks>
+    bool SetValue(object? value, string? culture = null, string? segment = null);
 
     void PublishValues(string? culture = "*", string segment = "*");
 

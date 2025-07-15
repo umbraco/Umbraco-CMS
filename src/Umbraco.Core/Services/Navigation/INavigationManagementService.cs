@@ -29,6 +29,7 @@ public interface INavigationManagementService
     ///     provided, the new node is added at the root level.
     /// </summary>
     /// <param name="key">The unique identifier of the new node to add.</param>
+    /// <param name="contentTypeKey">The unique identifier of the node's content type.</param>
     /// <param name="parentKey">
     ///     The unique identifier of the parent node. If <c>null</c>, the new node will be added to
     ///     the root level.
@@ -46,7 +47,7 @@ public interface INavigationManagementService
     ///     when adding nodes directly to the root (where parentKey is null), a sort order must be provided
     ///     to ensure the item appears in the correct position among other root-level items.
     /// </remarks>
-    bool Add(Guid key, Guid? parentKey = null, int? sortOrder = null);
+    bool Add(Guid key, Guid contentTypeKey, Guid? parentKey = null, int? sortOrder = null);
 
     /// <summary>
     ///     Moves an existing node to a new parent in the main navigation structure. If a

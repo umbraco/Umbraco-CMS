@@ -1,14 +1,18 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 public class RelationItemModel
 {
     public Guid NodeKey { get; set; }
+
+    public string? NodeAlias { get; set; }
 
     public string? NodeName { get; set; }
 
     public string? NodeType { get; set; }
 
     public bool? NodePublished { get; set; }
+
+    public Guid ContentTypeKey { get; set; }
 
     public string? ContentTypeIcon { get; set; }
 

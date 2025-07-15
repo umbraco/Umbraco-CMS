@@ -34,7 +34,7 @@ public class AllWebhookController : WebhookControllerBase
         var viewModel = new PagedViewModel<WebhookResponseModel>
         {
             Total = result.Total,
-            Items = webhooks.Select(x => _webhookPresentationFactory.CreateResponseModel(x)),
+            Items = webhooks.Select(_webhookPresentationFactory.CreateResponseModel),
         };
 
         return Ok(viewModel);

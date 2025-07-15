@@ -46,7 +46,7 @@ public class PublishDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionPublish.ActionLetter, id, requestModel.PublishSchedules.Where(x=>x.Culture is not null).Select(x=>x.Culture!)),
+            ContentPermissionResource.WithKeys(ActionPublish.ActionLetter, id, requestModel.PublishSchedules.Where(x => x.Culture is not null).Select(x=>x.Culture!)),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -54,7 +54,7 @@ public class PublishDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
-        Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> modelResult = _documentPresentationFactory.CreateCultureAndScheduleModel(requestModel);
+        Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> modelResult = _documentPresentationFactory.CreateCulturePublishScheduleModels(requestModel);
 
         if (modelResult.Success is false)
         {

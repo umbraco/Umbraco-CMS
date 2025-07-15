@@ -109,7 +109,7 @@ public class WebProfiler : IProfiler
                     && !location.Contains("://"))
                 {
                     MiniProfilerContext.Value.Root.Name = "Before Redirect";
-                    cookieManager.SetCookieValue(WebProfileCookieKey, MiniProfilerContext.Value.ToJson(), false);
+                    cookieManager.SetCookieValue(WebProfileCookieKey, MiniProfilerContext.Value.ToJson(), false, false, "Unspecified");
                 }
             }
         }

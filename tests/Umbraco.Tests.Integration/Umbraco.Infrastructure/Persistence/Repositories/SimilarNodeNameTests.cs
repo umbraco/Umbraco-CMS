@@ -7,7 +7,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
 [TestFixture]
-public class SimilarNodeNameTests
+internal sealed class SimilarNodeNameTests
 {
     public void Name_Is_Suffixed()
     {

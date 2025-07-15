@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
 using Umbraco.Extensions;
@@ -23,26 +22,8 @@ public class LegacyPasswordSecurity
         }
     }
 
-    // TODO: Remove v11
     // Used for tests
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete("We shouldn't be altering our public API to make test code easier, removing v11")]
-    public string HashPasswordForStorage(string algorithmType, string password)
-    {
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            throw new ArgumentException("password cannot be empty", nameof(password));
-        }
-
-        var hashed = HashNewPassword(algorithmType, password, out string salt);
-        return FormatPasswordForStorage(algorithmType, hashed, salt);
-    }
-
-    // TODO: Remove v11
-    // Used for tests
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete("We shouldn't be altering our public API to make test code easier, removing v11")]
-    public string FormatPasswordForStorage(string algorithmType, string hashedPassword, string salt)
+    internal string FormatPasswordForStorage(string algorithmType, string hashedPassword, string salt)
     {
         if (!SupportHashAlgorithm(algorithmType))
         {
@@ -103,14 +84,7 @@ public class LegacyPasswordSecurity
     /// <summary>
     ///     Create a new password hash and a new salt
     /// </summary>
-    /// <param name="algorithm">The hashing algorithm for the password.</param>
-    /// <param name="newPassword"></param>
-    /// <param name="salt"></param>
-    /// <returns></returns>
-    // TODO: Do we need this method? We shouldn't be using this class to create new password hashes for storage
-    // TODO: Remove v11
-    [Obsolete("We shouldn't be altering our public API to make test code easier, removing v11")]
-    public string HashNewPassword(string algorithm, string newPassword, out string salt)
+    internal string HashNewPassword(string algorithm, string newPassword, out string salt)
     {
         salt = GenerateSalt();
         return HashPassword(algorithm, newPassword, salt);

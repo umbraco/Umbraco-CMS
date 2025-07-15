@@ -3,6 +3,7 @@
 
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -26,7 +27,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MediaRepositoryTest : UmbracoIntegrationTest
+internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpTestData() => CreateTestData();
@@ -64,7 +65,7 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
             new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
         var mediaUrlGenerators = new MediaUrlGeneratorCollection(() => Enumerable.Empty<IMediaUrlGenerator>());
         var dataValueReferences =
-            new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
+            new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
         var repository = new MediaRepository(
             scopeAccessor,
             appCaches,

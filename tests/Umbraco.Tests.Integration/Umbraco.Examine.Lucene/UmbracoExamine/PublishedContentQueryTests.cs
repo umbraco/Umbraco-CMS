@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
-public class PublishedContentQueryTests : ExamineBaseTest
+internal sealed class PublishedContentQueryTests : ExamineBaseTest
 {
     private class TestIndex : LuceneIndex, IUmbracoIndex
     {

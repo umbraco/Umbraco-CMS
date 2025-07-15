@@ -39,12 +39,12 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
 
     public bool Remove(TKey key)
     {
-        if (!Indecies.ContainsKey(key))
+        if (!Indecies.TryGetValue(key, out int index))
         {
             return false;
         }
 
-        RemoveAt(Indecies[key]);
+        RemoveAt(index);
         return true;
     }
 
@@ -72,13 +72,13 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
                 throw new InvalidOperationException("Key of new value does not match.");
             }
 
-            if (!Indecies.ContainsKey(key))
+            if (!Indecies.TryGetValue(key, out int index))
             {
                 Add(value);
             }
             else
             {
-                this[Indecies[key]] = value;
+                this[index] = value;
             }
         }
     }
@@ -97,7 +97,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
     /// <returns>False if key not found</returns>
     public bool Replace(TKey key, TValue value)
     {
-        if (!Indecies.ContainsKey(key))
+        if (!Indecies.TryGetValue(key, out int index))
         {
             return false;
         }
@@ -108,7 +108,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
             throw new InvalidOperationException("Key of new value does not match.");
         }
 
-        this[Indecies[key]] = value;
+        this[index] = value;
         return true;
     }
 
@@ -134,7 +134,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
     /// <param name="newKey"></param>
     public void ChangeKey(TKey currentKey, TKey newKey)
     {
-        if (!Indecies.ContainsKey(currentKey))
+        if (!Indecies.TryGetValue(currentKey, out int currentIndex))
         {
             throw new InvalidOperationException($"No item with the key '{currentKey}' was found in the dictionary.");
         }
@@ -143,8 +143,6 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
         {
             throw new ArgumentException($"An element with the same key '{newKey}' already exists in the dictionary.", nameof(newKey));
         }
-
-        var currentIndex = Indecies[currentKey];
 
         Indecies.Remove(currentKey);
         Indecies.Add(newKey, currentIndex);
@@ -162,9 +160,9 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
 
         if (index != Count)
         {
-            foreach (TKey k in Indecies.Keys.Where(k => Indecies[k] >= index).ToList())
+            foreach (KeyValuePair<TKey, int> largerOrEqualToIndex in Indecies.Where(kvp => kvp.Value >= index))
             {
-                Indecies[k]++;
+                Indecies[largerOrEqualToIndex.Key] = largerOrEqualToIndex.Value + 1;
             }
         }
 
@@ -187,9 +185,9 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
 
         Indecies.Remove(key);
 
-        foreach (TKey k in Indecies.Keys.Where(k => Indecies[k] > index).ToList())
+        foreach (KeyValuePair<TKey, int> largerThanIndex in Indecies.Where(kvp => kvp.Value > index))
         {
-            Indecies[k]--;
+            Indecies[largerThanIndex.Key] = largerThanIndex.Value - 1;
         }
     }
 

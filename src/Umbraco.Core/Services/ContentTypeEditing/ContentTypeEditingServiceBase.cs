@@ -1,6 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -18,7 +17,6 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     private readonly IDataTypeService _dataTypeService;
     private readonly IEntityService _entityService;
     private readonly IShortStringHelper _shortStringHelper;
-
     protected ContentTypeEditingServiceBase(
         IContentTypeService contentTypeService,
         TContentTypeService concreteContentTypeService,
@@ -52,7 +50,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
         var currentCompositionAliases = currentCompositeKeys.Any()
             ? allContentTypes.Where(ct => currentCompositeKeys.Contains(ct.Key)).Select(ct => ct.Alias).ToArray()
-            : Array.Empty<string>();
+            : [];
 
         ContentTypeAvailableCompositionsResults availableCompositions = _contentTypeService.GetAvailableCompositeContentTypes(
             contentType,
@@ -91,7 +89,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
         }
 
-        await AdditionalCreateValidationAsync(model);
+        // perform additional, content type specific validation
+        operationStatus = await AdditionalCreateValidationAsync(model);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
+        }
 
         // get the ID of the parent to create the content type under (we already validated that it exists)
         var parentId = GetParentId(model, containerKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
@@ -139,9 +142,9 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return Attempt.SucceedWithStatus<TContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
 
-    protected virtual async Task<ContentTypeOperationStatus> AdditionalCreateValidationAsync(
+    protected virtual Task<ContentTypeOperationStatus> AdditionalCreateValidationAsync(
         ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
-        => await Task.FromResult(ContentTypeOperationStatus.Success);
+        => Task.FromResult(ContentTypeOperationStatus.Success);
 
     #region Sanitization
 
@@ -319,6 +322,15 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         // get the content type keys we want to use for compositions
         Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
 
+        // if the content type keys are already set as compositions, don't perform any additional validation
+        // - this covers an edge case where compositions are configured for a content type before child content types are created
+        if (contentType is not null && contentType.ContentTypeComposition
+            .Select(c => c.Key)
+            .ContainsAll(compositionKeys))
+        {
+            return ContentTypeOperationStatus.Success;
+        }
+
         // verify that all compositions keys are allowed
         Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(contentType, allContentTypeCompositions, isElement: model.IsElement)
             .Results
@@ -334,7 +346,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return ContentTypeOperationStatus.Success;
     }
 
-    private ContentTypeOperationStatus ValidateProperties(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
+    private static ContentTypeOperationStatus ValidateProperties(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
     {
         // grab all content types used for composition and/or inheritance
         Guid[] allCompositionKeys = KeysForCompositionTypes(model, CompositionType.Composition, CompositionType.Inheritance);
@@ -353,7 +365,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return ContentTypeOperationStatus.Success;
     }
 
-    private ContentTypeOperationStatus ValidateContainers(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
+    private static ContentTypeOperationStatus ValidateContainers(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
     {
         if (model.Containers.Any(container => Enum.TryParse<PropertyGroupType>(container.Type, out _) is false))
         {
@@ -408,19 +420,19 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return ContentTypeAliasIsInUse(alias) is false;
     }
 
-    private bool IsReservedContentTypeAlias(string alias)
+    private static bool IsReservedContentTypeAlias(string alias)
     {
         var reservedAliases = new[] { "system" };
         return reservedAliases.InvariantContains(alias);
     }
 
+    protected abstract ISet<string> GetReservedFieldNames();
+
     private bool ContainsReservedPropertyTypeAlias(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
     {
         // Because of models builder you cannot have an alias that already exists in IPublishedContent, for instance Path.
         // Since MyModel.Path would conflict with IPublishedContent.Path.
-        var reservedPropertyTypeNames = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name)
-            .Union(typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name))
-            .ToArray();
+        ISet<string> reservedPropertyTypeNames = GetReservedFieldNames();
 
         return model.Properties.Any(propertyType => reservedPropertyTypeNames.InvariantContains(propertyType.Alias));
     }
@@ -462,7 +474,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return contentType;
     }
 
-    private void UpdateAllowedContentTypes(
+    private static void UpdateAllowedContentTypes(
         TContentType contentType,
         ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
         IContentTypeComposition[] allContentTypeCompositions)
@@ -561,7 +573,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
     }
 
-    private string PropertyGroupAlias(string? containerName)
+    private static string PropertyGroupAlias(string? containerName)
     {
         if (containerName.IsNullOrWhiteSpace())
         {
@@ -613,7 +625,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return propertyType;
     }
 
-    private void UpdateCompositions(
+    private static void UpdateCompositions(
         TContentType contentType,
         ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
         IContentTypeComposition[] allContentTypeCompositions)
@@ -646,7 +658,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
     }
 
-    private void UpdateParentContentType(
+    private static void UpdateParentContentType(
         TContentType contentType,
         ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
         IContentTypeComposition[] allContentTypeCompositions)
@@ -665,7 +677,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
     #region Shared between model validation and model update
 
-    private Guid[] GetDataTypeKeys(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    private static Guid[] GetDataTypeKeys(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
         => model.Properties.Select(property => property.DataTypeKey).Distinct().ToArray();
 
     private async Task<IDataType[]> GetDataTypesAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
@@ -673,7 +685,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         Guid[] dataTypeKeys = GetDataTypeKeys(model);
         return dataTypeKeys.Any()
             ? (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray()
-            : Array.Empty<IDataType>();
+            : [];
     }
 
     private int? GetParentId(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? containerKey)
@@ -699,7 +711,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         return Constants.System.Root;
     }
 
-    private Guid[] KeysForCompositionTypes(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, params CompositionType[] compositionTypes)
+    private static Guid[] KeysForCompositionTypes(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, params CompositionType[] compositionTypes)
         => model.Compositions
             .Where(c => compositionTypes.Contains(c.CompositionType))
             .Select(c => c.Key)

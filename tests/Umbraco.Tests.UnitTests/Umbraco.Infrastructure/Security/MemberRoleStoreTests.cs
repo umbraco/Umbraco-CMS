@@ -201,7 +201,7 @@ public class MemberRoleStoreTests
     }
 
     [Test]
-    public async Task
+    public Task
         GivenIDeleteAMemberRole_AndTheIdCannotBeParsedToAnInt_ThenTheMemberGroupShouldNotBeDeleted_AndIShouldGetAnArgumentException()
     {
         // arrange
@@ -214,6 +214,7 @@ public class MemberRoleStoreTests
 
         // act
         Assert.ThrowsAsync<ArgumentException>(async () => await sut.DeleteAsync(fakeRole, fakeCancellationToken));
+        return Task.CompletedTask;
     }
 
     [Test]
@@ -263,7 +264,7 @@ public class MemberRoleStoreTests
     }
 
     [Test]
-    public async Task GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAnIntOrGuid_ThenIShouldGetAFailureResultAsync()
+    public Task GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAnIntOrGuid_ThenIShouldGetAFailureResultAsync()
     {
         // arrange
         var sut = CreateSut();
@@ -276,6 +277,7 @@ public class MemberRoleStoreTests
         // assert
         Assert.That(actual, Throws.TypeOf<ArgumentOutOfRangeException>());
         _mockMemberGroupService.VerifyNoOtherCalls();
+        return Task.CompletedTask;
     }
 
     [Test]

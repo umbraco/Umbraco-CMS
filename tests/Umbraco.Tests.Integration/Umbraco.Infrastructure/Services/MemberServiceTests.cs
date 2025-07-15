@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [Category("Slow")]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class MemberServiceTests : UmbracoIntegrationTest
+internal sealed class MemberServiceTests : UmbracoIntegrationTest
 {
     private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
 

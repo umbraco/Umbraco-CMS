@@ -14,6 +14,7 @@ public enum UserGroupOperationStatus
     MediaStartNodeKeyNotFound,
     DocumentStartNodeKeyNotFound,
     DocumentPermissionKeyNotFound,
+    DocumentTypePermissionKeyNotFound,
     LanguageNotFound,
     NameTooLong,
     AliasTooLong,

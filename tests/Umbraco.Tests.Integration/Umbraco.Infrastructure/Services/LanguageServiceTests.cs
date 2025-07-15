@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class LanguageServiceTests : UmbracoIntegrationTest
+internal sealed class LanguageServiceTests : UmbracoIntegrationTest
 {
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 

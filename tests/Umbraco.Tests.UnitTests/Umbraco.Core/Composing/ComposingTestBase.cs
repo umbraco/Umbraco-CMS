@@ -31,12 +31,7 @@ public abstract class ComposingTestBase
         var typeFinder = TestHelper.GetTypeFinder();
         TypeLoader = new TypeLoader(
             typeFinder,
-            new VaryingRuntimeHash(),
-            NoAppCache.Instance,
-            new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)),
             Mock.Of<ILogger<TypeLoader>>(),
-            Mock.Of<IProfiler>(),
-            false,
             AssembliesToScan);
     }
 }

@@ -1,10 +1,10 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaTypeEditingServiceTests
+internal sealed partial class MediaTypeEditingServiceTests
 {
     [TestCase("jpg", Constants.Conventions.MediaTypes.Image)]
     [TestCase("png", Constants.Conventions.MediaTypes.Image)]

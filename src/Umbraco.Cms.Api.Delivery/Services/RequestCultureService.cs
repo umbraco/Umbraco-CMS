@@ -2,17 +2,15 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
 internal sealed partial class RequestCultureService : RequestHeaderHandler, IRequestCultureService
 {
-    private readonly IVariationContextAccessor _variationContextAccessor;
-
-    public RequestCultureService(IHttpContextAccessor httpContextAccessor, IVariationContextAccessor variationContextAccessor)
-        : base(httpContextAccessor) =>
-        _variationContextAccessor = variationContextAccessor;
+    public RequestCultureService(IHttpContextAccessor httpContextAccessor)
+        : base(httpContextAccessor)
+    {
+    }
 
     /// <inheritdoc />
     public string? GetRequestedCulture()
@@ -21,15 +19,10 @@ internal sealed partial class RequestCultureService : RequestHeaderHandler, IReq
         return ValidLanguageHeaderRegex().IsMatch(acceptLanguage) ? acceptLanguage : null;
     }
 
-    /// <inheritdoc />
+    [Obsolete("Use IVariationContextAccessor to manipulate the variation context. Scheduled for removal in V17.")]
     public void SetRequestCulture(string culture)
     {
-        if (_variationContextAccessor.VariationContext?.Culture == culture)
-        {
-            return;
-        }
-
-        _variationContextAccessor.VariationContext = new VariationContext(culture);
+        // no-op
     }
 
     // at the time of writing we're introducing this to get rid of accept-language header values like "en-GB,en-US;q=0.9,en;q=0.8",

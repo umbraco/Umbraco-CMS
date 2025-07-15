@@ -38,4 +38,10 @@ public class BlockGridLayoutItem : BlockLayoutItemBase
         : base(contentKey, settingsKey)
     {
     }
+
+    public override bool ReferencesContent(Guid key)
+        => ContentKey == key || Areas.Any(area => area.ContainsContent(key));
+
+    public override bool ReferencesSetting(Guid key)
+        => SettingsKey == key || Areas.Any(area => area.ContainsSetting(key));
 }

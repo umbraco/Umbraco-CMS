@@ -1,43 +1,85 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Routing
 {
     internal class RedirectTracker : IRedirectTracker
     {
-        private readonly IUmbracoContextFactory _umbracoContextFactory;
-        private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly IPublishedContentCache _contentCache;
         private readonly IDocumentNavigationQueryService _navigationQueryService;
         private readonly ILogger<RedirectTracker> _logger;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
+        private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
 
         public RedirectTracker(
-            IUmbracoContextFactory umbracoContextFactory,
-            IVariationContextAccessor variationContextAccessor,
             ILocalizationService localizationService,
             IRedirectUrlService redirectUrlService,
             IPublishedContentCache contentCache,
             IDocumentNavigationQueryService navigationQueryService,
-            ILogger<RedirectTracker> logger)
+            ILogger<RedirectTracker> logger,
+            IPublishedUrlProvider publishedUrlProvider,
+            IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
         {
-            _umbracoContextFactory = umbracoContextFactory;
-            _variationContextAccessor = variationContextAccessor;
             _localizationService = localizationService;
             _redirectUrlService = redirectUrlService;
             _contentCache = contentCache;
             _navigationQueryService = navigationQueryService;
             _logger = logger;
+            _publishedUrlProvider = publishedUrlProvider;
+            _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
+        }
+
+        [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
+        public RedirectTracker(
+            IVariationContextAccessor variationContextAccessor,
+            ILocalizationService localizationService,
+            IRedirectUrlService redirectUrlService,
+            IPublishedContentCache contentCache,
+            IDocumentNavigationQueryService navigationQueryService,
+            ILogger<RedirectTracker> logger,
+            IPublishedUrlProvider publishedUrlProvider,
+            IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+            : this(
+                localizationService,
+                redirectUrlService,
+                contentCache,
+                navigationQueryService,
+                logger,
+                publishedUrlProvider,
+                publishedContentStatusFilteringService)
+        {
+        }
+
+        [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
+        public RedirectTracker(
+            IVariationContextAccessor variationContextAccessor,
+            ILocalizationService localizationService,
+            IRedirectUrlService redirectUrlService,
+            IPublishedContentCache contentCache,
+            IDocumentNavigationQueryService navigationQueryService,
+            ILogger<RedirectTracker> logger,
+            IPublishedUrlProvider publishedUrlProvider)
+            : this(
+                localizationService,
+                redirectUrlService,
+                contentCache,
+                navigationQueryService,
+                logger,
+                publishedUrlProvider,
+                StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
+        {
         }
 
         /// <inheritdoc/>
@@ -50,12 +92,12 @@ namespace Umbraco.Cms.Infrastructure.Routing
             }
 
             // Get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures)
-            var defaultCultures = new Lazy<string[]>(() => entityContent.AncestorsOrSelf(_contentCache, _navigationQueryService).FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray() ?? Array.Empty<string>());
+            var defaultCultures = new Lazy<string[]>(() => entityContent.AncestorsOrSelf(_navigationQueryService, _publishedContentStatusFilteringService).FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray() ?? Array.Empty<string>());
 
             // Get all language ISO codes (in case we're dealing with invariant content with variant ancestors)
             var languageIsoCodes = new Lazy<string[]>(() => _localizationService.GetAllLanguages().Select(x => x.IsoCode).ToArray());
 
-            foreach (IPublishedContent publishedContent in entityContent.DescendantsOrSelf(_variationContextAccessor, _contentCache, _navigationQueryService))
+            foreach (IPublishedContent publishedContent in entityContent.DescendantsOrSelf(_navigationQueryService, _publishedContentStatusFilteringService))
             {
                 // If this entity defines specific cultures, use those instead of the default ones
                 IEnumerable<string> cultures = publishedContent.Cultures.Any() ? publishedContent.Cultures.Keys : defaultCultures.Value;
@@ -64,7 +106,8 @@ namespace Umbraco.Cms.Infrastructure.Routing
                 {
                     try
                     {
-                        var route = _contentCache.GetRouteById(publishedContent.Id, culture);
+                        var route = _publishedUrlProvider.GetUrl(publishedContent.Id, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
+
                         if (IsValidRoute(route))
                         {
                             oldRoutes[(publishedContent.Id, culture)] = (publishedContent.Key, route);
@@ -74,7 +117,7 @@ namespace Umbraco.Cms.Infrastructure.Routing
                             // Retry using all languages, if this is invariant but has a variant ancestor.
                             foreach (string languageIsoCode in languageIsoCodes.Value)
                             {
-                                route = _contentCache.GetRouteById(publishedContent.Id, languageIsoCode);
+                                route = _publishedUrlProvider.GetUrl(publishedContent.Id, UrlMode.Relative, languageIsoCode).TrimEnd(Constants.CharArrays.ForwardSlash);
                                 if (IsValidRoute(route))
                                 {
                                     oldRoutes[(publishedContent.Id, languageIsoCode)] = (publishedContent.Key, route);
@@ -98,19 +141,11 @@ namespace Umbraco.Cms.Infrastructure.Routing
                 return;
             }
 
-            using UmbracoContextReference reference = _umbracoContextFactory.EnsureUmbracoContext();
-            IPublishedContentCache? contentCache = reference.UmbracoContext.Content;
-            if (contentCache == null)
-            {
-                _logger.LogWarning("Could not track redirects because there is no published content cache available on the current published snapshot.");
-                return;
-            }
-
             foreach (((int contentId, string culture), (Guid contentKey, string oldRoute)) in oldRoutes)
             {
                 try
                 {
-                    var newRoute = contentCache.GetRouteById(contentId, culture);
+                    var newRoute = _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative,  culture).TrimEnd(Constants.CharArrays.ForwardSlash);
                     if (!IsValidRoute(newRoute) || oldRoute == newRoute)
                     {
                         continue;

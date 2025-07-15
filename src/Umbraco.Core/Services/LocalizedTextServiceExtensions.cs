@@ -52,7 +52,7 @@ public static class LocalizedTextServiceExtensions
             return null;
         }
 
-        if (text.StartsWith("#") == false)
+        if (text.StartsWith('#') == false)
         {
             return text;
         }
@@ -64,7 +64,7 @@ public static class LocalizedTextServiceExtensions
             return value;
         }
 
-        if (text.IndexOf('_') == -1)
+        if (!text.Contains('_'))
         {
             return text;
         }
@@ -77,7 +77,7 @@ public static class LocalizedTextServiceExtensions
         }
 
         value = manager.Localize(areaAndKey[0], areaAndKey[1]);
-        return value.StartsWith("[") ? text : value;
+        return value.StartsWith('[') ? text : value;
     }
 
     /// <summary>

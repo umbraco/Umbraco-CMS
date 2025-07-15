@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Web.Common.Logging;
 /// </remarks>
 internal class RegisteredReloadableLogger
 {
-    private static readonly object _frozenLock = new();
+    private static readonly Lock _frozenLock = new();
     private static bool _frozen;
     private readonly ReloadableLogger _logger;
 

@@ -25,52 +25,6 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     private readonly ICoreScopeProvider _coreScopeProvider;
     private DeliveryApiSettings _deliveryApiSettings;
 
-    [Obsolete("Please use ctor that takes an IDeliveryApiCompositeIdHandler. Scheduled for removal in v15")]
-    public DeliveryApiContentIndexValueSetBuilder(
-        ContentIndexHandlerCollection contentIndexHandlerCollection,
-        IContentService contentService,
-        IPublicAccessService publicAccessService,
-        ILogger<DeliveryApiContentIndexValueSetBuilder> logger,
-        IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
-        IMemberService memberService)
-    : this(
-        contentIndexHandlerCollection,
-        contentService,
-        publicAccessService,
-        logger,
-        deliveryApiContentIndexFieldDefinitionBuilder,
-        deliveryApiSettings,
-        memberService,
-        StaticServiceProvider.Instance.GetRequiredService<IDeliveryApiCompositeIdHandler>(),
-        StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>()
-        )
-    {
-    }
-    [Obsolete("Please use ctor that takes an IDeliveryApiCompositeIdHandler. Scheduled for removal in v15")]
-    public DeliveryApiContentIndexValueSetBuilder(
-        ContentIndexHandlerCollection contentIndexHandlerCollection,
-        IContentService contentService,
-        IPublicAccessService publicAccessService,
-        ILogger<DeliveryApiContentIndexValueSetBuilder> logger,
-        IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
-        IMemberService memberService,
-        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandle)
-     :this(
-         contentIndexHandlerCollection,
-         contentService,
-         publicAccessService,
-         logger,
-         deliveryApiContentIndexFieldDefinitionBuilder,
-         deliveryApiSettings,
-         memberService,
-         deliveryApiCompositeIdHandle,
-         StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>())
-    {
-
-    }
-
     public DeliveryApiContentIndexValueSetBuilder(
         ContentIndexHandlerCollection contentIndexHandlerCollection,
         IContentService contentService,

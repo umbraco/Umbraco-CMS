@@ -16,7 +16,7 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
     [Test]
     public void ImageCropperValueConverter_ConvertsValueToImageCropperValue()
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new ImageCropperConfiguration
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new ImageCropperConfiguration
         {
             Crops = new ImageCropperConfiguration.Crop[]
             {

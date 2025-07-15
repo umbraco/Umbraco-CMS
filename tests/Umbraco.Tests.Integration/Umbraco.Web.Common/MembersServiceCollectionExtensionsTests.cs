@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Tests.Integration.Umbraco.Web.Common;
 
 [TestFixture]
-public class MembersServiceCollectionExtensionsTests : UmbracoIntegrationTest
+internal sealed class MembersServiceCollectionExtensionsTests : UmbracoIntegrationTest
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddMembersIdentity();
 

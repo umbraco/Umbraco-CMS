@@ -1,0 +1,43 @@
+<style>
+	/* Make stories able to use 100% height */
+  html {
+    height: 100vh;
+  }
+  /* Make stories able to use 100% height */
+  body,
+  #root,
+  #root-inner {
+    height: 100%;
+  }
+
+	body {
+		padding: 0px !important;
+	}
+
+	pre {
+		font-family: monospace;
+		font-size: 14px;
+		background-color: var(--uui-color-background);
+		padding: 1.5em;
+		border-radius: 3px;
+		line-height: 1.3em;
+	}
+</style>
+<script src="umbraco/backoffice/msw/index.js"></script>
+<script>
+	(function () {
+		window.addEventListener('load', () => {
+			var body = document.querySelector('body');
+			window.addEventListener('keydown', (e) => {
+				if (e.ctrlKey === true && e.key === 'g') {
+					if (body.hasAttribute('baseline-grid')) {
+						body.removeAttribute('baseline-grid');
+					} else {
+						body.setAttribute('baseline-grid', '');
+					}
+				}
+			});
+		});
+	})();
+</script>
+

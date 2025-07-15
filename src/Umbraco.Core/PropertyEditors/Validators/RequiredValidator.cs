@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -9,18 +9,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// </summary>
 public class RequiredValidator : IValueRequiredValidator, IValueValidator
 {
-    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
-    public RequiredValidator(ILocalizedTextService textService)
-        : this()
-    {
-    }
-
     public RequiredValidator()
     {
     }
 
     /// <inheritdoc cref="IValueValidator.Validate" />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration) =>
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext) =>
         ValidateRequired(value, valueType);
 
     /// <inheritdoc cref="IValueRequiredValidator.ValidateRequired" />

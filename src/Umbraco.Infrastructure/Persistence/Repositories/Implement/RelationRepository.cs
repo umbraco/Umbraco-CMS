@@ -34,10 +34,10 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
     }
 
     public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
-        => GetPagedParentEntitiesByChildId(childId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+        => GetPagedParentEntitiesByChildId(childId, pageIndex, pageSize, out totalRecords, [], entityTypes);
 
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
-        => GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
+        => GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, [], entityTypes);
 
     public Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias)
     {
@@ -474,6 +474,9 @@ internal class RelationItemDto
 
     [Column(Name = "nodeObjectType")]
     public Guid ChildNodeObjectType { get; set; }
+
+    [Column(Name = "contentTypeKey")]
+    public Guid ChildContentTypeKey { get; set; }
 
     [Column(Name = "contentTypeIcon")]
     public string? ChildContentTypeIcon { get; set; }

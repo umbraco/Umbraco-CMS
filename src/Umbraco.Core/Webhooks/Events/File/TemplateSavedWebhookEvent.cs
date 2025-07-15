@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -21,13 +22,9 @@ public class TemplateSavedWebhookEvent : WebhookEventBase<TemplateSavedNotificat
     public override string Alias => Constants.WebhookEvents.Aliases.TemplateSaved;
 
     public override object? ConvertNotificationToRequestPayload(TemplateSavedNotification notification)
-    {
-        // Create a new anonymous object with the properties we want
-        return new
+        => notification.SavedEntities.Select(entity => new
         {
-            notification.CreateTemplateForContentType,
+            Id = entity.Key,
             notification.ContentTypeAlias,
-            notification.SavedEntities
-        };
-    }
+        });
 }

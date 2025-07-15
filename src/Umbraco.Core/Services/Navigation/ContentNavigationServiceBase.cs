@@ -7,19 +7,25 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Navigation;
 
-internal abstract class ContentNavigationServiceBase
+internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeService>
+    where TContentType : class, IContentTypeComposition
+    where TContentTypeService : IContentTypeBaseService<TContentType>
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
+    private readonly TContentTypeService _typeService;
+    private Lazy<Dictionary<string, Guid>> _contentTypeAliasToKeyMap;
     private ConcurrentDictionary<Guid, NavigationNode> _navigationStructure = new();
     private ConcurrentDictionary<Guid, NavigationNode> _recycleBinNavigationStructure = new();
-    private IList<Guid> _roots = new List<Guid>();
-    private IList<Guid> _recycleBinRoots = new List<Guid>();
+    private HashSet<Guid> _roots = [];
+    private HashSet<Guid> _recycleBinRoots = [];
 
-    protected ContentNavigationServiceBase(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository)
+    protected ContentNavigationServiceBase(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository, TContentTypeService typeService)
     {
         _coreScopeProvider = coreScopeProvider;
         _navigationRepository = navigationRepository;
+        _typeService = typeService;
+        _contentTypeAliasToKeyMap = new Lazy<Dictionary<string, Guid>>(LoadContentTypes);
     }
 
     /// <summary>
@@ -38,17 +44,77 @@ internal abstract class ContentNavigationServiceBase
     public bool TryGetRootKeys(out IEnumerable<Guid> rootKeys)
         => TryGetRootKeysFromStructure(_roots, out rootKeys);
 
+    public bool TryGetRootKeysOfType(string contentTypeAlias, out IEnumerable<Guid> rootKeys)
+    {
+        if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
+        {
+            return TryGetRootKeysFromStructure(_roots, out rootKeys, contentTypeKey);
+        }
+
+        // Content type alias doesn't exist
+        rootKeys = [];
+        return false;
+    }
+
     public bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_navigationStructure, parentKey, out childrenKeys);
+
+    public bool TryGetChildrenKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> childrenKeys)
+    {
+        if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
+        {
+            return TryGetChildrenKeysFromStructure(_navigationStructure, parentKey, out childrenKeys, contentTypeKey);
+        }
+
+        // Content type alias doesn't exist
+        childrenKeys = [];
+        return false;
+    }
 
     public bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
         => TryGetDescendantsKeysFromStructure(_navigationStructure, parentKey, out descendantsKeys);
 
+    public bool TryGetDescendantsKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> descendantsKeys)
+    {
+        if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
+        {
+            return TryGetDescendantsKeysFromStructure(_navigationStructure, parentKey, out descendantsKeys, contentTypeKey);
+        }
+
+        // Content type alias doesn't exist
+        descendantsKeys = [];
+        return false;
+    }
+
     public bool TryGetAncestorsKeys(Guid childKey, out IEnumerable<Guid> ancestorsKeys)
         => TryGetAncestorsKeysFromStructure(_navigationStructure, childKey, out ancestorsKeys);
 
+    public bool TryGetAncestorsKeysOfType(Guid parentKey, string contentTypeAlias, out IEnumerable<Guid> ancestorsKeys)
+    {
+        if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
+        {
+            return TryGetAncestorsKeysFromStructure(_navigationStructure, parentKey, out ancestorsKeys, contentTypeKey);
+        }
+
+        // Content type alias doesn't exist
+        ancestorsKeys = [];
+        return false;
+    }
+
     public bool TryGetSiblingsKeys(Guid key, out IEnumerable<Guid> siblingsKeys)
         => TryGetSiblingsKeysFromStructure(_navigationStructure, key, out siblingsKeys);
+
+    public bool TryGetSiblingsKeysOfType(Guid key, string contentTypeAlias, out IEnumerable<Guid> siblingsKeys)
+    {
+        if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
+        {
+            return TryGetSiblingsKeysFromStructure(_navigationStructure, key, out siblingsKeys, contentTypeKey);
+        }
+
+        // Content type alias doesn't exist
+        siblingsKeys = [];
+        return false;
+    }
 
     public bool TryGetParentKeyInBin(Guid childKey, out Guid? parentKey)
         => TryGetParentKeyFromStructure(_recycleBinNavigationStructure, childKey, out parentKey);
@@ -104,7 +170,7 @@ internal abstract class ContentNavigationServiceBase
                _navigationStructure.TryRemove(key, out _);
     }
 
-    public bool Add(Guid key, Guid? parentKey = null, int? sortOrder = null)
+    public bool Add(Guid key, Guid contentTypeKey, Guid? parentKey = null, int? sortOrder = null)
     {
         NavigationNode? parentNode = null;
         if (parentKey.HasValue)
@@ -120,7 +186,7 @@ internal abstract class ContentNavigationServiceBase
         }
 
         // Note: sortOrder can't be automatically determined for items at root level, so it needs to be passed in
-        var newNode = new NavigationNode(key, sortOrder ?? 0);
+        var newNode = new NavigationNode(key, contentTypeKey, sortOrder ?? 0);
         if (_navigationStructure.TryAdd(key, newNode) is false)
         {
             return false; // Node with this key already exists
@@ -227,12 +293,12 @@ internal abstract class ContentNavigationServiceBase
     /// <param name="readLock">The read lock value, should be -333 or -334 for content and media trees.</param>
     /// <param name="objectTypeKey">The key of the object type to rebuild.</param>
     /// <param name="trashed">Indicates whether the items are in the recycle bin.</param>
-    protected async Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
+    protected Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
     {
         // This is only relevant for items in the content and media trees
         if (readLock != Constants.Locks.ContentTree && readLock != Constants.Locks.MediaTree)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
@@ -241,17 +307,21 @@ internal abstract class ContentNavigationServiceBase
         // Build the corresponding navigation structure
         if (trashed)
         {
+            _recycleBinRoots.Clear();
             IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
             BuildNavigationDictionary(_recycleBinNavigationStructure, _recycleBinRoots,  navigationModels);
         }
         else
         {
+            _roots.Clear();
             IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
             BuildNavigationDictionary(_navigationStructure, _roots, navigationModels);
         }
+
+        return Task.CompletedTask;
     }
 
-    private bool TryGetParentKeyFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out Guid? parentKey)
+    private static bool TryGetParentKeyFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out Guid? parentKey)
     {
         if (structure.TryGetValue(childKey, out NavigationNode? childNode))
         {
@@ -264,18 +334,37 @@ internal abstract class ContentNavigationServiceBase
         return false;
     }
 
-    private bool TryGetRootKeysFromStructure(IList<Guid> input, out IEnumerable<Guid> rootKeys)
+    private bool TryGetRootKeysFromStructure(
+        HashSet<Guid> input,
+        out IEnumerable<Guid> rootKeys,
+        Guid? contentTypeKey = null)
     {
-        // TODO can we make this more efficient?
+        var keysWithSortOrder = new List<(Guid Key, int SortOrder)>(input.Count);
+        foreach (Guid key in input)
+        {
+            NavigationNode navigationNode = _navigationStructure[key];
+
+            // Apply contentTypeKey filter
+            if (contentTypeKey.HasValue && navigationNode.ContentTypeKey != contentTypeKey.Value)
+            {
+                continue;
+            }
+
+            keysWithSortOrder.Add((key, navigationNode.SortOrder));
+        }
+
         // Sort by SortOrder
-        rootKeys = input
-            .OrderBy(key => _navigationStructure[key].SortOrder)
-            .ToList();
+        keysWithSortOrder.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+        rootKeys = keysWithSortOrder.ConvertAll(keyWithSortOrder => keyWithSortOrder.Key);
 
         return true;
     }
 
-    private bool TryGetChildrenKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid parentKey, out IEnumerable<Guid> childrenKeys)
+    private static bool TryGetChildrenKeysFromStructure(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid parentKey,
+        out IEnumerable<Guid> childrenKeys,
+        Guid? contentTypeKey = null)
     {
         if (structure.TryGetValue(parentKey, out NavigationNode? parentNode) is false)
         {
@@ -285,12 +374,16 @@ internal abstract class ContentNavigationServiceBase
         }
 
         // Keep children keys ordered based on their SortOrder
-        childrenKeys = GetOrderedChildren(parentNode, structure).ToList();
+        childrenKeys = GetOrderedChildren(parentNode, structure, contentTypeKey);
 
         return true;
     }
 
-    private bool TryGetDescendantsKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid parentKey, out IEnumerable<Guid> descendantsKeys)
+    private static bool TryGetDescendantsKeysFromStructure(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid parentKey,
+        out IEnumerable<Guid> descendantsKeys,
+        Guid? contentTypeKey = null)
     {
         var descendants = new List<Guid>();
 
@@ -301,13 +394,17 @@ internal abstract class ContentNavigationServiceBase
             return false;
         }
 
-        GetDescendantsRecursively(structure, parentNode, descendants);
+        GetDescendantsRecursively(structure, parentNode, descendants, contentTypeKey);
 
         descendantsKeys = descendants;
         return true;
     }
 
-    private bool TryGetAncestorsKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out IEnumerable<Guid> ancestorsKeys)
+    private static bool TryGetAncestorsKeysFromStructure(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid childKey,
+        out IEnumerable<Guid> ancestorsKeys,
+        Guid? contentTypeKey = null)
     {
         var ancestors = new List<Guid>();
 
@@ -320,14 +417,22 @@ internal abstract class ContentNavigationServiceBase
 
         while (node.Parent is not null && structure.TryGetValue(node.Parent.Value, out node))
         {
-            ancestors.Add(node.Key);
+            // Apply contentTypeKey filter
+            if (contentTypeKey.HasValue is false || node.ContentTypeKey == contentTypeKey.Value)
+            {
+                ancestors.Add(node.Key);
+            }
         }
 
         ancestorsKeys = ancestors;
         return true;
     }
 
-    private bool TryGetSiblingsKeysFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid key, out IEnumerable<Guid> siblingsKeys)
+    private static bool TryGetSiblingsKeysFromStructure(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid key,
+        out IEnumerable<Guid> siblingsKeys,
+        Guid? contentTypeKey = null)
     {
         siblingsKeys = [];
 
@@ -339,15 +444,23 @@ internal abstract class ContentNavigationServiceBase
         if (node.Parent is null)
         {
             // To find siblings of a node at root level, we need to iterate over all items and add those with null Parent
-            siblingsKeys = structure
-                .Where(kv => kv.Value.Parent is null && kv.Key != key)
+            IEnumerable<KeyValuePair<Guid, NavigationNode>> filteredSiblings = structure
+                .Where(kv => kv.Value.Parent is null && kv.Key != key);
+
+            // Apply contentTypeKey filter
+            if (contentTypeKey.HasValue)
+            {
+                filteredSiblings = filteredSiblings.Where(kv => kv.Value.ContentTypeKey == contentTypeKey.Value);
+            }
+
+            siblingsKeys = filteredSiblings
                 .OrderBy(kv => kv.Value.SortOrder)
                 .Select(kv => kv.Key)
                 .ToList();
             return true;
         }
 
-        if (TryGetChildrenKeys(node.Parent.Value, out IEnumerable<Guid> childrenKeys) is false)
+        if (TryGetChildrenKeysFromStructure(structure, node.Parent.Value, out IEnumerable<Guid> childrenKeys, contentTypeKey) is false)
         {
             return false; // Couldn't retrieve children keys
         }
@@ -357,22 +470,31 @@ internal abstract class ContentNavigationServiceBase
         return true;
     }
 
-    private void GetDescendantsRecursively(ConcurrentDictionary<Guid, NavigationNode> structure, NavigationNode node, List<Guid> descendants)
+    private static void GetDescendantsRecursively(
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        NavigationNode node,
+        List<Guid> descendants,
+        Guid? contentTypeKey = null)
     {
-        var childrenKeys = GetOrderedChildren(node, structure).ToList();
+        // Get all children regardless of contentType
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, structure);
         foreach (Guid childKey in childrenKeys)
         {
-            descendants.Add(childKey);
+            // Apply contentTypeKey filter
+            if (contentTypeKey.HasValue is false || structure[childKey].ContentTypeKey == contentTypeKey.Value)
+            {
+                descendants.Add(childKey);
+            }
 
             // Retrieve the child node and its descendants
             if (structure.TryGetValue(childKey, out NavigationNode? childNode))
             {
-                GetDescendantsRecursively(structure, childNode, descendants);
+                GetDescendantsRecursively(structure, childNode, descendants, contentTypeKey);
             }
         }
     }
 
-    private bool TryRemoveNodeFromParentInStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid key, out NavigationNode? nodeToRemove)
+    private static bool TryRemoveNodeFromParentInStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid key, out NavigationNode? nodeToRemove)
     {
         if (structure.TryGetValue(key, out nodeToRemove) is false)
         {
@@ -392,7 +514,7 @@ internal abstract class ContentNavigationServiceBase
     {
         _recycleBinRoots.Add(node.Key);
         _roots.Remove(node.Key);
-        var childrenKeys = GetOrderedChildren(node, _navigationStructure).ToList();
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _navigationStructure);
 
         foreach (Guid childKey in childrenKeys)
         {
@@ -415,7 +537,7 @@ internal abstract class ContentNavigationServiceBase
 
     private void RemoveDescendantsRecursively(NavigationNode node)
     {
-        var childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure).ToList();
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure);
         foreach (Guid childKey in childrenKeys)
         {
             if (_recycleBinNavigationStructure.TryGetValue(childKey, out NavigationNode? childNode) is false)
@@ -436,7 +558,7 @@ internal abstract class ContentNavigationServiceBase
         }
 
         _recycleBinRoots.Remove(node.Key);
-        var childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure).ToList();
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure);
 
         foreach (Guid childKey in childrenKeys)
         {
@@ -455,20 +577,68 @@ internal abstract class ContentNavigationServiceBase
         }
     }
 
-    private IEnumerable<Guid> GetOrderedChildren(NavigationNode node, ConcurrentDictionary<Guid, NavigationNode> structure)
-        => node.Children
-            .Where(structure.ContainsKey)
-            .OrderBy(childKey => structure[childKey].SortOrder)
-            .ToList();
+    private static IReadOnlyList<Guid> GetOrderedChildren(
+        NavigationNode node,
+        ConcurrentDictionary<Guid, NavigationNode> structure,
+        Guid? contentTypeKey = null)
+    {
+        if (node.Children.Count < 1)
+        {
+            return [];
+        }
 
-    private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, IList<Guid> roots, IEnumerable<INavigationModel> entities)
+        var childrenWithSortOrder = new List<(Guid ChildNodeKey, int SortOrder)>(node.Children.Count);
+        foreach (Guid childNodeKey in node.Children)
+        {
+            if (!structure.TryGetValue(childNodeKey, out NavigationNode? childNode))
+            {
+                continue;
+            }
+
+            // Apply contentTypeKey filter
+            if (contentTypeKey.HasValue && childNode.ContentTypeKey != contentTypeKey.Value)
+            {
+                continue;
+            }
+
+            childrenWithSortOrder.Add((childNodeKey, childNode.SortOrder));
+        }
+
+        childrenWithSortOrder.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+        return childrenWithSortOrder.ConvertAll(childWithSortOrder => childWithSortOrder.ChildNodeKey);
+    }
+
+    private bool TryGetContentTypeKey(string contentTypeAlias, out Guid? contentTypeKey)
+    {
+        Dictionary<string, Guid> aliasToKeyMap = _contentTypeAliasToKeyMap.Value;
+
+        if (aliasToKeyMap.TryGetValue(contentTypeAlias, out Guid key))
+        {
+            contentTypeKey = key;
+            return true;
+        }
+
+        TContentType? contentType = _typeService.Get(contentTypeAlias);
+        if (contentType is null)
+        {
+            // Content type alias doesn't exist
+            contentTypeKey = null;
+            return false;
+        }
+
+        aliasToKeyMap.TryAdd(contentTypeAlias, contentType.Key);
+        contentTypeKey = contentType.Key;
+        return true;
+    }
+
+    private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, HashSet<Guid> roots, IEnumerable<INavigationModel> entities)
     {
         var entityList = entities.ToList();
         var idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);
 
         foreach (INavigationModel entity in entityList)
         {
-            var node = new NavigationNode(entity.Key, entity.SortOrder);
+            var node = new NavigationNode(entity.Key, entity.ContentTypeKey, entity.SortOrder);
             nodesStructure[entity.Key] = node;
 
             // We don't set the parent for items under root, it will stay null
@@ -490,4 +660,7 @@ internal abstract class ContentNavigationServiceBase
             }
         }
     }
+
+    private Dictionary<string, Guid> LoadContentTypes()
+        => _typeService.GetAll().ToDictionary(ct => ct.Alias, ct => ct.Key);
 }

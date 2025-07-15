@@ -358,7 +358,7 @@ namespace Umbraco.Cms.Core.IO
 
             // nothing prevents us to reach the file, security-wise, yet it is outside
             // this filesystem's root - throw
-            throw new UnauthorizedAccessException($"File original: [{originalPath}] full: [{path}] is outside this filesystem's root.");
+            throw new UnauthorizedAccessException($"Requested path {originalPath} is outside this filesystem's root.");
         }
 
         /// <summary>

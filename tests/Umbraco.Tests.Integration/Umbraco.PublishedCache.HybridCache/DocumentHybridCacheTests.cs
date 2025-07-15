@@ -1,19 +1,27 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
+internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
 {
-    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder.AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>();
+        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
+    }
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
@@ -76,6 +84,19 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     }
 
     [Test]
+    public async Task Cannot_get_unpublished_content()
+    {
+        // Arrange
+        var unpublishAttempt = await ContentPublishingService.UnpublishAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
+
+        //Act
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, false);
+
+        // Assert
+        Assert.IsNull(textPage);
+    }
+
+    [Test]
     public async Task Can_Get_Draft_Of_Published_Content_By_Key()
     {
         // Act
@@ -90,11 +111,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Content_By_Id()
     {
         // Arrange
-        Textpage.InvariantName = NewName;
+        Textpage.Variants = [new() { Name = NewName }];
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
-            InvariantName = NewName,
-            InvariantProperties = Textpage.InvariantProperties,
+            Properties = Textpage.Properties,
             Variants = Textpage.Variants,
             TemplateKey = Textpage.TemplateKey,
         };
@@ -111,11 +131,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Content_By_Key()
     {
         // Arrange
-        Textpage.InvariantName = NewName;
+        Textpage.Variants = [new() { Name = NewName }];
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
-            InvariantName = NewName,
-            InvariantProperties = Textpage.InvariantProperties,
+            Properties = Textpage.Properties,
             Variants = Textpage.Variants,
             TemplateKey = Textpage.TemplateKey,
         };
@@ -135,11 +154,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Published_Content_By_Id(bool preview, bool result)
     {
         // Arrange
-        PublishedTextPage.InvariantName = NewName;
+        PublishedTextPage.Variants = [new() { Name = NewName }];
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
-            InvariantName = NewName,
-            InvariantProperties = PublishedTextPage.InvariantProperties,
+            Properties = PublishedTextPage.Properties,
             Variants = PublishedTextPage.Variants,
             TemplateKey = PublishedTextPage.TemplateKey,
         };
@@ -159,11 +177,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Published_Content_By_Key(bool preview, bool result)
     {
         // Arrange
-        PublishedTextPage.InvariantName = NewName;
+        PublishedTextPage.Variants = [new() { Name = NewName }];;
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
-            InvariantName = NewName,
-            InvariantProperties = PublishedTextPage.InvariantProperties,
+            Properties = PublishedTextPage.Properties,
             Variants = PublishedTextPage.Variants,
             TemplateKey = PublishedTextPage.TemplateKey,
         };
@@ -180,7 +197,7 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Draft_Content_Property_By_Id()
     {
         // Arrange
-        var titleValue = Textpage.InvariantProperties.First(x => x.Alias == "title").Value;
+        var titleValue = Textpage.Properties.First(x => x.Alias == "title").Value;
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(TextpageId, true);
@@ -193,7 +210,7 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Draft_Content_Property_By_Key()
     {
         // Arrange
-        var titleValue = Textpage.InvariantProperties.First(x => x.Alias == "title").Value;
+        var titleValue = Textpage.Properties.First(x => x.Alias == "title").Value;
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(Textpage.Key.Value, true);
@@ -206,7 +223,7 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Published_Content_Property_By_Id()
     {
         // Arrange
-        var titleValue = PublishedTextPage.InvariantProperties.First(x => x.Alias == "title").Value;
+        var titleValue = PublishedTextPage.Properties.First(x => x.Alias == "title").Value;
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, true);
@@ -219,7 +236,7 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Published_Content_Property_By_Key()
     {
         // Arrange
-        var titleValue = PublishedTextPage.InvariantProperties.First(x => x.Alias == "title").Value;
+        var titleValue = PublishedTextPage.Properties.First(x => x.Alias == "title").Value;
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
@@ -232,7 +249,7 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Draft_Of_Published_Content_Property_By_Id()
     {
         // Arrange
-        var titleValue = PublishedTextPage.InvariantProperties.First(x => x.Alias == "title").Value;
+        var titleValue = PublishedTextPage.Properties.First(x => x.Alias == "title").Value;
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, true);
@@ -245,7 +262,7 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Draft_Of_Published_Content_Property_By_Key()
     {
         // Arrange
-        var titleValue = PublishedTextPage.InvariantProperties.First(x => x.Alias == "title").Value;
+        var titleValue = PublishedTextPage.Properties.First(x => x.Alias == "title").Value;
 
         // Act
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
@@ -258,11 +275,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Content_Property_By_Id()
     {
         // Arrange
-        Textpage.InvariantProperties.First(x => x.Alias == "title").Value = NewTitle;
+        Textpage.Properties.First(x => x.Alias == "title").Value = NewTitle;
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
-            InvariantName = Textpage.InvariantName,
-            InvariantProperties = Textpage.InvariantProperties,
+            Properties = Textpage.Properties,
             Variants = Textpage.Variants,
             TemplateKey = Textpage.TemplateKey,
         };
@@ -279,11 +295,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Content_Property_By_Key()
     {
         // Arrange
-        Textpage.InvariantProperties.First(x => x.Alias == "title").Value = NewTitle;
+        Textpage.Properties.First(x => x.Alias == "title").Value = NewTitle;
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
-            InvariantName = Textpage.InvariantName,
-            InvariantProperties = Textpage.InvariantProperties,
+            Properties = Textpage.Properties,
             Variants = Textpage.Variants,
             TemplateKey = Textpage.TemplateKey,
         };
@@ -300,11 +315,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Published_Content_Property_By_Id()
     {
         // Arrange
-        PublishedTextPage.InvariantProperties.First(x => x.Alias == "title").Value = NewTitle;
+        PublishedTextPage.Properties.First(x => x.Alias == "title").Value = NewTitle;
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
-            InvariantName = PublishedTextPage.InvariantName,
-            InvariantProperties = PublishedTextPage.InvariantProperties,
+            Properties = PublishedTextPage.Properties,
             Variants = PublishedTextPage.Variants,
             TemplateKey = PublishedTextPage.TemplateKey,
         };
@@ -322,11 +336,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Published_Content_Property_By_Key()
     {
         // Arrange
-        PublishedTextPage.InvariantProperties.First(x => x.Alias == "title").Value = NewTitle;
+        PublishedTextPage.Properties.First(x => x.Alias == "title").Value = NewTitle;
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
-            InvariantName = PublishedTextPage.InvariantName,
-            InvariantProperties = PublishedTextPage.InvariantProperties,
+            Properties = PublishedTextPage.Properties,
             Variants = PublishedTextPage.Variants,
             TemplateKey = PublishedTextPage.TemplateKey,
         };
@@ -346,11 +359,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Of_Published_Content_Property_By_Id(bool preview, string titleName)
     {
         // Arrange
-        PublishedTextPage.InvariantProperties.First(x => x.Alias == "title").Value = NewTitle;
+        PublishedTextPage.Properties.First(x => x.Alias == "title").Value = NewTitle;
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
-            InvariantName = PublishedTextPage.InvariantName,
-            InvariantProperties = PublishedTextPage.InvariantProperties,
+            Properties = PublishedTextPage.Properties,
             Variants = PublishedTextPage.Variants,
             TemplateKey = PublishedTextPage.TemplateKey,
         };
@@ -369,11 +381,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
     public async Task Can_Get_Updated_Draft_Of_Published_Content_Property_By_Key(bool preview, string titleName)
     {
         // Arrange
-        PublishedTextPage.InvariantProperties.First(x => x.Alias == "title").Value = titleName;
+        PublishedTextPage.Properties.First(x => x.Alias == "title").Value = titleName;
         ContentUpdateModel updateModel = new ContentUpdateModel
         {
-            InvariantName = PublishedTextPage.InvariantName,
-            InvariantProperties = PublishedTextPage.InvariantProperties,
+            Properties = PublishedTextPage.Properties,
             Variants = PublishedTextPage.Variants,
             TemplateKey = PublishedTextPage.TemplateKey,
         };
@@ -456,10 +467,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
             Assert.IsNotNull(textPage);
             Assert.AreEqual(Textpage.Key, textPage.Key);
             Assert.AreEqual(Textpage.ContentTypeKey, textPage.ContentType.Key);
-            Assert.AreEqual(Textpage.InvariantName, textPage.Name);
+            Assert.AreEqual(Textpage.Variants.Single().Name, textPage.Name);
         });
 
-        AssertProperties(Textpage.InvariantProperties, textPage.Properties);
+        AssertProperties(Textpage.Properties, textPage.Properties);
     }
 
     private void AssertPublishedTextPage(IPublishedContent textPage)
@@ -469,10 +480,10 @@ public class DocumentHybridCacheTests : UmbracoIntegrationTestWithContentEditing
             Assert.IsNotNull(textPage);
             Assert.AreEqual(PublishedTextPage.Key, textPage.Key);
             Assert.AreEqual(PublishedTextPage.ContentTypeKey, textPage.ContentType.Key);
-            Assert.AreEqual(PublishedTextPage.InvariantName, textPage.Name);
+            Assert.AreEqual(PublishedTextPage.Variants.Single().Name, textPage.Name);
         });
 
-        AssertProperties(PublishedTextPage.InvariantProperties, textPage.Properties);
+        AssertProperties(PublishedTextPage.Properties, textPage.Properties);
     }
 
     private void AssertProperties(IEnumerable<PropertyValueModel> propertyCollection, IEnumerable<IPublishedProperty> publishedProperties)

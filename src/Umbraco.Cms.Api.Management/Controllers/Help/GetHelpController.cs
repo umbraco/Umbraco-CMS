@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -82,6 +82,5 @@ public class GetHelpController : HelpControllerBase
         return Ok(PagedViewModel<HelpPageResponseModel>.Empty());
     }
 
-    private bool IsAllowedUrl(string? url) =>
-        _helpPageSettings.HelpPageUrlAllowList is null || _helpPageSettings.HelpPageUrlAllowList.Contains(url);
+    private bool IsAllowedUrl(string? url) => url is null || _helpPageSettings.HelpPageUrlAllowList.Contains(url);
 }

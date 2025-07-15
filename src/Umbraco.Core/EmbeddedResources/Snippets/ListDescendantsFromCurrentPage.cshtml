@@ -7,15 +7,14 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @inject IPublishedValueFallback PublishedValueFallback
 @inject IPublishedUrlProvider PublishedUrlProvider
-@inject IVariationContextAccessor VariationContextAccessor
-@inject IPublishedContentCache PublishedContentCache
 @inject IDocumentNavigationQueryService DocumentNavigationQueryService
+@inject IPublishedContentStatusFilteringService PublishedContentStatusFilteringService
 @*
     This snippet creates links for every single page (no matter how deep) below
     the page currently being viewed by the website visitor, displayed as nested unordered HTML lists.
 *@
 
-@{ var selection = Model?.Content.Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
+@{ var selection = Model?.Content.Children(DocumentNavigationQueryService, PublishedContentStatusFilteringService).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
 
 @* Ensure that the Current Page has children *@
 @if (selection?.Length > 0)
@@ -34,7 +33,7 @@
                 @* if this child page has any children, where the property umbracoNaviHide is not True *@
                 @{
                     var children = item
-                        .Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService)
+                        .Children(DocumentNavigationQueryService, PublishedContentStatusFilteringService)
                         .Where(x => x.IsVisible(PublishedValueFallback))
                         .ToArray();
 
@@ -68,7 +67,7 @@
                         @* if the page has any children, where the property umbracoNaviHide is not True *@
                         @{
                             var children = item
-                                .Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService)
+                                .Children(DocumentNavigationQueryService, PublishedContentStatusFilteringService)
                                 .Where(x => x.IsVisible(PublishedValueFallback))
                                 .ToArray();
 

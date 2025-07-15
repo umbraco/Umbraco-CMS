@@ -32,6 +32,8 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
     protected bool SkipMigration { get; init; }
 
+    protected bool ParallelizeMigration { get; init; }
+
     protected enum EditorValueHandling
     {
         IgnoreConversion,
@@ -151,25 +153,16 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
 
                 var progress = 0;
 
-                Parallel.ForEachAsync(updateBatch, async (update, token) =>
+                void HandleUpdateBatch(UpdateBatch<PropertyDataDto> update)
                 {
-                    //Foreach here, but we need to suppress the flow before each task, but not the actual await of the task
-                    Task task;
-                    using (ExecutionContext.SuppressFlow())
-                    {
-                        task = Task.Run(
-                            () =>
-                        {
-                            using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-                            scope.Complete();
+
                             using UmbracoContextReference umbracoContextReference =
                                 _umbracoContextFactory.EnsureUmbracoContext();
 
                             progress++;
                             if (progress % 100 == 0)
                             {
-                                _logger.LogInformation("  - finíshed {progress} of {total} properties", progress,
-                                    updateBatch.Count);
+                        _logger.LogInformation("  - finíshed {progress} of {total} properties", progress, updateBatch.Count);
                             }
 
                             PropertyDataDto propertyDataDto = update.Poco;
@@ -265,11 +258,37 @@ public abstract class ConvertBlockEditorPropertiesBase : MigrationBase
                             stringValue = UpdateDatabaseValue(stringValue);
 
                             propertyDataDto.TextValue = stringValue;
-                        }, token);
-                    }
+                }
 
-                    await task;
-                }).GetAwaiter().GetResult();
+                if (ParallelizeMigration is false || DatabaseType == DatabaseType.SQLite)
+                {
+                    // SQLite locks up if we run the migration in parallel, so... let's not.
+                    foreach (UpdateBatch<PropertyDataDto> update in updateBatch)
+                    {
+                        HandleUpdateBatch(update);
+                    }
+                }
+                else
+                {
+                    Parallel.ForEachAsync(updateBatch, async (update, token) =>
+                    {
+                        //Foreach here, but we need to suppress the flow before each task, but not the actuall await of the task
+                        Task task;
+                        using (ExecutionContext.SuppressFlow())
+                        {
+                            task = Task.Run(
+                                () =>
+                                {
+                                    using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                                    scope.Complete();
+                                    HandleUpdateBatch(update);
+                                },
+                                token);
+                        }
+
+                        await task;
+                    }).GetAwaiter().GetResult();
+                }
 
                 updateBatch.RemoveAll(updatesToSkip.Contains);
 

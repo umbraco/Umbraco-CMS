@@ -29,17 +29,7 @@ public interface IPackagingService : IService
     ///     Returns the advertised installed packages
     /// </summary>
     /// <returns></returns>
-    [Obsolete("Use GetAllInstalledPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
-    IEnumerable<InstalledPackage> GetAllInstalledPackages();
-
-    /// <summary>
-    ///     Returns the advertised installed packages
-    /// </summary>
-    /// <returns></returns>
-    Task<IEnumerable<InstalledPackage>> GetAllInstalledPackagesAsync()
-#pragma warning disable CS0618 // Type or member is obsolete
-        => Task.FromResult(GetAllInstalledPackages());
-#pragma warning restore CS0618 // Type or member is obsolete
+    Task<IEnumerable<InstalledPackage>> GetAllInstalledPackagesAsync();
 
     /// <summary>
     ///     Returns installed packages collected from the package migration plans.
@@ -48,20 +38,12 @@ public interface IPackagingService : IService
 
     InstalledPackage? GetInstalledPackageByName(string packageName);
 
-    [Obsolete("Use GetCreatedPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
-    IEnumerable<PackageDefinition?> GetAllCreatedPackages();
-
     /// <summary>
     ///     Returns the created packages as a paged model.
     /// </summary>
     /// <param name="skip">The amount of items to skip.</param>
     /// <param name="take">The amount of items to take.</param>
-    Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take)
-    {
-        PackageDefinition[] packages = GetAllCreatedPackages().WhereNotNull().ToArray();
-        var pagedModel = new PagedModel<PackageDefinition>(packages.Length, packages.Skip(skip).Take(take));
-        return Task.FromResult(pagedModel);
-    }
+    Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take);
 
     /// <summary>
     ///     Returns a created package by id
@@ -77,22 +59,12 @@ public interface IPackagingService : IService
     /// <returns>The package or null if the package was not found.</returns>
     Task<PackageDefinition?> GetCreatedPackageByKeyAsync(Guid key);
 
-    [Obsolete("Use DeleteCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
-    void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId);
-
     /// <summary>
     ///     Deletes a created package by key.
     /// </summary>
     /// <param name="key">The key of the package.</param>
     /// <param name="userKey">Key of the user deleting the package.</param>
     Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, Guid userKey);
-
-    /// <summary>
-    ///     Persists a package definition to storage
-    /// </summary>
-    /// <returns></returns>
-    [Obsolete("Use CreateCreatedPackageAsync or UpdateCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
-    bool SaveCreatedPackage(PackageDefinition definition);
 
     /// <summary>
     ///     Creates a new package.

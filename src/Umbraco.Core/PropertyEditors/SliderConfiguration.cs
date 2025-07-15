@@ -13,4 +13,7 @@ public class SliderConfiguration
 
     [ConfigurationField("maxVal")]
     public decimal MaximumValue { get; set; }
+
+    [ConfigurationField("step")]
+    public decimal Step { get; set; }
 }

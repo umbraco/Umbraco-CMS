@@ -39,9 +39,5 @@ public class ContentSavedWebhookEvent : WebhookEventContentBase<ContentSavedNoti
         notification.SavedEntities;
 
     protected override object? ConvertEntityToRequestPayload(IContent entity)
-    {
-        // Get preview/saved version of content
-        IPublishedContent? publishedContent = _contentCache.GetById(true, entity.Key);
-        return publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
-    }
+        => new DefaultPayloadModel { Id = entity.Key };
 }

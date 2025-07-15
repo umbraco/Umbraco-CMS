@@ -16,12 +16,41 @@ namespace Umbraco.Cms.Infrastructure.Sync;
 /// </summary>
 public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
 {
-    private readonly IRequestAccessor _requestAccessor;
     private readonly IRequestCache _requestCache;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger" /> class.
     /// </summary>
+    public BatchedDatabaseServerMessenger(
+        IMainDom mainDom,
+        CacheRefresherCollection cacheRefreshers,
+        ILogger<BatchedDatabaseServerMessenger> logger,
+        ISyncBootStateAccessor syncBootStateAccessor,
+        IHostingEnvironment hostingEnvironment,
+        ICacheInstructionService cacheInstructionService,
+        IJsonSerializer jsonSerializer,
+        IRequestCache requestCache,
+        LastSyncedFileManager lastSyncedFileManager,
+        IOptionsMonitor<GlobalSettings> globalSettings)
+        : base(
+            mainDom,
+            cacheRefreshers,
+            logger,
+            true,
+            syncBootStateAccessor,
+            hostingEnvironment,
+            cacheInstructionService,
+            jsonSerializer,
+            lastSyncedFileManager,
+            globalSettings)
+    {
+        _requestCache = requestCache;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BatchedDatabaseServerMessenger" /> class.
+    /// </summary>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V18.")]
     public BatchedDatabaseServerMessenger(
         IMainDom mainDom,
         CacheRefresherCollection cacheRefreshers,
@@ -35,11 +64,18 @@ public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
         IRequestAccessor requestAccessor,
         LastSyncedFileManager lastSyncedFileManager,
         IOptionsMonitor<GlobalSettings> globalSettings)
-        : base(mainDom, cacheRefreshers, serverRoleAccessor, logger, true, syncBootStateAccessor, hostingEnvironment,
-            cacheInstructionService, jsonSerializer, lastSyncedFileManager, globalSettings)
+        : this(
+            mainDom,
+            cacheRefreshers,
+            logger,
+            syncBootStateAccessor,
+            hostingEnvironment,
+            cacheInstructionService,
+            jsonSerializer,
+            requestCache,
+            lastSyncedFileManager,
+            globalSettings)
     {
-        _requestCache = requestCache;
-        _requestAccessor = requestAccessor;
     }
 
     /// <inheritdoc />

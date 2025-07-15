@@ -20,45 +20,12 @@ namespace Umbraco.Cms.Core.Composing;
 /// </remarks>
 public sealed class TypeLoader
 {
-    private readonly object _locko = new();
+    private readonly Lock _locko = new();
     private readonly ILogger<TypeLoader> _logger;
 
     private readonly Dictionary<CompositeTypeTypeKey, TypeList> _types = new();
 
     private IEnumerable<Assembly>? _assemblies;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="TypeLoader" /> class.
-    /// </summary>
-    [Obsolete("Please use an alternative constructor.")]
-    public TypeLoader(
-        ITypeFinder typeFinder,
-        IRuntimeHash runtimeHash,
-        IAppPolicyCache runtimeCache,
-        DirectoryInfo localTempPath,
-        ILogger<TypeLoader> logger,
-        IProfiler profiler,
-        IEnumerable<Assembly>? assembliesToScan = null)
-        : this(typeFinder, logger, assembliesToScan)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="TypeLoader" /> class.
-    /// </summary>
-    [Obsolete("Please use an alternative constructor.")]
-    public TypeLoader(
-        ITypeFinder typeFinder,
-        IRuntimeHash runtimeHash,
-        IAppPolicyCache runtimeCache,
-        DirectoryInfo localTempPath,
-        ILogger<TypeLoader> logger,
-        IProfiler profiler,
-        bool detectChanges,
-        IEnumerable<Assembly>? assembliesToScan = null)
-        : this(typeFinder, logger, assembliesToScan)
-    {
-    }
 
     public TypeLoader(
         ITypeFinder typeFinder,
@@ -100,18 +67,6 @@ public sealed class TypeLoader
     [Obsolete("This will be removed in a future version.")]
     public IEnumerable<TypeList> TypeLists => _types.Values;
 
-    /// <summary>
-    ///     Sets a type list.
-    /// </summary>
-    /// <remarks>For unit tests.</remarks>
-    // internal for tests
-    [Obsolete("This will be removed in a future version.")]
-    public void AddTypeList(TypeList typeList)
-    {
-        Type tobject = typeof(object); // CompositeTypeTypeKey does not support null values
-        _types[new CompositeTypeTypeKey(typeList.BaseType ?? tobject, typeList.AttributeType ?? tobject)] = typeList;
-    }
-
     #region Get Assembly Attributes
 
     /// <summary>
@@ -135,34 +90,6 @@ public sealed class TypeLoader
     #endregion
 
     #region Cache
-
-    // internal for tests
-    [Obsolete("This will be removed in a future version.")]
-    public Attempt<IEnumerable<string>> TryGetCached(Type baseType, Type attributeType) =>
-        Attempt<IEnumerable<string>>.Fail();
-
-    // internal for tests
-    [Obsolete("This will be removed in a future version.")]
-    public Dictionary<(string, string), IEnumerable<string>>? ReadCache() => null;
-
-    // internal for tests
-    [Obsolete("This will be removed in a future version.")]
-    public string? GetTypesListFilePath() => null;
-
-    // internal for tests
-    [Obsolete("This will be removed in a future version.")]
-    public void WriteCache()
-    {
-    }
-
-    /// <summary>
-    ///     Clears cache.
-    /// </summary>
-    /// <remarks>Generally only used for resetting cache, for example during the install process.</remarks>
-    [Obsolete("This will be removed in a future version.")]
-    public void ClearTypesCache()
-    {
-    }
 
     #endregion
 
@@ -415,11 +342,7 @@ public sealed class TypeLoader
         // if we are to cache the results, do so
         if (cache)
         {
-            var added = _types.ContainsKey(listKey) == false;
-            if (added)
-            {
-                _types[listKey] = typeList;
-            }
+            var added = _types.TryAdd(listKey, typeList);
             if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
             {
                 _logger.LogDebug("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());

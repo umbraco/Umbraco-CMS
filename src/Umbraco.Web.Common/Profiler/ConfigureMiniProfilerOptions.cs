@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using StackExchange.Profiling;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
@@ -15,8 +14,8 @@ internal sealed class ConfigureMiniProfilerOptions : IConfigureOptions<MiniProfi
 {
     private readonly string _backOfficePath;
 
-    public ConfigureMiniProfilerOptions(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
-        => _backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+    public ConfigureMiniProfilerOptions(IHostingEnvironment hostingEnvironment)
+        => _backOfficePath = hostingEnvironment.GetBackOfficePath();
 
     public void Configure(MiniProfilerOptions options)
     {
@@ -41,6 +40,5 @@ internal sealed class ConfigureMiniProfilerOptions : IConfigureOptions<MiniProfi
 
         return identity?.GetClaims(Core.Constants.Security.AllowedApplicationsClaimType)
             .InvariantContains(Core.Constants.Applications.Settings) ?? false;
-
     }
 }

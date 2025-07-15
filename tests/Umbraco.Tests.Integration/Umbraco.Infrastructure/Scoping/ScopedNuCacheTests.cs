@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Scoping;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ScopedNuCacheTests : UmbracoIntegrationTest
+internal sealed class ScopedNuCacheTests : UmbracoIntegrationTest
 {
     private IContentService ContentService => GetRequiredService<IContentService>();
     private Mock<IHttpContextAccessor> MockHttpContextAccessor { get; } = CreateMockHttpContextAccessor();

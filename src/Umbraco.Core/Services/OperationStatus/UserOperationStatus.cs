@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services.OperationStatus;
+namespace Umbraco.Cms.Core.Services.OperationStatus;
 
 /// <summary>
 /// Used to signal a user operation succeeded or an atomic failure reason
@@ -41,4 +41,5 @@ public enum UserOperationStatus
     SelfPasswordResetNotAllowed,
     DuplicateId,
     InvalidUserType,
+    InvalidUserName,
 }

@@ -28,7 +28,7 @@ public class LoadTestController : Controller
 </html>";
 
     private static readonly Random s_random = new();
-    private static readonly object s_locko = new();
+    private static readonly Lock s_locko = new();
 
     private static volatile int s_containerId = -1;
 

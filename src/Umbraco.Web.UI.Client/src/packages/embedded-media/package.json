@@ -1,0 +1,8 @@
+{
+	"name": "@umbraco-backoffice/embedded-media",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	}
+}

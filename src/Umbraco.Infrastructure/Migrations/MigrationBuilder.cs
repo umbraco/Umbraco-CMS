@@ -8,6 +8,6 @@ public class MigrationBuilder : IMigrationBuilder
 
     public MigrationBuilder(IServiceProvider container) => _container = container;
 
-    public MigrationBase Build(Type migrationType, IMigrationContext context) =>
-        (MigrationBase)_container.CreateInstance(migrationType, context);
+    public AsyncMigrationBase Build(Type migrationType, IMigrationContext context) =>
+        (AsyncMigrationBase)_container.CreateInstance(migrationType, context);
 }

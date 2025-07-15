@@ -3,7 +3,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaNavigationServiceTests
+internal sealed partial class MediaNavigationServiceTests
 {
     [Test]
     [TestCase("1CD97C02-8534-4B72-AE9E-AE52EC94CF31")] // Album

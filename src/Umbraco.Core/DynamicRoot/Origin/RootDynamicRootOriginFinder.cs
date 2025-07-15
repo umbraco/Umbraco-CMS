@@ -27,7 +27,9 @@ public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
             return null;
         }
 
-        var entity = _entityService.Get(query.Context.ParentKey);
+        // when creating new content, CurrentKey will be null - fallback to using ParentKey
+        Guid entityKey = query.Context.CurrentKey ?? query.Context.ParentKey;
+        var entity = _entityService.Get(entityKey);
 
         if (entity is null || _allowedObjectTypes.Contains(entity.NodeObjectType) is false)
         {

@@ -1,14 +1,22 @@
-﻿using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 public partial class ContentPublishingServiceTests
 {
+    public static new void ConfigureDisableUnpublishWhenReferencedTrue(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config =>
+            config.DisableUnpublishWhenReferenced = true);
+
     [Test]
     public async Task Can_Unpublish_Root()
     {
@@ -90,6 +98,40 @@ public partial class ContentPublishingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.CancelledByEvent, result.Result);
         VerifyIsPublished(Textpage.Key);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferencedTrue))]
+    public async Task Cannot_Unpublish_When_Content_Is_Related_As_A_Child_And_Configured_To_Disable_When_Related()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        VerifyIsPublished(Textpage.Key);
+
+        // Setup a relation where the page being unpublished is related to another page as a child (e.g. the other page has a picker and has selected this page).
+        RelationService.Relate(Subpage, Textpage, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+
+        var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced, result.Result);
+        VerifyIsPublished(Textpage.Key);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferencedTrue))]
+    public async Task Can_Unpublish_When_Content_Is_Related_As_A_Parent_And_Configured_To_Disable_When_Related()
+    {
+        await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        VerifyIsPublished(Textpage.Key);
+
+        // Setup a relation where the page being unpublished is related to another page as a parent (e.g. this page has a picker and has selected the other page).
+        RelationService.Relate(Textpage, Subpage, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+
+        var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        VerifyIsNotPublished(Textpage.Key);
     }
 
     [Test]
@@ -229,8 +271,6 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
-
-
     [Test]
     public async Task Can_Unpublish_Non_Mandatory_Cultures()
     {
@@ -322,5 +362,27 @@ public partial class ContentPublishingServiceTests
 
         content = ContentService.GetById(content.Key)!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
+    }
+
+    [Test]
+    public async Task Can_Unpublish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Exclusively_Provided()
+    {
+        var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "en-US" }, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public async Task Can_Unpublish_Invariant_Content_With_Cultures_Provided_If_The_Default_Culture_Is_Provided_With_Other_Cultures()
+    {
+        var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "en-US", "da-DK" }, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+    }
+
+    [Test]
+    public async Task Cannot_Unpublish_Invariant_Content_With_Cultures_Provided_That_Do_Not_Include_The_Default_Culture()
+    {
+        var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, new HashSet<string>() { "da-DK" }, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant, result.Result);
     }
 }

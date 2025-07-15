@@ -247,13 +247,6 @@ public static class BuilderExtensions
         return builder;
     }
 
-    public static T WithInvariantName<T>(this T builder, string invariantName)
-        where T : IWithInvariantNameBuilder
-    {
-        builder.InvariantName = invariantName;
-        return builder;
-    }
-
     public static T WithKey<T>(this T builder, Guid? key)
         where T : IWithKeyBuilder
     {

@@ -63,7 +63,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         get => _startContentIds;
         set
         {
-            value ??= new int[0];
+            value ??= [];
 
             BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds!, nameof(StartContentIds), _startIdsComparer);
         }

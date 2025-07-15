@@ -188,7 +188,7 @@ public class PublishedValueFallback : IPublishedValueFallback
         IPublishedProperty? property; // if we are here, content's property has no value
         do
         {
-            content = content?.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(), StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>());
+            content = content?.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(), StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
 
             IPublishedPropertyType? propertyType = content?.ContentType.GetPropertyType(alias);
 

@@ -85,7 +85,22 @@ public interface IPublicAccessService : IService
     /// </summary>
     /// <param name="key"></param>
     /// <returns>Returns null if no entry is found</returns>
+    /// <remarks>
+    /// This method supports inheritance by considering ancestor entries (if any),
+    /// if no entry is found for the specified content key.
+    /// </remarks>
     Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyAsync(Guid key);
+
+    /// <summary>
+    ///     Gets the entry defined for the content item based on a content key, without taking ancestor entries into account.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns>Returns null if no entry is found</returns>
+    /// <remarks>
+    /// This method does not support inheritance. Use <see cref="GetEntryByContentKeyAsync"/> to include ancestor entries (if any).
+    /// </remarks>
+    Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyWithoutAncestorsAsync(Guid key)
+        => Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.EntryNotFound, null));
 
     /// <summary>
     ///     Deletes the entry and all associated rules for a given key.

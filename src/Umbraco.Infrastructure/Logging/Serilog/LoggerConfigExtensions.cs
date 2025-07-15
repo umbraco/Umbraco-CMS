@@ -95,7 +95,7 @@ namespace Umbraco.Extensions
 
             //Set this environment variable - so that it can be used in external config file
             //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
-            Environment.SetEnvironmentVariable("BASEDIR", hostEnvironment.MapPathContentRoot("/").TrimEndExact("\\"), EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("BASEDIR", hostEnvironment.MapPathContentRoot("/").TrimEnd("\\"), EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("MACHINENAME", Environment.MachineName, EnvironmentVariableTarget.Process);
 
@@ -109,7 +109,7 @@ namespace Umbraco.Extensions
                 .Enrich.FromLogContext(); // allows us to dynamically enrich
 
             logConfig.WriteTo.UmbracoFile(
-                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
+                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory, loggingConfiguration.LogFileNameFormat, loggingConfiguration.GetLogFileNameFormatArguments()),
                 fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
                 restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
                 rollingInterval: umbracoFileConfiguration.RollingInterval,

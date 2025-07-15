@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
@@ -24,6 +24,8 @@ public class Webhook : EntityBase, IWebhook
                 (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),
                 enumerable => enumerable.GetHashCode());
 
+    private string? _name;
+    private string? _description;
     private string _url;
     private string[] _events;
     private Guid[] _contentTypeKeys;
@@ -37,6 +39,18 @@ public class Webhook : EntityBase, IWebhook
         _events = events ?? Array.Empty<string>();
         _contentTypeKeys = entityKeys ?? Array.Empty<Guid>();
         _enabled = enabled ?? false;
+    }
+
+    public string? Name
+    {
+        get => _name;
+        set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
+    }
+
+    public string? Description
+    {
+        get => _description;
+        set => SetPropertyValueAndDetectChanges(value, ref _description!, nameof(Description));
     }
 
     public string Url

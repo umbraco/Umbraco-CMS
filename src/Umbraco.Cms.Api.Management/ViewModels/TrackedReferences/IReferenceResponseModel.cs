@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+﻿using Umbraco.Cms.Api.Common.OpenApi;
 
-public interface IReferenceResponseModel
+namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
+
+public interface IReferenceResponseModel : IOpenApiDiscriminator
 {
     public Guid Id { get; }
 

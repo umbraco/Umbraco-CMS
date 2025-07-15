@@ -1,11 +1,9 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
@@ -20,9 +18,9 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
         IMediaService mediaService,
         IMediaTypeService mediaTypeService,
         IDataTypeService dataTypeService,
-        ISqlContext sqlContext,
+        IMediaSearchService mediaSearchService,
         IMediaPermissionAuthorizer mediaPermissionAuthorizer)
-        : base(mediaTypeService, dataTypeService, sqlContext)
+        : base(mediaTypeService, dataTypeService, mediaSearchService)
     {
         _mediaService = mediaService;
         _mediaPermissionAuthorizer = mediaPermissionAuthorizer;
@@ -48,27 +46,6 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
         }
 
         return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
-    }
-
-    protected override async Task<PagedModel<IMedia>> GetPagedChildrenAsync(int id, IQuery<IMedia>? filter, Ordering? ordering, int skip, int take)
-    {
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
-        IEnumerable<IMedia> items = await Task.FromResult(_mediaService.GetPagedChildren(
-            id,
-            pageNumber,
-            pageSize,
-            out var total,
-            filter,
-            ordering));
-
-        var pagedResult = new PagedModel<IMedia>
-        {
-            Items = items,
-            Total = total,
-        };
-
-        return pagedResult;
     }
 
     // We can use an authorizer here, as it already handles all the necessary checks for this filtering.

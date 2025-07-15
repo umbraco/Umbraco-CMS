@@ -6,5 +6,6 @@ public enum TemporaryFileOperationStatus
     FileExtensionNotAllowed = 1,
     KeyAlreadyUsed = 2,
     NotFound = 3,
-    UploadBlocked
+    UploadBlocked = 4,
+    InvalidFileName = 5,
 }

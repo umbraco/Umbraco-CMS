@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MediaHybridCacheScopeTests : UmbracoIntegrationTestWithMediaEditing
+internal sealed class MediaHybridCacheScopeTests : UmbracoIntegrationTestWithMediaEditing
 {
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 

@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
-public class ContentTypeServiceTests : UmbracoIntegrationTest
+internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 {
     private IFileService FileService => GetRequiredService<IFileService>();
 
@@ -2101,7 +2101,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         return list.ToArray();
     }
 
-    public class ContentNotificationHandler : INotificationHandler<ContentMovedToRecycleBinNotification>
+    internal sealed class ContentNotificationHandler : INotificationHandler<ContentMovedToRecycleBinNotification>
     {
         public static Action<ContentMovedToRecycleBinNotification> MovedContentToRecycleBin { get; set; }
 
@@ -2109,7 +2109,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
             MovedContentToRecycleBin?.Invoke(notification);
     }
 
-    public class ContentTypeNotificationHandler : INotificationHandler<ContentTypeDeletedNotification>
+    internal sealed class ContentTypeNotificationHandler : INotificationHandler<ContentTypeDeletedNotification>
     {
         public static Action<ContentTypeDeletedNotification> Deleted { get; set; }
         public void Handle(ContentTypeDeletedNotification notification) => Deleted?.Invoke(notification);

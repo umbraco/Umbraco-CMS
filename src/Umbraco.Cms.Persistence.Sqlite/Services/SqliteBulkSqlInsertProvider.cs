@@ -35,7 +35,7 @@ public class SqliteBulkSqlInsertProvider : IBulkSqlInsertProvider
     /// <param name="pocoData">The PocoData object corresponding to the record's type.</param>
     /// <param name="records">The records.</param>
     /// <returns>The number of records that were inserted.</returns>
-    private int BulkInsertRecordsSqlite<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
+    private static int BulkInsertRecordsSqlite<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
     {
         var count = 0;
         var inTrans = database.InTransaction;

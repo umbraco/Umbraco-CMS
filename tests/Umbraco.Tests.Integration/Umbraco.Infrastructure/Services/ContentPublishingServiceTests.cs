@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -17,6 +19,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithContent
 {
     private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
+
+    private IRelationService RelationService => GetRequiredService<IRelationService>();
 
     private static readonly ISet<string> _allCultures = new HashSet<string>(){ "*" };
 
@@ -109,6 +113,41 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         return (langEn, langDa, contentType);
     }
 
+    private async Task<IContentType> SetupVariantInvariantTest()
+    {
+        var langDa = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .Build();
+        await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
+
+        var key = Guid.NewGuid();
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("variantInvariantContent")
+            .WithName("Variant Invariant Content")
+            .WithKey(key)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddAllowedContentType()
+            .WithKey(key)
+            .WithAlias("variantInvariantContent")
+            .Done()
+            .AddPropertyType()
+            .WithAlias("variantValue")
+            .WithVariations(ContentVariation.Culture)
+            .WithMandatory(true)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("invariantValue")
+            .WithVariations(ContentVariation.Nothing)
+            .WithMandatory(true)
+            .Done()
+            .Build();
+
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
+
+        return contentType;
+    }
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
         => builder
             .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
@@ -132,4 +171,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         public void Handle(ContentUnpublishingNotification notification) => UnpublishingContent?.Invoke(notification);
     }
+
+    public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config => config.AllowEditInvariantFromNonDefault = true);
 }

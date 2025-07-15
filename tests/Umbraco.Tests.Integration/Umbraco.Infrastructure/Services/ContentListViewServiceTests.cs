@@ -11,7 +11,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
-public class ContentListViewServiceTests : ContentListViewServiceTestsBase
+internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsBase
 {
     private static readonly Guid CustomListViewKey = new("AD8E2AAF-6801-408A-8CCF-EFAC0312729B");
 
@@ -66,7 +66,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
         var createModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
-            InvariantName = "Page",
+            Variants = [new () { Name = "Page" }]
         };
 
         var createResult = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -718,7 +718,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
         var createModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
-            InvariantName = "Page",
+            Variants = [new () { Name = "Page" }]
         };
 
         // Content that serves as a start node
@@ -857,7 +857,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
         {
             ContentTypeKey = contentTypeWithListViewPropertyType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Products",
+            Variants = [new () { Name = "Products" }]
         };
 
         var result = await ContentEditingService.CreateAsync(rootContentCreateModel, Constants.Security.SuperUserKey);
@@ -869,13 +869,13 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             {
                 ContentTypeKey = childContentType.Key,
                 ParentKey = root.Key,
-                InvariantName = $"Item {i}",
+                Variants = [new () { Name = $"Item {i}" }],
                 Key = i.ToGuid(),
-                InvariantProperties = new[]
-                {
+                Properties =
+                [
                     new PropertyValueModel { Alias = "itemName", Value = $"Item {i}" },
-                    new PropertyValueModel { Alias = "price", Value = i * 10 },
-                },
+                    new PropertyValueModel { Alias = "price", Value = i * 10 }
+                ],
             };
 
             await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
@@ -910,7 +910,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
         {
             ContentTypeKey = contentTypeWithListView.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Products",
+            Variants = [new () { Name = "Products" }]
         };
 
         var result = await ContentEditingService.CreateAsync(rootContentCreateModel, Constants.Security.SuperUserKey);
@@ -922,7 +922,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             {
                 ContentTypeKey = childContentType.Key,
                 ParentKey = root.Key,
-                InvariantName = $"Item {i}",
+                Variants = [new () { Name = $"Item {i}" }],
                 Key = i.ToGuid(),
             };
 
@@ -963,19 +963,18 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
         var rootContentCreateModel = new ContentCreateModel
         {
             ContentTypeKey = contentTypeWithListView.Key,
+            Properties = [],
             Variants = new[]
             {
                 new VariantModel
                 {
                     Culture = "en-US",
                     Name = "English Page",
-                    Properties = Enumerable.Empty<PropertyValueModel>(),
                 },
                 new VariantModel
                 {
                     Culture = "da-DK",
                     Name = "Danish Page",
-                    Properties = Enumerable.Empty<PropertyValueModel>(),
                 },
             },
         };
@@ -989,19 +988,18 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             {
                 ContentTypeKey = childContentType.Key,
                 ParentKey = root.Key,
+                Properties = [],
                 Variants = new[]
                 {
                     new VariantModel
                     {
                         Culture = "en-US",
                         Name = $"Child item {i}",
-                        Properties = Enumerable.Empty<PropertyValueModel>(),
                     },
                     new VariantModel
                     {
                         Culture = "da-DK",
                         Name = $"(DA) Child item {5 - i}",
-                        Properties = Enumerable.Empty<PropertyValueModel>(),
                     },
                 },
             };

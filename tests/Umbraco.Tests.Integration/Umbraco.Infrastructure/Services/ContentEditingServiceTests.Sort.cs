@@ -55,7 +55,7 @@ public partial class ContentEditingServiceTests
             await ContentEditingService.CreateAsync(
                 new ContentCreateModel
                 {
-                    ContentTypeKey = rootContentType.Key, InvariantName = $"Root {i}", ParentKey = Constants.System.RootKey,
+                    ContentTypeKey = rootContentType.Key, Variants = [new () { Name = $"Root {i}" }], ParentKey = Constants.System.RootKey,
                 },
                 Constants.Security.SuperUserKey);
         }
@@ -130,7 +130,7 @@ public partial class ContentEditingServiceTests
         var root = (await ContentEditingService.CreateAsync(
             new ContentCreateModel
             {
-                ContentTypeKey = rootContentType.Key, InvariantName = "Root", ParentKey = Constants.System.RootKey,
+                ContentTypeKey = rootContentType.Key, Variants = [new () { Name = "Root" }], ParentKey = Constants.System.RootKey,
             },
             Constants.Security.SuperUserKey)).Result.Content!;
 
@@ -140,7 +140,7 @@ public partial class ContentEditingServiceTests
             {
                 ContentTypeKey = childContentType.Key,
                 ParentKey = root.Key,
-                InvariantName = $"Child {i}",
+                Variants = [new () { Name = $"Child {i}" }]
             };
 
             await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);

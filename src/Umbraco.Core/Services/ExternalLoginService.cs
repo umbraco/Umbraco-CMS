@@ -5,21 +5,40 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
 public class ExternalLoginService : RepositoryService, IExternalLoginWithKeyService
 {
     private readonly IExternalLoginWithKeyRepository _externalLoginRepository;
+    private readonly IUserRepository _userRepository;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
     public ExternalLoginService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IExternalLoginWithKeyRepository externalLoginRepository)
-        : base(provider, loggerFactory, eventMessagesFactory) =>
+        : this(
+              provider,
+              loggerFactory,
+              eventMessagesFactory,
+              externalLoginRepository,
+              StaticServiceProvider.Instance.GetRequiredService<IUserRepository>())
+    {
+    }
+
+    public ExternalLoginService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IExternalLoginWithKeyRepository externalLoginRepository,
+        IUserRepository userRepository)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
         _externalLoginRepository = externalLoginRepository;
+        _userRepository = userRepository;
+    }
 
     public IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey)
     {
@@ -77,6 +96,17 @@ public class ExternalLoginService : RepositoryService, IExternalLoginWithKeyServ
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             _externalLoginRepository.DeleteUserLogins(userOrMemberKey);
+            scope.Complete();
+        }
+    }
+
+    /// <inheritdoc />
+    public void PurgeLoginsForRemovedProviders(IEnumerable<string> currentLoginProviders)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            _userRepository.InvalidateSessionsForRemovedProviders(currentLoginProviders);
+            _externalLoginRepository.DeleteUserLoginsForRemovedProviders(currentLoginProviders);
             scope.Complete();
         }
     }

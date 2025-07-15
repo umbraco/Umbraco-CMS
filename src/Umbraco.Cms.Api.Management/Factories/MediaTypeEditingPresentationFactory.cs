@@ -23,10 +23,12 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
         >(requestModel);
 
         createModel.Key = requestModel.Id;
-        createModel.ContainerKey = requestModel.Parent?.Id;
         createModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedMediaTypes);
-        createModel.Compositions = MapCompositions(requestModel.Compositions);
         createModel.ListView = requestModel.Collection?.Id;
+
+        IDictionary<Guid, ViewModels.ContentType.CompositionType> compositionTypesByKey = CompositionTypesByKey(requestModel.Compositions);
+        createModel.Compositions = MapCompositions(compositionTypesByKey);
+        createModel.ContainerKey = CalculateCreateContainerKey(requestModel.Parent, compositionTypesByKey);
 
         return createModel;
     }
@@ -42,7 +44,8 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
         >(requestModel);
 
         updateModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedMediaTypes);
-        updateModel.Compositions = MapCompositions(requestModel.Compositions);
+        updateModel.Compositions = MapCompositions(CompositionTypesByKey(requestModel.Compositions));
+
         updateModel.ListView = requestModel.Collection?.Id;
 
         return updateModel;
@@ -56,8 +59,8 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
             .DistinctBy(t => t.MediaType.Id)
             .ToDictionary(t => t.MediaType.Id, t => t.SortOrder));
 
-    private IEnumerable<Composition> MapCompositions(IEnumerable<MediaTypeComposition> documentTypeCompositions)
-        => MapCompositions(documentTypeCompositions
+    private IDictionary<Guid, ViewModels.ContentType.CompositionType> CompositionTypesByKey(IEnumerable<MediaTypeComposition> documentTypeCompositions)
+        => documentTypeCompositions
             .DistinctBy(c => c.MediaType.Id)
-            .ToDictionary(c => c.MediaType.Id, c => c.CompositionType));
+            .ToDictionary(c => c.MediaType.Id, c => c.CompositionType);
 }

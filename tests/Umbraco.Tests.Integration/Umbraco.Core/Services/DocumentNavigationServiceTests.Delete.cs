@@ -3,7 +3,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class DocumentNavigationServiceTests
+internal sealed partial class DocumentNavigationServiceTests
 {
     [Test]
     [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
@@ -63,7 +63,7 @@ public partial class DocumentNavigationServiceTests
 
         // Create a new sibling under the same parent
         var key = Guid.NewGuid();
-        var createModel = CreateContentCreateModel("Child 4", key, Root.Key);
+        var createModel = CreateContentCreateModel("Child 4", key, parentKey: Root.Key);
         await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         DocumentNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> siblingsKeysAfterCreation);

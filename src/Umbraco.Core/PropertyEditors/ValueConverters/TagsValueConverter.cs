@@ -23,23 +23,6 @@ public class TagsValueConverter : PropertyValueConverterBase
     public TagsValueConverter(IJsonSerializer jsonSerializer)
         => _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TagsValueConverter" /> class.
-    /// </summary>
-    /// <param name="dataTypeService">The data type service.</param>
-    /// <param name="jsonSerializer">The JSON serializer.</param>
-    [Obsolete("The IDataTypeService is not used anymore. This constructor will be removed in a future version.")]
-    public TagsValueConverter(IDataTypeService dataTypeService, IJsonSerializer jsonSerializer)
-        : this(jsonSerializer)
-    { }
-
-    /// <summary>
-    /// Clears the data type configuration caches.
-    /// </summary>
-    [Obsolete("Caching of data type configuration is not done anymore. This method will be removed in a future version.")]
-    public static void ClearCaches()
-    { }
-
     /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Tags);

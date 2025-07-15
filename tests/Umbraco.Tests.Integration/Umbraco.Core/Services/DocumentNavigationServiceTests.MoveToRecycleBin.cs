@@ -3,7 +3,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class DocumentNavigationServiceTests
+internal sealed partial class DocumentNavigationServiceTests
 {
     [Test]
     public async Task Parent_And_Descendants_Are_Updated_When_Content_Is_Moved_To_Recycle_Bin()
@@ -70,7 +70,7 @@ public partial class DocumentNavigationServiceTests
 
         // Create a new sibling under the same parent
         var key = Guid.NewGuid();
-        var createModel = CreateContentCreateModel("Child 4", key, Root.Key);
+        var createModel = CreateContentCreateModel("Child 4", key, parentKey: Root.Key);
         await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         DocumentNavigationQueryService.TryGetSiblingsKeys(node, out IEnumerable<Guid> siblingsKeysAfterCreation);
@@ -93,7 +93,7 @@ public partial class DocumentNavigationServiceTests
 
         // Create a new grandchild under Child1
         var key = Guid.NewGuid();
-        var createModel = CreateContentCreateModel("Grandchild 3", key, nodeToMoveToRecycleBin);
+        var createModel = CreateContentCreateModel("Grandchild 3", key, parentKey: nodeToMoveToRecycleBin);
         await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         DocumentNavigationQueryService.TryGetChildrenKeys(nodeToMoveToRecycleBin, out IEnumerable<Guid> childrenKeysBeforeDeletion);

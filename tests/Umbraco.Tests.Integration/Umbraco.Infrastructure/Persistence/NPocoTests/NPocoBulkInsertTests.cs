@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
 // TODO: npoco - is this still appropriate?
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class NPocoBulkInsertTests : UmbracoIntegrationTest
+internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
 {
     private readonly TestHelper _testHelper = new();
 

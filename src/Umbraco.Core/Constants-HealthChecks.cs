@@ -49,8 +49,6 @@ public static partial class Constants
                 public const string ClickJackingCheck = "https://umbra.co/healthchecks-click-jacking";
                 public const string HstsCheck = "https://umbra.co/healthchecks-hsts";
                 public const string NoSniffCheck = "https://umbra.co/healthchecks-no-sniff";
-                [Obsolete("This link is not used anymore in the XSS protected check.")]
-                public const string XssProtectionCheck = "https://umbra.co/healthchecks-xss-protection";
                 public const string ExcessiveHeadersCheck = "https://umbra.co/healthchecks-excessive-headers";
                 public const string CspHeaderCheck = "https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP";
 

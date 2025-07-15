@@ -12,26 +12,22 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 [TestFixture]
 public class UmbracoRequestPathsTests
 {
+    private IWebHostEnvironment _hostEnvironment;
+    private UmbracoRequestPathsOptions _umbracoRequestPathsOptions;
+
     [OneTimeSetUp]
     public void Setup()
     {
         _hostEnvironment = Mock.Of<IWebHostEnvironment>();
-        _globalSettings = new GlobalSettings();
         _umbracoRequestPathsOptions = new UmbracoRequestPathsOptions();
     }
-
-    private IWebHostEnvironment _hostEnvironment;
-    private GlobalSettings _globalSettings;
-    private UmbracoRequestPathsOptions _umbracoRequestPathsOptions;
 
     private IHostingEnvironment CreateHostingEnvironment(string virtualPath = "")
     {
         var hostingSettings = new HostingSettings { ApplicationVirtualPath = virtualPath };
         var webRoutingSettings = new WebRoutingSettings();
-        var mockedOptionsMonitorOfHostingSettings =
-            Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
-        var mockedOptionsMonitorOfWebRoutingSettings =
-            Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings);
+        var mockedOptionsMonitorOfHostingSettings = Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
+        var mockedOptionsMonitorOfWebRoutingSettings = Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings);
 
         return new TestHostingEnvironment(
             mockedOptionsMonitorOfHostingSettings,
@@ -50,7 +46,7 @@ public class UmbracoRequestPathsTests
     public void Is_Client_Side_Request(string url, bool assert)
     {
         var hostingEnvironment = CreateHostingEnvironment();
-        var umbracoRequestPaths = new UmbracoRequestPaths(Options.Create(_globalSettings), hostingEnvironment, Options.Create(_umbracoRequestPathsOptions));
+        var umbracoRequestPaths = new UmbracoRequestPaths(hostingEnvironment, Options.Create(_umbracoRequestPathsOptions));
 
         var uri = new Uri("http://test.com" + url);
         var result = umbracoRequestPaths.IsClientSideRequest(uri.AbsolutePath);
@@ -61,7 +57,7 @@ public class UmbracoRequestPathsTests
     public void Is_Client_Side_Request_InvalidPath_ReturnFalse()
     {
         var hostingEnvironment = CreateHostingEnvironment();
-        var umbracoRequestPaths = new UmbracoRequestPaths(Options.Create(_globalSettings), hostingEnvironment, Options.Create(_umbracoRequestPathsOptions));
+        var umbracoRequestPaths = new UmbracoRequestPaths(hostingEnvironment, Options.Create(_umbracoRequestPathsOptions));
 
         // This URL is invalid. Default to false when the extension cannot be determined
         var uri = new Uri("http://test.com/installing-modules+foobar+\"yipee\"");
@@ -93,7 +89,7 @@ public class UmbracoRequestPathsTests
     {
         var source = new Uri(input);
         var hostingEnvironment = CreateHostingEnvironment(virtualPath);
-        var umbracoRequestPaths = new UmbracoRequestPaths(Options.Create(_globalSettings), hostingEnvironment, Options.Create(_umbracoRequestPathsOptions));
+        var umbracoRequestPaths = new UmbracoRequestPaths(hostingEnvironment, Options.Create(_umbracoRequestPathsOptions));
         Assert.AreEqual(expected, umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath));
     }
 
@@ -105,9 +101,11 @@ public class UmbracoRequestPathsTests
     {
         var source = new Uri(input);
         var hostingEnvironment = CreateHostingEnvironment();
-        var umbracoRequestPathsOptions = new UmbracoRequestPathsOptions();
-        umbracoRequestPathsOptions.IsBackOfficeRequest = _ => true;
-        var umbracoRequestPaths = new UmbracoRequestPaths(Options.Create(_globalSettings), hostingEnvironment, Options.Create(umbracoRequestPathsOptions));
+        var umbracoRequestPathsOptions = new UmbracoRequestPathsOptions
+        {
+            IsBackOfficeRequest = _ => true
+        };
+        var umbracoRequestPaths = new UmbracoRequestPaths(hostingEnvironment, Options.Create(umbracoRequestPathsOptions));
         Assert.AreEqual(expected, umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath));
     }
 }

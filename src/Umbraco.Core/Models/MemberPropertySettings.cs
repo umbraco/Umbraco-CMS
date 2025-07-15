@@ -10,4 +10,6 @@ public class MemberPropertySettings
     public ISet<string> ReservedFieldNames => _reservedFieldNames;
 
     public bool AddReservedFieldName(string name) => _reservedFieldNames.Add(name);
+
+    public void AddReservedFieldNames(ISet<string> names) => _reservedFieldNames.UnionWith(names);
 }

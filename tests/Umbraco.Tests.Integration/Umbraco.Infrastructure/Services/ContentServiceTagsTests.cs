@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
     PublishedRepositoryEvents = true,
     WithApplication = true,
     Logger = UmbracoTestOptions.Logger.Console)]
-public class ContentServiceTagsTests : UmbracoIntegrationTest
+internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
@@ -686,7 +686,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Save(child2);
 
         // Act
-        ContentService.PublishBranch(content, true, content.AvailableCultures.ToArray());
+        ContentService.PublishBranch(content, PublishBranchFilter.IncludeUnpublished, content.AvailableCultures.ToArray());
 
         // Assert
         var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;

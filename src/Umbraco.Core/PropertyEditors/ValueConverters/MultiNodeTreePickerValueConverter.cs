@@ -115,7 +115,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
                                     udi,
                                     ref objectType,
                                     UmbracoObjectTypes.Document,
-                                    id => _contentCache.GetById(guidUdi.Guid));
+                                    id => _contentCache.GetById(preview, guidUdi.Guid));
                                 break;
                             case Constants.UdiEntityType.Media:
                                 multiNodeTreePickerItem = GetPublishedContent(
@@ -131,7 +131,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
                                     UmbracoObjectTypes.Member,
                                     id =>
                                     {
-                                        IMember? m = _memberService.GetByKey(guidUdi.Guid);
+                                        IMember? m = _memberService.GetById(guidUdi.Guid);
                                         if (m == null)
                                         {
                                             return null;
@@ -205,7 +205,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         {
             Constants.UdiEntityType.Document => entityTypeUdis.Select(udi =>
             {
-                IPublishedContent? content = _contentCache.GetById(udi.Guid);
+                IPublishedContent? content = _contentCache.GetById(preview, udi.Guid);
                 return content != null
                     ? _apiContentBuilder.Build(content)
                     : null;

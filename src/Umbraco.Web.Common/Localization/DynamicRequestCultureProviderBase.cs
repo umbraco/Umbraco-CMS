@@ -12,8 +12,8 @@ namespace Umbraco.Cms.Web.Common.Localization;
 public abstract class DynamicRequestCultureProviderBase : RequestCultureProvider
 {
     private readonly RequestLocalizationOptions _options;
-    private readonly object _lockerSupportedCultures = new();
-    private readonly object _lockerSupportedUICultures = new();
+    private readonly Lock _lockerSupportedCultures = new();
+    private readonly Lock _lockerSupportedUICultures = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DynamicRequestCultureProviderBase" /> class.
@@ -66,7 +66,7 @@ public abstract class DynamicRequestCultureProviderBase : RequestCultureProvider
     /// <param name="cultures">The cultures.</param>
     /// <param name="locker">The locker object to use.</param>
     /// <param name="addAction">The add action to execute.</param>
-    private static void TryAddLocked(IEnumerable<CultureInfo>? supportedCultures, IEnumerable<StringSegment> cultures, object locker, Action<StringSegment> addAction)
+    private static void TryAddLocked(IEnumerable<CultureInfo>? supportedCultures, IEnumerable<StringSegment> cultures, Lock locker, Action<StringSegment> addAction)
     {
         foreach (StringSegment culture in cultures)
         {

@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class TagServiceTests : UmbracoIntegrationTest
+internal sealed class TagServiceTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void CreateTestData()

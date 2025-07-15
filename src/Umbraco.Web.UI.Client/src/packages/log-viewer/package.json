@@ -1,0 +1,8 @@
+{
+	"name": "@umbraco-backoffice/log-viewer",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	}
+}

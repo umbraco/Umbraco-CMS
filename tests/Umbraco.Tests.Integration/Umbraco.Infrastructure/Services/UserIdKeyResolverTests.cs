@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class UserIdKeyResolverTests : UmbracoIntegrationTest
+internal sealed class UserIdKeyResolverTests : UmbracoIntegrationTest
 {
     private IUserService UserService => GetRequiredService<IUserService>();
 
@@ -75,14 +75,16 @@ public class UserIdKeyResolverTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Unknown_Key_Throws()
+    public Task Unknown_Key_Throws()
     {
         Assert.ThrowsAsync<InvalidOperationException>(async () => await UserIdKeyResolver.GetAsync(Guid.NewGuid()));
+        return Task.CompletedTask;
     }
 
     [Test]
-    public async Task Unknown_Id_Throws()
+    public Task Unknown_Id_Throws()
     {
-         Assert.ThrowsAsync<InvalidOperationException>(async () => await UserIdKeyResolver.GetAsync(1234567890));
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await UserIdKeyResolver.GetAsync(1234567890));
+        return Task.CompletedTask;
     }
 }

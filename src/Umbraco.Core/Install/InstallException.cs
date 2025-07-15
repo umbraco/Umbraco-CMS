@@ -6,7 +6,6 @@ namespace Umbraco.Cms.Core.Install;
 ///     Used for steps to be able to return a JSON structure back to the UI.
 /// </summary>
 /// <seealso cref="System.Exception" />
-[Serializable]
 public class InstallException : Exception
 {
     /// <summary>
@@ -62,21 +61,6 @@ public class InstallException : Exception
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="InstallException" /> class.
-    /// </summary>
-    /// <param name="info">
-    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
-    ///     data about the exception being thrown.
-    /// </param>
-    /// <param name="context">
-    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
-    ///     information about the source or destination.
-    /// </param>
-    protected InstallException(SerializationInfo info, StreamingContext context)
-        : base(info, context) =>
-        View = info.GetString(nameof(View));
-
-    /// <summary>
     ///     Gets the view.
     /// </summary>
     /// <value>
@@ -94,29 +78,4 @@ public class InstallException : Exception
     ///     This object is not included when serializing.
     /// </remarks>
     public object? ViewModel { get; private set; }
-
-    /// <summary>
-    ///     When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with
-    ///     information about the exception.
-    /// </summary>
-    /// <param name="info">
-    ///     The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object
-    ///     data about the exception being thrown.
-    /// </param>
-    /// <param name="context">
-    ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
-    ///     information about the source or destination.
-    /// </param>
-    /// <exception cref="ArgumentNullException">info</exception>
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-        if (info == null)
-        {
-            throw new ArgumentNullException(nameof(info));
-        }
-
-        info.AddValue(nameof(View), View);
-
-        base.GetObjectData(info, context);
-    }
 }

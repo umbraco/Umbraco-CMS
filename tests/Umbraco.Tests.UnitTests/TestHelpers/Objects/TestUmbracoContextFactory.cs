@@ -21,36 +21,15 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
 public class TestUmbracoContextFactory
 {
     public static IUmbracoContextFactory Create(
-        GlobalSettings globalSettings = null,
         IUmbracoContextAccessor umbracoContextAccessor = null,
         IHttpContextAccessor httpContextAccessor = null,
         IPublishedUrlProvider publishedUrlProvider = null,
         UmbracoRequestPathsOptions umbracoRequestPathsOptions = null)
     {
-        if (globalSettings == null)
-        {
-            globalSettings = new GlobalSettings();
-        }
-
-        if (umbracoContextAccessor == null)
-        {
-            umbracoContextAccessor = new TestUmbracoContextAccessor();
-        }
-
-        if (httpContextAccessor == null)
-        {
-            httpContextAccessor = Mock.Of<IHttpContextAccessor>();
-        }
-
-        if (publishedUrlProvider == null)
-        {
-            publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
-        }
-
-        if (umbracoRequestPathsOptions == null)
-        {
-            umbracoRequestPathsOptions = new UmbracoRequestPathsOptions();
-        }
+        umbracoContextAccessor ??= new TestUmbracoContextAccessor();
+        httpContextAccessor ??= Mock.Of<IHttpContextAccessor>();
+        publishedUrlProvider ??= Mock.Of<IPublishedUrlProvider>();
+        umbracoRequestPathsOptions ??= new UmbracoRequestPathsOptions();
 
         var contentCache = new Mock<IPublishedContentCache>();
         var mediaCache = new Mock<IPublishedMediaCache>();
@@ -62,7 +41,7 @@ public class TestUmbracoContextFactory
 
         var umbracoContextFactory = new UmbracoContextFactory(
             umbracoContextAccessor,
-            new UmbracoRequestPaths(Options.Create(globalSettings), hostingEnvironment, Options.Create(umbracoRequestPathsOptions)),
+            new UmbracoRequestPaths(hostingEnvironment, Options.Create(umbracoRequestPathsOptions)),
             hostingEnvironment,
             new UriUtility(hostingEnvironment),
             new AspNetCoreCookieManager(httpContextAccessor),

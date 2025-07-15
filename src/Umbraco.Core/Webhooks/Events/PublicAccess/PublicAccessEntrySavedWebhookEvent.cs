@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -21,5 +22,5 @@ public class PublicAccessEntrySavedWebhookEvent : WebhookEventBase<PublicAccessE
     public override string Alias => Constants.WebhookEvents.Aliases.PublicAccessEntrySaved;
 
     public override object? ConvertNotificationToRequestPayload(PublicAccessEntrySavedNotification notification)
-        => notification.SavedEntities;
+        => notification.SavedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

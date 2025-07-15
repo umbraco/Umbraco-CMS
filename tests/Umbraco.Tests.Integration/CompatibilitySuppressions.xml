@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Updating_Single_Variant_Name_Does_Not_Change_Update_Dates_Of_Other_Vaiants</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+</Suppressions>

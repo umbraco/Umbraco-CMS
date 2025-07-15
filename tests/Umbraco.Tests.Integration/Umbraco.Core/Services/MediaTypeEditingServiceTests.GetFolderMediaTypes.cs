@@ -1,10 +1,10 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaTypeEditingServiceTests
+internal sealed partial class MediaTypeEditingServiceTests
 {
     [Test]
     public async Task Can_Get_Default_Folder_Media_Type()

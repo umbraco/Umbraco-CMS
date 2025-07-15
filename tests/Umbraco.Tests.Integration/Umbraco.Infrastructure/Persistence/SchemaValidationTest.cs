@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
-public class SchemaValidationTest : UmbracoIntegrationTest
+internal sealed class SchemaValidationTest : UmbracoIntegrationTest
 {
     private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
 

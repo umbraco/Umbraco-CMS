@@ -1,5 +1,4 @@
-﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -9,7 +8,6 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
@@ -32,10 +30,11 @@ public class AllowedChildrenDocumentTypeController : DocumentTypeControllerBase
     public async Task<IActionResult> AllowedChildrenByKey(
         CancellationToken cancellationToken,
         Guid id,
+        Guid? parentContentKey = null,
         int skip = 0,
         int take = 100)
     {
-        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> attempt = await _contentTypeService.GetAllowedChildrenAsync(id, skip, take);
+        Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> attempt = await _contentTypeService.GetAllowedChildrenAsync(id, parentContentKey, skip, take);
         if (attempt.Success is false)
         {
             return OperationStatusResult(attempt.Status);

@@ -58,7 +58,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
         return new SqlServerDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout.Value);
     }
 
-    private class SqlServerDistributedLock : IDistributedLock
+    private sealed class SqlServerDistributedLock : IDistributedLock
     {
         private readonly SqlServerDistributedLockingMechanism _parent;
         private readonly TimeSpan _timeout;

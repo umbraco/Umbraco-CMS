@@ -18,9 +18,9 @@ public class DeleteByKeyRedirectUrlManagementController : RedirectUrlManagementC
     [MapToApiVersion("1.0")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteByKey(CancellationToken cancellationToken, Guid id)
+    public Task<IActionResult> DeleteByKey(CancellationToken cancellationToken, Guid id)
     {
         _redirectUrlService.Delete(id);
-        return Ok();
+        return Task.FromResult<IActionResult>(Ok());
     }
 }

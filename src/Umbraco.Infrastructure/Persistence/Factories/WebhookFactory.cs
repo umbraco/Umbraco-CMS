@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -16,6 +16,8 @@ internal static class WebhookFactory
         {
             Id = dto.Id,
             Key = dto.Key,
+            Name = dto.Name,
+            Description = dto.Description,
         };
 
         return entity;
@@ -25,10 +27,12 @@ internal static class WebhookFactory
     {
         var dto = new WebhookDto
         {
-            Url = webhook.Url,
-            Key = webhook.Key,
-            Enabled = webhook.Enabled,
             Id = webhook.Id,
+            Key = webhook.Key,
+            Name = webhook.Name,
+            Description = webhook.Description,
+            Url = webhook.Url,
+            Enabled = webhook.Enabled,
         };
 
         return dto;

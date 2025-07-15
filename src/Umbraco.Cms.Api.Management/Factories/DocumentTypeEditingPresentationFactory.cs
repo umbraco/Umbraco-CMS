@@ -25,12 +25,14 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
         MapCleanup(createModel, requestModel.Cleanup);
 
         createModel.Key = requestModel.Id;
-        createModel.ContainerKey = requestModel.Parent?.Id;
         createModel.AllowedTemplateKeys = requestModel.AllowedTemplates.Select(reference => reference.Id).ToArray();
         createModel.DefaultTemplateKey = requestModel.DefaultTemplate?.Id;
         createModel.ListView = requestModel.Collection?.Id;
         createModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedDocumentTypes);
-        createModel.Compositions = MapCompositions(requestModel.Compositions);
+
+        IDictionary<Guid, ViewModels.ContentType.CompositionType> compositionTypesByKey = CompositionTypesByKey(requestModel.Compositions);
+        createModel.Compositions = MapCompositions(compositionTypesByKey);
+        createModel.ContainerKey = CalculateCreateContainerKey(requestModel.Parent, compositionTypesByKey);
 
         return createModel;
     }
@@ -51,7 +53,7 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
         updateModel.DefaultTemplateKey = requestModel.DefaultTemplate?.Id;
         updateModel.ListView = requestModel.Collection?.Id;
         updateModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedDocumentTypes);
-        updateModel.Compositions = MapCompositions(requestModel.Compositions);
+        updateModel.Compositions = MapCompositions(CompositionTypesByKey(requestModel.Compositions));
 
         return updateModel;
     }
@@ -72,8 +74,8 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
             .DistinctBy(t => t.DocumentType.Id)
             .ToDictionary(t => t.DocumentType.Id, t => t.SortOrder));
 
-    private IEnumerable<Composition> MapCompositions(IEnumerable<DocumentTypeComposition> documentTypeCompositions)
-        => MapCompositions(documentTypeCompositions
+    private IDictionary<Guid, ViewModels.ContentType.CompositionType> CompositionTypesByKey(IEnumerable<DocumentTypeComposition> documentTypeCompositions)
+        => documentTypeCompositions
             .DistinctBy(c => c.DocumentType.Id)
-            .ToDictionary(c => c.DocumentType.Id, c => c.CompositionType));
+            .ToDictionary(c => c.DocumentType.Id, c => c.CompositionType);
 }
