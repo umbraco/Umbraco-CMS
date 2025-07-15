@@ -220,9 +220,6 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 				display: block;
 			}
 
-			umb-entity-item-ref[drag-placeholder] {
-				opacity: 0.2;
-			}
 		`,
 	];
 }
