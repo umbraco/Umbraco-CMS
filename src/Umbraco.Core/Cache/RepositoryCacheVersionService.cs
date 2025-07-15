@@ -35,13 +35,6 @@ public class RepositoryCacheVersionService : IRepositoryCacheVersionService
         scope.ReadLock(Constants.Locks.CacheVersion);
 
         var cacheKey = GetCacheKey<TEntity>();
-        if (_cacheVersions.TryGetValue(cacheKey, out Guid localVersion) is false)
-        {
-            _logger.LogDebug("Cache for {EntityType} is not initialized, considering it synced", typeof(TEntity).Name);
-
-            // We're not initialized yet, so cache is empty, which means cache is synced.
-            return true;
-        }
 
         RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionRepository.GetAsync(cacheKey);
 
@@ -50,6 +43,16 @@ public class RepositoryCacheVersionService : IRepositoryCacheVersionService
             _logger.LogDebug("Cache for {EntityType} has no version in the database, considering it synced", typeof(TEntity).Name);
 
             // If the database version is null, it means the cache has never been initialized, so we consider it synced.
+            return true;
+        }
+
+        if (_cacheVersions.TryGetValue(cacheKey, out Guid localVersion) is false)
+        {
+            _logger.LogDebug("Cache for {EntityType} is not initialized, considering it synced", typeof(TEntity).Name);
+
+            // We're not initialized yet, so cache is empty, which means cache is synced.
+            // Since the cache is most likely no longer empty, we should set the cache version to the database version.
+            _cacheVersions[cacheKey] = Guid.Parse(databaseVersion.Version);
             return true;
         }
 
