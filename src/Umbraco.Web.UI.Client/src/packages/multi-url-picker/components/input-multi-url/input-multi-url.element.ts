@@ -30,8 +30,7 @@ import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/back
  * @fires blur - when the input loses focus
  * @fires focus - when the input gains focus
  */
-const elementName = 'umb-input-multi-url';
-@customElement(elementName)
+@customElement('umb-input-multi-url')
 export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<UmbLinkPickerLink>(this, {
 		getUniqueOfElement: (element) => {
@@ -431,6 +430,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputMultiUrlElement;
+		'umb-input-multi-url': UmbInputMultiUrlElement;
 	}
 }
