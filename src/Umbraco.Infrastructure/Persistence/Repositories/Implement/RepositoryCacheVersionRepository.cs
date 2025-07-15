@@ -25,13 +25,13 @@ internal class RepositoryCacheVersionRepository : RepositoryBase, IRepositoryCac
         }
 
         Sql<ISqlContext> query = Sql()
-            .Select<RepositoryCacheVersionDto>()
+            .Select<RepositoryCacheVersionDto>(x => x.Version)
             .From<RepositoryCacheVersionDto>()
             .Where<RepositoryCacheVersionDto>(x => x.Identifier == identifier);
 
-        RepositoryCacheVersionDto? dto = (await Database.FetchAsync<RepositoryCacheVersionDto>(query)).FirstOrDefault();
+        var version = await Database.ExecuteScalarAsync<string?>(query);
 
-        return Map(dto);
+        return new RepositoryCacheVersion { Identifier = identifier, Version = version };
     }
 
     public async Task<IEnumerable<RepositoryCacheVersion>> GetAllAsync()
@@ -48,10 +48,7 @@ internal class RepositoryCacheVersionRepository : RepositoryBase, IRepositoryCac
     public async Task SaveAsync(RepositoryCacheVersion repositoryCacheVersion)
     {
         RepositoryCacheVersionDto dto = Map(repositoryCacheVersion);
-        await Database.InsertOrUpdateAsync(
-            dto,
-            "SET identifier = @identifier, version = @version",
-            new { identifier = dto.Identifier, version = dto.Version, });
+        await Database.InsertOrUpdateAsync(dto, null, null);
     }
 
     private static RepositoryCacheVersionDto Map(RepositoryCacheVersion entity)

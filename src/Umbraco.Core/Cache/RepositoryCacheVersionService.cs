@@ -31,7 +31,7 @@ public class RepositoryCacheVersionService : IRepositoryCacheVersionService
         _logger.LogDebug("Checking if cache for {EntityType} is synced", typeof(TEntity).Name);
 
         // We have to take a read lock to ensure the cache is not being updated while we check the version
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(Constants.Locks.CacheVersion);
 
         var cacheKey = GetCacheKey<TEntity>();
@@ -44,7 +44,6 @@ public class RepositoryCacheVersionService : IRepositoryCacheVersionService
         }
 
         RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionRepository.GetAsync(cacheKey);
-        scope.Complete();
 
         if (databaseVersion?.Version is null)
         {
@@ -67,7 +66,6 @@ public class RepositoryCacheVersionService : IRepositoryCacheVersionService
 
         _logger.LogDebug("Cache for {EntityType} is synced", typeof(TEntity).Name);
         return true;
-
     }
 
     /// <inheritdoc />

@@ -100,5 +100,5 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
     /// <summary>
     /// Registers a change in the cache.
     /// </summary>
-    protected void RegisterCacheChange() => _cacheVersionService.SetCacheUpdatedAsync<TEntity>().Wait();
+    protected void RegisterCacheChange() => _cacheVersionService.SetCacheUpdatedAsync<TEntity>().GetAwaiter().GetResult();
 }
