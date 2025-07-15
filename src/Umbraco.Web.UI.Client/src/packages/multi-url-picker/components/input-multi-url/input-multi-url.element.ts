@@ -292,35 +292,27 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	async #getUrlForDocument(unique: string) {
-		const { data: documentUrlData } = await this.#documentUrlRepository.requestItems([unique]);
-		const urlsItem = documentUrlData?.[0];
+		const { data: data } = await this.#documentUrlRepository.requestItems([unique]);
 
-		this.#documentUrlsDataResolver.setData(urlsItem?.urls);
+		this.#documentUrlsDataResolver.setData(data?.[0]?.urls);
+
 		const resolvedUrls = await this.#documentUrlsDataResolver.getUrls();
 		return resolvedUrls?.[0]?.url ?? '';
 	}
 
 	async #getUrlForMedia(unique: string) {
-		const { data: mediaUrlData } = await this.#mediaUrlRepository.requestItems([unique]);
-		return mediaUrlData?.[0].url ?? '';
+		const { data } = await this.#mediaUrlRepository.requestItems([unique]);
+		return data?.[0].url ?? '';
 	}
 
 	async #getNameForDocument(unique: string) {
 		const { data } = await this.#documentItemRepository.requestItems([unique]);
-		if (data && data.length > 0) {
-			return data[0].name;
-		}
-
-		return '';
+		return data?.[0]?.name ?? '';
 	}
 
 	async #getNameForMedia(unique: string) {
 		const { data } = await this.#mediaItemRepository.requestItems([unique]);
-		if (data && data.length > 0) {
-			return data[0].name;
-		}
-
-		return '';
+		return data?.[0]?.name ?? '';
 	}
 
 	async #requestRemoveItem(index: number) {
