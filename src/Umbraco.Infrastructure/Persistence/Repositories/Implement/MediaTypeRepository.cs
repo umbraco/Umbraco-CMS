@@ -26,7 +26,7 @@ internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMed
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
-        Lazy<IIdKeyMap> idKeyMap)
+        IIdKeyMap idKeyMap)
         : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper, idKeyMap)
     {
     }

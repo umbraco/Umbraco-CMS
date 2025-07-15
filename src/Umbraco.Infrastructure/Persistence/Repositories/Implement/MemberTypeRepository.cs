@@ -29,7 +29,7 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
-        Lazy<IIdKeyMap> idKeyMap)
+        IIdKeyMap idKeyMap)
         : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper, idKeyMap)
          => _shortStringHelper = shortStringHelper;
 

@@ -412,7 +412,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     private MediaTypeRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), CommonRepository, LanguageRepository, ShortStringHelper, new Lazy<IIdKeyMap>(() => IdKeyMap));
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), CommonRepository, LanguageRepository, ShortStringHelper, IdKeyMap);
 
     private EntityContainerRepository CreateContainerRepository(IScopeProvider provider) =>
         new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<EntityContainerRepository>(), Constants.ObjectTypes.MediaTypeContainer);

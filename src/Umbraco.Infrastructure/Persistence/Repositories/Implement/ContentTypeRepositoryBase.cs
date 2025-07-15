@@ -29,7 +29,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     where TEntity : class, IContentTypeComposition
 {
     private readonly IShortStringHelper _shortStringHelper;
-    private readonly Lazy<IIdKeyMap> _idKeyMap;
+    private readonly IIdKeyMap _idKeyMap;
 
     protected ContentTypeRepositoryBase(
         IScopeAccessor scopeAccessor,
@@ -38,7 +38,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
-        Lazy<IIdKeyMap> idKeyMap)
+        IIdKeyMap idKeyMap)
         : base(scopeAccessor, cache, logger)
     {
         _shortStringHelper = shortStringHelper;
@@ -1449,7 +1449,7 @@ AND umbracoNode.id <> @id",
         // If a key is provided, use that.
         if (propertyType.DataTypeKey != Guid.Empty)
         {
-            Attempt<int> dataTypeIdAttempt = _idKeyMap.Value.GetIdForKey(propertyType.DataTypeKey, UmbracoObjectTypes.DataType);
+            Attempt<int> dataTypeIdAttempt = _idKeyMap.GetIdForKey(propertyType.DataTypeKey, UmbracoObjectTypes.DataType);
             if (dataTypeIdAttempt.Success)
             {
                 propertyType.DataTypeId = dataTypeIdAttempt.Result;

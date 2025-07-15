@@ -27,7 +27,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
-        Lazy<IIdKeyMap> idKeyMap)
+        IIdKeyMap idKeyMap)
         : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper, idKeyMap)
     {
     }
