@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Scoping;
 namespace Umbraco.Cms.Core.Cache;
 
 /// <inheritdoc />
-public class RepositoryCacheVersionService : IRepositoryCacheVersionService
+internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IRepositoryCacheVersionRepository _repositoryCacheVersionRepository;
@@ -112,7 +112,7 @@ public class RepositoryCacheVersionService : IRepositoryCacheVersionService
         scope.Complete();
     }
 
-    private string GetCacheKey<TEntity>()
+    internal string GetCacheKey<TEntity>()
         where TEntity : class =>
         typeof(TEntity).Name;
 }
