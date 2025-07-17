@@ -2664,6 +2664,8 @@ export default {
 		toolbar_removeGroup: 'Fjern gruppe',
 		toolbar_removeItem: 'Fjern handling',
 		toolbar_emptyGroup: 'Tom',
+		statusbar_characters: () => 'tegn',
+		statusbar_words: () => 'ord',
 	},
 	collection: {
 		noItemsTitle: 'Intet indhold',
