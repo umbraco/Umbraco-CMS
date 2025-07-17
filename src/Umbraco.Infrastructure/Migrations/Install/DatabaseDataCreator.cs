@@ -2290,6 +2290,22 @@ internal class DatabaseDataCreator
                                     "\", \"multiple\": true}",
                 });
         }
+
+        /*if (_database.Exists<NodeDto>(1055))
+        {
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
+                new DataTypeDto
+                {
+                    NodeId = 1055,
+                    EditorAlias = Constants.PropertyEditors.Aliases.DateTimeWithTimezone,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DatePicker",
+                    DbType = "Ntext",
+                    Configuration = "{\"timezones\": [\"UTC\"], \"format\": \"YYYY-MM-DD HH:mm:ss\"}",
+                });
+        }*/
     }
 
     private void CreateRelationTypeData()

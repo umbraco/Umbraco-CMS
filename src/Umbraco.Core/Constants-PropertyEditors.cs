@@ -71,6 +71,11 @@ public static partial class Constants
             public const string DateTime = "Umbraco.DateTime";
 
             /// <summary>
+            ///     UTC DateTime.
+            /// </summary>
+            public const string DateTimeWithTimeZone = "Umbraco.DateTimeWithTimeZone";
+
+            /// <summary>
             ///     DropDown List.
             /// </summary>
             public const string DropDownListFlexible = "Umbraco.DropDown.Flexible";
