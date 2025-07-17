@@ -15,8 +15,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
 {
-    public PublicAccessRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<PublicAccessRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public PublicAccessRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<PublicAccessRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
     {
     }
 

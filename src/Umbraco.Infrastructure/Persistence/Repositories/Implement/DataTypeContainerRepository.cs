@@ -11,8 +11,9 @@ internal class DataTypeContainerRepository : EntityContainerRepository, IDataTyp
     public DataTypeContainerRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
-        ILogger<DataTypeContainerRepository> logger)
-        : base(scopeAccessor, cache, logger, Constants.ObjectTypes.DataTypeContainer)
+        ILogger<DataTypeContainerRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, cache, logger, Constants.ObjectTypes.DataTypeContainer, repositoryCacheVersionService)
     {
     }
 

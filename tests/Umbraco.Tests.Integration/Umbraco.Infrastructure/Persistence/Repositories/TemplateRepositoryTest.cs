@@ -63,7 +63,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     private IOptionsMonitor<RuntimeSettings> RuntimeSettings => GetRequiredService<IOptionsMonitor<RuntimeSettings>>();
 
     private ITemplateRepository CreateRepository(IScopeProvider provider) =>
-        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, ViewHelper, RuntimeSettings);
+        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, ViewHelper, RuntimeSettings, Mock.Of<IRepositoryCacheVersionService>());
 
     [Test]
     public void Can_Instantiate_Repository()
@@ -262,14 +262,14 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var templateRepository = CreateRepository(provider);
             var globalSettings = new GlobalSettings();
             var serializer = new SystemTextJsonSerializer();
-            var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
+            var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>());
             var commonRepository =
                 new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>());
-            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
+            var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>());
+            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>());
+            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>());
             var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
-            var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository, Mock.Of<IRepositoryCacheVersionService>());
             var propertyEditors =
                 new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
             var dataValueReferences =

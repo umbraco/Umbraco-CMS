@@ -55,6 +55,7 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     /// <param name="runtimeState">State of the runtime.</param>
     /// <param name="permissionMappers">The permission mappers.</param>
     /// <param name="globalCache">The app policy cache.</param>
+    /// <param name="repositoryCacheVersionService"></param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -72,8 +73,9 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
         IEnumerable<IPermissionMapper> permissionMappers,
-        IAppPolicyCache globalCache)
-        : base(scopeAccessor, appCaches, logger)
+        IAppPolicyCache globalCache,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, appCaches, logger, repositoryCacheVersionService)
     {
         _scopeAccessor = scopeAccessor;
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));

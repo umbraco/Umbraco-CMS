@@ -19,9 +19,13 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
 {
     private readonly IEventMessagesFactory _eventMessagesFactory;
 
-    public MemberGroupRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberGroupRepository> logger,
-        IEventMessagesFactory eventMessagesFactory)
-        : base(scopeAccessor, cache, logger) =>
+    public MemberGroupRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MemberGroupRepository> logger,
+        IEventMessagesFactory eventMessagesFactory,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, cache, logger, repositoryCacheVersionService) =>
         _eventMessagesFactory = eventMessagesFactory;
 
     protected Guid NodeObjectTypeId => Constants.ObjectTypes.MemberGroup;

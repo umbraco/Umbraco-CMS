@@ -24,8 +24,12 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
     private readonly Dictionary<string, int> _codeIdMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<int, string> _idCodeMap = new();
 
-    public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LanguageRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public LanguageRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<LanguageRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, cache, logger,  repositoryCacheVersionService)
     {
     }
 

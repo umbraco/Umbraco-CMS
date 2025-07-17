@@ -39,8 +39,14 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         PropertyEditorCollection editors,
         ILogger<DataTypeRepository> logger,
         ILoggerFactory loggerFactory,
-        IConfigurationEditorJsonSerializer serializer)
-        : base(scopeAccessor, cache, logger)
+        IConfigurationEditorJsonSerializer serializer,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService
+            )
     {
         _editors = editors;
         _serializer = serializer;

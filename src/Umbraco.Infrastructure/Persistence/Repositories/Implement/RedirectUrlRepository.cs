@@ -14,8 +14,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
 {
-    public RedirectUrlRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RedirectUrlRepository> logger)
-        : base(scopeAccessor, cache, logger)
+    public RedirectUrlRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<RedirectUrlRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
     {
     }
 

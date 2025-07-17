@@ -80,5 +80,10 @@ public static partial class Constants
         ///     All webhook logs.
         /// </summary>
         public const int WebhookLogs = -343;
+
+        /// <summary>
+        ///    The cache version.
+        /// </summary>
+        public const int CacheVersion = -344;
     }
 }

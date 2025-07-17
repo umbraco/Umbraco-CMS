@@ -14,8 +14,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRepository
 {
-    public AuditRepository(IScopeAccessor scopeAccessor, ILogger<AuditRepository> logger)
-        : base(scopeAccessor, AppCaches.NoCache, logger)
+    public AuditRepository(
+        IScopeAccessor scopeAccessor,
+        ILogger<AuditRepository> logger,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(
+            scopeAccessor,
+            AppCaches.NoCache,
+            logger,
+            repositoryCacheVersionService)
     {
     }
 

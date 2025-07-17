@@ -25,8 +25,16 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         ILogger<ContentTypeRepository> logger,
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
-        IShortStringHelper shortStringHelper)
-        : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
+        IShortStringHelper shortStringHelper,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            commonRepository,
+            languageRepository,
+            shortStringHelper,
+            repositoryCacheVersionService)
     {
     }
 
