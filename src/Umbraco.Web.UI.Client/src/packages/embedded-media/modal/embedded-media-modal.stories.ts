@@ -1,7 +1,7 @@
 import './embedded-media-modal.element.js';
 
 import type { UmbEmbeddedMediaModalData } from './embedded-media-modal.token.js';
-import type { Meta } from '@storybook/web-components';
+import type { Meta } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {

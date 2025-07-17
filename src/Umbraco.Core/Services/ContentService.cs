@@ -3611,6 +3611,9 @@ public class ContentService : RepositoryService, IContentService
     }
 
     public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+        => SaveBlueprint(content, null, userId);
+
+    public void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -3631,7 +3634,7 @@ public class ContentService : RepositoryService, IContentService
 
             Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
-            scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, evtMsgs));
+            scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, createdFromContent, evtMsgs));
             scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
             scope.Complete();
@@ -3654,12 +3657,12 @@ public class ContentService : RepositoryService, IContentService
 
     private static readonly string?[] ArrayOfOneNullString = { null };
 
-    public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
+    public IContent CreateBlueprintFromContent(
+        IContent blueprint,
+        string name,
+        int userId = Constants.Security.SuperUserId)
     {
-        if (blueprint == null)
-        {
-            throw new ArgumentNullException(nameof(blueprint));
-        }
+        ArgumentNullException.ThrowIfNull(blueprint);
 
         IContentType contentType = GetContentType(blueprint.ContentType.Alias);
         var content = new Content(name, -1, contentType);
@@ -3672,15 +3675,13 @@ public class ContentService : RepositoryService, IContentService
         if (blueprint.CultureInfos?.Count > 0)
         {
             cultures = blueprint.CultureInfos.Values.Select(x => x.Culture);
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            if (blueprint.CultureInfos.TryGetValue(_languageRepository.GetDefaultIsoCode(), out ContentCultureInfos defaultCulture))
             {
-                if (blueprint.CultureInfos.TryGetValue(_languageRepository.GetDefaultIsoCode(), out ContentCultureInfos defaultCulture))
-                {
-                    defaultCulture.Name = name;
-                }
-
-                scope.Complete();
+                defaultCulture.Name = name;
             }
+
+            scope.Complete();
         }
 
         DateTime now = DateTime.Now;
@@ -3700,6 +3701,11 @@ public class ContentService : RepositoryService, IContentService
 
         return content;
     }
+
+    /// <inheritdoc />
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
+    public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
+        => CreateBlueprintFromContent(blueprint, name, userId);
 
     public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
     {

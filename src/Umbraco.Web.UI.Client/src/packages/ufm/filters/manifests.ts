@@ -1,4 +1,4 @@
-import type { ManifestUfmFilter } from '../ufm-filter.extension.js';
+import type { ManifestUfmFilter } from '../extensions/ufm-filter.extension.js';
 
 export const manifests: Array<ManifestUfmFilter> = [
 	{
@@ -7,6 +7,13 @@ export const manifests: Array<ManifestUfmFilter> = [
 		name: 'Fallback UFM Filter',
 		api: () => import('./fallback.filter.js'),
 		meta: { alias: 'fallback' },
+	},
+	{
+		type: 'ufmFilter',
+		alias: 'Umb.Filter.Bytes',
+		name: 'Bytes UFM Filter',
+		api: () => import('./bytes.filter.js'),
+		meta: { alias: 'bytes' },
 	},
 	{
 		type: 'ufmFilter',

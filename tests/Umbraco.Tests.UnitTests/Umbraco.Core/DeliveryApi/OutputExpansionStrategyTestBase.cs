@@ -327,7 +327,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var urlSegment = "url-segment";
         ConfigurePublishedContentMock(content, key, name, urlSegment, _contentType, properties);
 
-        RegisterContentWithProviders(content.Object);
+        RegisterContentWithProviders(content.Object, false);
     }
 
     protected void SetupMediaMock(Mock<IPublishedContent> media, params IPublishedProperty[] properties)
