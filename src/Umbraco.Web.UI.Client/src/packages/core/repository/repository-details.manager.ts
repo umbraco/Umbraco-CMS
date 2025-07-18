@@ -76,6 +76,8 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		this.observe(
 			this.uniques,
 			(uniques) => {
+				if (!uniques?.length) return;
+
 				// remove entries based on no-longer existing uniques:
 				const removedEntries = this.#entries
 					.getValue()
