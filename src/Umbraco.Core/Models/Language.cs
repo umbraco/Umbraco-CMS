@@ -16,6 +16,7 @@ public class Language : EntityBase, ILanguage
     private bool _isDefaultVariantLanguage;
     private string _isoCode;
     private bool _mandatory;
+    private int _sortOrder;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Language" /> class.
@@ -28,14 +29,14 @@ public class Language : EntityBase, ILanguage
         _cultureName = cultureName ?? throw new ArgumentNullException(nameof(cultureName));
     }
 
-        /// <inheritdoc />
-        [DataMember]
-        public string IsoCode
+    /// <inheritdoc />
+    [DataMember]
+    public string IsoCode
+    {
+        get => _isoCode;
+        set
         {
-            get => _isoCode;
-            set
-            {
-                ArgumentNullException.ThrowIfNull(value);
+            ArgumentNullException.ThrowIfNull(value);
 
             SetPropertyValueAndDetectChanges(value, ref _isoCode!, nameof(IsoCode));
         }
@@ -77,5 +78,13 @@ public class Language : EntityBase, ILanguage
     {
         get => _fallbackLanguageIsoCode;
         set => SetPropertyValueAndDetectChanges(value, ref _fallbackLanguageIsoCode, nameof(FallbackIsoCode));
+    }
+
+    /// <inheritdoc />
+    [DataMember]
+    public int SortOrder
+    {
+        get => _sortOrder;
+        set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, nameof(SortOrder));
     }
 }

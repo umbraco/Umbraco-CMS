@@ -60,4 +60,10 @@ internal class LanguageDto
     [Index(IndexTypes.NonClustered)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? FallbackLanguageId { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the sort order of the language.
+    /// </summary>
+    [Column("sortOrder")]
+    public int SortOrder { get; set; }
 }
