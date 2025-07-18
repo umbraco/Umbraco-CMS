@@ -843,7 +843,7 @@ namespace Umbraco.Cms.Core.Services
                 scope.Notifications.Publish(new MediaSavedNotification(mediasA, messages).WithStateFrom(savingNotification));
                 // TODO: See note about suppressing events in content service
                 scope.Notifications.Publish(new MediaTreeChangeNotification(treeChanges, messages));
-                Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Bulk save media");
+                Audit(AuditType.Save, userId, Constants.System.Root, "Bulk save media");
 
                 scope.Complete();
             }
