@@ -40,6 +40,7 @@ public static partial class Constants
         public const string ConfigExamine = ConfigPrefix + "Examine";
         public const string ConfigIndexing = ConfigPrefix + "Indexing";
         public const string ConfigLogging = ConfigPrefix + "Logging";
+        public const string ConfigLongRunningOperations = ConfigPrefix + "LongRunningOperations";
         public const string ConfigMemberPassword = ConfigPrefix + "Security:MemberPassword";
         public const string ConfigModelsBuilder = ConfigPrefix + "ModelsBuilder";
         public const string ConfigModelsMode = ConfigModelsBuilder + ":ModelsMode";
