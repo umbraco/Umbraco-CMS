@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -20,7 +22,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
         IEventMessagesFactory eventMessagesFactory,
         IMemberService memberService,
         IMemberTypeRepository memberTypeRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IMemberTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
@@ -31,7 +33,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
             loggerFactory,
             eventMessagesFactory,
             memberTypeRepository,
-            auditRepository,
+            auditService,
             entityContainerRepository,
             entityRepository,
             eventAggregator,
@@ -40,6 +42,63 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
     {
         MemberService = memberService;
         _memberTypeRepository = memberTypeRepository;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public MemberTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMemberService memberService,
+        IMemberTypeRepository memberTypeRepository,
+        IAuditRepository auditRepository,
+        IMemberTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            memberService,
+            memberTypeRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public MemberTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMemberService memberService,
+        IMemberTypeRepository memberTypeRepository,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        IMemberTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            memberService,
+            memberTypeRepository,
+            auditService,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
+    {
     }
 
     // beware! order is important to avoid deadlocks

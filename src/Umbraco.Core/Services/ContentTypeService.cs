@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -22,7 +24,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         IEventMessagesFactory eventMessagesFactory,
         IContentService contentService,
         IContentTypeRepository repository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IDocumentTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
@@ -33,13 +35,70 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             loggerFactory,
             eventMessagesFactory,
             repository,
-            auditRepository,
+            auditService,
             entityContainerRepository,
             entityRepository,
             eventAggregator,
             userIdKeyResolver,
             contentTypeFilters) =>
         ContentService = contentService;
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public ContentTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IContentService contentService,
+        IContentTypeRepository repository,
+        IAuditRepository auditRepository,
+        IDocumentTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            contentService,
+            repository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public ContentTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IContentService contentService,
+        IContentTypeRepository repository,
+        IAuditRepository auditRepository,
+        IAuditService auditService,
+        IDocumentTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            contentService,
+            repository,
+            auditService,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver,
+            contentTypeFilters)
+    {
+    }
 
     protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;
 

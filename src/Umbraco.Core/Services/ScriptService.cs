@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -17,8 +19,49 @@ public class ScriptService : FileServiceOperationBase<IScriptRepository, IScript
         IScriptRepository repository,
         ILogger<StylesheetService> logger,
         IUserIdKeyResolver userIdKeyResolver,
+        IAuditService auditService)
+        : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditService)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public ScriptService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IScriptRepository repository,
+        ILogger<StylesheetService> logger,
+        IUserIdKeyResolver userIdKeyResolver,
         IAuditRepository auditRepository)
-        : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditRepository)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            logger,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>())
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public ScriptService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IScriptRepository repository,
+        ILogger<StylesheetService> logger,
+        IUserIdKeyResolver userIdKeyResolver,
+        IAuditService auditService,
+        IAuditRepository auditRepository)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            logger,
+            userIdKeyResolver,
+            auditService)
     {
     }
 

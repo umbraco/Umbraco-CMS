@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class DictionaryItemService : RepositoryService, IDictionaryItemService
 {
     private readonly IDictionaryRepository _dictionaryRepository;
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly ILanguageService _languageService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
@@ -21,13 +21,13 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDictionaryRepository dictionaryRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         ILanguageService languageService,
         IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _dictionaryRepository = dictionaryRepository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _languageService = languageService;
         _userIdKeyResolver = userIdKeyResolver;
     }
@@ -199,8 +199,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
                 new DictionaryItemDeletedNotification(dictionaryItem, eventMessages)
                     .WithStateFrom(deletingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Delete, "Delete DictionaryItem", currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            await AuditAsync(AuditType.Delete, "Delete DictionaryItem", userKey, dictionaryItem.Id, nameof(DictionaryItem));
 
             scope.Complete();
             return Attempt.SucceedWithStatus<IDictionaryItem?, DictionaryItemOperationStatus>(DictionaryItemOperationStatus.Success, dictionaryItem);
@@ -261,8 +260,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Move, "Move DictionaryItem", currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            await AuditAsync(AuditType.Move, "Move DictionaryItem", userKey, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
             return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
@@ -322,8 +320,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(auditType, auditMessage, currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
+            await AuditAsync(auditType, auditMessage, userKey, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
             return Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem);
@@ -339,8 +336,13 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         }
     }
 
-    private void Audit(AuditType type, string message, int userId, int objectId, string? entityType) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
+    private async Task AuditAsync(AuditType type, string message, Guid userKey, int objectId, string? entityType) =>
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            entityType,
+            message);
 
     private bool HasValidParent(IDictionaryItem dictionaryItem)
         => dictionaryItem.ParentId.HasValue == false || _dictionaryRepository.Get(dictionaryItem.ParentId.Value) != null;
