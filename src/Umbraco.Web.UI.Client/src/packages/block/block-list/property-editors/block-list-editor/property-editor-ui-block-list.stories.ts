@@ -5,11 +5,10 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-block-list.element.js';
 
 export default {
-	title: 'Property Editor UIs/Block List',
+	title: 'Extension Type/Property Editor UI/Block List',
 	component: 'umb-property-editor-ui-block-list',
 	id: 'umb-property-editor-ui-block-list',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIBlockListElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIBlockListElement> = () =>
 	html`<umb-property-editor-ui-block-list></umb-property-editor-ui-block-list>`;
-AAAOverview.storyName = 'Overview';

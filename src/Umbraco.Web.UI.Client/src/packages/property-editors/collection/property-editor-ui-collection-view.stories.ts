@@ -5,11 +5,10 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-collection.element.js';
 
 export default {
-	title: 'Property Editor UIs/Collection',
+	title: 'Extension Type/Property Editor UI/Collection',
 	component: 'umb-property-editor-ui-collection',
 	id: 'umb-property-editor-ui-collection',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUICollectionElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUICollectionElement> = () =>
 	html`<umb-property-editor-ui-collection></umb-property-editor-ui-collection>`;
-AAAOverview.storyName = 'Overview';
