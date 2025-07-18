@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
 });
 
-test('can create a data type folder', async ({umbracoApi, umbracoUi}) => {
+test('can create a data type folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.createDataTypeFolder(dataTypeFolderName);
@@ -126,7 +126,7 @@ test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoU
   expect(childrenFolderData[0].isFolder).toBeTruthy();
 });
 
-test('cannot delete a non-empty data type folder', async ({umbracoApi, umbracoUi}) => {
+test('cannot delete a non-empty data type folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   let dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
@@ -151,7 +151,7 @@ test('cannot delete a non-empty data type folder', async ({umbracoApi, umbracoUi
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can move a data type to a data type folder', async ({umbracoApi, umbracoUi}) => {
+test('can move a data type to a data type folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   const dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, editorUiAlias,[]);
@@ -174,7 +174,7 @@ test('can move a data type to a data type folder', async ({umbracoApi, umbracoUi
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can duplicate a data type to a data type folder', async ({umbracoApi, umbracoUi}) => {
+test('can duplicate a data type to a data type folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   await umbracoApi.dataType.create(dataTypeName, editorAlias, editorUiAlias, []);

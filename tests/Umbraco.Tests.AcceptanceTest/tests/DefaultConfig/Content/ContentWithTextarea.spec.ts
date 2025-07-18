@@ -80,7 +80,7 @@ test('can input text into the textarea', async ({umbracoApi, umbracoUi}) => {
   expect(contentData.values[0].value).toEqual(text);
 });
 
-test('cannot input the text that exceeds the allowed amount of characters', async ({umbracoApi, umbracoUi}) => {
+test('cannot input the text that exceeds the allowed amount of characters', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maxChars = 100;
   const textExceedMaxChars = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam mattis porttitor orci id cursus. Nulla';
