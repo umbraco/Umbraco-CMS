@@ -1,10 +1,11 @@
 using System.Collections.Concurrent;
+using Umbraco.Cms.Core.Collections;
 
 namespace Umbraco.Cms.Core.Models.Navigation;
 
 public sealed class NavigationNode
 {
-    private HashSet<Guid> _children;
+    private ConcurrentHashSet<Guid> _children;
 
     public Guid Key { get; private set; }
 
@@ -21,7 +22,7 @@ public sealed class NavigationNode
         Key = key;
         ContentTypeKey = contentTypeKey;
         SortOrder = sortOrder;
-        _children = new HashSet<Guid>();
+        _children = new ConcurrentHashSet<Guid>();
     }
 
     public void UpdateSortOrder(int newSortOrder) => SortOrder = newSortOrder;
