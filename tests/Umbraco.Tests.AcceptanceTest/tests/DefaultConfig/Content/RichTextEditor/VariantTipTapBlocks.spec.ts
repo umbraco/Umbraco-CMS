@@ -80,7 +80,6 @@ test('can not create unsupported invariant document type with invariant tiptap R
 
   // Assert
   await umbracoUi.content.isFailedStateButtonVisible();
-  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeFalsy();
 });
@@ -101,7 +100,6 @@ test('can not create unsupported invariant document type with invariant tiptap R
 
   // Assert
   await umbracoUi.content.isFailedStateButtonVisible();
-  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeFalsy();
 });
