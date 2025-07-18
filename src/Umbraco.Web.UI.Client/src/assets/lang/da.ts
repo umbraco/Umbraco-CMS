@@ -18,6 +18,7 @@ export default {
 		changeDocType: 'Skift Dokument Type',
 		changeDataType: 'Skift Input Type',
 		copy: 'Kopier',
+		copyTo: 'Kopier til',
 		create: 'Opret',
 		export: 'Eksportér',
 		createPackage: 'Opret pakke',
@@ -65,6 +66,13 @@ export default {
 		editContent: 'Rediger indhold',
 		chooseWhereToImport: 'Vælg hvor du vil importere',
 		viewActionsFor: (name) => (name ? `Se handlinger for '${name}'` : 'Se handlinger'),
+		folderCreate: 'Opret mappe',
+		folderDelete: 'Slet',
+		folderRename: 'Omdøb',
+		import: 'Importer',
+		read: 'Læs',
+		readOnly: 'Skrivebeskyttet',
+		trash: 'Papirkurv',
 		loadMore: 'Indlæs flere',
 	},
 	actionCategories: {
@@ -85,6 +93,7 @@ export default {
 		protect: 'Tillad adgang til at indstille og ændre offentlig adgang til en node',
 		publish: 'Tillad adgang til at udgive en node',
 		unpublish: 'Tillad adgang til at afpublicere en node',
+		read: 'Tillad adgang til at læse et dokument',
 		rights: 'Tillad adgang til at ændre rettigheder for en node',
 		rollback: 'Tillad adgang til at returnere en node til en tidligere tilstand',
 		sendtopublish: 'Tillad adgang til at sende en node til godkendelse før den udgives',
@@ -168,7 +177,15 @@ export default {
 		morePublishingOptions: 'Flere publiseringsmuligheder',
 		submitChanges: 'Indsæt',
 	},
+	auditTrailsMedia: {
+		delete: 'Medie slettet',
+		move: 'Medie flyttet',
+		copy: 'Medie kopieret',
+		save: 'Medie gemt',
+	},
 	auditTrails: {
+		assigndomain: 'Domæne tildelt: %0%',
+		smallAssignDomain: 'Tildel domæne',
 		atViewingFor: 'For',
 		delete: 'Brugeren har slettet indholdet',
 		unpublish: 'Brugeren har afpubliceret indholdet',
@@ -330,6 +347,11 @@ export default {
 		variantScheduleNotAllowed: 'Schedule is not allowed',
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 		saveModalTitle: 'Gem',
+		saveAndPublishModalTitle: 'Gem og udgiv',
+		publishModalTitle: 'Udgiv',
+		selectAllVariants: 'Vælg alle varianter',
+		scheduledPendingChanges: 'Denne tidsplan har ændringer, der træder i kraft, når du klikker på "%0%".',
+		noVariantsToProcess: 'Der er ingen tilgængelige varianter',
 	},
 	blueprints: {
 		createBlueprintFrom: "Opret en ny indholdsskabelon fra '%0%'",
@@ -345,7 +367,7 @@ export default {
 	},
 	entityDetail: {
 		notFoundTitle: (entityType: string) => {
-			const entityName = entityType ?? 'Elementet';
+      const entityName = entityType ?? 'Elementet';
 			return `${entityName} blev ikke fundet`;
 		},
 		notFoundDescription: (entityType: string) => {
@@ -375,6 +397,7 @@ export default {
 		renameFolderFailed: 'Omdøbning af mappen med id %0% fejlede',
 		dragAndDropYourFilesIntoTheArea:
 			'Træk dine filer ind i dropzonen for, at uploade dem til\n      mediebiblioteket.\n    ',
+		fileSecurityValidationFailure: 'En eller flere fil-sikkerhedsvalideringer er fejlet',
 		uploadNotAllowed: 'Upload er ikke tiladt på denne lokation',
 	},
 	member: {
@@ -394,6 +417,7 @@ export default {
 	contentType: {
 		copyFailed: 'Kopiering af indholdstypen fejlede',
 		moveFailed: 'Flytning af indholdstypen fejlede',
+		contentTypes: 'Indholdstyper',
 	},
 	mediaType: {
 		copyFailed: 'Kopiering af medietypen fejlede',
@@ -441,6 +465,7 @@ export default {
 			'Benyttes til at organisere dokumenttyper, element-typer og kompositioner i\n      dokumenttype-træet.\n    ',
 		newFolder: 'Ny mappe',
 		newDataType: 'Ny datatype',
+		newDataTypeDescription: 'Bruges til at definere en konfiguration for en Egenskabstype på en Indholdstype.',
 		newJavascriptFile: 'Ny JavaScript-fil',
 		newEmptyPartialView: 'Ny tom partial view',
 		newPartialViewMacro: 'Ny partial view makro',
@@ -605,6 +630,13 @@ export default {
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
 		seeErrorAction: 'Se fejlen',
 		seeErrorDialogHeadline: 'Fejl detaljer',
+		selectEvent: 'Vælg begivenhed',
+		editWebhook: 'Rediger webhook',
+		confirmTrash: (name: string) => `Er du sikker på, at du vil flytte <strong>${name}</strong> til papirkurven?`,
+		confirmBulkTrash: (total: number) =>
+			`Er du sikker på, at du vil flytte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> til papirkurven?`,
+		confirmBulkDelete: (total: number) =>
+			`Er du sikker på, at du vil slette <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong>?`,
 	},
 	dictionary: {
 		noItems: 'Der er ingen ordbogselementer.',
@@ -615,6 +647,8 @@ export default {
 		noItemsInFile: 'There are no dictionary items in this file.',
 		noItemsFound: 'There were no dictionary items found.',
 		createNew: 'Create dictionary item',
+		pickFile: 'Vælg fil',
+		pickFileRequired: 'Vælg venligst en ".udt" fil',
 	},
 	dictionaryItem: {
 		description:
@@ -650,6 +684,10 @@ export default {
 		indexCannotRebuild: 'Dette index kan ikke genbygges for det ikke har nogen',
 		iIndexPopulator: 'IIndexPopulator',
 		contentInIndex: 'Content in index',
+		noResults: 'Ingen resultater blev fundet',
+		searchResultsFound: 'Viser %0% - %1% af %2% resultat(er) - Side %3% af %4%',
+		corruptStatus: 'Mulig korrupt indeks opdaget',
+		corruptErrorDescription: 'Fejl modtaget ved evaluering af indekset:',
 	},
 	placeholders: {
 		username: 'Indtast dit brugernavn',
@@ -675,6 +713,8 @@ export default {
 		a11yName: 'Navn',
 		rteParagraph: 'Udfold din kreativitet...',
 		rteHeading: 'Hvad skal overskriften være?',
+		enterUrl: 'Indtast en URL...',
+		enterdate: 'Vælg en dato...',
 	},
 	editcontenttype: {
 		createListView: 'Opret brugerdefineret listevisning',
@@ -707,6 +747,7 @@ export default {
 			'I understand this action will delete the properties and data based on this Data\n      Type\n    ',
 		canChangePropertyEditorHelp:
 			'Changing a property editor on a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
+		noConfiguration: 'Der er ingen konfiguration for denne egenskabseditor.',
 	},
 	errorHandling: {
 		errorButDataWasSaved:
@@ -951,6 +992,13 @@ export default {
 			if (new Date(date).getTime() < new Date(now).getTime()) return `for ${duration} siden`;
 			return `om ${duration}`;
 		},
+		primary: 'Primær',
+		change: 'Skift',
+		pixels: 'pixels',
+		notFound: 'Ikke fundet',
+		manifest: 'Manifest',
+		toggleFor: 'Toggle for %0%',
+		document: 'Dokument',
 	},
 	colors: {
 		blue: 'Blå',
@@ -1083,6 +1131,7 @@ export default {
 	language: {
 		cultureCode: 'Culture Code',
 		displayName: 'Culture Name',
+		noFallbackLanguages: 'Der er ingen andre sprog at vælge imellem',
 	},
 	lockout: {
 		lockoutWillOccur: 'Du har været inaktiv, og du vil blive logget ud om',
@@ -1187,6 +1236,7 @@ export default {
 		installInstructions: 'Install instructions',
 		packagesPromoted: 'Promoted',
 		packageMigrationsRun: 'Run pending package migrations',
+		packageMigrationsConfirmText: 'Vil du køre de ventende pakke-migrationer?',
 		packageMigrationsComplete: 'Package migrations have successfully completed.',
 		packageMigrationsNonePending: 'All package migrations have successfully completed.',
 		verifiedToWorkOnUmbracoCloud: 'Verified to work on Umbraco Cloud',
@@ -1255,6 +1305,13 @@ export default {
 		defineRootNode: 'Vælg udgangspunkt',
 		pickedTrashedItem: 'Du har valgt et dokument som er slettet eller lagt i papirkurven',
 		pickedTrashedItems: 'Du har valgt dokumenter som er slettede eller lagt i papirkurven',
+		specifyPickerRootTitle: 'Angiv rod',
+		defineXPathOrigin: 'Angiv via XPath',
+		unsupportedHeadline: (type?: string) =>
+			`<strong>Ikke-understøttede ${type ?? 'indholds'} elementer</strong><br>Følgende indhold understøttes ikke længere i denne editor.`,
+		unsupportedMessage:
+			'Hvis du stadig har brug for dette indhold, bedes du kontakte din administrator. Ellers kan du fjerne det.',
+		unsupportedRemove: 'Fjern ikke-understøttede elementer?',
 	},
 	dynamicRoot: {
 		configurationTitle: 'Dynamisk udgangspunkts forespørgsel',
@@ -1287,6 +1344,7 @@ export default {
 		noValidStartNodeTitle: 'Intet passende indhold',
 		noValidStartNodeDesc:
 			'Konfigurationen af dette felt passer ikke med noget indhold. Opret det manglende indhold eller kontakt din adminnistrator for at tilpasse Dynamisk Udgangspunkts Forespørgselen for dette felt.',
+		cancelAndClearQuery: 'Annuller og ryd søgning',
 	},
 	mediaPicker: {
 		deletedItem: 'Slettet medie',
@@ -1504,6 +1562,13 @@ export default {
 		dictionaryItemImported: 'The following dictionary item(s) has been imported!',
 		preventCleanupEnableError: 'An error occurred while enabling version cleanup for %0%',
 		preventCleanupDisableError: 'An error occurred while disabling version cleanup for %0%',
+		offlineHeadline: 'Offline',
+		offlineMessage: 'Du er i øjeblikket offline. Tjek venligst din internetforbindelse.',
+		onlineHeadline: 'Online',
+		onlineMessage: 'Du er nu online. Du kan fortsætte arbejdet.',
+		editContentScheduledNotSavedText: 'Planlægningen for publicering kunne ikke opdateres',
+		webhookSaved: 'Webhook gemt',
+		editContentPublishedFailedByValidation: 'Dokumentet kunne ikke publiceres, men det er gemt for dig',
 	},
 	stylesheet: {
 		addRule: 'Tilføj style',
@@ -1562,6 +1627,8 @@ export default {
 		itemsReturned: 'sider returneret, på',
 		iWant: 'Returner',
 		allContent: 'alt indhold',
+		systemFields: 'Systemfelter',
+		publishedItemsReturned: 'Der blev returneret %0% publicerede elementer på %1% ms',
 		contentOfType: 'indhold af typen "%0%"',
 		from: 'fra',
 		websiteRoot: 'mit website',
@@ -1643,6 +1710,8 @@ export default {
 			'<p>Modifying a row configuration name will result in loss of data for any existing content that is based on this configuration.</p> <p><strong>Modifying only the label will not result in data loss.</strong></p>',
 	},
 	contentTypeEditor: {
+		cultureAndVariantInvariantLabel: 'Delt på tværs af sprog og segmenter',
+		editProperty: 'Rediger egenskab',
 		compositions: 'Kompositioner',
 		group: 'Gruppe',
 		noGroups: 'Du har ikke tilføjet nogen grupper',
@@ -1753,6 +1822,35 @@ export default {
 		collectionsDescription: 'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer.',
 		structure: 'Struktur',
 		presentation: 'Præsentation',
+	},
+	webhooks: {
+		addWebhook: 'Opret webhook',
+		addWebhookHeader: 'Tilføj webhook-header',
+		addDocumentType: 'Tilføj dokumenttype',
+		addMediaType: 'Tilføj medietype',
+		createHeader: 'Opret header',
+		deliveries: 'Leveringer',
+		noHeaders: 'Der er ikke tilføjet nogen webhook-headers',
+		noEventsFound: 'Ingen hændelser blev fundet.',
+		enabled: 'Aktiveret',
+		disabled: 'Deaktiveret',
+		events: 'Hændelser',
+		event: 'Hændelse',
+		url: 'URL',
+		types: 'Indholdstyper',
+		webhookKey: 'Webhook-nøgle',
+		retryCount: 'Antal forsøg',
+		urlDescription: 'Den URL der kaldes, når webhooken udløses.',
+		eventDescription: 'De hændelser, som webhooken skal udløses for.',
+		contentTypeDescription: 'Udløs kun webhooken for en specifik indholdstype.',
+		enabledDescription: 'Er webhooken aktiveret?',
+		headersDescription: 'Brugertilpassede headers, der inkluderes i webhook-anmodningen.',
+		contentType: 'Indholdstype',
+		headers: 'Headers',
+		selectEventFirst: 'Vælg venligst en hændelse først.',
+		selectEvents: 'Vælg hændelser',
+		statusCode: 'Statuskode',
+		unnamedWebhook: 'Navnløs webhook',
 	},
 	languages: {
 		addLanguage: 'Tilføj sprog',
@@ -1884,6 +1982,8 @@ export default {
 		settingsGroup: 'Indstillinger',
 		templatingGroup: 'Design og layout',
 		thirdPartyGroup: 'Tredjepart',
+		structureGroup: 'Struktur',
+		advancedGroup: 'Avanceret',
 		webhooks: 'Webhooks',
 	},
 	update: {
@@ -1902,8 +2002,14 @@ export default {
 		createUserHeadline: (kind: string) => {
 			return kind === 'Api' ? 'Opret API bruger' : 'Opret bruger';
 		},
+		createUserDescription: (kind: string) => {
+			const defaultUserText = `Opret en bruger for at give adgang til Umbraco. Når en bruger oprettes, genereres der en adgangskode, som du kan dele med brugeren.`;
+			const apiUserText = `Opret en API-bruger for at give eksterne tjenester mulighed for at godkende via Umbraco Management API'et.`;
+			return kind === 'Api' ? apiUserText : defaultUserText;
+		},
 		changePassword: 'Skift dit kodeord',
 		changePhoto: 'Skift billede',
+		configureMfa: 'Konfigurer MFA',
 		newPassword: 'Nyt kodeord',
 		newPasswordFormatLengthTip: 'Minium %0% karakterer tilbage!',
 		newPasswordFormatNonAlphaTip: 'Der skal som minium være %0% specielle karakterer.',
@@ -1931,6 +2037,10 @@ export default {
 		kind: 'Slags',
 		language: 'Sprog',
 		languageHelp: 'Indstil det sprog, du vil se i menuer og dialoger',
+		languageNotFound: (culture: string, baseCulture: string) =>
+			`Den angivne kultur "${culture}" blev ikke fundet, basis-kulturen "${baseCulture}" vil blive brugt.`,
+		languageNotFoundFallback: (culture: string, baseCulture: string) =>
+			`Hverken den angivne kultur "${culture}" eller basis-kulturen "${baseCulture}" blev fundet, standard fallback-kulturen "Engelsk (UK)" vil blive brugt.`,
 		lastLockoutDate: 'Senest låst ude',
 		lastLogin: 'Seneste login',
 		lastPasswordChangeDate: 'Kodeord sidst ændret',
@@ -1968,6 +2078,8 @@ export default {
 		permissionsEntityGroup_document: 'Indhold',
 		permissionsEntityGroup_media: 'Medie',
 		permissionsEntityGroup_member: 'Medlemmer',
+		'permissionsEntityGroup_document-property-value': 'Dokumentegenskabsværdi',
+		permissionNoVerbs: 'Ingen tilladte rettigheder',
 		profile: 'Profil',
 		searchAllChildren: "Søg alle 'børn'",
 		languagesHelp: 'Tilføj sprog for at give brugerne adgang til at redigere',
@@ -2107,6 +2219,10 @@ export default {
 		duplicateUsername: "Brugernavnet '%0%' er allerede taget",
 		legacyOption: 'Ugyldig indstilling',
 		legacyOptionDescription: 'Denne indstilling understøttes ikke længere, vælg venligst noget andet',
+		numberMisconfigured: "Minimumsværdien '%0%' skal være mindre end maksimumsværdien '%1%'.",
+		invalidExtensions: 'En eller flere af filtypenavnene er ugyldige.',
+		allowedExtensions: 'Tilladte filtypenavne er:',
+		disallowedExtensions: 'Ikke tilladte filtypenavne er:',
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Slå URL tracker fra',
@@ -2228,6 +2344,8 @@ export default {
 		searchContentTree: 'Søg i indholdstræet',
 		maxAmount: 'Maximum antal',
 		contextDialogDescription: 'Perform action %0% on the %1% node',
+		expandChildItems: 'Udvid underordnede elementer for',
+		openContextNode: 'Åbn kontekstnode for',
 	},
 	references: {
 		tabName: 'Referencer',
@@ -2311,6 +2429,7 @@ export default {
 		labelForCopyToClipboard: 'Kopier til udklipsholder',
 		confirmDeleteHeadline: 'Slet fra udklipsholderen',
 		confirmDeleteDescription: 'Er du sikker på at du vil slette <strong>{0}</strong> fra udklipsholderen?',
+		copySuccessHeadline: 'Kopieret til udklipsholder',
 	},
 	propertyActions: {
 		tooltipForPropertyActionsMenu: 'Åben egenskabshandlinger',
@@ -2340,10 +2459,12 @@ export default {
 		labelEditorSize: 'Rederings lagets størrelse',
 		addCustomView: 'Tilføj speciel visning',
 		addSettingsElementType: 'Tilføj instillinger',
+		confirmDeleteBlockTitle: 'Slet %0',
 		confirmDeleteBlockMessage: 'Er du sikker på at du vil slette indholdet <strong>%0%</strong>?',
 		confirmDeleteBlockTypeMessage: 'Er du sikker på at du vil slette konfigurationen <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'Indholdet vil stadigt eksistere, men redigering af dette indhold vil ikke\n      være muligt. Indholdet vil blive vist som ikke understøttet indhold.\n    ',
+		confirmDeleteBlockGroupTitle: 'Slet gruppe?',
 		confirmDeleteBlockGroupMessage:
 			'Er du sikker på at du vil slette gruppen <strong>%0%</strong> og blok konfigurationer?',
 		confirmDeleteBlockGroupNotice:
@@ -2356,6 +2477,7 @@ export default {
 		tabClipboard: 'Udklipsholder',
 		tabBlockSettings: 'Indstillinger',
 		headlineAdvanced: 'Avanceret',
+		headlineCustomView: 'Brugerdefineret visning',
 		forceHideContentEditor: 'Skjul indholdseditoren',
 		forceHideContentEditorHelp: 'Skjul indholds redigerings knappen samt indholdseditoren i Blok Redigerings vinduet',
 		gridInlineEditing: 'Direkte redigering',
@@ -2385,6 +2507,7 @@ export default {
 		layoutOptions: 'Layout-opsætning',
 		structuralOptions: 'Struktur',
 		sizeOptions: 'Størrelses opsætning',
+		sizeOptionsHelp: 'Definér en eller flere størrelsesmuligheder for at gøre blokken kan ændres i størrelse',
 		allowedBlockColumns: 'Tilgængelige kolonne-størrelser',
 		allowedBlockColumnsHelp:
 			'Vælg de forskellige antal kolonner denne blok må optage i layoutet. Dette forhindre ikke blokken i at optræde i et mindre område.',
@@ -2432,7 +2555,6 @@ export default {
 		configureArea: 'Konfigurer område',
 		deleteArea: 'Slet område',
 		addColumnSpanOption: 'Tilføj mulighed for %0% koloner',
-		sizeOptionsHelp: 'Define one or more size options, this enables resizing of the Block',
 		allowBlockInAreas: 'Allow in areas',
 		allowBlockInAreasHelp:
 			'Make this block available by default within the areas of other Blocks (unless explicit permissions are set for these areas).',
@@ -2445,6 +2567,10 @@ export default {
 		unsupportedBlockName: 'Ugyldigt indhold',
 		unsupportedBlockDescription:
 			'Dette indhold er ikke længere understøttet. Hvis du mangler dette indhold bør du kontakte din administrator. Ellers bør du slette dette indhold.',
+		blockVariantConfigurationNotSupported:
+			'En eller flere bloktyper i denne blokeditor bruger en elementtype, der er konfigureret til at variere efter kultur eller segment. Dette understøttes ikke på et indholdselement, som ikke varierer efter kultur eller segment.',
+		areaValidationEntriesNotAllowed: '<strong>%0%</strong> er ikke tilladt i dette område.',
+		rootValidationEntriesNotAllowed: '<strong>%0%</strong> er ikke tilladt i roden af denne egenskab.',
 	},
 	contentTemplatesDashboard: {
 		whatHeadline: 'Hvad er Indholdsskabeloner?',
@@ -2578,6 +2704,8 @@ export default {
 		trainingHeadline: 'Hours of Umbraco training videos are only a click away',
 		trainingDescription:
 			'\n        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>\n    ',
+		learningBaseDescription:
+  			'  <p>Vil du mestre Umbraco? Brug et par minutter på at lære nogle best practices ved at besøge <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">Umbraco Learning Base YouTube-kanalen</a>. Her finder du en masse videoer, der dækker mange aspekter af Umbraco.</p> ',
 		getStarted: 'To get you started',
 	},
 	settingsDashboard: {
@@ -2648,12 +2776,33 @@ export default {
 		wordWrapConfigDescription:
 			'Slå ordbrydning til eller fra, så tekst automatisk brydes ved vinduets kant i stedet for at skabe en horisontal scrollbar.',
 	},
+	rte: {
+		config_blocks: 'Tilgængelige blokke',
+		config_blocks_description: 'Definér de tilgængelige blokke.',
+		config_ignoreUserStartNodes: 'Ignorer brugerens startnoder',
+		config_maxImageSize: 'Maksimal størrelse for indsatte billeder',
+		config_maxImageSize_description: 'Maksimal bredde eller højde – indtast 0 for at deaktivere ændring af størrelse.',
+		config_mediaParentId: 'Upload-mappe til billeder',
+		config_mediaParentId_description: 'Vælg uploadplacering for indsatte billeder.',
+		config_overlaySize: 'Overlay-størrelse',
+		config_overlaySize_description: 'Vælg bredden på overlayet (linkvælger).',
+	},	
 	tiptap: {
+		anchor: 'Anker',
+		anchor_input: 'Indtast anker-ID',
+		config_dimensions_description: 'Sæt den maksimale bredde og højde på editoren. Dette ekskluderer værktøjslinjens højde.',
+		maxDimensions: 'Maksimale dimensioner',
+		minDimensions: 'Minimale dimensioner',
+		config_extensions: 'Funktioner',
+		config_statusbar: 'Statuslinje',
+		config_toolbar: 'Værktøjslinje',
 		extGroup_formatting: 'Text formattering',
 		extGroup_interactive: 'Inaktive elementer',
 		extGroup_media: 'Medier',
 		extGroup_structure: 'Indholds struktur',
 		extGroup_unknown: 'Ukategoriseret',
+		statusbar_availableItems: 'Tilgængelige statusser',
+		statusbar_availableItemsEmpty: 'Der er ingen statuslinjeudvidelser at vise',
 		toobar_availableItems: 'Tilgængelige handlinger',
 		toobar_availableItemsEmpty: 'Ingen handler at vise',
 		toolbar_designer: 'Handlings designer',
@@ -2664,9 +2813,28 @@ export default {
 		toolbar_removeGroup: 'Fjern gruppe',
 		toolbar_removeItem: 'Fjern handling',
 		toolbar_emptyGroup: 'Tom',
+		sourceCodeEdit: 'Rediger kildekode',
+		charmap: 'Tegntabel',
+		charmap_headline: 'Specialtegn',
+		charmap_currency: 'Valuta',
+		charmap_text: 'Tekst',
+		charmap_quotations: 'Anførselstegn',
+		charmap_maths: 'Matematiske',
+		charmap_extlatin: 'Udvidet latinsk',
+		charmap_symbols: 'Symboler',
+		charmap_arrows: 'Pile',
 	},
 	collection: {
 		noItemsTitle: 'Intet indhold',
 		addCollectionConfiguration: 'Tilføj samling',
+	},
+	linkPicker: {
+		modalSource: 'Kilde',
+		modalManual: 'Manuel',
+		modalAnchorValidationMessage:
+			'Indtast et anker eller en querystring, vælg et dokument eller medieelement, eller konfigurer URL’en manuelt.',
+		resetUrlHeadline: 'Nulstil URL?',
+		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
+		resetUrlLabel: 'Nulstil',
 	},
 } as UmbLocalizationDictionary;
