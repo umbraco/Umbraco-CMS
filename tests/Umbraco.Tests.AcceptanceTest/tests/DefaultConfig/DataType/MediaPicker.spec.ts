@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const mediaPickerTypes = [
@@ -67,23 +67,25 @@ test('can update enable focal point', async ({umbracoApi, umbracoUi}) => {
 
 test('can add image crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const cropData = ['Test Label', 'testAlias', 100, 50];
+  const cropObject = {label: 'Test Label', alias: AliasHelper.toAlias('Test Label'), width: 100, height: 50};
   await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
+  await umbracoUi.dataType.clickCreateCropButton();
+
   await umbracoUi.dataType.enterCropValues(
-    cropData[0].toString(),
-    cropData[1].toString(),
-    cropData[2].toString(),
-    cropData[3].toString()
+    cropObject.label,
+    cropObject.alias,
+    cropObject.width.toString(),
+    cropObject.height.toString()
   );
-  await umbracoUi.dataType.clickAddCropButton();
+  await umbracoUi.dataType.clickCreateCropButton();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
-  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropData[0], cropData[1], cropData[2], cropData[3])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropObject.label, cropObject.alias, cropObject.width, cropObject.height)).toBeTruthy();
 });
 
 test('can update ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
