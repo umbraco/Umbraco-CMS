@@ -158,7 +158,7 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         throw new InvalidOperationException("Unexpected content");
     }
 
-    private class FileMetaData
+    private sealed class FileMetaData
     {
         public DateTime AvailableUntil { get; init; }
     }

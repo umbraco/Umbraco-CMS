@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-internal class MemberGroupService : RepositoryService, IMemberGroupService
+internal sealed class MemberGroupService : RepositoryService, IMemberGroupService
 {
     private readonly IMemberGroupRepository _memberGroupRepository;
 

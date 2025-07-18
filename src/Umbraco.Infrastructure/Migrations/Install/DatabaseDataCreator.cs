@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 /// <summary>
 ///     Creates the initial database data during install.
 /// </summary>
-internal class DatabaseDataCreator
+internal sealed class DatabaseDataCreator
 {
 
     internal const string EditorGroupAlias = "editor";

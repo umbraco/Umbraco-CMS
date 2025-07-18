@@ -40,7 +40,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<BlockGridEditorPropertyValueEditor>(Attribute!);
 
-    internal class BlockGridEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockGridValue, BlockGridLayoutItem>
+    internal sealed class BlockGridEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockGridValue, BlockGridLayoutItem>
     {
         public BlockGridEditorPropertyValueEditor(
             DataEditorAttribute attribute,
@@ -65,7 +65,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
 
         protected override BlockGridValue CreateWithLayout(IEnumerable<BlockGridLayoutItem> layout) => new(layout);
 
-        private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockGridValue, BlockGridLayoutItem>
+        private sealed class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockGridValue, BlockGridLayoutItem>
         {
             private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockEditorValues;
 

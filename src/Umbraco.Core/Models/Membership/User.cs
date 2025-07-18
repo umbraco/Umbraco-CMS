@@ -426,7 +426,7 @@ public class User : EntityBase, IUser, IProfile
     /// <summary>
     ///     Internal class used to wrap the user in a profile
     /// </summary>
-    private class WrappedUserProfile : IProfile
+    private sealed class WrappedUserProfile : IProfile
     {
         private readonly IUser _user;
 

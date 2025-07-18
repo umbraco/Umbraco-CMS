@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Core.Diagnostics;
 
-internal class NoopMarchal : IMarchal
+internal sealed class NoopMarchal : IMarchal
 {
     public IntPtr GetExceptionPointers() => IntPtr.Zero;
 }

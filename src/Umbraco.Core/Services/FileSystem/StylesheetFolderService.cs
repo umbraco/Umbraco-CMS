@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.FileSystem;
 
-internal class StylesheetFolderService : FolderServiceOperationBase<IStylesheetRepository, StylesheetFolderModel, StylesheetFolderOperationStatus>, IStylesheetFolderService
+internal sealed class StylesheetFolderService : FolderServiceOperationBase<IStylesheetRepository, StylesheetFolderModel, StylesheetFolderOperationStatus>, IStylesheetFolderService
 {
     public StylesheetFolderService(IStylesheetRepository repository, ICoreScopeProvider scopeProvider)
         : base(repository, scopeProvider)

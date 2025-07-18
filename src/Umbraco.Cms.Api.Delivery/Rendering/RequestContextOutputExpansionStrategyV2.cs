@@ -124,7 +124,7 @@ internal sealed class RequestContextOutputExpansionStrategyV2 : IOutputExpansion
     private object? GetPropertyValue(IPublishedProperty property)
         => _propertyRenderer.GetPropertyValue(property, _expandProperties.Peek() is not null);
 
-    private class Node
+    private sealed class Node
     {
         public string Key { get; private set; } = string.Empty;
 

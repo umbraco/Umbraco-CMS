@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence;
 ///     <para>Beware, the application MUST restart when this class behavior changes.</para>
 ///     <para>You can override the GetColmunnInfo method to control which columns this includes</para>
 /// </remarks>
-internal class UmbracoPocoDataBuilder : PocoDataBuilder
+internal sealed class UmbracoPocoDataBuilder : PocoDataBuilder
 {
     private readonly bool _upgrading;
 

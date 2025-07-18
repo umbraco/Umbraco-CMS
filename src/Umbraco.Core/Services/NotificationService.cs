@@ -607,7 +607,7 @@ public class NotificationService : INotificationService
         }
     }
 
-    private class NotificationRequest
+    private sealed class NotificationRequest
     {
         public NotificationRequest(EmailMessage mail, string? action, string? userName, string? email)
         {

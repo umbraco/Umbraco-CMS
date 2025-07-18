@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Access)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class AccessDto
+internal sealed class AccessDto
 {
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoAccess", AutoIncrement = false)]

@@ -1231,7 +1231,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        private class NodeIdKey
+        private sealed class NodeIdKey
         {
             [Column("id")]
             public int NodeId { get; set; }

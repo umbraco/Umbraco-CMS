@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Cache;
 ///     </para>
 ///     <para>Used by DictionaryRepository.</para>
 /// </remarks>
-internal class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
+internal sealed class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
     where TEntity : class, IEntity
 {
     public SingleItemsOnlyRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)

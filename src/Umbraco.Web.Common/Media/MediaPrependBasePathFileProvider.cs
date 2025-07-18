@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Web.Common.Media;
 /// A PR has been submitted to the Dazinator project: https://github.com/dazinator/Dazinator.Extensions.FileProviders/pull/53
 /// If that PR is accepted, the Dazinator dependency should be updated and this class should be removed.
 /// </remarks>
-internal class MediaPrependBasePathFileProvider : IFileProvider
+internal sealed class MediaPrependBasePathFileProvider : IFileProvider
 {
     private readonly PathString _basePath;
     private readonly IFileProvider _underlyingFileProvider;
@@ -29,7 +29,7 @@ internal class MediaPrependBasePathFileProvider : IFileProvider
         _underlyingFileProvider = underlyingFileProvider;
     }
 
-    protected virtual bool TryMapSubPath(string originalSubPath, out PathString newSubPath)
+    private bool TryMapSubPath(string originalSubPath, out PathString newSubPath)
     {
         if (!string.IsNullOrEmpty(originalSubPath))
         {

@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Core.Hosting;
 
-internal class NoopApplicationShutdownRegistry : IApplicationShutdownRegistry
+internal sealed class NoopApplicationShutdownRegistry : IApplicationShutdownRegistry
 {
     public void RegisterObject(IRegisteredObject registeredObject)
     {

@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Umbraco.Cms.Core.IO;
 
-internal class ShadowFileSystem : IFileSystem
+internal sealed class ShadowFileSystem : IFileSystem
 {
     private readonly IFileSystem _sfs;
 
@@ -392,7 +392,7 @@ internal class ShadowFileSystem : IFileSystem
     }
 
     // copied from System.Web.Util.Wildcard internal
-    internal class WildcardExpression
+    internal sealed class WildcardExpression
     {
         private static readonly Regex MetaRegex = new("[\\+\\{\\\\\\[\\|\\(\\)\\.\\^\\$]");
         private static readonly Regex QuestRegex = new("\\?");
@@ -454,7 +454,7 @@ internal class ShadowFileSystem : IFileSystem
         }
     }
 
-    private class ShadowNode
+    private sealed class ShadowNode
     {
         public ShadowNode(bool isDelete, bool isdir)
         {

@@ -872,7 +872,7 @@ public static class HtmlHelperRenderExtensions
     /// <summary>
     ///     Used for rendering out the Form for BeginUmbracoForm
     /// </summary>
-    internal class UmbracoForm : MvcForm
+    internal sealed class UmbracoForm : MvcForm
     {
         private readonly string _surfaceControllerInput;
         private readonly ViewContext _viewContext;

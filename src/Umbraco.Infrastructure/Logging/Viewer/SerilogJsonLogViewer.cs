@@ -5,7 +5,7 @@ using ILogger = Serilog.ILogger;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
-internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
+internal sealed class SerilogJsonLogViewer : SerilogLogViewerSourceBase
 {
     private const int FileSizeCap = 100;
     private readonly ILogger<SerilogJsonLogViewer> _logger;
@@ -112,7 +112,7 @@ internal class SerilogJsonLogViewer : SerilogLogViewerSourceBase
         return logs;
     }
 
-    private string GetSearchPattern(DateTime day) => $"*{day:yyyyMMdd}*.json";
+    private static string GetSearchPattern(DateTime day) => $"*{day:yyyyMMdd}*.json";
 
     private bool TryRead(LogEventReader reader, out LogEvent? evt)
     {

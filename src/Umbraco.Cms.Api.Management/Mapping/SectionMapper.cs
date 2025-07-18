@@ -45,7 +45,7 @@ public static class SectionMapper
         return name;
     }
 
-    private class SectionMapping
+    private sealed class SectionMapping
     {
         public required string Alias { get; init; }
 

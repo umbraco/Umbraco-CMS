@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     The value editor for the file upload property editor.
 /// </summary>
-internal class FileUploadPropertyValueEditor : DataValueEditor
+internal sealed class FileUploadPropertyValueEditor : DataValueEditor
 {
     private readonly MediaFileManager _mediaFileManager;
     private readonly ITemporaryFileService _temporaryFileService;
@@ -159,7 +159,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
         => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
 
-    private bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
+    private static bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
     {
         if (dataTypeConfiguration is FileUploadConfiguration fileUploadConfiguration)
         {
@@ -207,7 +207,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     /// Provides media path.
     /// </summary>
     /// <returns>File system relative path</returns>
-    protected virtual string GetMediaPath(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
+    private string GetMediaPath(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
     {
         // in case we are using the old path scheme, try to re-use numbers (bah...)
         return _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey);

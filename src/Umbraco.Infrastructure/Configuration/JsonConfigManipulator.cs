@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.Configuration;
 
-internal class JsonConfigManipulator : IConfigManipulator
+internal sealed class JsonConfigManipulator : IConfigManipulator
 {
     private const string ConnectionStringObjectName = "ConnectionStrings";
     private const string UmbracoConnectionStringPath = $"{ConnectionStringObjectName}:{Constants.System.UmbracoConnectionName}";

@@ -3,7 +3,7 @@
 namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence
 {
     // read-only dto
-    internal class ContentSourceDto : IReadOnlyContentBase
+    internal sealed class ContentSourceDto : IReadOnlyContentBase
     {
         public int Id { get; init; }
 

@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
     /// <summary>
     /// Implements <see cref="IScopeProvider"/>.
     /// </summary>
-    internal class ScopeProvider :
+    internal sealed class ScopeProvider :
         ICoreScopeProvider,
         IScopeProvider,
         Core.Scoping.IScopeProvider,

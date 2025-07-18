@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class ContentScheduleDto
+internal sealed class ContentScheduleDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentSchedule;
 

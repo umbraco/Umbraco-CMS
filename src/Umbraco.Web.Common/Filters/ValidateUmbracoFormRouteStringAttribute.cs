@@ -22,9 +22,9 @@ public class ValidateUmbracoFormRouteStringAttribute : TypeFilterAttribute
     // TODO: Lets revisit this when we get members done and the front-end working and whether it can moved to an authz policy
     public ValidateUmbracoFormRouteStringAttribute()
         : base(typeof(ValidateUmbracoFormRouteStringFilter)) =>
-        Arguments = new object[] { };
+        Arguments = [];
 
-    internal class ValidateUmbracoFormRouteStringFilter : IAuthorizationFilter
+    internal sealed class ValidateUmbracoFormRouteStringFilter : IAuthorizationFilter
     {
         private readonly IDataProtectionProvider _dataProtectionProvider;
 

@@ -39,7 +39,7 @@ public class IntegerPropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the integer property editor.
     /// </summary>
-    internal class IntegerPropertyValueEditor : DataValueEditor
+    internal sealed class IntegerPropertyValueEditor : DataValueEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="IntegerPropertyValueEditor"/> class.
@@ -106,7 +106,7 @@ public class IntegerPropertyEditor : DataEditor
         /// <summary>
         /// Validates the min/max configuration for the integer property editor.
         /// </summary>
-        internal class MinMaxValidator : IntegerPropertyConfigurationValidatorBase, IValueValidator
+        internal sealed class MinMaxValidator : IntegerPropertyConfigurationValidatorBase, IValueValidator
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
@@ -143,7 +143,7 @@ public class IntegerPropertyEditor : DataEditor
         /// <summary>
         /// Validates the step configuration for the integer property editor.
         /// </summary>
-        internal class StepValidator : IntegerPropertyConfigurationValidatorBase, IValueValidator
+        internal sealed class StepValidator : IntegerPropertyConfigurationValidatorBase, IValueValidator
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="StepValidator"/> class.

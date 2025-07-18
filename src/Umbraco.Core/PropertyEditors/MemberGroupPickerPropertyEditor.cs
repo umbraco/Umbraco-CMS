@@ -21,7 +21,7 @@ public class MemberGroupPickerPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MemberGroupPickerPropertyValueEditor>(Attribute!);
 
-    private class MemberGroupPickerPropertyValueEditor : DataValueEditor
+    private sealed class MemberGroupPickerPropertyValueEditor : DataValueEditor
     {
         private readonly IMemberGroupService _memberGroupService;
 

@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
     ///     Implements <see cref="IScope" />.
     /// </summary>
     /// <remarks>Not thread-safe obviously.</remarks>
-    internal class Scope : CoreScope, ICoreScope, IScope, Core.Scoping.IScope
+    internal sealed class Scope : CoreScope, ICoreScope, IScope, Core.Scoping.IScope
     {
         private readonly bool _autoComplete;
         private readonly CoreDebugSettings _coreDebugSettings;

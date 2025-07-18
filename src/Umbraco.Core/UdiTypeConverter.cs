@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core;
 /// <remarks>
 ///     Primarily this is used so that WebApi can auto-bind a string parameter to a UDI instance
 /// </remarks>
-internal class UdiTypeConverter : TypeConverter
+internal sealed class UdiTypeConverter : TypeConverter
 {
     public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
     {

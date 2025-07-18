@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.ContentChildType)]
 [PrimaryKey("Id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class ContentTypeAllowedContentTypeDto
+internal sealed class ContentTypeAllowedContentTypeDto
 {
     [Column("Id")]
     [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType", Column = "nodeId")]

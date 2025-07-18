@@ -39,7 +39,7 @@ public class LogProfiler : IProfiler
     public bool IsEnabled => _logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug);
 
     // a lightweight disposable timer
-    private class LightDisposableTimer : DisposableObjectSlim
+    private sealed class LightDisposableTimer : DisposableObjectSlim
     {
         private readonly Action<long> _callback;
         private readonly Stopwatch _stopwatch = Stopwatch.StartNew();

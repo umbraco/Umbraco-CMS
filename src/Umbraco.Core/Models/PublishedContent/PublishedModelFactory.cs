@@ -151,7 +151,7 @@ public class PublishedModelFactory : IPublishedModelFactory
     public Type MapModelType(Type type)
         => ModelType.Map(type, _modelTypeMap);
 
-    private class ModelInfo
+    private sealed class ModelInfo
     {
         public Type? ParameterType { get; set; }
 

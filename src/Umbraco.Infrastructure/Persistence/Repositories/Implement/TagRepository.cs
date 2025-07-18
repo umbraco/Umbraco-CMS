@@ -15,7 +15,7 @@ using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
+internal sealed class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
 {
     public TagRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TagRepository> logger)
         : base(scopeAccessor, cache, logger)
@@ -245,7 +245,7 @@ WHERE r.tagId IS NULL";
     }
 
     // used to run Distinct() on tags
-    private class TagComparer : IEqualityComparer<ITag>
+    private sealed class TagComparer : IEqualityComparer<ITag>
     {
         public bool Equals(ITag? x, ITag? y) =>
             ReferenceEquals(x, y) // takes care of both being null
@@ -276,7 +276,7 @@ WHERE r.tagId IS NULL";
 
     // ReSharper disable once ClassNeverInstantiated.Local
     // ReSharper disable UnusedAutoPropertyAccessor.Local
-    private class TaggedEntityDto
+    private sealed class TaggedEntityDto
     {
         public int NodeId { get; set; }
         public string? PropertyTypeAlias { get; set; }
@@ -538,7 +538,7 @@ WHERE r.tagId IS NULL";
         return sql;
     }
 
-    private Sql<ISqlContext> AddTagsSqlWhere(Sql<ISqlContext> sql, string? culture)
+    private static Sql<ISqlContext> AddTagsSqlWhere(Sql<ISqlContext> sql, string? culture)
     {
         if (culture == null)
         {
@@ -557,7 +557,7 @@ WHERE r.tagId IS NULL";
     private IEnumerable<ITag> ExecuteTagsQuery(Sql sql) =>
         Database.Fetch<TagDto>(sql).Select(TagFactory.BuildEntity);
 
-    private Guid GetNodeObjectType(TaggableObjectTypes type)
+    private static Guid GetNodeObjectType(TaggableObjectTypes type)
     {
         switch (type)
         {

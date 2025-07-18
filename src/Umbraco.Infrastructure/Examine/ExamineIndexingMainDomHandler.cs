@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Runtime;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-internal class ExamineIndexingMainDomHandler
+internal sealed class ExamineIndexingMainDomHandler
 {
     private readonly IMainDom _mainDom;
     private readonly IProfilingLogger _profilingLogger;

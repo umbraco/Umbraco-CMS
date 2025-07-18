@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore;
 /// Notification handler which will listen to the <see cref="UmbracoRequestBeginNotification"/>, and ensure that
 /// the applicationUrl is set on the first request.
 /// </summary>
-internal class ApplicationUrlRequestBeginNotificationHandler : INotificationHandler<UmbracoRequestBeginNotification>
+internal sealed class ApplicationUrlRequestBeginNotificationHandler : INotificationHandler<UmbracoRequestBeginNotification>
 {
     private readonly IRequestAccessor _requestAccessor;
 

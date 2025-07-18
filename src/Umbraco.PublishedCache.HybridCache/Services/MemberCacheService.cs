@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-internal class MemberCacheService : IMemberCacheService
+internal sealed class MemberCacheService : IMemberCacheService
 {
     private readonly IPublishedContentFactory _publishedContentFactory;
 

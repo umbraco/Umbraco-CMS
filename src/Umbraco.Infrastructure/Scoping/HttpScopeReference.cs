@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Scoping;
 ///     Disposed at the end of the request to cleanup any orphaned Scopes.
 /// </summary>
 /// <remarks>Registered as Scoped in DI (per request)</remarks>
-internal class HttpScopeReference : IHttpScopeReference
+internal sealed class HttpScopeReference : IHttpScopeReference
 {
     private readonly ScopeProvider _scopeProvider;
     private bool _disposedValue;
@@ -24,7 +24,7 @@ internal class HttpScopeReference : IHttpScopeReference
 
     public void Register() => _registered = true;
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (!_disposedValue)
         {

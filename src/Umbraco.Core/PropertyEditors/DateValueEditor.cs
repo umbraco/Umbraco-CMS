@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 ///     CUstom value editor so we can serialize with the correct date format (excluding time)
 ///     and includes the date validator
 /// </summary>
-internal class DateValueEditor : DataValueEditor
+internal sealed class DateValueEditor : DataValueEditor
 {
     public DateValueEditor(
         IShortStringHelper shortStringHelper,

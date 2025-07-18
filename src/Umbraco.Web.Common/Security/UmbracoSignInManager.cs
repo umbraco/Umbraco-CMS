@@ -517,7 +517,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     }
 
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L891
-    private class TwoFactorAuthenticationInfo
+    private sealed class TwoFactorAuthenticationInfo
     {
         public string? UserId { get; set; }
 

@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 
-internal class RichTextRegexValidator : IRichTextRegexValidator
+internal sealed class RichTextRegexValidator : IRichTextRegexValidator
 {
     private readonly RegexValidator _regexValidator;
     private readonly IJsonSerializer _jsonSerializer;
