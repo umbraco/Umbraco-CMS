@@ -355,8 +355,7 @@ test('can update content with update permission enabled', async ({umbracoApi, um
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
 });
 
-// TODO: the permission for update is not working, it is always enabled.
-test.skip('can not update content with update permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('can not update content with update permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
