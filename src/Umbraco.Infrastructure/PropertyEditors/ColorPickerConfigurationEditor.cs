@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
+internal sealed class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
 {
     public ColorPickerConfigurationEditor(IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         : base(ioHelper)
@@ -19,7 +19,7 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
         items.Validators.Add(new ColorListValidator(configurationEditorJsonSerializer));
     }
 
-    internal class ColorListValidator : IValueValidator
+    internal sealed class ColorListValidator : IValueValidator
     {
         private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 

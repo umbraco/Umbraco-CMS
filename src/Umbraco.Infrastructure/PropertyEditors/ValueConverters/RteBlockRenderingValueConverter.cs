@@ -231,7 +231,7 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         };
     }
 
-    private class RichTextEditorIntermediateValue : IRichTextEditorIntermediateValue
+    private sealed class RichTextEditorIntermediateValue : IRichTextEditorIntermediateValue
     {
         public required string Markup { get; set; }
 
