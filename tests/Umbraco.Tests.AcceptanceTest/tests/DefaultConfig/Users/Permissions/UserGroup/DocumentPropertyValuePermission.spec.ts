@@ -70,7 +70,7 @@ test('cannot open content without document read permission even with UI read per
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert
-  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.permissionDenied);
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
 });
 
 test('cannot edit property values without UI write permission', async ({umbracoApi, umbracoUi}) => {
@@ -89,7 +89,7 @@ test('cannot edit property values without UI write permission', async ({umbracoA
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Remove .skip when the front-end is ready. 
+// Remove .skip when the front-end is ready.
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
 test.skip('can edit property values with UI write permission', async ({umbracoApi, umbracoUi}) => {
   // Arrange
