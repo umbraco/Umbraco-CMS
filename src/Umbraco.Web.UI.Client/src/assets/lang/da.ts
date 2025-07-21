@@ -367,7 +367,7 @@ export default {
 	},
 	entityDetail: {
 		notFoundTitle: (entityType: string) => {
-      const entityName = entityType ?? 'Elementet';
+			const entityName = entityType ?? 'Elementet';
 			return `${entityName} blev ikke fundet`;
 		},
 		notFoundDescription: (entityType: string) => {
@@ -2786,7 +2786,7 @@ export default {
 		config_mediaParentId_description: 'Vælg uploadplacering for indsatte billeder.',
 		config_overlaySize: 'Overlay-størrelse',
 		config_overlaySize_description: 'Vælg bredden på overlayet (linkvælger).',
-	},	
+	},
 	tiptap: {
 		anchor: 'Anker',
 		anchor_input: 'Indtast anker-ID',
