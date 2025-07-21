@@ -61,8 +61,6 @@ internal sealed class InitializeMemberApplicationNotificationHandler : INotifica
                 return;
             }
 
-            _isInitialized = true;
-
             // we cannot inject the IMemberApplicationManager because it ultimately takes a dependency on the DbContext ... and during
             // install that is not allowed (no connection string means no DbContext)
             using IServiceScope scope = _serviceScopeFactory.CreateScope();
@@ -70,6 +68,8 @@ internal sealed class InitializeMemberApplicationNotificationHandler : INotifica
 
             await HandleMemberApplication(memberApplicationManager, cancellationToken);
             await HandleMemberClientCredentialsApplication(memberApplicationManager, cancellationToken);
+
+            _isInitialized = true;
         }
         finally
         {
