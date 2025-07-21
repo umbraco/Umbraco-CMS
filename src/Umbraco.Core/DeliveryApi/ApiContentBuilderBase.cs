@@ -1,7 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
@@ -50,44 +51,31 @@ public abstract class ApiContentBuilderBase<T>
             return default;
         }
 
-        IDictionary<string, object?> properties =
-            _outputExpansionStrategyAccessor.TryGetValue(out IOutputExpansionStrategy? outputExpansionStrategy)
-                ? outputExpansionStrategy.MapContentProperties(content)
-                : new Dictionary<string, object?>();
-
-        // If a segment is requested and all segmented properties are null, we consider the segment as not created or non-existing and return null.
+        // If a segment is requested and no segmented properties have any values, we consider the segment as not created or non-existing and return null.
         // This aligns the behaviour of the API when it comes to "Accept-Segment" and "Accept-Language" requests, so 404 is returned for both when
         // the segment or language is not created or does not exist.
         // It also aligns with what we show in the backoffice for whether a segment is "Published" or "Not created".
         // Requested languages that aren't created or don't exist will already have exited early in the route builder.
-        if (IsSegmentRequested() && AreAllSegmentedPropertiesNull(content, properties))
+        var segment = VariationContextAccessor.VariationContext?.Segment;
+        if (segment.IsNullOrWhiteSpace() is false
+            && content.ContentType.VariesBySegment()
+            && content
+                .Properties
+                .Where(p => p.PropertyType.VariesBySegment())
+                .All(p => p.HasValue(VariationContextAccessor.VariationContext?.Culture, segment) is false))
         {
             return default;
         }
+
+        IDictionary<string, object?> properties =
+            _outputExpansionStrategyAccessor.TryGetValue(out IOutputExpansionStrategy? outputExpansionStrategy)
+                ? outputExpansionStrategy.MapContentProperties(content)
+                : new Dictionary<string, object?>();
 
         return Create(
             content,
             _apiContentNameProvider.GetName(content),
             route,
             properties);
-    }
-
-    private bool IsSegmentRequested() => string.IsNullOrWhiteSpace(VariationContextAccessor.VariationContext?.Segment) is false;
-
-    private static bool AreAllSegmentedPropertiesNull(
-        IPublishedContent content,
-        IDictionary<string, object?> properties)
-    {
-        var segmentedProperties = content.Properties
-            .Where(x => x.PropertyType.Variations.HasFlag(Models.ContentVariation.Segment))
-            .Select(x => x.Alias)
-            .ToList();
-
-        if (segmentedProperties.Count == 0)
-        {
-            return true;
-        }
-
-        return segmentedProperties.All(x => properties.ContainsKey(x) is false || properties[x] is null);
     }
 }

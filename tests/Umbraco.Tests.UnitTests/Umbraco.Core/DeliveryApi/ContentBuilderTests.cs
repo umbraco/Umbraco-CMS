@@ -154,6 +154,7 @@ public class ContentBuilderTests : DeliveryApiTests
         var content = new Mock<IPublishedContent>();
 
         var sharedPropertyValueConverter = new Mock<IDeliveryApiPropertyValueConverter>();
+        sharedPropertyValueConverter.Setup(p => p.IsValue(It.IsAny<object?>(), It.IsAny<PropertyValueLevel>())).Returns(sharedValue is not null);
         sharedPropertyValueConverter.Setup(p => p.ConvertIntermediateToDeliveryApiObject(
             It.IsAny<IPublishedElement>(),
             It.IsAny<IPublishedPropertyType>(),
@@ -169,6 +170,7 @@ public class ContentBuilderTests : DeliveryApiTests
         var sharedProperty = new PublishedElementPropertyBase(sharedPropertyType, content.Object, false, PropertyCacheLevel.None, new VariationContext(), Mock.Of<ICacheManager>());
 
         var segmentedPropertyValueConverter = new Mock<IDeliveryApiPropertyValueConverter>();
+        segmentedPropertyValueConverter.Setup(p => p.IsValue(It.IsAny<object?>(), It.IsAny<PropertyValueLevel>())).Returns(segmentedValue is not null);
         segmentedPropertyValueConverter.Setup(p => p.ConvertIntermediateToDeliveryApiObject(
             It.IsAny<IPublishedElement>(),
             It.IsAny<IPublishedPropertyType>(),
@@ -186,6 +188,7 @@ public class ContentBuilderTests : DeliveryApiTests
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Alias).Returns("thePageType");
         contentType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
+        contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Segment);
 
         var key = Guid.NewGuid();
         var urlSegment = "url-segment";
