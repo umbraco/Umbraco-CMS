@@ -17,7 +17,7 @@ public class DataType : TreeEntityBase, IDataType
     private IDictionary<string, object> _configurationData;
     private ValueStorageType _databaseType;
     private IDataEditor? _editor;
-    private string? _editorUIAlias;
+    private string? _editorUiAlias;
     private bool _hasConfigurationObject;
 
     /// <summary>
@@ -63,8 +63,8 @@ public class DataType : TreeEntityBase, IDataType
     [DataMember]
     public string? EditorUiAlias
     {
-        get => _editorUIAlias;
-        set => SetPropertyValueAndDetectChanges(value, ref _editorUIAlias, nameof(EditorUiAlias));
+        get => _editorUiAlias;
+        set => SetPropertyValueAndDetectChanges(value, ref _editorUiAlias, nameof(EditorUiAlias));
     }
 
     /// <inheritdoc />
