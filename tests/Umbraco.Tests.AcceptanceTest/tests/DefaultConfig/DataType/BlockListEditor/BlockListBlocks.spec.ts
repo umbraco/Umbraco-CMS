@@ -414,9 +414,26 @@ test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi
   expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(false);
 });
 
-// TODO: Thumbnails are not showing in the UI
-test.skip('can add a thumbnail to a block ', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const mediaName = 'TestMedia';
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
+  const mediaUrl = await umbracoApi.media.getMediaUrl(mediaId);
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.dataType.doesBlockHaveThumbnailImage(mediaUrl);
 });
 
 // TODO: Thumbnails are not showing in the UI
