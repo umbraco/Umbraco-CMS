@@ -217,7 +217,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
         public string? QueryString { get; set; }
     }
 
-    internal class MinMaxValidator : ITypedJsonValidator<LinkDisplay[], MultiUrlPickerConfiguration>
+    internal sealed class MinMaxValidator : ITypedJsonValidator<LinkDisplay[], MultiUrlPickerConfiguration>
     {
         private readonly ILocalizedTextService _localizedTextService;
 

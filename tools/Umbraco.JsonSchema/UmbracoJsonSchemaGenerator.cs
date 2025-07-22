@@ -5,7 +5,7 @@ using NJsonSchema;
 using NJsonSchema.Generation;
 
 /// <inheritdoc />
-internal class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
+internal sealed class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoJsonSchemaGenerator" /> class.
@@ -26,7 +26,7 @@ internal class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
     { }
 
     /// <inheritdoc />
-    private class UmbracoSystemTextJsonReflectionService : SystemTextJsonReflectionService
+    private sealed class UmbracoSystemTextJsonReflectionService : SystemTextJsonReflectionService
     {
         /// <inheritdoc />
         public override void GenerateProperties(JsonSchema schema, ContextualType contextualType, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)

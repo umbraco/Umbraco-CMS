@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying;
 ///     based on Umbraco's business logic models.
 /// </summary>
 /// <remarks>This object is stateful and cannot be re-used to parse an expression.</remarks>
-internal class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
+internal sealed class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
 {
     private readonly BaseMapper? _mapper;
     private readonly IMapperCollection? _mappers;

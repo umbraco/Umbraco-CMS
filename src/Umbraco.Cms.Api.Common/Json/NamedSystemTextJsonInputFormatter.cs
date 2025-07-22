@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Cms.Api.Common.Json;
 
-internal class NamedSystemTextJsonInputFormatter : SystemTextJsonInputFormatter
+internal sealed class NamedSystemTextJsonInputFormatter : SystemTextJsonInputFormatter
 {
     private readonly string _jsonOptionsName;
 

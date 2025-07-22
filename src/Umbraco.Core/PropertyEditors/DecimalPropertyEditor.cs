@@ -41,7 +41,7 @@ public class DecimalPropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the decimal property editor.
     /// </summary>
-    internal class DecimalPropertyValueEditor : DataValueEditor
+    internal sealed class DecimalPropertyValueEditor : DataValueEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DecimalPropertyValueEditor"/> class.
@@ -63,7 +63,7 @@ public class DecimalPropertyEditor : DataEditor
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             => TryParsePropertyValue(editorValue.Value);
 
-        private decimal? TryParsePropertyValue(object? value)
+        private static decimal? TryParsePropertyValue(object? value)
             => value is decimal decimalValue
                 ? decimalValue
                 : decimal.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out var parsedDecimalValue)
@@ -108,7 +108,7 @@ public class DecimalPropertyEditor : DataEditor
         /// <summary>
         /// Validates the min/max configuration for the decimal property editor.
         /// </summary>
-        internal class MinMaxValidator : DecimalPropertyConfigurationValidatorBase, IValueValidator
+        internal sealed class MinMaxValidator : DecimalPropertyConfigurationValidatorBase, IValueValidator
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
@@ -145,7 +145,7 @@ public class DecimalPropertyEditor : DataEditor
         /// <summary>
         /// Validates the step configuration for the decimal property editor.
         /// </summary>
-        internal class StepValidator : DecimalPropertyConfigurationValidatorBase, IValueValidator
+        internal sealed class StepValidator : DecimalPropertyConfigurationValidatorBase, IValueValidator
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="StepValidator"/> class.
