@@ -631,7 +631,7 @@ test('can not see delete button in content for userGroup with delete permission 
   await umbracoUi.content.isPermissionInActionsMenuVisible('Create…', true);
 });
 
-test('can create and update content with permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can create and update content with permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedDocumentName = testDocumentName + ' Updated';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateAndUpdateDocumentPermission(userGroupName);
