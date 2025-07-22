@@ -1091,14 +1091,14 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .From<ExternalLoginDto>()
             .Where<ExternalLoginDto>(x => !x.LoginProvider.StartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix)) // Only invalidate sessions relating to backoffice users, not members.
             .WhereNotIn<ExternalLoginDto>(x => x.LoginProvider, currentLoginProviders);
-        List<Guid> userAndMemberKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
-        if (userAndMemberKeysAssociatedWithRemovedProviders.Count == 0)
+        List<Guid> userKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
+        if (userKeysAssociatedWithRemovedProviders.Count == 0)
         {
             return;
         }
 
         // Convert to user integer IDs.
-        var userIdsAssociatedWithRemovedProviders = userAndMemberKeysAssociatedWithRemovedProviders
+        var userIdsAssociatedWithRemovedProviders = userKeysAssociatedWithRemovedProviders
             .Select(ConvertUserKeyToUserId)
             .Where(x => x.HasValue)
             .Select(x => x!.Value)
