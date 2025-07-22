@@ -2,7 +2,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -54,6 +54,9 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	@state()
 	private _timeZoneOptions: Array<Option> = [];
 
+	@state()
+	private _format: string = 'yyyy-MM-dd HH:mm';
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -72,11 +75,11 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		}
 
 		this._currentDate = dateTime;
-		this._datePickerValue = dateTime.toFormat('yyyy-MM-dd HH:mm');
+		this._datePickerValue = dateTime.toFormat(this._format);
 		this._selectedTimeZone = value.timeZone;
 
 		if (this._selectedTimeZone) {
-			this._timeZoneOffset = dateTime.offsetNameShort || '';
+			this._timeZoneOffset = dateTime.toFormat('ZZ');
 		}
 	}
 
@@ -106,6 +109,14 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		if (clientTimeZoneOpt) {
 			clientTimeZoneOpt.selected = true;
 			this._selectedTimeZone = clientTimeZoneOpt.value;
+			if(this._currentDate){
+				this._currentDate = this._currentDate.setZone(this._selectedTimeZone);
+				this._datePickerValue = this._currentDate.toFormat(this._format);
+				this._timeZoneOffset = this._currentDate.toFormat('ZZ');
+			}else{
+				this._timeZoneOffset = DateTime.now().setZone(this._selectedTimeZone).toFormat('ZZ');
+			}
+
 			return;
 		}
 
@@ -113,6 +124,13 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		const firstOption = this._timeZoneOptions[0];
 		this._selectedTimeZone = firstOption.value;
 		firstOption.selected = true;
+		if(this._currentDate){
+			this._currentDate = this._currentDate.setZone(this._selectedTimeZone);
+			this._datePickerValue = this._currentDate.toFormat(this._format);
+			this._timeZoneOffset = this._currentDate.toFormat('ZZ');
+		}else{
+			this._timeZoneOffset = DateTime.now().setZone(this._selectedTimeZone).toFormat('ZZ');
+		}
 	}
 
 	#mapTimeZoneOption(timeZone: string, selected: boolean = false): Option {
@@ -167,18 +185,18 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 			this._value = undefined;
 			this._timeZoneOffset = '';
 			this.dispatchEvent(new UmbChangeEvent());
-			this._timeZoneOffset = DateTime.now().setZone(timeZone).offsetNameShort || '';
+			this._timeZoneOffset = DateTime.now().setZone(timeZone).toFormat('ZZ');
 			return;
 		}
 
 		// Try to parse the date with the selected time zone
-		const newDate = DateTime.fromFormat(this._datePickerValue, 'yyyy-MM-dd HH:mm', { zone: this._selectedTimeZone });
+		const newDate = DateTime.fromFormat(this._datePickerValue, this._format, { zone: this._selectedTimeZone });
 
 		// If the date is invalid, we reset the value
 		if (!newDate.isValid) {
 			this._value = undefined;
 			this.dispatchEvent(new UmbChangeEvent());
-			this._timeZoneOffset = DateTime.now().setZone(timeZone).offsetNameShort || '';
+			this._timeZoneOffset = DateTime.now().setZone(timeZone).toFormat('ZZ');
 			return;
 		}
 
@@ -186,25 +204,55 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		this._value = { date: this._currentDate.toISO() || '', timeZone: timeZone };
 		this.dispatchEvent(new UmbChangeEvent());
 
-		this._timeZoneOffset = this._currentDate.setZone(timeZone).offsetNameShort || '';
+		this._timeZoneOffset = this._currentDate.setZone(timeZone).toFormat('ZZ');
 	}
 
 	override render() {
 		return html`
-			<umb-input-date
-				label=${this.localize.term('placeholders_enterdate')}
-				.value=${this._datePickerValue}
-				type="datetime-local"
-				@change=${this.#onValueChange}
-				?readonly=${this.readonly}>
-			</umb-input-date>
+			<div class="picker">
+				<umb-input-date
+					label=${this.localize.term('placeholders_enterdate')}
+					.value=${this._datePickerValue}
+					type="datetime-local"
+					@change=${this.#onValueChange}
+					?readonly=${this.readonly}>
+				</umb-input-date>
+				${this.#renderTimeZones()}
+			</div>
+			<div class="info">
+				${this.#renderInfo()}
+			</div>
+		`;
+	}
+
+	#renderTimeZones() {
+		if(this._timeZoneOptions.length === 0) {
+			return nothing;
+		}
+		if(this._timeZoneOptions.length === 1) {
+			return html`
+				<span title="UTC${this._timeZoneOffset}">${this._timeZoneOptions[0].name}</span>
+				`;
+		}
+
+		return html`
 			<uui-select
 				id="timeZone"
 				name="timeZone"
 				label="timeZone"
 				.options=${this._timeZoneOptions || []}
-				@change=${this.#onTimeZoneChange}></uui-select>
-			<span id="timeZoneOffset"> ${this._timeZoneOffset}</span>
+				@change=${this.#onTimeZoneChange}
+				title="UTC${this._timeZoneOffset}"></uui-select>
+		`;
+	}
+
+	#renderInfo() {
+		if (!this._currentDate) {
+			return nothing;
+		}
+		return html`
+			${this._selectedTimeZone !== this.#getClientTimeZone() ? html`<span><b>Local:</b> ${this._currentDate.toLocal().toFormat(this._format)}</span>`: '' }
+			${this._selectedTimeZone !== "UTC" ? html`<span><b>UTC:</b> ${this._currentDate.toUTC().toFormat(this._format)}</span>`: '' }
 		`;
 	}
 
@@ -212,8 +260,17 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		css`
 			:host {
 				display: flex;
+				flex-direction: column;
+			}
+			.picker {
+				display: flex;
 				align-items: center;
-				gap: var(--uui-size-space-1);
+				gap: var(--uui-size-space-2);
+			}
+			.info{
+				display: flex;
+				gap: var(--uui-size-space-3);
+				padding-top: var(--uui-size-space-3);
 			}
 		`,
 	];
