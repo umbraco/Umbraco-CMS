@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.MemberPropertyType)]
 [PrimaryKey("pk")]
 [ExplicitColumns]
-internal class MemberPropertyTypeDto
+internal sealed class MemberPropertyTypeDto
 {
     [Column("pk")]
     [PrimaryKeyColumn]

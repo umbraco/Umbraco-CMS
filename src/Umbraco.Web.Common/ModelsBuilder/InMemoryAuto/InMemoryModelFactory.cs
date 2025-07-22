@@ -21,7 +21,7 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 {
-    internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
+    internal sealed class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
     {
         private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
         private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
@@ -572,7 +572,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             return assembly;
         }
 
-        private void TryDeleteUnusedAssemblies(string dllPathFile)
+        private static void TryDeleteUnusedAssemblies(string dllPathFile)
         {
             if (File.Exists(dllPathFile))
             {
@@ -818,7 +818,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             _hostingLifetime.UnregisterObject(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposedValue)
             {
@@ -843,14 +843,14 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             Dispose(disposing: true);
         }
 
-        internal class Infos
+        internal sealed class Infos
         {
             public Dictionary<string, Type>? ModelTypeMap { get; set; }
 
             public Dictionary<string, ModelInfo>? ModelInfos { get; set; }
         }
 
-        internal class ModelInfo
+        internal sealed class ModelInfo
         {
             public Type? ParameterType { get; set; }
 

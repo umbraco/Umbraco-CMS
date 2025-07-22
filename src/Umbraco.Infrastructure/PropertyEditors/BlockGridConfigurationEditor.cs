@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class BlockGridConfigurationEditor : ConfigurationEditor<BlockGridConfiguration>
+internal sealed class BlockGridConfigurationEditor : ConfigurationEditor<BlockGridConfiguration>
 {
     public BlockGridConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
     {

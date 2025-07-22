@@ -210,6 +210,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		const query = this._searchQuery;
 		const { data } = await this.#mediaSearchProvider.search({
 			query,
+			includeTrashed: false,
 			searchFrom: this._searchFrom,
 			culture: this.#contextCulture,
 			...this.data?.search?.queryParams,
