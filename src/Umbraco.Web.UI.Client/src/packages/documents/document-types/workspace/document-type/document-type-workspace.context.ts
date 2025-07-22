@@ -20,8 +20,10 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPathPatternTypeAsEncodedParamsType } from '@umbraco-cms/backoffice/router';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
+import { UMB_TEMPLATE_ROOT_ENTITY_TYPE, UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 type DetailModelType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -188,6 +190,16 @@ export class UmbDocumentTypeWorkspaceContext
 		if (!templateScaffold) throw new Error('Could not create template scaffold');
 		const { data: template } = await this.#templateRepository.create(templateScaffold, null);
 		if (!template) throw new Error('Could not create template');
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) {
+			throw new Error('Could not get the action event context');
+		}
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType: UMB_TEMPLATE_ROOT_ENTITY_TYPE,
+			unique: null,
+		});
+		eventContext.dispatchEvent(event);
 
 		const templateEntity = { id: template.unique };
 		const allowedTemplates = this.getAllowedTemplateIds() ?? [];
