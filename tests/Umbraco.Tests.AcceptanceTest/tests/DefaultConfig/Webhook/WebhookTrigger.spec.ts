@@ -123,7 +123,7 @@ test('can trigger when media is deleted', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.webhook.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.isItemVisibleInRecycleBin(mediaName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaName, true, true);
   await umbracoUi.media.deleteMediaItem(mediaName);
   await umbracoUi.media.waitForMediaToBeTrashed();
 
@@ -147,7 +147,7 @@ test('can trigger the webhook for a specific media type', async ({umbracoApi, um
   await umbracoUi.webhook.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.isItemVisibleInRecycleBin(mediaName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaName, true, true);
   await umbracoUi.media.deleteMediaItem(mediaName);
   await umbracoUi.media.deleteMediaItem(secondMediaName);
 
