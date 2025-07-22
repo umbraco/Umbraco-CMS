@@ -67,6 +67,7 @@ for (const mediaFileType of mediaFileTypes) {
     await umbracoUi.media.clickCreateMediaWithType(mediaFileType.fileName);
     await umbracoUi.media.enterMediaItemName(mediaFileType.fileName);
     await umbracoUi.media.uploadFile('./fixtures/mediaLibrary/' + mediaFileType.filePath);
+    await umbracoUi.waitForTimeout(500); // Wait for the file to be uploaded
     await umbracoUi.media.clickSaveButton();
 
     // Assert
@@ -219,7 +220,7 @@ test('can delete a media item from the recycle bin', async ({umbracoApi, umbraco
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, true, true);
   await umbracoUi.media.deleteMediaItem(mediaFileName);
 
   // Assert
@@ -237,7 +238,7 @@ test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
   // Act
-  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName);
+  await umbracoUi.media.isItemVisibleInRecycleBin(mediaFileName, true, true);
   await umbracoUi.media.clickEmptyRecycleBinButton();
   await umbracoUi.media.clickConfirmEmptyRecycleBinButton();
 

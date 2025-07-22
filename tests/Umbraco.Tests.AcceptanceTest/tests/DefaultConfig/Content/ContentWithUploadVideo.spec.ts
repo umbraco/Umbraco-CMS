@@ -77,12 +77,12 @@ for (const uploadVideo of uploadVideos) {
     // Act
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.uploadFile(uploadVideoPath + uploadVideo.fileName);
+    await umbracoUi.waitForTimeout(500);
     await umbracoUi.content.clickSaveButton();
 
     // Assert
     await umbracoUi.content.isSuccessStateVisibleForSaveButton();
     expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
-    await umbracoUi.waitForTimeout(500);
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
     expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(uploadVideo.fileName));
