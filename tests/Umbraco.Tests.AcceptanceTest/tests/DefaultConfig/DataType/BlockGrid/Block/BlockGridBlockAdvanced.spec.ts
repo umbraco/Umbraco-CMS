@@ -80,7 +80,7 @@ test('can update overlay size in a block', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainOverlaySize(blockGridEditorName, contentElementTypeId, overlaySize)).toBeTruthy();
 });
 
-test('can enable inline editing mode in a block', async ({umbracoApi, umbracoUi}) => {
+test('can enable inline editing mode in a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -119,7 +119,7 @@ test('can disable inline editing mode in a block', async ({umbracoApi, umbracoUi
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainInlineEditing(blockGridEditorName, contentElementTypeId, false)).toBeTruthy();
 });
 
-test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
+test('can enable hide content editor in a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);

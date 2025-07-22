@@ -84,7 +84,7 @@ test('can create content with the custom radiobox data type', async ({umbracoApi
   expect(contentData.values[0].value).toEqual(optionValues[0]);
 });
 
-test('can not publish mandatory radiobox with an empty value', async ({umbracoApi, umbracoUi}) => {
+test('can not publish mandatory radiobox with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeId = await umbracoApi.dataType.createRadioboxDataType(customDataTypeName, optionValues);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);

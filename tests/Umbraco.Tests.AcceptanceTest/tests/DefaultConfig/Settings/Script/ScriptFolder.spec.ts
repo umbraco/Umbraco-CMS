@@ -137,7 +137,7 @@ test('can create a script in a folder in a folder', async ({umbracoApi, umbracoU
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptName, true, false);
 });
 
-test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
+test('cannot delete non-empty folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childFolderName = 'ChildFolderName';
   await umbracoApi.script.createFolder(scriptFolderName);

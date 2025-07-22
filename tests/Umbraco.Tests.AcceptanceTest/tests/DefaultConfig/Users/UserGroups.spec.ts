@@ -1,9 +1,9 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const allPermissions = {
   uiPermission:
-    ['Browse',
+    ['Read',
       'Create Document Blueprint',
       'Delete',
       'Create',
@@ -51,7 +51,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-test('can create an empty user group', async ({umbracoApi, umbracoUi}) => {
+test('can create an empty user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickCreateLink();
@@ -87,7 +87,7 @@ test('can rename a user group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.userGroup.isUserGroupWithNameVisible(oldUserGroupName, false);
 });
 
-test('can update a user group', async ({umbracoApi, umbracoUi}) => {
+test('can update a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
   await umbracoUi.userGroup.clickUserGroupsButton();
@@ -105,7 +105,7 @@ test('can update a user group', async ({umbracoApi, umbracoUi}) => {
   expect(userGroupData.fallbackPermissions).toContain(allPermissions.verbPermission[0]);
 });
 
-test('can delete a user group', async ({umbracoApi, umbracoUi}) => {
+test('can delete a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.userGroup.createSimpleUserGroupWithContentSection(userGroupName);
   await umbracoUi.userGroup.clickUserGroupsButton();
@@ -395,7 +395,7 @@ test('can enable all permissions for a user group', async ({umbracoApi, umbracoU
   expect(userGroupData.fallbackPermissions).toEqual(allPermissions.verbPermission);
 });
 
-test('can add granular permission to a specific document for a user group', async ({umbracoApi, umbracoUi}) => {
+test('can add granular permission to a specific document for a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeName = 'TestDocumentType';
   const documentName = 'TestDocument';
@@ -421,7 +421,7 @@ test('can add granular permission to a specific document for a user group', asyn
   await umbracoApi.document.ensureNameNotExists(documentTypeName);
 });
 
-test('can add all granular permissions to a specific document for a user group', async ({umbracoApi, umbracoUi}) => {
+test('can add all granular permissions to a specific document for a user group', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeName = 'TestDocumentType';
   const documentName = 'TestDocument';

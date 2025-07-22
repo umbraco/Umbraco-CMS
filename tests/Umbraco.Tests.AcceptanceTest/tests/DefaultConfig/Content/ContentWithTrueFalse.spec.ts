@@ -61,7 +61,7 @@ test('can publish content with the true/false data type', async ({umbracoApi, um
   expect(contentData.values).toEqual([]);
 });
 
-test('can toggle the true/false value in the content ', async ({umbracoApi, umbracoUi}) => {
+test('can toggle the true/false value in the content', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
