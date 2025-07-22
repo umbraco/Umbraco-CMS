@@ -76,8 +76,6 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		this.observe(
 			this.uniques,
 			(uniques) => {
-				if (!uniques?.length) return;
-
 				// remove entries based on no-longer existing uniques:
 				const removedEntries = this.#entries
 					.getValue()
@@ -90,7 +88,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 					this.removeUmbControllerByAlias('observeEntry_' + entry);
 				});
 
-				this.#requestNewDetails();
+				this.#requestNewDetails(uniques);
 			},
 			null,
 		);
@@ -183,18 +181,16 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		return this.#entries.asObservablePart((items) => items.find((item) => item.unique === unique));
 	}
 
-	async #requestNewDetails(): Promise<void> {
+	async #requestNewDetails(uniques?: Array<DetailType['unique']>): Promise<void> {
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
-		const requestedUniques = this.getUniques();
-
-		const newRequestedUniques = requestedUniques.filter((unique) => {
+		const newRequestedUniques = uniques?.filter((unique) => {
 			const item = this.#statuses.getValue().find((status) => status.unique === unique);
 			return !item;
 		});
 
-		newRequestedUniques.forEach((unique) => {
+		newRequestedUniques?.forEach((unique) => {
 			this.#requestDetails(unique);
 		});
 	}
