@@ -63,7 +63,7 @@ test('can trigger when content is deleted', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
+  await umbracoUi.content.waitForRecycleBinToBeEmptied();
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
   expect(webhookSiteData[0].content).toContain(contentId);
 });

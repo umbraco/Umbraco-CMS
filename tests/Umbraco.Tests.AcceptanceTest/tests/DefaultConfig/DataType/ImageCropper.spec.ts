@@ -18,58 +18,64 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can add crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const cropData = ['Test Label', 'Test Alias', 100, 50];
+  const cropObject = {label: 'Test Label', alias: AliasHelper.toAlias('Test Label'), width: 100, height: 50};
   await umbracoApi.dataType.createDefaultImageCropperDataType(customDataTypeName);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
-  await umbracoUi.dataType.clickAddCropButton();
+  await umbracoUi.dataType.clickCreateCropButton();
   await umbracoUi.dataType.enterCropValues(
-    cropData[0].toString(),
-    cropData[1].toString(),
-    cropData[2].toString(),
-    cropData[3].toString()
+    cropObject.label,
+    cropObject.alias,
+    cropObject.width.toString(),
+    cropObject.height.toString()
   );
   await umbracoUi.dataType.clickCreateCropButton();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
-  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropData[0], cropData[1], cropData[2], cropData[3])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropObject.label, cropObject.alias, cropObject.width, cropObject.height)).toBeTruthy();
 });
 
 test('can edit crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const cropData = ['Test Label', AliasHelper.toAlias('Test Label'), 100, 50];
-  const updatedCropData = ['Updated Label', AliasHelper.toAlias('Updated Label'), 80, 30];
-  await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropData[0], cropData[2], cropData[3]);
+  const cropObject = {label: 'Test Label', alias: AliasHelper.toAlias('Test Label'), width: 100, height: 50};
+  const updatedCropObject = {label: 'Updated Label', alias: AliasHelper.toAlias('Updated Label'), width: 80, height: 30};
+
+  await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropObject.label, cropObject.width, cropObject.height);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
-  await umbracoUi.dataType.editCropByAlias(cropData[0]);
-  await umbracoUi.dataType.enterCropValues(updatedCropData[0], updatedCropData[1], updatedCropData[2].toString(), updatedCropData[3].toString());
+  await umbracoUi.dataType.editCropByAlias(cropObject.alias);
+  await umbracoUi.dataType.enterCropValues(
+    updatedCropObject.label,
+    updatedCropObject.alias,
+    updatedCropObject.width.toString(),
+    updatedCropObject.height.toString()
+  );
   await umbracoUi.dataType.clickEditCropButton();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
-  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, updatedCropData[0], updatedCropData[1], updatedCropData[2], updatedCropData[3])).toBeTruthy();
-  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropData[0], cropData[1], cropData[2], cropData[3])).toBeFalsy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, updatedCropObject.label, updatedCropObject.alias, updatedCropObject.width, updatedCropObject.height)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropObject.label, cropObject.alias, cropObject.width, cropObject.height)).toBeFalsy();
 });
 
 test('can delete crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const cropData = ['Deleted Alias', AliasHelper.toAlias('Deleted Alias'), 50, 100];
-  await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropData[0], cropData[2], cropData[3]);
+  const cropObject = {label: 'Deleted Label', alias: AliasHelper.toAlias('Deleted Label'), width: 50, height: 100};
+  await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropObject.label, cropObject.width, cropObject.height);
   await umbracoUi.dataType.goToDataType(customDataTypeName);
 
   // Act
-  await umbracoUi.dataType.removeCropByAlias(cropData[0].toString());
+  await umbracoUi.dataType.removeCropByAlias(cropObject.alias);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
   await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
-  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropData[0], cropData[1], cropData[2], cropData[3])).toBeFalsy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveCrops(customDataTypeName, cropObject.label, cropObject.alias, cropObject.width, cropObject.height)).toBeFalsy();
 });
 
 test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {

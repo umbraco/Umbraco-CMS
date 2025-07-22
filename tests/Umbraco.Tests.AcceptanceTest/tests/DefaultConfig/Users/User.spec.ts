@@ -120,7 +120,7 @@ test('can update culture for a user', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
-  await umbracoUi.user.selectUserLanguage('Dansk');
+  await umbracoUi.user.selectUserLanguage(danishIsoCode);
   await umbracoUi.user.clickSaveButton();
 
   // Assert

@@ -76,9 +76,7 @@ test('can not browse content node with permission disabled', async ({umbracoApi,
   await umbracoUi.content.goToContentWithName(rootDocumentName);
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible();
-  // TODO: Uncomment this when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18533
-  //await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
 });
 
 test('can create document blueprint with permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -127,7 +125,8 @@ test('can delete content with delete permission enabled', async ({umbracoApi, um
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  await umbracoUi.content.waitForContentToBeTrashed();
+  await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName);
 });
 
 test('can not delete content with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -159,7 +158,8 @@ test('can empty recycle bin with delete permission enabled', async ({umbracoApi,
   await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
+  await umbracoUi.content.waitForRecycleBinToBeEmptied();
+  await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName, false);
 });
 
 test('can not empty recycle bin with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
