@@ -17,6 +17,7 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
+	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -183,16 +184,28 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 			this._data.setPersisted(this.structure.getOwnerContentType());
 
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			if (!actionEventContext) {
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			if (!eventContext) {
 				throw new Error('Could not get the action event context');
 			}
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
+
+			const unique = this.getUnique()!;
+			const entityType = this.getEntityType();
+
+			const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({
+				unique,
+				entityType,
 			});
 
-			actionEventContext.dispatchEvent(event);
+			eventContext.dispatchEvent(reloadStructureEvent);
+
+			const updatedEvent = new UmbEntityUpdatedEvent({
+				unique,
+				entityType,
+				eventUnique: this._workspaceEventUnique,
+			});
+
+			eventContext.dispatchEvent(updatedEvent);
 		} catch (error) {
 			console.error(error);
 		}
