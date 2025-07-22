@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 /// <summary>
 /// Rebuilds the published content cache in the database.
 /// </summary>
-internal class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
+internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
 {
     private const string NuCacheSerializerKey = "Umbraco.Web.PublishedCache.NuCache.Serializer";
     private const string RebuildOperationName = "DatabaseCacheRebuild";

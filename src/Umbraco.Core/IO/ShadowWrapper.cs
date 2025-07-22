@@ -5,7 +5,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO;
 
-internal class ShadowWrapper : IFileSystem, IFileProviderFactory
+internal sealed class ShadowWrapper : IFileSystem, IFileProviderFactory
 {
     private const string ShadowFsPath = "ShadowFs";
 

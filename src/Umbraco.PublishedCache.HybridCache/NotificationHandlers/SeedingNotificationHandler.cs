@@ -9,7 +9,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 
-internal class SeedingNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
+internal sealed class SeedingNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
 {
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;

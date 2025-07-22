@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents the configuration editor for a multiple textstring value editor.
 /// </summary>
-internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<MultipleTextStringConfiguration>
+internal sealed class MultipleTextStringConfigurationEditor : ConfigurationEditor<MultipleTextStringConfiguration>
 {
     public MultipleTextStringConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)
