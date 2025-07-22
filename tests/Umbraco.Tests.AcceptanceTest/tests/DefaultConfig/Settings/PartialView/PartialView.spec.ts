@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const partialViewName = 'TestPartialView';
@@ -192,17 +192,16 @@ test('can use query builder with Where statement for a partial view', async ({um
 
 test('can insert dictionary item into a partial view', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const partialViewContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")' + defaultPartialViewContent;
   await umbracoApi.partialView.create(partialViewFileName, defaultPartialViewContent, '/');
   expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
-
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
-
-  const partialViewContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")' + defaultPartialViewContent;
 
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
   await umbracoUi.partialView.insertDictionaryItem(dictionaryName);
+  await umbracoUi.waitForTimeout(500); // Wait for the dictionary item to be inserted
   await umbracoUi.partialView.clickSaveButton();
 
   // Assert
