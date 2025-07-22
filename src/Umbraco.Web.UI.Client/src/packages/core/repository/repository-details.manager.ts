@@ -182,15 +182,17 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 	}
 
 	async #requestNewDetails(uniques?: Array<DetailType['unique']>): Promise<void> {
+		if (!uniques?.length) return;
+
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
-		const newRequestedUniques = uniques?.filter((unique) => {
+		const newRequestedUniques = uniques.filter((unique) => {
 			const item = this.#statuses.getValue().find((status) => status.unique === unique);
 			return !item;
 		});
 
-		newRequestedUniques?.forEach((unique) => {
+		newRequestedUniques.forEach((unique) => {
 			this.#requestDetails(unique);
 		});
 	}
