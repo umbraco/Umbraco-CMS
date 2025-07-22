@@ -1,27 +1,27 @@
-import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types.js';
 import { UmbContentTypeStructureManager } from '../structure/index.js';
+import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types.js';
 import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	UmbDetailRepository,
-	UmbRepositoryResponse,
-	UmbRepositoryResponseWithAsObservable,
-} from '@umbraco-cms/backoffice/repository';
-import {
-	UmbEntityDetailWorkspaceContextBase,
-	type UmbEntityDetailWorkspaceContextArgs,
-	type UmbEntityDetailWorkspaceContextCreateArgs,
-	type UmbRoutableWorkspaceContext,
-} from '@umbraco-cms/backoffice/workspace';
-import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { Observable } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type {
+	UmbDetailRepository,
+	UmbRepositoryResponse,
+	UmbRepositoryResponseWithAsObservable,
+} from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbEntityDetailWorkspaceContextArgs,
+	UmbEntityDetailWorkspaceContextCreateArgs,
+	UmbRoutableWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbContentTypeWorkspaceContextArgs extends UmbEntityDetailWorkspaceContextArgs {}
