@@ -852,7 +852,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
                             orderBySystemField: toBool(options.orderBySystemField),
-                            filter: options.filter,
+                            filter: encodeURIComponent(options.filter),
                             cultureName: options.cultureName
                         })),
                 'Failed to retrieve children for content item ' + parentId);
