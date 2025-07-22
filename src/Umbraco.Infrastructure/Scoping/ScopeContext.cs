@@ -104,7 +104,7 @@ _enlisted ??= new Dictionary<string, IEnlistedObject>();
         return enlistedAs.Item;
     }
 
-    private class EnlistedObject<T> : IEnlistedObject
+    private sealed class EnlistedObject<T> : IEnlistedObject
     {
         private readonly Action<bool, T?>? _action;
 

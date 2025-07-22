@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Scoping;
 
-internal class AmbientScopeContextStack : IAmbientScopeContextStack
+internal sealed class AmbientScopeContextStack : IAmbientScopeContextStack
 {
     private static Lock _lock = new();
     private static AsyncLocal<ConcurrentStack<IScopeContext>> _stack = new();

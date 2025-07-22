@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Web.Common.Validators;
 /// <summary>
 /// Ensures we bypass property validation for rendering models.
 /// </summary>
-internal class BypassRenderingModelValidatorProvider : IModelValidatorProvider
+internal sealed class BypassRenderingModelValidatorProvider : IModelValidatorProvider
 {
     public void CreateValidators(ModelValidatorProviderContext context)
     {

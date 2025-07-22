@@ -73,7 +73,12 @@ public class DeliveryApiTests
         PublishStatusQueryService = publishStatusQueryService.Object;
     }
 
-    protected IPublishedPropertyType SetupPublishedPropertyType(IPropertyValueConverter valueConverter, string propertyTypeAlias, string editorAlias, object? dataTypeConfiguration = null)
+    protected IPublishedPropertyType SetupPublishedPropertyType(
+        IPropertyValueConverter valueConverter,
+        string propertyTypeAlias,
+        string editorAlias,
+        object? dataTypeConfiguration = null,
+        ContentVariation contentVariation = ContentVariation.Nothing)
     {
         var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
         mockPublishedContentTypeFactory.Setup(x => x.GetDataType(It.IsAny<int>()))
@@ -83,7 +88,7 @@ public class DeliveryApiTests
             propertyTypeAlias,
             123,
             true,
-            ContentVariation.Nothing,
+            contentVariation,
             new PropertyValueConverterCollection(() => new[] { valueConverter }),
             Mock.Of<IPublishedModelFactory>(),
             mockPublishedContentTypeFactory.Object);

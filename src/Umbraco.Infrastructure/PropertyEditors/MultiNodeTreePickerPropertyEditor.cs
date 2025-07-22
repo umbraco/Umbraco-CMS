@@ -189,7 +189,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
         /// <summary>
         /// Validates the min/max configuration for the multi-node tree picker property editor.
         /// </summary>
-        internal class MinMaxValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        internal sealed class MinMaxValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 
@@ -247,7 +247,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
         /// <summary>
         /// Validates the selected object type for the multi-node tree picker property editor.
         /// </summary>
-        internal class ObjectTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        internal sealed class ObjectTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly ICoreScopeProvider _coreScopeProvider;
@@ -335,7 +335,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
         /// <summary>
         /// Validates the selected content type for the multi-node tree picker property editor.
         /// </summary>
-        internal class ContentTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
+        internal sealed class ContentTypeValidator : ITypedJsonValidator<EditorEntityReference[], MultiNodePickerConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly ICoreScopeProvider _coreScopeProvider;

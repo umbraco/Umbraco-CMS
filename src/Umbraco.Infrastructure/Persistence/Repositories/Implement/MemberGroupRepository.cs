@@ -15,7 +15,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
+internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
 {
     private readonly IEventMessagesFactory _eventMessagesFactory;
 
@@ -302,7 +302,7 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
             });
     }
 
-    private class AssignedRolesDto
+    private sealed class AssignedRolesDto
     {
         [Column("text")]
         public string? RoleName { get; set; }

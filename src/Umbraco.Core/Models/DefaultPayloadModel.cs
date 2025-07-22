@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models;
 
-internal class DefaultPayloadModel
+internal sealed class DefaultPayloadModel
 {
     public Guid Id { get; set; }
 }

@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace Umbraco.Cms.Core.Configuration;
 
-internal class EntryAssemblyMetadata : IEntryAssemblyMetadata
+internal sealed class EntryAssemblyMetadata : IEntryAssemblyMetadata
 {
     public EntryAssemblyMetadata()
     {
