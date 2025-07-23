@@ -26,8 +26,8 @@ public class AddLongRunningOperations : MigrationBase
             .From<LockDto>()
             .Where<LockDto>(x => x.Id == Constants.Locks.LongRunningOperations);
 
-        LockDto? longRunningOperationsLock = Database.FirstOrDefault<LockDto>(sql);
-        if (longRunningOperationsLock is null)
+        LockDto? existingLockDto = Database.FirstOrDefault<LockDto>(sql);
+        if (existingLockDto is null)
         {
             Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.LongRunningOperations, Name = "LongRunningOperations" });
         }

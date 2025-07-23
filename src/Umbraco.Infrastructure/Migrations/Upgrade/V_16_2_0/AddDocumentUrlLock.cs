@@ -1,4 +1,6 @@
+using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -14,16 +16,15 @@ internal class AddDocumentUrlLock : MigrationBase
 
     protected override void Migrate()
     {
-        LockDto? existingDto = Database.Single<LockDto>(Context.SqlContext.Sql()
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Select<LockDto>()
             .From<LockDto>()
-            .Where<LockDto>(dto => dto.Id == Constants.Locks.DocumentUrls));
+            .Where<LockDto>(x => x.Id == Constants.Locks.DocumentUrls);
 
-        if (existingDto is not null)
+        LockDto? existingLockDto = Database.FirstOrDefault<LockDto>(sql);
+        if (existingLockDto is null)
         {
-            return;
+            Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
         }
-
-        Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
     }
 }
