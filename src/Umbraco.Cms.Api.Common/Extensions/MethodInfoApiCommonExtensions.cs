@@ -12,7 +12,7 @@ public static class MethodInfoApiCommonExtensions
     {
         MapToApiVersionAttribute[] mapToApis = methodInfo.GetCustomAttributes(typeof(MapToApiVersionAttribute), inherit: true).Cast<MapToApiVersionAttribute>().ToArray();
 
-        return string.Join("|", mapToApis.SelectMany(x=>x.Versions));
+        return string.Join("|", mapToApis.SelectMany(x => x.Versions));
     }
 
     public static string? GetMapToApiAttributeValue(this MethodInfo methodInfo)
