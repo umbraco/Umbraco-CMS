@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 ///     <para>Limited to objects that have a corresponding node (in umbracoNode table).</para>
 ///     <para>Returns <see cref="IEntitySlim" /> objects, i.e. lightweight representation of entities.</para>
 /// </remarks>
-internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
+internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 {
     public EntityRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
         : base(scopeAccessor, appCaches)
@@ -782,7 +782,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a generic content item which could be either a document, media or a member
     /// </summary>
-    private class GenericContentEntityDto : DocumentEntityDto
+    private sealed class GenericContentEntityDto : DocumentEntityDto
     {
         public string? MediaPath { get; set; }
     }
@@ -801,7 +801,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a media item with its media path info
     /// </summary>
-    private class MediaEntityDto : BaseDto
+    private sealed class MediaEntityDto : BaseDto
     {
         public string? MediaPath { get; set; }
     }
@@ -809,7 +809,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a member item
     /// </summary>
-    private class MemberEntityDto : BaseDto
+    private sealed class MemberEntityDto : BaseDto
     {
     }
 
@@ -917,7 +917,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         entity.ListViewKey = dto.ListView;
     }
 
-    private MediaEntitySlim BuildMediaEntity(BaseDto dto)
+    private static MediaEntitySlim BuildMediaEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new MediaEntitySlim();
@@ -936,7 +936,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
-    private DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
+    private static DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new DocumentEntitySlim();
@@ -953,7 +953,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
-    private MemberEntitySlim BuildMemberEntity(BaseDto dto)
+    private static MemberEntitySlim BuildMemberEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new MemberEntitySlim();

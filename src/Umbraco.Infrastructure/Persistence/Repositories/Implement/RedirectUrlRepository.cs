@@ -12,7 +12,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
+internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
 {
     public RedirectUrlRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<RedirectUrlRepository> logger)
         : base(scopeAccessor, cache, logger)
