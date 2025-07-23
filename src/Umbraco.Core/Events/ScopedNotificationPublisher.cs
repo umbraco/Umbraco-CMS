@@ -18,7 +18,7 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
     private readonly IEventAggregator _eventAggregator;
     private readonly List<INotification> _notificationOnScopeCompleted = new List<INotification>();
     private readonly bool _publishCancelableNotificationOnScopeExit;
-    private readonly object _locker = new();
+    private readonly Lock _locker = new();
     private bool _isSuppressed;
 
     public ScopedNotificationPublisher(IEventAggregator eventAggregator, bool publishCancelableNotificationOnScopeExit = false)
@@ -116,7 +116,7 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
     protected virtual void PublishScopedNotifications(IList<INotification> notifications)
         => _eventAggregator.Publish<INotification, TNotificationHandler>(notifications);
 
-    private class Suppressor : IDisposable
+    private sealed class Suppressor : IDisposable
     {
         private readonly ScopedNotificationPublisher<TNotificationHandler> _scopedNotificationPublisher;
         private bool _disposedValue;
@@ -129,7 +129,7 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
 
         public void Dispose() => Dispose(true);
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposedValue)
             {

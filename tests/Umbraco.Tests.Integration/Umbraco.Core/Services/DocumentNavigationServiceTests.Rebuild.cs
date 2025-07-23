@@ -7,10 +7,11 @@ using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class DocumentNavigationServiceTests
+internal sealed partial class DocumentNavigationServiceTests
 {
-    [Test]
-    public async Task Structure_Can_Rebuild()
+    [TestCase(1, TestName = "Structure_Can_Rebuild")]
+    [TestCase(2, TestName = "Structure_Can_Rebuild_MultipleTimes")]
+    public async Task Structure_Can_Rebuild(int numberOfRebuilds)
     {
         // Arrange
         Guid nodeKey = Root.Key;
@@ -21,6 +22,7 @@ public partial class DocumentNavigationServiceTests
         DocumentNavigationQueryService.TryGetDescendantsKeys(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
         DocumentNavigationQueryService.TryGetAncestorsKeys(nodeKey, out IEnumerable<Guid> originalAncestorsKeys);
         DocumentNavigationQueryService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
+        DocumentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> originalRouteKeys);
 
         // In-memory navigation structure is empty here
         var newDocumentNavigationService = new DocumentNavigationService(
@@ -30,7 +32,10 @@ public partial class DocumentNavigationServiceTests
         var initialNodeExists = newDocumentNavigationService.TryGetParentKey(nodeKey, out _);
 
         // Act
-        await newDocumentNavigationService.RebuildAsync();
+        for (int i = 0; i < numberOfRebuilds; i++)
+        {
+            await newDocumentNavigationService.RebuildAsync();
+        }
 
         // Capture rebuilt state
         var nodeExists = newDocumentNavigationService.TryGetParentKey(nodeKey, out Guid? parentKeyFromRebuild);
@@ -38,6 +43,7 @@ public partial class DocumentNavigationServiceTests
         newDocumentNavigationService.TryGetDescendantsKeys(nodeKey, out IEnumerable<Guid> descendantsKeysFromRebuild);
         newDocumentNavigationService.TryGetAncestorsKeys(nodeKey, out IEnumerable<Guid> ancestorsKeysFromRebuild);
         newDocumentNavigationService.TryGetSiblingsKeys(nodeKey, out IEnumerable<Guid> siblingsKeysFromRebuild);
+        newDocumentNavigationService.TryGetRootKeys(out IEnumerable<Guid> routeKeysFromRebuild);
 
         // Assert
         Assert.Multiple(() =>
@@ -53,11 +59,13 @@ public partial class DocumentNavigationServiceTests
             CollectionAssert.AreEquivalent(originalDescendantsKeys, descendantsKeysFromRebuild);
             CollectionAssert.AreEquivalent(originalAncestorsKeys, ancestorsKeysFromRebuild);
             CollectionAssert.AreEquivalent(originalSiblingsKeys, siblingsKeysFromRebuild);
+            CollectionAssert.AreEquivalent(originalRouteKeys, routeKeysFromRebuild);
         });
     }
 
-    [Test]
-    public async Task Bin_Structure_Can_Rebuild()
+    [TestCase(1, TestName = "Bin_Structure_Can_Rebuild")]
+    [TestCase(2, TestName = "Bin_Structure_Can_Rebuild_MultipleTimes")]
+    public async Task Bin_Structure_Can_Rebuild(int numberOfRebuilds)
     {
         // Arrange
         Guid nodeKey = Root.Key;
@@ -69,6 +77,7 @@ public partial class DocumentNavigationServiceTests
         DocumentNavigationQueryService.TryGetDescendantsKeysInBin(nodeKey, out IEnumerable<Guid> originalDescendantsKeys);
         DocumentNavigationQueryService.TryGetAncestorsKeysInBin(nodeKey, out IEnumerable<Guid> originalAncestorsKeys);
         DocumentNavigationQueryService.TryGetSiblingsKeysInBin(nodeKey, out IEnumerable<Guid> originalSiblingsKeys);
+        DocumentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> originalRouteKeys);
 
         // In-memory navigation structure is empty here
         var newDocumentNavigationService = new DocumentNavigationService(
@@ -78,7 +87,10 @@ public partial class DocumentNavigationServiceTests
         var initialNodeExists = newDocumentNavigationService.TryGetParentKeyInBin(nodeKey, out _);
 
         // Act
-        await newDocumentNavigationService.RebuildBinAsync();
+        for (int i = 0; i < numberOfRebuilds; i++)
+        {
+            await newDocumentNavigationService.RebuildBinAsync();
+        }
 
         // Capture rebuilt state
         var nodeExists = newDocumentNavigationService.TryGetParentKeyInBin(nodeKey, out Guid? parentKeyFromRebuild);
@@ -86,6 +98,7 @@ public partial class DocumentNavigationServiceTests
         newDocumentNavigationService.TryGetDescendantsKeysInBin(nodeKey, out IEnumerable<Guid> descendantsKeysFromRebuild);
         newDocumentNavigationService.TryGetAncestorsKeysInBin(nodeKey, out IEnumerable<Guid> ancestorsKeysFromRebuild);
         newDocumentNavigationService.TryGetSiblingsKeysInBin(nodeKey, out IEnumerable<Guid> siblingsKeysFromRebuild);
+        newDocumentNavigationService.TryGetRootKeys(out IEnumerable<Guid> routeKeysFromRebuild);
 
         // Assert
         Assert.Multiple(() =>
@@ -101,6 +114,7 @@ public partial class DocumentNavigationServiceTests
             CollectionAssert.AreEquivalent(originalDescendantsKeys, descendantsKeysFromRebuild);
             CollectionAssert.AreEquivalent(originalAncestorsKeys, ancestorsKeysFromRebuild);
             CollectionAssert.AreEquivalent(originalSiblingsKeys, siblingsKeysFromRebuild);
+            CollectionAssert.AreEquivalent(originalRouteKeys, routeKeysFromRebuild);
         });
     }
 }

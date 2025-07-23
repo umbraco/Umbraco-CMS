@@ -19,12 +19,12 @@ test('can create a template', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
 
   // Act
   await umbracoUi.template.clickActionsMenuAtRoot();
-  await umbracoUi.template.clickCreateButton();
+  await umbracoUi.template.clickCreateActionMenuOption();
   await umbracoUi.template.enterTemplateName(templateName);
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.template.waitForTemplateToBeCreated();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeTruthy();
   await umbracoUi.template.isTemplateRootTreeItemVisible(templateName);
 });
@@ -43,7 +43,7 @@ test('can update content of a template', {tag: '@smoke'}, async ({umbracoApi, um
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   // Checks if the template was updated
   const updatedTemplate = await umbracoApi.template.getByName(templateName);
   expect(updatedTemplate.content).toBe(updatedTemplateContent);
@@ -63,7 +63,7 @@ test('can rename a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.get(templateId);
   expect(templateData.name).toBe(templateName);
 });
@@ -79,10 +79,10 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.clickDeleteAndConfirmButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.template.waitForTemplateToBeDeleted();
   await umbracoUi.template.reloadTemplateTree();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
-  await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false);
+  await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false, false);
 });
 
 test('can set a template as master template', async ({umbracoApi, umbracoUi}) => {
@@ -95,12 +95,12 @@ test('can set a template as master template', async ({umbracoApi, umbracoUi}) =>
   // Act
   await umbracoUi.template.goToTemplate(childTemplateName);
   await umbracoUi.template.clickChangeMasterTemplateButton();
-  await umbracoUi.template.clickButtonWithName(templateName);
+  await umbracoUi.template.clickModalMenuItemWithName(templateName);
   await umbracoUi.template.clickChooseButton();
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   await umbracoUi.template.isMasterTemplateNameVisible(templateName);
   // Checks if the childTemplate has the masterTemplate set
   const childTemplateData = await umbracoApi.template.getByName(childTemplateName);
@@ -127,7 +127,7 @@ test('can remove a master template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   await umbracoUi.template.isMasterTemplateNameVisible('No master');
   const childTemplate = await umbracoApi.template.getByName(childTemplateName);
   expect(childTemplate.masterTemplate).toBe(null);
@@ -163,7 +163,6 @@ test.skip('can use query builder with Order By statement for a template', async 
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.addQueryBuilderWithOrderByStatement(propertyAliasValue, isAscending);
   // Verify that the code is shown
   await umbracoUi.template.isQueryBuilderCodeShown(expectedCode);
@@ -171,12 +170,13 @@ test.skip('can use query builder with Order By statement for a template', async 
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(expectedTemplateContent);
 });
 
-test('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
+// Remove .fixme when the issue is fixed: https://github.com/umbraco/Umbraco-CMS/issues/18536
+test.fixme('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';
@@ -203,7 +203,6 @@ test('can use query builder with Where statement for a template', async ({umbrac
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.template.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
   // Verify that the code is shown
   await umbracoUi.template.isQueryBuilderCodeShown(expectedCode);
@@ -211,7 +210,7 @@ test('can use query builder with Where statement for a template', async ({umbrac
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(expectedTemplateContent);
 });
@@ -225,12 +224,11 @@ test('can insert sections - render child template into a template', async ({umbr
 
   // Act
   await umbracoUi.template.goToTemplate(templateName);
-  await umbracoUi.waitForTimeout(1000);
   await umbracoUi.template.insertSection(sectionType);
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 });
@@ -249,7 +247,7 @@ test('can insert sections - render a named section into a template', async ({umb
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 });
@@ -268,7 +266,7 @@ test('can insert sections - define a named section into a template', async ({umb
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.isSuccessNotificationVisible();
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 });
@@ -287,7 +285,7 @@ test('can insert dictionary item into a template', async ({umbracoApi, umbracoUi
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 
@@ -310,7 +308,7 @@ test('can insert partial view into a template', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 });
@@ -327,7 +325,7 @@ test('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.template.isSuccessStateVisibleForSaveButton();
   const templateData = await umbracoApi.template.getByName(templateName);
   expect(templateData.content).toBe(templateContent);
 });
@@ -366,12 +364,10 @@ test('cannot create a template with an empty name', {tag: '@smoke'}, async ({umb
 
   // Act
   await umbracoUi.template.clickActionsMenuAtRoot();
-  await umbracoUi.template.clickCreateButton();
+  await umbracoUi.template.clickCreateActionMenuOption();
   await umbracoUi.template.clickSaveButton();
 
   // Assert
-  await umbracoUi.template.isErrorNotificationVisible();
-  // TODO: Uncomment this when the front-end updates the error message
-  //await umbracoUi.template.doesErrorNotificationHaveText(NotificationConstantHelper.error.emptyName);
+  await umbracoUi.template.isFailedStateButtonVisible();
   expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
 });

@@ -1,4 +1,6 @@
-import { UMB_ROUTE_CONTEXT } from '../route.context.js';
+import type { IRouterSlot, Params } from '../router-slot/index.js';
+import { UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../contexts/route-path-addendum.context-token.js';
+import { UMB_ROUTE_CONTEXT } from '../route/route.context.js';
 import { encodeFolderName } from '../encode-folder-name.function.js';
 import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
 import type {
@@ -9,11 +11,9 @@ import type {
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import type { IRouterSlot, Params } from '@umbraco-cms/backoffice/external/router-slot';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
@@ -49,8 +49,8 @@ export class UmbModalRouteRegistrationController<
 {
 	//
 	#init;
-	#contextConsumer;
 
+	#addendum?: string;
 	#additionalPath?: string;
 	#uniquePaths: Map<string, string | undefined> = new Map();
 
@@ -89,13 +89,22 @@ export class UmbModalRouteRegistrationController<
 		super(host, ctrlAlias ?? alias.toString());
 		this.#key = UmbId.new();
 		this.#modalAlias = alias;
-		//this.#path = path;
 
-		this.#contextConsumer = new UmbContextConsumerController(this, UMB_ROUTE_CONTEXT, (_routeContext) => {
-			this.#routeContext = _routeContext;
-			this.#registerModal();
+		this.consumeContext(UMB_ROUTE_PATH_ADDENDUM_CONTEXT, (context) => {
+			this.observe(
+				context?.addendum,
+				(addendum) => {
+					this.#addendum = addendum;
+					this.#registerModal().catch(() => undefined);
+				},
+				'observeAddendum',
+			);
 		});
-		this.#init = this.#contextConsumer.asPromise();
+
+		this.#init = this.consumeContext(UMB_ROUTE_CONTEXT, (_routeContext) => {
+			this.#routeContext = _routeContext;
+			this.#registerModal().catch(() => undefined);
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**
@@ -167,7 +176,7 @@ export class UmbModalRouteRegistrationController<
 		if (oldValue === value) return;
 
 		this.#uniquePaths.set(identifier, value);
-		this.#registerModal();
+		this.#registerModal().catch(() => undefined);
 	}
 	getUniquePathValue(identifier: string): string | undefined {
 		return this.#uniquePaths.get(identifier);
@@ -176,12 +185,18 @@ export class UmbModalRouteRegistrationController<
 	async #registerModal() {
 		await this.#init;
 		if (!this.#routeContext) return;
+		if (this.#addendum === undefined) return;
 
 		const pathParts = Array.from(this.#uniquePaths.values());
 
 		// Check if there is any undefined values of unique map:
 		if (pathParts.some((value) => value === undefined)) {
 			this.#unregisterModal();
+		}
+
+		if (this.#addendum !== '') {
+			// append in the start of pathParts:
+			pathParts.unshift(this.#addendum);
 		}
 
 		if (this.#additionalPath) {
@@ -208,7 +223,7 @@ export class UmbModalRouteRegistrationController<
 		this.#modalRegistrationContext = this.#routeContext;
 	}
 
-	async #unregisterModal() {
+	#unregisterModal() {
 		if (!this.#routeContext) return;
 		if (this.#modalRegistrationContext) {
 			this.#modalRegistrationContext.unregisterModal(this);
@@ -219,7 +234,7 @@ export class UmbModalRouteRegistrationController<
 	override hostConnected() {
 		super.hostConnected();
 		if (!this.#modalRegistrationContext) {
-			this.#registerModal();
+			this.#registerModal().catch(() => undefined);
 		}
 	}
 	override hostDisconnected(): void {
@@ -333,7 +348,6 @@ export class UmbModalRouteRegistrationController<
 
 	public override destroy(): void {
 		super.destroy();
-		this.#contextConsumer.destroy();
 		this.#modalRegistrationContext = undefined;
 		this.#uniquePaths = undefined as any;
 		this.#routeContext = undefined;

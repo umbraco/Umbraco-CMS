@@ -122,17 +122,26 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this.#createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
 			.onSetup(async (params) => {
-				const contentContextConsumer = this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, () => {
-					this.removeUmbController(contentContextConsumer);
-				}).passContextAliasMatches();
-				const propContextConsumer = this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, () => {
-					this.removeUmbController(propContextConsumer);
-				}).passContextAliasMatches();
+				// TODO: Make it possible to have no callback, and make it possible to use getContext with a callback.
+				// TODO: Make sure a onSetup rejection ends up closing the modal and firing a good error message in the console. eventually calling onReject.
+				const contentContextConsumer = this.consumeContext(
+					UMB_CONTENT_TYPE_WORKSPACE_CONTEXT,
+					() => {},
+				).passContextAliasMatches();
+				const propContextConsumer = this.consumeContext(
+					UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT,
+					() => {},
+				).passContextAliasMatches();
 				const [contentContext, propContext] = await Promise.all([
 					contentContextConsumer.asPromise(),
 					propContextConsumer.asPromise(),
 					this.#initPromise,
 				]);
+				if (!contentContext || !propContext) {
+					throw new Error('Could not get content or property context');
+				}
+				this.removeUmbController(contentContextConsumer);
+				this.removeUmbController(propContextConsumer);
 				const propertyEditorName = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias)?.name;
 				const dataTypeName = `${contentContext?.getName() ?? ''} - ${propContext.getName() ?? ''} - ${propertyEditorName}`;
 

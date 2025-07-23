@@ -1,5 +1,5 @@
-import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../../context/block-grid-entries.context-token.js';
-import { UmbBlockGridEntriesElement } from '../block-grid-entries/index.js';
+import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/constants.js';
+import { UmbBlockGridEntriesElement } from '../block-grid-entries/block-grid-entries.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 /**
@@ -14,7 +14,7 @@ export class UmbBlockGridAreasContainerElement extends UmbBlockGridEntriesElemen
 
 		this.consumeContext(UMB_BLOCK_GRID_ENTRIES_CONTEXT, (context) => {
 			this.observe(
-				context.layoutColumns,
+				context?.layoutColumns,
 				(layoutColumns) => {
 					this.layoutColumns = layoutColumns;
 				},

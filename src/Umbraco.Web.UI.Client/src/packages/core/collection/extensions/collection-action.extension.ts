@@ -1,3 +1,5 @@
+import type { UmbCollectionAction } from '../action/collection-action-base.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 /**
@@ -6,7 +8,7 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  */
 // TODO: create interface for API
 export interface ManifestCollectionAction
-	extends ManifestElementAndApi,
+	extends ManifestElementAndApi<UmbControllerHostElement, UmbCollectionAction>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'collectionAction';
 	meta: MetaCollectionAction;
@@ -15,6 +17,7 @@ export interface ManifestCollectionAction
 export interface MetaCollectionAction {
 	label: string;
 	href?: string;
+	additionalOptions?: boolean;
 }
 
 declare global {

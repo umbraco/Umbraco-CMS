@@ -3,10 +3,12 @@ import './document-schedule-modal.element.js';
 import { UmbDocumentVariantState } from '../../../types.js';
 import type { UmbDocumentScheduleModalData, UmbDocumentScheduleModalValue } from './document-schedule-modal.token.js';
 import type { UmbDocumentScheduleModalElement } from './document-schedule-modal.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentScheduleModalData = {
+	activeVariants: [],
+	prevalues: [],
 	options: [
 		{
 			unique: 'en-us',
@@ -20,6 +22,8 @@ const modalData: UmbDocumentScheduleModalData = {
 				publishDate: null,
 				updateDate: null,
 				segment: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
 			},
 			language: {
 				entityType: 'language',
@@ -42,6 +46,8 @@ const modalData: UmbDocumentScheduleModalData = {
 				publishDate: null,
 				updateDate: null,
 				segment: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
 			},
 			language: {
 				entityType: 'language',
@@ -124,6 +130,8 @@ export const Overview: Story = {};
 export const WithoutVariants: Story = {
 	args: {
 		data: {
+			activeVariants: modalData.activeVariants,
+			prevalues: modalData.prevalues,
 			options: modalData.options.slice(0, 1),
 		},
 	},

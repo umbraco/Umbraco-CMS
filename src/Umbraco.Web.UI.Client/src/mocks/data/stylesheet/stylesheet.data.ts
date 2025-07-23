@@ -10,93 +10,91 @@ export type UmbMockStylesheetModel = StylesheetResponseModel &
 
 export const data: Array<UmbMockStylesheetModel> = [
 	{
-		name: 'Stylesheet File 1.css',
-		path: '/Stylesheet File 1.css',
+		name: 'RTE Styles',
+		path: '/rte-styles.css',
 		parent: null,
 		isFolder: false,
 		hasChildren: false,
 		content: `
-		/** Stylesheet 1 */
+/** RTE Stylesheet */
 
-		h1 {
-	color: blue;
+#editor {
+	background-color: pink;
+	font-size: 1.5rem;
 }
 
-/**umb_name:bjjh*/
-h1 {
-	color: blue;
+h2 {
+	color: red;
+	font-size: 2rem;
 }
 
-/**umb_name:comeone*/
-h1 {
+h3 {
 	color: blue;
+	font-size: 1.75rem;
 }
 
-/**umb_name:lol*/
-h1 {
-	color: blue;
+h4 {
+	color: green;
+	font-size: 1.5rem;
 }`,
 	},
 	{
-		name: 'Stylesheet File 2.css',
-		path: '/Stylesheet File 2.css',
+		name: 'RTE Styles 2',
+		path: '/rte-styles-2.css',
 		parent: null,
 		isFolder: false,
 		hasChildren: false,
 		content: `
-		/** Stylesheet 2 */
-h1 {
-	color: green;
+/** RTE Stylesheet 2 */
+
+body {
+	font-family: cursive;
 }
 
-/**umb_name:HELLO*/
-h1 {
-	color: green;
+span {
+	color: red;
 }
 
-/**umb_name:SOMETHING*/
-h1 {
-	color: green;
+span {
+	color: blue;
 }
 
-/**umb_name:NIOCE*/
-h1 {
+span {
 	color: green;
 }`,
 	},
 	{
-		name: 'Folder 1',
-		path: '/Folder 1',
+		name: 'Folder for website',
+		path: '/folder-for-website',
 		parent: null,
 		isFolder: true,
 		hasChildren: true,
 		content: '',
 	},
 	{
-		name: 'Stylesheet File 3.css',
-		path: '/Folder 1/Stylesheet File 3.css',
+		name: 'Website Styles',
+		path: '/folder-for-website/website-styles.css',
 		parent: {
-			path: '/Folder 1',
+			path: '/folder-for-website',
 		},
 		hasChildren: false,
 		isFolder: false,
-		content: `h1 {
-	color: pink;
-}
+		content: `
+/** Website Stylesheet */
 
-/**umb_name:ONE*/
-h1 {
-	color: pink;
+body {
+	background-color: #ffb7d3;
+	color: #b57790;
+	font-family: sans-serif;
 }
-
-/**umb_name:TWO*/
-h1 {
-	color: pink;
-}
-
-/**umb_name:THREE*/
-h1 {
-	color: pink;
-}`,
+`,
+	},
+	{
+		name: 'Forbidden',
+		path: '/forbidden',
+		parent: null,
+		isFolder: false,
+		hasChildren: false,
+		content: `console.log('You are not allowed to see this stylesheet!');`,
 	},
 ];

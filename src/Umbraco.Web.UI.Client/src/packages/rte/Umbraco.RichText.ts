@@ -10,22 +10,22 @@ export const manifest: ManifestPropertyEditorSchema = {
 			properties: [
 				{
 					alias: 'blocks',
-					label: 'Available Blocks',
-					description: 'Define the available blocks.',
+					label: '#rte_config_blocks',
+					description: '{#rte_config_blocks_description}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockRteTypeConfiguration',
 					weight: 80,
 				},
 				{
 					alias: 'mediaParentId',
-					label: 'Image Upload Folder',
-					description: 'Choose the upload location of pasted images',
+					label: '#rte_config_mediaParentId',
+					description: '{#rte_config_mediaParentId_description}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaEntityPicker',
 					config: [{ alias: 'validationLimit', value: { min: 0, max: 1 } }],
 					weight: 90,
 				},
 				{
 					alias: 'ignoreUserStartNodes',
-					label: 'Ignore User Start Nodes',
+					label: '#rte_config_ignoreUserStartNodes',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 					weight: 100,
 				},

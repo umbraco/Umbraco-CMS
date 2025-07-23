@@ -18,9 +18,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
-internal class CollectibleRuntimeViewCompiler : IViewCompiler
+internal sealed class CollectibleRuntimeViewCompiler : IViewCompiler
 {
-    private readonly object _cacheLock = new object();
+    private readonly Lock _cacheLock = new();
     private readonly Dictionary<string, CompiledViewDescriptor> _precompiledViews;
     private readonly ConcurrentDictionary<string, string> _normalizedPathCache;
     private readonly IFileProvider _fileProvider;
@@ -69,12 +69,9 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         foreach (CompiledViewDescriptor precompiledView in precompiledViews)
         {
             _logger.LogDebug("Initializing Razor view compiler with compiled view: '{ViewName}'", precompiledView.RelativePath);
-            if (!_precompiledViews.ContainsKey(precompiledView.RelativePath))
-            {
-                // View ordering has precedence semantics, a view with a higher precedence was
-                // already added to the list.
-                _precompiledViews.Add(precompiledView.RelativePath, precompiledView);
-            }
+            // View ordering has precedence semantics, a view with a higher precedence was
+            // already added to the list.
+            _precompiledViews.TryAdd(precompiledView.RelativePath, precompiledView);
         }
 
         if (_precompiledViews.Count == 0)
@@ -322,7 +319,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         }
     }
 
-    protected virtual CompiledViewDescriptor CompileAndEmit(string relativePath)
+    private CompiledViewDescriptor CompileAndEmit(string relativePath)
     {
         RazorProjectItem projectItem = _projectEngine.FileSystem.GetItem(relativePath, fileKind: null);
         RazorCodeDocument codeDocument = _projectEngine.Process(projectItem);
@@ -447,7 +444,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
     // Taken from: https://github.com/dotnet/aspnetcore/blob/a450cb69b5e4549f5515cdb057a68771f56cefd7/src/Mvc/Mvc.Razor/src/ViewPath.cs
     // This normalizes the relative path to the view, ensuring that it matches with what we have as keys in _precompiledViews
-    private string NormalizePath(string path)
+    private static string NormalizePath(string path)
     {
         var addLeadingSlash = path[0] != '\\' && path[0] != '/';
         var transformSlashes = path.IndexOf('\\') != -1;

@@ -48,7 +48,6 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 			allowNonExistingSegmentsCreation: true,
 			disableDeleteWhenReferenced: true,
 			disableUnpublishWhenReferenced: true,
-			reservedFieldNames: [],
 		};
 	}
 }
@@ -58,6 +57,7 @@ const treeItemMapper = (model: UmbMockDocumentModel): DocumentTreeItemResponseMo
 	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
 
 	return {
+		ancestors: model.ancestors,
 		documentType: {
 			icon: documentType.icon,
 			id: documentType.id,
@@ -69,6 +69,7 @@ const treeItemMapper = (model: UmbMockDocumentModel): DocumentTreeItemResponseMo
 		noAccess: model.noAccess,
 		parent: model.parent,
 		variants: model.variants,
+		createDate: model.createDate,
 	};
 };
 
@@ -76,9 +77,24 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 	const documentType = umbDocumentTypeMockDb.read(request.documentType.id);
 	if (!documentType) throw new Error(`Document type with id ${request.documentType.id} not found`);
 
+	const isRoot = request.parent === null || request.parent === undefined;
+	let ancestors: Array<{ id: string }> = [];
+
+	if (!isRoot) {
+		const parentId = request.parent!.id;
+
+		const parentAncestors = umbDocumentMockDb.tree.getAncestorsOf({ descendantId: parentId }).map((ancestor) => {
+			return {
+				id: ancestor.id,
+			};
+		});
+		ancestors = [...parentAncestors, { id: parentId }];
+	}
+
 	const now = new Date().toString();
 
 	return {
+		ancestors,
 		documentType: {
 			id: documentType.id,
 			icon: documentType.icon,
@@ -86,6 +102,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 		},
 		hasChildren: false,
 		id: request.id ? request.id : UmbId.new(),
+		createDate: now,
 		isProtected: false,
 		isTrashed: false,
 		noAccess: false,
@@ -137,6 +154,7 @@ const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 
 const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionResponseModel => {
 	return {
+		ancestors: model.ancestors,
 		creator: null,
 		documentType: {
 			id: model.documentType.id,
@@ -144,6 +162,8 @@ const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionRespon
 			icon: model.documentType.icon,
 		},
 		id: model.id,
+		isProtected: model.isProtected,
+		isTrashed: model.isTrashed,
 		sortOrder: 0,
 		updater: null,
 		values: model.values,

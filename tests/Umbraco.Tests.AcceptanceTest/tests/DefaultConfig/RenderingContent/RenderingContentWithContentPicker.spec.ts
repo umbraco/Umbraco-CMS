@@ -19,9 +19,9 @@ test.beforeEach(async ({umbracoApi}) => {
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.document.ensureNameNotExists(contentPickerName); 
+  await umbracoApi.document.ensureNameNotExists(contentPickerName);
   await umbracoApi.documentType.ensureNameNotExists(contentPickerDocumentTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
@@ -29,9 +29,8 @@ test.afterEach(async ({umbracoApi}) => {
 test('can render content with content picker value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const templateId = await umbracoApi.template.createTemplateWithDisplayingContentPickerValue(templateName, AliasHelper.toAlias(propertyName));
-  await umbracoApi.document.createPublishedDocumentWithValue(contentName, contentPickerId, dataTypeData.id, templateId, propertyName, documentTypeName);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  const contentURL = contentData.urls[0].url;
+  const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, contentPickerId, dataTypeData.id, templateId, propertyName, documentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
   // Act
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);

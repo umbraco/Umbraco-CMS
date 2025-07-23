@@ -1,12 +1,12 @@
+import type { UmbInputMemberGroupElement } from '../../components/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-property-editor-ui-member-group-picker
@@ -41,7 +41,7 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 
 	#onChange(event: CustomEvent & { target: UmbInputMemberGroupElement }) {
 		this.value = event.target.value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {
@@ -50,7 +50,6 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 				.min=${this._min}
 				.max=${this._max}
 				.value=${this.value}
-				?showOpenButton=${true}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}></umb-input-member-group>
 		`;

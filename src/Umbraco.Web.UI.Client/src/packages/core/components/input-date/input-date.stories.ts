@@ -1,5 +1,5 @@
 import type { UmbInputDateElement } from './input-date.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './input-date.element.js';
 
 const meta: Meta<UmbInputDateElement> = {

@@ -9,6 +9,11 @@ parameters:
     displayName: Run SQL Server Linux Acceptance Tests
     type: boolean
     default: false
+    # Skipped due to DB locks, the tests are still being run on the Nightly build
+  - name: sqliteAcceptanceTests
+    displayName: Run SQLite Acceptance Tests
+    type: boolean
+    default: false
   - name: myGetDeploy
     displayName: Deploy to MyGet
     type: boolean
@@ -427,6 +432,33 @@ stages:
             displayName: Start SQL Server Docker image (Linux)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
+          - powershell: |
+              $maxAttempts = 12
+              $attempt = 0
+              $status = ""
+
+              while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
+                Start-Sleep -Seconds 5
+                # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
+                $status = docker inspect -f '{{.State.Status}}' mssql
+
+                if ($status -ne 'running') {
+                  Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
+                  $attempt++
+                }
+              }
+
+              if ($status -eq 'running') {
+                Write-Host "SQL Server container is running"
+                docker ps -a
+              } else {
+                Write-Host "SQL Server did not become ready in time. Last known status: $status"
+                docker logs mssql
+                exit 1
+              }
+            displayName: Wait for SQL Server to be ready (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
           - pwsh: SqlLocalDB start MSSQLLocalDB
             displayName: Start SQL Server LocalDB (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
@@ -484,6 +516,8 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
+        # currently disabled due to DB locks randomly occuring.
+        condition: eq(${{parameters.sqliteAcceptanceTests}}, True)
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
@@ -492,22 +526,22 @@ stages:
           matrix:
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=1/3'
+              testCommand: "npm run smokeTestSqlite -- --shard=1/3"
             LinuxPart2Of3:
               vmImage: "ubuntu-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=2/3'
+              testCommand: "npm run smokeTestSqlite -- --shard=2/3"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=3/3'
+              testCommand: "npm run smokeTestSqlite -- --shard=3/3"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=1/3'
+              testCommand: "npm run smokeTestSqlite -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=2/3'
+              testCommand: "npm run smokeTestSqlite -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --shard=3/3'
+              testCommand: "npm run smokeTestSqlite -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -533,7 +567,8 @@ stages:
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
-              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
+              CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -586,14 +621,13 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Install Playwright and dependencies
-          - pwsh: npx playwright install --with-deps
-            displayName: Install Playwright
+          - pwsh: npx playwright install chromium
+            displayName: Install Playwright only with Chromium browser
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
           - pwsh: $(testCommand)
             displayName: Run Playwright tests
-            continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
             env:
               CI: true
@@ -603,27 +637,45 @@ stages:
           # Stop application
           - bash: kill -15 $(AcceptanceTestProcessId)
             displayName: Stop application (Linux)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
+            condition: and(ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
 
           - pwsh: Stop-Process -Id $(AcceptanceTestProcessId)
             displayName: Stop application (Windows)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
+            condition: and(ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
 
           # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory) -Recurse
+                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
               }
             displayName: Copy Playwright results
             condition: succeededOrFailed()
 
-          # Publish
+          # Copy console error log
+          - pwsh: |
+              if (Test-Path tests/Umbraco.Tests.AcceptanceTest/console-errors.json) {
+                  Copy-Item tests/Umbraco.Tests.AcceptanceTest/console-errors.json $(Build.ArtifactStagingDirectory)
+              }
+            displayName: Copy console error log
+            condition: succeededOrFailed()
+
+          # Publish test artifacts
           - task: PublishPipelineArtifact@1
             displayName: Publish test artifacts
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: "Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+
+          # Publish test results
+          - task: PublishTestResults@2
+            displayName: "Publish test results"
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '*.xml'
+              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
+              testRunTitle: "$(Agent.JobName)"
 
       - job:
         displayName: E2E Tests (SQL Server)
@@ -635,29 +687,29 @@ stages:
           matrix:
             ${{ if eq(parameters.sqlServerLinuxAcceptanceTests, True) }}:
               LinuxPart1Of3:
-                testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=1/3'
+                testCommand: "npm run smokeTest -- --shard=1/3"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
               LinuxPart2Of3:
-                testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=2/3'
+                testCommand: "npm run smokeTest -- --shard=2/3"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
               LinuxPart3Of3:
-                testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=3/3'
+                testCommand: "npm run smokeTest -- --shard=3/3"
                 vmImage: "ubuntu-latest"
                 SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
                 CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=1/3'
+              testCommand: "npm run smokeTest -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=2/3'
+              testCommand: "npm run smokeTest -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: 'npx playwright test DefaultConfig --grep "@smoke" --grep-invert "Users" --shard=3/3'
+              testCommand: "npm run smokeTest -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -682,7 +734,8 @@ stages:
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
-              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
+              CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -744,14 +797,13 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Install Playwright and dependencies
-          - pwsh: npx playwright install --with-deps
-            displayName: Install Playwright
+          - pwsh: npx playwright install chromium
+            displayName: Install Playwright only with Chromium browser
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
           - pwsh: $(testCommand)
             displayName: Run Playwright tests
-            continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
             env:
               CI: true
@@ -761,36 +813,54 @@ stages:
           # Stop application
           - bash: kill -15 $(AcceptanceTestProcessId)
             displayName: Stop application (Linux)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
+            condition: and(ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
 
           - pwsh: Stop-Process -Id $(AcceptanceTestProcessId)
             displayName: Stop application (Windows)
-            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
+            condition: and(ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
 
           # Stop SQL Server
           - pwsh: docker stop mssql
             displayName: Stop SQL Server Docker image (Linux)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+            condition: eq(variables['Agent.OS'], 'Linux')
 
           - pwsh: SqlLocalDB stop MSSQLLocalDB
             displayName: Stop SQL Server LocalDB (Windows)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+            condition: eq(variables['Agent.OS'], 'Windows_NT')
 
           # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory) -Recurse
+                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results/* $(Build.ArtifactStagingDirectory) -Recurse
               }
             displayName: Copy Playwright results
             condition: succeededOrFailed()
 
-          # Publish
+          # Copy console error log
+          - pwsh: |
+              if (Test-Path tests/Umbraco.Tests.AcceptanceTest/console-errors.json) {
+                  Copy-Item tests/Umbraco.Tests.AcceptanceTest/console-errors.json $(Build.ArtifactStagingDirectory)
+              }
+            displayName: Copy console error log
+            condition: succeededOrFailed()
+
+          # Publish test artifacts
           - task: PublishPipelineArtifact@1
             displayName: Publish test artifacts
             condition: succeededOrFailed()
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)
-              artifact: "Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+              artifact: "Acceptance Test Results - $(Agent.JobName) - Attempt #$(System.JobAttempt)"
+
+          # Publish test results
+          - task: PublishTestResults@2
+            displayName: "Publish test results"
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '*.xml'
+              searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
+              testRunTitle: "$(Agent.JobName)"
 
   ###############################################
   ## Release
@@ -800,10 +870,12 @@ stages:
     dependsOn:
       - Unit
       - Integration
-    #      - E2E
+      - E2E
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
+        pool:
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
         displayName: Push to pre-release feed
         steps:
           - checkout: none
@@ -865,6 +937,8 @@ stages:
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
+        pool:
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
         displayName: Push to NuGet
         steps:
           - checkout: none

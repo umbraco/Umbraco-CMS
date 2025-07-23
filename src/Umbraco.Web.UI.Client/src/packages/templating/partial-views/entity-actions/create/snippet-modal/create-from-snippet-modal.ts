@@ -1,7 +1,7 @@
 import type { UmbCreatePartialViewFromSnippetModalData } from './index.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { PartialViewSnippetItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -25,16 +25,18 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 	}
 
 	protected override async firstUpdated() {
-		const { data } = await tryExecuteAndNotify(this, PartialViewService.getPartialViewSnippet({ take: 10000 }));
+		const { data } = await tryExecute(this, PartialViewService.getPartialViewSnippet({ query: { take: 10000 } }));
 
-		if (data) {
-			this._snippets = data.items.map((snippet) => {
-				return {
-					name: snippet.name,
-					path: this.#getCreateHref(snippet),
-				};
-			});
+		if (!data) {
+			return;
 		}
+
+		this._snippets = data.items.map((snippet) => {
+			return {
+				name: snippet.name,
+				path: this.#getCreateHref(snippet),
+			};
+		});
 	}
 
 	// close the modal when navigating to data type
@@ -44,7 +46,7 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Create Partial View from snippet">
+			<umb-body-layout headline=${this.localize.term('create_newPartialViewFromSnippet')}>
 				<uui-box>
 					${this._snippets.map(
 						(snippet) =>
@@ -53,7 +55,11 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 							></uui-menu-item>`,
 					)}
 				</uui-box>
-				<uui-button slot="actions" @click=${this._rejectModal} look="secondary">Close</uui-button>
+				<uui-button
+					slot="actions"
+					@click=${this._rejectModal}
+					look="secondary"
+					label=${this.localize.term('general_close')}></uui-button>
 			</umb-body-layout>
 		`;
 	}

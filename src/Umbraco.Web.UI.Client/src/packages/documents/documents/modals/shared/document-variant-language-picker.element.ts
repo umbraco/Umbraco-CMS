@@ -41,7 +41,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	_selection: Array<string> = [];
 
 	@state()
-	_isAllSelected?: boolean;
+	_isAllSelected: boolean = false;
 
 	/**
 	 * A filter function that determines if an item is pickableFilter or not.
@@ -61,6 +61,10 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 
 	protected override updated(_changedProperties: PropertyValues): void {
 		super.updated(_changedProperties);
+
+		if (_changedProperties.has('variantLanguageOptions')) {
+			this._isAllSelected = this.#isAllSelected();
+		}
 
 		if (this.selectionManager && this.pickableFilter) {
 			this.#selectionManager.setAllowLimitation((unique) => {
@@ -86,7 +90,7 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		const allUniques = this.variantLanguageOptions.map((o) => o.unique);
 		const filter = this.selectionManager.getAllowLimitation();
 		const allowedUniques = allUniques.filter((unique) => filter(unique));
-		return this._selection.length === allowedUniques.length;
+		return this._selection.length !== 0 && this._selection.length === allowedUniques.length;
 	}
 
 	override render() {
@@ -160,16 +164,18 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 			.required {
 				color: var(--uui-color-danger);
 				--uui-menu-item-color-hover: var(--uui-color-danger-emphasis);
+				--uui-menu-item-color-disabled: var(--uui-color-danger);
 			}
 			.label {
-				padding: 0.5rem 0;
+				padding: var(--uui-size-space-3) 0;
 			}
 			.label-status {
-				font-size: 0.8rem;
+				font-size: var(--uui-type-small-size);
 			}
 
 			uui-menu-item {
 				--uui-menu-item-flat-structure: 1;
+				--uui-menu-item-border-radius: var(--uui-border-radius);
 			}
 
 			uui-checkbox {

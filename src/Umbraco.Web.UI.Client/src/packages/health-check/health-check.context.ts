@@ -3,7 +3,7 @@ import type {
 	HealthCheckGroupWithResultResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
@@ -17,7 +17,7 @@ export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
 	public readonly results = this.#results.asObservable();
 
 	async getGroupChecks(name: string) {
-		const { data } = await tryExecuteAndNotify(this, HealthCheckService.getHealthCheckGroupByName({ name }));
+		const { data } = await tryExecute(this, HealthCheckService.getHealthCheckGroupByName({ path: { name } }));
 
 		if (data) {
 			this.#checks.setValue(data);
@@ -27,7 +27,7 @@ export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
 	}
 
 	async checkGroup(name: string) {
-		const { data } = await tryExecuteAndNotify(this, HealthCheckService.postHealthCheckGroupByNameCheck({ name }));
+		const { data } = await tryExecute(this, HealthCheckService.postHealthCheckGroupByNameCheck({ path: { name } }));
 
 		if (data) {
 			this.#results.setValue(data);

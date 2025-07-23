@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DOCUMENT_TREE_ALIAS, UMB_DOCUMENT_TREE_REPOSITORY_ALIAS } from '../../tree/index.js';
-import { UMB_USER_PERMISSION_DOCUMENT_MOVE } from '../../user-permissions/constants.js';
+import { UMB_USER_PERMISSION_DOCUMENT_MOVE } from '../../user-permissions/document/constants.js';
 import { UMB_MOVE_DOCUMENT_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';

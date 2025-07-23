@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
@@ -15,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Implements <see href="IDocumentUrlService" /> operations for handling document URLs.
+/// </summary>
 public class DocumentUrlService : IDocumentUrlService
 {
     private const string RebuildKey = "UmbracoUrlGeneration";
@@ -34,9 +38,64 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly IDomainCacheService _domainCacheService;
 
-    private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegment> _cache = new();
+    private readonly ConcurrentDictionary<string, PublishedDocumentUrlSegments> _cache = new();
     private bool _isInitialized;
 
+    /// <summary>
+    /// Model used to cache a single published document along with all it's URL segments.
+    /// </summary>
+    /// <remarks>Internal for the purpose of unit and benchmark testing.</remarks>
+    internal sealed class PublishedDocumentUrlSegments
+    {
+        /// <summary>
+        /// Gets or sets the document key.
+        /// </summary>
+        public required Guid DocumentKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the language Id.
+        /// </summary>
+        public required int LanguageId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of <see cref="UrlSegment"/> for the document, language and state.
+        /// </summary>
+        public required IList<UrlSegment> UrlSegments { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the document is a draft version or not.
+        /// </summary>
+        public required bool IsDraft { get; set; }
+
+        /// <summary>
+        /// Model used to represent a URL segment for a document in the cache.
+        /// </summary>
+        public class UrlSegment
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="UrlSegment"/> class.
+            /// </summary>
+            public UrlSegment(string segment, bool isPrimary)
+            {
+                Segment = segment;
+                IsPrimary = isPrimary;
+            }
+
+            /// <summary>
+            /// Gets the URL segment string.
+            /// </summary>
+            public string Segment { get; }
+
+            /// <summary>
+            /// Gets a value indicating whether this URL segment is the primary one for the document, language and state.
+            /// </summary>
+            public bool IsPrimary { get; }
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
+    /// </summary>
     public DocumentUrlService(
         ILogger<DocumentUrlService> logger,
         IDocumentUrlRepository documentUrlRepository,
@@ -69,6 +128,7 @@ public class DocumentUrlService : IDocumentUrlService
         _domainCacheService = domainCacheService;
     }
 
+    /// <inheritdoc/>
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
     {
         if (forceEmpty)
@@ -79,17 +139,21 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        if (await ShouldRebuildUrlsAsync())
+        if (ShouldRebuildUrls())
         {
-			_logger.LogInformation("Rebuilding all urls.");
+            _logger.LogInformation("Rebuilding all document URLs.");
             await RebuildAllUrlsAsync();
         }
+
+        _logger.LogInformation("Caching document URLs.");
 
         IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments = _documentUrlRepository.GetAll();
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         var languageIdToIsoCode = languages.ToDictionary(x => x.Id, x => x.IsoCode);
-        foreach (PublishedDocumentUrlSegment publishedDocumentUrlSegment in publishedDocumentUrlSegments)
+
+        int numberOfCachedUrls = 0;
+        foreach (PublishedDocumentUrlSegments publishedDocumentUrlSegment in ConvertToCacheModel(publishedDocumentUrlSegments))
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -99,41 +163,77 @@ public class DocumentUrlService : IDocumentUrlService
             if (languageIdToIsoCode.TryGetValue(publishedDocumentUrlSegment.LanguageId, out var isoCode))
             {
                 UpdateCache(_coreScopeProvider.Context!, publishedDocumentUrlSegment, isoCode);
+                numberOfCachedUrls++;
             }
         }
+
+        _logger.LogInformation("Cached {NumberOfUrls} document URLs.", numberOfCachedUrls);
+
         _isInitialized = true;
         scope.Complete();
     }
 
-    private void UpdateCache(IScopeContext scopeContext, PublishedDocumentUrlSegment publishedDocumentUrlSegment, string isoCode)
+    private bool ShouldRebuildUrls()
     {
-        var cacheKey = CreateCacheKey(publishedDocumentUrlSegment.DocumentKey, isoCode, publishedDocumentUrlSegment.IsDraft);
+        var persistedValue = GetPersistedRebuildValue();
+        var currentValue = GetCurrentRebuildValue();
 
-        scopeContext.Enlist("UpdateCache_" + cacheKey, () =>
+        return string.Equals(persistedValue, currentValue) is false;
+    }
+
+    private string? GetPersistedRebuildValue() => _keyValueService.GetValue(RebuildKey);
+
+    private string GetCurrentRebuildValue() => string.Join("|", _urlSegmentProviderCollection.Select(x => x.GetType().Name));
+
+    /// <inheritdoc/>
+    public async Task RebuildAllUrlsAsync()
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+
+        IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
+
+        await CreateOrUpdateUrlSegmentsAsync(documents);
+
+        _keyValueService.SetValue(RebuildKey, GetCurrentRebuildValue());
+
+        scope.Complete();
+    }
+
+    /// <summary>
+    /// Converts a collection of <see cref="PublishedDocumentUrlSegment"/> to a collection of <see cref="PublishedDocumentUrlSegments"/> for caching purposes.
+    /// </summary>
+    /// <param name="publishedDocumentUrlSegments">The collection of <see cref="PublishedDocumentUrlSegment"/> retrieved from the database on startup.</param>
+    /// <returns>The collection of cache models.</returns>
+    /// <remarks>Internal for the purpose of unit and benchmark testing.</remarks>
+    internal static IEnumerable<PublishedDocumentUrlSegments> ConvertToCacheModel(IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments)
+    {
+        var cacheModels = new Dictionary<(Guid DocumentKey, int LanguageId, bool IsDraft), PublishedDocumentUrlSegments>();
+
+        foreach (PublishedDocumentUrlSegment model in publishedDocumentUrlSegments)
         {
-            _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegment? existingValue);
+            (Guid DocumentKey, int LanguageId, bool IsDraft) key = (model.DocumentKey, model.LanguageId, model.IsDraft);
 
-            if (existingValue is null)
+            if (!cacheModels.TryGetValue(key, out PublishedDocumentUrlSegments? existingCacheModel))
             {
-                if (_cache.TryAdd(cacheKey, publishedDocumentUrlSegment) is false)
+                cacheModels[key] = new PublishedDocumentUrlSegments
                 {
-                    _logger.LogError("Could not add the document url cache.");
-                    return false;
-                }
+                    DocumentKey = model.DocumentKey,
+                    LanguageId = model.LanguageId,
+                    UrlSegments = [new PublishedDocumentUrlSegments.UrlSegment(model.UrlSegment, model.IsPrimary)],
+                    IsDraft = model.IsDraft,
+                };
             }
             else
             {
-                if (_cache.TryUpdate(cacheKey, publishedDocumentUrlSegment, existingValue) is false)
+                if (existingCacheModel.UrlSegments.Any(x => x.Segment == model.UrlSegment) is false)
                 {
-                    _logger.LogError("Could not update the document url cache.");
-                    return false;
+                    existingCacheModel.UrlSegments.Add(new PublishedDocumentUrlSegments.UrlSegment(model.UrlSegment, model.IsPrimary));
                 }
             }
+        }
 
-            return true;
-        });
-
-
+        return cacheModels.Values;
     }
 
     private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, string isoCode, bool isDraft)
@@ -152,40 +252,58 @@ public class DocumentUrlService : IDocumentUrlService
         });
     }
 
-    public async Task RebuildAllUrlsAsync()
+    private void UpdateCache(IScopeContext scopeContext, PublishedDocumentUrlSegments publishedDocumentUrlSegments, string isoCode)
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        scope.ReadLock(Constants.Locks.ContentTree);
+        var cacheKey = CreateCacheKey(publishedDocumentUrlSegments.DocumentKey, isoCode, publishedDocumentUrlSegments.IsDraft);
 
-        IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
+        scopeContext.Enlist("UpdateCache_" + cacheKey, () =>
+        {
+            _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegments? existingValue);
 
-        await CreateOrUpdateUrlSegmentsAsync(documents);
+            if (existingValue is null)
+            {
+                if (_cache.TryAdd(cacheKey, publishedDocumentUrlSegments) is false)
+                {
+                    _logger.LogError("Could not add to the document url cache.");
+                    return false;
+                }
+            }
+            else
+            {
+                if (_cache.TryUpdate(cacheKey, publishedDocumentUrlSegments, existingValue) is false)
+                {
+                    _logger.LogError("Could not update the document url cache.");
+                    return false;
+                }
+            }
 
-        _keyValueService.SetValue(RebuildKey, GetCurrentRebuildValue());
-
-        scope.Complete();
+            return true;
+        });
     }
 
-    private Task<bool> ShouldRebuildUrlsAsync()
-    {
-        var persistedValue = GetPersistedRebuildValue();
-        var currentValue = GetCurrentRebuildValue();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static string CreateCacheKey(Guid documentKey, string culture, bool isDraft) => $"{documentKey}|{culture}|{isDraft}".ToLowerInvariant();
 
-        return Task.FromResult(string.Equals(persistedValue, currentValue) is false);
-    }
-
-    private string GetCurrentRebuildValue() => string.Join("|", _urlSegmentProviderCollection.Select(x => x.GetType().Name));
-
-    private string? GetPersistedRebuildValue() => _keyValueService.GetValue(RebuildKey);
-
+    /// <inheritdoc/>
     public string? GetUrlSegment(Guid documentKey, string culture, bool isDraft)
     {
         ThrowIfNotInitialized();
         var cacheKey = CreateCacheKey(documentKey, culture, isDraft);
 
-        _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegment? urlSegment);
+        _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegments? urlSegment);
 
-        return urlSegment?.UrlSegment;
+        return urlSegment?.UrlSegments.FirstOrDefault(x => x.IsPrimary)?.Segment;
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<string> GetUrlSegments(Guid documentKey, string culture, bool isDraft)
+    {
+        ThrowIfNotInitialized();
+        var cacheKey = CreateCacheKey(documentKey, culture, isDraft);
+
+        _cache.TryGetValue(cacheKey, out PublishedDocumentUrlSegments? urlSegments);
+
+        return urlSegments?.UrlSegments.Select(x => x.Segment) ?? Enumerable.Empty<string>();
     }
 
     private void ThrowIfNotInitialized()
@@ -196,10 +314,35 @@ public class DocumentUrlService : IDocumentUrlService
         }
     }
 
+    /// <inheritdoc/>
+    public async Task CreateOrUpdateUrlSegmentsAsync(Guid key)
+    {
+        IContent? content = _contentService.GetById(key);
+
+        if (content is not null)
+        {
+            await CreateOrUpdateUrlSegmentsAsync(content.Yield());
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
+    {
+        var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
+        IContent item = _contentService.GetById(id)!;
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+
+        await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
+        {
+            item,
+        });
+    }
+
+    /// <inheritdoc/>
     public async Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documentsEnumerable)
     {
         IEnumerable<IContent> documents = documentsEnumerable as IContent[] ?? documentsEnumerable.ToArray();
-        if(documents.Any() is false)
+        if (documents.Any() is false)
         {
             return;
         }
@@ -209,7 +352,7 @@ public class DocumentUrlService : IDocumentUrlService
         var toSave = new List<PublishedDocumentUrlSegment>();
 
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        var languageDictionary = languages.ToDictionary(x=>x.IsoCode);
+        var languageDictionary = languages.ToDictionary(x => x.IsoCode);
 
         foreach (IContent document in documents)
         {
@@ -224,7 +367,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
         }
 
-        if(toSave.Any())
+        if (toSave.Count > 0)
         {
             _documentUrlRepository.Save(toSave);
         }
@@ -234,9 +377,9 @@ public class DocumentUrlService : IDocumentUrlService
 
     private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, ILanguage language, List<PublishedDocumentUrlSegment> toSave)
     {
-        IEnumerable<(PublishedDocumentUrlSegment model, bool shouldCache)> modelsAndStatus = GenerateModels(document, culture, language);
+        IEnumerable<(PublishedDocumentUrlSegments model, bool shouldCache)> modelsAndStatus = GenerateModels(document, culture, language);
 
-        foreach ((PublishedDocumentUrlSegment model, bool shouldCache) in modelsAndStatus)
+        foreach ((PublishedDocumentUrlSegments model, bool shouldCache) in modelsAndStatus)
         {
             if (shouldCache is false)
             {
@@ -244,69 +387,91 @@ public class DocumentUrlService : IDocumentUrlService
             }
             else
             {
-                toSave.Add(model);
+                toSave.AddRange(ConvertToPersistedModel(model));
                 UpdateCache(scopeContext, model, language.IsoCode);
             }
         }
     }
 
-    private IEnumerable<(PublishedDocumentUrlSegment model, bool shouldCache)> GenerateModels(IContent document, string? culture, ILanguage language)
+    private IEnumerable<(PublishedDocumentUrlSegments model, bool shouldCache)> GenerateModels(IContent document, string? culture, ILanguage language)
     {
         if (document.Trashed is false
             && (IsInvariantAndPublished(document) || IsVariantAndPublishedForCulture(document, culture)))
         {
-            var publishedUrlSegment =
-                document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture);
-            if (publishedUrlSegment.IsNullOrWhiteSpace())
+            string[] publishedUrlSegments = document.GetUrlSegments(_shortStringHelper, _urlSegmentProviderCollection, culture).ToArray();
+            if (publishedUrlSegments.Length == 0)
             {
-                _logger.LogWarning("No published url segment found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
+                _logger.LogWarning("No published URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
             }
             else
             {
-                yield return (new PublishedDocumentUrlSegment()
+                yield return (new PublishedDocumentUrlSegments
                 {
                     DocumentKey = document.Key,
                     LanguageId = language.Id,
-                    UrlSegment = publishedUrlSegment,
-                    IsDraft = false
+                    UrlSegments = publishedUrlSegments
+                        .Select((x, i) => new PublishedDocumentUrlSegments.UrlSegment(x, i == 0))
+                        .ToList(),
+                    IsDraft = false,
                 }, true);
             }
         }
         else
         {
-            yield return (new PublishedDocumentUrlSegment()
+            yield return (new PublishedDocumentUrlSegments
             {
                 DocumentKey = document.Key,
                 LanguageId = language.Id,
-                UrlSegment = string.Empty,
-                IsDraft = false
+                UrlSegments = [],
+                IsDraft = false,
             }, false);
         }
 
-        var draftUrlSegment = document.GetUrlSegment(_shortStringHelper, _urlSegmentProviderCollection, culture, false);
+        string[] draftUrlSegments = document.GetUrlSegments(_shortStringHelper, _urlSegmentProviderCollection, culture, false).ToArray();
 
-        if(draftUrlSegment.IsNullOrWhiteSpace())
+        if (draftUrlSegments.Any() is false)
         {
-            _logger.LogWarning("No draft url segment found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
+            _logger.LogWarning("No draft URL segments found for document {DocumentKey} in culture {Culture}", document.Key, culture ?? "{null}");
         }
         else
         {
-            yield return (new PublishedDocumentUrlSegment()
+            yield return (new PublishedDocumentUrlSegments
             {
-                DocumentKey = document.Key, LanguageId = language.Id, UrlSegment = draftUrlSegment, IsDraft = true
+                DocumentKey = document.Key,
+                LanguageId = language.Id,
+                UrlSegments = draftUrlSegments
+                    .Select((x, i) => new PublishedDocumentUrlSegments.UrlSegment(x, i == 0))
+                    .ToList(),
+                IsDraft = true,
             }, document.Trashed is false);
         }
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool IsVariantAndPublishedForCulture(IContent document, string? culture) =>
-        document.PublishCultureInfos?.Values.Any(x => x.Culture == culture) ?? false;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsInvariantAndPublished(IContent document)
         => document.ContentType.VariesByCulture() is false  // Is Invariant
            && document.Published; // Is Published
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsVariantAndPublishedForCulture(IContent document, string? culture) =>
+        document.PublishCultureInfos?.Values.Any(x => x.Culture == culture) ?? false;
+
+    private static IEnumerable<PublishedDocumentUrlSegment> ConvertToPersistedModel(PublishedDocumentUrlSegments model)
+    {
+        foreach (PublishedDocumentUrlSegments.UrlSegment urlSegment in model.UrlSegments)
+        {
+            yield return new PublishedDocumentUrlSegment
+            {
+                DocumentKey = model.DocumentKey,
+                LanguageId = model.LanguageId,
+                UrlSegment = urlSegment.Segment,
+                IsDraft = model.IsDraft,
+                IsPrimary = urlSegment.IsPrimary,
+            };
+        }
+    }
+
+    /// <inheritdoc/>
     public async Task DeleteUrlsFromCacheAsync(IEnumerable<Guid> documentKeysEnumerable)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
@@ -327,6 +492,7 @@ public class DocumentUrlService : IDocumentUrlService
         scope.Complete();
     }
 
+    /// <inheritdoc/>
     public Guid? GetDocumentKeyByRoute(string route, string? culture, int? documentStartNodeId, bool isDraft)
     {
         var urlSegments = route.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
@@ -361,7 +527,7 @@ public class DocumentUrlService : IDocumentUrlService
             // Otherwise we have to find the child with that segment anc follow that
             foreach (var urlSegment in urlSegments)
             {
-                //Get the children of the runnerKey and find the child (if any) with the correct url segment
+                // Get the children of the runnerKey and find the child (if any) with the correct url segment
                 IEnumerable<Guid> childKeys = GetChildKeys(runnerKey.Value);
 
                 runnerKey = GetChildWithUrlSegment(childKeys, urlSegment, culture, isDraft);
@@ -371,7 +537,8 @@ public class DocumentUrlService : IDocumentUrlService
                 {
                     break;
                 }
-                //if part of the path is unpublished, we need to break
+
+                // If part of the path is unpublished, we need to break
                 if (isDraft is false && IsContentPublished(runnerKey.Value, culture) is false)
                 {
                     return null;
@@ -380,8 +547,9 @@ public class DocumentUrlService : IDocumentUrlService
 
             return runnerKey;
         }
+
         // If there is no parts, it means it is a root (and no assigned domain)
-        if(urlSegments.Length == 0)
+        if (urlSegments.Length == 0)
         {
             // // if we do not hide the top level and no domain was found, it mean there is no content.
             // // TODO we can remove this to keep consistency with the old routing, but it seems incorrect to allow that.
@@ -435,13 +603,106 @@ public class DocumentUrlService : IDocumentUrlService
         return runnerKey;
     }
 
+    private Guid? GetStartNodeKey(int? documentStartNodeId)
+    {
+        if (documentStartNodeId is null)
+        {
+            return null;
+        }
+
+        Attempt<Guid> attempt = _idKeyMap.GetKeyForId(documentStartNodeId.Value, UmbracoObjectTypes.Document);
+        return attempt.Success ? attempt.Result : null;
+    }
+
     private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsDocumentPublished(contentKey, culture);
 
+    /// <summary>
+    /// Gets the children based on the latest published version of the content. (No aware of things in this scope).
+    /// </summary>
+    /// <param name="documentKey">The key of the document to get children from.</param>
+    /// <returns>The keys of all the children of the document.</returns>
+    private IEnumerable<Guid> GetChildKeys(Guid documentKey)
+    {
+        if (_documentNavigationQueryService.TryGetChildrenKeys(documentKey, out IEnumerable<Guid> childrenKeys))
+        {
+            return childrenKeys;
+        }
+
+        return [];
+    }
+
+    private Guid? GetChildWithUrlSegment(IEnumerable<Guid> childKeys, string urlSegment, string culture, bool isDraft)
+    {
+        foreach (Guid childKey in childKeys)
+        {
+            IEnumerable<string> childUrlSegments = GetUrlSegments(childKey, culture, isDraft);
+
+            if (childUrlSegments.Contains(urlSegment))
+            {
+                return childKey;
+            }
+        }
+
+        return null;
+    }
+
+    private Guid? GetTopMostRootKey(bool isDraft, string culture) => GetRootKeys(isDraft, culture).Cast<Guid?>().FirstOrDefault();
+
+    private IEnumerable<Guid> GetRootKeys(bool isDraft, string culture)
+    {
+        if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys))
+        {
+            foreach (Guid rootKey in rootKeys)
+            {
+                if (isDraft || IsContentPublished(rootKey, culture))
+                {
+                    yield return rootKey;
+                }
+            }
+        }
+    }
+
+    private IEnumerable<Guid> GetKeysInRoot(bool considerFirstLevelAsRoot, bool isDraft, string culture)
+    {
+        if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeysEnumerable) is false)
+        {
+            yield break;
+        }
+
+        IEnumerable<Guid> rootKeys = rootKeysEnumerable as Guid[] ?? rootKeysEnumerable.ToArray();
+
+        if (considerFirstLevelAsRoot)
+        {
+            foreach (Guid rootKey in rootKeys)
+            {
+                if (isDraft is false && IsContentPublished(rootKey, culture) is false)
+                {
+                    continue;
+                }
+
+                IEnumerable<Guid> childKeys = GetChildKeys(rootKey);
+
+                foreach (Guid childKey in childKeys)
+                {
+                    yield return childKey;
+                }
+            }
+        }
+        else
+        {
+            foreach (Guid rootKey in rootKeys)
+            {
+                yield return rootKey;
+            }
+        }
+    }
+
+    /// <inheritdoc/>
     public string GetLegacyRouteFormat(Guid documentKey, string? culture, bool isDraft)
     {
         Attempt<int> documentIdAttempt = _idKeyMap.GetIdForKey(documentKey, UmbracoObjectTypes.Document);
 
-        if(documentIdAttempt.Success is false)
+        if (documentIdAttempt.Success is false)
         {
             return "#";
         }
@@ -451,25 +712,28 @@ public class DocumentUrlService : IDocumentUrlService
             return "#";
         }
 
-        if(isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
+        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
         {
             return "#";
         }
 
-        var cultureOrDefault = string.IsNullOrWhiteSpace(culture) is false ? culture : _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        string cultureOrDefault = GetCultureOrDefault(culture);
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
         ILookup<Guid, Domain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToLookup(x => x, ancestorKey =>
         {
             Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
 
-            if(idAttempt.Success is false)
+            if (idAttempt.Success is false)
             {
                 return null;
             }
 
             IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
-            return domains.FirstOrDefault(x=>x.Culture == cultureOrDefault);
+
+            // If no culture is specified, we assume invariant and return the first domain.
+            // This is also only used to later to specify the node id in the route, so it does not matter what culture it is.
+            return GetDomainForCultureOrInvariant(domains, culture);
         });
 
         var urlSegments = new List<string>();
@@ -478,16 +742,16 @@ public class DocumentUrlService : IDocumentUrlService
 
         foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
         {
-            var domains = ancestorOrSelfKeyToDomains[ancestorOrSelfKey].WhereNotNull();
+            IEnumerable<Domain> domains = ancestorOrSelfKeyToDomains[ancestorOrSelfKey].WhereNotNull();
             if (domains.Any())
             {
                 foundDomain = domains.First();// What todo here that is better?
                 break;
             }
 
-            if (_cache.TryGetValue(CreateCacheKey(ancestorOrSelfKey, cultureOrDefault, isDraft), out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
+            if (TryGetPrimaryUrlSegment(ancestorOrSelfKey, cultureOrDefault, isDraft, out string? segment))
             {
-                urlSegments.Add(publishedDocumentUrlSegment.UrlSegment);
+                urlSegments.Add(segment);
             }
 
             if (foundDomain is not null)
@@ -496,8 +760,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
         }
 
-        var leftToRight = _globalSettings.ForceCombineUrlPathLeftToRight
-                          || CultureInfo.GetCultureInfo(cultureOrDefault).TextInfo.IsRightToLeft is false;
+        bool leftToRight = ArePathsLeftToRight(cultureOrDefault);
         if (leftToRight)
         {
             urlSegments.Reverse();
@@ -505,7 +768,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (foundDomain is not null)
         {
-            //we found a domain, and not to construct the route in the funny legacy way
+            // We found a domain, and not to construct the route in the funny legacy way
             return foundDomain.ContentId + "/" + string.Join("/", urlSegments);
         }
 
@@ -513,20 +776,77 @@ public class DocumentUrlService : IDocumentUrlService
         return GetFullUrl(isRootFirstItem, urlSegments, null, leftToRight);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private string GetCultureOrDefault(string? culture)
+        => string.IsNullOrWhiteSpace(culture) is false
+            ? culture
+            : _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool ArePathsLeftToRight(string cultureOrDefault)
+        => _globalSettings.ForceCombineUrlPathLeftToRight ||
+            CultureInfo.GetCultureInfo(cultureOrDefault).TextInfo.IsRightToLeft is false;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Domain? GetDomainForCultureOrInvariant(IEnumerable<Domain> domains, string? culture)
+        => string.IsNullOrEmpty(culture)
+            ? domains.FirstOrDefault()
+            : domains.FirstOrDefault(x => x.Culture?.Equals(culture, StringComparison.InvariantCultureIgnoreCase) ?? false);
+
+    private string GetFullUrl(bool isRootFirstItem, List<string> segments, Domain? foundDomain, bool leftToRight)
+    {
+        var urlSegments = new List<string>(segments);
+
+        if (foundDomain is not null)
+        {
+            return foundDomain.Name.EnsureEndsWith("/") + string.Join('/', urlSegments);
+        }
+
+        var hideTopLevel = HideTopLevel(_globalSettings.HideTopLevelNodeFromPath, isRootFirstItem, urlSegments);
+        if (leftToRight)
+        {
+            return '/' + string.Join('/', urlSegments.Skip(hideTopLevel ? 1 : 0));
+        }
+
+        if (hideTopLevel)
+        {
+            urlSegments.RemoveAt(urlSegments.Count - 1);
+        }
+
+        return '/' + string.Join('/', urlSegments);
+    }
+
+    private static bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, List<string> urlSegments)
+    {
+        if (hideTopLevelNodeFromPath is false)
+        {
+            return false;
+        }
+
+        if (isRootFirstItem is false && urlSegments.Count == 1)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc/>
     public bool HasAny()
     {
         ThrowIfNotInitialized();
         return _cache.Any();
     }
 
-
+    /// <inheritdoc/>
+    [Obsolete("This method is obsolete and will be removed in future versions. Use IPublishedUrlInfoProvider.GetAllAsync instead.")]
     public async Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey)
     {
         var result = new List<UrlInfo>();
 
         Attempt<int> documentIdAttempt = _idKeyMap.GetIdForKey(contentKey, UmbracoObjectTypes.Document);
 
-        if(documentIdAttempt.Success is false)
+        if (documentIdAttempt.Success is false)
         {
             return result;
         }
@@ -538,30 +858,34 @@ public class DocumentUrlService : IDocumentUrlService
         var cultures = languages.ToDictionary(x=>x.IsoCode);
 
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
-        Dictionary<Guid, Task<ILookup<string, Domain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToDictionary(x => x, async ancestorKey =>
-        {
-            Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
+        Dictionary<Guid, Task<ILookup<string, Domain>>> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray
+            .ToDictionary(
+                x => x,
+                ancestorKey =>
+                {
+                    Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
 
-            if(idAttempt.Success is false)
-            {
-                return null;
-            }
-            IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
-            return domains.ToLookup(x => x.Culture!);
-        })!;
+                    if (idAttempt.Success is false)
+                    {
+                        return Task.FromResult((ILookup<string, Domain>)null!);
+                    }
+
+                    IEnumerable<Domain> domains = _domainCacheService.GetAssigned(idAttempt.Result, false);
+                    return Task.FromResult(domains.ToLookup(x => x.Culture!));
+                })!;
 
         foreach ((string culture, ILanguage language) in cultures)
         {
             var urlSegments = new List<string>();
-            List<Domain?> foundDomains = new List<Domain?>();
+            var foundDomains = new List<Domain?>();
 
             var hasUrlInCulture = true;
             foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
             {
-                var domainLookup = await ancestorOrSelfKeyToDomains[ancestorOrSelfKey];
+                ILookup<string, Domain> domainLookup = await ancestorOrSelfKeyToDomains[ancestorOrSelfKey];
                 if (domainLookup.Any())
                 {
-                    var domains = domainLookup[culture];
+                    IEnumerable<Domain> domains = domainLookup[culture];
                     foreach (Domain domain in domains)
                     {
                         Attempt<Guid> domainKeyAttempt =
@@ -581,11 +905,9 @@ public class DocumentUrlService : IDocumentUrlService
                     }
                 }
 
-                if (_cache.TryGetValue(
-                        CreateCacheKey(ancestorOrSelfKey, culture, false),
-                        out PublishedDocumentUrlSegment? publishedDocumentUrlSegment))
+                if (TryGetPrimaryUrlSegment(ancestorOrSelfKey, culture, false, out string? segment))
                 {
-                    urlSegments.Add(publishedDocumentUrlSegment.UrlSegment);
+                    urlSegments.Add(segment);
                 }
                 else
                 {
@@ -593,7 +915,7 @@ public class DocumentUrlService : IDocumentUrlService
                 }
             }
 
-            //If we did not find a domain and this is not the default language, then the content is not routable
+            // If we did not find a domain and this is not the default language, then the content is not routable
             if (foundDomains.Any() is false && language.IsDefault is false)
             {
                 continue;
@@ -625,8 +947,7 @@ public class DocumentUrlService : IDocumentUrlService
                     result.Add(new UrlInfo(
                         text: foundUrl,
                         isUrl: hasUrlInCulture,
-                        culture: culture
-                    ));
+                        culture: culture));
                 }
                 else
                 {
@@ -638,192 +959,37 @@ public class DocumentUrlService : IDocumentUrlService
                         result.Add(new UrlInfo(
                             text: foundUrl,
                             isUrl: hasUrlInCulture,
-                            culture: culture
-                        ));
+                            culture: culture));
                     }
                     else
                     {
                         result.Add(new UrlInfo(
                             text: "Conflict: Other page has the same url",
                             isUrl: false,
-                            culture: culture
-                        ));
+                            culture: culture));
                     }
                 }
-
-
-
             }
         }
 
         return result;
     }
 
-
-    private string GetFullUrl(bool isRootFirstItem, List<string> segments, Domain? foundDomain, bool leftToRight)
+    private bool TryGetPrimaryUrlSegment(Guid documentKey, string culture, bool isDraft, [NotNullWhen(true)] out string? segment)
     {
-        var urlSegments = new List<string>(segments);
-
-        if (foundDomain is not null)
+        if (_cache.TryGetValue(
+            CreateCacheKey(documentKey, culture, isDraft),
+            out PublishedDocumentUrlSegments? publishedDocumentUrlSegments))
         {
-            return foundDomain.Name.EnsureEndsWith("/") + string.Join('/', urlSegments);
-        }
-
-        var hideTopLevel = HideTopLevel(_globalSettings.HideTopLevelNodeFromPath, isRootFirstItem, urlSegments);
-        if (leftToRight)
-        {
-            return '/' + string.Join('/', urlSegments.Skip(hideTopLevel ? 1 : 0));
-        }
-
-        if (hideTopLevel)
-        {
-            urlSegments.RemoveAt(urlSegments.Count - 1);
-        }
-
-        return '/' + string.Join('/', urlSegments);
-    }
-
-    private bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, List<string> urlSegments)
-    {
-        if (hideTopLevelNodeFromPath is false)
-        {
-            return false;
-        }
-
-        if(isRootFirstItem is false && urlSegments.Count == 1)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
-    {
-        var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
-        IContent item = _contentService.GetById(id)!;
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
-
-        await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
-        {
-            item
-        });
-    }
-
-    public async Task CreateOrUpdateUrlSegmentsAsync(Guid key)
-    {
-        IContent? content = _contentService.GetById(key);
-
-        if (content is not null)
-        {
-            await CreateOrUpdateUrlSegmentsAsync(content.Yield());
-        }
-    }
-
-    private IEnumerable<Guid> GetKeysInRoot(bool considerFirstLevelAsRoot, bool isDraft, string culture)
-    {
-        if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeysEnumerable) is false)
-        {
-            yield break;
-        }
-
-        IEnumerable<Guid> rootKeys = rootKeysEnumerable as Guid[] ?? rootKeysEnumerable.ToArray();
-
-        if (considerFirstLevelAsRoot)
-        {
-            yield return rootKeys.First();
-
-            foreach (Guid rootKey in rootKeys)
+            PublishedDocumentUrlSegments.UrlSegment? primaryUrlSegment = publishedDocumentUrlSegments.UrlSegments.FirstOrDefault(x => x.IsPrimary);
+            if (primaryUrlSegment is not null)
             {
-                if (isDraft is false && IsContentPublished(rootKey, culture) is false)
-                {
-                    continue;
-                }
-
-                IEnumerable<Guid> childKeys = GetChildKeys(rootKey);
-
-                foreach (Guid childKey in childKeys)
-                {
-                    yield return childKey;
-                }
-            }
-        }
-        else
-        {
-            foreach (Guid rootKey in rootKeys)
-            {
-                yield return rootKey;
+                segment = primaryUrlSegment.Segment;
+                return true;
             }
         }
 
+        segment = null;
+        return false;
     }
-
-    private Guid? GetChildWithUrlSegment(IEnumerable<Guid> childKeys, string urlSegment, string culture, bool isDraft)
-    {
-        foreach (Guid childKey in childKeys)
-        {
-            var childUrlSegment = GetUrlSegment(childKey, culture, isDraft);
-
-            if (string.Equals(childUrlSegment, urlSegment))
-            {
-                return childKey;
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Gets the children based on the latest published version of the content. (No aware of things in this scope).
-    /// </summary>
-    /// <param name="documentKey">The key of the document to get children from.</param>
-    /// <returns>The keys of all the children of the document.</returns>
-    private IEnumerable<Guid> GetChildKeys(Guid documentKey)
-    {
-        if(_documentNavigationQueryService.TryGetChildrenKeys(documentKey, out IEnumerable<Guid> childrenKeys))
-        {
-            return childrenKeys;
-        }
-
-        return Enumerable.Empty<Guid>();
-    }
-
-    private IEnumerable<Guid> GetRootKeys(bool isDraft, string culture)
-    {
-        if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys))
-        {
-            foreach (Guid rootKey in rootKeys)
-            {
-                if (isDraft || IsContentPublished(rootKey, culture))
-                {
-                    yield return rootKey;
-                }
-            }
-        }
-    }
-
-
-    /// <summary>
-    /// Gets the top most root key.
-    /// </summary>
-    /// <returns>The top most root key.</returns>
-    private Guid? GetTopMostRootKey(bool isDraft, string culture)
-    {
-        return GetRootKeys(isDraft, culture).Cast<Guid?>().FirstOrDefault();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static string CreateCacheKey(Guid documentKey, string culture, bool isDraft) => $"{documentKey}|{culture}|{isDraft}".ToLowerInvariant();
-
-    private Guid? GetStartNodeKey(int? documentStartNodeId)
-    {
-        if (documentStartNodeId is null)
-        {
-            return null;
-        }
-
-        Attempt<Guid> attempt = _idKeyMap.GetKeyForId(documentStartNodeId.Value, UmbracoObjectTypes.Document);
-        return attempt.Success ? attempt.Result : null;
-    }
-
 }

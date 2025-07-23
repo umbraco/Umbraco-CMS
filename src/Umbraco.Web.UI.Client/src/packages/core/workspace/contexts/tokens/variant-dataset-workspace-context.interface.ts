@@ -4,6 +4,8 @@ import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-con
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
+import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel>
 	extends UmbSubmittableWorkspaceContext {
@@ -17,6 +19,10 @@ export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntity
 	variantOptions: Observable<Array<UmbEntityVariantOptionModel<VariantType>>>;
 	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): VariantType | undefined;
+	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
+	varies: Observable<boolean | undefined>;
+	variesByCulture: Observable<boolean | undefined>;
+	variesBySegment: Observable<boolean | undefined>;
 
 	// Property:
 	// This one is async cause it needs to structure to provide this data: [NL]
@@ -28,4 +34,5 @@ export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntity
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId): Promise<void>;
 
 	createPropertyDatasetContext(host: UmbControllerHost, variantId?: UmbVariantId): UmbPropertyDatasetContext;
+	getVariantValidationContext(variantId: UmbVariantId): UmbValidationController | undefined;
 }

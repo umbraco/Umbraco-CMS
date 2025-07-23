@@ -1,16 +1,18 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import type { UmbDocumentSearchItemModel } from './types.js';
-import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbDocumentSearchItemModel, UmbDocumentSearchRequestArgs } from './types.js';
+import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbDocumentSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<UmbDocumentSearchItemModel> {
+export class UmbDocumentSearchServerDataSource
+	implements UmbSearchDataSource<UmbDocumentSearchItemModel, UmbDocumentSearchRequestArgs>
+{
 	#host: UmbControllerHost;
 
 	/**
@@ -24,16 +26,21 @@ export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<Um
 
 	/**
 	 * Get a list of versions for a document
-	 * @param args
+	 * @param {UmbDocumentSearchRequestArgs} args - The arguments for the search
 	 * @returns {*}
 	 * @memberof UmbDocumentSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+	async search(args: UmbDocumentSearchRequestArgs) {
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.getItemDocumentSearch({
-				query: args.query,
-				parentId: args.searchFrom?.unique ?? undefined,
+				query: {
+					allowedDocumentTypes: args.allowedContentTypes?.map((contentType) => contentType.unique),
+					culture: args.culture || undefined,
+					parentId: args.searchFrom?.unique ?? undefined,
+					query: args.query,
+					trashed: args.includeTrashed,
+				},
 			}),
 		);
 

@@ -1,4 +1,8 @@
-import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS, UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../constants.js';
+import {
+	UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
+	UMB_MEDIA_ITEM_REPOSITORY_ALIAS,
+	UMB_MEDIA_REFERENCE_REPOSITORY_ALIAS,
+} from '../constants.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
@@ -10,12 +14,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Media.Delete',
-		name: 'Delete Media Entity Action ',
-		kind: 'delete',
+		name: 'Delete Media Entity Action',
+		kind: 'deleteWithRelation',
 		forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_MEDIA_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
+			referenceRepositoryAlias: UMB_MEDIA_REFERENCE_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{

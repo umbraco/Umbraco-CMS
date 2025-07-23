@@ -22,17 +22,16 @@ test('can create a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.goToUsers();
 
   // Act
-  await umbracoUi.user.clickCreateButton();
-  await umbracoUi.user.clickUserButton();
+  await umbracoUi.user.clickCreateActionWithOptionName('User');
   await umbracoUi.user.enterNameOfTheUser(nameOfTheUser);
   await umbracoUi.user.enterUserEmail(userEmail);
   await umbracoUi.user.clickChooseButton();
   await umbracoUi.user.clickButtonWithName(defaultUserGroupName);
-  await umbracoUi.user.clickSubmitButton();
+  await umbracoUi.user.clickChooseModalButton();
   await umbracoUi.user.clickCreateUserButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.user.waitForUserToBeCreated();
   expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeTruthy();
 });
 
@@ -50,7 +49,7 @@ test('can rename a user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeTruthy();
 });
 
@@ -67,7 +66,7 @@ test('can delete a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickConfirmToDeleteButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.user.waitForUserToBeDeleted();
   expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeFalsy();
   // Checks if the user is deleted from the list
   await umbracoUi.user.clickUsersMenu();
@@ -86,11 +85,11 @@ test('can add multiple user groups to a user', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
   await umbracoUi.user.clickChooseUserGroupsButton();
   await umbracoUi.user.clickButtonWithName(secondUserGroupName);
-  await umbracoUi.user.clickSubmitButton();
+  await umbracoUi.user.clickChooseModalButton();
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.user.doesUserContainUserGroupIds(nameOfTheUser, [userGroupWriters.id, userGroupTranslators.id])).toBeTruthy();
 });
 
@@ -107,7 +106,7 @@ test('can remove a user group from a user', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.userGroupIds).toEqual([]);
 });
@@ -125,7 +124,7 @@ test('can update culture for a user', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.languageIsoCode).toEqual(danishIsoCode);
 });
@@ -150,7 +149,7 @@ test('can add a content start node to a user', {tag: '@smoke'}, async ({umbracoA
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.user.doesUserContainContentStartNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
 
   // Clean
@@ -185,7 +184,7 @@ test('can add multiple content start nodes for a user', async ({umbracoApi, umbr
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.user.doesUserContainContentStartNodeIds(nameOfTheUser, [documentId, secondDocumentId])).toBeTruthy();
 
   // Clean
@@ -218,7 +217,7 @@ test('can remove a content start node from a user', {tag: '@smoke'}, async ({umb
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.user.doesUserContainContentStartNodeIds(nameOfTheUser, [documentId])).toBeFalsy();
 
   // Clean
@@ -239,11 +238,11 @@ test('can add media start nodes for a user', {tag: '@smoke'}, async ({umbracoApi
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
   await umbracoUi.user.clickChooseMediaStartNodeButton();
   await umbracoUi.user.selectMediaWithName(mediaName);
-  await umbracoUi.user.clickSubmitButton();
+  await umbracoUi.user.clickChooseModalButton();
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeTruthy();
 
   // Clean
@@ -271,11 +270,11 @@ test('can add multiple media start nodes for a user', async ({umbracoApi, umbrac
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
   await umbracoUi.user.clickChooseMediaStartNodeButton();
   await umbracoUi.user.selectMediaWithName(secondMediaName);
-  await umbracoUi.user.clickSubmitButton();
+  await umbracoUi.user.clickChooseModalButton();
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [firstMediaId, secondMediaId])).toBeTruthy();
 
   // Clean
@@ -304,7 +303,7 @@ test('can remove a media start node from a user', async ({umbracoApi, umbracoUi}
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeFalsy();
 
   // Clean
@@ -319,11 +318,11 @@ test('can allow access to all documents for a user', async ({umbracoApi, umbraco
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
-  await umbracoUi.user.clickAllowAccessToAllDocumentsSlider();
+  await umbracoUi.user.clickAllowAccessToAllDocumentsToggle();
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.hasDocumentRootAccess).toBeTruthy()
 });
@@ -336,11 +335,11 @@ test('can allow access to all media for a user', async ({umbracoApi, umbracoUi})
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
-  await umbracoUi.user.clickAllowAccessToAllMediaSlider();
+  await umbracoUi.user.clickAllowAccessToAllMediaToggle();
   await umbracoUi.user.clickSaveButton();
 
   // Assert
-  await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.hasMediaRootAccess).toBeTruthy();
 });
@@ -364,6 +363,8 @@ test('can see if the user has the correct access based on content start nodes', 
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
+  // Currently this wait is necessary
+  await umbracoUi.waitForTimeout(2000);
 
   // Assert
   await umbracoUi.user.doesUserHaveAccessToContentNode(documentName);
@@ -457,9 +458,7 @@ test('can enable a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickConfirmEnableButton();
 
   // Assert
-  // TODO: Unskip when it shows userEnabled/userInactive instead of userDisabled
-  // await umbracoUi.user.doesSuccessNotificationHaveText(NotificationConstantHelper.success.userEnabled);
-  await umbracoUi.user.isUserActiveTextVisible();
+  await umbracoUi.user.doesSuccessNotificationHaveText(newTestUser + NotificationConstantHelper.success.userEnabled);
   // The state of the user is not enabled. The reason for this is that the user has not logged in, resulting in the state Inactive.
   const userData = await umbracoApi.user.getByName(newTestUser);
   expect(userData.state).toBe(inactiveStatus);

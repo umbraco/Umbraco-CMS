@@ -107,6 +107,7 @@ public static partial class Constants
             /// <summary>
             ///     Guid for List View - Members as string
             /// </summary>
+            [Obsolete("No longer used in Umbraco. Scheduled for removal in Umbraco 17.")]
             public const string ListViewMembers = "AA2C52A0-CE87-4E65-A47C-7DF09358585D";
 
             /// <summary>

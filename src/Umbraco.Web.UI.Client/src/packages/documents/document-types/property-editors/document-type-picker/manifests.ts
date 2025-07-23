@@ -9,14 +9,9 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Document Type Picker',
 		icon: 'icon-document-dashed-line',
 		group: 'advanced',
+		supportsReadOnly: true,
 		settings: {
 			properties: [
-				{
-					alias: 'showOpenButton',
-					label: 'Show open button',
-					description: 'Opens the node in a dialog',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
 				{
 					alias: 'onlyPickElementTypes',
 					label: 'Only Element Types',

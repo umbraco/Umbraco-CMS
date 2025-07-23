@@ -1,10 +1,11 @@
+import type { UmbIconDefinition } from '../types.js';
+import { UMB_ICON_REGISTRY_CONTEXT } from '../icon-registry.context-token.js';
 import type { UmbIconPickerModalData, UmbIconPickerModalValue } from './icon-picker-modal.token.js';
 import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { extractUmbColorVariable, umbracoColors } from '@umbraco-cms/backoffice/resources';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_ICON_REGISTRY_CONTEXT, type UmbIconDefinition } from '@umbraco-cms/backoffice/icon';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-icon-picker-modal')
@@ -29,7 +30,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	constructor() {
 		super();
 		this.consumeContext(UMB_ICON_REGISTRY_CONTEXT, (context) => {
-			this.observe(context.approvedIcons, (icons) => {
+			this.observe(context?.approvedIcons, (icons) => {
 				this.#icons = icons;
 				this.#filterIcons();
 			});
@@ -93,7 +94,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 										label=${color.alias}
 										title=${color.alias}
 										value=${color.alias}
-										style="--uui-swatch-color: var(${color.varName})"></uui-color-swatch>
+										style="--uui-swatch-color: var(${color.varName})">
+									</uui-color-swatch>
 								`,
 							)
 						}
@@ -116,15 +118,17 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	renderSearch() {
-		return html` <uui-input
-			type="search"
-			placeholder=${this.localize.term('placeholders_filter')}
-			label=${this.localize.term('placeholders_filter')}
-			id="search"
-			@keyup=${this.#filterIcons}
-			${umbFocus()}>
-			<uui-icon name="search" slot="prepend" id="search_icon"></uui-icon>
-		</uui-input>`;
+		return html`
+			<uui-input
+				type="search"
+				placeholder=${this.localize.term('placeholders_filter')}
+				label=${this.localize.term('placeholders_filter')}
+				id="search"
+				@keyup=${this.#filterIcons}
+				${umbFocus()}>
+				<uui-icon name="search" slot="prepend" id="search_icon"></uui-icon>
+			</uui-input>
+		`;
 	}
 
 	renderIcons() {

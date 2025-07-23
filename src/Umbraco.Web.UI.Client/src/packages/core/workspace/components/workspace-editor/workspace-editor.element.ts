@@ -1,9 +1,10 @@
+import type { ManifestWorkspaceView } from '../../extensions/types.js';
+import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement, UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 
 /**
@@ -62,24 +63,26 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		if (this._workspaceViews.length > 0) {
 			newRoutes = this._workspaceViews.map((manifest) => {
 				return {
-					path: `view/${manifest.meta.pathname}`,
+					path: UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname }),
 					component: () => createExtensionElement(manifest),
 					setup: (component) => {
 						if (component) {
 							(component as any).manifest = manifest;
 						}
 					},
-				} as UmbRoute;
+				};
 			});
 
 			// Duplicate first workspace and use it for the empty path scenario. [NL]
-			newRoutes.push({ ...newRoutes[0], path: '' });
-
-			newRoutes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
-			});
+			newRoutes.push({ ...newRoutes[0], unique: newRoutes[0].path, path: '' });
 		}
+
+		// Add a catch-all route for not found
+		// This will be the last route, so it will only match if no other routes match or if no workspace views are defined.
+		newRoutes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
 		this._routes = newRoutes;
 	}
@@ -89,9 +92,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
 				${this.#renderBackButton()}
 				<slot name="header" slot="header"></slot>
-				${this.#renderViews()}
 				<slot name="action-menu" slot="action-menu"></slot>
-				${this.#renderRoutes()}
+				${this.#renderViews()} ${this.#renderRoutes()}
 				<slot></slot>
 				${when(
 					!this.enforceNoFooter,
@@ -153,6 +155,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		if (!this._routes || this._routes.length === 0) return nothing;
 		return html`
 			<umb-router-slot
+				inherit-addendum
 				id="router-slot"
 				.routes=${this._routes}
 				@init=${(event: UmbRouterSlotInitEvent) => {

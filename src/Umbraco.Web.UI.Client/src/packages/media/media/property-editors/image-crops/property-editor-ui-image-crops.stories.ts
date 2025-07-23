@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUIImageCropsElement } from './property-editor-ui-image-crops.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 
 import './property-editor-ui-image-crops.element.js';
 

@@ -23,7 +23,9 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	}
 
 	private async _onHealthCheckHandler() {
-		this._healthCheckDashboardContext?.checkAll();
+		this._buttonState = 'waiting';
+		await this._healthCheckDashboardContext?.checkAll();
+		this._buttonState = 'success';
 	}
 
 	override render() {
@@ -41,7 +43,16 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 					</uui-button>
 				</div>
 				<div class="grid">
-					<umb-extension-slot type="healthCheck" default-element="umb-health-check-group-box-overview">
+
+					${
+						// As well as the visual presentation, this amend to the rendering based on button state is necessary
+						// in order to trigger an update after the checks are complete (this.requestUpdate() doesn't suffice).
+						this._buttonState !== 'waiting'
+							? html`<umb-extension-slot
+									type="healthCheck"
+									default-element="umb-health-check-group-box-overview"></umb-extension-slot>`
+							: html`<uui-loader></uui-loader>`
+					}
 					</umb-extension-slot>
 				</div>
 			</uui-box>

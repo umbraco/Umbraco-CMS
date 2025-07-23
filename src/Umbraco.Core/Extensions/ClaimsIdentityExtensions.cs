@@ -384,7 +384,10 @@ public static class ClaimsIdentityExtensions
         var firstValue = identity.FindFirstValue(ClaimTypes.NameIdentifier);
         if (firstValue is not null)
         {
-            return int.Parse(firstValue, CultureInfo.InvariantCulture);
+            if (int.TryParse(firstValue, CultureInfo.InvariantCulture, out var id))
+            {
+                return id;
+            }
         }
 
         return null;

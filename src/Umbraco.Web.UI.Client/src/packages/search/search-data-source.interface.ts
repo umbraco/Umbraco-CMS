@@ -6,6 +6,9 @@ export interface UmbSearchDataSourceConstructor<SearchResultItemType extends Umb
 	new (host: UmbControllerHost): UmbSearchDataSource<SearchResultItemType>;
 }
 
-export interface UmbSearchDataSource<SearchResultItemType extends UmbSearchResultItemModel> {
-	search(args: UmbSearchRequestArgs): Promise<UmbDataSourceResponse<UmbPagedModel<SearchResultItemType>>>;
+export interface UmbSearchDataSource<
+	SearchResultItemType extends UmbSearchResultItemModel,
+	RequestArgsType extends UmbSearchRequestArgs = UmbSearchRequestArgs,
+> {
+	search(args: RequestArgsType): Promise<UmbDataSourceResponse<UmbPagedModel<SearchResultItemType>>>;
 }

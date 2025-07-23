@@ -4,7 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbImagingStore extends UmbContextBase<never> implements UmbApi {
+export class UmbImagingStore extends UmbContextBase implements UmbApi {
 	#data;
 
 	constructor(host: UmbControllerHost) {

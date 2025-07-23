@@ -27,6 +27,10 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Content type culture variance mismatch")
                 .WithDetail("The content type variance did not match that of the passed content data.")
                 .Build()),
+            ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch => BadRequest(problemDetailsBuilder
+                .WithTitle("Content type segment variance mismatch")
+                .WithDetail("The content type variance did not match that of the passed content data.")
+                .Build()),
             ContentEditingOperationStatus.NotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The content could not be found")
                 .Build()),
@@ -75,6 +79,14 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
             ContentEditingOperationStatus.DuplicateName => BadRequest(problemDetailsBuilder
                 .WithTitle("Duplicate name")
                 .WithDetail("The supplied name is already in use for the same content type.")
+                .Build()),
+            ContentEditingOperationStatus.CannotDeleteWhenReferenced => BadRequest(problemDetailsBuilder
+                .WithTitle("Cannot delete a referenced content item")
+                .WithDetail("Cannot delete a referenced document, while the setting ContentSettings.DisableDeleteWhenReferenced is enabled.")
+                .Build()),
+            ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced => BadRequest(problemDetailsBuilder
+                .WithTitle("Cannot move a referenced document to the recycle bin")
+                .WithDetail("Cannot move a referenced document to the recycle bin, while the setting ContentSettings.DisableUnpublishWhenReferenced is enabled.")
                 .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,

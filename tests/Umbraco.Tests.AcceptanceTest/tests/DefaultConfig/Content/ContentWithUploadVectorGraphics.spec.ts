@@ -26,13 +26,13 @@ test('can create content with the upload vector graphics data type', async ({umb
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -53,7 +53,7 @@ test('can publish content with the upload vector graphics data type', async ({um
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -75,15 +75,15 @@ test(`can upload a file with the svg extension in the content`, async ({umbracoA
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(vectorGraphicsName));
+  await umbracoUi.content.doesUploadedSvgThumbnailHaveSrc(umbracoApi.baseUrl + contentData.values[0].value.src);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently the uploaded vector graphics file still displays after removing.
-test.skip('can remove an svg file in the content', async ({umbracoApi, umbracoUi}) => {
+test('can remove an svg file in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadVectorGraphicsName = 'VectorGraphics.svg';
   const mineType = 'image/svg+xml';
@@ -99,7 +99,7 @@ test.skip('can remove an svg file in the content', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);

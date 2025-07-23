@@ -40,6 +40,7 @@ export class UmbUrlPickerMonacoMarkdownEditorAction extends UmbControllerBase {
 			modal: { size: overlaySize },
 			data: {
 				index: null,
+				isNew: selectedValue === '',
 				config: {},
 			},
 			value: {

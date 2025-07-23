@@ -1,15 +1,17 @@
 import type { UmbAuthProviderDefaultProps, UmbUserLoginState } from '../types.js';
-import { UmbLitElement } from '../../lit-element/lit-element.element.js';
-import { UmbTextStyles } from '../../style/index.js';
 import type { ManifestAuthProvider } from '../auth-provider.extension.js';
 import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-auth-provider-default')
 export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbAuthProviderDefaultProps {
 	@property({ attribute: false })
 	userLoginState?: UmbUserLoginState | undefined;
+
 	@property({ attribute: false })
 	manifest!: ManifestAuthProvider;
+
 	@property({ attribute: false })
 	onSubmit!: (manifestOrProviderName: string | ManifestAuthProvider, loginHint?: string) => void;
 

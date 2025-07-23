@@ -35,10 +35,13 @@ export class UmbUserPermissionVerbElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: block;
+			}
+
 			#setting {
 				display: flex;
 				align-items: center;
-				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-space-3) 0 var(--uui-size-space-4) 0;
 			}
 

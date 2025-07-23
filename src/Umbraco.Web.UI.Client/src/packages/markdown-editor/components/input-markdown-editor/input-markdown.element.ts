@@ -16,7 +16,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbChangeEvent, type UmbInputEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_MEDIA_PICKER_MODAL, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import { UmbCodeEditorLoadedEvent } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
@@ -33,7 +33,9 @@ interface UmbMarkdownEditorAction extends monaco.editor.IActionDescriptor {
  * @fires change - when the value of the input changes
  */
 @customElement('umb-input-markdown')
-export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, '') {
+export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof UmbLitElement, undefined>(
+	UmbLitElement,
+) {
 	protected override getFormElement() {
 		return this._codeEditor;
 	}
@@ -85,6 +87,11 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 			this.observe(umbExtensionsRegistry.byType('monacoMarkdownEditorAction'), (manifests) => {
 				manifests.forEach(async (manifest) => {
 					const api = await createExtensionApi(this, manifest, [this]);
+
+					if (api) {
+						(api as any).manifest = manifest;
+					}
+
 					const action: UmbMarkdownEditorAction = {
 						id: manifest.alias ?? api.getUnique(),
 						label: this.localize.string(manifest.meta?.label ?? api.getLabel()),
@@ -217,34 +224,28 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin(UmbLitElement, 
 
 		this._focusEditor(); // Focus before opening modal, otherwise cannot regain focus back after modal
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_MEDIA_PICKER_MODAL);
-
-		modalContext
-			?.onSubmit()
-			.then(async (value) => {
-				if (!value) return;
-
-				const uniques = value.selection;
-				const { data: mediaUrls } = await this.#mediaUrlRepository.requestItems(uniques);
-				const mediaUrl = mediaUrls?.length ? (mediaUrls[0].url ?? 'URL') : 'URL';
-
-				this.#editor?.monacoEditor?.executeEdits('', [
-					{
-						range: selection,
-						text: `![${alt}](${mediaUrl})`,
-					},
-				]);
-
-				this.#editor?.select({
-					startColumn: selection.startColumn + 2,
-					endColumn: selection.startColumn + alt.length + 2, // +2 because of ![
-					endLineNumber: selection.startLineNumber,
-					startLineNumber: selection.startLineNumber,
-				});
-			})
+		const value = await umbOpenModal(this, UMB_MEDIA_PICKER_MODAL)
 			.catch(() => undefined)
 			.finally(() => this._focusEditor());
+		if (!value) return;
+
+		const uniques = value.selection.filter((unique) => unique !== null) as Array<string>;
+		const { data: mediaUrls } = await this.#mediaUrlRepository.requestItems(uniques);
+		const mediaUrl = mediaUrls?.length ? (mediaUrls[0].url ?? 'URL') : 'URL';
+
+		this.#editor?.monacoEditor?.executeEdits('', [
+			{
+				range: selection,
+				text: `![${alt}](${mediaUrl})`,
+			},
+		]);
+
+		this.#editor?.select({
+			startColumn: selection.startColumn + 2,
+			endColumn: selection.startColumn + alt.length + 2, // +2 because of ![
+			endLineNumber: selection.startLineNumber,
+			startLineNumber: selection.startLineNumber,
+		});
 	}
 
 	private _insertLine() {

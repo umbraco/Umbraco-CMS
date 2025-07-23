@@ -74,7 +74,13 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		if (totalPages <= 1) return '';
 
 		return html`<div id="pagination">
-			<uui-pagination .total=${totalPages} @change="${this._onPageChange}"></uui-pagination>
+			<uui-pagination 
+			.total=${totalPages} 
+			firstlabel=${this.localize.term('general_first')}
+            previouslabel=${this.localize.term('general_previous')}
+            nextlabel=${this.localize.term('general_next')}
+            lastlabel=${this.localize.term('general_last')}
+			@change="${this._onPageChange}"></uui-pagination>
 		</div>`;
 	}
 

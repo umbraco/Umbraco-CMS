@@ -1,9 +1,10 @@
 import type { UmbContextToken } from '../token/index.js';
+import type { UmbContextMinimal } from '../types.js';
 import { UmbContextProvider } from './context-provider.js';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbContextProviderController<
-		BaseType = unknown,
+		BaseType extends UmbContextMinimal = UmbContextMinimal,
 		ResultType extends BaseType = BaseType,
 		InstanceType extends ResultType = ResultType,
 	>
@@ -48,8 +49,9 @@ export class UmbContextProviderController<
 
 	public override destroy(): void {
 		if (this.#host) {
-			this.#host.removeUmbController(this);
+			const host = this.#host;
 			(this.#host as unknown) = undefined;
+			host.removeUmbController(this);
 		}
 		super.destroy();
 	}

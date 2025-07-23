@@ -6,19 +6,20 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:server-api": "openapi-ts"
   },
   "engines": {
-    "node": ">=20.8",
-    "npm": ">=10.1"
+    "node": ">=22",
+    "npm": ">=10.9"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@umbraco-cms/backoffice": "^15.0.0",
-    "msw": "^2.6.4",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.11",
-    "vite-tsconfig-paths": "^5.1.2"
+    "@hey-api/client-fetch": "^0.10.2",
+    "@hey-api/openapi-ts": "^0.67.6",
+    "@umbraco-cms/backoffice": "16.0.0-rc4",
+    "msw": "^2.7.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
   },
   "msw": {
     "workerDirectory": [

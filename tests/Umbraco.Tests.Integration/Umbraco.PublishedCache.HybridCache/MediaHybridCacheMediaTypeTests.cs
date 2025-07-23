@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Notifications;
@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWithMediaEditing
+internal sealed class MediaHybridCacheMediaTypeTests : UmbracoIntegrationTestWithMediaEditing
 {
     private IPublishedMediaCache PublishedMediaHybridCache => GetRequiredService<IPublishedMediaCache>();
 

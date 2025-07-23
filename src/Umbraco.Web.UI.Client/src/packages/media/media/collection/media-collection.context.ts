@@ -1,7 +1,7 @@
 import { UMB_MEDIA_PLACEHOLDER_ENTITY_TYPE } from '../entity.js';
-import type { UmbFileDropzoneItemStatus } from '../dropzone/types.js';
 import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS } from './views/constants.js';
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from './types.js';
+import type { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -11,7 +11,7 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 > {
 	/**
 	 * The thumbnail items that are currently displayed in the collection.
-	 * @deprecated Use the `<umb-imaging-thumbnail>` element instead.
+	 * @deprecated Use the `<umb-imaging-thumbnail>` element instead. This will be removed in Umbraco 17.
 	 */
 	public readonly thumbnailItems = this.items;
 
@@ -46,6 +46,11 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	updatePlaceholderStatus(unique: string, status?: UmbFileDropzoneItemStatus) {
 		this._items.updateOne(unique, { status });
 		this.#placeholders.updateOne(unique, { status });
+	}
+
+	updatePlaceholderProgress(unique: string, progress: number) {
+		this._items.updateOne(unique, { progress });
+		this.#placeholders.updateOne(unique, { progress });
 	}
 
 	/**

@@ -117,7 +117,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             result.Add(new ContentSchedule(
                 scheduleDto.Id,
-                LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? string.Empty,
+                LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
                 scheduleDto.Date,
                 scheduleDto.Action == ContentScheduleAction.Release.ToString()
                     ? ContentScheduleAction.Release
@@ -400,15 +400,17 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             foreach (ContentVariation v in contentVariation)
             {
-                content.SetCultureInfo(v.Culture, v.Name, v.Date);
+                content.SetCultureInfo(v.Culture, v.Name, DateTime.SpecifyKind(v.Date, DateTimeKind.Local));
             }
         }
 
+        // Dates stored in the database are local server time, but for SQL Server, will be considered
+        // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
         if (content.PublishedState is PublishedState.Published && content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
         {
             foreach (ContentVariation v in contentVariation)
             {
-                content.SetPublishInfo(v.Culture, v.Name, v.Date);
+                content.SetPublishInfo(v.Culture, v.Name, DateTime.SpecifyKind(v.Date, DateTimeKind.Local));
             }
         }
 
@@ -574,14 +576,14 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
     }
 
-    private class ContentVariation
+    private sealed class ContentVariation
     {
         public string? Culture { get; set; }
         public string? Name { get; set; }
         public DateTime Date { get; set; }
     }
 
-    private class DocumentVariation
+    private sealed class DocumentVariation
     {
         public string? Culture { get; set; }
         public bool Edited { get; set; }
@@ -1551,7 +1553,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     // reading repository purely for looking up by GUID
     // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
     // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
-    private class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
+    private sealed class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
     {
         private readonly DocumentRepository _outerRepo;
 
@@ -1819,7 +1821,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
-    private class CultureNodeName
+    private sealed class CultureNodeName
     {
         public int Id { get; set; }
         public string? Name { get; set; }

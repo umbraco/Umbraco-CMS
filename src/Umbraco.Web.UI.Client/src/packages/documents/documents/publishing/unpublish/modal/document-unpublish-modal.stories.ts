@@ -6,7 +6,7 @@ import type {
 	UmbDocumentUnpublishModalValue,
 } from './document-unpublish-modal.token.js';
 import type { UmbDocumentUnpublishModalElement } from './document-unpublish-modal.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentUnpublishModalData = {
@@ -23,6 +23,8 @@ const modalData: UmbDocumentUnpublishModalData = {
 				publishDate: null,
 				updateDate: null,
 				segment: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
 			},
 			language: {
 				entityType: 'language',
@@ -45,6 +47,8 @@ const modalData: UmbDocumentUnpublishModalData = {
 				createDate: '2021-08-25T14:00:00Z',
 				publishDate: null,
 				updateDate: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
 			},
 			language: {
 				entityType: 'language',
@@ -67,6 +71,8 @@ const modalData: UmbDocumentUnpublishModalData = {
 				publishDate: null,
 				updateDate: null,
 				segment: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
 			},
 			language: {
 				entityType: 'language',

@@ -30,7 +30,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
     {
     }
 
-    private class ModelBindingExceptionFilter : IExceptionFilter
+    private sealed class ModelBindingExceptionFilter : IExceptionFilter
     {
         private static readonly Regex GetPublishedModelsTypesRegex =
             new("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);

@@ -2,7 +2,7 @@ import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
 import type { UmbAppLanguageContext } from '../global-contexts/index.js';
 import { UMB_APP_LANGUAGE_CONTEXT } from '../constants.js';
-import type { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
@@ -37,6 +37,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	#appLanguageContext?: UmbAppLanguageContext;
 	#languagesObserver?: any;
 
+	// TODO: Here we have some read only state logic and then we have it again in the context. We should align this otherwise it will become a nightmare to maintain. [NL]
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
 
@@ -52,12 +53,12 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.languages, (languages) => {
+			this.observe(context?.languages, (languages) => {
 				this.#currentUserAllowedLanguages = languages;
 				this.#checkForLanguageAccess();
 			});
 
-			this.observe(context.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
+			this.observe(context?.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
 				this.#currentUserHasAccessToAllLanguages = hasAccessToAllLanguages;
 				this.#checkForLanguageAccess();
 			});
@@ -112,16 +113,9 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		}
 	}
 
-	#onLabelClick(event: UUIMenuItemEvent) {
-		const menuItem = event.target;
-		const unique = menuItem.dataset.unique;
-		if (!unique) throw new Error('Missing unique on menu item');
-
+	#chooseLanguage(unique: string) {
 		this.#appLanguageContext?.setLanguage(unique);
 		this._isOpen = false;
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		this._popoverElement?.hidePopover();
 	}
 
@@ -144,7 +138,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			id="dropdown-popover"
 			data-mark="app-language-menu"
 			@beforetoggle=${this.#onPopoverToggle}>
-			<umb-popover-layout>
+						<umb-popover-layout>
+			<uui-scroll-container style="max-height:calc(100vh - (var(--umb-header-layout-height) + 60px));">
 				${repeat(
 					this._languages,
 					(language) => language.unique,
@@ -153,12 +148,14 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 							label=${ifDefined(language.name)}
 							data-mark="${language.entityType}:${language.unique}"
 							?active=${language.unique === this._appLanguage?.unique}
-							@click-label=${this.#onLabelClick}>
+							@click-label=${() => this.#chooseLanguage(language.unique)}>
 							${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
 						</uui-menu-item>
 					`,
 				)}
-			</umb-popover-layout>
+				</uui-scroll-container>
+							</umb-popover-layout>
+
 		</uui-popover-container>`;
 	}
 
@@ -203,6 +200,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			uui-menu-item {
 				color: var(--uui-color-text);
+				
+				width: auto;
 			}
 		`,
 	];

@@ -38,15 +38,13 @@ test('can create content with a rich text editor that has a stylesheet', async (
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(documentName);
-  // Is needed to make sure that the rich text editor is loaded
-  await umbracoUi.waitForTimeout(500);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(documentName)).toBeTruthy();
 });

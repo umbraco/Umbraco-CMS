@@ -48,9 +48,13 @@ export class UmbSectionSidebarMenuElement<
 		UmbTextStyles,
 		css`
 			h3 {
-				margin: var(--uui-size-5) 0;
+				display: flex;
+				align-items: center;
+				height: var(--umb-header-layout-height);
+				margin: 0;
 				padding: var(--uui-size-4) var(--uui-size-8);
-				font-size: 15px;
+				box-sizing: border-box;
+				font-size: 14px;
 			}
 		`,
 	];

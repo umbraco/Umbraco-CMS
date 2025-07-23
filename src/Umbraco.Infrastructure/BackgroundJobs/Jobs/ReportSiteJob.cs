@@ -29,18 +29,6 @@ public class ReportSiteJob : IRecurringBackgroundJob
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    [Obsolete("Use the constructor with IHttpClientFactory instead.")]
-    public ReportSiteJob(
-        ILogger<ReportSiteJob> logger,
-        ITelemetryService telemetryService,
-        IJsonSerializer jsonSerializer)
-        : this(
-            logger,
-            telemetryService,
-            jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<IHttpClientFactory>())
-    { }
-
     public ReportSiteJob(
         ILogger<ReportSiteJob> logger,
         ITelemetryService telemetryService,

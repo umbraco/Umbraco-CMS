@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Webhook)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class WebhookDto
+internal sealed class WebhookDto
 {
     [Column("id")]
     [PrimaryKeyColumn(AutoIncrement = true)]
@@ -17,6 +17,15 @@ internal class WebhookDto
     [Column(Name = "key")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public Guid Key { get; set; }
+
+    [Column(Name = "name")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public string? Name { get; set; }
+
+    [Column(Name = "description")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public string? Description { get; set; }
 
     [Column(Name = "url")]
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]

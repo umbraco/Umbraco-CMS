@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
 [ApiVersion("1.0")]
+[Obsolete("Please use ReferencedByDataTypeController and the referenced-by endpoint. Scheduled for removal in Umbraco 17.")]
 public class ReferencesDataTypeController : DataTypeControllerBase
 {
     private readonly IDataTypeService _dataTypeService;

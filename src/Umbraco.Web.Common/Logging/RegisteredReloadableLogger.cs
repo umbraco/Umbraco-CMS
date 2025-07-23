@@ -9,9 +9,9 @@ namespace Umbraco.Cms.Web.Common.Logging;
 ///     Ensures freeze is only called a single time even when resolving a logger from the snapshot container
 ///     built for <see cref="RefreshingRazorViewEngine" />.
 /// </remarks>
-internal class RegisteredReloadableLogger
+internal sealed class RegisteredReloadableLogger
 {
-    private static readonly object _frozenLock = new();
+    private static readonly Lock _frozenLock = new();
     private static bool _frozen;
     private readonly ReloadableLogger _logger;
 

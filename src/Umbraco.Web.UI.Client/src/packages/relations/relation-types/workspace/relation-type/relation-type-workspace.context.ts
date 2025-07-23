@@ -7,7 +7,7 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbRelationTypeWorkspaceContext extends UmbContextBase<UmbRelationTypeWorkspaceContext> {
+export class UmbRelationTypeWorkspaceContext extends UmbContextBase {
 	public readonly workspaceAlias = 'Umb.Workspace.RelationType';
 	public readonly repository = new UmbRelationTypeDetailRepository(this);
 

@@ -63,7 +63,7 @@ public static class GuidUtils
         // a Guid is 3 blocks + 8 bits
 
         // so it turns into a 3*8+2 = 26 chars string
-        var chars = new char[length];
+        Span<char> chars = stackalloc char[length];
 
         var i = 0;
         var j = 0;

@@ -1,7 +1,7 @@
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UpdateDomainsRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document Culture and Hostnames that fetches data from the server
@@ -27,7 +27,7 @@ export class UmbDocumentCultureAndHostnamesServerDataSource {
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.getDocumentByIdDomains({ id: unique }));
+		return tryExecute(this.#host, DocumentService.getDocumentByIdDomains({ path: { id: unique } }));
 	}
 
 	/**
@@ -38,6 +38,6 @@ export class UmbDocumentCultureAndHostnamesServerDataSource {
 	 */
 	async update(unique: string, data: UpdateDomainsRequestModel) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdDomains({ id: unique, requestBody: data }));
+		return tryExecute(this.#host, DocumentService.putDocumentByIdDomains({ path: { id: unique }, body: data }));
 	}
 }

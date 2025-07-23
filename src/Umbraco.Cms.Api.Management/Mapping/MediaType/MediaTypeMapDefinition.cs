@@ -40,7 +40,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.AllowedMediaTypes = source.AllowedContentTypes?.Select(ct =>
                 new MediaTypeSort { MediaType = new ReferenceByIdModel(ct.Key), SortOrder = ct.SortOrder })
             .ToArray() ?? Enumerable.Empty<MediaTypeSort>();
-        target.Compositions = MapNestedCompositions(
+        target.Compositions = MapCompositions(
             source.ContentTypeComposition,
             source.ParentId,
             (referenceByIdModel, compositionType) => new MediaTypeComposition

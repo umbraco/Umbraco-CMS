@@ -1,10 +1,9 @@
 import type { UmbBlockGridTypeAreaType } from '../../types.js';
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../../context/index.js';
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../context/block-grid-manager.context-token.js';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
+import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../block-grid-manager/constants.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 
-import '../block-grid-entries/index.js';
 /**
  * @description
  * This element is used to render the block grid areas.
@@ -26,14 +25,14 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 
 		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (context) => {
 			this.observe(
-				context.areas,
+				context?.areas,
 				(areas) => {
 					this._areas = areas;
 				},
 				'observeAreas',
 			);
 			this.observe(
-				context.areaGridColumns,
+				context?.areaGridColumns,
 				(areaGridColumns) => {
 					this._areaGridColumns = areaGridColumns;
 					//this.requestUpdate('_areaGridColumns');
@@ -43,7 +42,7 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 		});
 		this.consumeContext(UMB_BLOCK_GRID_MANAGER_CONTEXT, (manager) => {
 			this.observe(
-				manager.layoutStylesheet,
+				manager?.layoutStylesheet,
 				(stylesheet) => {
 					// Do not re-render stylesheet if its the same href.
 					if (!stylesheet || this._styleElement?.href === stylesheet) return;

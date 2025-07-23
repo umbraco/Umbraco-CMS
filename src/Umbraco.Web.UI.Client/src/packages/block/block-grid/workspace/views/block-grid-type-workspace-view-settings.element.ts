@@ -29,7 +29,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, async (context) => {
 			this.observe(
-				await context.propertyValueByAlias<undefined | string>('gridColumns'),
+				await context?.propertyValueByAlias<undefined | string>('gridColumns'),
 				(value) => {
 					this._dataTypeGridColumns = value ? parseInt(value, 10) : undefined;
 				},
@@ -43,7 +43,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 			// TODO set showSizeOption to true when rowMinSpan or rowMaxSpan is set
 
 			this.observe(
-				await context.propertyValueByAlias('columnSpanOptions'),
+				await context?.propertyValueByAlias('columnSpanOptions'),
 				(value) => {
 					if (Array.isArray(value) && value.length > 0) {
 						this._showSizeOptions = true;
@@ -54,7 +54,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 			);
 
 			this.observe(
-				await context.propertyValueByAlias<number | undefined>('rowMinSpan'),
+				await context?.propertyValueByAlias<number | undefined>('rowMinSpan'),
 				(value) => {
 					this._rowMinSpan = value;
 				},
@@ -62,7 +62,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 			);
 
 			this.observe(
-				await context.propertyValueByAlias<number | undefined>('rowMaxSpan'),
+				await context?.propertyValueByAlias<number | undefined>('rowMaxSpan'),
 				(value) => {
 					this._rowMaxSpan = value;
 				},

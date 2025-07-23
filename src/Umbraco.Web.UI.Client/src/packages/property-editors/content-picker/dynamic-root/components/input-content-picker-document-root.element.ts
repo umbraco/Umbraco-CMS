@@ -4,15 +4,20 @@ import {
 	UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL,
 } from '../modals/index.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from '../dynamic-root.extension.js';
-import { html, css, customElement, property, ifDefined, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document';
+import { UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
+import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const elementName = 'umb-input-content-picker-document-root';
 @customElement(elementName)
@@ -20,6 +25,16 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 	string | undefined,
 	typeof UmbLitElement
 >(UmbLitElement) {
+	readonly #documentItemManager = new UmbRepositoryItemsManager<UmbDocumentItemModel>(
+		this,
+		UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+	);
+
+	readonly #documentTypeItemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
+		this,
+		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+	);
+
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -34,6 +49,10 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 	data?: UmbContentPickerDynamicRoot;
 
 	#dynamicRootOrigin?: { label: string; icon: string; description?: string };
+
+	#documentLookup: Record<string, string> = {};
+
+	#documentTypeLookup: Record<string, string> = {};
 
 	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
@@ -59,9 +78,29 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 				this._queryStepManifests = queryStepManifests;
 			},
 		);
+
+		this.observe(this.#documentItemManager.items, (documents) => {
+			if (!documents?.length) return;
+
+			documents.forEach((document) => {
+				this.#documentLookup[document.unique] = document.name;
+			});
+
+			this.requestUpdate();
+		});
+
+		this.observe(this.#documentTypeItemManager.items, (documentTypes) => {
+			if (!documentTypes?.length) return;
+
+			documentTypes.forEach((documentType) => {
+				this.#documentTypeLookup[documentType.unique] = documentType.name;
+			});
+
+			this.requestUpdate();
+		});
 	}
 
-	override connectedCallback(): void {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		this.#updateDynamicRootOrigin(this.data);
@@ -116,6 +155,11 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 	#updateDynamicRootOrigin(data?: UmbContentPickerDynamicRoot) {
 		if (!data) return;
 		const origin = this._originManifests.find((item) => item.meta.originAlias === data.originAlias)?.meta;
+
+		if (data.originKey) {
+			this.#documentItemManager.setUniques([data.originKey]);
+		}
+
 		this.#dynamicRootOrigin = {
 			label: origin?.label ?? data.originAlias,
 			icon: origin?.icon ?? 'icon-wand',
@@ -131,7 +175,10 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 			querySteps = querySteps.map((item) => (item.unique ? item : { ...item, unique: UmbId.new() }));
 		}
 
+		this.#documentTypeItemManager.setUniques((querySteps ?? []).map((x) => x.anyOfDocTypeKeys ?? []).flat());
+
 		this.#sorter?.setModel(querySteps ?? []);
+
 		this.data = { ...this.data, ...{ querySteps } };
 	}
 
@@ -142,8 +189,16 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 		description?: string;
 	} {
 		const step = this._queryStepManifests.find((step) => step.meta.queryStepAlias === item.alias)?.meta;
-		const docTypes = item.anyOfDocTypeKeys?.join(', ');
-		const description = docTypes ? this.localize.term('dynamicRoot_queryStepTypes') + docTypes : undefined;
+
+		const docTypeNames =
+			item.anyOfDocTypeKeys
+				?.map((docTypeKey) => this.#documentTypeLookup[docTypeKey] ?? docTypeKey)
+				.sort()
+				.join(', ') ?? '';
+
+		const description = item.anyOfDocTypeKeys
+			? this.localize.term('dynamicRoot_queryStepTypes') + docTypeNames
+			: undefined;
 
 		return {
 			unique: item.unique,
@@ -193,11 +248,11 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 
 	#renderOrigin() {
 		if (!this.#dynamicRootOrigin) return;
+		const description = this.#dynamicRootOrigin.description
+			? this.#documentLookup[this.#dynamicRootOrigin.description]
+			: '';
 		return html`
-			<uui-ref-node
-				standalone
-				name=${this.#dynamicRootOrigin.label}
-				detail=${ifDefined(this.#dynamicRootOrigin.description)}>
+			<uui-ref-node standalone name=${this.#dynamicRootOrigin.label} detail=${ifDefined(description)}>
 				<umb-icon slot="icon" name=${ifDefined(this.#dynamicRootOrigin.icon)}></umb-icon>
 				<uui-action-bar slot="actions">
 					<uui-button

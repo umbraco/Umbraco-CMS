@@ -1,31 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Navigation;
-using Umbraco.Cms.Core.Web;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
 public class DocumentUrlFactory : IDocumentUrlFactory
 {
-    private readonly IDocumentUrlService _documentUrlService;
+    private readonly IPublishedUrlInfoProvider _publishedUrlInfoProvider;
 
 
-    public DocumentUrlFactory(IDocumentUrlService documentUrlService)
-    {
-        _documentUrlService = documentUrlService;
-    }
+    public DocumentUrlFactory(IPublishedUrlInfoProvider publishedUrlInfoProvider)
+        => _publishedUrlInfoProvider = publishedUrlInfoProvider;
 
     public async Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content)
     {
-        IEnumerable<UrlInfo> urlInfos = await _documentUrlService.ListUrlsAsync(content.Key);
+        ISet<UrlInfo> urlInfos = await _publishedUrlInfoProvider.GetAllAsync(content);
 
         return urlInfos
             .Where(urlInfo => urlInfo.IsUrl)

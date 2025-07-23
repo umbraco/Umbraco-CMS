@@ -28,6 +28,7 @@ export class UmbMemberWorkspaceContext
 	implements UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbMemberVariantModel>
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.memberType.unique);
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.memberType.icon);
 	readonly kind = this._data.createObservablePartOfCurrent((data) => data?.kind);
 	readonly createDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].createDate);
 	readonly updateDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].updateDate);
@@ -41,9 +42,21 @@ export class UmbMemberWorkspaceContext
 			// TODO: Enable Validation Repository when we have UI for showing validation issues on other tabs. [NL]
 			//contentValidationRepository: UmbMemberValidationRepository,
 			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
+			contentTypePropertyName: 'memberType',
 		});
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.contentTypeUnique,
+			(unique) => {
+				if (unique) {
+					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
+
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 
 		this.routes.setRoutes([
 			{
@@ -78,6 +91,7 @@ export class UmbMemberWorkspaceContext
 			preset: {
 				memberType: {
 					unique: memberTypeUnique,
+					icon: 'icon-user',
 				},
 			},
 		});

@@ -10,7 +10,7 @@ import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/wor
 import { UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
 
 type EntityType = UmbUserDetailModel;
 
@@ -46,8 +46,6 @@ export class UmbUserWorkspaceContext
 			detailRepositoryAlias: UMB_USER_DETAIL_REPOSITORY_ALIAS,
 		});
 
-		this.addValidationContext(new UmbValidationContext(this));
-
 		this.routes.setRoutes([
 			{
 				path: 'edit/:id',
@@ -63,7 +61,17 @@ export class UmbUserWorkspaceContext
 	override async load(unique: string) {
 		const response = await super.load(unique);
 
-		this.observe(response.asObservable?.(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
+		if (!response.data) {
+			// Return early if there is no user	data
+			this.removeUmbControllerByAlias('umbUserStoreObserver');
+			return response;
+		}
+
+		this.observe(
+			(response as UmbRepositoryResponseWithAsObservable<EntityType>).asObservable?.(),
+			(user) => this.onUserStoreChanges(user),
+			'umbUserStoreObserver',
+		);
 
 		if (!this._detailRepository) {
 			throw new Error('Detail repository is missing');

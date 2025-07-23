@@ -45,6 +45,7 @@ const treeItemMapper = (model: UmbMockMediaModel): MediaTreeItemResponseModel =>
 		noAccess: model.noAccess,
 		parent: model.parent,
 		variants: model.variants,
+		createDate: model.createDate,
 	};
 };
 
@@ -62,6 +63,7 @@ const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaMo
 		},
 		hasChildren: false,
 		id: request.id ? request.id : UmbId.new(),
+		createDate: now,
 		isTrashed: false,
 		noAccess: false,
 		parent: request.parent,

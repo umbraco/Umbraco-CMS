@@ -10,11 +10,11 @@ const cropValue = {label: cropLabel, alias: AliasHelper.toAlias(cropLabel), widt
 let dataTypeId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
-  dataTypeId = await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropValue.label, cropValue.width, cropValue.height); 
+  dataTypeId = await umbracoApi.dataType.createImageCropperDataTypeWithOneCrop(customDataTypeName, cropValue.label, cropValue.width, cropValue.height);
 });
 
 test.afterEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName); 
+  await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.template.ensureNameNotExists(templateName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -25,7 +25,7 @@ test('can render content with an image cropper', async ({umbracoApi, umbracoUi})
   const templateId = await umbracoApi.template.createTemplateWithDisplayingImageCropperValue(templateName, AliasHelper.toAlias(propertyName), AliasHelper.toAlias(cropValue.label));
   await umbracoApi.document.createPublishedDocumentWithImageCropper(contentName, cropValue, dataTypeId, templateId, propertyName, documentTypeName);
   const contentData = await umbracoApi.document.getByName(contentName);
-  const contentURL = contentData.urls[0].url;
+  const contentURL = await umbracoApi.document.getDocumentUrl(contentData.id);
   const imageSrc = contentData.values[0].value.src;
 
   // Act

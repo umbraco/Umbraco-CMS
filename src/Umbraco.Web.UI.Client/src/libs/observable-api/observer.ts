@@ -32,6 +32,9 @@ export class UmbObserver<T> {
 						wantedToClose = true;
 					} else {
 						subscription.unsubscribe();
+						if (!this.#callback) {
+							this.destroy();
+						}
 					}
 					resolve(value as Exclude<T, undefined>);
 				}
@@ -39,6 +42,9 @@ export class UmbObserver<T> {
 			initialCallback = false;
 			if (wantedToClose) {
 				subscription.unsubscribe();
+				if (!this.#callback) {
+					this.destroy();
+				}
 			}
 		});
 	}

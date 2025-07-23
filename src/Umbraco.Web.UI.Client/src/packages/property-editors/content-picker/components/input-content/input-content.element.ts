@@ -1,14 +1,13 @@
 import type { UmbContentPickerSource } from '../../types.js';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-const elementName = 'umb-input-content';
-@customElement(elementName)
+@customElement('umb-input-content')
 export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
 	UmbLitElement,
 ) {
@@ -49,25 +48,12 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	}
 	#allowedContentTypeIds: Array<string> = [];
 
-	@property({ type: Boolean })
-	showOpenButton?: boolean;
-
 	@property({ type: Array })
 	public set selection(values: Array<UmbReferenceByUniqueAndType>) {
 		this.#selection = values?.map((item) => item.unique) ?? [];
 	}
 	public get selection(): Array<UmbReferenceByUniqueAndType> {
 		return this.#selection.map((id) => ({ type: this.#entityTypeLookup[this.#type], unique: id }));
-	}
-
-	/** @deprecated Please use `selection` instead. This property will be removed in Umbraco 15. */
-	@property({ type: Array })
-	public set items(items: Array<UmbReferenceByUniqueAndType>) {
-		this.selection = items;
-	}
-	/** @deprecated Please use `selection` instead. This property will be removed in Umbraco 15. */
-	public get items(): Array<UmbReferenceByUniqueAndType> {
-		return this.selection;
 	}
 
 	@property({ type: String })
@@ -124,7 +110,6 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.minMessage=${this.minMessage}
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
-				?showOpenButton=${this.showOpenButton}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-document>
 		`;
@@ -139,7 +124,6 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.minMessage=${this.minMessage}
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
-				?showOpenButton=${this.showOpenButton}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-media>
 		`;
@@ -154,7 +138,6 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.minMessage=${this.minMessage}
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
-				?showOpenButton=${this.showOpenButton}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-member>
 		`;
@@ -174,6 +157,6 @@ export { UmbInputContentElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputContentElement;
+		'umb-input-content': UmbInputContentElement;
 	}
 }

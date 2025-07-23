@@ -1,11 +1,11 @@
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestHeaderApp } from '@umbraco-cms/backoffice/extension-registry';
-import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-backoffice-header-apps')
-export class UmbBackofficeHeaderAppsElement extends LitElement {
+export class UmbBackofficeHeaderAppsElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-extension-slot
@@ -23,7 +23,7 @@ export class UmbBackofficeHeaderAppsElement extends LitElement {
 		return ext.component;
 	};
 
-	static override styles: CSSResultGroup = [
+	static override readonly styles = [
 		css`
 			#apps {
 				display: flex;

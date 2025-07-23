@@ -1,4 +1,5 @@
 const { rest } = window.MockServiceWorker;
+import { createProblemDetails } from '../../data/utils.js';
 import { umbStylesheetMockDb } from '../../data/stylesheet/stylesheet.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
@@ -14,6 +15,14 @@ export const detailHandlers = [
 		const path = umbStylesheetMockDb.file.create(requestBody);
 		const encodedPath = encodeURIComponent(path);
 
+		// Validate name
+		if (!requestBody.name) {
+			return res(
+				ctx.status(400, 'name is required'),
+				ctx.json(createProblemDetails({ title: 'Validation', detail: 'name is required' })),
+			);
+		}
+
 		return res(
 			ctx.status(201),
 			ctx.set({
@@ -26,6 +35,10 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:path`), (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
+		if (path.endsWith('forbidden')) {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const response = umbStylesheetMockDb.file.read(decodeURIComponent(path));
 		return res(ctx.status(200), ctx.json(response));
 	}),
@@ -33,6 +46,10 @@ export const detailHandlers = [
 	rest.delete(umbracoPath(`${UMB_SLUG}/:path`), (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
+		if (path.endsWith('forbidden')) {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		umbStylesheetMockDb.file.delete(decodeURIComponent(path));
 		return res(ctx.status(200));
 	}),
@@ -40,6 +57,10 @@ export const detailHandlers = [
 	rest.put(umbracoPath(`${UMB_SLUG}/:path`), async (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
+		if (path.endsWith('forbidden')) {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const requestBody = (await req.json()) as UpdateStylesheetRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		umbStylesheetMockDb.file.update(decodeURIComponent(path), requestBody);

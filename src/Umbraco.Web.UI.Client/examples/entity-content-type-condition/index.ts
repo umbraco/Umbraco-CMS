@@ -1,3 +1,5 @@
+import { UMB_WORKSPACE_CONTENT_TYPE_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/content-type';
+
 const workspace: UmbExtensionManifest = {
 	type: 'workspaceView',
 	alias: 'Example.WorkspaceView.EntityContentTypeCondition',
@@ -10,7 +12,7 @@ const workspace: UmbExtensionManifest = {
 	},
 	conditions: [
 		{
-			alias: 'Umb.Condition.WorkspaceContentTypeAlias',
+			alias: UMB_WORKSPACE_CONTENT_TYPE_ALIAS_CONDITION_ALIAS,
 			//match : 'blogPost'
 			oneOf: ['blogPost', 'mediaType1'],
 		},

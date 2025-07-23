@@ -32,7 +32,7 @@ export class UmbWorkspacePackageElement extends UmbLitElement {
 		return html`<div class="header" slot="header">
 			<uui-button compact @click="${this._navigateBack}">
 				<uui-icon name="icon-arrow-left"></uui-icon>
-				${this._package.name ?? 'Package name'}
+				<span data-mark="input:workspace-name">${this._package.name ?? 'Package name'}</span>
 			</uui-button>
 		</div>`;
 	}

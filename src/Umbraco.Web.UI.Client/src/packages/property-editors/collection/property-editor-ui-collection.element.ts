@@ -31,14 +31,14 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 		super();
 
 		this.consumeContext(UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._collectionAlias = workspaceContext.getCollectionAlias();
+			this._collectionAlias = workspaceContext?.getCollectionAlias() ?? UMB_DOCUMENT_COLLECTION_ALIAS;
 
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
-				this.observe(propertyContext.alias, async (propertyAlias) => {
+				this.observe(propertyContext?.alias, async (propertyAlias) => {
 					if (propertyAlias) {
 						// Gets the Data Type ID for the current property.
-						const property = await workspaceContext.structure.getPropertyStructureByAlias(propertyAlias);
-						const unique = workspaceContext.getUnique();
+						const property = await workspaceContext!.structure.getPropertyStructureByAlias(propertyAlias);
+						const unique = workspaceContext!.getUnique();
 						if (unique && property && this._config) {
 							this._config.unique = unique;
 							this._config.dataTypeId = property.dataType.unique;

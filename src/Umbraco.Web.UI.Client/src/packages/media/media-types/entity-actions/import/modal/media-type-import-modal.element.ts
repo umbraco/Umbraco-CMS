@@ -1,9 +1,10 @@
 import { UmbMediaTypeImportRepository } from '../repository/media-type-import.repository.js';
 import type { UmbMediaTypeImportModalData, UmbMediaTypeImportModalValue } from './media-type-import-modal.token.js';
-import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbDropzoneElement } from '@umbraco-cms/backoffice/media';
+import type { UmbDropzoneMediaElement } from '@umbraco-cms/backoffice/media';
+import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
 
 interface UmbMediaTypePreview {
 	unique: string;
@@ -24,9 +25,6 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 	@state()
 	private _fileContent: Array<UmbMediaTypePreview> = [];
 
-	@query('#dropzone')
-	private dropzone?: UmbDropzoneElement;
-
 	constructor() {
 		super();
 		this.#fileReader = new FileReader();
@@ -40,12 +38,18 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 		};
 	}
 
-	#onUploadCompleted() {
-		const data = this.dropzone?.getItems()[0];
-		if (!data?.temporaryFile) return;
+	#onUploadComplete(evt: UmbDropzoneChangeEvent) {
+		evt.preventDefault();
+		const target = evt.target as UmbDropzoneMediaElement;
+		const data = target.value;
+		if (!data?.length) return;
 
-		this.#temporaryUnique = data.temporaryFile.temporaryUnique;
-		this.#fileReader.readAsText(data.temporaryFile.file);
+		const file = data[0];
+
+		if (file.temporaryFile) {
+			this.#temporaryUnique = file.temporaryFile.temporaryUnique;
+			this.#fileReader.readAsText(file.temporaryFile.file);
+		}
 	}
 
 	async #onFileImport() {
@@ -90,10 +94,6 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 		this.#temporaryUnique = undefined;
 	}
 
-	async #onBrowse() {
-		this.dropzone?.browse();
-	}
-
 	override render() {
 		return html` <umb-body-layout headline=${this.localize.term('general_import')}>
 			<uui-box> ${this.#renderUploadZone()} </uui-box>
@@ -125,15 +125,12 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 							label=${this.localize.term('general_remove')}></uui-button>
 					</uui-ref-node>`,
 				() =>
-					/**TODO Add localizations */
 					html`<div id="wrapper">
-						Drag and drop your file here
-						<uui-button look="primary" label="or click here to choose a file" @click=${this.#onBrowse}></uui-button>
-						<umb-dropzone
-							id="dropzone"
-							accept=".udt"
-							@complete=${this.#onUploadCompleted}
-							createAsTemporary></umb-dropzone>
+						<umb-input-dropzone id="dropzone" accept=".udt" @change=${this.#onUploadComplete}
+							><umb-localize slot="text" key="media_dragAndDropYourFilesIntoTheArea"
+								>Drag and drop your file(s) into the area
+							</umb-localize></umb-input-dropzone
+						>
 					</div>`,
 			)}
 		`;
@@ -152,6 +149,10 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 				border: 2px dashed var(--uui-color-divider-standalone);
 				background-color: var(--uui-color-surface-alt);
 				padding: var(--uui-size-space-6);
+			}
+
+			#dropzone {
+				width: 100%;
 			}
 
 			#import {

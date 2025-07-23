@@ -1,4 +1,4 @@
-import { UmbDocumentItemRepository } from '../../../repository/index.js';
+import { UmbDocumentItemRepository } from '../../../item/index.js';
 import { UmbDocumentNotificationsRepository } from '../repository/document-notifications.repository.js';
 import type { UmbDocumentNotificationsModalData } from './document-notifications-modal.token.js';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';

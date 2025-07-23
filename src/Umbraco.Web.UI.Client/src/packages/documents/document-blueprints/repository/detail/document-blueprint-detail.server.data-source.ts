@@ -1,19 +1,21 @@
 import type { UmbDocumentBlueprintDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentBlueprintRequestModel,
+	DocumentBlueprintResponseModel,
 	UpdateDocumentBlueprintRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document that fetches data from the server
  * @class UmbDocumentBlueprintServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource<UmbDocumentBlueprintDetailModel> {
 	#host: UmbControllerHost;
@@ -74,47 +76,36 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	 * @returns {*}
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbDocumentBlueprintDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentBlueprintService.getDocumentBlueprintById({ id: unique }),
+			DocumentBlueprintService.getDocumentBlueprintById({ path: { id: unique } }),
 		);
 
 		if (error || !data) {
 			return { error };
 		}
 
-		// TODO: make data mapper to prevent errors
-		const document: UmbDocumentBlueprintDetailModel = {
-			entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
-			unique: data.id,
-			values: data.values.map((value) => {
-				return {
-					editorAlias: value.editorAlias,
-					alias: value.alias,
-					culture: value.culture || null,
-					segment: value.segment || null,
-					value: value.value,
-				};
-			}),
-			variants: data.variants.map((variant) => {
-				return {
-					state: variant.state,
-					culture: variant.culture || null,
-					segment: variant.segment || null,
-					name: variant.name,
-					publishDate: variant.publishDate || null,
-					createDate: variant.createDate,
-					updateDate: variant.updateDate,
-				};
-			}),
-			documentType: {
-				unique: data.documentType.id,
-				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
-			},
-		};
+		const document = this.#createDocumentBlueprintDetailModel(data);
+
+		return { data: document };
+	}
+
+	async scaffoldByUnique(unique: string): Promise<UmbDataSourceResponse<UmbDocumentBlueprintDetailModel>> {
+		if (!unique) throw new Error('Unique is missing');
+
+		const { data, error } = await tryExecute(
+			this.#host,
+			DocumentBlueprintService.getDocumentBlueprintByIdScaffold({ path: { id: unique } }),
+		);
+
+		if (error || !data) {
+			return { error };
+		}
+
+		const document = this.#createDocumentBlueprintDetailModel(data);
 
 		return { data: document };
 	}
@@ -131,7 +122,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!model.unique) throw new Error('Document unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDocumentBlueprintRequestModel = {
+		const body: CreateDocumentBlueprintRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
@@ -139,14 +130,14 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.postDocumentBlueprint({
-				requestBody,
+				body,
 			}),
 		);
 
-		if (data) {
+		if (data && typeof data === 'string') {
 			return this.read(data);
 		}
 
@@ -164,16 +155,16 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateDocumentBlueprintRequestModel = {
+		const body: UpdateDocumentBlueprintRequestModel = {
 			values: model.values,
 			variants: model.variants,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			DocumentBlueprintService.putDocumentBlueprintById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 		);
 
@@ -193,7 +184,38 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		// TODO: update to delete when implemented
-		return tryExecuteAndNotify(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ id: unique }));
+		return tryExecute(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ path: { id: unique } }));
+	}
+
+	#createDocumentBlueprintDetailModel(data: DocumentBlueprintResponseModel): UmbDocumentBlueprintDetailModel {
+		return {
+			entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
+			unique: data.id,
+			values: data.values.map((value) => {
+				return {
+					editorAlias: value.editorAlias,
+					entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
+					culture: value.culture || null,
+					segment: value.segment || null,
+					alias: value.alias,
+					value: value.value,
+				};
+			}),
+			variants: data.variants.map((variant) => {
+				return {
+					state: variant.state,
+					culture: variant.culture || null,
+					segment: variant.segment || null,
+					name: variant.name,
+					publishDate: variant.publishDate || null,
+					createDate: variant.createDate,
+					updateDate: variant.updateDate,
+				};
+			}),
+			documentType: {
+				unique: data.documentType.id,
+				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
+			},
+		};
 	}
 }

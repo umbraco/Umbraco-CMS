@@ -20,7 +20,7 @@ public class NotificationService : INotificationService
 {
     // manage notifications
     // ideally, would need to use IBackgroundTasks - but they are not part of Core!
-    private static readonly object Locker = new();
+    private static readonly Lock Locker = new();
 
     private readonly IContentService _contentService;
     private readonly ContentSettings _contentSettings;
@@ -607,7 +607,7 @@ public class NotificationService : INotificationService
         }
     }
 
-    private class NotificationRequest
+    private sealed class NotificationRequest
     {
         public NotificationRequest(EmailMessage mail, string? action, string? userName, string? email)
         {

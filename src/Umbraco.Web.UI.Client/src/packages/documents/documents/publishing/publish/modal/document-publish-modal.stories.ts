@@ -3,7 +3,7 @@ import './document-publish-modal.element.js';
 import { UmbDocumentVariantState } from '../../../types.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
 import type { UmbDocumentPublishModalElement } from './document-publish-modal.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentPublishModalData = {
@@ -20,6 +20,8 @@ const modalData: UmbDocumentPublishModalData = {
 				publishDate: null,
 				updateDate: null,
 				segment: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
 			},
 			language: {
 				entityType: 'language',
@@ -42,6 +44,8 @@ const modalData: UmbDocumentPublishModalData = {
 				createDate: '2021-08-25T14:00:00Z',
 				publishDate: null,
 				updateDate: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
 			},
 			language: {
 				entityType: 'language',
@@ -64,6 +68,8 @@ const modalData: UmbDocumentPublishModalData = {
 				publishDate: null,
 				updateDate: null,
 				segment: null,
+				scheduledPublishDate: null,
+				scheduledUnpublishDate: null,
 			},
 			language: {
 				entityType: 'language',

@@ -2,6 +2,13 @@ import { manifest as schemaManifest } from './Umbraco.MarkdownEditor.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
+		type: 'propertyValuePreset',
+		forPropertyEditorSchemaAlias: 'Umbraco.MarkdownEditor',
+		alias: 'Umb.PropertyValuePreset.MarkdownEditor',
+		name: 'Markdown Editor Property Value Preset',
+		api: () => import('./markdown-editor-property-value-preset.js'),
+	},
+	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.MarkdownEditor',
 		name: 'Markdown Editor Property Editor UI',
@@ -24,7 +31,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 						alias: 'defaultValue',
 						label: 'Default value',
 						description: 'If value is blank, the editor will show this',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextArea',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.MarkdownEditor',
 					},
 					{
 						alias: 'overlaySize',

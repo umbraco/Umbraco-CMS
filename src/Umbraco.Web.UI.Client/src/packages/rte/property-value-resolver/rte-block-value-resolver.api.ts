@@ -1,4 +1,4 @@
-import type { UmbPropertyEditorUiValueType } from '../types.js';
+import type { UmbPropertyEditorRteValueType } from '../types.js';
 import {
 	UmbBlockValueResolver,
 	type UmbBlockDataValueModel,
@@ -6,9 +6,9 @@ import {
 } from '@umbraco-cms/backoffice/block';
 import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
-export class UmbRteBlockValueResolver extends UmbBlockValueResolver<UmbPropertyEditorUiValueType> {
+export class UmbRteBlockValueResolver extends UmbBlockValueResolver<UmbPropertyEditorRteValueType> {
 	async processValues(
-		property: UmbElementValueModel<UmbPropertyEditorUiValueType>,
+		property: UmbElementValueModel<UmbPropertyEditorRteValueType>,
 		valuesCallback: (values: Array<UmbBlockDataValueModel>) => Promise<Array<UmbBlockDataValueModel> | undefined>,
 	) {
 		if (property.value) {
@@ -16,7 +16,9 @@ export class UmbRteBlockValueResolver extends UmbBlockValueResolver<UmbPropertyE
 				...property,
 				value: {
 					...property.value,
-					blocks: await this._processValueBlockData(property.value.blocks, valuesCallback),
+					blocks: property.value?.blocks
+						? await this._processValueBlockData(property.value.blocks, valuesCallback)
+						: undefined,
 				},
 			};
 		}
@@ -24,7 +26,7 @@ export class UmbRteBlockValueResolver extends UmbBlockValueResolver<UmbPropertyE
 	}
 
 	async processVariants(
-		property: UmbElementValueModel<UmbPropertyEditorUiValueType>,
+		property: UmbElementValueModel<UmbPropertyEditorRteValueType>,
 		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
 	) {
 		if (property.value) {
@@ -32,7 +34,9 @@ export class UmbRteBlockValueResolver extends UmbBlockValueResolver<UmbPropertyE
 				...property,
 				value: {
 					...property.value,
-					blocks: await this._processVariantBlockData(property.value.blocks, variantsCallback),
+					blocks: property.value?.blocks
+						? await this._processVariantBlockData(property.value.blocks, variantsCallback)
+						: undefined,
 				},
 			};
 		}

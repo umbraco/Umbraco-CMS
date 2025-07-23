@@ -4,7 +4,7 @@ import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the UserGroup that fetches data from the server
@@ -24,9 +24,9 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 	}
 
 	async getCollection(filter: UmbUserGroupCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
-			UserGroupService.getFilterUserGroup({ skip: filter.skip, take: filter.take, filter: filter.query }),
+			UserGroupService.getFilterUserGroup({ query: { skip: filter.skip, take: filter.take, filter: filter.query } }),
 		);
 
 		if (data) {

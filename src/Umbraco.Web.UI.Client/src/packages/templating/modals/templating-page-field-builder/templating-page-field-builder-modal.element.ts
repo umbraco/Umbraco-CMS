@@ -94,7 +94,7 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 							?disabled=${this._field ? false : true}></uui-checkbox>
 
 						<uui-label><umb-localize key="templateEditor_outputSample">Output sample</umb-localize></uui-label>
-						<umb-code-block language="C#" copy
+						<umb-code-block style="max-height:500px;" language="C#" copy
 							>${this._field ? getUmbracoFieldSnippet(this._field, this._default, this._recursive) : ''}</umb-code-block
 						>
 					</div>

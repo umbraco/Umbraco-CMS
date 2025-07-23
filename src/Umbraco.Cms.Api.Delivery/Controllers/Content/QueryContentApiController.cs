@@ -12,7 +12,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
-[ApiVersion("1.0")]
 [ApiVersion("2.0")]
 public class QueryContentApiController : ContentApiControllerBase
 {
@@ -29,20 +28,6 @@ public class QueryContentApiController : ContentApiControllerBase
         _apiContentQueryService = apiContentQueryService;
         _requestMemberAccessService = requestMemberAccessService;
     }
-
-    [HttpGet]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<IApiContentResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
-    public async Task<IActionResult> Query(
-        string? fetch,
-        [FromQuery] string[] filter,
-        [FromQuery] string[] sort,
-        int skip = 0,
-        int take = 10)
-        => await HandleRequest(fetch, filter, sort, skip, take);
 
     /// <summary>
     ///     Gets a paginated list of content item(s) from query.

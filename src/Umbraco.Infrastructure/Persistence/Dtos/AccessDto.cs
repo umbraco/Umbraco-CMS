@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Access)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class AccessDto
+internal sealed class AccessDto
 {
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoAccess", AutoIncrement = false)]
@@ -27,11 +27,11 @@ internal class AccessDto
     [ForeignKey(typeof(NodeDto), Name = "FK_umbracoAccess_umbracoNode_id2")]
     public int NoAccessNodeId { get; set; }
 
-    [Column("createDate")]
+    [Column("createDate", ForceToUtc = false)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime CreateDate { get; set; }
 
-    [Column("updateDate")]
+    [Column("updateDate", ForceToUtc = false)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime UpdateDate { get; set; }
 

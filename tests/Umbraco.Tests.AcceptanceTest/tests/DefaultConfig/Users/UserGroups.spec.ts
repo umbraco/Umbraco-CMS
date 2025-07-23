@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 const allPermissions = {
   uiPermission:
-    ['Browse Node',
+    ['Browse',
       'Create Document Blueprint',
       'Delete',
       'Create',
@@ -59,7 +59,7 @@ test('can create an empty user group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
+  await umbracoUi.userGroup.waitForUserGroupToBeCreated();
   expect(await umbracoApi.userGroup.doesNameExist(userGroupName)).toBeTruthy();
   // Checks if the user group was created in the UI as well
   await umbracoUi.userGroup.clickUserGroupsButton();
@@ -79,7 +79,7 @@ test('can rename a user group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.userGroup.doesNameExist(userGroupName)).toBeTruthy();
   // Checks if the user group was created in the UI as well
   await umbracoUi.userGroup.clickUserGroupsButton();
@@ -98,7 +98,7 @@ test('can update a user group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.reloadPage();
   await umbracoUi.userGroup.doesUserGroupHavePermission(allPermissions.uiPermission[0]);
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
@@ -112,12 +112,12 @@ test('can delete a user group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
   // Act
-  await umbracoUi.userGroup.clickActionsButton();
+  await umbracoUi.userGroup.clickActionButton();
   await umbracoUi.userGroup.clickDeleteButton();
   await umbracoUi.userGroup.clickConfirmToDeleteButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
+  await umbracoUi.userGroup.waitForUserGroupToBeDeleted();
   expect(await umbracoApi.userGroup.doesNameExist(userGroupName)).toBeFalsy();
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.isUserGroupWithNameVisible(userGroupName, false);
@@ -134,9 +134,9 @@ test('can add a section to a user group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.userGroup.clickUserGroupsButton();
-  await umbracoUi.userGroup.doesUserGroupHaveSection(userGroupName, 'Content');
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Content');
 })
 
 test('can add multiple sections to a user group', async ({umbracoApi, umbracoUi}) => {
@@ -150,10 +150,10 @@ test('can add multiple sections to a user group', async ({umbracoApi, umbracoUi}
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.userGroup.clickUserGroupsButton();
-  await umbracoUi.userGroup.doesUserGroupHaveSection(userGroupName, 'Content');
-  await umbracoUi.userGroup.doesUserGroupHaveSection(userGroupName, 'Media');
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Content');
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Media');
 });
 
 test('can remove a section from a user group', async ({umbracoApi, umbracoUi}) => {
@@ -168,9 +168,9 @@ test('can remove a section from a user group', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.userGroup.clickUserGroupsButton();
-  await umbracoUi.userGroup.doesUserGroupHaveSection(userGroupName, 'Content', false);
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Content', false);
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
   expect(userGroupData.sections).toEqual([]);
 });
@@ -186,7 +186,7 @@ test('can add a language to a user group', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.reloadPage();
   await umbracoUi.userGroup.doesUserGroupContainLanguage(englishLanguage);
   expect(await umbracoApi.userGroup.doesUserGroupContainLanguage(userGroupName, 'en-US')).toBeTruthy();
@@ -203,7 +203,7 @@ test('can enable all languages for a user group', async ({umbracoApi, umbracoUi}
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.userGroup.doesUserGroupContainAccessToAllLanguages(userGroupName)).toBeTruthy();
 })
 
@@ -221,7 +221,7 @@ test('can add multiple languages to a user group', async ({umbracoApi, umbracoUi
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.reloadPage();
   await umbracoUi.userGroup.doesUserGroupContainLanguage(englishLanguage);
   await umbracoUi.userGroup.doesUserGroupContainLanguage(danishLanguage);
@@ -245,7 +245,7 @@ test('can remove language from a user group', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.reloadPage();
   await umbracoUi.userGroup.doesUserGroupContainLanguage(englishLanguage, false);
   expect(await umbracoApi.userGroup.doesUserGroupContainLanguage(userGroupName, 'en-US')).toBeFalsy();
@@ -269,7 +269,7 @@ test('can add a content start node to a user group', async ({umbracoApi, umbraco
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.userGroup.doesUserGroupContainContentStartNodeId(userGroupName, documentId)).toBeTruthy();
 
   // Clean
@@ -294,7 +294,7 @@ test('can remove a content start node from a user group ', async ({umbracoApi, u
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.userGroup.doesUserGroupContainContentStartNodeId(userGroupName, documentId)).toBeFalsy();
 
   // Clean
@@ -312,7 +312,7 @@ test('can enable access to all content from a user group ', async ({umbracoApi, 
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.userGroup.doesUserGroupContainDocumentRootAccess(userGroupName)).toBeTruthy();
 });
 
@@ -328,11 +328,11 @@ test('can add a media start node to a user group', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.userGroup.clickChooseMediaStartNodeButton();
   await umbracoUi.userGroup.selectMediaWithName(mediaName);
-  await umbracoUi.userGroup.clickSubmitButton();
+  await umbracoUi.userGroup.clickChooseModalButton();
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.userGroup.doesUserGroupContainMediaStartNodeId(userGroupName, mediaId)).toBeTruthy();
 
   // Clean
@@ -355,7 +355,7 @@ test('can remove a media start node from a user group ', async ({umbracoApi, umb
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.userGroup.doesUserGroupContainMediaStartNodeId(userGroupName, mediaId)).toBeFalsy();
 
   // Clean
@@ -373,7 +373,7 @@ test('can enable access to all media in a user group ', async ({umbracoApi, umbr
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.userGroup.doesUserGroupContainMediaRootAccess(userGroupName)).toBeTruthy();
 });
 
@@ -388,7 +388,7 @@ test('can enable all permissions for a user group', async ({umbracoApi, umbracoU
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.reloadPage();
   await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(allPermissions.uiPermission);
   const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
@@ -414,7 +414,7 @@ test('can add granular permission to a specific document for a user group', asyn
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, [allPermissions.verbPermission[0]])).toBeTruthy();
 
   // Clean
@@ -440,7 +440,7 @@ test('can add all granular permissions to a specific document for a user group',
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   await umbracoUi.reloadPage();
   await umbracoUi.userGroup.clickGranularPermissionWithName(documentName);
   await umbracoUi.userGroup.doesUserGroupHavePermissionEnabled(allPermissions.uiPermission);
@@ -457,7 +457,7 @@ test('can remove granular permission to a specific document for a user group', a
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
-  await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentWithBrowseNode(userGroupName, documentId);
+  await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentWithRead(userGroupName, documentId);
   expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, [allPermissions.verbPermission[0]])).toBeTruthy();
   await umbracoUi.userGroup.clickUserGroupsButton();
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
@@ -467,7 +467,7 @@ test('can remove granular permission to a specific document for a user group', a
   await umbracoUi.userGroup.clickSaveButton();
 
   // Assert
-  await umbracoUi.userGroup.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.userGroup.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.userGroup.doesUserGroupContainGranularPermissionsForDocument(userGroupName, documentId, [allPermissions.verbPermission[0]])).toBeFalsy();
 
   // Clean

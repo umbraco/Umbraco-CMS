@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -37,7 +37,7 @@ public class ReferencedByDocumentController : DocumentControllerBase
         int skip = 0,
         int take = 20)
     {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, false);
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
 
         var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
         {
@@ -45,6 +45,6 @@ public class ReferencedByDocumentController : DocumentControllerBase
             Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return pagedViewModel;
     }
 }

@@ -1,6 +1,6 @@
-import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
-import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
+import type { UmbBlockGridEntryElement } from '../block-grid-entry/block-grid-entry.element.js';
 import type { UmbBlockGridLayoutModel } from '../../types.js';
+import { UmbBlockGridEntriesContext } from './block-grid-entries.context.js';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
@@ -9,8 +9,11 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, state, repeat, css, property, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import '../block-grid-entry/index.js';
-import { UmbSorterController, type UmbSorterConfig, type resolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
+import {
+	UmbSorterController,
+	type UmbSorterConfig,
+	type UmbSorterResolvePlacementArgs,
+} from '@umbraco-cms/backoffice/sorter';
 import {
 	UmbFormControlMixin,
 	UmbFormControlValidator,
@@ -23,9 +26,15 @@ import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
  * @param args
  * @returns { null | true }
  */
-function resolvePlacementAsGrid(args: resolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>) {
+function resolvePlacementAsBlockGrid(
+	args: UmbSorterResolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>,
+) {
 	// If this has areas, we do not want to move, unless we are at the edge
-	if (args.relatedModel.areas?.length > 0 && isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)) {
+	if (
+		args.relatedModel.areas &&
+		args.relatedModel.areas.length > 0 &&
+		isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)
+	) {
 		return null;
 	}
 
@@ -80,9 +89,16 @@ function resolvePlacementAsGrid(args: resolvePlacementArgs<UmbBlockGridLayoutMod
 	const relatedStartCol = Math.round(
 		getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns),
 	);
-
 	// If the found related element does not have enough room after which for the current element, then we go vertical mode:
-	return relatedStartCol + (args.horizontalPlaceAfter ? foundElColumns : 0) + currentElementColumns > gridColumnNumber;
+	const verticalDirection = relatedStartCol + foundElColumns + currentElementColumns > gridColumnNumber;
+	return verticalDirection;
+	/*
+	let placeAfter = args.horizontalPlaceAfter;
+
+	return {
+		verticalDirection,
+		placeAfter,
+	};*/
 }
 
 // --------------------------
@@ -96,7 +112,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.contentKey;
 	},
-	resolvePlacement: resolvePlacementAsGrid,
+	resolvePlacement: resolvePlacementAsBlockGrid,
 	identifier: 'block-grid-editor',
 	itemSelector: 'umb-block-grid-entry',
 	containerSelector: '.umb-block-grid__layout-container',
@@ -244,7 +260,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			);
 
 			this.observe(
-				manager.readOnlyState.isReadOnly,
+				manager.readOnlyState.permitted,
 				(isReadOnly) => (this._isReadOnly = isReadOnly),
 				'observeIsReadOnly',
 			);
@@ -321,6 +337,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			this.#typeLimitValidator = undefined;
 		}
 		if (hasTypeLimits) {
+			// If we have specific block type limits, we should use those for validation (not the Block Type Configurations)
 			this.#typeLimitValidator = this.addValidator(
 				'customError',
 				() => {
@@ -341,6 +358,28 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				},
 				() => {
 					return !this.#context.checkBlockTypeLimitsValidity();
+				},
+			);
+		} else {
+			// Limit based on Block Type Configurations (Allow in Areas / allow in root)
+			this.#typeLimitValidator = this.addValidator(
+				'customError',
+				() => {
+					const invalids = this.#context
+						.getInvalidBlockTypeConfigurations()
+						// make invalids unique:
+						.filter((v, i, a) => a.indexOf(v) === i)
+						// join them together to become a string:
+						.join(', ');
+					return this.localize.term(
+						this._areaKey
+							? 'blockEditor_areaValidationEntriesNotAllowed'
+							: 'blockEditor_rootValidationEntriesNotAllowed',
+						invalids,
+					);
+				},
+				() => {
+					return !this.#context.checkBlockTypeConfigurationValidity();
 				},
 			);
 		}
@@ -388,6 +427,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		return html`
 			<uui-button
 				look="placeholder"
+				color=${this.pristine === false && this.validity.valid === false ? 'invalid' : 'default'}
 				label=${this._configCreateLabel ?? this._createLabel ?? ''}
 				href=${this.#context.getPathForCreateBlock(-1) ?? ''}
 				?disabled=${this._isReadOnly}></uui-button>
@@ -404,7 +444,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				look="placeholder"
 				href=${this.#context.getPathForClipboard(-1) ?? ''}
 				?disabled=${this._isReadOnly}>
-				<uui-icon name="icon-paste-in"></uui-icon>
+				<uui-icon name="icon-clipboard-paste"></uui-icon>
 			</uui-button>
 		`;
 	}
@@ -452,13 +492,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			:host([area-key]) #createButton {
 				--umb-block-grid--create-button--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
 				display: var(--umb-block-grid--create-button--is-dragging--variable, grid);
-			}
-			:host(:not([pristine]):invalid) #createButton {
-				--uui-button-contrast: var(--uui-color-danger);
-				--uui-button-contrast-hover: var(--uui-color-danger);
-				--uui-color-default-emphasis: var(--uui-color-danger);
-				--uui-button-border-color: var(--uui-color-danger);
-				--uui-button-border-color-hover: var(--uui-color-danger);
 			}
 
 			.umb-block-grid__layout-container[data-area-length='0'] {

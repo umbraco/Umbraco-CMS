@@ -19,6 +19,14 @@ public class HealthCheckCompletedWebhookEvent : WebhookEventBase<HealthCheckComp
         new
         {
             notification.HealthCheckResults.AllChecksSuccessful,
-            notification.HealthCheckResults.ResultsAsDictionary
+            Results = notification.HealthCheckResults.ResultsAsDictionary.Select(result => new
+            {
+                result.Key,
+                Statusus = result.Value.Select(x => new
+                {
+                    ResultType = x.ResultType.ToString(),
+                    x.Message,
+                }),
+            }),
         };
 }

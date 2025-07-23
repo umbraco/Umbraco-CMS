@@ -25,7 +25,6 @@ public class GlobalSettings
     internal const string StaticUmbracoCssPath = "~/css";
     internal const string StaticUmbracoScriptsPath = "~/scripts";
     internal const string StaticUmbracoMediaPath = "~/media";
-    internal const bool StaticInstallMissingDatabase = false;
     internal const bool StaticDisableElectionForSingleServer = false;
     internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
     internal const string StaticDistributedLockingReadLockDefaultTimeout = "00:01:00";
@@ -113,13 +112,6 @@ public class GlobalSettings
     ///     If the value is a virtual path, it's resolved relative to the webroot.
     /// </remarks>
     public string UmbracoMediaPhysicalRootPath { get; set; } = null!;
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether to install the database when it is missing.
-    /// </summary>
-    [Obsolete("This option will be removed in V16.")]
-    [DefaultValue(StaticInstallMissingDatabase)]
-    public bool InstallMissingDatabase { get; set; } = StaticInstallMissingDatabase;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to disable the election for a single server.

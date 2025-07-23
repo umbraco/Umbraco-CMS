@@ -33,11 +33,10 @@ public class SiteDynamicRootOriginFinder : RootDynamicRootOriginFinder
             return null;
         }
 
-
-        IEnumerable<string> reversePath = entity.Path.Split(",").Reverse();
-        foreach (var contentIdString in reversePath)
+        string[] contentIdStrings = entity.Path.Split(',');
+        for (int i = contentIdStrings.Length - 1; i >= 0; i--)
         {
-            var contentId = int.Parse(contentIdString, NumberStyles.Integer, CultureInfo.InvariantCulture);
+            var contentId = int.Parse(contentIdStrings[i], NumberStyles.Integer, CultureInfo.InvariantCulture);
             IEnumerable<IDomain> domains = _domainService.GetAssignedDomains(contentId, true);
             if (!domains.Any())
             {

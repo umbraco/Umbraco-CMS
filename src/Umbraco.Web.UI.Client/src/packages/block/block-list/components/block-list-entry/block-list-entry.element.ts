@@ -1,11 +1,13 @@
 import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
-import type { UmbBlockListLayoutModel } from '../../types.js';
-import { UMB_BLOCK_LIST } from '../../constants.js';
+import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
+import {
+	UMB_BLOCK_LIST,
+	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
+	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+} from '../../constants.js';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import '../ref-list-block/index.js';
-import '../inline-list-block/index.js';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
@@ -14,8 +16,13 @@ import type {
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
+import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
+import '../ref-list-block/index.js';
+import '../inline-list-block/index.js';
+import '../unsupported-list-block/index.js';
 /**
  * @element umb-block-list-entry
  */
@@ -61,6 +68,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_showContentEdit = false;
+
 	@state()
 	_hasSettings = false;
 
@@ -72,6 +80,12 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_exposed?: boolean;
+
+	@state()
+	_unsupported?: boolean;
+
+	@state()
+	_showActions?: boolean;
 
 	@state()
 	_workspaceEditContentPath?: string;
@@ -106,7 +120,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	constructor() {
 		super();
-
+		this.#init();
+	}
+	#init() {
 		this.observe(
 			this.#context.showContentEdit,
 			(showContentEdit) => {
@@ -152,6 +168,23 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			(exposed) => {
 				this.#updateBlockViewProps({ unpublished: !exposed });
 				this._exposed = exposed;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.unsupported,
+			(unsupported) => {
+				if (unsupported === undefined) return;
+				this.#updateBlockViewProps({ unsupported: unsupported });
+				this._unsupported = unsupported;
+				this.toggleAttribute('unsupported', unsupported);
+			},
+			null,
+		);
+		this.observe(
+			this.#context.actionsVisibility,
+			(showActions) => {
+				this._showActions = showActions;
 			},
 			null,
 		);
@@ -208,9 +241,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
-			this.#context.readOnlyState.isReadOnly,
+			this.#context.readOnlyGuard.permitted,
 			(isReadOnly) => (this._isReadOnly = isReadOnly),
-			'umbReadonlyObserver',
+			'umbReadOnlyObserver',
 		);
 	}
 
@@ -266,7 +299,50 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.#context.expose();
 	};
 
+	async #copyToClipboard() {
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+		if (!propertyDatasetContext || !propertyContext || !clipboardContext) {
+			throw new Error('Could not get required contexts to copy.');
+		}
+
+		const workspaceName = propertyDatasetContext?.getName();
+		const propertyLabel = propertyContext?.getLabel();
+		const blockLabel = this._label;
+
+		const entryName = workspaceName
+			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
+			: `${propertyLabel} - ${blockLabel}`;
+
+		const content = this.#context.getContent();
+		const layout = this.#context.getLayout();
+		const settings = this.#context.getSettings();
+		const expose = this.#context.getExpose();
+
+		const propertyValue: UmbBlockListValueModel = {
+			contentData: content ? [structuredClone(content)] : [],
+			layout: {
+				[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
+			},
+			settingsData: settings ? [structuredClone(settings)] : [],
+			expose: expose ? [structuredClone(expose)] : [],
+		};
+
+		clipboardContext.write({
+			icon: this._icon,
+			name: entryName,
+			propertyValue,
+			propertyEditorUiAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+		});
+	}
+
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
+		if (this._unsupported) {
+			// If the block is unsupported, we should not allow any custom views to render.
+			return false;
+		}
+
 		if (
 			manifest.forContentTypeAlias &&
 			!stringOrStringArrayContains(manifest.forContentTypeAlias, this._contentTypeAlias!)
@@ -280,10 +356,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		ext.component?.setAttribute('part', 'component');
 		if (this._exposed) {
 			return ext.component;
 		} else {
-			return html`<div>
+			return html`<div style="min-height: var(--uui-size-16);">
 				${ext.component}
 				<umb-block-overlay-expose-button
 					.contentTypeName=${this._contentTypeName}
@@ -314,8 +391,26 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			${umbDestroyOnDisconnect()}></umb-inline-list-block>`;
 	}
 
+	#renderUnsupportedBlock() {
+		return html`<umb-unsupported-list-block
+			.config=${this._blockViewProps.config}
+			.content=${this._blockViewProps.content}
+			.settings=${this._blockViewProps.settings}
+			${umbDestroyOnDisconnect()}></umb-unsupported-list-block>`;
+	}
+
+	#renderBuiltinBlockView() {
+		if (this._unsupported) {
+			return this.#renderUnsupportedBlock();
+		}
+		if (this._inlineEditingMode) {
+			return this.#renderInlineBlock();
+		}
+		return this.#renderRefBlock();
+	}
+
 	#renderBlock() {
-		return this.contentKey && this._contentTypeAlias
+		return this.contentKey && (this._contentTypeAlias || this._unsupported)
 			? html`
 					<div class="umb-block-list__block">
 						<umb-extension-slot
@@ -325,16 +420,23 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							.props=${this._blockViewProps}
 							.filter=${this.#extensionSlotFilterMethod}
 							single
-							>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
+							>${this.#renderBuiltinBlockView()}</umb-extension-slot
 						>
-						<uui-action-bar>
-							${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderDeleteAction()}
-						</uui-action-bar>
+						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 							: nothing}
 					</div>
 				`
+			: nothing;
+	}
+
+	#renderActionBar() {
+		return this._showActions
+			? html`<uui-action-bar>
+					${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+					${this.#renderDeleteAction()}
+				</uui-action-bar>`
 			: nothing;
 	}
 
@@ -343,11 +445,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			? html`<uui-button
 					label="edit"
 					look="secondary"
-					color=${this._contentInvalid ? 'danger' : ''}
+					color=${this._contentInvalid ? 'invalid' : ''}
 					href=${this._workspaceEditContentPath}>
-					<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
+					<uui-icon name=${this._exposed === false && this._isReadOnly === false ? 'icon-add' : 'icon-edit'}></uui-icon>
 					${this._contentInvalid
-						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 						: nothing}
 				</uui-button>`
 			: this._showContentEdit === false && this._exposed === false
@@ -366,11 +468,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				? html`<uui-button
 						label="Edit settings"
 						look="secondary"
-						color=${this._settingsInvalid ? 'danger' : ''}
+						color=${this._settingsInvalid ? 'invalid' : ''}
 						href=${this._workspaceEditSettingsPath}>
 						<uui-icon name="icon-settings"></uui-icon>
 						${this._settingsInvalid
-							? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
 							: nothing}
 					</uui-button>`
 				: nothing}
@@ -384,11 +486,18 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		</uui-button>`;
 	}
 
+	#renderCopyToClipboardAction() {
+		return html`<uui-button label="Copy to clipboard" look="secondary" @click=${() => this.#copyToClipboard()}>
+			<uui-icon name="icon-clipboard-copy"></uui-icon>
+		</uui-button>`;
+	}
+
 	override render() {
 		return this.#renderBlock();
 	}
 
 	static override styles = [
+		UUIBlinkKeyframes,
 		css`
 			:host {
 				position: relative;
@@ -417,7 +526,12 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
-				border-color: var(--uui-color-danger);
+				border-color: var(--uui-color-invalid);
+			}
+
+			umb-extension-slot::part(component) {
+				position: relative;
+				z-index: 0;
 			}
 
 			uui-action-bar {

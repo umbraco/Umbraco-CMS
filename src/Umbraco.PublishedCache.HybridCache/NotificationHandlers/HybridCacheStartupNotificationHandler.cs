@@ -20,13 +20,13 @@ public class HybridCacheStartupNotificationHandler : INotificationAsyncHandler<U
         _runtimeState = runtimeState;
     }
 
-    public Task HandleAsync(UmbracoApplicationStartingNotification notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(UmbracoApplicationStartingNotification notification, CancellationToken cancellationToken)
     {
-        if (_runtimeState.Level > RuntimeLevel.Install)
+        if (_runtimeState.Level <= RuntimeLevel.Install)
         {
-            _databaseCacheRebuilder.RebuildDatabaseCacheIfSerializerChanged();
+            return;
         }
 
-        return Task.CompletedTask;
+        await _databaseCacheRebuilder.RebuildDatabaseCacheIfSerializerChangedAsync();
     }
 }

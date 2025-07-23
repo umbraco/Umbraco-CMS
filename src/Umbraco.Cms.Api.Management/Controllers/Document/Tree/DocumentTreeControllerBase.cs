@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Entities;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -33,7 +34,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService)
+    : base(entityService, userStartNodeEntitiesService, dataTypeService)
     {
         _publicAccessService = publicAccessService;
         _appCaches = appCaches;
@@ -52,8 +53,11 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
             responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
+            responseModel.Ancestors = EntityService.GetPathKeys(entity, omitSelf: true)
+                .Select(x => new ReferenceByIdModel(x));
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
+            responseModel.CreateDate = entity.CreateDate;
 
             responseModel.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(documentEntitySlim);
             responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);

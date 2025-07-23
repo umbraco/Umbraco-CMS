@@ -16,8 +16,6 @@ export const onUnhandledRequest = (req: MockedRequest) => {
 export const startMockServiceWorker = (config?: StartOptions) =>
 	worker.start({
 		onUnhandledRequest,
-		// TODO: this can not rely on a VITE variable
-		quiet: import.meta.env.VITE_MSW_QUIET === 'on',
 		...config,
 	});
 

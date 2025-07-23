@@ -43,6 +43,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<LoggingSettings>, LoggingSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<SecuritySettings>, SecuritySettingsValidator>();
@@ -68,6 +69,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ImagingSettings>()
             .AddUmbracoOptions<IndexingSettings>()
             .AddUmbracoOptions<LoggingSettings>()
+            .AddUmbracoOptions<LongRunningOperationsSettings>()
             .AddUmbracoOptions<MemberPasswordConfigurationSettings>()
             .AddUmbracoOptions<NuCacheSettings>()
             .AddUmbracoOptions<RequestHandlerSettings>()
@@ -79,10 +81,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<UmbracoPluginSettings>()
             .AddUmbracoOptions<UnattendedSettings>()
             .AddUmbracoOptions<BasicAuthSettings>()
-            .AddUmbracoOptions<RuntimeMinificationSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
-            .AddUmbracoOptions<ContentDashboardSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
             .AddUmbracoOptions<DataTypesSettings>()
             .AddUmbracoOptions<WebhookSettings>()
@@ -104,6 +104,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
             builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
+
+        builder.Services.AddOptions<TinyMceToTiptapMigrationSettings>();
 
         return builder;
     }

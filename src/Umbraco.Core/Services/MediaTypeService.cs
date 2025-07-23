@@ -1,12 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.Locking;
 using Umbraco.Extensions;
 
@@ -24,7 +23,8 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
         IMediaTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             provider,
             loggerFactory,
@@ -34,32 +34,8 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
             entityContainerRepository,
             entityRepository,
             eventAggregator,
-            userIdKeyResolver) => MediaService = mediaService;
-
-    [Obsolete("Use the constructor with all dependencies instead")]
-    public MediaTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IMediaService mediaService,
-        IMediaTypeRepository mediaTypeRepository,
-        IAuditRepository auditRepository,
-        IMediaTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            mediaService,
-            mediaTypeRepository,
-            auditRepository,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
+            userIdKeyResolver,
+            contentTypeFilters) => MediaService = mediaService;
 
 
     protected override int[] ReadLockIds => MediaTypeLocks.ReadLockIds;

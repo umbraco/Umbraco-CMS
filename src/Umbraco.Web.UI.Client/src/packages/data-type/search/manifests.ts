@@ -1,4 +1,5 @@
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
+import { manifests as globalSearchManifests } from './global-search/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -12,9 +13,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		name: 'Data Type Search Result Item ',
+		name: 'Data Type Search Result Item',
 		alias: 'Umb.SearchResultItem.DataType',
 		type: 'searchResultItem',
 		forEntityTypes: [UMB_DATA_TYPE_ENTITY_TYPE],
 	},
+	...globalSearchManifests,
 ];

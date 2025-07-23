@@ -1,5 +1,5 @@
 import { UmbMemberSearchServerDataSource } from './member-search.server.data-source.js';
-import type { UmbMemberSearchItemModel } from './member.search-provider.js';
+import type { UmbMemberSearchItemModel } from './types.js';
 import type { UmbSearchRepository, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

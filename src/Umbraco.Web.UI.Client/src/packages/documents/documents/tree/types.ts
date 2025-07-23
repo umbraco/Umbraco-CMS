@@ -7,8 +7,10 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export interface UmbDocumentTreeItemModel extends UmbTreeItemModel {
+	ancestors: Array<UmbEntityModel>;
 	entityType: UmbDocumentEntityType;
 	noAccess: boolean;
 	isTrashed: boolean;
@@ -18,6 +20,7 @@ export interface UmbDocumentTreeItemModel extends UmbTreeItemModel {
 		icon: string;
 		collection: UmbReferenceByUnique | null;
 	};
+	createDate: string;
 	variants: Array<UmbDocumentTreeItemVariantModel>;
 }
 

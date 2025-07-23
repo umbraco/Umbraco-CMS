@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './input-radio-button-list.element.js';
 import type { UmbInputRadioButtonListElement } from './input-radio-button-list.element.js';
 

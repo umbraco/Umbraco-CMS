@@ -1,6 +1,7 @@
+import { UmbEntityBulkActionBase } from '../../entity-bulk-action-base.js';
+import type { UmbEntityBulkActionArgs } from '../../types.js';
 import type { UmbBulkTrashRepository } from './trash-repository.interface.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -9,8 +10,26 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { MetaEntityBulkActionTrashKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+/**
+ * @deprecated since v15.3.0. Will be removed in v17.0.0. import `UmbMediaTrashEntityBulkAction` from @umbraco-cms/backoffice/recycle-bin instead.
+ * @exports
+ * @class UmbMediaTrashEntityBulkAction
+ * @augments {UmbEntityBulkActionBase<MetaEntityBulkActionTrashKind>}
+ */
 export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<MetaEntityBulkActionTrashKind> {
+	constructor(host: UmbControllerHost, args: UmbEntityBulkActionArgs<MetaEntityBulkActionTrashKind>) {
+		super(host, args);
+
+		new UmbDeprecation({
+			removeInVersion: '17.0.0',
+			deprecated: 'UmbMediaTrashEntityBulkAction',
+			solution: 'import UmbMediaTrashEntityBulkAction from @umbraco-cms/backoffice/recycle-bin instead.',
+		}).warn();
+	}
+
 	async execute() {
 		if (this.selection?.length === 0) return;
 

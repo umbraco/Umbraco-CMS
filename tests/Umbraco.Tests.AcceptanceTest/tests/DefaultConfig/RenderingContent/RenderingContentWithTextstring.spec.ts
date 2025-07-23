@@ -31,9 +31,8 @@ for (const textstring of textstrings) {
     // Arrange
     const textstringValue = textstring.value;
     const templateId = await umbracoApi.template.createTemplateWithDisplayingStringValue(templateName, AliasHelper.toAlias(propertyName));
-    await umbracoApi.document.createPublishedDocumentWithValue(contentName, textstringValue, dataTypeData.id, templateId, propertyName, documentTypeName);
-    const contentData = await umbracoApi.document.getByName(contentName);
-    const contentURL = contentData.urls[0].url;
+    const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, textstringValue, dataTypeData.id, templateId, propertyName, documentTypeName);
+    const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
     // Act
     await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);

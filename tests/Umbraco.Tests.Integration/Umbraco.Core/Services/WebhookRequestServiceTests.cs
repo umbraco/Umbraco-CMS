@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class WebhookRequestServiceTests : UmbracoIntegrationTest
+internal sealed class WebhookRequestServiceTests : UmbracoIntegrationTest
 {
     private IWebhookRequestService WebhookRequestService => GetRequiredService<IWebhookRequestService>();
 

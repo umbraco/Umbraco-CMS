@@ -5,5 +5,3 @@ public class CultureAndScheduleModel
     public required ISet<string> CulturesToPublishImmediately { get; set; }
     public required ContentScheduleCollection Schedules { get; set; }
 }
-
-

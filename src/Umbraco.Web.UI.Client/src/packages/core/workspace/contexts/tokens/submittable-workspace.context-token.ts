@@ -1,5 +1,6 @@
+import type { UmbWorkspaceContext } from '../../types.js';
+import type { UmbSubmittableWorkspaceContext } from './submittable-workspace-context.interface.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_SUBMITTABLE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbWorkspaceContext,

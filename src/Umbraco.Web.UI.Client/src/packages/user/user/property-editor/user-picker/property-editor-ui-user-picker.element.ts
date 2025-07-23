@@ -1,11 +1,11 @@
+import type { UmbUserInputElement } from '../../components/index.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbUserInputElement } from '@umbraco-cms/backoffice/user';
 
 /**
  * @element umb-property-editor-ui-user-picker
@@ -20,7 +20,7 @@ export class UmbPropertyEditorUIUserPickerElement extends UmbLitElement implemen
 
 	#onChange(event: CustomEvent & { target: UmbUserInputElement }) {
 		this.value = event.target.value;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

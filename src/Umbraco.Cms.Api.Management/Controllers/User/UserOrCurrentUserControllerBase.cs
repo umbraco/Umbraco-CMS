@@ -35,6 +35,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Email Cannot be changed")
                 .WithDetail("Local login is disabled, so the email cannot be changed.")
                 .Build()),
+            UserOperationStatus.InvalidUserName => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid username")
+                .WithDetail("The username contains one or more invalid characters.")
+                .Build()),
             UserOperationStatus.DuplicateUserName => BadRequest(problemDetailsBuilder
                 .WithTitle("Duplicate Username")
                 .WithDetail("The username is already in use.")

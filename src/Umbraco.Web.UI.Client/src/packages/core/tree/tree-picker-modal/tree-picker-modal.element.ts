@@ -1,4 +1,4 @@
-import type { UmbTreeSelectionConfiguration } from '../types.js';
+import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
 import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -7,7 +7,6 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
@@ -55,7 +54,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 		if (_changedProperties.has('data')) {
 			if (this.data?.search) {
-				this.#pickerContext.search.updateConfig({ ...this.data?.search, searchFrom: this.data?.startNode });
+				this.#pickerContext.search.updateConfig({
+					...this.data.search,
+					searchFrom: this.data.startNode,
+				});
 			}
 
 			const multiple = this.data?.multiple ?? false;
@@ -148,7 +150,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	override render() {
 		return html`
-			<umb-body-layout headline="Select">
+			<umb-body-layout headline=${this.localize.term('general_choose')}>
 				<uui-box> ${this.#renderSearch()} ${this.#renderTree()}</uui-box>
 				${this.#renderActions()}
 			</umb-body-layout>
@@ -157,7 +159,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	#renderSearch() {
 		return html`
 			<umb-picker-search-field></umb-picker-search-field>
-			<umb-picker-search-result></umb-picker-search-result>
+			<umb-picker-search-result .pickableFilter=${this.data?.pickableFilter}></umb-picker-search-result>
 		`;
 	}
 
@@ -172,6 +174,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				.props=${{
 					hideTreeItemActions: true,
 					hideTreeRoot: this.data?.hideTreeRoot,
+					expandTreeRoot: this.data?.expandTreeRoot,
 					selectionConfiguration: this._selectionConfiguration,
 					filter: this.data?.filter,
 					selectableFilter: this.data?.pickableFilter,

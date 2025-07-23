@@ -1,15 +1,27 @@
 import { UmbAuthFlow } from './auth-flow.js';
-import { UMB_AUTH_CONTEXT, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
+import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
+import { UmbAuthSessionTimeoutController } from './controllers/auth-session-timeout.controller.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { ManifestAuthProvider } from './auth-provider.extension.js';
-import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_STORAGE_TOKEN_RESPONSE_NAME } from './constants.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { ReplaySubject, Subject, firstValueFrom, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
+import {
+	ReplaySubject,
+	Subject,
+	firstValueFrom,
+	switchMap,
+	distinctUntilChanged,
+	throttleTime,
+	auditTime,
+} from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
 
-export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
+export class UmbAuthContext extends UmbContextBase {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
 	// Timeout is different from `isAuthorized` because it can occur repeatedly
 	#isTimeout = new Subject<void>();
@@ -32,20 +44,29 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	 * Observable that emits true if the user is authorized, otherwise false.
 	 * @remark It will only emit when the authorization state changes.
 	 */
-	readonly isAuthorized = this.#isAuthorized.asObservable();
+	readonly isAuthorized = this.#isAuthorized.asObservable().pipe(distinctUntilChanged());
 
 	/**
 	 * Observable that acts as a signal and emits when the user has timed out, i.e. the token has expired.
 	 * This can be used to show a timeout message to the user.
-	 * @remark It can emit multiple times if more than one request is made after the token has expired.
+	 * @remark It will emit once per second, so it can be used to trigger UI updates or other actions when the user has timed out.
 	 */
-	readonly timeoutSignal = this.#isTimeout.asObservable();
+	readonly timeoutSignal = this.#isTimeout.asObservable().pipe(
+		// Audit the timeout signal to ensure that it waits for 1s before allowing another emission, which prevents rapid firing of the signal.
+		// This is useful to prevent the UI from being flooded with timeout events.
+		auditTime(1000),
+	);
 
 	/**
 	 * Observable that acts as a signal for when the authorization state changes.
+	 * @remark It will emit once per second, so it can be used to trigger UI updates or other actions when the authorization state changes.
+	 * @returns {Subject<void>} An observable that emits when the authorization state changes.
 	 */
-	get authorizationSignal() {
-		return this.#authFlow.authorizationSignal;
+	get authorizationSignal(): Observable<void> {
+		return this.#authFlow.authorizationSignal.asObservable().pipe(
+			// Throttle the signal to ensure that it emits once, then waits for 1s before allowing another emission.
+			throttleTime(1000),
+		);
 	}
 
 	constructor(host: UmbControllerHost, serverUrl: string, backofficePath: string, isBypassed: boolean) {
@@ -54,12 +75,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		this.#serverUrl = serverUrl;
 		this.#backofficePath = backofficePath;
 
-		this.#authFlow = new UmbAuthFlow(
-			serverUrl,
-			this.getRedirectUrl(),
-			this.getPostLogoutRedirectUrl(),
-			this.#isTimeout,
-		);
+		this.#authFlow = new UmbAuthFlow(serverUrl, this.getRedirectUrl(), this.getPostLogoutRedirectUrl());
 
 		// Observe the authorization signal and close the auth window
 		this.observe(
@@ -74,6 +90,11 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		// Observe changes to local storage and update the authorization state
 		// This establishes the tab-to-tab communication
 		window.addEventListener('storage', this.#onStorageEvent.bind(this));
+
+		if (!isTestEnvironment()) {
+			// Start the session timeout controller
+			new UmbAuthSessionTimeoutController(this, this.#authFlow);
+		}
 	}
 
 	override destroy(): void {
@@ -88,7 +109,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 			// Refresh the local storage state into memory
 			await this.setInitialState();
 			// Let any auth listeners (such as the auth modal) know that the auth state has changed
-			this.authorizationSignal.next();
+			this.#authFlow.authorizationSignal.next();
 		}
 	}
 
@@ -232,26 +253,24 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 
 	/**
 	 * Get the default OpenAPI configuration, which is set up to communicate with the Management API.
-	 * @remark This is useful if you want to communicate with your own resources generated by the [openapi-typescript-codegen](https://github.com/ferdikoomen/openapi-typescript-codegen) library.
+	 * @remark This is useful if you want to communicate with your own resources generated by the [@hey-api/openapi-ts](https://github.com/hey-api/openapi-ts) library.
 	 * @memberof UmbAuthContext
 	 * @example <caption>Using the default OpenAPI configuration</caption>
 	 * ```js
-	 *  	const defaultOpenApi = authContext.getOpenApiConfiguration();
-	 *  	OpenAPI.BASE = defaultOpenApi.base;
-	 * 		OpenAPI.WITH_CREDENTIALS = defaultOpenApi.withCredentials;
-	 * 		OpenAPI.CREDENTIALS = defaultOpenApi.credentials;
-	 * 		OpenAPI.TOKEN = defaultOpenApi.token;
+	 * const defaultOpenApi = authContext.getOpenApiConfiguration();
+	 * client.setConfig({
+	 *   base: defaultOpenApi.base,
+	 *   auth: defaultOpenApi.token,
+	 * });
 	 * ```
-	 * @returns The default OpenAPI configuration
+	 * @returns {UmbOpenApiConfiguration} The default OpenAPI configuration
 	 */
 	getOpenApiConfiguration(): UmbOpenApiConfiguration {
+		const config = umbHttpClient.getConfig();
 		return {
-			base: OpenAPI.BASE,
-			version: OpenAPI.VERSION,
-			withCredentials: OpenAPI.WITH_CREDENTIALS,
-			credentials: OpenAPI.CREDENTIALS,
+			base: config.baseUrl,
+			credentials: config.credentials,
 			token: () => this.getLatestToken(),
-			encodePath: OpenAPI.ENCODE_PATH,
 		};
 	}
 

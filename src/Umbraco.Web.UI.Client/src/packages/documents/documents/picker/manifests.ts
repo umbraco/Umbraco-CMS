@@ -6,6 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: 'Umb.PickerSearchResultItem.Document',
 		name: 'Document Picker Search Result Item',
+		element: () => import('./document-picker-search-result-item.element.js'),
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 	},
 ];

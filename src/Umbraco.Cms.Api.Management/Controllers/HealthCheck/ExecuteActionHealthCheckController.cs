@@ -61,8 +61,8 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
             return BadRequest(invalidModelProblem);
         }
 
-        HealthCheckStatus result = healthCheck.ExecuteAction(_umbracoMapper.Map<HealthCheckAction>(action)!);
+        HealthCheckStatus result = await healthCheck.ExecuteActionAsync(_umbracoMapper.Map<HealthCheckAction>(action)!);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<HealthCheckResultResponseModel>(result)));
+        return Ok(_umbracoMapper.Map<HealthCheckResultResponseModel>(result));
     }
 }

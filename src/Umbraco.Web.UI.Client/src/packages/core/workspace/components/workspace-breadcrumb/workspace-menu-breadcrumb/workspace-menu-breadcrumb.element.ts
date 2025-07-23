@@ -1,8 +1,9 @@
+import { UMB_WORKSPACE_CONTEXT } from '../../../workspace.context-token.js';
 import { css, customElement, html, ifDefined, map, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/menu';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbMenuStructureWorkspaceContext, UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-workspace-breadcrumb')
@@ -16,7 +17,7 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	// TODO: figure out the correct context type
 	#workspaceContext?: any;
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
-	#structureContext?: UmbMenuStructureWorkspaceContext;
+	#structureContext?: typeof UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -31,10 +32,8 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 			this.#observeName();
 		});
 
-		// TODO: set up context token
-		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
-			// TODO: get the correct interface from the context token
-			this.#structureContext = instance as UmbMenuStructureWorkspaceContext;
+		this.consumeContext<UmbMenuStructureWorkspaceContext>(UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT, (instance) => {
+			this.#structureContext = instance;
 			this.#observeStructure();
 		});
 	}
@@ -46,9 +45,7 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		this.observe(
 			this.#structureContext.structure,
 			(value) => {
-				// TODO: get the type from the context
-				const structure = value as Array<UmbStructureItemModel>;
-				this._structure = isNew ? structure : structure.slice(0, -1);
+				this._structure = isNew ? value : value.slice(0, -1);
 			},
 			'menuStructureObserver',
 		);
@@ -65,8 +62,8 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	}
 
 	#getHref(structureItem: UmbStructureItemModel) {
-		const workspaceBasePath = `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit`;
-		return structureItem.isFolder ? undefined : `${workspaceBasePath}/${structureItem.unique}`;
+		if (structureItem.isFolder) return undefined;
+		return `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit/${structureItem.unique}`;
 	}
 
 	override render() {
@@ -79,7 +76,7 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 							>${this.localize.string(structureItem.name)}</uui-breadcrumb-item
 						>`,
 				)}
-				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
+				<uui-breadcrumb-item last-item>${this._name}</uui-breadcrumb-item>
 			</uui-breadcrumbs>
 		`;
 	}

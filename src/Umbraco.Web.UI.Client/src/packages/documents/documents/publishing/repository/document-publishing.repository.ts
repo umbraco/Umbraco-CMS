@@ -1,26 +1,10 @@
 import type { UmbDocumentDetailModel, UmbDocumentVariantPublishModel } from '../../types.js';
 import { UmbDocumentPublishingServerDataSource } from './document-publishing.server.data-source.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
-import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
-	#init!: Promise<unknown>;
-	#publishingDataSource: UmbDocumentPublishingServerDataSource;
-	#notificationContext?: UmbNotificationContext;
-
-	constructor(host: UmbControllerHost) {
-		super(host);
-
-		this.#publishingDataSource = new UmbDocumentPublishingServerDataSource(this);
-
-		this.#init = Promise.all([
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				this.#notificationContext = instance;
-			}).asPromise(),
-		]);
-	}
+	#publishingDataSource = new UmbDocumentPublishingServerDataSource(this);
 
 	/**
 	 * Publish one or more variants of a Document
@@ -34,16 +18,8 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
 		if (!unique) throw new Error('id is missing');
 		if (!variants.length) throw new Error('variant IDs are missing');
-		await this.#init;
 
-		const { error } = await this.#publishingDataSource.publish(unique, variants);
-
-		if (!error) {
-			const notification = { data: { message: `Document published` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-
-		return { error };
+		return this.#publishingDataSource.publish(unique, variants);
 	}
 
 	/**
@@ -56,16 +32,8 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	async unpublish(id: string, variantIds: Array<UmbVariantId>) {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
-		await this.#init;
 
-		const { error } = await this.#publishingDataSource.unpublish(id, variantIds);
-
-		if (!error) {
-			const notification = { data: { message: `Document unpublished` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-
-		return { error };
+		return this.#publishingDataSource.unpublish(id, variantIds);
 	}
 
 	/**
@@ -78,20 +46,8 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	async publishWithDescendants(id: string, variantIds: Array<UmbVariantId>, includeUnpublishedDescendants: boolean) {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
-		await this.#init;
 
-		const { error } = await this.#publishingDataSource.publishWithDescendants(
-			id,
-			variantIds,
-			includeUnpublishedDescendants,
-		);
-
-		if (!error) {
-			const notification = { data: { message: `Document published with descendants` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-
-		return { error };
+		return this.#publishingDataSource.publishWithDescendants(id, variantIds, includeUnpublishedDescendants);
 	}
 
 	/**

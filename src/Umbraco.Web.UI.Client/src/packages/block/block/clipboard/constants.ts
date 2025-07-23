@@ -1,0 +1,1 @@
+export const UMB_BLOCK_CLIPBOARD_ENTRY_VALUE_TYPE = 'block';

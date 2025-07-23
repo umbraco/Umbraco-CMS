@@ -41,7 +41,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
                 new DocumentTypeSort { DocumentType = new ReferenceByIdModel(ct.Key), SortOrder = ct.SortOrder })
             .OrderBy(ct => ct.SortOrder)
             .ToArray() ?? Enumerable.Empty<DocumentTypeSort>();
-        target.Compositions = MapNestedCompositions(
+        target.Compositions = MapCompositions(
             source.ContentTypeComposition,
             source.ParentId,
             (referenceByIdModel, compositionType) => new DocumentTypeComposition

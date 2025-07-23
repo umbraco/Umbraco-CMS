@@ -1,3 +1,5 @@
+import { UmbModalBaseElement } from '../../component/modal-base.element.js';
+import type { UmbItemPickerModalData, UmbItemPickerModel } from './item-picker-modal.token.js';
 import {
 	css,
 	html,
@@ -8,9 +10,7 @@ import {
 	state,
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbItemPickerModalData, UmbItemPickerModel } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-item-picker-modal')
@@ -75,7 +75,7 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 												name=${this.localize.string(item.label)}
 												detail=${ifDefined(item.description)}
 												icon=${ifDefined(item.icon)}
-												@click=${() => this.#submit(item)}>
+												@open=${() => this.#submit(item)}>
 											</umb-ref-item>
 										`,
 									)}

@@ -1,9 +1,15 @@
-import type { ApiError, CancelError } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbApiError, UmbCancelError, UmbError } from '../resources/umb-error.js';
 
 export interface UmbDataSourceResponse<T = unknown> extends UmbDataSourceErrorResponse {
+	/**
+	 * The data returned from the data source.
+	 */
 	data?: T;
 }
 
 export interface UmbDataSourceErrorResponse {
-	error?: ApiError | CancelError;
+	/**
+	 * The error that occurred when fetching the data.
+	 */
+	error?: UmbError | UmbApiError | UmbCancelError | Error;
 }

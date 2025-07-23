@@ -21,6 +21,9 @@ export class UmbUnregisterExtensionEntityAction extends UmbEntityActionBase<unkn
 		umbExtensionsRegistry.unregister(extension.alias);
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!actionEventContext) {
+			throw new Error('Action event context not found');
+		}
 		const event = new UmbRequestReloadStructureForEntityEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,

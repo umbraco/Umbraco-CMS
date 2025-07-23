@@ -28,10 +28,10 @@ public class ContentCopiedWebhookEvent : WebhookEventBase<ContentCopiedNotificat
     {
         return new
         {
-            notification.Copy,
-            notification.Original,
-            notification.ParentId,
-            notification.RelateToOriginal
+            Id = notification.Copy.Key,
+            Original = notification.Original.Key,
+            Parent = notification.ParentKey,
+            notification.RelateToOriginal,
         };
     }
 }

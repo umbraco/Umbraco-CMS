@@ -17,8 +17,8 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private Lazy<Dictionary<string, Guid>> _contentTypeAliasToKeyMap;
     private ConcurrentDictionary<Guid, NavigationNode> _navigationStructure = new();
     private ConcurrentDictionary<Guid, NavigationNode> _recycleBinNavigationStructure = new();
-    private IList<Guid> _roots = new List<Guid>();
-    private IList<Guid> _recycleBinRoots = new List<Guid>();
+    private HashSet<Guid> _roots = [];
+    private HashSet<Guid> _recycleBinRoots = [];
 
     protected ContentNavigationServiceBase(ICoreScopeProvider coreScopeProvider, INavigationRepository navigationRepository, TContentTypeService typeService)
     {
@@ -293,12 +293,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// <param name="readLock">The read lock value, should be -333 or -334 for content and media trees.</param>
     /// <param name="objectTypeKey">The key of the object type to rebuild.</param>
     /// <param name="trashed">Indicates whether the items are in the recycle bin.</param>
-    protected async Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
+    protected Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
     {
         // This is only relevant for items in the content and media trees
         if (readLock != Constants.Locks.ContentTree && readLock != Constants.Locks.MediaTree)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
@@ -307,17 +307,21 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         // Build the corresponding navigation structure
         if (trashed)
         {
+            _recycleBinRoots.Clear();
             IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
             BuildNavigationDictionary(_recycleBinNavigationStructure, _recycleBinRoots,  navigationModels);
         }
         else
         {
+            _roots.Clear();
             IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
             BuildNavigationDictionary(_navigationStructure, _roots, navigationModels);
         }
+
+        return Task.CompletedTask;
     }
 
-    private bool TryGetParentKeyFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out Guid? parentKey)
+    private static bool TryGetParentKeyFromStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid childKey, out Guid? parentKey)
     {
         if (structure.TryGetValue(childKey, out NavigationNode? childNode))
         {
@@ -331,25 +335,32 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     }
 
     private bool TryGetRootKeysFromStructure(
-        IList<Guid> input,
+        HashSet<Guid> input,
         out IEnumerable<Guid> rootKeys,
         Guid? contentTypeKey = null)
     {
-        // Apply contentTypeKey filter
-        IEnumerable<Guid> filteredKeys = contentTypeKey.HasValue
-            ? input.Where(key => _navigationStructure[key].ContentTypeKey == contentTypeKey.Value)
-            : input;
+        var keysWithSortOrder = new List<(Guid Key, int SortOrder)>(input.Count);
+        foreach (Guid key in input)
+        {
+            NavigationNode navigationNode = _navigationStructure[key];
 
-        // TODO can we make this more efficient?
+            // Apply contentTypeKey filter
+            if (contentTypeKey.HasValue && navigationNode.ContentTypeKey != contentTypeKey.Value)
+            {
+                continue;
+            }
+
+            keysWithSortOrder.Add((key, navigationNode.SortOrder));
+        }
+
         // Sort by SortOrder
-        rootKeys = filteredKeys
-            .OrderBy(key => _navigationStructure[key].SortOrder)
-            .ToList();
+        keysWithSortOrder.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+        rootKeys = keysWithSortOrder.ConvertAll(keyWithSortOrder => keyWithSortOrder.Key);
 
         return true;
     }
 
-    private bool TryGetChildrenKeysFromStructure(
+    private static bool TryGetChildrenKeysFromStructure(
         ConcurrentDictionary<Guid, NavigationNode> structure,
         Guid parentKey,
         out IEnumerable<Guid> childrenKeys,
@@ -363,12 +374,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
 
         // Keep children keys ordered based on their SortOrder
-        childrenKeys = GetOrderedChildren(parentNode, structure, contentTypeKey).ToList();
+        childrenKeys = GetOrderedChildren(parentNode, structure, contentTypeKey);
 
         return true;
     }
 
-    private bool TryGetDescendantsKeysFromStructure(
+    private static bool TryGetDescendantsKeysFromStructure(
         ConcurrentDictionary<Guid, NavigationNode> structure,
         Guid parentKey,
         out IEnumerable<Guid> descendantsKeys,
@@ -389,7 +400,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private bool TryGetAncestorsKeysFromStructure(
+    private static bool TryGetAncestorsKeysFromStructure(
         ConcurrentDictionary<Guid, NavigationNode> structure,
         Guid childKey,
         out IEnumerable<Guid> ancestorsKeys,
@@ -417,7 +428,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private bool TryGetSiblingsKeysFromStructure(
+    private static bool TryGetSiblingsKeysFromStructure(
         ConcurrentDictionary<Guid, NavigationNode> structure,
         Guid key,
         out IEnumerable<Guid> siblingsKeys,
@@ -459,14 +470,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private void GetDescendantsRecursively(
+    private static void GetDescendantsRecursively(
         ConcurrentDictionary<Guid, NavigationNode> structure,
         NavigationNode node,
         List<Guid> descendants,
         Guid? contentTypeKey = null)
     {
         // Get all children regardless of contentType
-        var childrenKeys = GetOrderedChildren(node, structure).ToList();
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, structure);
         foreach (Guid childKey in childrenKeys)
         {
             // Apply contentTypeKey filter
@@ -483,7 +494,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
     }
 
-    private bool TryRemoveNodeFromParentInStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid key, out NavigationNode? nodeToRemove)
+    private static bool TryRemoveNodeFromParentInStructure(ConcurrentDictionary<Guid, NavigationNode> structure, Guid key, out NavigationNode? nodeToRemove)
     {
         if (structure.TryGetValue(key, out nodeToRemove) is false)
         {
@@ -503,7 +514,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     {
         _recycleBinRoots.Add(node.Key);
         _roots.Remove(node.Key);
-        var childrenKeys = GetOrderedChildren(node, _navigationStructure).ToList();
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _navigationStructure);
 
         foreach (Guid childKey in childrenKeys)
         {
@@ -526,7 +537,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
     private void RemoveDescendantsRecursively(NavigationNode node)
     {
-        var childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure).ToList();
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure);
         foreach (Guid childKey in childrenKeys)
         {
             if (_recycleBinNavigationStructure.TryGetValue(childKey, out NavigationNode? childNode) is false)
@@ -547,7 +558,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
 
         _recycleBinRoots.Remove(node.Key);
-        var childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure).ToList();
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _recycleBinNavigationStructure);
 
         foreach (Guid childKey in childrenKeys)
         {
@@ -566,24 +577,35 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
     }
 
-    private IEnumerable<Guid> GetOrderedChildren(
+    private static IReadOnlyList<Guid> GetOrderedChildren(
         NavigationNode node,
         ConcurrentDictionary<Guid, NavigationNode> structure,
         Guid? contentTypeKey = null)
     {
-        IEnumerable<Guid> children = node
-            .Children
-            .Where(structure.ContainsKey);
-
-        // Apply contentTypeKey filter
-        if (contentTypeKey.HasValue)
+        if (node.Children.Count < 1)
         {
-            children = children.Where(childKey => structure[childKey].ContentTypeKey == contentTypeKey.Value);
+            return [];
         }
 
-        return children
-            .OrderBy(childKey => structure[childKey].SortOrder)
-            .ToList();
+        var childrenWithSortOrder = new List<(Guid ChildNodeKey, int SortOrder)>(node.Children.Count);
+        foreach (Guid childNodeKey in node.Children)
+        {
+            if (!structure.TryGetValue(childNodeKey, out NavigationNode? childNode))
+            {
+                continue;
+            }
+
+            // Apply contentTypeKey filter
+            if (contentTypeKey.HasValue && childNode.ContentTypeKey != contentTypeKey.Value)
+            {
+                continue;
+            }
+
+            childrenWithSortOrder.Add((childNodeKey, childNode.SortOrder));
+        }
+
+        childrenWithSortOrder.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+        return childrenWithSortOrder.ConvertAll(childWithSortOrder => childWithSortOrder.ChildNodeKey);
     }
 
     private bool TryGetContentTypeKey(string contentTypeAlias, out Guid? contentTypeKey)
@@ -609,7 +631,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, IList<Guid> roots, IEnumerable<INavigationModel> entities)
+    private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, HashSet<Guid> roots, IEnumerable<INavigationModel> entities)
     {
         var entityList = entities.ToList();
         var idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);

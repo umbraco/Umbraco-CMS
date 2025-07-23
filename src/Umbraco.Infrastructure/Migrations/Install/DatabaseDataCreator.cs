@@ -17,8 +17,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 /// <summary>
 ///     Creates the initial database data during install.
 /// </summary>
-internal class DatabaseDataCreator
+internal sealed class DatabaseDataCreator
 {
+
+    internal const string EditorGroupAlias = "editor";
+
+    internal const string SensitiveDataGroupAlias = "sensitiveData";
+
+    internal const string TranslatorGroupAlias = "translator";
+
+    internal const string WriterGroupAlias = "writer";
 
     internal static readonly LogViewerQueryDto[] _defaultLogQueries =
     [
@@ -195,9 +203,10 @@ internal class DatabaseDataCreator
     {
         var userGroupKeyToPermissions = new Dictionary<Guid, IEnumerable<string>>()
         {
-            [Constants.Security.AdminGroupKey] = new[] { ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T" },
-            [Constants.Security.EditorGroupKey] = new[] { ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T" },
-            [Constants.Security.TranslatorGroupKey] = new[] { ActionUpdate.ActionLetter, ActionBrowse.ActionLetter },
+            [Constants.Security.AdminGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
+            [Constants.Security.EditorGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
+            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":" , ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
+            [Constants.Security.TranslatorGroupKey] = [ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
         };
 
         var i = 1;
@@ -1041,6 +1050,7 @@ internal class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MainDom, Name = "MainDom" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookRequest, Name = "WebhookRequest" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookLogs, Name = "WebhookLogs" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.LongRunningOperations, Name = "LongRunningOperations" });
     }
 
     private void CreateContentTypeData()
@@ -1216,7 +1226,7 @@ internal class DatabaseDataCreator
                 Key = Constants.Security.WriterGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
-                Alias = Constants.Security.WriterGroupAlias,
+                Alias = WriterGroupAlias,
                 Name = "Writers",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
@@ -1233,7 +1243,7 @@ internal class DatabaseDataCreator
                 Key = Constants.Security.EditorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
-                Alias = Constants.Security.EditorGroupAlias,
+                Alias = EditorGroupAlias,
                 Name = "Editors",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
@@ -1250,7 +1260,7 @@ internal class DatabaseDataCreator
                 Key = Constants.Security.TranslatorGroupKey,
                 StartMediaId = -1,
                 StartContentId = -1,
-                Alias = Constants.Security.TranslatorGroupAlias,
+                Alias = TranslatorGroupAlias,
                 Name = "Translators",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
@@ -1265,7 +1275,7 @@ internal class DatabaseDataCreator
             {
                 Id = 5,
                 Key = Constants.Security.SensitiveDataGroupKey,
-                Alias = Constants.Security.SensitiveDataGroupAlias,
+                Alias = SensitiveDataGroupAlias,
                 Name = "Sensitive data",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
@@ -2298,6 +2308,9 @@ internal class DatabaseDataCreator
             Constants.Conventions.RelationTypes.RelatedMediaName, null, null, false, true);
         CreateRelationTypeData(5, Constants.Conventions.RelationTypes.RelatedDocumentAlias,
             Constants.Conventions.RelationTypes.RelatedDocumentName, null, null, false, true);
+        CreateRelationTypeData(6, Constants.Conventions.RelationTypes.RelatedMemberAlias,
+            Constants.Conventions.RelationTypes.RelatedMemberName, null, null, false, true);
+
     }
 
     private void CreateRelationTypeData(int id, string alias, string name, Guid? parentObjectType,

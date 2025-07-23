@@ -4,6 +4,7 @@ import { detailHandlers } from './detail.handlers.js';
 import { itemHandlers } from './item.handlers.js';
 import { moveHandlers } from './move.handlers.js';
 import { copyHandlers } from './copy.handlers.js';
+import { filterHandlers } from './filter.handlers.js';
 
 export const handlers = [
 	...treeHandlers,
@@ -12,4 +13,5 @@ export const handlers = [
 	...detailHandlers,
 	...moveHandlers,
 	...copyHandlers,
+	...filterHandlers,
 ];

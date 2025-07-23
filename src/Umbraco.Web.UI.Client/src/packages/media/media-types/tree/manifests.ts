@@ -9,7 +9,7 @@ import {
 	UMB_MEDIA_TYPE_TREE_STORE_ALIAS,
 } from './constants.js';
 import { manifests as folderManifests } from './folder/manifests.js';
-import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
+import { manifests as treeItemChildrenManifest } from './tree-item-children/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -51,5 +51,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	...folderManifests,
-	...reloadTreeItemChildrenManifest,
+	...treeItemChildrenManifest,
 ];

@@ -1,13 +1,10 @@
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../document-collection.context-token.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import { UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { css, customElement, html, map, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
-	UMB_DOCUMENT_ENTITY_TYPE,
-	UMB_DOCUMENT_ROOT_ENTITY_TYPE,
-	UMB_DOCUMENT_WORKSPACE_CONTEXT,
-} from '@umbraco-cms/backoffice/document';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
@@ -39,16 +36,16 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.observe(workspaceContext.unique, (unique) => {
+			this.observe(workspaceContext?.unique, (unique) => {
 				this._documentUnique = unique;
 			});
-			this.observe(workspaceContext.contentTypeUnique, (documentTypeUnique) => {
+			this.observe(workspaceContext?.contentTypeUnique, (documentTypeUnique) => {
 				this._documentTypeUnique = documentTypeUnique;
 			});
 		});
 
 		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
-			this.observe(collectionContext.workspacePathBuilder, (builder) => {
+			this.observe(collectionContext?.workspacePathBuilder, (builder) => {
 				this._workspacePathBuilder = builder;
 			});
 		});
@@ -56,12 +53,12 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 
 	override async firstUpdated() {
 		if (this._documentTypeUnique) {
-			this.#retrieveAllowedDocumentTypesOf(this._documentTypeUnique);
+			this.#retrieveAllowedDocumentTypesOf(this._documentTypeUnique, this._documentUnique || null);
 		}
 	}
 
-	async #retrieveAllowedDocumentTypesOf(unique: string | null) {
-		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique);
+	async #retrieveAllowedDocumentTypesOf(unique: string | null, parentContentUnique: string | null) {
+		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
 
 		if (data && data.items) {
 			this._allowedDocumentTypes = data.items;
@@ -69,7 +66,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	}
 
 	#onPopoverToggle(event: ToggleEvent) {
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';
@@ -94,6 +91,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		if (this._allowedDocumentTypes.length !== 1) return;
 
 		const item = this._allowedDocumentTypes[0];
+		// TODO: Stop appending values to labels, instead we need to parse the name as a argument to the label. [NL]
 		const label =
 			(this.manifest?.meta.label
 				? this.localize.string(this.manifest?.meta.label)

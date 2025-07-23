@@ -33,7 +33,7 @@ public interface ITagQuery
     /// <summary>
     ///     Gets all document tags.
     /// </summary>
-    ///   /// <remarks>
+    /// <remarks>
     ///     If no culture is specified, it retrieves tags with an invariant culture.
     ///     If a culture is specified, it only retrieves tags for that culture.
     ///     Use "*" to retrieve tags for all cultures.

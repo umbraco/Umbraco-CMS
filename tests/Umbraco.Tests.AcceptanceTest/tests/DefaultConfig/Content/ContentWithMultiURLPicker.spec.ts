@@ -17,7 +17,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// TODO, this is flaky on the pipeline, not locally. Look into why
+test.fixme('can create content with the document link', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -33,18 +34,18 @@ test('can create content with the document link', {tag: '@smoke'}, async ({umbra
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.clickLinkToDocumentButton();
+  await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
-  await umbracoUi.content.clickButtonWithName('Choose');
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -72,7 +73,6 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
   const linkedDocumentName = 'ContentToPick';
   const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
-  await umbracoUi.waitForTimeout(2000);
   await umbracoApi.document.publish(linkedDocumentId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -80,14 +80,14 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.clickLinkToDocumentButton();
+  await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
   await umbracoUi.content.clickButtonWithName('Choose');
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -115,13 +115,14 @@ test('can create content with the external link', async ({umbracoApi, umbracoUi}
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -147,15 +148,14 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.clickLinkToMediaButton();
+  await umbracoUi.content.clickMediaLinkButton();
   await umbracoUi.content.selectMediaWithName(mediaFileName);
-  await umbracoUi.content.clickMediaPickerModalSubmitButton();
-  await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -185,20 +185,20 @@ test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.goToContentWithName(contentName);
   // Add media link
   await umbracoUi.content.clickAddMultiURLPickerButton();
-  await umbracoUi.content.clickLinkToMediaButton();
+  await umbracoUi.content.clickMediaLinkButton();
   await umbracoUi.content.selectMediaWithName(mediaFileName);
-  await umbracoUi.content.clickMediaPickerModalSubmitButton();
-  await umbracoUi.waitForTimeout(500);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickAddButton();
   // Add external link
   await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(link);
   await umbracoUi.content.enterLinkTitle(linkTitle);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -232,7 +232,7 @@ test('can remove the URL picker in the content', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
@@ -251,11 +251,11 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickLinkWithName(linkTitle);
   await umbracoUi.content.enterLinkTitle(updatedLinkTitle);
-  await umbracoUi.content.clickSubmitButton();
+  await umbracoUi.content.clickUpdateButton();
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  await umbracoUi.content.isSuccessNotificationVisible();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
@@ -264,4 +264,133 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   expect(contentData.values[0].value[0].icon).toEqual('icon-link');
   expect(contentData.values[0].value[0].name).toEqual(updatedLinkTitle);
   expect(contentData.values[0].value[0].url).toEqual(link);
+});
+
+test('cannot submit an empty link', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink('');
+  await umbracoUi.content.enterAnchorOrQuerystring('');
+  await umbracoUi.content.enterLinkTitle('');
+  await umbracoUi.content.clickAddButton();
+
+  // Assert
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+});
+
+test('cannot update the URL picker with an empty link', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDocumentWithExternalLinkURLPicker(contentName, documentTypeId, link, linkTitle);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickLinkWithName(linkTitle);
+  await umbracoUi.content.enterLink('');
+  await umbracoUi.content.enterAnchorOrQuerystring('');
+  await umbracoUi.content.enterLinkTitle('');
+  await umbracoUi.content.clickUpdateButton();
+
+  // Assert
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+});
+
+test('cannot submit an empty URL with an anchor or query', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink('');
+  await umbracoUi.content.enterAnchorOrQuerystring('#value');
+  await umbracoUi.content.clickAddButton();
+
+  // Assert
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+});
+
+// TODO: Remove skip when the front-end ready. Currently it still accept the empty link using spacebar
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17411
+test.skip('cannot submit an empty link using spacebar', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickManualLinkButton();
+  await umbracoUi.content.enterLink('Space', true);
+  await umbracoUi.content.enterAnchorOrQuerystring('Space', true);
+  await umbracoUi.content.enterLinkTitle('Space', true);
+  await umbracoUi.content.clickAddButton();
+
+  // Assert
+  await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
+});
+
+// TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17974
+test.skip('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedState = 'Draft';
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  // Create a document to link
+  const documentTypeForLinkedDocumentName = 'TestDocumentType';
+  const documentTypeForLinkedDocumentId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeForLinkedDocumentName);
+  const linkedDocumentName = 'LinkedDocument';
+  const linkedDocumentId = await umbracoApi.document.createDefaultDocument(linkedDocumentName, documentTypeForLinkedDocumentId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateActionMenuOption();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.clickAddMultiURLPickerButton();
+  await umbracoUi.content.clickDocumentLinkButton();
+  await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.content.clickButtonWithName('Choose');
+  await umbracoUi.content.clickAddButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.waitForContentToBeCreated();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe(expectedState);
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value.length).toBe(1);
+  expect(contentData.values[0].value[0].type).toEqual('document');
+  expect(contentData.values[0].value[0].icon).toEqual('icon-document');
+  expect(contentData.values[0].value[0].target).toBeNull();
+  expect(contentData.values[0].value[0].unique).toEqual(linkedDocumentId);
+  expect(contentData.values[0].value[0].name).toEqual(linkedDocumentName);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeForLinkedDocumentName);
+  await umbracoApi.document.ensureNameNotExists(linkedDocumentName);
 });

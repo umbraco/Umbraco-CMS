@@ -17,7 +17,7 @@ public static class TypeHelper
 
     private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache = new();
 
-    private static readonly Assembly[] EmptyAssemblies = new Assembly[0];
+    private static readonly Assembly[] EmptyAssemblies = [];
 
     /// <summary>
     ///     Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also
@@ -376,10 +376,10 @@ public static class TypeHelper
         if (contract.IsGenericParameter)
         {
             // eg <T>
-            if (bindings.ContainsKey(contract.Name))
+            if (bindings.TryGetValue(contract.Name, out Type? binding))
             {
                 // already bound: ensure it's compatible
-                return bindings[contract.Name] == implementation;
+                return binding == implementation;
             }
 
             // not already bound: bind

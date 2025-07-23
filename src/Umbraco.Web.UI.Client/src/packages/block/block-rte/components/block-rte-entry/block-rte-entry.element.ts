@@ -60,13 +60,16 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	_exposed?: boolean;
 
 	@state()
+	_showActions?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
 	_workspaceEditSettingsPath?: string;
 
 	@state()
-	_contentElementTypeAlias?: string;
+	_contentTypeAlias?: string;
 
 	@state()
 	_contentTypeName?: string;
@@ -115,7 +118,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.observe(
 			this.#context.contentElementTypeAlias,
 			(alias) => {
-				this._contentElementTypeAlias = alias;
+				this._contentTypeAlias = alias;
 			},
 			null,
 		);
@@ -155,6 +158,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			(exposed) => {
 				this.#updateBlockViewProps({ unpublished: !exposed });
 				this._exposed = exposed;
+			},
+			null,
+		);
+
+		this.observe(
+			this.#context.actionsVisibility,
+			(showActions) => {
+				this._showActions = showActions;
 			},
 			null,
 		);
@@ -230,7 +241,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
-		const elementTypeAlias = this._contentElementTypeAlias ?? '';
+		const elementTypeAlias = this._contentTypeAlias ?? '';
 		const isForBlockEditor =
 			!manifest.forBlockEditor || stringOrStringArrayContains(manifest.forBlockEditor, UMB_BLOCK_RTE);
 		const isForContentTypeAlias =
@@ -243,6 +254,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		ext.component?.setAttribute('part', 'component');
 		if (this._exposed) {
 			return ext.component;
 		} else {
@@ -256,23 +268,31 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	#renderBlock() {
-		return html`
-			<div class="uui-text uui-font">
-				<umb-extension-slot
-					type="blockEditorCustomView"
-					default-element="umb-ref-rte-block"
-					.renderMethod=${this.#extensionSlotRenderMethod}
-					.props=${this._blockViewProps}
-					.filter=${this.#filterBlockCustomViews}
-					single>
-					${this.#renderRefBlock()}
-				</umb-extension-slot>
-				<uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()} </uui-action-bar>
-				${!this._showContentEdit && this._contentInvalid
-					? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
-					: nothing}
-			</div>
-		`;
+		return this.contentKey && this._contentTypeAlias
+			? html`
+					<div class="uui-text uui-font">
+						<umb-extension-slot
+							type="blockEditorCustomView"
+							default-element="umb-ref-rte-block"
+							.renderMethod=${this.#extensionSlotRenderMethod}
+							.props=${this._blockViewProps}
+							.filter=${this.#filterBlockCustomViews}
+							single>
+							${this.#renderRefBlock()}
+						</umb-extension-slot>
+						${this.#renderActionBar()}
+						${!this._showContentEdit && this._contentInvalid
+							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
+							: nothing}
+					</div>
+				`
+			: nothing;
+	}
+
+	#renderActionBar() {
+		return this._showActions
+			? html` <uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()}</uui-action-bar> `
+			: nothing;
 	}
 
 	#renderRefBlock() {
@@ -281,7 +301,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-ref-rte-block>`;
+			.settings=${this._blockViewProps.settings}
+			.config=${this._blockViewProps.config}></umb-ref-rte-block>`;
 	}
 
 	#renderEditAction() {
@@ -289,11 +310,11 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			? html`<uui-button
 					label="edit"
 					look="secondary"
-					color=${this._contentInvalid ? 'danger' : ''}
+					color=${this._contentInvalid ? 'invalid' : ''}
 					href=${this._workspaceEditContentPath}>
 					<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
 					${this._contentInvalid
-						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 						: nothing}
 				</uui-button>`
 			: this._showContentEdit === false && this._exposed === false
@@ -312,11 +333,11 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				? html`<uui-button
 						label="Edit settings"
 						look="secondary"
-						color=${this._settingsInvalid ? 'danger' : ''}
+						color=${this._settingsInvalid ? 'invalid' : ''}
 						href=${this._workspaceEditSettingsPath}>
 						<uui-icon name="icon-settings"></uui-icon>
 						${this._settingsInvalid
-							? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
 							: nothing}
 					</uui-button>`
 				: nothing}
@@ -343,6 +364,12 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 					outline: 3px solid var(--uui-color-focus);
 				}
 			}
+
+			umb-extension-slot::part(component) {
+				position: relative;
+				z-index: 0;
+			}
+
 			uui-action-bar {
 				position: absolute;
 				top: var(--uui-size-2);

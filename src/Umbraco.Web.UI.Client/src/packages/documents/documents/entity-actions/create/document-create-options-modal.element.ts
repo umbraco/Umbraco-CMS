@@ -1,4 +1,4 @@
-import { UmbDocumentItemRepository } from '../../repository/index.js';
+import { UmbDocumentItemRepository } from '../../item/index.js';
 import type {
 	UmbDocumentCreateOptionsModalData,
 	UmbDocumentCreateOptionsModalValue,
@@ -14,12 +14,12 @@ import {
 	UmbDocumentBlueprintItemRepository,
 	type UmbDocumentBlueprintItemBaseModel,
 } from '@umbraco-cms/backoffice/document-blueprint';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
-	type UmbDocumentEntityTypeUnion,
-} from '@umbraco-cms/backoffice/document';
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+} from '../../paths.js';
+import type { UmbDocumentEntityTypeUnion } from '../../entity.js';
 
 @customElement('umb-document-create-options-modal')
 export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
@@ -47,15 +47,15 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		const parentUnique = this.data?.parent.unique;
 		const documentTypeUnique = this.data?.documentType?.unique || null;
 
-		this.#retrieveAllowedDocumentTypesOf(documentTypeUnique);
+		this.#retrieveAllowedDocumentTypesOf(documentTypeUnique, parentUnique || null);
 
 		if (parentUnique) {
 			this.#retrieveHeadline(parentUnique);
 		}
 	}
 
-	async #retrieveAllowedDocumentTypesOf(unique: string | null) {
-		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique);
+	async #retrieveAllowedDocumentTypesOf(unique: string | null, parentContentUnique: string | null) {
+		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
 
 		if (data) {
 			// TODO: implement pagination, or get 1000?

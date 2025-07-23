@@ -11,6 +11,7 @@ export interface MetaTiptapExtension {
 	icon: string;
 	label: string;
 	group: string;
+	description?: string;
 }
 
 declare global {

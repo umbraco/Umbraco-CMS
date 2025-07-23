@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-internal class PublishedProperty : PublishedPropertyBase
+internal sealed class PublishedProperty : PublishedPropertyBase
 {
     private readonly PublishedContent _content;
     private readonly bool _isPreviewing;
@@ -27,7 +27,7 @@ internal class PublishedProperty : PublishedPropertyBase
     private CacheValues? _cacheValues;
 
     // the variant source and inter values
-    private readonly object _locko = new();
+    private readonly Lock _locko = new();
     private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
 
     // initializes a published content property with a value
@@ -76,7 +76,7 @@ internal class PublishedProperty : PublishedPropertyBase
     // used to cache the CacheValues of this property
     internal string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValues(_content.Key, Alias, _isPreviewing);
 
-    private string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
+    private static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
     {
         if (previewing)
         {
@@ -226,7 +226,7 @@ internal class PublishedProperty : PublishedPropertyBase
         return value;
     }
 
-    private object? GetDeliveryApiDefaultObject(CacheValue cacheValues, Func<object?> getValue)
+    private static object? GetDeliveryApiDefaultObject(CacheValue cacheValues, Func<object?> getValue)
     {
         if (cacheValues.DeliveryApiDefaultObjectInitialized == false)
         {
@@ -237,7 +237,7 @@ internal class PublishedProperty : PublishedPropertyBase
         return cacheValues.DeliveryApiDefaultObjectValue;
     }
 
-    private object? GetDeliveryApiExpandedObject(CacheValue cacheValues, Func<object?> getValue)
+    private static object? GetDeliveryApiExpandedObject(CacheValue cacheValues, Func<object?> getValue)
     {
         if (cacheValues.DeliveryApiExpandedObjectInitialized == false)
         {
@@ -248,7 +248,7 @@ internal class PublishedProperty : PublishedPropertyBase
         return cacheValues.DeliveryApiExpandedObjectValue;
     }
 
-    private class SourceInterValue
+    private sealed class SourceInterValue
     {
         private string? _culture;
         private string? _segment;
@@ -268,13 +268,19 @@ internal class PublishedProperty : PublishedPropertyBase
         public object? SourceValue { get; set; }
     }
 
-    private class CacheValues : CacheValue
+    private sealed class CacheValues : CacheValue
     {
-        private readonly object _locko = new();
+        private readonly Lock _locko = new();
         private ConcurrentDictionary<CompositeStringStringKey, CacheValue>? _values;
 
         public CacheValue For(string? culture, string? segment)
         {
+            // As noted on IPropertyValue, null value means invariant
+            // But as we need an actual string value to build a CompositeStringStringKey
+            // We need to convert null to empty
+            culture ??= string.Empty;
+            segment ??= string.Empty;
+
             if (culture == string.Empty && segment == string.Empty)
             {
                 return this;

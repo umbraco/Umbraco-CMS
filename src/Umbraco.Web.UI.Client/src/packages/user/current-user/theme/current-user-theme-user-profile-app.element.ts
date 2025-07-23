@@ -10,7 +10,7 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 	#themeContext?: UmbThemeContext;
 
 	@state()
-	private _themeAlias: string | null = null;
+	private _themeAlias?: string;
 
 	@state()
 	private _themes: Array<Option> = [];
@@ -20,7 +20,7 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 		this.consumeContext(UMB_THEME_CONTEXT, (context) => {
 			this.#themeContext = context;
 			this.observe(
-				context.theme,
+				context?.theme,
 				(themeAlias) => {
 					this._themeAlias = themeAlias;
 				},

@@ -23,6 +23,8 @@ import { handlers as partialViewHandlers } from './handlers/partial-view/index.j
 import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers.js';
 import { handlers as publishedStatusHandlers } from './handlers/published-status.handlers.js';
 import { handlers as redirectManagementHandlers } from './handlers/redirect-management.handlers.js';
+import { handlers as relationTypeHandlers } from './handlers/relation-type/index.js';
+import { handlers as relationHandlers } from './handlers/relation/index.js';
 import { handlers as rteEmbedHandlers } from './handlers/rte-embed.handlers.js';
 import { handlers as scriptHandlers } from './handlers/script/index.js';
 import { handlers as staticFileHandlers } from './handlers/static-file/index.js';
@@ -37,6 +39,7 @@ import * as manifestsHandlers from './handlers/manifests.handlers.js';
 import * as serverHandlers from './handlers/server.handlers.js';
 import { handlers as documentBlueprintHandlers } from './handlers/document-blueprint/index.js';
 import { handlers as temporaryFileHandlers } from './handlers/temporary-file/index.js';
+import { handlers as segmentHandlers } from './handlers/segment.handlers.js';
 
 const handlers = [
 	...backofficeHandlers,
@@ -64,6 +67,8 @@ const handlers = [
 	...profilingHandlers,
 	...publishedStatusHandlers,
 	...redirectManagementHandlers,
+	...relationTypeHandlers,
+	...relationHandlers,
 	...rteEmbedHandlers,
 	...scriptHandlers,
 	...staticFileHandlers,
@@ -76,6 +81,7 @@ const handlers = [
 	...userHandlers,
 	...documentBlueprintHandlers,
 	...temporaryFileHandlers,
+	...segmentHandlers,
 	...serverHandlers.serverInformationHandlers,
 	serverHandlers.serverRunningHandler,
 	...manifestsHandlers.manifestEmptyHandlers,

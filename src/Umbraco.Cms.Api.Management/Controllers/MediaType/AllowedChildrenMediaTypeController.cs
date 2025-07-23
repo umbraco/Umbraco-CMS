@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -30,10 +30,11 @@ public class AllowedChildrenMediaTypeController : MediaTypeControllerBase
     public async Task<IActionResult> AllowedChildrenByKey(
         CancellationToken cancellationToken,
         Guid id,
+        Guid? parentContentKey = null,
         int skip = 0,
         int take = 100)
     {
-        Attempt<PagedModel<IMediaType>?, ContentTypeOperationStatus> attempt = await _mediaTypeService.GetAllowedChildrenAsync(id, skip, take);
+        Attempt<PagedModel<IMediaType>?, ContentTypeOperationStatus> attempt = await _mediaTypeService.GetAllowedChildrenAsync(id, parentContentKey, skip, take);
         if (attempt.Success is false)
         {
             return OperationStatusResult(attempt.Status);

@@ -2,7 +2,7 @@ import { UmbUserServerDataSource } from '../../repository/detail/user-detail.ser
 import type { UmbInviteUserDataSource, UmbInviteUserRequestModel, UmbResendUserInviteRequestModel } from './types.js';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for inviting users
@@ -31,7 +31,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 	async invite(request: UmbInviteUserRequestModel) {
 		if (!request) throw new Error('Request Data is missing');
 
-		const requestBody = {
+		const body = {
 			email: request.email,
 			userName: request.userName,
 			name: request.name,
@@ -41,15 +41,15 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 			message: request.message,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.postUserInvite({
-				requestBody,
+				body,
 			}),
 		);
 
 		if (data) {
-			return this.#detailSource.read(data);
+			return this.#detailSource.read(data as never);
 		}
 
 		return { error };
@@ -65,17 +65,17 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 		if (!request.user.unique) throw new Error('User unique is missing');
 		if (!request) throw new Error('Request data is missing');
 
-		const requestBody = {
+		const body = {
 			user: {
 				id: request.user.unique,
 			},
 			message: request.message,
 		};
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			UserService.postUserInviteResend({
-				requestBody,
+				body,
 			}),
 		);
 	}

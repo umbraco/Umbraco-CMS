@@ -1,4 +1,5 @@
 const { rest } = window.MockServiceWorker;
+import { createProblemDetails } from '../../data/utils.js';
 import { umbTemplateMockDb } from '../../data/template/template.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
@@ -11,6 +12,14 @@ export const detailHandlers = [
 	rest.post(umbracoPath(`${UMB_SLUG}`), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as CreateTemplateRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
+
+		// Validate name and alias
+		if (!requestBody.name || !requestBody.alias) {
+			return res(
+				ctx.status(400, 'name and alias are required'),
+				ctx.json(createProblemDetails({ title: 'Validation', detail: 'name and alias are required' })),
+			);
+		}
 
 		const id = umbTemplateMockDb.detail.create(requestBody);
 
@@ -31,6 +40,10 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const response = umbTemplateMockDb.detail.read(id);
 		return res(ctx.status(200), ctx.json(response));
 	}),
@@ -38,8 +51,21 @@ export const detailHandlers = [
 	rest.put(umbracoPath(`${UMB_SLUG}/:id`), async (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const requestBody = (await req.json()) as UpdateTemplateRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
+
+		// Validate name and alias
+		if (!requestBody.name || !requestBody.alias) {
+			return res(
+				ctx.status(400, 'name and alias are required'),
+				ctx.json(createProblemDetails({ title: 'Validation', detail: 'name and alias are required' })),
+			);
+		}
+
 		umbTemplateMockDb.detail.update(id, requestBody);
 		return res(ctx.status(200));
 	}),
@@ -47,6 +73,10 @@ export const detailHandlers = [
 	rest.delete(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		umbTemplateMockDb.detail.delete(id);
 		return res(ctx.status(200));
 	}),

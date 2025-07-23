@@ -8,6 +8,7 @@ import type {
 	UpdateMediaRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import type { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
 
 export const detailHandlers = [
 	rest.post(umbracoPath(`${UMB_SLUG}`), async (req, res, ctx) => {
@@ -28,6 +29,10 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), (_req, res, ctx) => {
 		const id = _req.params.id as string;
 		if (!id) return;
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 
 		const PagedTrackedReference = {
 			total: referenceData.length,
@@ -40,13 +45,42 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const response = umbMediaMockDb.detail.read(id);
 		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.put<UmbMediaDetailModel>(umbracoPath(`${UMB_SLUG}/:id/validate`), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
+		const model = await req.json<UmbMediaDetailModel>();
+		if (!model) return res(ctx.status(400));
+
+		const hasMediaPickerOrFileUploadValue = model.values.some((v) => {
+			return v.editorAlias === 'Umbraco.UploadField' && v.value;
+		});
+
+		if (!hasMediaPickerOrFileUploadValue) {
+			return res(ctx.status(400, 'No media picker or file upload value found'));
+		}
+
+		return res(ctx.status(200));
 	}),
 
 	rest.put(umbracoPath(`${UMB_SLUG}/:id`), async (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const requestBody = (await req.json()) as UpdateMediaRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		umbMediaMockDb.detail.update(id, requestBody);
@@ -56,6 +90,10 @@ export const detailHandlers = [
 	rest.delete(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		umbMediaMockDb.detail.delete(id);
 		return res(ctx.status(200));
 	}),

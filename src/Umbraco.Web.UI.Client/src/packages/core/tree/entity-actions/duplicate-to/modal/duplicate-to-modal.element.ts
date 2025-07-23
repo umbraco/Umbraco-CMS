@@ -1,10 +1,9 @@
+import type { UmbTreeElement } from '../../../tree.element.js';
 import type { UmbDuplicateToModalData, UmbDuplicateToModalValue } from './duplicate-to-modal.token.js';
 import { html, customElement, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
 const elementName = 'umb-duplicate-to-modal';
 @customElement(elementName)
@@ -32,6 +31,7 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 						alias=${this.data.treeAlias}
 						.props=${{
 							foldersOnly: this.data?.foldersOnly,
+							expandTreeRoot: true,
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>

@@ -1,5 +1,5 @@
+import type { IRouterSlot, Params } from '../router-slot/index.js';
 import type { UmbModalRouteBuilder } from './modal-route-registration.controller.js';
-import type { IRouterSlot, Params } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UmbModalContext, UmbModalManagerContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbModalRouteRegistration<

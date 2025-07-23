@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO;
 
 [TestFixture]
 [UmbracoTest]
-public class ShadowFileSystemTests : UmbracoIntegrationTest
+internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() => ClearFiles(HostingEnvironment);

@@ -5,8 +5,7 @@ import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-const elementName = 'umb-picker-search-field';
-@customElement(elementName)
+@customElement('umb-picker-search-field')
 export class UmbPickerSearchFieldElement extends UmbLitElement {
 	@state()
 	_query: string = '';
@@ -24,9 +23,12 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 
 		this.consumeContext(UMB_PICKER_CONTEXT, (context) => {
 			this.#pickerContext = context;
-			this.observe(this.#pickerContext.search.searchable, (isSearchable) => (this._isSearchable = isSearchable));
-			this.observe(this.#pickerContext.search.searching, (searching) => (this._searching = searching));
-			this.observe(this.#pickerContext.search.query, (query) => (this._query = query?.query || ''));
+			this.observe(
+				this.#pickerContext?.search.searchable,
+				(isSearchable) => (this._isSearchable = isSearchable ?? false),
+			);
+			this.observe(this.#pickerContext?.search.searching, (searching) => (this._searching = searching ?? false));
+			this.observe(this.#pickerContext?.search.query, (query) => (this._query = query?.query || ''));
 		});
 	}
 
@@ -66,6 +68,11 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 				width: 100%;
 			}
 
+			uui-input [slot='prepend'] {
+				display: flex;
+				align-items: center;
+			}
+
 			#divider {
 				width: 100%;
 				height: 1px;
@@ -84,6 +91,6 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPickerSearchFieldElement;
+		'umb-picker-search-field': UmbPickerSearchFieldElement;
 	}
 }
