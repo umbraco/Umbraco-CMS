@@ -1,8 +1,7 @@
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 
-internal class UmbracoCmsSchema
+internal sealed class UmbracoCmsSchema
 {
     public required UmbracoDefinition Umbraco { get; set; }
 

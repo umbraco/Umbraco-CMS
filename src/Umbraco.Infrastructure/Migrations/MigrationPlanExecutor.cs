@@ -122,7 +122,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         if (_rebuildCache)
         {
             _logger.LogInformation("Starts rebuilding the cache. This can be a long running operation");
-            RebuildCache();
+            await RebuildCache();
         }
 
         // If any completed migration requires us to sign out the user we'll do that.
@@ -295,11 +295,11 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         }
     }
 
-    private void RebuildCache()
+    private async Task RebuildCache()
     {
         _appCaches.RuntimeCache.Clear();
         _appCaches.IsolatedCaches.ClearAllCaches();
-        _databaseCacheRebuilder.Rebuild(false);
+        await _databaseCacheRebuilder.RebuildAsync(false);
         _distributedCache.RefreshAllPublishedSnapshot();
     }
 

@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 namespace Umbraco.Cms.Infrastructure.Scoping
 {
-    internal class AmbientScopeStack : IAmbientScopeStack
+    internal sealed class AmbientScopeStack : IAmbientScopeStack
     {
         private static Lock _lock = new();
         private static AsyncLocal<ConcurrentStack<IScope>> _stack = new ();

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.AccessRule)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class AccessRuleDto
+internal sealed class AccessRuleDto
 {
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoAccessRule", AutoIncrement = false)]

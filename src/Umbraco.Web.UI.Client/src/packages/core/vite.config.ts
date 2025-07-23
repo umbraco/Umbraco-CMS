@@ -10,11 +10,13 @@ rmSync(dist, { recursive: true, force: true });
 export default defineConfig({
 	...getDefaultConfig({
 		dist,
+		base: '/umbraco/backoffice/packages/core',
 		entry: {
 			'action/index': './action/index.ts',
 			'audit-log/index': './audit-log/index.ts',
 			'auth/index': './auth/index.ts',
 			'backend-api/index': './backend-api/index.ts',
+			'cache/index': './cache/index.ts',
 			'collection/index': './collection/index.ts',
 			'components/index': './components/index.ts',
 			'const/index': './const/index.ts',

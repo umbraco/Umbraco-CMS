@@ -22,6 +22,11 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		this._fileExtensions = config.getValueByAlias<Array<string>>('fileExtensions');
+		if (this._fileExtensions?.length) {
+			this._fileExtensions = this._fileExtensions.map((ext) =>
+				ext.startsWith('.') ? ext : ext.includes('/') ? ext : `.${ext}`,
+			);
+		}
 	}
 
 	#onChange(event: CustomEvent) {

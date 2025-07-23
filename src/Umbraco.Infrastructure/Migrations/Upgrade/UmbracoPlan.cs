@@ -120,6 +120,10 @@ public class UmbracoPlan : MigrationPlan
         To<V_16_0_0.MigrateTinyMceToTiptap>("{C6681435-584F-4BC8-BB8D-BC853966AF0B}");
         To<V_16_0_0.AddDocumentPropertyPermissions>("{D1568C33-A697-455F-8D16-48060CB954A1}");
 
+        // To 16.2.0
+        To<V_16_2_0.AddLongRunningOperations>("{741C22CF-5FB8-4343-BF79-B97A58C2CCBA}");
+        To<V_16_2_0.AddDocumentUrlLock>("{BE11D4D3-3A1F-4598-90D4-B548BD188C48}");
+
         // To 17.0.0
         To<V_17_0_0.AddGuidsToAuditEntries>("{17D5F6CA-CEB8-462A-AF86-4B9C3BF91CF1}");
         To<V_17_0_0.SetDateDefaultsToUtcNow>("{1847C7FF-B021-44EB-BEB0-A77A4376A6F2}");
