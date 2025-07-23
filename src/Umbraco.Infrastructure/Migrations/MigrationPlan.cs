@@ -365,7 +365,7 @@ public class MigrationPlan
     ///     Throws an exception when the initial state is unknown.
     /// </summary>
     public virtual void ThrowOnUnknownInitialState(string state) =>
-        throw new InvalidOperationException($"The migration plan does not support migrating from state \"{state}\".");
+        throw new InvalidOperationException($"The migration plan \"{Name}\" does not support migrating from state \"{state}\".");
 
     /// <summary>
     ///     Follows a path (for tests and debugging).

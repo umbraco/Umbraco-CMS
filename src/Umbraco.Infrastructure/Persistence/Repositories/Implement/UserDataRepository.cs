@@ -44,12 +44,13 @@ internal sealed class UserDataRepository : IUserDataRepository
             sql = ApplyFilter(sql, filter);
         }
 
+        // Fetching the total before applying OrderBy to avoid issue with count subquery.
+        var totalItems = _scopeAccessor.AmbientScope?.Database.Count(sql!) ?? 0;
+
         sql = sql.OrderBy<UserDataDto>(dto => dto.Identifier); // need to order to skiptake
 
         List<UserDataDto>? userDataDtos =
             await _scopeAccessor.AmbientScope?.Database.SkipTakeAsync<UserDataDto>(skip, take, sql)!;
-
-        var totalItems = _scopeAccessor.AmbientScope?.Database.Count(sql!) ?? 0;
 
         return new PagedModel<IUserData> { Total = totalItems, Items = DtosToModels(userDataDtos) };
     }

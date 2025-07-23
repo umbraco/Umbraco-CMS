@@ -1050,6 +1050,8 @@ internal sealed class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MainDom, Name = "MainDom" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookRequest, Name = "WebhookRequest" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookLogs, Name = "WebhookLogs" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.LongRunningOperations, Name = "LongRunningOperations" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
     }
 
     private void CreateContentTypeData()
