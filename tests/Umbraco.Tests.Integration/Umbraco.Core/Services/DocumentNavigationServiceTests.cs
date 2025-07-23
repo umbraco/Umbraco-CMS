@@ -6,7 +6,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class DocumentNavigationServiceTests : DocumentNavigationServiceTestsBase
+internal sealed partial class DocumentNavigationServiceTests : DocumentNavigationServiceTestsBase
 {
     [SetUp]
     public async Task Setup()

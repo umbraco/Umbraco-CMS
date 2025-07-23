@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -12,12 +10,6 @@ public sealed class BlockEditorVarianceHandler
 {
     private readonly ILanguageService _languageService;
     private readonly IContentTypeService _contentTypeService;
-
-    [Obsolete("Please use the constructor that accepts IContentTypeService. Will be removed in V16.")]
-    public BlockEditorVarianceHandler(ILanguageService languageService)
-        : this(languageService, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
-    {
-    }
 
     public BlockEditorVarianceHandler(ILanguageService languageService, IContentTypeService contentTypeService)
     {

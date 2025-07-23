@@ -34,7 +34,7 @@ test('can update grid columns for areas for a block', async ({umbracoApi, umbrac
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaGridColumns(blockGridEditorName, contentElementTypeId, gridColumns)).toBeTruthy();
 });
 
@@ -54,7 +54,7 @@ test('can add an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbraco
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
@@ -91,7 +91,7 @@ test('can update alias an area for a block', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId, newAlias)).toBeTruthy();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaCount(blockGridEditorName, contentElementTypeId, 1)).toBeTruthy();
 });
@@ -113,7 +113,7 @@ test('can remove an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId, areaAlias)).toBeFalsy();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaCount(blockGridEditorName, contentElementTypeId, 0)).toBeTruthy();
 });
@@ -136,7 +136,7 @@ test('can add multiple areas for a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId)).toBeTruthy();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId, areaAlias)).toBeTruthy();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaCount(blockGridEditorName, contentElementTypeId, 2)).toBeTruthy();
@@ -161,7 +161,7 @@ test('can add create button label for an area in a block', async ({umbracoApi, u
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithCreateButtonLabel(blockGridEditorName, contentElementTypeId, areaAlias, createButtonLabel)).toBeTruthy();
 });
 
@@ -184,7 +184,7 @@ test('can remove create button label for an area in a block', async ({umbracoApi
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithCreateButtonLabel(blockGridEditorName, contentElementTypeId, areaAlias, '')).toBeTruthy();
 });
 
@@ -207,7 +207,7 @@ test('can add min allowed for an area in a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMinAllowed(blockGridEditorName, contentElementTypeId, areaAlias, minAllowed)).toBeTruthy();
 });
 
@@ -231,7 +231,7 @@ test('can remove min allowed for an area in a block', async ({umbracoApi, umbrac
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMinAllowed(blockGridEditorName, contentElementTypeId, areaAlias, minAllowed)).toBeFalsy();
 });
 
@@ -255,7 +255,7 @@ test.skip('can add add max allowed for an area in a block', async ({umbracoApi, 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeTruthy();
 });
 
@@ -279,7 +279,7 @@ test('can remove max allowed for an area in a block', async ({umbracoApi, umbrac
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeFalsy();
 });
 
@@ -305,7 +305,7 @@ test.skip('min can not be more than max an area in a block', async ({umbracoApi,
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
 });
 
 test('can add specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
@@ -326,7 +326,7 @@ test('can add specified allowance for an area in a block', async ({umbracoApi, u
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
 });
 
 // TODO: It is currently not possible to add a specified allowance

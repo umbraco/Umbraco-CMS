@@ -17,9 +17,10 @@ import {
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	type UmbPublishableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -34,13 +35,14 @@ import {
 } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
-
 export class UmbDocumentWorkspaceContext
 	extends UmbContentDetailWorkspaceContextBase<
 		ContentModel,
@@ -65,13 +67,12 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
 		(data) => !!data?.documentType.collection,
 	);
-	readonly urls = this._data.createObservablePartOfCurrent((data) => data?.urls || []);
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
+
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
-	#userCanCreate = false;
-	#userCanUpdate = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -87,59 +88,55 @@ export class UmbDocumentWorkspaceContext
 			saveModalToken: UMB_DOCUMENT_SAVE_MODAL,
 		});
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
+			const config = await context?.getDocumentConfiguration();
+			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
+			const allowEditInvariantFromNonDefault = config?.allowEditInvariantFromNonDefault ?? true;
+
+			this._variantOptionsFilter = (variantOption) => {
+				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
+
+				// Do not allow creating a segment variant
+				if (!allowSegmentCreation && isNotCreatedSegmentVariant) {
+					return false;
+				}
+
+				return true;
+			};
+
+			if (allowEditInvariantFromNonDefault === false) {
+				this.#preventEditInvariantFromNonDefault();
+			}
+		});
+
+		this.observe(
+			this.contentTypeUnique,
+			(unique) => {
+				if (unique) {
+					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
 
 		// TODO: Remove this in v17 as we have moved the publishing methods to the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.
 		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (context) => {
 			this.#publishingContext = context;
 		});
 
-		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
-			{
-				config: {
-					allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
-				},
-				onChange: (permitted: boolean) => {
-					if (permitted === this.#userCanCreate) return;
-					this.#userCanCreate = permitted;
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_CREATE,
-						this.#userCanCreate,
-						'You do not have permission to create documents.',
-					);
-				},
-			},
-		]);
-
-		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
-			{
-				config: {
-					allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
-				},
-				onChange: (permitted: boolean) => {
-					if (permitted === this.#userCanUpdate) return;
-					this.#userCanUpdate = permitted;
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-						this.#userCanUpdate,
-						'You do not have permission to update documents.',
-					);
-				},
-			},
-		]);
-
-		this.observe(this.variants, () => {
-			this.#setReadOnlyStateForUserPermission(
-				UMB_USER_PERMISSION_DOCUMENT_CREATE,
-				this.#userCanCreate,
-				'You do not have permission to create documents.',
-			);
-
-			this.#setReadOnlyStateForUserPermission(
-				UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-				this.#userCanUpdate,
-				'You do not have permission to update documents.',
-			);
+		this.observe(this.isNew, (isNew) => {
+			if (isNew === undefined) return;
+			if (isNew) {
+				this.#enforceUserPermission(
+					UMB_USER_PERMISSION_DOCUMENT_CREATE,
+					'You do not have permission to create documents.',
+				);
+			} else {
+				this.#enforceUserPermission(
+					UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+					'You do not have permission to update documents.',
+				);
+			}
 		});
 
 		this.routes.setRoutes([
@@ -193,6 +190,22 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
+	#enforceUserPermission(verb: string, message: string) {
+		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
+		this.#handleUserPermissionChange(verb, false, message);
+
+		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [verb],
+				},
+				onChange: (permitted: boolean) => {
+					this.#handleUserPermissionChange(verb, permitted, message);
+				},
+			},
+		]);
+	}
+
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
@@ -211,14 +224,16 @@ export class UmbDocumentWorkspaceContext
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
 		if (blueprintUnique) {
 			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
-			const { data } = await blueprintRepository.requestByUnique(blueprintUnique);
+			const { data } = await blueprintRepository.scaffoldByUnique(blueprintUnique);
+
+			if (!data) throw new Error('Blueprint data is missing');
 
 			return this.createScaffold({
 				parent,
 				preset: {
-					documentType: data?.documentType,
-					values: data?.values,
-					variants: data?.variants as Array<UmbDocumentVariantModel>,
+					documentType: data.documentType,
+					values: data.values,
+					variants: data.variants as Array<UmbDocumentVariantModel>,
 				},
 			});
 		}
@@ -228,7 +243,6 @@ export class UmbDocumentWorkspaceContext
 			preset: {
 				documentType: {
 					unique: documentTypeUnique,
-					collection: null,
 				},
 			},
 		});
@@ -266,34 +280,30 @@ export class UmbDocumentWorkspaceContext
 		this._data.updateCurrent({ template: { unique: templateUnique } });
 	}
 
-	/**
-	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
-	 */
-	public override requestSubmit() {
+	protected override async _handleSave() {
 		const elementStyle = (this.getHostElement() as HTMLElement).style;
 		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
 		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
 		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
 		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
-		return this._handleSubmit();
+		await super._handleSave();
 	}
 
 	public async saveAndPreview(): Promise<void> {
-		return this.#handleSaveAndPreview();
+		return await this.#handleSaveAndPreview();
 	}
 
 	async #handleSaveAndPreview() {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		let culture = UMB_INVARIANT_CULTURE;
+		let firstVariantId = UmbVariantId.CreateInvariant();
 
 		// Save document (the active variant) before previewing.
 		const { selected } = await this._determineVariantOptions();
 		if (selected.length > 0) {
-			culture = selected[0];
-			const variantIds = [UmbVariantId.FromString(culture)];
+			firstVariantId = UmbVariantId.FromString(selected[0]);
+			const variantIds = [firstVariantId];
 			const saveData = await this._data.constructData(variantIds);
 			await this.runMandatoryValidationForSaveData(saveData);
 			await this.performCreateOrUpdate(variantIds, saveData);
@@ -302,14 +312,21 @@ export class UmbDocumentWorkspaceContext
 		// Tell the server that we're entering preview mode.
 		await new UmbDocumentPreviewRepository(this).enter();
 
-		const appContext = await this.getContext(UMB_APP_CONTEXT);
+		const serverContext = await this.getContext(UMB_SERVER_CONTEXT);
+		if (!serverContext) {
+			throw new Error('Server context is missing');
+		}
 
-		const backofficePath = appContext.getBackofficePath();
-		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', appContext.getServerUrl());
+		const backofficePath = serverContext.getBackofficePath();
+		const previewUrl = new URL(ensurePathEndsWithSlash(backofficePath) + 'preview', window.location.origin);
 		previewUrl.searchParams.set('id', unique);
 
-		if (culture && culture !== UMB_INVARIANT_CULTURE) {
-			previewUrl.searchParams.set('culture', culture);
+		if (firstVariantId.culture) {
+			previewUrl.searchParams.set('culture', firstVariantId.culture);
+		}
+
+		if (firstVariantId.segment) {
+			previewUrl.searchParams.set('segment', firstVariantId.segment);
 		}
 
 		const previewWindow = window.open(previewUrl.toString(), `umbpreview-${unique}`);
@@ -323,7 +340,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Publish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.publish();
+		await this.#publishingContext.publish();
 	}
 
 	/**
@@ -337,7 +354,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the SaveAndPublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.saveAndPublish();
+		await this.#publishingContext.saveAndPublish();
 	}
 
 	/**
@@ -351,7 +368,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.schedule();
+		await this.#publishingContext.schedule();
 	}
 
 	/**
@@ -365,7 +382,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Unpublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.unpublish();
+		await this.#publishingContext.unpublish();
 	}
 
 	/**
@@ -379,7 +396,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.publishWithDescendants();
+		await this.#publishingContext.publishWithDescendants();
 	}
 
 	public createPropertyDatasetContext(
@@ -389,28 +406,48 @@ export class UmbDocumentWorkspaceContext
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
-	async #setReadOnlyStateForUserPermission(identifier: string, permitted: boolean, message: string) {
-		const variants = this.getVariants();
-		const uniques = variants?.map((variant) => identifier + variant.culture) || [];
-
+	async #handleUserPermissionChange(identifier: string, permitted: boolean, message: string) {
 		if (permitted) {
-			this.readOnlyState?.removeStates(uniques);
+			this.readOnlyGuard?.removeRule(identifier);
 			return;
 		}
 
-		const variantIds = variants?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
-
-		const readOnlyStates = variantIds.map((variantId) => {
-			return {
-				unique: identifier + variantId.culture,
-				variantId,
-				message,
-			};
+		this.readOnlyGuard?.addRule({
+			unique: identifier,
+			message,
+			/* This guard is a bit backwards. The rule is permitted to be read-only. 
+			If the user does not have permission, we set it to true = permitted to be read-only. */
+			permitted: true,
 		});
+	}
 
-		this.readOnlyState?.removeStates(uniques);
+	#preventEditInvariantFromNonDefault() {
+		this.observe(
+			observeMultiple([this.structure.contentTypeProperties, this.variantOptions]),
+			([properties, variantOptions]) => {
+				if (properties.length === 0) return;
+				if (variantOptions.length === 0) return;
 
-		this.readOnlyState?.addStates(readOnlyStates);
+				variantOptions.forEach((variantOption) => {
+					// Do not add a rule for the default language. It is always permitted to edit.
+					if (variantOption.language.isDefault) return;
+
+					const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
+					const invariantVariantId = UmbVariantId.CreateInvariant();
+					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${invariantVariantId.toString()}`;
+
+					const rule: UmbVariantPropertyGuardRule = {
+						unique,
+						message: 'Shared properties can only be edited in the default language',
+						variantId: invariantVariantId,
+						datasetVariantId,
+						permitted: false,
+					};
+
+					this.propertyWriteGuard.addRule(rule);
+				});
+			},
+		);
 	}
 }
 

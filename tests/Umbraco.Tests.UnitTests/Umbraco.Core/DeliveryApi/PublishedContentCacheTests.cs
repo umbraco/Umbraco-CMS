@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -255,7 +255,10 @@ public class PublishedContentCacheTests : DeliveryApiTests
 
     private IOptionsMonitor<DeliveryApiSettings> CreateDeliveryApiSettings(string[]? disallowedContentTypeAliases = null)
     {
-        var deliveryApiSettings = new DeliveryApiSettings { DisallowedContentTypeAliases = disallowedContentTypeAliases ?? Array.Empty<string>() };
+        var deliveryApiSettings = new DeliveryApiSettings
+        {
+            DisallowedContentTypeAliases = new HashSet<string>(disallowedContentTypeAliases ?? Array.Empty<string>())
+        };
         var deliveryApiOptionsMonitorMock = new Mock<IOptionsMonitor<DeliveryApiSettings>>();
         deliveryApiOptionsMonitorMock.SetupGet(s => s.CurrentValue).Returns(deliveryApiSettings);
         return deliveryApiOptionsMonitorMock.Object;

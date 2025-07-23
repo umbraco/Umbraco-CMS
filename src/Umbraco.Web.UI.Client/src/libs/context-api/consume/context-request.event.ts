@@ -6,7 +6,7 @@ export const UMB_CONTEXT_REQUEST_EVENT_TYPE = 'umb:context-request';
 export const UMB_CONTENT_REQUEST_EVENT_TYPE = UMB_CONTEXT_REQUEST_EVENT_TYPE;
 export const UMB_DEBUG_CONTEXT_EVENT_TYPE = 'umb:debug-contexts';
 
-export type UmbContextCallback<T> = (instance: T) => void;
+export type UmbContextCallback<T> = (instance: T | undefined) => void;
 
 /**
  * @interface UmbContextRequestEvent

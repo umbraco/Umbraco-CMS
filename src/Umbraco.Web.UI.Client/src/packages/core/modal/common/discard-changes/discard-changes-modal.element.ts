@@ -16,7 +16,7 @@ export class UmbDiscardChangesModalElement extends UmbModalBaseElement {
 				<uui-button
 					slot="actions"
 					id="confirm"
-					color="positive"
+					color="danger"
 					look="primary"
 					label=${this.localize.term('prompt_discardChanges')}
 					@click=${this._submitModal}></uui-button>

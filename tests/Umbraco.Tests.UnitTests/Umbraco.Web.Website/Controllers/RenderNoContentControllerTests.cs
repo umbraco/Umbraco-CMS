@@ -26,8 +26,8 @@ public class RenderNoContentControllerTests
         var mockHostingEnvironment = new Mock<IHostingEnvironment>();
         var controller = new RenderNoContentController(
             new TestUmbracoContextAccessor(mockUmbracoContext.Object),
-            new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()),
-            mockHostingEnvironment.Object);
+            mockHostingEnvironment.Object,
+            new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()));
 
         var result = controller.Index() as RedirectResult;
 
@@ -53,7 +53,7 @@ public class RenderNoContentControllerTests
         {
             NoNodesViewPath = viewPath,
         });
-        var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), globalSettings, mockHostingEnvironment.Object);
+        var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockHostingEnvironment.Object, globalSettings);
 
         var result = controller.Index() as ViewResult;
         Assert.IsNotNull(result);

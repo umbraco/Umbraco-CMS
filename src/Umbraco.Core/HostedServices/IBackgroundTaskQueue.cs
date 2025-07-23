@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.HostedServices;
 public interface IBackgroundTaskQueue
 {
     /// <summary>
-    ///     Enqueue a work item to be executed on in the background.
+    ///     Enqueue a work item to be executed in the background.
     /// </summary>
     void QueueBackgroundWorkItem(Func<CancellationToken, Task> workItem);
 

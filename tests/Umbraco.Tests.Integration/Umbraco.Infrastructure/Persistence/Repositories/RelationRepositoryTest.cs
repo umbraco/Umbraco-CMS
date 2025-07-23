@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class RelationRepositoryTest : UmbracoIntegrationTest
+internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() => CreateTestData();

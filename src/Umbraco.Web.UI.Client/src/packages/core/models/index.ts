@@ -19,6 +19,10 @@ export interface UmbReferenceByUnique {
 	unique: string;
 }
 
+export interface UmbReferenceByAlias {
+	alias: string;
+}
+
 export interface UmbReferenceByUniqueAndType {
 	type: string;
 	unique: string;

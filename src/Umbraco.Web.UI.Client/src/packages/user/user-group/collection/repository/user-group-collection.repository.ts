@@ -1,5 +1,4 @@
 import type { UmbUserGroupDetailModel } from '../../types.js';
-import type { UmbUserGroupDetailStore } from '../../repository/index.js';
 import { UMB_USER_GROUP_DETAIL_STORE_CONTEXT } from '../../repository/index.js';
 import type { UmbUserGroupCollectionFilterModel } from '../types.js';
 import { UmbUserGroupCollectionServerDataSource } from './user-group-collection.server.data-source.js';
@@ -10,7 +9,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 export class UmbUserGroupCollectionRepository extends UmbControllerBase implements UmbCollectionRepository {
 	#init;
 
-	#detailStore?: UmbUserGroupDetailStore;
+	#detailStore?: typeof UMB_USER_GROUP_DETAIL_STORE_CONTEXT.TYPE;
 	#collectionSource: UmbCollectionDataSource<UmbUserGroupDetailModel>;
 
 	constructor(host: UmbControllerHost) {
@@ -19,7 +18,10 @@ export class UmbUserGroupCollectionRepository extends UmbControllerBase implemen
 
 		this.#init = this.consumeContext(UMB_USER_GROUP_DETAIL_STORE_CONTEXT, (instance) => {
 			this.#detailStore = instance;
-		}).asPromise();
+		})
+			.asPromise({ preventTimeout: true })
+			// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+			.catch(() => undefined);
 	}
 
 	async requestCollection(filter: UmbUserGroupCollectionFilterModel = { skip: 0, take: 100 }) {

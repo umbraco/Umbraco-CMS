@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -53,12 +53,11 @@ export class UmbLocalizeElement extends UmbLitElement {
 	}
 
 	override render() {
-		const text = this.text;
-		return text
-			? unsafeHTML(text)
-			: this.debug
-				? html`<span style="color:red">${this.key}</span>`
-				: html`<slot></slot>`;
+		return when(
+			this.text,
+			(text) => unsafeHTML(text),
+			() => (this.debug ? html`<span style="color:red">${this.key}</span>` : html`<slot></slot>`),
+		);
 	}
 
 	static override styles = [

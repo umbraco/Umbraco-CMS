@@ -53,7 +53,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.variantId, (id) => {
+			this.observe(context?.variantId, (id) => {
 				if (id && id.culture !== undefined) {
 					this._culture = id.culture;
 				}

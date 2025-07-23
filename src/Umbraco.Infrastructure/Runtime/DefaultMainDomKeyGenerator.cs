@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Runtime;
 
-internal class DefaultMainDomKeyGenerator : IMainDomKeyGenerator
+internal sealed class DefaultMainDomKeyGenerator : IMainDomKeyGenerator
 {
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;

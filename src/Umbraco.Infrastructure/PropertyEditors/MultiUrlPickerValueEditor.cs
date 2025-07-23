@@ -37,7 +37,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
         IIOHelper ioHelper,
         IContentService contentService,
         IMediaService mediaService)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _publishedUrlProvider = publishedUrlProvider;
@@ -217,7 +217,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
         public string? QueryString { get; set; }
     }
 
-    internal class MinMaxValidator : ITypedJsonValidator<LinkDisplay[], MultiUrlPickerConfiguration>
+    internal sealed class MinMaxValidator : ITypedJsonValidator<LinkDisplay[], MultiUrlPickerConfiguration>
     {
         private readonly ILocalizedTextService _localizedTextService;
 

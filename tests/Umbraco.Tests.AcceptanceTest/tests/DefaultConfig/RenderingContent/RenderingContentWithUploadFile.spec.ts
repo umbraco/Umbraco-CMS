@@ -27,7 +27,7 @@ for (const uploadedFile of uploadedFileList) {
     const templateId = await umbracoApi.template.createTemplateWithDisplayingUploadedFileValue(templateName, AliasHelper.toAlias(propertyName));
     await umbracoApi.document.createPublishedDocumentWithUploadFile(contentName, uploadedFile.uploadedFileName, uploadedFile.mineType, dataTypeData.id, templateId, propertyName, documentTypeName);
     const contentData = await umbracoApi.document.getByName(contentName);
-    const contentURL = contentData.urls[0].url;
+    const contentURL = await umbracoApi.document.getDocumentUrl(contentData.id);
     const uploadFileSrc = contentData.values[0].value.src;
 
     // Act

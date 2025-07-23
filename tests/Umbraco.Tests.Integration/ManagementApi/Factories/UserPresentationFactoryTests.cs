@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -40,9 +41,16 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         services.AddSingleton<IUrlAssembler, DefaultUrlAssembler>();
         services.AddSingleton<IPasswordConfigurationPresentationFactory, PasswordConfigurationPresentationFactory>();
         services.AddSingleton<IPermissionPresentationFactory, PermissionPresentationFactory>();
-        services.AddSingleton<DocumentPermissionMapper>();
-        services.AddSingleton<IPermissionMapper>(x => x.GetRequiredService<DocumentPermissionMapper>());
-        services.AddSingleton<IPermissionPresentationMapper>(x => x.GetRequiredService<DocumentPermissionMapper>());
+
+        services.AddSingleton<IPermissionMapper, DocumentPermissionMapper>();
+        services.AddSingleton<IPermissionPresentationMapper, DocumentPermissionMapper>();
+
+        services.AddSingleton<IPermissionMapper, DocumentPropertyValuePermissionMapper>();
+        services.AddSingleton<IPermissionPresentationMapper, DocumentPropertyValuePermissionMapper>();
+
+        services.AddSingleton<IPermissionMapper, CustomPermissionMapper>();
+        services.AddSingleton<IPermissionPresentationMapper, CustomPermissionMapper>();
+
     }
 
     [Test]
@@ -55,6 +63,48 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         var enUsLanguage = await LanguageService.GetAsync("en-US");
         var daDkLanguage = await LanguageService.GetAsync("da-DK");
 
+        var rootMediaFolder = MediaService.CreateMedia("Pictures Folder", Constants.System.Root, "Folder");
+        MediaService.Save(rootMediaFolder);
+
+        var groupOne = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [enUsLanguage.Id],
+            [],
+            [],
+            rootMediaFolder.Id);
+        var groupTwo = await CreateUserGroup(
+            "Group Two",
+            "groupTwo",
+            [daDkLanguage.Id],
+            [],
+            [],
+            rootMediaFolder.Id);
+
+        var user = await CreateUser([groupOne.Key, groupTwo.Key]);
+
+        var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+
+        Assert.AreEqual(user.Key, model.Id);
+        Assert.AreEqual("test@test.com", model.Email);
+        Assert.AreEqual("Test User", model.Name);
+        Assert.AreEqual("test@test.com", model.UserName);
+        Assert.AreEqual(2, model.UserGroupIds.Count);
+        Assert.IsTrue(model.UserGroupIds.Select(x => x.Id).ContainsAll([groupOne.Key, groupTwo.Key]));
+        Assert.IsFalse(model.HasAccessToAllLanguages);
+        Assert.AreEqual(2, model.Languages.Count());
+        Assert.IsTrue(model.Languages.ContainsAll(["en-US", "da-DK"]));
+        Assert.IsTrue(model.HasDocumentRootAccess);
+        Assert.AreEqual(0, model.DocumentStartNodeIds.Count);
+        Assert.IsFalse(model.HasMediaRootAccess);
+        Assert.AreEqual(1, model.MediaStartNodeIds.Count);
+        Assert.AreEqual(rootMediaFolder.Key, model.MediaStartNodeIds.First().Id);
+        Assert.IsFalse(model.HasAccessToSensitiveData);
+    }
+
+    [Test]
+    public async Task Can_Create_Current_User_Response_Model_With_Aggregated_Document_Permissions()
+    {
         var rootContentKey = Guid.Parse(TextpageKey);
         var subPageContentKey = Guid.Parse(SubPageKey);
         var subPage2ContentKey = Guid.Parse(SubPage2Key);
@@ -65,7 +115,7 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         var groupOne = await CreateUserGroup(
             "Group One",
             "groupOne",
-            [enUsLanguage.Id],
+            [],
             ["A", "B", "C"],
             [
                 new DocumentGranularPermission
@@ -93,7 +143,7 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         var groupTwo = await CreateUserGroup(
             "Group Two",
             "groupTwo",
-            [daDkLanguage.Id],
+            [],
             ["A", "B", "D"],
             [
                 new DocumentGranularPermission
@@ -113,21 +163,6 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
 
         var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
 
-        Assert.AreEqual(user.Key, model.Id);
-        Assert.AreEqual("test@test.com", model.Email);
-        Assert.AreEqual("Test User", model.Name);
-        Assert.AreEqual("test@test.com", model.UserName);
-        Assert.AreEqual(2, model.UserGroupIds.Count);
-        Assert.IsTrue(model.UserGroupIds.Select(x => x.Id).ContainsAll([groupOne.Key, groupTwo.Key]));
-        Assert.IsFalse(model.HasAccessToAllLanguages);
-        Assert.AreEqual(2, model.Languages.Count());
-        Assert.IsTrue(model.Languages.ContainsAll(["en-US", "da-DK"]));
-        Assert.IsTrue(model.HasDocumentRootAccess);
-        Assert.AreEqual(0, model.DocumentStartNodeIds.Count);
-        Assert.IsFalse(model.HasMediaRootAccess);
-        Assert.AreEqual(1, model.MediaStartNodeIds.Count);
-        Assert.AreEqual(rootMediaFolder.Key, model.MediaStartNodeIds.First().Id);
-        Assert.IsFalse(model.HasAccessToSensitiveData);
         Assert.AreEqual(4, model.FallbackPermissions.Count);
         Assert.IsTrue(model.FallbackPermissions.ContainsAll(["A", "B", "C", "D"]));
 
@@ -154,12 +189,242 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(subPage2ContentPermissions.Verbs.ContainsAll(["F", "G", "H"]));
     }
 
+    [Test]
+    public async Task Can_Create_Current_User_Response_Model_With_Aggregated_Document_Property_Value_Permissions()
+    {
+        var propertyTypeKey = Guid.NewGuid();
+        var propertyTypeKey2 = Guid.NewGuid();
+        var groupOne = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [],
+            [],
+            [
+                new DocumentGranularPermission
+                {
+                    Key = Guid.Parse(TextpageKey),
+                    Permission = "A",
+                },
+                new DocumentPropertyValueGranularPermission
+                {
+                    Key = ContentType.Key,
+                    Permission = $"{propertyTypeKey}|C",
+                },
+                new DocumentPropertyValueGranularPermission
+                {
+                    Key = ContentType.Key,
+                    Permission = $"{propertyTypeKey2}|D",
+                },
+            ],
+            Constants.System.Root);
+        var groupTwo = await CreateUserGroup(
+            "Group Two",
+            "groupTwo",
+            [],
+            [],
+            [
+                new DocumentPropertyValueGranularPermission
+                {
+                    Key = ContentType.Key,
+                    Permission = $"{propertyTypeKey}|B",
+                },
+            ],
+            Constants.System.Root);
+        var user = await CreateUser([groupOne.Key, groupTwo.Key]);
+
+        var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+        Assert.AreEqual(3, model.Permissions.Count);
+
+        var documentPermissions = model.Permissions
+            .Where(x => x is DocumentPermissionPresentationModel)
+            .Cast<DocumentPermissionPresentationModel>()
+            .Single(x => x.Document.Id == Guid.Parse(TextpageKey));
+        Assert.AreEqual(1, documentPermissions.Verbs.Count);
+        Assert.IsTrue(documentPermissions.Verbs.ContainsAll(["A"]));
+
+        var documentPropertyValuePermissions = model.Permissions
+            .Where(x => x is DocumentPropertyValuePermissionPresentationModel)
+            .Cast<DocumentPropertyValuePermissionPresentationModel>()
+            .Where(x => x.DocumentType.Id == ContentType.Key);
+        Assert.AreEqual(2, documentPropertyValuePermissions.Count());
+
+        var propertyTypePermission1 = documentPropertyValuePermissions
+            .Single(x => x.PropertyType.Id == propertyTypeKey);
+        Assert.AreEqual(2, propertyTypePermission1.Verbs.Count);
+        Assert.IsTrue(propertyTypePermission1.Verbs.ContainsAll(["B", "C"]));
+
+        var propertyTypePermission2 = documentPropertyValuePermissions
+            .Single(x => x.PropertyType.Id == propertyTypeKey2);
+        Assert.AreEqual(1, propertyTypePermission2.Verbs.Count);
+        Assert.IsTrue(propertyTypePermission2.Verbs.ContainsAll(["D"]));
+    }
+
+    [Test]
+    public async Task Can_Create_Current_User_Response_Model_With_Aggregated_Custom_Permissions()
+    {
+        var key1 = Guid.NewGuid();
+        var key2 = Guid.NewGuid();
+        var groupOne = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [],
+            [],
+            [
+                new CustomGranularPermission
+                {
+                    Permission = $"{key1}|A",
+                },
+                new CustomGranularPermission
+                {
+                    Permission = $"{key1}|B",
+                },
+                new CustomGranularPermission
+                {
+                    Permission = $"{key2}|C",
+                }
+            ],
+            Constants.System.Root);
+        var groupTwo = await CreateUserGroup(
+            "Group Two",
+            "groupTwo",
+            [],
+            [],
+            [
+                new CustomGranularPermission
+                {
+                    Permission = $"{key1}|A",
+                },
+                new CustomGranularPermission
+                {
+                    Permission = $"{key2}|B",
+                },
+            ],
+            Constants.System.Root);
+        var user = await CreateUser([groupOne.Key, groupTwo.Key]);
+
+        var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+        Assert.AreEqual(2, model.Permissions.Count);
+
+        var customPermissions = model.Permissions
+            .Where(x => x is CustomPermissionPresentationModel)
+            .Cast<CustomPermissionPresentationModel>();
+        Assert.AreEqual(2, customPermissions.Count());
+
+        var customPermission1 = customPermissions
+            .Single(x => x.Key == key1);
+        Assert.AreEqual(2, customPermission1.Verbs.Count);
+        Assert.IsTrue(customPermission1.Verbs.ContainsAll(["A", "B"]));
+
+        var customPermission2 = customPermissions
+            .Single(x => x.Key == key2);
+        Assert.AreEqual(2, customPermission2.Verbs.Count);
+        Assert.IsTrue(customPermission2.Verbs.ContainsAll(["B", "C"]));
+    }
+
+    private class CustomGranularPermission : IGranularPermission
+    {
+        public const string ContextType = "Custom";
+
+        public string Context => ContextType;
+
+        public required string Permission { get; set; }
+
+        protected bool Equals(CustomGranularPermission other) => Permission == other.Permission;
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
+            return Equals((CustomGranularPermission)obj);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Permission);
+    }
+
+    private class CustomPermissionPresentationModel : IPermissionPresentationModel
+    {
+        public required ISet<string> Verbs { get; set; }
+
+        public required Guid Key { get; set; }
+    }
+
+    private class CustomPermissionMapper : IPermissionMapper, IPermissionPresentationMapper
+    {
+        public string Context => CustomGranularPermission.ContextType;
+
+        public Type PresentationModelToHandle => typeof(CustomPermissionPresentationModel);
+
+        public IGranularPermission MapFromDto(UserGroup2GranularPermissionDto dto)
+        {
+            return new CustomGranularPermission
+            {
+                Permission = dto.Permission,
+            };
+        }
+
+        public IEnumerable<IPermissionPresentationModel> MapManyAsync(IEnumerable<IGranularPermission> granularPermissions)
+            => granularPermissions
+                .Where(x => x is CustomGranularPermission)
+                .Cast<CustomGranularPermission>()
+                .Select(x => new CustomPermissionPresentationModel
+                {
+                    Key = Guid.Parse(x.Permission.Split('|')[0]),
+                    Verbs = new HashSet<string> { x.Permission.Split('|')[1] },
+                });
+
+        public IEnumerable<IGranularPermission> MapToGranularPermissions(IPermissionPresentationModel permissionViewModel)
+        {
+            if (permissionViewModel is not CustomPermissionPresentationModel customPermissionPresentationModel)
+            {
+                yield break;
+            }
+
+            foreach (var verb in customPermissionPresentationModel.Verbs.Distinct().DefaultIfEmpty(string.Empty))
+            {
+                yield return new CustomGranularPermission
+                {
+                    Permission = customPermissionPresentationModel.Key + "|" + verb,
+                };
+            }
+        }
+
+        public IEnumerable<IPermissionPresentationModel> AggregatePresentationModels(IUser user, IEnumerable<IPermissionPresentationModel> models)
+        {
+            IEnumerable<(Guid Key, ISet<string> Verbs)> groupedModels = models
+                .Cast<CustomPermissionPresentationModel>()
+                .GroupBy(x => x.Key)
+                .Select(x => (x.Key, (ISet<string>)x.SelectMany(y => y.Verbs).Distinct().ToHashSet()));
+
+            foreach ((Guid key, ISet<string> verbs) in groupedModels)
+            {
+                yield return new CustomPermissionPresentationModel
+                {
+                    Key = key,
+                    Verbs = verbs,
+                };
+            }
+        }
+    }
+
     private async Task<IUserGroup> CreateUserGroup(
         string name,
         string alias,
         int[] allowedLanguages,
         string[] permissions,
-        DocumentGranularPermission[] granularPermissions,
+        IGranularPermission[] granularPermissions,
         int startMediaId)
     {
         var userGroup = new UserGroupBuilder()

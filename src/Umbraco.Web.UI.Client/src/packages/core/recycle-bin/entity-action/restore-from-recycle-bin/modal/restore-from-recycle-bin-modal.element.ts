@@ -6,7 +6,7 @@ import type {
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
@@ -102,14 +102,11 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 	async #onSelectCustomDestination() {
 		if (!this.data?.pickerModal) throw new Error('Cannot select a destination without a picker modal.');
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, this.data.pickerModal, {
+		const { selection } = await umbOpenModal(this, this.data.pickerModal, {
 			data: {
 				multiple: false,
 			},
 		});
-
-		const { selection } = await modal.onSubmit();
 
 		if (selection.length > 0) {
 			const unique = selection[0];

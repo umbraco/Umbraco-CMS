@@ -1,9 +1,10 @@
 import { UmbDocumentTypeSearchServerDataSource } from './document-type-search.server.data-source.js';
 import type { UmbDocumentTypeSearchItemModel } from './document-type.search-provider.js';
-import type { UmbSearchRepository, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbDocumentTypeSearchRequestArgs } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbSearchRepository } from '@umbraco-cms/backoffice/search';
 
 export class UmbDocumentTypeSearchRepository
 	extends UmbControllerBase
@@ -17,7 +18,7 @@ export class UmbDocumentTypeSearchRepository
 		this.#dataSource = new UmbDocumentTypeSearchServerDataSource(this);
 	}
 
-	search(args: UmbSearchRequestArgs) {
+	search(args: UmbDocumentTypeSearchRequestArgs) {
 		return this.#dataSource.search(args);
 	}
 }

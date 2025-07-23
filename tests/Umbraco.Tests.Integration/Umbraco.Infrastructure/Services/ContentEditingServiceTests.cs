@@ -49,7 +49,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = rootName
+            Variants = [new () { Name = rootName }]
         };
 
         var root = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result.Content!;
@@ -61,7 +61,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
         ContentTypeService.Save(contentType);
 
         createModel.ParentKey = root.Key;
-        createModel.InvariantName = childName;
+        createModel.Variants = [new() { Name = childName }];
 
         var child = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result.Content!;
         Assert.AreEqual(root.Id, child.ParentId);

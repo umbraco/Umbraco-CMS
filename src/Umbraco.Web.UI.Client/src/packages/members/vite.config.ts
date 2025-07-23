@@ -13,6 +13,7 @@ export default defineConfig({
 		entry: {
 			'member/index': 'member/index.ts',
 			'member-group/index': 'member-group/index.ts',
+			'member-public-access/index': 'member-public-access/index.ts',
 			'member-type/index': 'member-type/index.ts',
 			'umbraco-package': 'umbraco-package.ts',
 			manifests: 'manifests.ts',

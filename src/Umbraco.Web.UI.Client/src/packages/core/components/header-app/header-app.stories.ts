@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './header-app-button.element.js';
 import type { UmbHeaderAppButtonElement } from './header-app-button.element.js';
 

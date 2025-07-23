@@ -2,7 +2,7 @@ import type { UmbDocumentTypeItemModel, UmbDocumentTypeTreeItemModel } from '../
 import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '../../constants.js';
 import { UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UmbDocumentTypePickerInputContext } from './input-document-type.context.js';
-import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -105,6 +105,10 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	public override get value(): string | undefined {
 		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
+
+	@property({ type: Boolean, attribute: 'readonly' })
+	readonly?: boolean;
+
 	@state()
 	private _items?: Array<UmbDocumentTypeItemModel>;
 
@@ -147,7 +151,10 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 	#getPickableFilter() {
 		if (this.documentTypesOnly) {
-			return (x: UmbDocumentTypeTreeItemModel) => x.isFolder === false && x.isElement === false;
+			/* TODO: We do not have the same model in the tree and during the search, so theoretically, we cannot use the same filter. 
+			The search item model does not include "isFolder," so it checks for falsy intentionally. 
+			We need to investigate getting this typed correctly. [MR] */
+			return (x: UmbDocumentTypeTreeItemModel) => !x.isFolder && x.isElement === false;
 		}
 		if (this.elementTypesOnly) {
 			return (x: UmbDocumentTypeTreeItemModel) => x.isElement;
@@ -156,10 +163,25 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	}
 
 	#openPicker() {
-		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
-			pickableFilter: this.#getPickableFilter(),
-		});
+		if (this.documentTypesOnly && this.elementTypesOnly) {
+			throw new Error('You cannot set both documentTypesOnly and elementTypesOnly to true.');
+		}
+
+		const args: Parameters<UmbDocumentTypePickerInputContext['openPicker']>[1] = {};
+
+		if (this.documentTypesOnly) {
+			args.documentTypesOnly = true;
+		} else if (this.elementTypesOnly) {
+			args.elementTypesOnly = true;
+		}
+
+		this.#pickerContext.openPicker(
+			{
+				hideTreeRoot: true,
+				pickableFilter: this.#getPickableFilter(),
+			},
+			args,
+		);
 	}
 
 	#removeItem(item: UmbDocumentTypeItemModel) {
@@ -171,7 +193,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selection.length >= this.max) return nothing;
+		if (this.readonly || (this.max > 0 && this.selection.length >= this.max)) return nothing;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -201,7 +223,14 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 			<uui-ref-node-document-type id=${item.unique} name=${this.localize.string(item.name)} href=${href}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
+					${when(
+						!this.readonly,
+						() => html`
+							<uui-button
+								label=${this.localize.term('general_remove')}
+								@click=${() => this.#removeItem(item)}></uui-button>
+						`,
+					)}
 				</uui-action-bar>
 			</uui-ref-node-document-type>
 		`;

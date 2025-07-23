@@ -29,8 +29,9 @@ public class ContentTests
 
     private readonly PropertyEditorCollection _propertyEditorCollection = new (new DataEditorCollection(() => []));
 
-    [Test]
-    public void Variant_Culture_Names_Track_Dirty_Changes()
+    [TestCase("name-fr", false)]
+    [TestCase("name-fr-updated", true)]
+    public void Variant_Culture_Names_Track_Dirty_Changes(string newName, bool expectedDirty)
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias("contentType")
@@ -58,14 +59,17 @@ public class ContentTests
         Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
 
         content.ResetDirtyProperties();
+        frCultureName.ResetDirtyProperties();
 
         Assert.IsFalse(content.IsPropertyDirty("CultureInfos")); // it's been reset
         Assert.IsTrue(content.WasPropertyDirty("CultureInfos"));
 
         Thread.Sleep(500); // The "Date" wont be dirty if the test runs too fast since it will be the same date
-        content.SetCultureName("name-fr", langFr);
-        Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
-        Assert.IsTrue(content.IsPropertyDirty("CultureInfos")); // it's true now since we've updated a name
+        content.SetCultureName(newName, langFr);
+
+        // dirty is only true if we updated the name
+        Assert.AreEqual(expectedDirty, frCultureName.IsPropertyDirty("Date"));
+        Assert.AreEqual(expectedDirty, content.IsPropertyDirty("CultureInfos"));
     }
 
     [Test]
@@ -97,6 +101,7 @@ public class ContentTests
         Assert.IsTrue(frCultureName.IsPropertyDirty("Date"));
 
         content.ResetDirtyProperties();
+        frCultureName.ResetDirtyProperties();
 
         Assert.IsFalse(content.IsPropertyDirty("PublishCultureInfos")); // it's been reset
         Assert.IsTrue(content.WasPropertyDirty("PublishCultureInfos"));

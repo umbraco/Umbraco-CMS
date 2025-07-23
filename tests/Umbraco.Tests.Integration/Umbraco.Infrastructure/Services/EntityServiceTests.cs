@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-public class EntityServiceTests : UmbracoIntegrationTest
+internal sealed class EntityServiceTests : UmbracoIntegrationTest
 {
     [SetUp]
     public async Task SetupTestData()
@@ -931,6 +931,98 @@ public class EntityServiceTests : UmbracoIntegrationTest
 
     }
 
+    [Test]
+    public void EntityService_Siblings_ReturnsExpectedSiblings()
+    {
+        var children = CreateSiblingsTestData();
+
+        var taget = children[1];
+
+        var result = EntityService.GetSiblings(taget.Key, UmbracoObjectTypes.Document, 1, 1).ToArray();
+        Assert.AreEqual(3, result.Length);
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[1].Key);
+        Assert.IsTrue(result[2].Key == children[2].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_SkipsTrashedEntities()
+    {
+        var children = CreateSiblingsTestData();
+
+        var trash = children[1];
+        ContentService.MoveToRecycleBin(trash);
+
+        var taget = children[2];
+        var result = EntityService.GetSiblings(taget.Key, UmbracoObjectTypes.Document, 1, 1).ToArray();
+        Assert.AreEqual(3, result.Length);
+        Assert.IsFalse(result.Any(x => x.Key == trash.Key));
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[2].Key);
+        Assert.IsTrue(result[2].Key == children[3].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_RespectsOrdering()
+    {
+        var children = CreateSiblingsTestData();
+
+        // Order the children by name to ensure the ordering works when differing from the default sort order, the name is a GUID.
+        children = children.OrderBy(x => x.Name).ToList();
+
+        var taget = children[1];
+        var result = EntityService.GetSiblings(taget.Key, UmbracoObjectTypes.Document, 1, 1, Ordering.By(nameof(NodeDto.Text))).ToArray();
+        Assert.AreEqual(3, result.Length);
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[1].Key);
+        Assert.IsTrue(result[2].Key == children[2].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_IgnoresOutOfBoundsLower()
+    {
+        var children = CreateSiblingsTestData();
+
+        var taget = children[1];
+        var result = EntityService.GetSiblings(taget.Key, UmbracoObjectTypes.Document, 100, 1).ToArray();
+        Assert.AreEqual(3, result.Length);
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[1].Key);
+        Assert.IsTrue(result[2].Key == children[2].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_IgnoresOutOfBoundsUpper()
+    {
+        var children = CreateSiblingsTestData();
+
+        var taget = children[^2];
+        var result = EntityService.GetSiblings(taget.Key, UmbracoObjectTypes.Document, 1, 100).ToArray();
+        Assert.AreEqual(3, result.Length);
+        Assert.IsTrue(result[^1].Key == children[^1].Key);
+        Assert.IsTrue(result[^2].Key == children[^2].Key);
+        Assert.IsTrue(result[^3].Key == children[^3].Key);
+    }
+
+    private List<Content> CreateSiblingsTestData()
+    {
+        var contentType = ContentTypeService.Get("umbTextpage");
+
+        var root = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(root);
+
+        var children = new List<Content>();
+
+        for (int i = 0; i < 10; i++)
+        {
+            var child = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+            ContentService.Save(child);
+            children.Add(child);
+        }
+
+        return children;
+    }
+
     private static bool _isSetup;
 
     private int _folderId;
@@ -968,7 +1060,7 @@ public class EntityServiceTests : UmbracoIntegrationTest
 
             // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
             _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
-            var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+            var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
             ContentService.Save(_subpage, -1, contentSchedule);
 
             // Create and Save Content "Text Page 2" based on "umbTextpage" -> 1055

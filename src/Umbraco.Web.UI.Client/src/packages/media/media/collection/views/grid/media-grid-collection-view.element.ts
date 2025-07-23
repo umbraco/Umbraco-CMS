@@ -28,9 +28,9 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
-			collectionContext.setupView(this);
+			collectionContext?.setupView(this);
 			this.observe(
-				collectionContext.workspacePathBuilder,
+				collectionContext?.workspacePathBuilder,
 				(builder) => {
 					this._workspacePathBuilder = builder;
 				},
@@ -134,11 +134,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-			}
-
-			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */
-			umb-imaging-thumbnail {
-				pointer-events: none;
 			}
 
 			#media-grid {

@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class FileServiceTests : UmbracoIntegrationTest
+internal sealed class FileServiceTests : UmbracoIntegrationTest
 {
     private IFileService FileService => GetRequiredService<IFileService>();
 

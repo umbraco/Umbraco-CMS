@@ -1,4 +1,4 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -33,9 +33,6 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         _apiElementBuilder = apiElementBuilder;
         _logger = logger;
     }
-
-    [Obsolete($"Please use the overload that accepts {nameof(RichTextBlockModel)}. Will be removed in V15.")]
-    public IRichTextElement? Parse(string html) => Parse(html, null);
 
     public IRichTextElement? Parse(string html, RichTextBlockModel? richTextBlockModel)
     {
@@ -101,9 +98,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         // - non-#comment nodes
         // - non-#text nodes
         // - non-empty #text nodes
-        // - empty #text between inline elements (see #17037)
+        // - empty #text between inline elements (see #17037) but not #text with only newlines (see #19388)
         HtmlNode[] childNodes = element.ChildNodes
-            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || c.NextSibling is not null || string.IsNullOrWhiteSpace(c.InnerText) is false))
+            .Where(c => c.Name != CommentNodeName && (c.Name != TextNodeName || IsNonEmptyElement(c)))
             .ToArray();
 
         var tag = TagName(element);
@@ -123,6 +120,9 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
 
         return createElement(tag, attributes, childElements);
     }
+
+    private static bool IsNonEmptyElement(HtmlNode htmlNode) =>
+        string.IsNullOrWhiteSpace(htmlNode.InnerText) is false || htmlNode.InnerText.Any(c => c != '\n' && c != '\r');
 
     private static string TagName(HtmlNode htmlNode) => htmlNode.Name;
 

@@ -66,13 +66,14 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._mediaTypeUnique = this.#workspaceContext.getContentTypeId()!;
+			this._mediaTypeUnique = context?.getContentTypeId();
 			this.#getData();
 			this.#observeContent();
 		});
 	}
 
 	async #getData() {
+		if (!this.#workspaceContext) return;
 		if (!this._mediaTypeUnique) throw new Error('Media type unique is not set');
 		const { data } = await this.#mediaTypeItemRepository.requestItems([this._mediaTypeUnique]);
 		this._mediaTypeName = data?.[0].name;
@@ -80,10 +81,8 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	#observeContent() {
-		if (!this.#workspaceContext) return;
-
 		this.observe(
-			this.#workspaceContext.unique,
+			this.#workspaceContext?.unique,
 			(unique) => {
 				this._mediaUnique = unique!;
 			},
@@ -91,10 +90,14 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 		);
 
 		/** TODO: Doubt this is the right way to get the create date... */
-		this.observe(this.#workspaceContext.variants, (variants) => {
-			this._createDate = variants?.[0]?.createDate;
-			this._updateDate = variants?.[0]?.updateDate;
-		});
+		this.observe(
+			this.#workspaceContext?.variants,
+			(variants) => {
+				this._createDate = variants?.[0]?.createDate;
+				this._updateDate = variants?.[0]?.updateDate;
+			},
+			'observeVariants',
+		);
 	}
 
 	override render() {

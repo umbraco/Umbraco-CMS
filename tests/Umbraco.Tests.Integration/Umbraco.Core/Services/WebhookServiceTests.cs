@@ -7,12 +7,9 @@ using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-// TODO (V16): Make this test class internal (along with any others in this project). We should just expose the base classes and helpers.
-// Could also consider moving the base classes to a different assembly, and shipping that, but not our tests.
-
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class WebhookServiceTests : UmbracoIntegrationTest
+internal sealed class WebhookServiceTests : UmbracoIntegrationTest
 {
     private IWebhookService WebhookService => GetRequiredService<IWebhookService>();
 

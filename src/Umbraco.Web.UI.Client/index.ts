@@ -1,31 +1,21 @@
-import { UmbAppElement } from './src/apps/app/app.element.js';
 import { startMockServiceWorker } from './src/mocks/index.js';
+import { UmbAppElement } from '@umbraco-cms/backoffice/app';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
-	startMockServiceWorker();
-}
-
 const appElement = new UmbAppElement();
-const isMocking = import.meta.env.VITE_UMBRACO_USE_MSW === 'on';
+appElement.backofficePath = '/';
 
-if (!isMocking) {
+//#region Vite Mock Setup
+if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
+	appElement.bypassAuth = true;
+	startMockServiceWorker();
+} else {
 	appElement.serverUrl = import.meta.env.VITE_UMBRACO_API_URL;
 }
 
-if (import.meta.env.DEV) {
-	appElement.backofficePath = '/';
-}
-
-appElement.bypassAuth = isMocking;
-
-
-document.body.appendChild(appElement);
-
-
 // Example injector:
-if(import.meta.env.VITE_EXAMPLE_PATH) {
-	import(/* @vite-ignore */ './'+import.meta.env.VITE_EXAMPLE_PATH+'/index.ts').then((js) => {
+if (import.meta.env.VITE_EXAMPLE_PATH) {
+	import(/* @vite-ignore */ './' + import.meta.env.VITE_EXAMPLE_PATH + '/index.ts').then((js) => {
 		if (js) {
 			Object.keys(js).forEach((key) => {
 				const value = js[key];
@@ -38,5 +28,7 @@ if(import.meta.env.VITE_EXAMPLE_PATH) {
 			});
 		}
 	});
-
 }
+//#endregion
+
+document.body.append(appElement);

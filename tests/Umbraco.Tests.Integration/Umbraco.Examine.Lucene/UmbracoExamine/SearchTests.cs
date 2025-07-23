@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class SearchTests : ExamineBaseTest
+internal sealed class SearchTests : ExamineBaseTest
 {
     private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
 

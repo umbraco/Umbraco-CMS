@@ -1,16 +1,13 @@
-using System.Linq;
 using AutoFixture;
 using AutoFixture.Kernel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Moq;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -20,7 +17,7 @@ using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.AutoFixture.Customizations;
 
-internal class UmbracoCustomizations : ICustomization
+internal sealed class UmbracoCustomizations : ICustomization
 {
     public void Customize(IFixture fixture)
     {
@@ -50,19 +47,10 @@ internal class UmbracoCustomizations : ICustomization
             x.With(settings => settings.ApplicationVirtualPath, string.Empty));
 
         fixture.Customize<BackOfficeAreaRoutes>(u => u.FromFactory(
-            () => new BackOfficeAreaRoutes(
-                Options.Create(new GlobalSettings()),
-                Mock.Of<IHostingEnvironment>(x =>
-                    x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
-                Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run),
-                new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>))));
+            () => new BackOfficeAreaRoutes(Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
 
         fixture.Customize<PreviewRoutes>(u => u.FromFactory(
-            () => new PreviewRoutes(
-                Options.Create(new GlobalSettings()),
-                Mock.Of<IHostingEnvironment>(x =>
-                    x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
-                Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
+            () => new PreviewRoutes(Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
 
         var httpContextAccessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
         fixture.Customize<HttpContext>(x => x.FromFactory(() => httpContextAccessor.HttpContext));

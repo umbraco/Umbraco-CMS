@@ -1,7 +1,7 @@
 import { UmbTiptapToolbarElementApiBase } from '../base.js';
 import { UmbLink } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_LINK_PICKER_MODAL } from '@umbraco-cms/backoffice/multi-url-picker';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/multi-url-picker';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
@@ -15,12 +15,9 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 
 		const overlaySize = this.configuration?.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
 
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalHandler = modalManager.open(this, UMB_LINK_PICKER_MODAL, { data, value, modal: { size: overlaySize } });
-
-		if (!modalHandler) return;
-
-		const result = await modalHandler.onSubmit().catch(() => undefined);
+		const result = await umbOpenModal(this, UMB_LINK_PICKER_MODAL, { data, value, modal: { size: overlaySize } }).catch(
+			() => undefined,
+		);
 		if (!result?.link) return;
 
 		const linkAttrs = this.#parseLinkData(result.link);

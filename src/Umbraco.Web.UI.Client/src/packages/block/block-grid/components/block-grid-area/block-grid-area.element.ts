@@ -14,7 +14,7 @@ export class UmbBlockGridAreasContainerElement extends UmbBlockGridEntriesElemen
 
 		this.consumeContext(UMB_BLOCK_GRID_ENTRIES_CONTEXT, (context) => {
 			this.observe(
-				context.layoutColumns,
+				context?.layoutColumns,
 				(layoutColumns) => {
 					this.layoutColumns = layoutColumns;
 				},

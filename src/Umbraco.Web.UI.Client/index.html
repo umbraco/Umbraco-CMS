@@ -3,19 +3,12 @@
 	<head>
 		<base href="/" />
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="umbraco/backoffice/assets/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Umbraco</title>
-		<script type="importmap">
-			{
-				"imports": {
-					"@umbraco-cms/backoffice/block-rte": "/src/packages/block/block-rte/index.ts"
-				}
-			}
-		</script>
-		<script src="node_modules/msw/lib/iife/index.js"></script>
-		<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css" />
+		<link rel="icon" type="image/svg+xml" href="./umbraco/backoffice/assets/favicon.svg" />
 		<link rel="stylesheet" href="src/css/umb-css.css" />
+		<link rel="stylesheet" href="./umbraco/backoffice/css/uui-css.css" />
+		<script src="./umbraco/backoffice/msw/index.js"></script>
 		<script type="module" src="index.ts"></script>
 	</head>
 

@@ -1,4 +1,5 @@
 ﻿import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {expect} from "@playwright/test";
 
 // Document Type
 const documentTypeName = 'DocumentTypeName';
@@ -22,6 +23,7 @@ const textStringText = 'ThisIsATextString';
 
 // Content Name
 const contentName = 'ContentName';
+let contentId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureIsoCodeNotExists('da');
@@ -43,7 +45,7 @@ test('invariant document type with invariant block list with invariant block wit
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, textStringName, textStringDataTypeId);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -56,9 +58,8 @@ test('invariant document type with invariant block list with invariant block wit
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
   await umbracoUi.content.goToBlockListBlockWithName(documentTypeGroupName, blockListName, blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
@@ -69,7 +70,7 @@ test('can not create unsupported invariant document type with invariant block li
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, false);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -78,8 +79,10 @@ test('can not create unsupported invariant document type with invariant block li
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.isFailedStateButtonVisible();
+  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeFalsy();
 });
 
 test('can not create unsupported invariant document type with invariant block list with variant block with an variant textString', async ({umbracoApi, umbracoUi}) => {
@@ -87,7 +90,7 @@ test('can not create unsupported invariant document type with invariant block li
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, true);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
 
   // Act
@@ -96,8 +99,10 @@ test('can not create unsupported invariant document type with invariant block li
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.isFailedStateButtonVisible();
+  await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeFalsy();
 });
 
 test('variant document type with variant block list with variant block with an variant textString', async ({umbracoApi, umbracoUi}) => {
@@ -105,7 +110,7 @@ test('variant document type with variant block list with variant block with an v
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, true);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName, true);
-  await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
+  contentId = await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -119,9 +124,8 @@ test('variant document type with variant block list with variant block with an v
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
   await umbracoUi.content.goToBlockListBlockWithName(documentTypeGroupName, blockListName, blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
@@ -132,7 +136,7 @@ test('variant document type with invariant block list with variant block with an
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, false);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName, true, false);
-  await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
+  contentId = await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -146,9 +150,8 @@ test('variant document type with invariant block list with variant block with an
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
   await umbracoUi.content.goToBlockListBlockWithName(documentTypeGroupName, blockListName, blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
@@ -159,7 +162,7 @@ test('variant document type with invariant block list with variant block with an
   elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(blockName, elementGroupName, textStringName, textStringDataTypeId, true, true);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName, true, false);
-  await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
+  contentId = await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -173,9 +176,8 @@ test('variant document type with invariant block list with variant block with an
   await umbracoUi.content.clickContainerSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
   await umbracoUi.content.goToBlockListBlockWithName(documentTypeGroupName, blockListName, blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);

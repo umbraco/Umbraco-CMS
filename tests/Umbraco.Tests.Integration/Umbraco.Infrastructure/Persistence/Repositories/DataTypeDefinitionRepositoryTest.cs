@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
+internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
 {
     private IDataValueEditorFactory DataValueEditorFactory => GetRequiredService<IDataValueEditorFactory>();
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();

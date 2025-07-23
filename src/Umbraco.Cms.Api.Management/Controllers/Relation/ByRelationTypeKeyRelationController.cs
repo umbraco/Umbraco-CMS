@@ -43,16 +43,15 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
 
         if (relationsAttempt.Success is false)
         {
-            return await Task.FromResult(RelationOperationStatusResult(relationsAttempt.Status));
+            return RelationOperationStatusResult(relationsAttempt.Status);
         }
 
         IEnumerable<RelationResponseModel> mappedRelations = relationsAttempt.Result.Items.Select(_relationPresentationFactory.Create);
 
-        return await Task.FromResult(Ok(new PagedViewModel<RelationResponseModel>
+        return Ok(new PagedViewModel<RelationResponseModel>
         {
             Total = relationsAttempt.Result.Total,
             Items = mappedRelations,
-        }));
-
+        });
     }
 }

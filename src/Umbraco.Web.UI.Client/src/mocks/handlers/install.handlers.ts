@@ -1,9 +1,9 @@
 const { rest } = window.MockServiceWorker;
 import type {
 	DatabaseInstallRequestModel,
+	InstallRequestModelReadable,
 	InstallSettingsResponseModel,
 	ProblemDetails,
-	InstallRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -99,7 +99,7 @@ export const handlers = [
 	}),
 
 	rest.post(umbracoPath('/install/setup'), async (req, res, ctx) => {
-		const body = await req.json<InstallRequestModel>();
+		const body = await req.json<InstallRequestModelReadable>();
 
 		if (body.database?.name === 'fail') {
 			return res(

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("contentTypeId", AutoIncrement = false)]
 [ExplicitColumns]
-internal class ContentVersionCleanupPolicyDto
+internal sealed class ContentVersionCleanupPolicyDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCleanupPolicy;
 
@@ -27,6 +27,6 @@ internal class ContentVersionCleanupPolicyDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? KeepLatestVersionPerDayForDays { get; set; }
 
-    [Column("updated")]
+    [Column("updated", ForceToUtc = false)]
     public DateTime Updated { get; set; }
 }

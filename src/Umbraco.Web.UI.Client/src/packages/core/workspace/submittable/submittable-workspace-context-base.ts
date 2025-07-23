@@ -10,7 +10,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 
 export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
-	extends UmbContextBase<UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>>
+	extends UmbContextBase
 	implements UmbSubmittableWorkspaceContext
 {
 	public readonly workspaceAlias: string;
@@ -52,7 +52,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.workspaceAlias = workspaceAlias;
 		// TODO: Consider if we can move this consumption to #resolveSubmit, just as a getContext, but it depends if others use the modalContext prop.. [NL]
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
-			(this.modalContext as UmbModalContext) = context;
+			(this.modalContext as UmbModalContext | undefined) = context;
 		});
 	}
 
@@ -84,6 +84,17 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		);
 	}
 
+	protected async _validateAndLog(): Promise<void> {
+		await this.validate().catch(async () => {
+			// TODO: Implement developer-mode logging here. [NL]
+			console.warn(
+				'Validation failed because of these validation messages still begin present: ',
+				this.#validationContexts.flatMap((x) => x.messages.getMessages()),
+			);
+			return Promise.reject();
+		});
+	}
+
 	public async validateAndSubmit(
 		onValid: () => Promise<void>,
 		onInvalid: (reason?: any) => Promise<void>,
@@ -95,16 +106,11 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-		this.validate().then(
+		this._validateAndLog().then(
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},
 			async (error) => {
-				// TODO: Implement developer-mode logging here. [NL]
-				console.warn(
-					'Validation failed because of these validation messages still begin present: ',
-					this.#validationContexts.flatMap((x) => x.messages.getMessages()),
-				);
 				onInvalid(error).then(this.#resolveSubmit, this.#rejectSubmit);
 			},
 		);
@@ -155,6 +161,17 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	protected abstract submit(): Promise<void>;
 	protected invalidSubmit(reason?: any): Promise<void> {
 		return Promise.reject(reason);
+	}
+
+	override destroy(): void {
+		this.#isNew.destroy();
+		this.routes.destroy();
+		super.destroy();
+		this.#submitPromise = undefined;
+		this.#submitResolve = undefined;
+		this.#submitReject = undefined;
+		this.#validationContexts.forEach((context) => context.destroy());
+		this.#validationContexts = [];
 	}
 }
 

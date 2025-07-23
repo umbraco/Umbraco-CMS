@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// Tests for the media list view service. Please notice that a lot of functional test is covered by the content list
 /// view service tests, since these services share the same base implementation.
 /// </summary>
-public class MediaListViewServiceTests : ContentListViewServiceTestsBase
+internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBase
 {
     private IMediaListViewService MediaListViewService => GetRequiredService<IMediaListViewService>();
 
@@ -222,7 +222,7 @@ public class MediaListViewServiceTests : ContentListViewServiceTestsBase
         {
             ContentTypeKey = mediaTypeWithListView.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Album",
+            Variants = [new () { Name = "Album" }]
         };
 
         var result = await MediaEditingService.CreateAsync(rootContentCreateModel, Constants.Security.SuperUserKey);
@@ -234,7 +234,7 @@ public class MediaListViewServiceTests : ContentListViewServiceTestsBase
             {
                 ContentTypeKey = childImageMediaType.Key,
                 ParentKey = root.Key,
-                InvariantName = $"Image {i}",
+                Variants = [new () { Name = $"Image {i}" }],
                 Key = i.ToGuid(),
             };
 

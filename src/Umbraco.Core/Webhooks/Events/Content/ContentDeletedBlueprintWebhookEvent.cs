@@ -28,5 +28,5 @@ public class ContentDeletedBlueprintWebhookEvent : WebhookEventContentBase<Conte
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentDeletedBlueprintNotification notification) =>
         notification.DeletedBlueprints;
 
-    protected override object ConvertEntityToRequestPayload(IContent entity) => entity;
+    protected override object ConvertEntityToRequestPayload(IContent entity) => new DefaultPayloadModel { Id = entity.Key };
 }

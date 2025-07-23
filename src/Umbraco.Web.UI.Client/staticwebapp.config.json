@@ -1,7 +1,11 @@
 {
 	"navigationFallback": {
 		"rewrite": "/index.html",
-		"exclude": ["*.{jpg,jpeg,gif,png,svg,css}", "/assets/*"]
+		"exclude": [
+			"*.{jpg,jpeg,gif,png,svg,css}",
+			"/assets/*",
+			"/umbraco/backoffice/assets/*"
+		]
 	},
 	"trailingSlash": "never"
 }

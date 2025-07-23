@@ -27,10 +27,7 @@ export interface LogViewerDateRange {
 }
 
 // TODO: Revisit usage of workspace for this case...
-export class UmbLogViewerWorkspaceContext
-	extends UmbContextBase<UmbLogViewerWorkspaceContext, typeof UMB_APP_LOG_VIEWER_CONTEXT>
-	implements UmbWorkspaceContext
-{
+export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbWorkspaceContext {
 	public readonly workspaceAlias: string = 'Umb.Workspace.LogViewer';
 	#repository: UmbLogViewerRepository;
 

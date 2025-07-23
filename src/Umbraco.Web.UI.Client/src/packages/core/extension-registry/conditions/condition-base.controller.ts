@@ -14,11 +14,11 @@ export class UmbConditionBase<ConditionConfigType extends UmbConditionConfigBase
 	public set permitted(value) {
 		if (value === this.#permitted) return;
 		this.#permitted = value;
-		this.#onChange();
+		this.#onChange(value);
 	}
-	#onChange: () => void;
+	#onChange: (permitted: boolean) => void;
 
-	constructor(host: UmbControllerHost, args: { config: ConditionConfigType; onChange: () => void }) {
+	constructor(host: UmbControllerHost, args: { config: ConditionConfigType; onChange: (permitted: boolean) => void }) {
 		super(host);
 		this.config = args.config;
 		this.#onChange = args.onChange;

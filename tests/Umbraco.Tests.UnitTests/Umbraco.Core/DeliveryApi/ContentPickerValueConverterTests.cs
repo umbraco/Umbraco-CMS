@@ -19,7 +19,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             new ApiContentBuilder(
                 nameProvider ?? new ApiContentNameProvider(),
                 CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings()),
-                CreateOutputExpansionStrategyAccessor()));
+                CreateOutputExpansionStrategyAccessor(), CreateVariationContextAccessor()));
 
     [Test]
     public void ContentPickerValueConverter_BuildsDeliveryApiOutput()

@@ -20,7 +20,7 @@ public static class DatabaseProviderMetadataExtensions
         => databaseProviderMetadata.Where(x => (!onlyQuickInstall || x.SupportsQuickInstall) && x.IsAvailable).OrderBy(x => x.SortOrder);
 
     /// <summary>
-    /// Determines whether a database can be created for the specified provider name while ignoring the value of <see cref="GlobalSettings.InstallMissingDatabase" />.
+    /// Determines whether a database can be created for the specified provider name.
     /// </summary>
     /// <param name="databaseProviderMetadata">The database provider metadata.</param>
     /// <param name="umbracoDatabaseFactory">The database factory.</param>

@@ -1,7 +1,9 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {expect} from "@playwright/test";
 
 // Content Name
 const contentName = 'ContentName';
+let contentId = null;
 
 // Document Type
 const documentTypeName = 'DocumentTypeName';
@@ -35,7 +37,7 @@ test('can not publish a block list with a mandatory radiobox without a value', a
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
 
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -54,8 +56,8 @@ test('can not publish a block list with a mandatory radiobox without a value', a
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
 });
 
 test('can not publish a block list with a mandatory checkbox list without a value', async ({umbracoApi, umbracoUi}) => {
@@ -64,7 +66,7 @@ test('can not publish a block list with a mandatory checkbox list without a valu
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
 
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -83,8 +85,8 @@ test('can not publish a block list with a mandatory checkbox list without a valu
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
 });
 
 test('can not publish a block list with a mandatory dropdown without a value', async ({umbracoApi, umbracoUi}) => {
@@ -93,7 +95,7 @@ test('can not publish a block list with a mandatory dropdown without a value', a
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(blockName, elementGroupName, propertyEditorName, propertyEditorId, true);
   blockListId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListName, elementTypeId);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListName, blockListId, documentTypeGroupName);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
 
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -112,6 +114,6 @@ test('can not publish a block list with a mandatory dropdown without a value', a
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
 });

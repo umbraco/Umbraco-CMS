@@ -6,7 +6,7 @@ import type { UmbEntityVariantOptionModel, UmbEntityVariantModel } from '@umbrac
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 
-export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguageAccessWorkspaceContext> {
+export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 	#workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
@@ -17,19 +17,19 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguag
 
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.observe(instance.variantOptions, (variantOptions) => {
+			this.observe(instance?.variantOptions, (variantOptions) => {
 				this.#variantOptions = variantOptions;
 				this.#checkForLanguageAccess();
 			});
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.languages, (languages) => {
+			this.observe(context?.languages, (languages) => {
 				this.#currentUserAllowedLanguages = languages;
 				this.#checkForLanguageAccess();
 			});
 
-			this.observe(context.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
+			this.observe(context?.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
 				this.#currentUserHasAccessToAllLanguages = hasAccessToAllLanguages;
 				this.#checkForLanguageAccess();
 			});
@@ -57,7 +57,7 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguag
 
 		// create a list of states for the disallowed languages
 		const identifier = 'UMB_LANGUAGE_PERMISSION_';
-		const readOnlyStates = variantIds.map((variantId) => {
+		const readOnlyRules = variantIds.map((variantId) => {
 			return {
 				unique: identifier + variantId.culture,
 				variantId,
@@ -66,11 +66,12 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase<UmbLanguag
 		});
 
 		// remove all previous states before adding new ones
+		// TODO: But maybe options that was added previously is not there any longer? [NL]
 		const uniques = this.#variantOptions?.map((variant) => identifier + variant.culture) || [];
-		this.#workspaceContext.readOnlyState?.removeStates(uniques);
+		this.#workspaceContext.readOnlyGuard?.removeRules(uniques);
 
 		// add new states
-		this.#workspaceContext.readOnlyState?.addStates(readOnlyStates);
+		this.#workspaceContext.readOnlyGuard?.addRules(readOnlyRules);
 	}
 }
 

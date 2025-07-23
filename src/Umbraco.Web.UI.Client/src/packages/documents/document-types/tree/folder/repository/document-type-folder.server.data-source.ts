@@ -2,7 +2,7 @@ import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
@@ -49,10 +49,10 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.getDocumentTypeFolderById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 
@@ -80,16 +80,16 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
 
-		const requestBody = {
+		const body = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			name: model.name,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.postDocumentTypeFolder({
-				requestBody,
+				body,
 			}),
 		);
 
@@ -110,11 +110,11 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Folder name is missing');
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.putDocumentTypeFolderById({
-				id: model.unique,
-				requestBody: { name: model.name },
+				path: { id: model.unique },
+				body: { name: model.name },
 			}),
 		);
 
@@ -133,10 +133,10 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			DocumentTypeService.deleteDocumentTypeFolderById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

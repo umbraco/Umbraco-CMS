@@ -21,10 +21,10 @@ public class TypeFinderSettings
     ///     By default the entry assemblies for scanning plugin types is the Umbraco DLLs. If you require
     ///     scanning for plugins based on different root referenced assemblies you can add the assembly name to this list.
     /// </summary>
-    public IEnumerable<string>? AdditionalEntryAssemblies { get; set; }
+    public ISet<string> AdditionalEntryAssemblies { get; set; } = new HashSet<string>();
 
     /// <summary>
     ///     Gets or sets a value for the assemblies that will be excluded from scanning.
     /// </summary>
-    public string[] AdditionalAssemblyExclusionEntries { get; set; } = Array.Empty<string>();
+    public ISet<string> AdditionalAssemblyExclusionEntries { get; set; } = new HashSet<string>();
 }

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class WebhookLogServiceTests : UmbracoIntegrationTest
+internal sealed class WebhookLogServiceTests : UmbracoIntegrationTest
 {
     private IWebhookLogService WebhookLogService => GetRequiredService<IWebhookLogService>();
 

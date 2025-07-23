@@ -19,7 +19,7 @@ public class TemporaryFileServiceTests : UmbracoIntegrationTest
     public static void ConfigureAllowedUploadedFileExtensions(IUmbracoBuilder builder)
     {
         builder.Services.Configure<ContentSettings>(config =>
-            config.AllowedUploadedFileExtensions = ["txt"]);
+            config.AllowedUploadedFileExtensions = new HashSet<string> { "txt" });
     }
 
     [Test]

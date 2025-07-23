@@ -406,7 +406,6 @@ export default {
 		newPartialViewMacroFromSnippet: 'Novi djelomični prikaz za makro iz isječka',
 		newPartialViewMacroNoMacro: 'Novi djelomični prikaz za makro (bez makroa)',
 		newStyleSheetFile: 'Novi CSS fajl',
-		newRteStyleSheetFile: 'Novi Rich Text Editor CSS fajl',
 	},
 	dashboard: {
 		browser: 'Pregledajte svoju web stranicu',

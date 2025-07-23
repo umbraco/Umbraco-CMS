@@ -29,9 +29,8 @@ test('can render content with member picker value', async ({umbracoApi, umbracoU
   const memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
   const memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingMemberPickerValue(templateName, AliasHelper.toAlias(propertyName));
-  await umbracoApi.document.createPublishedDocumentWithValue(contentName, memberId, dataTypeData.id, templateId, propertyName, documentTypeName);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  const contentURL = contentData.urls[0].url;
+  const contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, memberId, dataTypeData.id, templateId, propertyName, documentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
   // Act
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);

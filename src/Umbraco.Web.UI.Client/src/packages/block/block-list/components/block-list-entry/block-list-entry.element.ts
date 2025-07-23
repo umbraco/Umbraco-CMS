@@ -16,7 +16,7 @@ import type {
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
+import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
@@ -83,6 +83,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_unsupported?: boolean;
+
+	@state()
+	_showActions?: boolean;
 
 	@state()
 	_workspaceEditContentPath?: string;
@@ -179,6 +182,13 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
+			this.#context.actionsVisibility,
+			(showActions) => {
+				this._showActions = showActions;
+			},
+			null,
+		);
+		this.observe(
 			this.#context.inlineEditingMode,
 			(mode) => {
 				this._inlineEditingMode = mode;
@@ -231,9 +241,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			null,
 		);
 		this.observe(
-			this.#context.readOnlyState.isReadOnly,
+			this.#context.readOnlyGuard.permitted,
 			(isReadOnly) => (this._isReadOnly = isReadOnly),
-			'umbReadonlyObserver',
+			'umbReadOnlyObserver',
 		);
 	}
 
@@ -293,6 +303,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
 		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+		if (!propertyDatasetContext || !propertyContext || !clipboardContext) {
+			throw new Error('Could not get required contexts to copy.');
+		}
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
@@ -343,10 +356,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		ext.component?.setAttribute('part', 'component');
 		if (this._exposed) {
 			return ext.component;
 		} else {
-			return html`<div>
+			return html`<div style="min-height: var(--uui-size-16);">
 				${ext.component}
 				<umb-block-overlay-expose-button
 					.contentTypeName=${this._contentTypeName}
@@ -408,15 +422,21 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							single
 							>${this.#renderBuiltinBlockView()}</umb-extension-slot
 						>
-						<uui-action-bar>
-							${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()}
-							${this.#renderCopyToClipboardAction()} ${this.#renderDeleteAction()}
-						</uui-action-bar>
+						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 							: nothing}
 					</div>
 				`
+			: nothing;
+	}
+
+	#renderActionBar() {
+		return this._showActions
+			? html`<uui-action-bar>
+					${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+					${this.#renderDeleteAction()}
+				</uui-action-bar>`
 			: nothing;
 	}
 
@@ -477,6 +497,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	static override styles = [
+		UUIBlinkKeyframes,
 		css`
 			:host {
 				position: relative;
@@ -506,6 +527,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
 				border-color: var(--uui-color-invalid);
+			}
+
+			umb-extension-slot::part(component) {
+				position: relative;
+				z-index: 0;
 			}
 
 			uui-action-bar {

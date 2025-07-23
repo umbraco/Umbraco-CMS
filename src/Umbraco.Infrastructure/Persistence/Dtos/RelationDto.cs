@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Relation)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class RelationDto
+internal sealed class RelationDto
 {
     [Column("id")]
     [PrimaryKeyColumn]
@@ -27,7 +27,7 @@ internal class RelationDto
     [ForeignKey(typeof(RelationTypeDto))]
     public int RelationType { get; set; }
 
-    [Column("datetime")]
+    [Column("datetime", ForceToUtc = false)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime Datetime { get; set; }
 

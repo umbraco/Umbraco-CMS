@@ -7,7 +7,7 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 /**
  * The base class for a store that holds an object.
  */
-export class UmbStoreObjectBase<T> extends UmbContextBase<never> implements UmbApi {
+export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 	protected _data;
 
 	constructor(host: UmbControllerHost, storeAlias: string, initialData?: T) {

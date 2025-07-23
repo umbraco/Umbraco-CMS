@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
@@ -16,6 +16,6 @@ public class GetTelemetryController : TelemetryControllerBase
     [HttpGet("level")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TelemetryResponseModel), StatusCodes.Status200OK)]
-    public async Task<TelemetryRepresentationBase> Get(CancellationToken cancellationToken)
-        => await Task.FromResult(new TelemetryResponseModel { TelemetryLevel = _metricsConsentService.GetConsentLevel() });
+    public Task<TelemetryRepresentationBase> Get(CancellationToken cancellationToken)
+        => Task.FromResult<TelemetryRepresentationBase>(new TelemetryResponseModel { TelemetryLevel = _metricsConsentService.GetConsentLevel() });
 }

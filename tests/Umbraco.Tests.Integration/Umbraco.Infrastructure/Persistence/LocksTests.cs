@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence;
 [TestFixture]
 [Timeout(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class LocksTests : UmbracoIntegrationTest
+internal sealed class LocksTests : UmbracoIntegrationTest
 {
     [SetUp]
     protected void SetUp()

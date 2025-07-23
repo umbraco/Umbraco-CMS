@@ -1,5 +1,5 @@
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityReferenceDataSource, UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
@@ -26,9 +26,9 @@ export class UmbDataTypeReferenceServerDataSource extends UmbControllerBase impl
 		skip = 0,
 		take = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this,
-			DataTypeService.getDataTypeByIdReferencedBy({ id: unique, skip, take }),
+			DataTypeService.getDataTypeByIdReferencedBy({ path: { id: unique }, query: { skip, take } }),
 		);
 
 		if (data) {

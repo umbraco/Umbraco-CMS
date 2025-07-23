@@ -123,8 +123,7 @@ internal sealed class MemberContentEditingService
 
         var sensitivePropertyAliases = memberType.GetSensitivePropertyTypeAliases().ToArray();
         return updateModel
-            .InvariantProperties
-            .Union(updateModel.Variants.SelectMany(variant => variant.Properties))
+            .Properties
             .Select(property => property.Alias)
             .Intersect(sensitivePropertyAliases, StringComparer.OrdinalIgnoreCase)
             .Any() is false;

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -25,7 +25,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse("<p>Hello</p>");
+        var element = parser.Parse("<p>Hello</p>", RichTextBlockModel.Empty);
         Assert.IsNotNull(element);
         Assert.AreEqual("#root", element.Tag);
     }
@@ -35,7 +35,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse("<p>Some text paragraph</p>") as RichTextRootElement;
+        var element = parser.Parse("<p>Some text paragraph</p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         Assert.AreEqual(1, element.Elements.Count());
         var paragraph = element.Elements.Single() as RichTextGenericElement;
@@ -51,7 +51,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse("<p>Some text<br/>More text<br/>Even more text</p>") as RichTextRootElement;
+        var element = parser.Parse("<p>Some text<br/>More text<br/>Even more text</p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         Assert.AreEqual(1, element.Elements.Count());
         var paragraph = element.Elements.Single() as RichTextGenericElement;
@@ -99,7 +99,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse("<p><span data-something=\"the data-something value\">Text in a data-something SPAN</span></p>") as RichTextRootElement;
+        var element = parser.Parse("<p><span data-something=\"the data-something value\">Text in a data-something SPAN</span></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var span = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(span);
@@ -117,7 +117,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse("<p><span something=\"the original something\" data-something=\"the data something\">Text in a data-something SPAN</span></p>") as RichTextRootElement;
+        var element = parser.Parse("<p><span something=\"the original something\" data-something=\"the data something\">Text in a data-something SPAN</span></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var span = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(span);
@@ -132,7 +132,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -151,7 +151,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://media/{_mediaKey:N}}}\"></a></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://media/{_mediaKey:N}}}\"></a></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -166,7 +166,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><a href=\"https://some.where/else/\"></a></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><a href=\"https://some.where/else/\"></a></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -181,7 +181,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><a href=\"https://some.where/else/\">This is the link text</a></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><a href=\"https://some.where/else/\">This is the link text</a></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -197,7 +197,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><a href=\"/{href}\"></a></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><a href=\"/{href}\"></a></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -210,7 +210,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><img src=\"/media/whatever/something.png?rmode=max&amp;width=500\" data-udi=\"umb://media/{_mediaKey:N}\"></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><img src=\"/media/whatever/something.png?rmode=max&amp;width=500\" data-udi=\"umb://media/{_mediaKey:N}\"></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -225,7 +225,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><img src=\"https://some.where/something.png?rmode=max&amp;width=500\"></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><img src=\"https://some.where/something.png?rmode=max&amp;width=500\"></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -240,7 +240,7 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse("<p>some text<!-- a comment -->some more text</p>") as RichTextRootElement;
+        var element = parser.Parse("<p>some text<!-- a comment -->some more text</p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var paragraph = element.Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(paragraph);
@@ -259,7 +259,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id = Guid.NewGuid();
 
         var tagName = $"umb-rte-block{(inlineBlock ? "-inline" : string.Empty)}";
-        var element = parser.Parse($"<p><{tagName} data-content-key=\"{id:N}\"><!--Umbraco-Block--></{tagName}></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><{tagName} data-content-key=\"{id:N}\"><!--Umbraco-Block--></{tagName}></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var paragraph = element.Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(paragraph);
@@ -333,7 +333,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var id1 = Guid.NewGuid();
         var id2 = Guid.NewGuid();
 
-        var element = parser.Parse($"<p><umb-rte-block-inline data-content-key=\"{id1:N}\"><!--Umbraco-Block--></umb-rte-block-inline></p><umb-rte-block data-content-key=\"{id2:N}\"><!--Umbraco-Block--></umb-rte-block>") as RichTextRootElement;
+        var element = parser.Parse($"<p><umb-rte-block-inline data-content-key=\"{id1:N}\"><!--Umbraco-Block--></umb-rte-block-inline></p><umb-rte-block data-content-key=\"{id2:N}\"><!--Umbraco-Block--></umb-rte-block>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         Assert.AreEqual(2, element.Elements.Count());
 
@@ -357,16 +357,71 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsEmpty(blockLevelBlock.Elements);
     }
 
+    private const string TestParagraph = "What follows from <strong>here</strong> <em>is</em> <a href=\"#\">just</a> a bunch of text.";
+
     [Test]
     public void ParseElement_CanHandleWhitespaceAroundInlineElemements()
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse("<p>What follows from <strong>here</strong> <em>is</em> <a href=\"#\">just</a> a bunch of text.</p>") as RichTextRootElement;
+        var element = parser.Parse($"<p>{TestParagraph}</p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var paragraphElement = element.Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(paragraphElement);
 
+        AssertTestParagraph(paragraphElement);
+    }
+
+    [TestCase(1, "\n")]
+    [TestCase(2, "\n")]
+    [TestCase(1, "\r")]
+    [TestCase(2, "\r")]
+    [TestCase(1, "\r\n")]
+    [TestCase(2, "\r\n")]
+    public void ParseElement_RemovesNewLinesAroundHtmlStructuralElements(int numberOfNewLineCharacters, string newlineCharacter)
+    {
+        var parser = CreateRichTextElementParser();
+
+        var newLineSeparator = string.Concat(Enumerable.Repeat(newlineCharacter, numberOfNewLineCharacters));
+        var element = parser.Parse($"<table>{newLineSeparator}<tr>{newLineSeparator}<td>{TestParagraph}</td>{newLineSeparator}</tr>{newLineSeparator}</table>", RichTextBlockModel.Empty) as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var tableElement = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(tableElement);
+
+        var rowElement = tableElement.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(rowElement);
+
+        var cellElement = rowElement.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(cellElement);
+
+        AssertTestParagraph(cellElement);
+    }
+
+    [TestCase(1, "\n")]
+    [TestCase(2, "\n")]
+    [TestCase(1, "\r")]
+    [TestCase(2, "\r")]
+    [TestCase(1, "\r\n")]
+    [TestCase(2, "\r\n")]
+    public void ParseElement_RemovesNewLinesAroundHtmlContentElements(int numberOfNewLineCharacters, string newlineCharacter)
+    {
+        var parser = CreateRichTextElementParser();
+
+        var newLineSeparator = string.Concat(Enumerable.Repeat(newlineCharacter, numberOfNewLineCharacters));
+        var element = parser.Parse($"<div><p>{TestParagraph}</p>{newLineSeparator}<p></p>{newLineSeparator}<p>&nbsp;</p>{newLineSeparator}<p>{TestParagraph}</p></div>", RichTextBlockModel.Empty) as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var divElement = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(divElement);
+
+        var paragraphELements = divElement.Elements;
+        Assert.AreEqual(4, paragraphELements.Count());
+
+        AssertTestParagraph(paragraphELements.First() as RichTextGenericElement);
+        AssertTestParagraph(paragraphELements.Last() as RichTextGenericElement);
+    }
+
+    private static void AssertTestParagraph(RichTextGenericElement paragraphElement)
+    {
         var childElements = paragraphElement.Elements.ToArray();
         Assert.AreEqual(7, childElements.Length);
 

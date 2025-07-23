@@ -1,6 +1,6 @@
 import type { UmbTreeItemContext } from '../index.js';
 import type { UmbTreeItemModel } from '../../types.js';
-import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, ifDefined, nothing, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -8,24 +8,24 @@ export abstract class UmbTreeItemElementBase<
 	TreeItemModelType extends UmbTreeItemModel,
 	TreeItemContextType extends UmbTreeItemContext<TreeItemModelType> = UmbTreeItemContext<TreeItemModelType>,
 > extends UmbLitElement {
-	protected _item?: TreeItemModelType;
 	@property({ type: Object, attribute: false })
-	get item(): TreeItemModelType | undefined {
-		return this._item;
-	}
 	set item(newVal: TreeItemModelType) {
 		this._item = newVal;
 
 		if (this._item) {
+			this._label = this.localize.string(this._item?.name ?? '');
 			this.#initTreeItem();
 		}
 	}
-
-	#api: TreeItemContextType | undefined;
-	@property({ type: Object, attribute: false })
-	public get api(): TreeItemContextType | undefined {
-		return this.#api;
+	get item(): TreeItemModelType | undefined {
+		return this._item;
 	}
+	protected _item?: TreeItemModelType;
+
+	@state()
+	_label?: string;
+
+	@property({ type: Object, attribute: false })
 	public set api(value: TreeItemContextType | undefined) {
 		this.#api = value;
 
@@ -44,6 +44,10 @@ export abstract class UmbTreeItemElementBase<
 			this.#initTreeItem();
 		}
 	}
+	public get api(): TreeItemContextType | undefined {
+		return this.#api;
+	}
+	#api: TreeItemContextType | undefined;
 
 	@property({ type: Boolean, attribute: false })
 	hideActions: boolean = false;
@@ -67,7 +71,7 @@ export abstract class UmbTreeItemElementBase<
 	private _isSelectable = false;
 
 	@state()
-	private _isSelected = false;
+	protected _isSelected = false;
 
 	@state()
 	private _hasChildren = false;
@@ -119,7 +123,6 @@ export abstract class UmbTreeItemElementBase<
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
 	override render() {
-		const label = this.localize.string(this._item?.name ?? '');
 		return html`
 			<uui-menu-item
 				@show-children=${this._onShowChildren}
@@ -133,8 +136,8 @@ export abstract class UmbTreeItemElementBase<
 				.loading=${this._isLoading}
 				.hasChildren=${this._hasChildren}
 				.showChildren=${this._isOpen}
-				.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + label}
-				label=${label}
+				.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
+				label=${this._label}
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
 				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
@@ -162,10 +165,9 @@ export abstract class UmbTreeItemElementBase<
 	#renderIcon() {
 		const icon = this._item?.icon;
 		const isFolder = this._item?.isFolder;
-		const iconWithoutColor = icon?.split(' ')[0];
 
-		if (icon && iconWithoutColor) {
-			return html`<umb-icon slot="icon" name="${this._isActive ? iconWithoutColor : icon}"></umb-icon>`;
+		if (icon) {
+			return html`<umb-icon slot="icon" name="${this._getIconToRender(icon)}"></umb-icon>`;
 		}
 
 		if (isFolder) {
@@ -175,20 +177,26 @@ export abstract class UmbTreeItemElementBase<
 		return html`<umb-icon slot="icon" name="icon-circle-dotted"></umb-icon>`;
 	}
 
+	protected _getIconToRender(icon: string) {
+		const iconWithoutColor = icon.split(' ')[0];
+		return this._isActive || this._isSelected ? iconWithoutColor : icon;
+	}
+
 	renderLabel() {
 		return html`<slot name="label" slot="label"></slot>`;
 	}
 
 	#renderActions() {
-		if (this.hideActions) return;
-		return this.#api && this._item
-			? html`<umb-entity-actions-bundle
-					slot="actions"
-					.entityType=${this.#api.entityType}
-					.unique=${this.#api.unique}
-					.label=${this._item.name}>
-				</umb-entity-actions-bundle>`
-			: '';
+		if (this.hideActions) return nothing;
+		if (!this.#api || !this._item) return nothing;
+		return html`
+			<umb-entity-actions-bundle
+				slot="actions"
+				.entityType=${this.#api.entityType}
+				.unique=${this.#api.unique}
+				.label=${this.localize.term('actions_viewActionsFor', [this._label])}>
+			</umb-entity-actions-bundle>
+		`;
 	}
 
 	#renderChildItems() {
@@ -197,10 +205,11 @@ export abstract class UmbTreeItemElementBase<
 				? repeat(
 						this._childItems,
 						(item, index) => item.name + '___' + index,
-						(item) =>
-							html`<umb-tree-item
+						(item) => html`
+							<umb-tree-item
 								.entityType=${item.entityType}
-								.props=${{ hideActions: this.hideActions, item }}></umb-tree-item>`,
+								.props=${{ hideActions: this.hideActions, item }}></umb-tree-item>
+						`,
 					)
 				: ''}
 		`;
@@ -211,6 +220,6 @@ export abstract class UmbTreeItemElementBase<
 			return nothing;
 		}
 
-		return html` <uui-button @click=${this.#onLoadMoreClick} label="Load more"></uui-button> `;
+		return html` <umb-tree-load-more-button @click=${this.#onLoadMoreClick}></umb-tree-load-more-button> `;
 	}
 }

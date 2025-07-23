@@ -31,7 +31,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 				this.#value = value;
 				// Only remove server validations from validation context [NL]
 				const toRemove = this.#messages.filter((x) => x.type === 'server').map((msg) => msg.key);
-				this.#context?.messages.removeMessageByKeys(toRemove);
+				this.#context?.messages?.removeMessageByKeys(toRemove);
 			}
 		}
 	}
@@ -43,7 +43,7 @@ export class UmbBindServerValidationToFormControl extends UmbControllerBase {
 			this.#context = context;
 
 			this.observe(
-				context.messages?.messagesOfNotTypeAndPath('client', dataPath),
+				context?.messages?.messagesOfNotTypeAndPath('client', dataPath),
 				(messages) => {
 					this.#messages = messages ?? [];
 					this.#isValid = this.#messages.length === 0;

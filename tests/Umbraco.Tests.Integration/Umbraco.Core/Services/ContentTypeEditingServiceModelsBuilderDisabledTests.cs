@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public class
+internal sealed class
     ContentTypeEditingServiceModelsBuilderDisabledTests : ContentTypeEditingServiceModelsBuilderDisabledTestsBase
 {
     // test some properties from IPublishedContent

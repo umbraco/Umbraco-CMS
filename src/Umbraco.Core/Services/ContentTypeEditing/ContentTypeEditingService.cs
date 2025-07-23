@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -49,24 +49,6 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
             entityService,
             shortStringHelper,
             elementSwitchValidator,
-            StaticServiceProvider.Instance.GetRequiredService<IReservedFieldNamesService>())
-    {
-    }
-
-    [Obsolete("Use the constructor that is not marked obsolete, will be removed in v16")]
-    public ContentTypeEditingService(
-        IContentTypeService contentTypeService,
-        ITemplateService templateService,
-        IDataTypeService dataTypeService,
-        IEntityService entityService,
-        IShortStringHelper shortStringHelper)
-        : this(
-            contentTypeService,
-            templateService,
-            dataTypeService,
-            entityService,
-            shortStringHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IElementSwitchValidator>(),
             StaticServiceProvider.Instance.GetRequiredService<IReservedFieldNamesService>())
     {
     }

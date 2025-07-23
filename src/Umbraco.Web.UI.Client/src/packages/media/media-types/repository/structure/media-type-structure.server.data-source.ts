@@ -30,8 +30,8 @@ const getAllowedChildrenOf = (unique: string | null, parentContentUnique: string
 	if (unique) {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return MediaTypeService.getMediaTypeByIdAllowedChildren({
-			id: unique,
-			parentContentKey: parentContentUnique ?? undefined,
+			path: { id: unique },
+			query: { parentContentKey: parentContentUnique ?? undefined },
 		});
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
@@ -51,8 +51,8 @@ const mapper = (item: AllowedMediaTypeModel): UmbAllowedMediaTypeModel => {
 
 const getAllowedMediaTypesOfFolders = async ({ skip, take }: { skip: number; take: number }) => {
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	const { items } = await MediaTypeService.getItemMediaTypeFolders({ skip, take });
-	return items.map((item) => mapper(item));
+	const { data } = await MediaTypeService.getItemMediaTypeFolders({ query: { skip, take } });
+	return data.items.map((item) => mapper(item));
 };
 
 const getAllowedMediaTypesOfExtension = async ({
@@ -65,6 +65,6 @@ const getAllowedMediaTypesOfExtension = async ({
 	take: number;
 }) => {
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	const { items } = await MediaTypeService.getItemMediaTypeAllowed({ fileExtension, skip, take });
-	return items.map((item) => mapper(item));
+	const { data } = await MediaTypeService.getItemMediaTypeAllowed({ query: { fileExtension, skip, take } });
+	return data.items.map((item) => mapper(item));
 };

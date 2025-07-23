@@ -11,11 +11,13 @@ namespace Umbraco.Cms.Core.Strings;
 /// </remarks>
 public static class Utf8ToAsciiConverter
 {
-    [Obsolete("Use ToAsciiString(ReadOnlySpan<char>..) instead")]
-    public static string ToAsciiString(string text, char fail = '?')
-    {
-        return ToAsciiString(text.AsSpan(), fail);
-    }
+    /// <summary>
+    ///     Converts an Utf8 string into an Ascii string.
+    /// </summary>
+    /// <param name="text">The text to convert.</param>
+    /// <param name="fail">The character to use to replace characters that cannot properly be converted.</param>
+    /// <returns>The converted text.</returns>
+    public static string ToAsciiString(string text, char fail = '?') => ToAsciiString(text.AsSpan(), fail);
 
     /// <summary>
     ///     Converts an Utf8 string into an Ascii string.

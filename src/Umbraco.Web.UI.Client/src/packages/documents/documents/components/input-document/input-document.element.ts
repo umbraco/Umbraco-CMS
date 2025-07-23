@@ -1,3 +1,4 @@
+import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UmbDocumentPickerInputContext } from './input-document.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -5,7 +6,6 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 
@@ -89,6 +89,9 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
+	@property({ type: Boolean, attribute: 'include-trashed' })
+	includeTrashed = false;
+
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
@@ -153,6 +156,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 					unique: id,
 					entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 				})),
+				includeTrashed: this.includeTrashed,
 			},
 		);
 	}

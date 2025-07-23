@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_USER_PERMISSION_DOCUMENT_CREATE } from '../../user-permissions/index.js';
+import { UMB_USER_PERMISSION_DOCUMENT_CREATE } from '../../user-permissions/document/constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
 export const manifests: Array<UmbExtensionManifest> = [

@@ -3,7 +3,7 @@ import type { UmbInputImageCropperFieldElement } from './image-cropper-field.ele
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFileDropzoneItemStatus, UmbInputDropzoneDashedStyles } from '@umbraco-cms/backoffice/dropzone';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
@@ -146,7 +146,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	#renderDropzone() {
 		return html`
 			<umb-input-dropzone
-				id="dropzone"
+				standalone
 				accept=${ifDefined(this._accept)}
 				disable-folder-upload
 				@change="${this.#onUpload}"></umb-input-dropzone>
@@ -173,23 +173,33 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 	}
 
 	#renderImageCropper() {
-		return html`<umb-image-cropper-field
-			.value=${this.value}
-			.file=${this._file?.temporaryFile?.file}
-			@change=${this.#onChange}>
-			<uui-button slot="actions" @click=${this.#onRemove} label=${this.localize.term('content_uploadClear')}>
-				<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
-			</uui-button>
-		</umb-image-cropper-field> `;
+		return html`
+			<umb-image-cropper-field .value=${this.value} .file=${this._file?.temporaryFile?.file} @change=${this.#onChange}>
+				<uui-button slot="actions" compact label=${this.localize.term('content_uploadClear')} @click=${this.#onRemove}>
+					<uui-icon name="icon-trash"></uui-icon>
+					<umb-localize key="content_uploadClear">Remove file(s)</umb-localize>
+				</uui-button>
+			</umb-image-cropper-field>
+		`;
 	}
 
 	static override readonly styles = [
 		UmbTextStyles,
-		UmbInputDropzoneDashedStyles,
 		css`
+			umb-input-dropzone {
+				max-width: 500px;
+				min-width: 300px;
+			}
+
 			#loader {
 				display: flex;
 				justify-content: center;
+			}
+
+			[slot='actions'] {
+				uui-icon {
+					padding-right: var(--uui-size-1);
+				}
 			}
 		`,
 	];

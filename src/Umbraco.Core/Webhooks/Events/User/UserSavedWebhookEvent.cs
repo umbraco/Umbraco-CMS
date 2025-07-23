@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -21,19 +22,5 @@ public class UserSavedWebhookEvent : WebhookEventBase<UserSavedNotification>
     public override string Alias => Constants.WebhookEvents.Aliases.UserSaved;
 
     public override object? ConvertNotificationToRequestPayload(UserSavedNotification notification)
-    {
-        // TODO: Map more stuff here
-        var result = notification.SavedEntities.Select(entity => new
-        {
-            entity.Id,
-            entity.Key,
-            entity.Name,
-            entity.Language,
-            entity.Email,
-            entity.Username,
-            entity.FailedPasswordAttempts
-        });
-
-        return result;
-    }
+    => notification.SavedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

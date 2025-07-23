@@ -20,19 +20,6 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     private readonly bool _metaTagOptionAvailable;
     private readonly bool _shouldNotExist;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="BaseHttpHeaderCheck" /> class.
-    /// </summary>
-    [Obsolete("Use constructor that takes all parameters instead.")]
-    protected BaseHttpHeaderCheck(
-        IHostingEnvironment hostingEnvironment,
-        ILocalizedTextService textService,
-        string header,
-        string localizedTextPrefix,
-        bool metaTagOptionAvailable)
-        : this(hostingEnvironment, textService, header, localizedTextPrefix, metaTagOptionAvailable, false)
-    { }
-
     protected BaseHttpHeaderCheck(
         IHostingEnvironment hostingEnvironment,
         ILocalizedTextService textService,
@@ -62,15 +49,14 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     /// <summary>
     ///     Get the status for this health check
     /// </summary>
-    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync() =>
-        await Task.WhenAll(CheckForHeader());
+    public override async Task<IEnumerable<HealthCheckStatus>> GetStatusAsync()
+        => [await CheckForHeader()];
 
     /// <summary>
     ///     Executes the action and returns it's status
     /// </summary>
     public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
-        => throw new InvalidOperationException(
-            "HTTP Header action requested is either not executable or does not exist");
+        => throw new InvalidOperationException("HTTP Header action requested is either not executable or does not exist");
 
     /// <summary>
     ///     The actual health check method.

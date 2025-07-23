@@ -10,7 +10,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source that fetches the user collection data from the server.
@@ -36,16 +36,18 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbUserCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.getFilterUser({
-				filter: filter.filter,
-				orderBy: filter.orderBy as unknown as UserOrderModel, // TODO: This is a temporary workaround to avoid a type error.
-				orderDirection: filter.orderDirection as unknown as DirectionModel, // TODO: This is a temporary workaround to avoid a type error.
-				skip: filter.skip,
-				take: filter.take,
-				userGroupIds: filter.userGroupIds,
-				userStates: filter.userStates as unknown as Array<UserStateModel>, // TODO: This is a temporary workaround to avoid a type error.
+				query: {
+					filter: filter.filter,
+					orderBy: filter.orderBy as unknown as UserOrderModel, // TODO: This is a temporary workaround to avoid a type error.
+					orderDirection: filter.orderDirection as unknown as DirectionModel, // TODO: This is a temporary workaround to avoid a type error.
+					skip: filter.skip,
+					take: filter.take,
+					userGroupIds: filter.userGroupIds,
+					userStates: filter.userStates as unknown as Array<UserStateModel>, // TODO: This is a temporary workaround to avoid a type error.
+				},
 			}),
 		);
 

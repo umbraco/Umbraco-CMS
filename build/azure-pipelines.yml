@@ -432,6 +432,33 @@ stages:
             displayName: Start SQL Server Docker image (Linux)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
+          - powershell: |
+              $maxAttempts = 12
+              $attempt = 0
+              $status = ""
+
+              while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
+                Start-Sleep -Seconds 5
+                # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
+                $status = docker inspect -f '{{.State.Status}}' mssql
+
+                if ($status -ne 'running') {
+                  Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
+                  $attempt++
+                }
+              }
+
+              if ($status -eq 'running') {
+                Write-Host "SQL Server container is running"
+                docker ps -a
+              } else {
+                Write-Host "SQL Server did not become ready in time. Last known status: $status"
+                docker logs mssql
+                exit 1
+              }
+            displayName: Wait for SQL Server to be ready (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
           - pwsh: SqlLocalDB start MSSQLLocalDB
             displayName: Start SQL Server LocalDB (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
@@ -540,7 +567,8 @@ stages:
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
-              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
+              CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -623,6 +651,14 @@ stages:
             displayName: Copy Playwright results
             condition: succeededOrFailed()
 
+          # Copy console error log
+          - pwsh: |
+              if (Test-Path tests/Umbraco.Tests.AcceptanceTest/console-errors.json) {
+                  Copy-Item tests/Umbraco.Tests.AcceptanceTest/console-errors.json $(Build.ArtifactStagingDirectory)
+              }
+            displayName: Copy console error log
+            condition: succeededOrFailed()
+
           # Publish test artifacts
           - task: PublishPipelineArtifact@1
             displayName: Publish test artifacts
@@ -698,7 +734,8 @@ stages:
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
-              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
+              CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -799,6 +836,14 @@ stages:
             displayName: Copy Playwright results
             condition: succeededOrFailed()
 
+          # Copy console error log
+          - pwsh: |
+              if (Test-Path tests/Umbraco.Tests.AcceptanceTest/console-errors.json) {
+                  Copy-Item tests/Umbraco.Tests.AcceptanceTest/console-errors.json $(Build.ArtifactStagingDirectory)
+              }
+            displayName: Copy console error log
+            condition: succeededOrFailed()
+
           # Publish test artifacts
           - task: PublishPipelineArtifact@1
             displayName: Publish test artifacts
@@ -829,6 +874,8 @@ stages:
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
+        pool:
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
         displayName: Push to pre-release feed
         steps:
           - checkout: none
@@ -890,6 +937,8 @@ stages:
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
+        pool:
+          vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
         displayName: Push to NuGet
         steps:
           - checkout: none

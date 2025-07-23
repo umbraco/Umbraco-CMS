@@ -1,10 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -16,29 +14,16 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Provides an abstract base class for property value editors based on block editors.
+/// </summary>
 public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockValuePropertyValueEditorBase<TValue, TLayout>
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
-    protected BlockEditorPropertyValueEditor(
-        DataEditorAttribute attribute,
-        PropertyEditorCollection propertyEditors,
-        DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeConfigurationCache dataTypeConfigurationCache,
-        ILocalizedTextService textService,
-        ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>> logger,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
-        : this(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            ioHelper,
-            attribute)
-    {
-    }
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BlockEditorPropertyValueEditor{TValue, TLayout}"/> class.
+    /// </summary>
     protected BlockEditorPropertyValueEditor(
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
@@ -81,13 +66,7 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         return BlockEditorValues.DeserializeAndClean(rawJson)?.BlockValue;
     }
 
-    /// <summary>
-    ///     Ensure that sub-editor values are translated through their ToEditor methods
-    /// </summary>
-    /// <param name="property"></param>
-    /// <param name="culture"></param>
-    /// <param name="segment"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
     {
         var val = property.GetValue(culture, segment);
@@ -114,38 +93,48 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
         return blockEditorData.BlockValue;
     }
 
-    /// <summary>
-    ///     Ensure that sub-editor values are translated through their FromEditor methods
-    /// </summary>
-    /// <param name="editorValue"></param>
-    /// <param name="currentValue"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
+        // Note: we can't early return here if editorValue is null or empty, because these is the following case:
+        // - current value not null (which means doc has at least one element in block list)
+        // - editor value (new value) is null (which means doc has no elements in block list)
+        // If we check editor value for null value and return before MapBlockValueFromEditor, then we will not trigger updates for properties.
+        // For most of the properties this is fine, but for properties which contain other state it might be critical (e.g. file upload field).
+        // So, we must run MapBlockValueFromEditor even if editorValue is null or string.IsNullOrWhiteSpace(editorValue.Value.ToString()) is true.
+
+        BlockEditorData<TValue, TLayout>? currentBlockEditorData = GetBlockEditorData(currentValue);
+        BlockEditorData<TValue, TLayout>? blockEditorData = GetBlockEditorData(editorValue.Value);
+
+        // We can skip MapBlockValueFromEditor if both editorValue and currentValue values are empty.
+        if (IsBlockEditorDataEmpty(currentBlockEditorData) && IsBlockEditorDataEmpty(blockEditorData))
         {
             return null;
         }
 
-        BlockEditorData<TValue, TLayout>? blockEditorData;
+        MapBlockValueFromEditor(blockEditorData?.BlockValue, currentBlockEditorData?.BlockValue, editorValue.ContentKey);
+
+        if (IsBlockEditorDataEmpty(blockEditorData))
+        {
+            return null;
+        }
+
+        return JsonSerializer.Serialize(blockEditorData.BlockValue);
+    }
+
+    private BlockEditorData<TValue, TLayout>? GetBlockEditorData(object? value)
+    {
         try
         {
-            blockEditorData = BlockEditorValues.DeserializeAndClean(editorValue.Value);
+            return BlockEditorValues.DeserializeAndClean(value);
         }
         catch
         {
-            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
-            return string.Empty;
+            // If this occurs it means the data is invalid. It shouldn't happen could if we change the data format.
+            return null;
         }
-
-        if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
-        {
-            return string.Empty;
-        }
-
-        MapBlockValueFromEditor(blockEditorData.BlockValue);
-
-        // return json
-        return JsonSerializer.Serialize(blockEditorData.BlockValue);
     }
+
+    private static bool IsBlockEditorDataEmpty([NotNullWhen(false)] BlockEditorData<TValue, TLayout>? editorData)
+        => editorData is null || editorData.BlockValue.ContentData.Count == 0;
 }

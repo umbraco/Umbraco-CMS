@@ -1,5 +1,5 @@
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { PublishedCacheService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -19,7 +19,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	//Reload
 	private async _reloadMemoryCache() {
 		this._buttonStateReload = 'waiting';
-		const { error } = await tryExecuteAndNotify(this, PublishedCacheService.postPublishedCacheReload());
+		const { error } = await tryExecute(this, PublishedCacheService.postPublishedCacheReload());
 		if (error) {
 			this._buttonStateReload = 'failed';
 		} else {
@@ -40,7 +40,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	// Rebuild
 	private async _rebuildDatabaseCache() {
 		this._buttonStateRebuild = 'waiting';
-		const { error } = await tryExecuteAndNotify(this, PublishedCacheService.postPublishedCacheRebuild());
+		const { error } = await tryExecute(this, PublishedCacheService.postPublishedCacheRebuild());
 		if (error) {
 			this._buttonStateRebuild = 'failed';
 		} else {
@@ -54,7 +54,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		while (this._buttonStateRebuild === 'waiting') {
 			await new Promise((resolve) => setTimeout(resolve, this.#isFirstRebuildStatusPoll ? 1000 : 5000));
 			this.#isFirstRebuildStatusPoll = false;
-			const { data, error } = await tryExecuteAndNotify(this, PublishedCacheService.getPublishedCacheRebuildStatus());
+			const { data, error } = await tryExecute(this, PublishedCacheService.getPublishedCacheRebuildStatus());
 			if (error || !data) {
 				this._buttonStateRebuild = 'failed';
 				return;

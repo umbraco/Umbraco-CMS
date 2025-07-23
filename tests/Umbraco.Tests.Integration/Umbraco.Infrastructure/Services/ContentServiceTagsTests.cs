@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
     PublishedRepositoryEvents = true,
     WithApplication = true,
     Logger = UmbracoTestOptions.Logger.Console)]
-public class ContentServiceTagsTests : UmbracoIntegrationTest
+internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;

@@ -21,7 +21,6 @@ export interface UmbMediaDetailModel extends UmbContentDetailModel {
 	entityType: UmbMediaEntityType;
 	isTrashed: boolean;
 	unique: string;
-	urls: Array<UmbMediaUrlInfoModel>;
 	values: Array<UmbMediaValueModel>;
 	variants: Array<UmbEntityVariantModel>;
 }

@@ -1,5 +1,6 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_SEARCH_PROVIDER_ALIAS } from './constants.js';
+import { manifests as globalSearchManifests } from './global-search/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -13,9 +14,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	{
-		name: 'Media Search Result Item ',
+		name: 'Media Search Result Item',
 		alias: 'Umb.SearchResultItem.Media',
 		type: 'searchResultItem',
+		element: () => import('./media-search-result-item.element.js'),
 		forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
 	},
+	...globalSearchManifests,
 ];

@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
     PublishedRepositoryEvents = true,
     WithApplication = true,
     Boot = true)]
-public class TrackRelationsTests : UmbracoIntegrationTestWithContent
+internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 {
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 

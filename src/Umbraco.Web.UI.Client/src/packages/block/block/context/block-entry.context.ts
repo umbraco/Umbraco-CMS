@@ -17,7 +17,7 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { encodeFilePath, UmbReadOnlyVariantStateManager } from '@umbraco-cms/backoffice/utils';
+import { encodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
@@ -47,7 +47,7 @@ export abstract class UmbBlockEntryContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockOriginData extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
-> extends UmbContextBase<unknown> {
+> extends UmbContextBase {
 	//
 	_manager?: BlockManagerContextType;
 	_entries?: BlockEntriesContextType;
@@ -65,7 +65,17 @@ export abstract class UmbBlockEntryContext<
 	#hasExpose = new UmbBooleanState(undefined);
 	readonly hasExpose = this.#hasExpose.asObservable();
 
-	public readonly readOnlyState = new UmbReadOnlyVariantStateManager(this);
+	#actionsVisibility = new UmbBooleanState(true);
+	readonly actionsVisibility = this.#actionsVisibility.asObservable();
+
+	hideActions() {
+		this.#actionsVisibility.setValue(false);
+	}
+	showActions() {
+		this.#actionsVisibility.setValue(true);
+	}
+
+	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	// Workspace alike methods, to enables editing of data without the need of a workspace (Custom views and block grid inline editing mode for example).
 	getEntityType() {
@@ -548,18 +558,27 @@ export abstract class UmbBlockEntryContext<
 	abstract _gotContentType(contentType: UmbContentTypeModel | undefined): void;
 
 	async #observeVariantId() {
-		if (!this._manager) return;
+		if (!this._manager) {
+			this.removeUmbControllerByAlias('observeVariantId');
+			return;
+		}
 		await this.#contentStructurePromise;
 		if (!this.#contentStructure) {
 			throw new Error('No contentStructure found');
+		}
+
+		if (!this._manager) {
+			// The manager maybe got removed while we awaited the promise above.
+			this.removeUmbControllerByAlias('observeVariantId');
+			return;
 		}
 
 		// observe variantId:
 		this.observe(
 			observeMultiple([
 				this._manager.variantId,
-				this.#contentStructure?.ownerContentTypeObservablePart((x) => x?.variesByCulture),
-				this.#contentStructure?.ownerContentTypeObservablePart((x) => x?.variesBySegment),
+				this.#contentStructure.ownerContentTypeObservablePart((x) => x?.variesByCulture),
+				this.#contentStructure.ownerContentTypeObservablePart((x) => x?.variesBySegment),
 			]),
 			([variantId, variesByCulture, variesBySegment]) => {
 				if (!variantId || variesByCulture === undefined || variesBySegment === undefined) return;
@@ -573,22 +592,23 @@ export abstract class UmbBlockEntryContext<
 	#observeReadOnlyState() {
 		if (!this._manager) return;
 
+		// TODO: Here is a potential future issue. This is parsing on the read only state of the variant that this is opened from, that is problematic when we enable switching variant within a Block. [NL]
+		// TODO: This could benefit from a more dynamic approach, where we inherit all non-variant and variant scoped states. [NL]
 		this.observe(
-			observeMultiple([this._manager.readOnlyState.isReadOnly, this._manager.variantId]),
-			([isReadOnly, variantId]) => {
+			// TODO: Instead transfer all variant states.
+			this._manager.readOnlyState.isPermittedForObservableVariant(this._variantId),
+			(isReadOnly) => {
 				const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
-				if (variantId === undefined) return;
 
 				if (isReadOnly) {
-					const state = {
+					const rule = {
 						unique,
-						variantId,
-						message: '',
+						variantId: this.#variantId.getValue(),
 					};
 
-					this.readOnlyState?.addState(state);
+					this.readOnlyGuard?.addRule(rule);
 				} else {
-					this.readOnlyState?.removeState(unique);
+					this.readOnlyGuard?.removeRule(unique);
 				}
 			},
 			'observeIsReadOnly',

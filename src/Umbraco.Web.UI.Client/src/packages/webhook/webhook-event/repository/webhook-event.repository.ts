@@ -16,11 +16,14 @@ export class UmbWebhookEventRepository extends UmbRepositoryBase implements UmbA
 
 		this.#source = new UmbWebhookEventServerDataSource(host);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_WEBHOOK_EVENT_STORE_CONTEXT, (instance) => {
+		this.#init = this.consumeContext(UMB_WEBHOOK_EVENT_STORE_CONTEXT, (instance) => {
+			if (instance) {
 				this.#store = instance;
-			}).asPromise(),
-		]);
+			}
+		})
+			.asPromise({ preventTimeout: true })
+			// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+			.catch(() => undefined);
 	}
 
 	async requestEvents() {
@@ -28,8 +31,12 @@ export class UmbWebhookEventRepository extends UmbRepositoryBase implements UmbA
 
 		const { data, error } = await this.#source.getAll();
 
+		if (!this.#store) {
+			return {};
+		}
+
 		if (data) {
-			this.#store!.appendItems(data.items);
+			this.#store.appendItems(data.items);
 		}
 
 		return { data, error, asObservable: () => this.#store!.all() };

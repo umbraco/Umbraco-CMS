@@ -1,15 +1,9 @@
 import { UmbUnlockUserRepository } from '../../repository/index.js';
 import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
-import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export class UmbUnlockUserEntityAction extends UmbEntityActionBase<never> {
-	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
-		super(host, args);
-	}
-
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 
@@ -29,7 +23,10 @@ export class UmbUnlockUserEntityAction extends UmbEntityActionBase<never> {
 		});
 
 		const unlockUserRepository = new UmbUnlockUserRepository(this);
-		await unlockUserRepository?.unlock([this.args.unique]);
+		const { error } = await unlockUserRepository.unlock([this.args.unique]);
+		if (error) {
+			throw error;
+		}
 	}
 }
 

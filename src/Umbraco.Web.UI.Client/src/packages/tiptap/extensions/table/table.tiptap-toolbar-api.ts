@@ -29,12 +29,17 @@ export class UmbTiptapToolbarTableExtensionApi extends UmbTiptapToolbarElementAp
 		tableProperties: (editor) => this.#tableProperties(editor),
 	};
 
+	override isActive(editor?: Editor, item?: unknown) {
+		if (!item) return super.isActive(editor);
+		return false;
+	}
+
 	async #tableProperties(editor?: Editor) {
 		if (!editor || !editor.isActive('table')) return;
 
 		const modalData = this.#getModalData(editor);
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_TIPTAP_TABLE_PROPERTIES_MODAL, modalData);
+		const modal = modalManager?.open(this, UMB_TIPTAP_TABLE_PROPERTIES_MODAL, modalData);
 
 		if (!modal) return;
 

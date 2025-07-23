@@ -4,7 +4,7 @@ import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Server data source for the Media audit log
@@ -29,14 +29,16 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 	 * @memberof UmbMediaAuditLogServerDataSource
 	 */
 	async getAuditLog(args: UmbAuditLogRequestArgs) {
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.getMediaByIdAuditLog({
-				id: args.unique,
-				orderDirection: args.orderDirection as DirectionModel, // TODO: fix this type cast
-				sinceDate: args.sinceDate,
-				skip: args.skip,
-				take: args.take,
+				path: { id: args.unique },
+				query: {
+					orderDirection: args.orderDirection as DirectionModel, // TODO: fix this type cast
+					sinceDate: args.sinceDate,
+					skip: args.skip,
+					take: args.take,
+				},
 			}),
 		);
 

@@ -1,5 +1,5 @@
+import type { UmbItemRepository } from './item/index.js';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -41,11 +41,12 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	#statuses = new UmbArrayState<UmbRepositoryItemsStatus>([], (x) => x.unique);
 	statuses = this.#statuses.asObservable();
 
+	// TODO: Align with the other manager(details), and make a generic type/base for these. v.17.0 [NL]
 	/**
 	 * Creates an instance of UmbRepositoryItemsManager.
 	 * @param {UmbControllerHost} host - The host for the controller.
 	 * @param {string} repositoryAlias - The alias of the repository to use.
-	 * @param {((entry: ItemType) => string | undefined)} [getUniqueMethod] - DEPRECATED since 15.3. Will be removed in v. 17: A method to get the unique key from the item.
+	 * @param {((entry: ItemType) => string | undefined)} [getUniqueMethod] - DEPRECATED since 15.3. Will be removed in v.17.0: A method to get the unique key from the item.
 	 * @memberof UmbRepositoryItemsManager
 	 */
 	constructor(
@@ -107,7 +108,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 			);
 
 			this.#eventContext = context;
-			this.#eventContext.addEventListener(
+			this.#eventContext?.addEventListener(
 				UmbEntityUpdatedEvent.TYPE,
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
@@ -249,7 +250,8 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		}
 	}
 
-	#sortByUniques(data: Array<ItemType>): Array<ItemType> {
+	#sortByUniques(data?: Array<ItemType>): Array<ItemType> {
+		if (!data) return [];
 		const uniques = this.getUniques();
 		return [...data].sort((a, b) => {
 			const aIndex = uniques.indexOf(this.#getUnique(a) ?? '');

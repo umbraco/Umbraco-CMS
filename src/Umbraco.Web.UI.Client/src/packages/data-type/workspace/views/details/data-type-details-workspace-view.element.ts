@@ -2,7 +2,7 @@ import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.conte
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
@@ -55,15 +55,11 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	}
 
 	async #openPropertyEditorUIPicker() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const value = await modalManager
-			.open(this, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
-				value: {
-					selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
-				},
-			})
-			.onSubmit()
-			.catch(() => undefined);
+		const value = await umbOpenModal(this, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
+			value: {
+				selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
+			},
+		}).catch(() => undefined);
 
 		if (value) {
 			this.#workspaceContext?.setPropertyEditorUiAlias(value.selection[0]);

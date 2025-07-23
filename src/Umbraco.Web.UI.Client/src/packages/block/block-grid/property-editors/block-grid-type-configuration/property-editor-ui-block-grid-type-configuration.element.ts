@@ -1,3 +1,6 @@
+import type { UmbBlockGridTypeGroupType } from '../../types.js';
+import { UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL } from '../../workspace/index.js';
+import { UMB_BLOCK_GRID_TYPE } from '../../constants.js';
 import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import type {
 	UmbPropertyEditorUiElement,
@@ -15,11 +18,6 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UMB_BLOCK_GRID_TYPE,
-	UMB_BLOCK_GRID_TYPE_WORKSPACE_MODAL,
-	type UmbBlockGridTypeGroupType,
-} from '@umbraco-cms/backoffice/block-grid';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_PROPERTY_CONTEXT,
@@ -30,6 +28,9 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+
+// TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the `umb-input-block-type` element.
+import '@umbraco-cms/backoffice/block-type';
 
 interface MappedGroupWithBlockTypes extends UmbBlockGridTypeGroupType {
 	blocks: Array<UmbBlockTypeWithGroupKey>;
@@ -98,13 +99,13 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, async (context) => {
-			this._alias = context.getAlias();
+			this._alias = context?.getAlias();
 		});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.#datasetContext = context;
 			this.observe(
-				await this.#datasetContext.propertyValueByAlias('blockGroups'),
+				await this.#datasetContext?.propertyValueByAlias('blockGroups'),
 				(value) => {
 					this.#blockGroups = (value as Array<UmbBlockGridTypeGroupType>) ?? [];
 					this.#mapValuesToBlockGroups();

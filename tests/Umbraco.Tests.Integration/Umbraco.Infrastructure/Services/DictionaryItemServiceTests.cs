@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DictionaryItemServiceTests : UmbracoIntegrationTest
+internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
 {
     private Guid _parentItemId;
     private Guid _childItemId;

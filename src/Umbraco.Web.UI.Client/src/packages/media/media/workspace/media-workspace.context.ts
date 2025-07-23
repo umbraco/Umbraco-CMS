@@ -38,8 +38,7 @@ export class UmbMediaWorkspaceContext
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.mediaType.unique);
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
-
-	readonly urls = this._data.createObservablePartOfCurrent((data) => data?.urls || []);
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.mediaType.icon);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
@@ -54,7 +53,18 @@ export class UmbMediaWorkspaceContext
 			contentTypePropertyName: 'mediaType',
 		});
 
-		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique), null);
+		this.observe(
+			this.contentTypeUnique,
+			(unique) => {
+				if (unique) {
+					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
+
+		this.propertyViewGuard.fallbackToPermitted();
+		this.propertyWriteGuard.fallbackToPermitted();
 
 		this.routes.setRoutes([
 			{
@@ -66,7 +76,7 @@ export class UmbMediaWorkspaceContext
 					const mediaTypeUnique = info.match.params.mediaTypeUnique;
 					await this.createScaffold({
 						parent: { entityType: parentEntityType, unique: parentUnique },
-						preset: { mediaType: { unique: mediaTypeUnique, collection: null } },
+						preset: { mediaType: { unique: mediaTypeUnique } },
 					});
 
 					new UmbWorkspaceIsNewRedirectController(
@@ -108,11 +118,10 @@ export class UmbMediaWorkspaceContext
 	 * @deprecated Use `createScaffold` instead.
 	 */
 	public async create(parent: { entityType: string; unique: string | null }, mediaTypeUnique: string) {
-		const args = {
+		return this.createScaffold({
 			parent,
-			preset: { mediaType: { unique: mediaTypeUnique, collection: null } },
-		};
-		return this.createScaffold(args);
+			preset: { mediaType: { unique: mediaTypeUnique } },
+		});
 	}
 
 	public getCollectionAlias() {

@@ -34,18 +34,6 @@ public static partial class Constants
 
         public const string AdminGroupAlias = "admin";
 
-        [Obsolete("Use EditorGroupKey instead. Scheduled for removal in V15.")]
-        public const string EditorGroupAlias = "editor";
-
-        [Obsolete("Use SensitiveDataGroupKey instead. Scheduled for removal in V15.")]
-        public const string SensitiveDataGroupAlias = "sensitiveData";
-
-        [Obsolete("Use TranslatorGroupKey instead. Scheduled for removal in V15.")]
-        public const string TranslatorGroupAlias = "translator";
-
-        [Obsolete("Use WriterGroupKey instead. Scheduled for removal in V15.")]
-        public const string WriterGroupAlias = "writer";
-
         /// <summary>
         /// The key of the admin group
         /// </summary>

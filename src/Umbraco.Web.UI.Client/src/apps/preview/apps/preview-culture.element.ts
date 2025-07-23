@@ -36,7 +36,7 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 		this._culture = culture;
 
 		const previewContext = await this.getContext(UMB_PREVIEW_CONTEXT);
-		previewContext.updateIFrame({ culture: culture.unique });
+		previewContext?.updateIFrame({ culture: culture.unique });
 	}
 
 	override render() {

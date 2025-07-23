@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
     ///     Implements <see cref="IScope" />.
     /// </summary>
     /// <remarks>Not thread-safe obviously.</remarks>
-    internal class Scope : CoreScope, ICoreScope, IScope, Core.Scoping.IScope
+    internal sealed class Scope : CoreScope, ICoreScope, IScope, Core.Scoping.IScope
     {
         private readonly bool _autoComplete;
         private readonly CoreDebugSettings _coreDebugSettings;
@@ -194,17 +194,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 callContext,
                 autoComplete)
         {
-        }
-
-        [Obsolete("Scopes are never stored on HttpContext.Items anymore, so CallContext is always true.")]
-        // a value indicating whether to force call-context
-        public bool CallContext
-        {
-            get => true;
-            set
-            {
-                // NOOP - always true.
-            }
         }
 
         // a value indicating whether the scope is detachable

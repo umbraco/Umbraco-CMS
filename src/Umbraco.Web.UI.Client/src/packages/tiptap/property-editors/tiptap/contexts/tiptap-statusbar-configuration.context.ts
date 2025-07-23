@@ -1,5 +1,6 @@
 import type { UmbTiptapStatusbarExtension, UmbTiptapStatusbarViewModel } from '../types.js';
 import type { UmbTiptapStatusbarValue } from '../../../components/types.js';
+import { UMB_TIPTAP_STATUSBAR_CONFIGURATION_CONTEXT } from './tiptap-statusbar-configuration.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -7,7 +8,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase<UmbTiptapStatusbarConfigurationContext> {
+export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase {
 	#extensions = new UmbArrayState<UmbTiptapStatusbarExtension>([], (x) => x.alias);
 	public readonly extensions = this.#extensions.asObservable();
 
@@ -24,7 +25,7 @@ export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase<UmbTi
 	public readonly statusbar = this.#statusbar.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'UmbTiptapStatusbarConfigurationContext');
+		super(host, UMB_TIPTAP_STATUSBAR_CONFIGURATION_CONTEXT);
 
 		this.observe(umbExtensionsRegistry.byType('tiptapStatusbarExtension'), (extensions) => {
 			const _extensions = extensions
@@ -43,7 +44,7 @@ export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase<UmbTi
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (dataset) => {
 			this.observe(
-				await dataset.propertyValueByAlias<Array<string>>('extensions'),
+				await dataset?.propertyValueByAlias<Array<string>>('extensions'),
 				(extensions) => {
 					if (extensions) {
 						this.#extensionsEnabled.clear();

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class ContentScheduleDto
+internal sealed class ContentScheduleDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentSchedule;
 
@@ -24,6 +24,7 @@ internal class ContentScheduleDto
     [NullSetting(NullSetting = NullSettings.Null)] // can be invariant
     public int? LanguageId { get; set; }
 
+    // NOTE: this date is explicitly stored and treated as UTC despite the lack of "Utc" postfix.
     [Column("date")]
     public DateTime Date { get; set; }
 

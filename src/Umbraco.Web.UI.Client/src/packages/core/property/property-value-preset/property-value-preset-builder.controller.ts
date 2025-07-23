@@ -54,9 +54,18 @@ export class UmbPropertyValuePresetBuilderController<
 		// Find a preset for this editor alias:
 		const manifests = umbExtensionsRegistry.getByTypeAndFilter('propertyValuePreset', filter);
 
-		const apis = (await Promise.all(manifests.map((x) => createExtensionApi(this, x)))).filter(
-			(x) => x !== undefined,
-		) as Array<UmbPropertyValuePreset>;
+		const apis = (
+			await Promise.all(
+				manifests.map((x) =>
+					createExtensionApi(this, x).then((x) => {
+						if (x) {
+							(x as any).manifest = x;
+						}
+						return x;
+					}),
+				),
+			)
+		).filter((x) => x !== undefined) as Array<UmbPropertyValuePreset>;
 
 		const result = await this._generatePropertyValues(apis, propertyType);
 
@@ -90,7 +99,7 @@ export class UmbPropertyValuePresetBuilderController<
 			value = await api.processValue(value, propertyType.config, propertyType.typeArgs, callArgs);
 		}
 
-		if (!value) {
+		if (value === undefined) {
 			return;
 		}
 

@@ -1,23 +1,16 @@
+import type { UmbFileUploadPreviewElement } from '../file-upload-preview.interface.js';
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-upload-field-image')
-export default class UmbInputUploadFieldImageElement extends UmbLitElement {
+export default class UmbInputUploadFieldImageElement extends UmbLitElement implements UmbFileUploadPreviewElement {
 	@property({ type: String })
 	path = '';
 
-	get #label() {
-		return this.path.split('/').pop() ?? '';
-	}
-
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
-
-		const label = this.#label;
-
-		return html`<uui-card-media id="card" .name=${label} href="${this.path}" target="_blank">
-			<img id="image" src=${this.path} alt="${label}" loading="lazy" />
-		</uui-card-media>`;
+		const label = this.path.split('/').pop() ?? '';
+		return html`<img src=${this.path} alt=${label} loading="lazy" />`;
 	}
 
 	static override readonly styles = [
@@ -30,12 +23,7 @@ export default class UmbInputUploadFieldImageElement extends UmbLitElement {
 				max-width: 100%;
 			}
 
-			#card {
-				width: 100%;
-				height: 100%;
-			}
-
-			#image {
+			img {
 				object-fit: contain;
 				width: auto;
 				height: 100%;

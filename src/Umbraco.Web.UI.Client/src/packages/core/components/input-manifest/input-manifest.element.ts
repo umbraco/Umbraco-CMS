@@ -33,6 +33,9 @@ export class UmbInputManifestElement extends UmbLitElement {
 
 	async #onClick() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		if (!modalManager) {
+			throw new Error('Modal manager not found.');
+		}
 		const modalContext = modalManager.open(this, UMB_ITEM_PICKER_MODAL, {
 			data: {
 				headline: `${this.localize.term('general_choose')}...`,

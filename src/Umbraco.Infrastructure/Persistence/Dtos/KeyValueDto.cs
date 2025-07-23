@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.KeyValue)]
 [PrimaryKey("key", AutoIncrement = false)]
 [ExplicitColumns]
-internal class KeyValueDto
+internal sealed class KeyValueDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.KeyValue;
 
@@ -23,7 +23,7 @@ internal class KeyValueDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Value { get; set; }
 
-    [Column("updated")]
+    [Column("updated", ForceToUtc = false)]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
     public DateTime UpdateDate { get; set; }
 

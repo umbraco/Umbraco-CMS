@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Preview;
@@ -6,14 +6,14 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Preview;
 
-public class EndPreviewTests : ManagementApiTest<EndPreviewController>
+internal sealed class EndPreviewTests : ManagementApiTest<EndPreviewController>
 {
     protected override Expression<Func<EndPreviewController, object>> MethodSelector =>
         x => x.End(CancellationToken.None);
 
 
     [Test]
-    public virtual async Task As_Anonymous_I_Can_End_Preview_Mode()
+    public async Task As_Anonymous_I_Can_End_Preview_Mode()
     {
         var response = await Client.DeleteAsync(Url);
 

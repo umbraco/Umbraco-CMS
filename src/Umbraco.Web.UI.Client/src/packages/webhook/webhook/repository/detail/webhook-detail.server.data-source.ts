@@ -8,12 +8,12 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Webhook that fetches data from the server
  * @class UmbWebhookDetailServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbWebhookDetailModel>}
  */
 export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<UmbWebhookDetailModel> {
 	#host: UmbControllerHost;
@@ -59,7 +59,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getWebhookById({ id: unique }));
+		const { data, error } = await tryExecute(this.#host, WebhookService.getWebhookById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -91,7 +91,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 		if (!model) throw new Error('Webhook is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateWebhookRequestModel = {
+		const body: CreateWebhookRequestModel = {
 			id: model.unique,
 			headers: model.headers,
 			events: model.events.map((event) => event.alias),
@@ -102,15 +102,15 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 			contentTypeKeys: model.contentTypes,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecute(
 			this.#host,
 			WebhookService.postWebhook({
-				requestBody,
+				body,
 			}),
 		);
 
 		if (data) {
-			return this.read(data);
+			return this.read(data as never);
 		}
 
 		return { error };
@@ -127,7 +127,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateWebhookRequestModel = {
+		const body: UpdateWebhookRequestModel = {
 			headers: model.headers,
 			events: model.events.map((event) => event.alias),
 			enabled: model.enabled,
@@ -137,11 +137,11 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 			contentTypeKeys: model.contentTypes,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { error } = await tryExecute(
 			this.#host,
 			WebhookService.putWebhookById({
-				id: model.unique,
-				requestBody,
+				path: { id: model.unique },
+				body,
 			}),
 		);
 
@@ -161,10 +161,10 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		return tryExecute(
 			this.#host,
 			WebhookService.deleteWebhookById({
-				id: unique,
+				path: { id: unique },
 			}),
 		);
 	}

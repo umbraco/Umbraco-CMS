@@ -61,6 +61,13 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 	multiple: boolean = false;
 
 	/**
+	 * Style the dropzone with a border.
+	 * @description This is useful if you want to display the dropzone directly rather than as a part of a separate component.
+	 */
+	@property({ type: Boolean, reflect: true })
+	standalone: boolean = false;
+
+	/**
 	 * The label for the dropzone.
 	 */
 	@property({ type: String })
@@ -86,14 +93,21 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 
 	constructor() {
 		super();
+		this._observeProgress();
+		this._observeProgressItems();
+	}
 
+	_observeProgress() {
 		this.observe(
 			this._manager.progress,
-			(progress) =>
-				this.dispatchEvent(new ProgressEvent('progress', { loaded: progress.completed, total: progress.total })),
+			(progress) => {
+				this.dispatchEvent(new ProgressEvent('progress', { loaded: progress.completed, total: progress.total }));
+			},
 			'_observeProgress',
 		);
+	}
 
+	protected _observeProgressItems() {
 		this.observe(
 			this._manager.progressItems,
 			(progressItems) => {
@@ -255,6 +269,21 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				pointer-events: none;
 			}
 
+			:host([standalone]) {
+				position: relative;
+				display: block;
+				inset: 0;
+				cursor: pointer;
+				border: 1px dashed var(--uui-color-divider-emphasis);
+				border-radius: var(--uui-border-radius);
+			}
+
+			:host([standalone]:not([disabled]):hover) {
+				border-color: var(--uui-color-default-emphasis);
+				--uui-color-default: var(--uui-color-default-emphasis);
+				color: var(--uui-color-default-emphasis);
+			}
+
 			#dropzone {
 				width: 100%;
 				inset: 0;
@@ -305,16 +334,6 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 		`,
 	];
 }
-
-export const UmbInputDropzoneDashedStyles = css`
-	umb-input-dropzone {
-		position: relative;
-		display: block;
-		inset: 0;
-		cursor: pointer;
-		border: 1px dashed var(--uui-color-divider-emphasis);
-	}
-`;
 
 declare global {
 	interface HTMLElementTagNameMap {

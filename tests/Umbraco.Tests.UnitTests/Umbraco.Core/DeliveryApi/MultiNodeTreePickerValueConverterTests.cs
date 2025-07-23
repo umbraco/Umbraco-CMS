@@ -25,7 +25,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         return new MultiNodeTreePickerValueConverter(
             Mock.Of<IUmbracoContextAccessor>(),
             Mock.Of<IMemberService>(),
-            new ApiContentBuilder(contentNameProvider, routeBuilder, expansionStrategyAccessor),
+            new ApiContentBuilder(contentNameProvider, routeBuilder, expansionStrategyAccessor, CreateVariationContextAccessor()),
             new ApiMediaBuilder(contentNameProvider, apiUrProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor),
             CacheManager.Content,
             CacheManager.Media,
@@ -33,7 +33,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
     }
 
     private PublishedDataType MultiNodePickerPublishedDataType(bool multiSelect, string entityType) =>
-        new PublishedDataType(123, "test", new Lazy<object>(() => new MultiNodePickerConfiguration
+        new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MultiNodePickerConfiguration
         {
             MaxNumber = multiSelect ? 10 : 1,
             TreeSource = new MultiNodePickerConfigurationTreeSource
@@ -73,7 +73,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var otherContentKey = Guid.NewGuid();
         var otherContent = SetupPublishedContent("The other page", otherContentKey, PublishedItemType.Content, PublishedContentType);
-        RegisterContentWithProviders(otherContent.Object);
+        RegisterContentWithProviders(otherContent.Object, false);
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
@@ -95,6 +95,28 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
     }
 
     [Test]
+    public void MultiNodeTreePickerValueConverter_InSingleMode_WithPreview_ConvertsValueToListOfContent()
+    {
+        var publishedDataType = MultiNodePickerPublishedDataType(false, Constants.UdiEntityType.Document);
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        var valueConverter = MultiNodeTreePickerValueConverter();
+
+        Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+
+        var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Document, DraftContent.Key) };
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, true, false) as IEnumerable<IApiContent>;
+        Assert.NotNull(result);
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(DraftContent.Name, result.First().Name);
+        Assert.AreEqual(DraftContent.Key, result.First().Id);
+        Assert.AreEqual("/the-draft-page-url/", result.First().Route.Path);
+        Assert.AreEqual("TheContentType", result.First().ContentType);
+        Assert.IsEmpty(result.First().Properties);
+    }
+
+    [Test]
     [TestCase(Constants.UdiEntityType.Document)]
     [TestCase("content")]
     public void MultiNodeTreePickerValueConverter_RendersContentProperties(string entityType)
@@ -113,7 +135,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
             .Setup(p => p.GetUrl(content.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns(content.Object.UrlSegment);
         PublishedContentCacheMock
-            .Setup(pcc => pcc.GetById(key))
+            .Setup(pcc => pcc.GetById(false, key))
             .Returns(content.Object);
 
         var publishedDataType = MultiNodePickerPublishedDataType(false, entityType);

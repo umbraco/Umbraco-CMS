@@ -7,6 +7,7 @@ import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-a
  * This enables controllers to be added to the life cycle of this element.
  * @param {object} superClass - superclass to be extended.
  * @mixin
+ * @returns {UmbControllerHostElement} - The class that extends the superClass and implements the UmbControllerHostElement interface.
  */
 export const UmbControllerHostElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbControllerHostElementClass

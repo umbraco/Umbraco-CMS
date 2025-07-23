@@ -1,9 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -28,12 +26,6 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     private readonly BlockListPropertyValueConstructorCache _constructorCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
-
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V16")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, IJsonSerializer jsonSerializer, BlockListPropertyValueConstructorCache constructorCache)
-        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, jsonSerializer, constructorCache, StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(), StaticServiceProvider.Instance.GetRequiredService<BlockEditorVarianceHandler>())
-    {
-    }
 
     public BlockListPropertyValueConverter(
         IProfilingLogger proflog,

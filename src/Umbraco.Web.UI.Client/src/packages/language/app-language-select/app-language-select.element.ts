@@ -37,6 +37,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	#appLanguageContext?: UmbAppLanguageContext;
 	#languagesObserver?: any;
 
+	// TODO: Here we have some read only state logic and then we have it again in the context. We should align this otherwise it will become a nightmare to maintain. [NL]
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
 
@@ -52,12 +53,12 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context.languages, (languages) => {
+			this.observe(context?.languages, (languages) => {
 				this.#currentUserAllowedLanguages = languages;
 				this.#checkForLanguageAccess();
 			});
 
-			this.observe(context.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
+			this.observe(context?.hasAccessToAllLanguages, (hasAccessToAllLanguages) => {
 				this.#currentUserHasAccessToAllLanguages = hasAccessToAllLanguages;
 				this.#checkForLanguageAccess();
 			});
@@ -137,7 +138,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			id="dropdown-popover"
 			data-mark="app-language-menu"
 			@beforetoggle=${this.#onPopoverToggle}>
-			<umb-popover-layout>
+						<umb-popover-layout>
+			<uui-scroll-container style="max-height:calc(100vh - (var(--umb-header-layout-height) + 60px));">
 				${repeat(
 					this._languages,
 					(language) => language.unique,
@@ -151,7 +153,9 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 						</uui-menu-item>
 					`,
 				)}
-			</umb-popover-layout>
+				</uui-scroll-container>
+							</umb-popover-layout>
+
 		</uui-popover-container>`;
 	}
 
@@ -196,6 +200,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			uui-menu-item {
 				color: var(--uui-color-text);
+				
+				width: auto;
 			}
 		`,
 	];

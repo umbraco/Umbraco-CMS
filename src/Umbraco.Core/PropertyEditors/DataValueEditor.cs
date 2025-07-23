@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Xml.Linq;
@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -23,26 +22,6 @@ public class DataValueEditor : IDataValueEditor
 {
     private readonly IJsonSerializer? _jsonSerializer;
     private readonly IShortStringHelper _shortStringHelper;
-
-    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
-    public DataValueEditor(
-        ILocalizedTextService localizedTextService,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer? jsonSerializer) // for tests, and manifest
-        : this(shortStringHelper, jsonSerializer)
-    {
-    }
-
-    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
-    public DataValueEditor(
-        ILocalizedTextService localizedTextService,
-        IShortStringHelper shortStringHelper,
-        IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper,
-        DataEditorAttribute attribute)
-        : this(shortStringHelper, jsonSerializer, ioHelper, attribute)
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DataValueEditor" /> class.

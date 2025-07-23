@@ -29,9 +29,8 @@ test('can render content with multiple media picker value', async ({umbracoApi, 
   const secondMediaFileId = await umbracoApi.media.createDefaultMediaWithArticle(secondMediaFileName);
   // Create a published document with multiple media picker value
   const templateId = await umbracoApi.template.createTemplateWithDisplayingMultipleMediaPickerValue(templateName, AliasHelper.toAlias(propertyName));
-  await umbracoApi.document.createPublishedDocumentWithTwoMediaPicker(contentName, firstMediaFileId, secondMediaFileId, dataTypeData.id, templateId, propertyName, documentTypeName);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  const contentURL = contentData.urls[0].url;
+  const contentKey = await umbracoApi.document.createPublishedDocumentWithTwoMediaPicker(contentName, firstMediaFileId, secondMediaFileId, dataTypeData.id, templateId, propertyName, documentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
   // Act
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
@@ -51,9 +50,8 @@ test.fixme('can render content with multiple image media picker value', async ({
   const secondMediaFileId = await umbracoApi.media.createDefaultMediaWithImage(secondMediaFileName);
   // Create a published document with multiple image media picker value
   const templateId = await umbracoApi.template.createTemplateWithDisplayingMultipleMediaPickerValue(templateName, AliasHelper.toAlias(propertyName));
-  await umbracoApi.document.createPublishedDocumentWithTwoMediaPicker(contentName, firstMediaFileId, secondMediaFileId, dataTypeData.id, templateId, propertyName, documentTypeName);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  const contentURL = contentData.urls[0].url;
+  const contentKey = await umbracoApi.document.createPublishedDocumentWithTwoMediaPicker(contentName, firstMediaFileId, secondMediaFileId, dataTypeData.id, templateId, propertyName, documentTypeName);
+  const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
 
   // Act
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);

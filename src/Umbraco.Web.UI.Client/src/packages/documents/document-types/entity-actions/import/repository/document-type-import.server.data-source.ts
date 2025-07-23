@@ -1,6 +1,6 @@
-import { DocumentTypeService, type PostDocumentTypeImportData } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeService, type ImportDocumentTypeRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Document Type Import Server Data Source
@@ -28,10 +28,10 @@ export class UmbDocumentTypeImportServerDataSource {
 	async import(temporaryUnique: string) {
 		if (!temporaryUnique) throw new Error('Unique is missing');
 
-		const requestBody: PostDocumentTypeImportData = {
-			requestBody: { file: { id: temporaryUnique } },
+		const body: ImportDocumentTypeRequestModel = {
+			file: { id: temporaryUnique },
 		};
 
-		return tryExecuteAndNotify(this.#host, DocumentTypeService.postDocumentTypeImport(requestBody));
+		return tryExecute(this.#host, DocumentTypeService.postDocumentTypeImport({ body }));
 	}
 }

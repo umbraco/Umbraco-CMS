@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUiTiptapElement } from './property-editor-ui-tiptap.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 import './property-editor-ui-tiptap.element.js';

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MetricsConsentServiceTest : UmbracoIntegrationTest
+internal sealed class MetricsConsentServiceTest : UmbracoIntegrationTest
 {
     private IMetricsConsentService MetricsConsentService => GetRequiredService<IMetricsConsentService>();
 

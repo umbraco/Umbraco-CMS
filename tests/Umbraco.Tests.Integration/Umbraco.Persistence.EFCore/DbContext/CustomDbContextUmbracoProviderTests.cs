@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-public class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTest
+internal sealed class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTest
 {
     [Test]
     public void Can_Register_Custom_DbContext_And_Resolve()

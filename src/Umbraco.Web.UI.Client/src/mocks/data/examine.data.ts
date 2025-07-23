@@ -1,7 +1,7 @@
 import type {
 	IndexResponseModel,
 	PagedIndexResponseModel,
-	SearchResultResponseModel,
+	SearchResultResponseModelReadable,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -19,7 +19,7 @@ export function getIndexByName(indexName: string) {
 /**
  *
  */
-export function getSearchResultsMockData(): SearchResultResponseModel[] {
+export function getSearchResultsMockData(): SearchResultResponseModelReadable[] {
 	return searchResultMockData;
 }
 
@@ -91,7 +91,7 @@ export const PagedIndexers: PagedIndexResponseModel = {
 	total: 0,
 };
 
-export const searchResultMockData: SearchResultResponseModel[] = [
+export const searchResultMockData: SearchResultResponseModelReadable[] = [
 	{
 		id: '1',
 		score: 1,

@@ -24,6 +24,8 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this._availableExtensions = this.#context.filterExtensions(query);
 	}, 250);
 
+	#initialized = false;
+
 	@state()
 	private _availableExtensions: Array<UmbTiptapToolbarExtension> = [];
 
@@ -34,9 +36,10 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	set value(value: UmbTiptapToolbarValue | undefined) {
 		if (!value) value = [[[]]];
 		if (value === this.#value) return;
-		this.#value = this.#context.migrateTinyMceToolbar(value);
+		this.#value = this.#context.isValidToolbarValue(value) ? value : [[[]]];
 	}
 	get value(): UmbTiptapToolbarValue | undefined {
+		if (this.#value === undefined) return undefined;
 		return this.#context.cloneToolbarValue(this.#value);
 	}
 	#value?: UmbTiptapToolbarValue;
@@ -58,14 +61,17 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			this.observe(this.#context.toolbar, (toolbar) => {
 				if (!toolbar.length) return;
 				this._toolbar = toolbar;
-				this.#value = toolbar.map((rows) => rows.data.map((groups) => [...groups.data]));
-				propertyContext.setValue(this.#value);
+				if (this.#initialized) {
+					this.#value = toolbar.map((rows) => rows.data.map((groups) => [...groups.data]));
+					propertyContext?.setValue(this.#value);
+				}
 			});
 		});
 	}
 
 	protected override firstUpdated() {
 		this.#context.setToolbar(this.value);
+		this.#initialized = true;
 	}
 
 	#onClick(item: UmbTiptapToolbarExtension) {
@@ -127,14 +133,11 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 	}
 
 	#renderAvailableItems() {
+		const label = this.localize.term('placeholders_filter');
 		return html`
 			<uui-box id="toolbox" headline=${this.localize.term('tiptap_toobar_availableItems')}>
 				<div slot="header-actions">
-					<uui-input
-						type="search"
-						autocomplete="off"
-						placeholder=${this.localize.term('placeholders_filter')}
-						@input=${this.#onFilterInput}>
+					<uui-input type="search" autocomplete="off" label=${label} placeholder=${label} @input=${this.#onFilterInput}>
 						<div slot="prepend">
 							<uui-icon name="search"></uui-icon>
 						</div>
@@ -160,12 +163,14 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		const forbidden = !this.#context.isExtensionEnabled(item.alias);
 		const inUse = this.#context.isExtensionInUse(item.alias);
 		if (inUse || forbidden) return nothing;
+		const label = this.localize.string(item.label);
 		return html`
 			<uui-button
 				compact
 				class=${forbidden ? 'forbidden' : ''}
 				data-mark="tiptap-toolbar-item:${item.alias}"
 				draggable="true"
+				label=${label}
 				look=${forbidden ? 'placeholder' : 'outline'}
 				?disabled=${forbidden || inUse}
 				@click=${() => this.#onClick(item)}
@@ -173,7 +178,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				@dragend=${this.#onDragEnd}>
 				<div class="inner">
 					${when(item.icon, () => html`<umb-icon .name=${item.icon}></umb-icon>`)}
-					<span>${this.localize.string(item.label)}</span>
+					<span>${label}</span>
 				</div>
 			</uui-button>
 		`;
@@ -246,7 +251,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				<div class="items">
 					${when(
 						group?.data.length === 0,
-						() => html`<em><umb-localize key="toolbar_emptyGroup">Empty</umb-localize></em>`,
+						() => html`<em><umb-localize key="tiptap_toolbar_emptyGroup">Empty</umb-localize></em>`,
 						() => html`${group!.data.map((alias, idx) => this.#renderItem(alias, rowIndex, groupIndex, idx))}`,
 					)}
 				</div>
@@ -276,22 +281,25 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		if (!item) return nothing;
 
 		const forbidden = !this.#context?.isExtensionEnabled(item.alias);
+		const label = this.localize.string(item.label);
 
 		switch (item.kind) {
+			case 'styleMenu':
 			case 'menu':
 				return html`
 					<uui-button
 						compact
 						class=${forbidden ? 'forbidden' : ''}
 						draggable="true"
+						label=${label}
 						look=${forbidden ? 'placeholder' : 'outline'}
-						title=${this.localize.string(item.label)}
+						title=${label}
 						?disabled=${forbidden}
 						@click=${() => this.#context.removeToolbarItem([rowIndex, groupIndex, itemIndex])}
 						@dragend=${this.#onDragEnd}
 						@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
 						<div class="inner">
-							<span>${this.localize.string(item.label)}</span>
+							<span>${label}</span>
 						</div>
 						<uui-symbol-expand slot="extra" open></uui-symbol-expand>
 					</uui-button>
@@ -306,7 +314,8 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 						data-mark="tiptap-toolbar-item:${item.alias}"
 						draggable="true"
 						look=${forbidden ? 'placeholder' : 'outline'}
-						title=${this.localize.string(item.label)}
+						label=${label}
+						title=${label}
 						?disabled=${forbidden}
 						@click=${() => this.#context.removeToolbarItem([rowIndex, groupIndex, itemIndex])}
 						@dragend=${this.#onDragEnd}
@@ -315,7 +324,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 							${when(
 								item.icon,
 								() => html`<umb-icon .name=${item.icon}></umb-icon>`,
-								() => html`<span>${this.localize.string(item.label)}</span>`,
+								() => html`<span>${label}</span>`,
 							)}
 						</div>
 					</uui-button>
@@ -354,10 +363,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 			uui-box {
 				[slot='header-actions'] {
 					margin-bottom: var(--uui-size-2);
-
-					uui-input {
-						align-items: baseline;
-					}
 
 					uui-icon {
 						color: var(--uui-color-border);

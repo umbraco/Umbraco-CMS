@@ -10,9 +10,9 @@ export interface UmbPickerModalData<ItemType> {
 	search?: UmbPickerModalSearchConfig;
 }
 
-export interface UmbPickerModalSearchConfig {
+export interface UmbPickerModalSearchConfig<QueryParamsType = Record<string, unknown>> {
 	providerAlias: string;
-	queryParams?: object;
+	queryParams?: QueryParamsType;
 }
 
 export interface UmbPickerModalValue {
