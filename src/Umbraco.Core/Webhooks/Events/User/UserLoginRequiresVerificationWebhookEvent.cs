@@ -21,7 +21,7 @@ public class UserLoginRequiresVerificationWebhookEvent : WebhookEventBase<UserLo
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserLoginRequiresVerification;
 
-    public override object? ConvertNotificationToRequestPayload(UserLoginRequiresVerificationNotification notification)
+    public override object ConvertNotificationToRequestPayload(UserLoginRequiresVerificationNotification notification)
         => new DefaultPayloadModel
         {
             Id = notification.AffectedUserId is not null &&
