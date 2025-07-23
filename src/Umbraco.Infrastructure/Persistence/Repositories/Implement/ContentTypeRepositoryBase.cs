@@ -1555,18 +1555,16 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
         // is included here just to be 100% sure since it has a FK on cmsPropertyType.
         var list = new List<string>
         {
-            "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
-            "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-            "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @id",
-            "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @id",
-            "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @id",
-            "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData +
-            " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyType +
-            " WHERE contentTypeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyTypeGroup +
-            " WHERE contenttypeNodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentChildType + " WHERE Id = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentChildType + " WHERE AllowedId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentTypeTree + " WHERE parentContentTypeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentTypeTree + " WHERE childContentTypeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE contentTypeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyTypeGroup + " WHERE contenttypeNodeId = @id",
         };
         return list;
     }
