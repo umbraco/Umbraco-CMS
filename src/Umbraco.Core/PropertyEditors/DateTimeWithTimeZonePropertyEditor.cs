@@ -11,18 +11,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueEditorIsReusable = true)]
 public class DateTimeWithTimeZonePropertyEditor : DataEditor
 {
-    private readonly IIOHelper _ioHelper;
-
     public DateTimeWithTimeZonePropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
-        _ioHelper = ioHelper;
         SupportsReadOnly = true;
     }
-
-    /// <inheritdoc />
-    protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new DateTimeWithTimeZoneConfigurationEditor(_ioHelper);
 }

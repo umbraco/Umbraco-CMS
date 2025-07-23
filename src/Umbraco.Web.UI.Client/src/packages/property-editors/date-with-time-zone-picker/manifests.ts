@@ -15,18 +15,34 @@ export const manifests: Array<UmbExtensionManifest> = [
 			settings: {
 				properties: [
 					{
-						alias: 'timeZones',
-						label: 'Time Zones',
-						description: 'Select the time zones that the user should be able to select from.',
+						alias: 'timeZonesToEdit',
+						label: 'Time Zones to Edit',
+						description: 'Select the time zones that the editor should be able to select from. If left empty, only the local time zone will be displayed.',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TimeZonePicker',
 						config: [],
 					},
+					{
+						alias: 'timeZonesToDisplay',
+						label: 'Time Zones to Display',
+						description: 'Select the time zones that the user should be able to see the time in.',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.CheckBoxList',
+						config: [
+							{
+								alias: "items",
+								value: ["Local", "UTC"]
+							}
+						]
+					}
 				],
 				defaultData: [
 					{
-						alias: 'timeZones',
-						value: ['UTC'],
+						alias: 'timeZonesToEdit',
+						value: [],
 					},
+					{
+						alias: 'timeZonesToDisplay',
+						value: [],
+					}
 				],
 			},
 		},
