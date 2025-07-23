@@ -438,7 +438,7 @@ AND umbracoNode.id <> @id",
             IEnumerable<int> propertyTypeToDeleteIds = dbPropertyTypeIds.Except(entityPropertyTypes);
             foreach (var propertyTypeId in propertyTypeToDeleteIds)
             {
-                DeletePropertyType(entity.Id, propertyTypeId);
+                DeletePropertyType(entity, propertyTypeId);
             }
         }
 
@@ -647,7 +647,7 @@ AND umbracoNode.id <> @id",
         {
             foreach (var id in orphanPropertyTypeIds)
             {
-                DeletePropertyType(entity.Id, id);
+                DeletePropertyType(entity, id);
             }
         }
 
@@ -1410,16 +1410,27 @@ AND umbracoNode.id <> @id",
         }
     }
 
-    private void DeletePropertyType(int contentTypeId, int propertyTypeId)
+    private void DeletePropertyType(IContentTypeComposition contentType, int propertyTypeId)
     {
-        // first clear dependencies
+        // First clear dependencies.
         Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
         Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
 
-        // then delete the property type
+        // Clear the property value permissions, which aren't a hard dependency with a foreign key, but we want to ensure
+        // that any for removed property types are cleared.
+        var uniqueIdAsString = string.Format(SqlContext.SqlSyntax.ConvertUniqueIdentifierToString, "uniqueId");
+        var permissionSearchString = SqlContext.SqlSyntax.GetConcat(
+            "(SELECT " + uniqueIdAsString + " FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE id = @PropertyTypeId)",
+            "'|%'");
+
+        Database.Delete<UserGroup2GranularPermissionDto>(
+            "WHERE uniqueId = @ContentTypeKey AND permission LIKE " + permissionSearchString,
+            new { ContentTypeKey = contentType.Key, PropertyTypeId = propertyTypeId });
+
+        // Finally delete the property type.
         Database.Delete<PropertyTypeDto>(
             "WHERE contentTypeId = @Id AND id = @PropertyTypeId",
-            new { Id = contentTypeId, PropertyTypeId = propertyTypeId });
+            new { contentType.Id, PropertyTypeId = propertyTypeId });
     }
 
     protected void ValidateAlias(TEntity entity)
