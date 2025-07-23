@@ -43,12 +43,12 @@ internal sealed class KeyValueService : IKeyValueService
             IKeyValue? keyValue = _repository.Get(key);
             if (keyValue == null)
             {
-                keyValue = new KeyValue { Identifier = key, Value = value, UpdateDate = DateTime.Now };
+                keyValue = new KeyValue { Identifier = key, Value = value, UpdateDate = DateTime.UtcNow };
             }
             else
             {
                 keyValue.Value = value;
-                keyValue.UpdateDate = DateTime.Now;
+                keyValue.UpdateDate = DateTime.UtcNow;
             }
 
             _repository.Save(keyValue);
@@ -80,7 +80,7 @@ internal sealed class KeyValueService : IKeyValueService
             }
 
             keyValue.Value = newValue;
-            keyValue.UpdateDate = DateTime.Now;
+            keyValue.UpdateDate = DateTime.UtcNow;
             _repository.Save(keyValue);
 
             scope.Complete();

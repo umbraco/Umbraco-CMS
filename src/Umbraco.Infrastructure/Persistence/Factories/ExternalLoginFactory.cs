@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
@@ -8,7 +9,7 @@ internal static class ExternalLoginFactory
 {
     public static IIdentityUserToken BuildEntity(ExternalLoginTokenDto dto)
     {
-        var entity = new IdentityUserToken(dto.Id, dto.ExternalLoginDto.LoginProvider, dto.Name, dto.Value, dto.ExternalLoginDto.UserOrMemberKey.ToString(), dto.CreateDate);
+        var entity = new IdentityUserToken(dto.Id, dto.ExternalLoginDto.LoginProvider, dto.Name, dto.Value, dto.ExternalLoginDto.UserOrMemberKey.ToString(), dto.CreateDate.EnsureUtc());
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);
@@ -22,7 +23,7 @@ internal static class ExternalLoginFactory
         var key = dto.UserId.HasValue ? dto.UserId.Value.ToGuid().ToString() : dto.UserOrMemberKey.ToString();
 
         var entity =
-            new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, key, dto.CreateDate)
+            new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, key, dto.CreateDate.EnsureUtc())
             {
                 UserData = dto.UserData,
             };
@@ -56,7 +57,7 @@ internal static class ExternalLoginFactory
             LoginProvider = entity.LoginProvider,
             ProviderKey = entity.ProviderKey,
             UserData = entity.UserData,
-            CreateDate = DateTime.Now,
+            CreateDate = DateTime.UtcNow,
         };
 
         return dto;
@@ -70,7 +71,7 @@ internal static class ExternalLoginFactory
             ExternalLoginId = externalLoginId,
             Name = token.Name,
             Value = token.Value,
-            CreateDate = DateTime.Now,
+            CreateDate = DateTime.UtcNow,
         };
 
         return dto;

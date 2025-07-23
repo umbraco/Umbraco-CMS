@@ -49,7 +49,7 @@ public class AuditEntryServiceTests
                 Assert.AreEqual(Constants.Security.SuperUserKey, item.PerformingUserKey);
                 Assert.AreEqual("performingDetails", item.PerformingDetails);
                 Assert.AreEqual("performingIp", item.PerformingIp);
-                Assert.AreEqual(date, item.EventDateUtc);
+                Assert.AreEqual(date, item.EventDate);
                 Assert.AreEqual(Constants.Security.UnknownUserId, item.AffectedUserId);
                 Assert.AreEqual(null, item.AffectedUserKey);
                 Assert.AreEqual("affectedDetails", item.AffectedDetails);
@@ -77,7 +77,7 @@ public class AuditEntryServiceTests
             Assert.AreEqual(Constants.Security.SuperUserId, result.PerformingUserId);
             Assert.AreEqual("performingDetails", result.PerformingDetails);
             Assert.AreEqual("performingIp", result.PerformingIp);
-            Assert.AreEqual(date, result.EventDateUtc);
+            Assert.AreEqual(date, result.EventDate);
             Assert.AreEqual(Constants.Security.UnknownUserId, result.AffectedUserId);
             Assert.AreEqual("affectedDetails", result.AffectedDetails);
             Assert.AreEqual("umbraco/test", result.EventType);

@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Extensions;

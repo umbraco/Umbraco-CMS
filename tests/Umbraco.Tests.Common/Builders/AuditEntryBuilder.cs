@@ -29,7 +29,7 @@ public class AuditEntryBuilder<TParent>
     private Guid? _affectedUserKey;
     private DateTime? _createDate;
     private DateTime? _deleteDate;
-    private DateTime? _eventDateUtc;
+    private DateTime? _eventDate;
     private string _eventDetails;
     private string _eventType;
     private int? _id;
@@ -119,7 +119,7 @@ public class AuditEntryBuilder<TParent>
 
     public AuditEntryBuilder<TParent> WithEventDate(DateTime eventDateUtc)
     {
-        _eventDateUtc = eventDateUtc;
+        _eventDate = eventDateUtc;
         return this;
     }
 
@@ -139,8 +139,8 @@ public class AuditEntryBuilder<TParent>
     {
         var id = _id ?? 0;
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var deleteDate = _deleteDate;
         var affectedDetails = _affectedDetails ?? Guid.NewGuid().ToString();
         var affectedUserId = _affectedUserId ?? -1;
@@ -149,7 +149,7 @@ public class AuditEntryBuilder<TParent>
         var eventType = _eventType ?? "umbraco/user";
         var performingDetails = _performingDetails ?? Guid.NewGuid().ToString();
         var performingIp = _performingIp ?? "127.0.0.1";
-        var eventDateUtc = _eventDateUtc ?? DateTime.UtcNow;
+        var eventDate = _eventDate ?? DateTime.UtcNow;
         var performingUserId = _performingUserId ?? -1;
         var performingUserKey = _performingUserKey ?? Constants.Security.SuperUserKey;
 
@@ -167,7 +167,7 @@ public class AuditEntryBuilder<TParent>
             EventType = eventType,
             PerformingDetails = performingDetails,
             PerformingIp = performingIp,
-            EventDateUtc = eventDateUtc,
+            EventDate = eventDate,
             PerformingUserId = performingUserId,
             PerformingUserKey = performingUserKey,
         };

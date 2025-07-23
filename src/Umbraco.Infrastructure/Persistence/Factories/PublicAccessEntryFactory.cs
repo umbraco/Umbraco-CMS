@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -16,10 +17,10 @@ internal static class PublicAccessEntryFactory
             {
                 RuleValue = x.RuleValue,
                 RuleType = x.RuleType,
-                CreateDate = x.CreateDate,
-                UpdateDate = x.UpdateDate,
+                CreateDate = x.CreateDate.EnsureUtc(),
+                UpdateDate = x.UpdateDate.EnsureUtc(),
             }))
-        { CreateDate = dto.CreateDate, UpdateDate = dto.UpdateDate };
+        { CreateDate = dto.CreateDate.EnsureUtc(), UpdateDate = dto.UpdateDate.EnsureUtc() };
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);

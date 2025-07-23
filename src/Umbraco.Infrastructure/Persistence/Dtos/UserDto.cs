@@ -73,35 +73,35 @@ public class UserDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? FailedLoginAttempts { get; set; }
 
-    [Column("lastLockoutDate", ForceToUtc = false)]
+    [Column("lastLockoutDate")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public DateTime? LastLockoutDate { get; set; }
 
-    [Column("lastPasswordChangeDate", ForceToUtc = false)]
+    [Column("lastPasswordChangeDate")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public DateTime? LastPasswordChangeDate { get; set; }
 
-    [Column("lastLoginDate", ForceToUtc = false)]
+    [Column("lastLoginDate")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public DateTime? LastLoginDate { get; set; }
 
-    [Column("emailConfirmedDate", ForceToUtc = false)]
+    [Column("emailConfirmedDate")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public DateTime? EmailConfirmedDate { get; set; }
 
-    [Column("invitedDate", ForceToUtc = false)]
+    [Column("invitedDate")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public DateTime? InvitedDate { get; set; }
 
-    [Column("createDate", ForceToUtc = false)]
+    [Column("createDate")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
-    public DateTime CreateDate { get; set; } = DateTime.Now;
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+    public DateTime CreateDate { get; set; } = DateTime.UtcNow;
 
-    [Column("updateDate", ForceToUtc = false)]
+    [Column("updateDate")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
-    public DateTime UpdateDate { get; set; } = DateTime.Now;
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+    public DateTime UpdateDate { get; set; } = DateTime.UtcNow;
 
     [Column("kind")]
     [NullSetting(NullSetting = NullSettings.NotNull)]

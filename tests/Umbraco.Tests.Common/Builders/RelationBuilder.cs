@@ -83,8 +83,8 @@ public class RelationBuilder
         var parentId = _parentId ?? 0;
         var childId = _childId ?? 0;
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var comment = _comment ?? string.Empty;
 
         if (_relationTypeBuilder == null && _relationType == null)

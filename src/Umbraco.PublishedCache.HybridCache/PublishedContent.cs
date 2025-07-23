@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
+using Umbraco.Cms.Core.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
@@ -59,11 +60,11 @@ internal class PublishedContent : PublishedContentBase
         Id = contentNode.Id;
         Key = contentNode.Key;
         CreatorId = contentNode.CreatorId;
-        CreateDate = contentNode.CreateDate;
+        CreateDate = contentNode.CreateDate.EnsureUtc();
         SortOrder = contentNode.SortOrder;
         WriterId = contentData.WriterId;
         TemplateId = contentData.TemplateId;
-        UpdateDate = contentData.VersionDate;
+        UpdateDate = contentData.VersionDate.EnsureUtc();
     }
 
     public override IPublishedContentType ContentType => _contentNode.ContentType;

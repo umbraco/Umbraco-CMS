@@ -30,7 +30,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
 
             var node = new NodeDto // create bogus item so we can add a notification
             {
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
                 Level = 1,
                 NodeObjectType = Constants.ObjectTypes.ContentItem,
                 ParentId = -1,
@@ -69,8 +69,8 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
                 Password = "test",
                 UserName = "test",
                 UserLanguage = "en",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
             };
             ScopeAccessor.AmbientScope.Database.Insert(userDto);
 
@@ -81,7 +81,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
             {
                 var node = new NodeDto
                 {
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.UtcNow,
                     Level = 1,
                     NodeObjectType = Constants.ObjectTypes.ContentItem,
                     ParentId = -1,
@@ -113,7 +113,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
 
             var node1 = new NodeDto
             {
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
                 Level = 1,
                 NodeObjectType = Constants.ObjectTypes.ContentItem,
                 ParentId = -1,
@@ -128,7 +128,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
             var entity1 = Mock.Of<IEntity>(e => e.Id == node1.NodeId);
             var node2 = new NodeDto
             {
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
                 Level = 1,
                 NodeObjectType = Constants.ObjectTypes.ContentItem,
                 ParentId = -1,
@@ -152,8 +152,8 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
                     Password = "test",
                     UserName = "test" + i,
                     UserLanguage = "en",
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now
+                    CreateDate = DateTime.UtcNow,
+                    UpdateDate = DateTime.UtcNow
                 };
                 ScopeAccessor.AmbientScope.Database.Insert(userDto);
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
@@ -176,7 +176,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
 
             var node1 = new NodeDto
             {
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
                 Level = 1,
                 NodeObjectType = Constants.ObjectTypes.ContentItem,
                 ParentId = -1,
@@ -191,7 +191,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
             var entity1 = Mock.Of<IEntity>(e => e.Id == node1.NodeId);
             var node2 = new NodeDto
             {
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
                 Level = 1,
                 NodeObjectType = Constants.ObjectTypes.ContentItem,
                 ParentId = -1,
@@ -215,8 +215,8 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
                     Password = "test",
                     UserName = "test" + i,
                     UserLanguage = "en",
-                    CreateDate = DateTime.Now,
-                    UpdateDate = DateTime.Now
+                    CreateDate = DateTime.UtcNow,
+                    UpdateDate = DateTime.UtcNow
                 };
                 ScopeAccessor.AmbientScope.Database.Insert(userDto);
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
@@ -244,8 +244,8 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
                 Password = "test",
                 UserName = "test",
                 UserLanguage = "en",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow
             };
             ScopeAccessor.AmbientScope.Database.Insert(userDto);
 
@@ -256,7 +256,7 @@ internal sealed class NotificationsRepositoryTest : UmbracoIntegrationTest
             {
                 var node = new NodeDto
                 {
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.UtcNow,
                     Level = 1,
                     NodeObjectType = Constants.ObjectTypes.ContentItem,
                     ParentId = -1,

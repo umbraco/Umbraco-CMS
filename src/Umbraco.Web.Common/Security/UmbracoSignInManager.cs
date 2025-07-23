@@ -351,7 +351,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         if (result.Succeeded)
         {
             // track the last login date
-            user!.LastLoginDateUtc = DateTime.UtcNow;
+            user!.LastLoginDate = DateTime.UtcNow;
             if (user.AccessFailedCount > 0)
             {
                 // we have successfully logged in, reset the AccessFailedCount

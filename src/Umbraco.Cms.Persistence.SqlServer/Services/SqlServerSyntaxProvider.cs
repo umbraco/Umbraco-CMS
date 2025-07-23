@@ -312,11 +312,8 @@ where tbl.[name]=@0 and col.[name]=@1;",
                 return "NEWID()";
             case SystemMethods.CurrentDateTime:
                 return "GETDATE()";
-
-                // case SystemMethods.NewSequentialId:
-                //    return "NEWSEQUENTIALID()";
-                // case SystemMethods.CurrentUTCDateTime:
-                //    return "GETUTCDATE()";
+            case SystemMethods.CurrentUTCDateTime:
+                return "GETUTCDATE()";
         }
 
         return null;
