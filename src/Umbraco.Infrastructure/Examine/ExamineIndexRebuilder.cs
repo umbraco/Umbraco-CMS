@@ -67,7 +67,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             return Attempt.Fail(IndexRebuildResult.NotAllowedToRun);
         }
 
-        Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.Run(
+        Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.RunAsync(
             GetRebuildOperationTypeName(indexName),
             async ct =>
             {
@@ -104,7 +104,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
             return Attempt.Fail(IndexRebuildResult.NotAllowedToRun);
         }
 
-        Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.Run(
+        Attempt<Guid, LongRunningOperationEnqueueStatus> attempt = await _longRunningOperationService.RunAsync(
             RebuildAllOperationTypeName,
             async ct =>
             {
@@ -128,7 +128,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
 
     /// <inheritdoc/>
     public async Task<bool> IsRebuilding(string indexName)
-        => (await _longRunningOperationService.GetByType(GetRebuildOperationTypeName(indexName), 0, 0)).Total != 0;
+        => (await _longRunningOperationService.GetByTypeAsync(GetRebuildOperationTypeName(indexName), 0, 0)).Total != 0;
 
     private static string GetRebuildOperationTypeName(string indexName) => $"RebuildExamineIndex-{indexName}";
 
