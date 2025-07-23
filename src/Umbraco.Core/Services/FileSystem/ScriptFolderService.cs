@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.FileSystem;
 
-internal class ScriptFolderService : FolderServiceOperationBase<IScriptRepository, ScriptFolderModel, ScriptFolderOperationStatus>, IScriptFolderService
+internal sealed class ScriptFolderService : FolderServiceOperationBase<IScriptRepository, ScriptFolderModel, ScriptFolderOperationStatus>, IScriptFolderService
 {
     public ScriptFolderService(IScriptRepository repository, ICoreScopeProvider scopeProvider)
         : base(repository, scopeProvider)

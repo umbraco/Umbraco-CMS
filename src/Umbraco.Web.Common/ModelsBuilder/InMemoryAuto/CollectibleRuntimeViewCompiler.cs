@@ -18,7 +18,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
-internal class CollectibleRuntimeViewCompiler : IViewCompiler
+internal sealed class CollectibleRuntimeViewCompiler : IViewCompiler
 {
     private readonly Lock _cacheLock = new();
     private readonly Dictionary<string, CompiledViewDescriptor> _precompiledViews;
@@ -319,7 +319,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         }
     }
 
-    protected virtual CompiledViewDescriptor CompileAndEmit(string relativePath)
+    private CompiledViewDescriptor CompileAndEmit(string relativePath)
     {
         RazorProjectItem projectItem = _projectEngine.FileSystem.GetItem(relativePath, fileKind: null);
         RazorCodeDocument codeDocument = _projectEngine.Process(projectItem);
@@ -444,7 +444,7 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
 
     // Taken from: https://github.com/dotnet/aspnetcore/blob/a450cb69b5e4549f5515cdb057a68771f56cefd7/src/Mvc/Mvc.Razor/src/ViewPath.cs
     // This normalizes the relative path to the view, ensuring that it matches with what we have as keys in _precompiledViews
-    private string NormalizePath(string path)
+    private static string NormalizePath(string path)
     {
         var addLeadingSlash = path[0] != '\\' && path[0] != '/';
         var transformSlashes = path.IndexOf('\\') != -1;

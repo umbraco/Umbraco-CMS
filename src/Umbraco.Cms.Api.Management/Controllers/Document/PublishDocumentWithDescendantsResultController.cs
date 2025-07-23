@@ -49,21 +49,23 @@ public class PublishDocumentWithDescendantsResultController : DocumentController
         var isPublishing = await _contentPublishingService.IsPublishingBranchAsync(taskId);
         if (isPublishing)
         {
-            return Ok(new PublishWithDescendantsResultModel
-            {
-                TaskId = taskId,
-                IsComplete = false
-            });
-        };
+            return Ok(
+                new PublishWithDescendantsResultModel
+                {
+                    TaskId = taskId,
+                    IsComplete = false,
+                });
+        }
 
         // If completed, get the result and return the status.
         Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> attempt = await _contentPublishingService.GetPublishBranchResultAsync(taskId);
         return attempt.Success
-            ? Ok(new PublishWithDescendantsResultModel
-            {
-                TaskId = taskId,
-                IsComplete = true
-            })
+            ? Ok(
+                new PublishWithDescendantsResultModel
+                {
+                    TaskId = taskId,
+                    IsComplete = true,
+                })
             : DocumentPublishingOperationStatusResult(attempt.Status, failedBranchItems: attempt.Result.FailedItems);
     }
 }

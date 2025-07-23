@@ -102,7 +102,7 @@ public partial class EventAggregator : IEventAggregator
         }
     }
 
-    private void PublishCore<TNotification>(IEnumerable<Action<IEnumerable<TNotification>>> allHandlers, IEnumerable<TNotification> notifications)
+    private static void PublishCore<TNotification>(IEnumerable<Action<IEnumerable<TNotification>>> allHandlers, IEnumerable<TNotification> notifications)
     {
         foreach (Action<IEnumerable<TNotification>> handler in allHandlers)
         {
@@ -110,7 +110,7 @@ public partial class EventAggregator : IEventAggregator
         }
     }
 
-    private async Task PublishCoreAsync<TNotification>(IEnumerable<Func<IEnumerable<TNotification>, CancellationToken, Task>> allHandlers, IEnumerable<TNotification> notifications, CancellationToken cancellationToken)
+    private static async Task PublishCoreAsync<TNotification>(IEnumerable<Func<IEnumerable<TNotification>, CancellationToken, Task>> allHandlers, IEnumerable<TNotification> notifications, CancellationToken cancellationToken)
     {
         foreach (Func<IEnumerable<TNotification>, CancellationToken, Task> handler in allHandlers)
         {
@@ -192,7 +192,7 @@ internal abstract class NotificationAsyncHandlerWrapper
         where TNotificationHandler : INotificationHandler;
 }
 
-internal class NotificationAsyncHandlerWrapperImpl<TNotificationType> : NotificationAsyncHandlerWrapper
+internal sealed class NotificationAsyncHandlerWrapperImpl<TNotificationType> : NotificationAsyncHandlerWrapper
     where TNotificationType : INotification
 {
     /// <remarks>
@@ -260,7 +260,7 @@ internal class NotificationAsyncHandlerWrapperImpl<TNotificationType> : Notifica
     }
 }
 
-internal class NotificationHandlerWrapperImpl<TNotificationType> : NotificationHandlerWrapper
+internal sealed class NotificationHandlerWrapperImpl<TNotificationType> : NotificationHandlerWrapper
     where TNotificationType : INotification
 {
     /// <remarks>

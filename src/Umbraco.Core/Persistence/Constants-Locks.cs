@@ -82,8 +82,13 @@ public static partial class Constants
         public const int WebhookLogs = -343;
 
         /// <summary>
-        ///     All Document Urls
+        ///     Long-running operations.
         /// </summary>
-        public const int DocumentUrls = -344;
+        public const int LongRunningOperations = -344;
+
+        /// <summary>
+        ///     All document URLs.
+        /// </summary>
+        public const int DocumentUrls = -345;
     }
 }

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents the Script Repository
 /// </summary>
-internal class ScriptRepository : FileRepository<string, IScript>, IScriptRepository
+internal sealed class ScriptRepository : FileRepository<string, IScript>, IScriptRepository
 {
     public ScriptRepository(FileSystems fileSystems)
         : base(fileSystems.ScriptsFileSystem)

@@ -5,9 +5,7 @@ import { UmbDocumentItemRepository, UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cm
 import { UmbMediaItemRepository, UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/multi-url-picker';
 
-const elementName = 'ufm-link';
-
-@customElement(elementName)
+@customElement('ufm-link')
 export class UmbUfmLinkElement extends UmbUfmElementBase {
 	@property()
 	alias?: string;
@@ -79,6 +77,6 @@ export { UmbUfmLinkElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbUfmLinkElement;
+		'ufm-link': UmbUfmLinkElement;
 	}
 }
