@@ -22,6 +22,7 @@ export class UmbSegmentCollectionServerDataSource
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbSegmentCollectionFilterModel) {
+		debugger;
 		const { data, error } = await tryExecute(this, SegmentService.getSegment({ query: filter }));
 
 		if (data) {

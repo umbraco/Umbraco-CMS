@@ -1,5 +1,4 @@
 using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -9,7 +8,6 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Segment;
 
@@ -29,9 +27,9 @@ public class AllSegmentController : SegmentControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SegmentResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100, Guid? documentId = null, Guid? documentTypeId = null)
     {
-        Attempt<PagedModel<Core.Models.Segment>?, SegmentOperationStatus> pagedAttempt = await _segmentService.GetPagedSegmentsAsync(skip, take);
+        Attempt<PagedModel<Core.Models.Segment>?, SegmentOperationStatus> pagedAttempt = await _segmentService.GetPagedSegmentsAsync(skip, take, documentId, documentTypeId);
 
         if (pagedAttempt.Success is false)
         {
