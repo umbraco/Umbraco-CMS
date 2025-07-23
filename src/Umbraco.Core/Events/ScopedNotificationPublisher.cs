@@ -116,7 +116,7 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
     protected virtual void PublishScopedNotifications(IList<INotification> notifications)
         => _eventAggregator.Publish<INotification, TNotificationHandler>(notifications);
 
-    private class Suppressor : IDisposable
+    private sealed class Suppressor : IDisposable
     {
         private readonly ScopedNotificationPublisher<TNotificationHandler> _scopedNotificationPublisher;
         private bool _disposedValue;
@@ -129,7 +129,7 @@ public class ScopedNotificationPublisher<TNotificationHandler> : IScopedNotifica
 
         public void Dispose() => Dispose(true);
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_disposedValue)
             {

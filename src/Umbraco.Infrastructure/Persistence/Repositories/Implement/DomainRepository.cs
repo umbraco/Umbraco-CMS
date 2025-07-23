@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class DomainRepository : EntityRepositoryBase<int, IDomain>, IDomainRepository
+internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDomainRepository
 {
     public DomainRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<DomainRepository> logger)
         : base(scopeAccessor, cache, logger)

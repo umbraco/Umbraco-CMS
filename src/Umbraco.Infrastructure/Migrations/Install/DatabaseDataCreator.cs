@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 /// <summary>
 ///     Creates the initial database data during install.
 /// </summary>
-internal class DatabaseDataCreator
+internal sealed class DatabaseDataCreator
 {
 
     internal const string EditorGroupAlias = "editor";
@@ -1050,6 +1050,7 @@ internal class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.MainDom, Name = "MainDom" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookRequest, Name = "WebhookRequest" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookLogs, Name = "WebhookLogs" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.LongRunningOperations, Name = "LongRunningOperations" });
     }
 
     private void CreateContentTypeData()

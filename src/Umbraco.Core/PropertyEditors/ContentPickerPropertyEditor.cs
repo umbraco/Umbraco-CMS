@@ -37,7 +37,7 @@ public class ContentPickerPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<ContentPickerPropertyValueEditor>(Attribute!);
 
-    internal class ContentPickerPropertyValueEditor : DataValueEditor, IDataValueReference
+    internal sealed class ContentPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
 
         public ContentPickerPropertyValueEditor(

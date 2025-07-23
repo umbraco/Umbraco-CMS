@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
-internal class MsgPackContentNestedDataSerializerFactory : IContentCacheDataSerializerFactory
+internal sealed class MsgPackContentNestedDataSerializerFactory : IContentCacheDataSerializerFactory
 {
     private readonly IPropertyCacheCompressionOptions _compressionOptions;
     private readonly IContentTypeService _contentTypeService;

@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="DictionaryItem" />
 /// </summary>
-internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
+internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILanguageRepository _languageRepository;
@@ -128,7 +128,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor, options);
     }
 
-    private IDictionaryItem ConvertFromDto(DictionaryDto dto, IDictionary<int, ILanguage> languagesById)
+    private static IDictionaryItem ConvertFromDto(DictionaryDto dto, IDictionary<int, ILanguage> languagesById)
     {
         IDictionaryItem entity = DictionaryItemFactory.BuildEntity(dto);
 
@@ -174,14 +174,14 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         return Get(query);
     }
 
-    private class DictionaryItemKeyIdDto
+    private sealed class DictionaryItemKeyIdDto
     {
         public string Key { get; } = null!;
 
         public Guid Id { get; set; }
     }
 
-    private class DictionaryByUniqueIdRepository : SimpleGetRepository<Guid, IDictionaryItem, DictionaryDto>
+    private sealed class DictionaryByUniqueIdRepository : SimpleGetRepository<Guid, IDictionaryItem, DictionaryDto>
     {
         private readonly DictionaryRepository _dictionaryRepository;
         private readonly IDictionary<int, ILanguage> _languagesById;
@@ -204,7 +204,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " = @id";
 
         protected override IDictionaryItem ConvertToEntity(DictionaryDto dto) =>
-            _dictionaryRepository.ConvertFromDto(dto, _languagesById);
+            ConvertFromDto(dto, _languagesById);
 
         protected override object GetBaseWhereClauseArguments(Guid id) => new { id };
 
@@ -236,7 +236,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         }
     }
 
-    private class DictionaryByKeyRepository : SimpleGetRepository<string, IDictionaryItem, DictionaryDto>
+    private sealed class DictionaryByKeyRepository : SimpleGetRepository<string, IDictionaryItem, DictionaryDto>
     {
         private readonly DictionaryRepository _dictionaryRepository;
         private readonly IDictionary<int, ILanguage> _languagesById;
@@ -259,7 +259,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
             "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " = @id";
 
         protected override IDictionaryItem ConvertToEntity(DictionaryDto dto) =>
-            _dictionaryRepository.ConvertFromDto(dto, _languagesById);
+            ConvertFromDto(dto, _languagesById);
 
         protected override object GetBaseWhereClauseArguments(string? id) => new { id };
 
