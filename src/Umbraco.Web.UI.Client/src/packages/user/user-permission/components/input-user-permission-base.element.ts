@@ -4,8 +4,8 @@ import { css, html, ifDefined, nothing, property, state } from '@umbraco-cms/bac
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbUserPermissionVerbElement } from '@umbraco-cms/backoffice/user';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbLitElement } from 'src/packages/core/lit-element/lit-element.element';
-import type { MetaEntityUserPermission } from '../entity-user-permission.extension';
+import type { MetaEntityUserPermission } from '../entity-user-permission.extension.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 export abstract class UmbInputUserPermissionBaseElement<
 	ManifestPermissionType extends ManifestElement & { meta: MetaEntityUserPermission },

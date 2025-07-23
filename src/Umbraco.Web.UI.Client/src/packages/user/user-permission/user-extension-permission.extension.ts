@@ -1,5 +1,5 @@
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
-import type { MetaEntityUserPermission } from './entity-user-permission.extension';
+import type { MetaEntityUserPermission } from './entity-user-permission.extension.js';
 
 export interface ManifestExtensionPermissions extends ManifestElement {
 	type: 'extensionPermissions';
