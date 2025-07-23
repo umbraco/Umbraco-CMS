@@ -385,7 +385,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(
+    IEnumerable<IMember> GetMembersByPropertyValue(
         string propertyTypeAlias,
         string value,
         StringPropertyMatchType matchType = StringPropertyMatchType.Exact);
@@ -402,7 +402,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
     /// <summary>
     ///     Gets a list of Members based on a property search
@@ -412,7 +412,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value);
+    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value);
 
     /// <summary>
     ///     Gets a list of Members based on a property search
@@ -426,7 +426,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
     /// <summary>
     /// Saves only the properties related to login for the member, using an optimized, non-locking update.
