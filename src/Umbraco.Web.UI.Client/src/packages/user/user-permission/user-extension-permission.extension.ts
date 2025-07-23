@@ -23,8 +23,6 @@ export interface ManifestExtensionUserPermission extends ManifestElement {
 	meta: MetaEntityUserPermission;
 }
 
-export interface MetaExtensionUserPermission extends MetaEntityUserPermission {}
-
 declare global {
 	interface UmbExtensionManifestMap {
 		umbExtensionPermissions: ManifestExtensionPermissions;

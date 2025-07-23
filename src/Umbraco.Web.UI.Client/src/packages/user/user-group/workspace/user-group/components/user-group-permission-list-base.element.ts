@@ -1,8 +1,8 @@
 import { html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context-token';
-import type { UmbSelectionChangeEvent } from 'src/packages/core/event/selection-change.event';
+import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export abstract class UmbUserGroupPermissionsListBaseElement extends UmbLitElement {
 	protected userGroupWorkspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
