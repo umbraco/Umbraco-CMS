@@ -44,7 +44,7 @@ internal sealed class UserDataRepository : IUserDataRepository
             sql = ApplyFilter(sql, filter);
         }
 
-        // Fetchin total before applying OrderBy to avoid issue with count subquery.
+        // Fetching the total before applying OrderBy to avoid issue with count subquery.
         var totalItems = _scopeAccessor.AmbientScope?.Database.Count(sql!) ?? 0;
 
         sql = sql.OrderBy<UserDataDto>(dto => dto.Identifier); // need to order to skiptake
