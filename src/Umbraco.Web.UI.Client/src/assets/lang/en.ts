@@ -2087,6 +2087,7 @@ export default {
 		permissionsDefault: 'Default permissions',
 		permissionsGranular: 'Granular permissions',
 		permissionsGranularHelp: 'Set permissions for specific nodes',
+		permissionsExtensions: 'Third-party permissions',
 		granularRightsLabel: 'Documents',
 		granularRightsDescription: 'Assign permissions to specific documents',
 		permissionsEntityGroup_document: 'Document',
