@@ -104,6 +104,6 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
 
     // member picker is unsupported for Delivery API output to avoid leaking member data by accident.
-    public object ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         => "(unsupported)";
 }

@@ -51,14 +51,14 @@ public class TrueFalsePropertyEditor : DataEditor
         public override IValueRequiredValidator RequiredValidator => new TrueFalseValueRequiredValidator();
 
         /// <inheritdoc/>
-        public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
             => ParsePropertyValue(property.GetValue(culture, segment));
 
         /// <inheritdoc/>
         /// <remarks>
         /// NOTE: property editor value type is Integer, which means we need to store the boolean representation as 0 or 1.
         /// </remarks>
-        public override object FromEditor(ContentPropertyData editorValue, object? currentValue)
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             => ParsePropertyValue(editorValue.Value) ? 1 : 0;
 
         private static bool ParsePropertyValue(object? value)
