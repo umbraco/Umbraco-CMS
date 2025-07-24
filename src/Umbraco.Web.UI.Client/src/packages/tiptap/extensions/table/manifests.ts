@@ -2,6 +2,7 @@ import { UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS } from './components/constants.
 
 const UMB_MENU_TIPTAP_TABLE_COLUMN_ALIAS = 'Umb.Menu.Tiptap.TableColumn';
 const UMB_MENU_TIPTAP_TABLE_ROW_ALIAS = 'Umb.Menu.Tiptap.TableRow';
+const UMB_MENU_TIPTAP_TABLE_CELL_ALIAS = 'Umb.Menu.Tiptap.TableCell';
 const modals: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
@@ -196,5 +197,60 @@ const tableRowMenu: Array<UmbExtensionManifest> = [
 ];
 
 const menus: Array<UmbExtensionManifest> = [...tableColumnMenu, ...tableRowMenu];
+const tableCellMenu: Array<UmbExtensionManifest> = [
+	{
+		type: 'menu',
+		alias: UMB_MENU_TIPTAP_TABLE_CELL_ALIAS,
+		name: 'Tiptap Table Cell Menu',
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableCellMerge',
+		name: 'Tiptap Table Menu Item: Merge Cell',
+		api: () => import('./actions/table-cell-merge.action.js'),
+		weight: 120,
+		meta: {
+			label: 'Merge cells',
+			menus: [UMB_MENU_TIPTAP_TABLE_CELL_ALIAS],
+		},
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableCellSplit',
+		name: 'Tiptap Table Menu Item: Split Cell',
+		api: () => import('./actions/table-cell-split.action.js'),
+		weight: 110,
+		meta: {
+			label: 'Split cell',
+			menus: [UMB_MENU_TIPTAP_TABLE_CELL_ALIAS],
+		},
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableCellMergeSplit',
+		name: 'Tiptap Table Menu Item: Merge Or Split Cell',
+		api: () => import('./actions/table-cell-merge-split.action.js'),
+		weight: 100,
+		meta: {
+			label: 'Merge or split',
+			menus: [UMB_MENU_TIPTAP_TABLE_CELL_ALIAS],
+		},
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableCellToggleHeader',
+		name: 'Tiptap Table Menu Item: Toggle Header Cell',
+		api: () => import('./actions/table-cell-toggle-header.action.js'),
+		weight: 90,
+		meta: {
+			label: 'Toggle header cell',
+			menus: [UMB_MENU_TIPTAP_TABLE_CELL_ALIAS],
+		},
+	},
+];
 
 export const manifests = [...modals, ...coreExtensions, ...toolbarExtensions, ...menus];
