@@ -1,13 +1,9 @@
 import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMenuElement } from '@umbraco-cms/backoffice/menu';
-import type { Editor, UmbTiptapBubbleMenuElement } from '@umbraco-cms/backoffice/external/tiptap';
 import type { ManifestMenuItem } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-tiptap-menu')
-export class UmbTiptapMenuElement extends UmbMenuElement implements UmbTiptapBubbleMenuElement {
-	@property({ attribute: false })
-	editor?: Editor;
-
+export class UmbTiptapMenuElement extends UmbMenuElement {
 	@property()
 	menuAlias?: string;
 
