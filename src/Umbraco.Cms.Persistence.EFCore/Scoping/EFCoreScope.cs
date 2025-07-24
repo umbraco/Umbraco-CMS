@@ -127,11 +127,6 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
 
         Locks.ClearLocks(InstanceId);
 
-        if (ParentScope is null)
-        {
-            Locks.EnsureLocksCleared(InstanceId);
-        }
-
         _efCoreScopeProvider.PopAmbientScope();
 
         HandleScopeContext();
