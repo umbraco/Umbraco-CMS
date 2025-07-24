@@ -45,14 +45,17 @@ namespace Umbraco.Extensions
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.FromLogContext(); // allows us to dynamically enrich
 
-            logConfig.WriteTo.UmbracoFile(
-                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory, loggingConfiguration.LogFileNameFormat, loggingConfiguration.GetLogFileNameFormatArguments()),
-                fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
-                restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
-                rollingInterval: umbracoFileConfiguration.RollingInterval,
-                flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
-                rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
+            if (umbracoFileConfiguration.Enabled)
+            {
+                logConfig.WriteTo.UmbracoFile(
+                    path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory, loggingConfiguration.LogFileNameFormat, loggingConfiguration.GetLogFileNameFormatArguments()),
+                    fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
+                    restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
+                    rollingInterval: umbracoFileConfiguration.RollingInterval,
+                    flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
+                    rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
+                    retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
+            }
 
             return logConfig;
         }
