@@ -44,9 +44,7 @@ public class FileService : RepositoryService, IFileService
         IHostingEnvironment hostingEnvironment,
         ITemplateService templateService,
         ITemplateRepository templateRepository,
-        IUserIdKeyResolver userIdKeyResolver,
-        IShortStringHelper shortStringHelper,
-        IOptions<GlobalSettings> globalSettings)
+        IUserIdKeyResolver userIdKeyResolver)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
     {
         _stylesheetRepository = stylesheetRepository;
@@ -85,9 +83,7 @@ public class FileService : RepositoryService, IFileService
             hostingEnvironment,
             templateService,
             templateRepository,
-            userIdKeyResolver,
-            shortStringHelper,
-            globalSettings)
+            userIdKeyResolver)
     {
     }
 
@@ -118,9 +114,7 @@ public class FileService : RepositoryService, IFileService
             hostingEnvironment,
             templateService,
             templateRepository,
-            userIdKeyResolver,
-            shortStringHelper,
-            globalSettings)
+            userIdKeyResolver)
     {
     }
 
