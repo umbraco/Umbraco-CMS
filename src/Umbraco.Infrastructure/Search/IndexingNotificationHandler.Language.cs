@@ -52,7 +52,7 @@ public sealed class LanguageIndexingNotificationHandler :
         {
             // if a lang is removed or it's culture has changed, we need to rebuild the indexes since
             // field names and values in the index have a string culture value.
-            await _indexRebuilder.RebuildIndexesAsync(false);
+            _ = await _indexRebuilder.RebuildIndexesAsync(false);
         }
     }
 }
