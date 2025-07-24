@@ -77,6 +77,7 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.reloadTemplateTree();
   await umbracoUi.template.clickActionsMenuForTemplate(templateName);
   await umbracoUi.template.clickDeleteAndConfirmButton();
+  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   await umbracoUi.template.waitForTemplateToBeDeleted();

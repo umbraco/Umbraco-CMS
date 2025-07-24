@@ -37,6 +37,7 @@ test('can delete a media type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeFolderName);
   await umbracoUi.mediaType.clickDeleteAndConfirmButton();
+  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   await umbracoUi.mediaType.waitForMediaTypeToBeDeleted();

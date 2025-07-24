@@ -36,6 +36,7 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
   await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
+  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   await umbracoUi.stylesheet.waitForStylesheetToBeDeleted();
@@ -152,6 +153,7 @@ test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.stylesheet.clickRootFolderCaretButton();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
   await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
+  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   //Assert
   await umbracoUi.stylesheet.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmpty);

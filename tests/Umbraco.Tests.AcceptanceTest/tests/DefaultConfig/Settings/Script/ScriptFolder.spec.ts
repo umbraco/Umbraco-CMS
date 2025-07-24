@@ -36,6 +36,7 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
   await umbracoUi.script.clickDeleteAndConfirmButton();
+  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   await umbracoUi.script.waitForScriptToBeDeleted();
