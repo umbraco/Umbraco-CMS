@@ -1,8 +1,10 @@
 import { UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS } from './components/constants.js';
 
+const UMB_MENU_TIPTAP_TABLE_ALIAS = 'Umb.Menu.Tiptap.Table';
 const UMB_MENU_TIPTAP_TABLE_COLUMN_ALIAS = 'Umb.Menu.Tiptap.TableColumn';
 const UMB_MENU_TIPTAP_TABLE_ROW_ALIAS = 'Umb.Menu.Tiptap.TableRow';
 const UMB_MENU_TIPTAP_TABLE_CELL_ALIAS = 'Umb.Menu.Tiptap.TableCell';
+
 const modals: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
@@ -77,6 +79,38 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 	},
 ];
 
+const tableMenu: Array<UmbExtensionManifest> = [
+	{
+		type: 'menu',
+		alias: UMB_MENU_TIPTAP_TABLE_ALIAS,
+		name: 'Tiptap Table Menu',
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableProperties',
+		name: 'Tiptap Table Menu Item: Table Properties',
+		api: () => import('./actions/table-properties.action.js'),
+		weight: 110,
+		meta: {
+			label: 'Table properties',
+			menus: [UMB_MENU_TIPTAP_TABLE_ALIAS],
+		},
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableDelete',
+		name: 'Tiptap Table Menu Item: Delete Table',
+		api: () => import('./actions/table-delete.action.js'),
+		weight: 100,
+		meta: {
+			label: 'Delete table',
+			icon: 'icon-trash',
+			menus: [UMB_MENU_TIPTAP_TABLE_ALIAS],
+		},
+	},
+];
 
 const tableColumnMenu: Array<UmbExtensionManifest> = [
 	{
@@ -196,7 +230,6 @@ const tableRowMenu: Array<UmbExtensionManifest> = [
 	},
 ];
 
-const menus: Array<UmbExtensionManifest> = [...tableColumnMenu, ...tableRowMenu];
 const tableCellMenu: Array<UmbExtensionManifest> = [
 	{
 		type: 'menu',
@@ -252,5 +285,7 @@ const tableCellMenu: Array<UmbExtensionManifest> = [
 		},
 	},
 ];
+
+const menus: Array<UmbExtensionManifest> = [...tableMenu, ...tableColumnMenu, ...tableRowMenu, ...tableCellMenu];
 
 export const manifests = [...modals, ...coreExtensions, ...toolbarExtensions, ...menus];
