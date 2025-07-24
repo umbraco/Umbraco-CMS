@@ -26,9 +26,9 @@ public class RebuildIndexerController : IndexerControllerBase
     }
 
     /// <summary>
-    ///     Rebuilds the index
+    ///     Rebuilds the index.
     /// </summary>
-    /// <param name="indexName"></param>
+    /// <param name="indexName">The name of the index to rebuild.</param>
     /// <returns></returns>
     [HttpPost("{indexName}/rebuild")]
     [MapToApiVersion("1.0")]
@@ -36,7 +36,7 @@ public class RebuildIndexerController : IndexerControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public Task<IActionResult> Rebuild(CancellationToken cancellationToken, string indexName)
+    public async Task<IActionResult> Rebuild(CancellationToken cancellationToken, string indexName)
     {
         if (!_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
@@ -48,7 +48,7 @@ public class RebuildIndexerController : IndexerControllerBase
                 Type = "Error",
             };
 
-            return Task.FromResult<IActionResult>(NotFound(invalidModelProblem));
+            return NotFound(invalidModelProblem);
         }
 
         if (!_indexingRebuilderService.CanRebuild(index.Name))
@@ -57,19 +57,19 @@ public class RebuildIndexerController : IndexerControllerBase
             {
                 Title = "Could not validate the populator",
                 Detail =
-                    $"The index {index?.Name} could not be rebuilt because we could not validate its associated {typeof(IIndexPopulator)}",
+                    $"The index {index.Name} could not be rebuilt because we could not validate its associated {typeof(IIndexPopulator)}",
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
             };
 
-            return Task.FromResult<IActionResult>(BadRequest(invalidModelProblem));
+            return BadRequest(invalidModelProblem);
         }
 
         _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
-        if (_indexingRebuilderService.TryRebuild(index, indexName))
+        if (await _indexingRebuilderService.TryRebuildAsync(index, indexName))
         {
-            return Task.FromResult<IActionResult>(Ok());
+            return Ok();
         }
 
         var problemDetails = new ProblemDetails
@@ -80,6 +80,6 @@ public class RebuildIndexerController : IndexerControllerBase
             Type = "Error",
         };
 
-        return Task.FromResult<IActionResult>(Conflict(problemDetails));
+        return Conflict(problemDetails);
     }
 }
