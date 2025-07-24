@@ -21,7 +21,7 @@ public interface IIndexRebuilder
     /// <param name="indexName">The name of the index to rebuild.</param>
     /// <param name="delay">The delay before starting the rebuild.</param>
     /// <param name="useBackgroundThread">Whether to use a background thread for the rebuild.</param>
-    [Obsolete("Use RebuildIndexesAsync instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in Umbraco 19.")]
     void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true);
 
     /// <summary>
@@ -43,7 +43,7 @@ public interface IIndexRebuilder
     /// <param name="onlyEmptyIndexes">Whether to only rebuild empty indexes.</param>
     /// <param name="delay">The delay before starting the rebuild.</param>
     /// <param name="useBackgroundThread">Whether to use a background thread for the rebuild.</param>
-    [Obsolete("Use RebuildIndexesAsync instead. Scheduled for removal in Umbraco 18.")]
+    [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in Umbraco 19.")]
     void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true);
 
     /// <summary>
@@ -64,6 +64,6 @@ public interface IIndexRebuilder
     /// </summary>
     /// <param name="indexName">The name of the index to check.</param>
     /// <returns>Whether the index is currently being rebuilt.</returns>
-    // TODO (v18): Remove the default implementation.
-    Task<bool> IsRebuilding(string indexName) => throw new NotImplementedException();
+    // TODO (v19): Remove the default implementation.
+    Task<bool> IsRebuildingAsync(string indexName) => throw new NotImplementedException();
 }

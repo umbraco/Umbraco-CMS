@@ -28,21 +28,8 @@ public class IndexPresentationFactory : IIndexPresentationFactory
         _logger = logger;
     }
 
-    [Obsolete("Use the non obsolete constructor instead. Scheduled for removal in v17")]
-    public IndexPresentationFactory(
-        IIndexDiagnosticsFactory indexDiagnosticsFactory,
-        IIndexRebuilder indexRebuilder,
-        IIndexingRebuilderService indexingRebuilderService)
-        : this(
-            indexDiagnosticsFactory,
-            indexRebuilder,
-            indexingRebuilderService,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<IndexPresentationFactory>>())
-    {
-    }
-
     /// <inheritdoc />
-    [Obsolete("Use CreateAsync() instead. Scheduled for removal in v18.")]
+    [Obsolete("Use CreateAsync() instead. Scheduled for removal in v19.")]
     public IndexResponseModel Create(IIndex index)
         => CreateAsync(index).GetAwaiter().GetResult();
 

@@ -69,7 +69,7 @@ public class IndexingRebuilderService : IIndexingRebuilderService
 
     /// <inheritdoc />
     public Task<bool> IsRebuildingAsync(string indexName)
-        => _indexRebuilder.IsRebuilding(indexName);
+        => _indexRebuilder.IsRebuildingAsync(indexName);
 
     private void Indexer_IndexOperationComplete(object? sender, EventArgs e)
     {

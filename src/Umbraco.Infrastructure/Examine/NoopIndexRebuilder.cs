@@ -8,5 +8,5 @@ internal sealed class NoopIndexRebuilder : IIndexRebuilder
 
     public void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true) {}
 
-    public Task<bool> IsRebuilding(string indexName) => Task.FromResult(false);
+    public Task<bool> IsRebuildingAsync(string indexName) => Task.FromResult(false);
 }
