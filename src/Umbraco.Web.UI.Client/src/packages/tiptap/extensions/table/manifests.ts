@@ -83,6 +83,57 @@ const tableColumnMenu: Array<UmbExtensionManifest> = [
 		alias: UMB_MENU_TIPTAP_TABLE_COLUMN_ALIAS,
 		name: 'Tiptap Table Column Menu',
 	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableColumnAddBefore',
+		name: 'Tiptap Table Menu Item: Add Column Before',
+		api: () => import('./actions/table-column-add-before.action.js'),
+		weight: 120,
+		meta: {
+			label: 'Add column before',
+			icon: 'icon-navigation-first',
+			menus: [UMB_MENU_TIPTAP_TABLE_COLUMN_ALIAS],
+		},
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableColumnAddAfter',
+		name: 'Tiptap Table Menu Item: Add Column After',
+		api: () => import('./actions/table-column-add-after.action.js'),
+		weight: 110,
+		meta: {
+			label: 'Add column after',
+			icon: 'icon-tab-key',
+			menus: [UMB_MENU_TIPTAP_TABLE_COLUMN_ALIAS],
+		},
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableColumnDelete',
+		name: 'Tiptap Table Menu Item: Delete Column',
+		api: () => import('./actions/table-column-delete.action.js'),
+		weight: 100,
+		meta: {
+			label: 'Delete column',
+			icon: 'icon-trash',
+			menus: [UMB_MENU_TIPTAP_TABLE_COLUMN_ALIAS],
+		},
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableColumnToggleHeader',
+		name: 'Tiptap Table Menu Item: Toggle Header Column',
+		api: () => import('./actions/table-column-toggle-header.action.js'),
+		weight: 90,
+		meta: {
+			label: 'Toggle header column',
+			menus: [UMB_MENU_TIPTAP_TABLE_COLUMN_ALIAS],
+		},
+	},
 ];
 
 const tableRowMenu: Array<UmbExtensionManifest> = [
