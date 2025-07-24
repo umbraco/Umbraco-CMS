@@ -5,79 +5,37 @@ using Serilog.Formatting.Compact.Reader;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Logging.Serilog;
 using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
-public class LogViewerRepository : ILogViewerRepository
+public class LogViewerRepository : LogViewerRepositoryBase
 {
     private readonly ILoggingConfiguration _loggingConfiguration;
     private readonly ILogger<LogViewerRepository> _logger;
     private readonly IJsonSerializer _jsonSerializer;
-    private readonly UmbracoFileConfiguration _umbracoFileConfig;
 
-    public LogViewerRepository(ILoggingConfiguration loggingConfiguration, ILogger<LogViewerRepository> logger, IJsonSerializer jsonSerializer, UmbracoFileConfiguration umbracoFileConfig)
+    public LogViewerRepository(
+        ILoggingConfiguration loggingConfiguration,
+        ILogger<LogViewerRepository> logger,
+        IJsonSerializer jsonSerializer,
+        UmbracoFileConfiguration umbracoFileConfig)
+        : base(umbracoFileConfig)
     {
         _loggingConfiguration = loggingConfiguration;
         _logger = logger;
         _jsonSerializer = jsonSerializer;
-        _umbracoFileConfig = umbracoFileConfig;
     }
 
-    /// <inheritdoc />
-    public IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, string? filterExpression = null)
-    {
-        var expressionFilter = new ExpressionFilter(filterExpression);
-
-        return GetLogs(logTimePeriod, expressionFilter);
-    }
-
-    /// <inheritdoc />
-    public LogLevelCounts GetLogCount(LogTimePeriod logTimePeriod)
-    {
-        var counter = new CountingFilter();
-
-        GetLogs(logTimePeriod, counter);
-
-        return counter.Counts;
-    }
-
-    /// <inheritdoc />
-    public LogTemplate[] GetMessageTemplates(LogTimePeriod logTimePeriod)
-    {
-        var messageTemplates = new MessageTemplateFilter();
-
-        GetLogs(logTimePeriod, messageTemplates);
-
-        return messageTemplates.Counts
-            .Select(x => new LogTemplate { MessageTemplate = x.Key, Count = x.Value })
-            .OrderByDescending(x => x.Count).ToArray();
-    }
-
-    /// <inheritdoc />
-    public LogLevel GetGlobalMinLogLevel()
-    {
-        LogEventLevel logLevel = GetGlobalLogLevelEventMinLevel();
-
-        return Enum.Parse<LogLevel>(logLevel.ToString());
-    }
-
-    public LogLevel RestrictedToMinimumLevel()
-    {
-        LogEventLevel minLevel = _umbracoFileConfig.RestrictedToMinimumLevel;
-        return Enum.Parse<LogLevel>(minLevel.ToString());
-    }
-
-    private LogEventLevel GetGlobalLogLevelEventMinLevel() =>
+    protected override LogEventLevel GetGlobalLogLevelEventMinLevel() =>
         Enum.GetValues(typeof(LogEventLevel))
             .Cast<LogEventLevel>()
             .Where(Log.IsEnabled)
             .DefaultIfEmpty(LogEventLevel.Information)
             .Min();
 
-    private IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, ILogFilter logFilter)
+    protected override IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, ILogFilter logFilter)
     {
         var logs = new List<LogEvent>();
 
