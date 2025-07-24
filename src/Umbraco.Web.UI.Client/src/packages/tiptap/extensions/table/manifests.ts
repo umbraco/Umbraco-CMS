@@ -142,6 +142,57 @@ const tableRowMenu: Array<UmbExtensionManifest> = [
 		alias: UMB_MENU_TIPTAP_TABLE_ROW_ALIAS,
 		name: 'Tiptap Table Row Menu',
 	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableRowAddBefore',
+		name: 'Tiptap Table Menu Item: Add Row Before',
+		api: () => import('./actions/table-row-add-before.action.js'),
+		weight: 120,
+		meta: {
+			label: 'Add row before',
+			icon: 'icon-page-up',
+			menus: [UMB_MENU_TIPTAP_TABLE_ROW_ALIAS],
+		},
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableRowAddAfter',
+		name: 'Tiptap Table Menu Item: Add Row After',
+		api: () => import('./actions/table-row-add-after.action.js'),
+		weight: 110,
+		meta: {
+			label: 'Add row after',
+			icon: 'icon-page-down',
+			menus: [UMB_MENU_TIPTAP_TABLE_ROW_ALIAS],
+		},
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableRowDelete',
+		name: 'Tiptap Table Menu Item: Delete Row',
+		api: () => import('./actions/table-row-delete.action.js'),
+		weight: 100,
+		meta: {
+			label: 'Delete row',
+			icon: 'icon-trash',
+			menus: [UMB_MENU_TIPTAP_TABLE_ROW_ALIAS],
+		},
+	},
+	{
+		type: 'menuItem',
+		kind: 'action',
+		alias: 'Umb.MenuItem.Tiptap.TableRowToggleHeader',
+		name: 'Tiptap Table Menu Item: Toggle Header Row',
+		api: () => import('./actions/table-row-toggle-header.action.js'),
+		weight: 90,
+		meta: {
+			label: 'Toggle header row',
+			menus: [UMB_MENU_TIPTAP_TABLE_ROW_ALIAS],
+		},
+	},
 ];
 
 const menus: Array<UmbExtensionManifest> = [...tableColumnMenu, ...tableRowMenu];
