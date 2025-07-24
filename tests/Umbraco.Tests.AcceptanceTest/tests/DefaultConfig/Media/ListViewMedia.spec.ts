@@ -129,6 +129,7 @@ test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi})
   await umbracoUi.media.clickCaretButtonForName('Media');
   await umbracoUi.media.clickModalTextByName(mediaFolderName);
   await umbracoUi.media.clickChooseModalButton();
+  await umbracoUi.waitForTimeout(500);
 
   // Assert
   await umbracoUi.media.waitForMediaToBeMoved();

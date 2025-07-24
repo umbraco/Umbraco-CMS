@@ -61,6 +61,7 @@ test('can delete a webhook', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.webhook.clickDeleteWebhookWithName(webhookName);
   await umbracoUi.webhook.clickConfirmToDeleteButton();
+  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   expect(await umbracoApi.webhook.doesNameExist(webhookName)).toBeFalsy();

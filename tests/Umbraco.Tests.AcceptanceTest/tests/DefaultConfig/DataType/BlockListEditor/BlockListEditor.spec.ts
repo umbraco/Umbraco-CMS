@@ -65,6 +65,7 @@ test('can delete a block list editor', {tag: '@smoke'}, async ({umbracoApi, umbr
   await umbracoUi.dataType.clickActionsMenuForDataType(blockListEditorName);
   await umbracoUi.dataType.clickDeleteActionMenuOption();
   await umbracoUi.dataType.clickConfirmToDeleteButton();
+  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   await umbracoUi.dataType.waitForDataTypeToBeDeleted();
