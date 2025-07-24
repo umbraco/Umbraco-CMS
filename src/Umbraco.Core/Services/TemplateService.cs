@@ -20,7 +20,6 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly ITemplateRepository _templateRepository;
     private readonly IAuditService _auditService;
     private readonly ITemplateContentParserService _templateContentParserService;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public TemplateService(
         ICoreScopeProvider provider,
@@ -29,15 +28,13 @@ public class TemplateService : RepositoryService, ITemplateService
         IShortStringHelper shortStringHelper,
         ITemplateRepository templateRepository,
         IAuditService auditService,
-        ITemplateContentParserService templateContentParserService,
-        IUserIdKeyResolver userIdKeyResolver)
+        ITemplateContentParserService templateContentParserService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _shortStringHelper = shortStringHelper;
         _templateRepository = templateRepository;
         _auditService = auditService;
         _templateContentParserService = templateContentParserService;
-        _userIdKeyResolver = userIdKeyResolver;
     }
 
     [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
@@ -58,8 +55,7 @@ public class TemplateService : RepositoryService, ITemplateService
             shortStringHelper,
             templateRepository,
             StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            templateContentParserService,
-            userIdKeyResolver)
+            templateContentParserService)
     {
     }
 
@@ -82,8 +78,7 @@ public class TemplateService : RepositoryService, ITemplateService
             shortStringHelper,
             templateRepository,
             auditService,
-            templateContentParserService,
-            userIdKeyResolver)
+            templateContentParserService)
     {
     }
 
