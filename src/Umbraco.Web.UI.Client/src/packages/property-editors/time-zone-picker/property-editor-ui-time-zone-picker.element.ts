@@ -34,11 +34,14 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 
 	override firstUpdated() {
 		if (!this.value) return;
-		this._list = Intl.supportedValuesOf('timeZone').map((option) => ({
-			value: option,
-			name: option.replaceAll('_', ' '),
-			selected: this._value.includes(option) || this._value.some((v) => this.#getBrowserTimeZoneName(v) === option),
-		}));
+		this._list = Intl.supportedValuesOf('timeZone')
+			// Exclude offset time zones, e.g. 'Etc/GMT+2', as they are not consistent between browsers
+			.filter(value => !value.startsWith('Etc/'))
+			.map((option) => ({
+				value: option,
+				name: option.replaceAll('_', ' '),
+				selected: this._value.includes(option) || this._value.some((v) => this.#getBrowserTimeZoneName(v) === option),
+			}));
 
 		// Remove UTC from the list, if present, and add it at the top
 		this._list = this._list.filter((option) => option.value !== 'UTC');
