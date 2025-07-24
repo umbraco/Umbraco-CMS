@@ -69,7 +69,6 @@ test('can delete a document blueprint', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.documentBlueprint.clickActionsMenuForDocumentBlueprints(documentBlueprintName);
   await umbracoUi.documentBlueprint.clickDeleteActionMenuOption();
   await umbracoUi.documentBlueprint.clickConfirmToDeleteButton();
-  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   await umbracoUi.documentBlueprint.waitForDocumentBlueprintToBeDeleted();

@@ -91,7 +91,6 @@ test('can delete a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeName);
   await umbracoUi.mediaType.clickDeleteActionMenuOption();
   await umbracoUi.mediaType.clickConfirmToDeleteButton();
-  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   await umbracoUi.mediaType.waitForMediaTypeToBeDeleted();

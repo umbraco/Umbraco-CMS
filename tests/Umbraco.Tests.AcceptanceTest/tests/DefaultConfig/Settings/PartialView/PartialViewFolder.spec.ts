@@ -40,7 +40,6 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.partialView.reloadPartialViewTree();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
   await umbracoUi.partialView.clickDeleteAndConfirmButton();
-  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   await umbracoUi.partialView.waitForPartialViewToBeDeleted();
@@ -157,7 +156,6 @@ test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.partialView.clickRootFolderCaretButton();
   await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
   await umbracoUi.partialView.clickDeleteAndConfirmButton();
-  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   await umbracoUi.partialView.doesErrorNotificationHaveText(NotificationConstantHelper.error.notEmpty);

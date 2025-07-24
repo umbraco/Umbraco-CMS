@@ -64,7 +64,6 @@ test('can delete a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.user.clickActionButton();
   await umbracoUi.user.clickDeleteButton();
   await umbracoUi.user.clickConfirmToDeleteButton();
-  await umbracoUi.waitForTimeout(500); // Wait for the deletion to complete
 
   // Assert
   await umbracoUi.user.waitForUserToBeDeleted();
