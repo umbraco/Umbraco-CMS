@@ -6,7 +6,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
-internal class ContentBaseFactory
+internal sealed class ContentBaseFactory
 {
     /// <summary>
     ///     Builds an IContent item from a dto and content type.

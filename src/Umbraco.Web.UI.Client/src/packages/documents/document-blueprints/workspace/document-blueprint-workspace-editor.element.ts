@@ -121,6 +121,11 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 				display: block;
 				width: 100%;
 				height: 100%;
+
+				--uui-color-invalid: var(--uui-color-warning);
+				--uui-color-invalid-emphasis: var(--uui-color-warning-emphasis);
+				--uui-color-invalid-standalone: var(--uui-color-warning-standalone);
+				--uui-color-invalid-contrast: var(--uui-color-warning-contrast);
 			}
 		`,
 	];

@@ -49,7 +49,7 @@ public class ColorPickerPropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the color picker property editor.
     /// </summary>
-    internal class ColorPickerPropertyValueEditor : DataValueEditor
+    internal sealed class ColorPickerPropertyValueEditor : DataValueEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ColorPickerPropertyValueEditor"/> class.
@@ -68,7 +68,7 @@ public class ColorPickerPropertyEditor : DataEditor
         /// <summary>
         /// Validates the color selection for the color picker property editor.
         /// </summary>
-        internal class ConfiguredColorValidator : IValueValidator
+        internal sealed class ConfiguredColorValidator : IValueValidator
         {
             private readonly ILocalizedTextService _localizedTextService;
 

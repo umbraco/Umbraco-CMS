@@ -45,6 +45,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
+			ignoreValidationResultOnSubmit: true,
 		});
 
 		this.observe(

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("nodeId", AutoIncrement = false)]
 [ExplicitColumns]
-internal class MemberDto
+internal sealed class MemberDto
 {
     private const string TableName = Constants.DatabaseSchema.Tables.Member;
 

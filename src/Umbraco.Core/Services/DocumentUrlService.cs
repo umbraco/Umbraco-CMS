@@ -45,7 +45,7 @@ public class DocumentUrlService : IDocumentUrlService
     /// Model used to cache a single published document along with all it's URL segments.
     /// </summary>
     /// <remarks>Internal for the purpose of unit and benchmark testing.</remarks>
-    internal class PublishedDocumentUrlSegments
+    internal sealed class PublishedDocumentUrlSegments
     {
         /// <summary>
         /// Gets or sets the document key.
@@ -369,6 +369,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (toSave.Count > 0)
         {
+            scope.WriteLock(Constants.Locks.DocumentUrls);
             _documentUrlRepository.Save(toSave);
         }
 
@@ -456,7 +457,7 @@ public class DocumentUrlService : IDocumentUrlService
     private static bool IsVariantAndPublishedForCulture(IContent document, string? culture) =>
         document.PublishCultureInfos?.Values.Any(x => x.Culture == culture) ?? false;
 
-    private IEnumerable<PublishedDocumentUrlSegment> ConvertToPersistedModel(PublishedDocumentUrlSegments model)
+    private static IEnumerable<PublishedDocumentUrlSegment> ConvertToPersistedModel(PublishedDocumentUrlSegments model)
     {
         foreach (PublishedDocumentUrlSegments.UrlSegment urlSegment in model.UrlSegments)
         {
@@ -816,7 +817,7 @@ public class DocumentUrlService : IDocumentUrlService
         return '/' + string.Join('/', urlSegments);
     }
 
-    private bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, List<string> urlSegments)
+    private static bool HideTopLevel(bool hideTopLevelNodeFromPath, bool isRootFirstItem, List<string> urlSegments)
     {
         if (hideTopLevelNodeFromPath is false)
         {

@@ -290,7 +290,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     }
 
     // for efficient value deserialization, we don't want to deserialize more than we need to (we don't need crops, focal point etc.)
-    private class LightWeightImageCropperValue
+    private sealed class LightWeightImageCropperValue
     {
         public string? Src { get; set; } = string.Empty;
     }
