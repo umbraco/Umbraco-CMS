@@ -1,5 +1,7 @@
 import { UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS } from './components/constants.js';
 
+const UMB_MENU_TIPTAP_TABLE_COLUMN_ALIAS = 'Umb.Menu.Tiptap.TableColumn';
+const UMB_MENU_TIPTAP_TABLE_ROW_ALIAS = 'Umb.Menu.Tiptap.TableRow';
 const modals: Array<UmbExtensionManifest> = [
 	{
 		type: 'modal',
@@ -74,4 +76,23 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 	},
 ];
 
-export const manifests = [...modals, ...coreExtensions, ...toolbarExtensions];
+
+const tableColumnMenu: Array<UmbExtensionManifest> = [
+	{
+		type: 'menu',
+		alias: UMB_MENU_TIPTAP_TABLE_COLUMN_ALIAS,
+		name: 'Tiptap Table Column Menu',
+	},
+];
+
+const tableRowMenu: Array<UmbExtensionManifest> = [
+	{
+		type: 'menu',
+		alias: UMB_MENU_TIPTAP_TABLE_ROW_ALIAS,
+		name: 'Tiptap Table Row Menu',
+	},
+];
+
+const menus: Array<UmbExtensionManifest> = [...tableColumnMenu, ...tableRowMenu];
+
+export const manifests = [...modals, ...coreExtensions, ...toolbarExtensions, ...menus];
