@@ -76,7 +76,7 @@ export default class UmbTablePropertiesAction extends UmbTiptapMenuItemActionApi
 							styles['margin-right'] = 'auto';
 							break;
 						case 'right':
-							styles['margin-left'] = 'auto;';
+							styles['margin-left'] = 'auto';
 							break;
 						default:
 							styles['margin-left'] = 'none';
