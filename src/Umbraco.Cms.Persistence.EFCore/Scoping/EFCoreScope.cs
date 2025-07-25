@@ -127,7 +127,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
 
         Locks.ClearLocks(InstanceId);
 
-        // Since we can nest EfCoreScopes in other scopes derived from CoreScope, we should check whether our ParentScope OR the base ParentScope exists.
+        // Since we can nest EFCoreScopes in other scopes derived from CoreScope, we should check whether our ParentScope OR the base ParentScope exists.
         // Only if neither do do we take responsibility for ensuring the locks are cleared.
         // Eventually the highest parent will clear the locks.
         // Further, these locks are a reference to the locks of the highest parent anyway (see the constructor of CoreScope).
