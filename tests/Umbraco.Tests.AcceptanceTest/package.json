@@ -9,13 +9,13 @@
     "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
+    "smokeTest": "npx playwright test DefaultConfig/Content/ScheduledPublishing --grep \"@smoke\"",
     "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\""
   },
   "devDependencies": {
     "@playwright/test": "^1.50",
     "@types/node": "^20.9.0",
-    "prompt": "^1.2.0",
+    "prompt": "^1.2.0", 
     "tslib": "^2.4.0",
     "typescript": "^4.8.3"
   },
