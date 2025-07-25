@@ -68,7 +68,7 @@ test('can remove an allowed template from a document type', async ({umbracoApi, 
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeTemplatesTab();
-  await umbracoUi.documentType.clickRemoveWithName(templateName, true);
+  await umbracoUi.documentType.clickRemoveWithName(templateName);
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
