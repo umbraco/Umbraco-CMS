@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.ElementTypeTree)]
+[TableName(Constants.DatabaseSchema.Tables.ContentTypeTree)]
 [ExplicitColumns]
 internal sealed class ContentType2ContentTypeDto
 {

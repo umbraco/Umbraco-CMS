@@ -20,7 +20,12 @@ public static partial class Constants
             public const string ContentType = /*TableNamePrefix*/ "cms" + "ContentType";
             public const string ContentChildType = /*TableNamePrefix*/ "cms" + "ContentTypeAllowedContentType";
             public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType";
+
+            [Obsolete("Please use ContentTypeTree instead. Scheduled for removal in Umbraco 18.")]
             public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType";
+
+            public const string ContentTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType";
+
             public const string DataType = TableNamePrefix + "DataType";
             public const string Template = /*TableNamePrefix*/ "cms" + "Template";
 
