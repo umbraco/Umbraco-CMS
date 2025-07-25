@@ -41,6 +41,7 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 					isDefault: item.isDefault,
 					isMandatory: item.isMandatory,
 					fallbackIsoCode: item.fallbackIsoCode || null,
+					sortOrder: item.sortOrder
 				};
 
 				return model;
