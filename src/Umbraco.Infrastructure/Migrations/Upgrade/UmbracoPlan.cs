@@ -126,5 +126,6 @@ public class UmbracoPlan : MigrationPlan
 
         // To 17.0.0
         To<V_17_0_0.AddGuidsToAuditEntries>("{17D5F6CA-CEB8-462A-AF86-4B9C3BF91CF1}");
+        To<V_17_0_0.MigrateSystemDatesToUtc>("{7208B20D-6BFC-472E-9374-85EEA817B27D}");
     }
 }
