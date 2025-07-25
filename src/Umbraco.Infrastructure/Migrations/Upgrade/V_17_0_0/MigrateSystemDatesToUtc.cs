@@ -43,11 +43,11 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         if (string.IsNullOrWhiteSpace(timeZoneName))
         {
             timeZoneName = _timeProvider.LocalTimeZone.StandardName;
-            _logger.LogInformation("Migrating system dates to UTC using the detected local server timezone: {TimeZoneName}", timeZoneName);
+            _logger.LogInformation("Migrating system dates to UTC using the detected local server timezone: {TimeZoneName}.", timeZoneName);
         }
         else
         {
-            _logger.LogInformation("Migrating system dates to UTC using the configured local server timezone: {TimeZoneName}", timeZoneName);
+            _logger.LogInformation("Migrating system dates to UTC using the configured local server timezone: {TimeZoneName}.", timeZoneName);
         }
 
         // If the local server timezone is UTC, skip the migration.
@@ -58,54 +58,78 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
             return;
         }
 
+        TimeSpan timeZoneOffset = GetTimezoneOffset(timeZoneName);
+
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
 
-        MigrateDateColumn(scope, "cmsMember", "emailConfirmedDate", timeZoneName);
-        MigrateDateColumn(scope, "cmsMember", "lastLoginDate", timeZoneName);
-        MigrateDateColumn(scope, "cmsMember", "lastLockoutDate", timeZoneName);
-        MigrateDateColumn(scope, "cmsMember", "lastPasswordChangeDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoAccess", "createDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoAccess", "updateDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoAccessRule", "createDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoAccessRule", "updateDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoAudit", "eventDateUtc", timeZoneName);
-        MigrateDateColumn(scope, "umbracoCreatedPackageSchema", "updateDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoContentVersion", "versionDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoContentVersionCleanupPolicy", "updated", timeZoneName);
-        MigrateDateColumn(scope, "umbracoContentVersionCultureVariation", "date", timeZoneName);
-        MigrateDateColumn(scope, "umbracoExternalLogin", "createDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoExternalLoginToken", "createDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoKeyValue", "update", timeZoneName);
-        MigrateDateColumn(scope, "umbracoLog", "Datestamp", timeZoneName);
-        MigrateDateColumn(scope, "umbracoNode", "createDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoRelation", "datetime", timeZoneName);
-        MigrateDateColumn(scope, "umbracoServer", "registeredDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoServer", "lastNotifiedDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoUser", "createDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoUser", "updateDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoUser", "emailConfirmedDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoUser", "lastLockoutDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoUser", "lastPasswordChangeDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoUser", "lastLoginDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoUser", "invitedDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoUserGroup", "createDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoUserGroup", "updateDate", timeZoneName);
-        MigrateDateColumn(scope, "umbracoWebhookLog", "date", timeZoneName);
+        MigrateDateColumn(scope, "cmsMember", "emailConfirmedDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "cmsMember", "lastLoginDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "cmsMember", "lastLockoutDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "cmsMember", "lastPasswordChangeDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoAccess", "createDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoAccess", "updateDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoAccessRule", "createDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoAccessRule", "updateDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoAudit", "eventDateUtc", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoCreatedPackageSchema", "updateDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoContentVersion", "versionDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoContentVersionCleanupPolicy", "updated", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoContentVersionCultureVariation", "date", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoExternalLogin", "createDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoExternalLoginToken", "createDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoKeyValue", "update", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoLog", "Datestamp", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoNode", "createDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoRelation", "datetime", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoServer", "registeredDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoServer", "lastNotifiedDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoUser", "createDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoUser", "updateDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoUser", "emailConfirmedDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoUser", "lastLockoutDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoUser", "lastPasswordChangeDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoUser", "lastLoginDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoUser", "invitedDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoUserGroup", "createDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoUserGroup", "updateDate", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoWebhookLog", "date", timeZoneName, timeZoneOffset);
 
         scope.Complete();
         Context.Complete();
     }
 
-    private void MigrateDateColumn(IScope scope, string tableName, string columName, string timezoneName)
+    private static TimeSpan GetTimezoneOffset(string timeZoneName)
+
+        // We know the provided timezone name exists, as it's either detected or configured (and configuration has been validated).
+        => TimeZoneInfo.FindSystemTimeZoneById(timeZoneName).BaseUtcOffset;
+
+    private void MigrateDateColumn(IScope scope, string tableName, string columName, string timezoneName, TimeSpan timeZoneOffset)
     {
+        var offsetInMinutes = timeZoneOffset.TotalMinutes;
+        var offSetInMinutesString = timeZoneOffset.TotalMinutes > 0
+            ? $"+{offsetInMinutes}"
+            : $"{offsetInMinutes}";
+
+        Sql sql;
         if (DatabaseType == DatabaseType.SQLite)
         {
-            // TODO: SQLite does not support AT TIME ZONE, so we need to handle this differently.
+            // SQLite does not support AT TIME ZONE, but we can use the offset to update the dates. It won't take account of daylight saving time, but
+            // given these are historical dates that are unlikely to be necessary to be 100% accurate, this is acceptable.
+            sql = Sql($"UPDATE {tableName} SET {columName} = DATETIME({columName}, '{offSetInMinutesString} minutes')");
         }
         else
         {
-            scope.Database.Execute($"UPDATE {tableName} SET {columName} = {columName} AT TIME ZONE '{timezoneName}' AT TIME ZONE 'UTC'");
+            sql = Sql($"UPDATE {tableName} SET {columName} = {columName} AT TIME ZONE '{timezoneName}' AT TIME ZONE 'UTC'");
         }
+
+        scope.Database.Execute(sql);
+
+        _logger.LogInformation(
+            "Migrated {TableName}.{ColumnName} from local server timezone of {TimeZoneName} ({OffSetInMinutes minutes}) to UTC.",
+            tableName,
+            columName,
+            timezoneName,
+            offSetInMinutesString);
     }
 }
