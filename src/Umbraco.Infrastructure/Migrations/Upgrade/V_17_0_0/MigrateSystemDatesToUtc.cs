@@ -78,7 +78,7 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         MigrateDateColumn(scope, "umbracoContentVersionCultureVariation", "date", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoExternalLogin", "createDate", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoExternalLoginToken", "createDate", timeZoneName, timeZoneOffset);
-        MigrateDateColumn(scope, "umbracoKeyValue", "update", timeZoneName, timeZoneOffset);
+        MigrateDateColumn(scope, "umbracoKeyValue", "updated", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoLog", "Datestamp", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoNode", "createDate", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoRelation", "datetime", timeZoneName, timeZoneOffset);
@@ -126,7 +126,7 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         scope.Database.Execute(sql);
 
         _logger.LogInformation(
-            "Migrated {TableName}.{ColumnName} from local server timezone of {TimeZoneName} ({OffSetInMinutes minutes}) to UTC.",
+            "Migrated {TableName}.{ColumnName} from local server timezone of {TimeZoneName} ({OffSetInMinutes} minutes) to UTC.",
             tableName,
             columName,
             timezoneName,
