@@ -3,14 +3,22 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
-using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Scoping
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
+    /// <summary>
+    /// These tests verify that the various types of scopes we have can be created and disposed within each other.
+    /// </summary>
+    /// <remarks>
+    /// Scopes are:
+    ///  - "Normal" - created by <see cref="IScopeProvider"/>"/>.
+    ///  - "Core" - created by <see cref="ICoreScopeProvider"/>"/>.
+    ///  - "EFCore" - created by <see cref="IEFCoreScopeProvider{TDbContext}"/>"/>.
+    /// </remarks>
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     internal sealed class NestedScopeTests : UmbracoIntegrationTest
@@ -23,7 +31,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Scoping
             Services.GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
 
         [Test]
-        [LongRunning]
         public void CanNestScopes_Normal_Core_EfCore()
         {
             using (var ambientScope = ScopeProvider.CreateScope())
@@ -47,7 +54,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Scoping
         }
 
         [Test]
-        [LongRunning]
         public void CanNestScopes_Normal_EfCore_Core()
         {
             using (var ambientScope = ScopeProvider.CreateScope())
@@ -71,7 +77,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Scoping
         }
 
         [Test]
-        [LongRunning]
         public void CanNestScopes_Core_Normal_Efcore()
         {
             using (var ambientScope = CoreScopeProvider.CreateCoreScope())
@@ -95,7 +100,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Scoping
         }
 
         [Test]
-        [LongRunning]
         public void CanNestScopes_Core_EfCore_Normal()
         {
             using (var ambientScope = CoreScopeProvider.CreateCoreScope())
@@ -119,7 +123,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Scoping
         }
 
         [Test]
-        [LongRunning]
         public void CanNestScopes_EfCore_Normal_Core()
         {
             using (var ambientScope = EfCoreScopeProvider.CreateScope())
@@ -143,7 +146,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Scoping
         }
 
         [Test]
-        [LongRunning]
         public void CanNestScopes_EfCore_Core_Normal()
         {
             using (var ambientScope = EfCoreScopeProvider.CreateScope())
@@ -167,7 +169,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Scoping
         }
 
         [Test]
-        [LongRunning]
         public void CanNestScopes_Normal_Normal()
         {
             using (var ambientScope = ScopeProvider.CreateScope())
@@ -185,7 +186,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Scoping
         }
 
         [Test]
-        [LongRunning]
         public void CanNestScopes_Core_Core()
         {
             using (var ambientScope = CoreScopeProvider.CreateCoreScope())
@@ -203,7 +203,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Scoping
         }
 
         [Test]
-        [LongRunning]
         public void CanNestScopes_EfCore_EfCore()
         {
             using (var ambientScope = EfCoreScopeProvider.CreateScope())
