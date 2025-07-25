@@ -127,7 +127,10 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
 
         Locks.ClearLocks(InstanceId);
 
-        if (ParentScope is null)
+        // since we can nest EfCoreScopes in other scopes derived from CoreScope
+        // we should check whether our parentscope or the base parentScope exists so that eventually the highest parent will clear up the locks
+        // even more so, because these locks are a reference to the locks of the highest parent anyway
+        if (ParentScope is null && base.HasParentScope is false)
         {
             Locks.EnsureLocksCleared(InstanceId);
         }
