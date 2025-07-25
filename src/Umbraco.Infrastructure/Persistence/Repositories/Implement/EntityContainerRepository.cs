@@ -24,6 +24,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         {
             Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer,
             Constants.ObjectTypes.DataTypeContainer, Constants.ObjectTypes.DocumentBlueprintContainer,
+            Constants.ObjectTypes.ElementContainer,
         };
         NodeObjectTypeId = containerObjectType;
         if (allowedContainers.Contains(NodeObjectTypeId) == false)

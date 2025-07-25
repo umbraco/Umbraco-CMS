@@ -4,9 +4,10 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Content;
 
+// TODO ELEMENTS: rename this to VariantStateHelper or ContentVariantStateHelper (depending on the new name for DocumentVariantState)
 internal static class DocumentVariantStateHelper
 {
-    internal static DocumentVariantState GetState(IContent content, string? culture)
+    internal static DocumentVariantState GetState(IPublishableContentBase content, string? culture)
         => GetState(
             content,
             culture,

@@ -297,10 +297,14 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentPermissionService, ContentPermissionService>();
             Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
             Services.AddUnique<IContentService, ContentService>();
+            Services.AddUnique<IElementService, ElementService>();
+            Services.AddUnique<IElementContainerService, ElementContainerService>();
             Services.AddUnique<IContentBlueprintEditingService, ContentBlueprintEditingService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
+            Services.AddUnique<IElementEditingService, ElementEditingService>();
             Services.AddUnique<IContentPublishingService, ContentPublishingService>();
             Services.AddUnique<IContentValidationService, ContentValidationService>();
+            Services.AddUnique<IElementValidationService, ElementValidationService>();
             Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             Services.AddUnique<IMemberService, MemberService>();
             Services.AddUnique<IMemberValidationService, MemberValidationService>();

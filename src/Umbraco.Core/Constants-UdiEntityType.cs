@@ -28,6 +28,7 @@ public static partial class Constants
         public const string DocumentType = "document-type";
         public const string DocumentTypeContainer = "document-type-container";
         public const string Element = "element";
+        public const string ElementContainer = "element-container";
         public const string Media = "media";
         public const string MediaType = "media-type";
         public const string MediaTypeContainer = "media-type-container";

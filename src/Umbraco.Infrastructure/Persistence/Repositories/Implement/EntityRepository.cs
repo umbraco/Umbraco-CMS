@@ -69,8 +69,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint);
         var isMedia = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Media);
         var isMember = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Member);
+        var isElement = objectTypes.Any(objectType => objectType == Constants.ObjectTypes.Element);
 
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, s =>
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, isElement, false, s =>
         {
             sqlCustomization?.Invoke(s);
 
@@ -87,7 +88,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
         var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
         sql = translator.Translate();
-        sql = AddGroupBy(isContent, isMedia, isMember, sql, ordering.IsEmpty);
+        sql = AddGroupBy(isContent, isMedia, isMember, isElement, sql, ordering.IsEmpty);
 
         if (!ordering.IsEmpty)
         {
@@ -115,13 +116,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     public IEntitySlim? Get(Guid key)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(false, false, false, false, key);
+        Sql<ISqlContext> sql = GetBaseWhere(false, false, false, false, false, key);
         BaseDto? dto = Database.FirstOrDefault<BaseDto>(sql);
         return dto == null ? null : BuildEntity(dto);
     }
 
 
-    private IEntitySlim? GetEntity(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool isMember)
+    private IEntitySlim? GetEntity(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool isMember, bool isElement)
     {
         // isContent is going to return a 1:M result now with the variants so we need to do different things
         if (isContent)
@@ -129,6 +130,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             List<DocumentEntityDto>? cdtos = Database.Fetch<DocumentEntityDto>(sql);
 
             return cdtos.Count == 0 ? null : BuildVariants(BuildDocumentEntity(cdtos[0]));
+        }
+
+        if (isElement)
+        {
+            List<ElementEntityDto>? cdtos = Database.Fetch<ElementEntityDto>(sql);
+
+            return cdtos.Count == 0 ? null : BuildVariants(BuildElementEntity(cdtos[0]));
         }
 
         BaseDto? dto = isMedia
@@ -204,14 +212,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                         objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
         var isMedia = objectTypeId == Constants.ObjectTypes.Media;
         var isMember = objectTypeId == Constants.ObjectTypes.Member;
+        var isElement = objectTypeId == Constants.ObjectTypes.Element;
 
-        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypeId, key);
-        return GetEntity(sql, isContent, isMedia, isMember);
+        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, isElement, objectTypeId, key);
+        return GetEntity(sql, isContent, isMedia, isMember, isElement);
     }
 
     public IEntitySlim? Get(int id)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(false, false, false, false, id);
+        Sql<ISqlContext> sql = GetBaseWhere(false, false, false, false, false, id);
         BaseDto? dto = Database.FirstOrDefault<BaseDto>(sql);
         return dto == null ? null : BuildEntity(dto);
     }
@@ -222,9 +231,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                         objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
         var isMedia = objectTypeId == Constants.ObjectTypes.Media;
         var isMember = objectTypeId == Constants.ObjectTypes.Member;
+        var isElement = objectTypeId == Constants.ObjectTypes.Element;
 
-        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypeId, id);
-        return GetEntity(sql, isContent, isMedia, isMember);
+        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, isElement, objectTypeId, id);
+        return GetEntity(sql, isContent, isMedia, isMember, isElement);
     }
 
     public IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids) =>
@@ -237,7 +247,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
             : PerformGetAll(objectType);
 
-    private IEnumerable<IEntitySlim> GetEntities(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool isMember)
+    private IEnumerable<IEntitySlim> GetEntities(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool isMember, bool isElement)
     {
         // isContent is going to return a 1:M result now with the variants so we need to do different things
         if (isContent)
@@ -247,6 +257,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             return cdtos.Count == 0
                 ? Enumerable.Empty<IEntitySlim>()
                 : BuildVariants(cdtos.Select(BuildDocumentEntity)).ToList();
+        }
+
+        if (isElement)
+        {
+            List<ElementEntityDto>? cdtos = Database.Fetch<ElementEntityDto>(sql);
+
+            return cdtos.Count == 0
+                ? Enumerable.Empty<IEntitySlim>()
+                : BuildVariants(cdtos.Select(BuildElementEntity)).ToList();
         }
 
         IEnumerable<BaseDto>? dtos = isMedia
@@ -264,9 +283,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                         objectType == Constants.ObjectTypes.DocumentBlueprint;
         var isMedia = objectType == Constants.ObjectTypes.Media;
         var isMember = objectType == Constants.ObjectTypes.Member;
+        var isElement = objectType == Constants.ObjectTypes.Element;
 
-        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectType, filter);
-        return GetEntities(sql, isContent, isMedia, isMember);
+        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, isElement, objectType, filter);
+        return GetEntities(sql, isContent, isMedia, isMember, isElement);
     }
 
     private IEnumerable<IEntitySlim> PerformGetAll(
@@ -278,9 +298,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                         objectType == Constants.ObjectTypes.DocumentBlueprint;
         var isMedia = objectType == Constants.ObjectTypes.Media;
         var isMember = objectType == Constants.ObjectTypes.Member;
+        var isElement = objectType == Constants.ObjectTypes.Element;
 
-        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectType, ordering, filter);
-        return GetEntities(sql, isContent, isMedia, isMember);
+        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, isElement, objectType, ordering, filter);
+        return GetEntities(sql, isContent, isMedia, isMember, isElement);
     }
 
     public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[]? ids) =>
@@ -304,10 +325,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     public IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query)
     {
-        Sql<ISqlContext> sqlClause = GetBase(false, false, false, null);
+        Sql<ISqlContext> sqlClause = GetBase(false, false, false, false, null);
         var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
         Sql<ISqlContext> sql = translator.Translate();
-        sql = AddGroupBy(false, false, false, sql, true);
+        sql = AddGroupBy(false, false, false, false, sql, true);
         List<BaseDto>? dtos = Database.Fetch<BaseDto>(sql);
         return dtos.Select(BuildEntity).ToList();
     }
@@ -318,14 +339,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                         objectType == Constants.ObjectTypes.DocumentBlueprint;
         var isMedia = objectType == Constants.ObjectTypes.Media;
         var isMember = objectType == Constants.ObjectTypes.Member;
+        var isElement = objectType == Constants.ObjectTypes.Element;
 
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] { objectType });
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, isElement, false, null, new[] { objectType });
 
         var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
         sql = translator.Translate();
-        sql = AddGroupBy(isContent, isMedia, isMember, sql, true);
+        sql = AddGroupBy(isContent, isMedia, isMember, isElement, sql, true);
 
-        return GetEntities(sql, isContent, isMedia, isMember);
+        return GetEntities(sql, isContent, isMedia, isMember, isElement);
     }
 
     public UmbracoObjectTypes GetObjectType(int id)
@@ -415,18 +437,19 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
-    private DocumentEntitySlim BuildVariants(DocumentEntitySlim entity)
+    private TEntity BuildVariants<TEntity>(TEntity entity)
         => BuildVariants(new[] { entity }).First();
 
-    private IEnumerable<DocumentEntitySlim> BuildVariants(IEnumerable<DocumentEntitySlim> entities)
+    private IEnumerable<TEntity> BuildVariants<TEntity>(IEnumerable<TEntity> entities)
+        where TEntity : PublishableContentEntitySlim
     {
-        List<DocumentEntitySlim>? v = null;
+        List<TEntity>? v = null;
         var entitiesList = entities.ToList();
-        foreach (DocumentEntitySlim e in entitiesList)
+        foreach (TEntity e in entitiesList)
         {
             if (e.Variations.VariesByCulture())
             {
-                (v ??= new List<DocumentEntitySlim>()).Add(e);
+                (v ??= new List<TEntity>()).Add(e);
             }
         }
 
@@ -444,7 +467,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         // group by node id (each group contains all languages)
         var xdtos = dtos.GroupBy(x => x.NodeId).ToDictionary(x => x.Key, x => x);
 
-        foreach (DocumentEntitySlim e in v)
+        foreach (TEntity e in v)
         {
             // since we're only iterating on entities that vary, we must have something
             IGrouping<int, VariantInfoDto> edtos = xdtos[e.Id];
@@ -496,50 +519,51 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             .OrderBy<LanguageDto>(x => x.Id);
 
     // gets the full sql for a given object type and a given unique id
-    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, bool isElement, Guid objectType,
         Guid uniqueId)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, objectType, uniqueId);
-        return AddGroupBy(isContent, isMedia, isMember, sql, true);
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, isElement, false, objectType, uniqueId);
+        return AddGroupBy(isContent, isMedia, isMember, isElement, sql, true);
     }
 
     // gets the full sql for a given object type and a given node id
-    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, bool isElement, Guid objectType,
         int nodeId)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, objectType, nodeId);
-        return AddGroupBy(isContent, isMedia, isMember, sql, true);
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, isElement, false, objectType, nodeId);
+        return AddGroupBy(isContent, isMedia, isMember, isElement, sql, true);
     }
 
     // gets the full sql for a given object type, with a given filter
-    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, Guid objectType,
+    protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, bool isMember, bool isElement, Guid objectType,
         Action<Sql<ISqlContext>>? filter)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
-        return AddGroupBy(isContent, isMedia, isMember, sql, true);
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, isElement, false, filter, new[] { objectType });
+        return AddGroupBy(isContent, isMedia, isMember, isElement, sql, true);
     }
 
     protected Sql<ISqlContext> GetFullSqlForEntityType(
         bool isContent,
         bool isMedia,
         bool isMember,
+        bool isElement,
         Guid objectType,
         Ordering ordering,
         Action<Sql<ISqlContext>>? filter)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
-        AddGroupBy(isContent, isMedia, isMember, sql, false);
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, isElement, false, filter, new[] { objectType });
+        AddGroupBy(isContent, isMedia, isMember, isElement, sql, false);
         ApplyOrdering(ref sql, ordering);
 
         return sql;
     }
 
-    protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, bool isCount = false)
-        => GetBase(isContent, isMedia, isMember, filter, [], isCount);
+    protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, bool isElement, Action<Sql<ISqlContext>>? filter, bool isCount = false)
+        => GetBase(isContent, isMedia, isMember, isElement, filter, [], isCount);
 
     // gets the base SELECT + FROM [+ filter] sql
     // always from the 'current' content version
-    protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, Guid[] objectTypes, bool isCount = false)
+    protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, bool isElement, Action<Sql<ISqlContext>>? filter, Guid[] objectTypes, bool isCount = false)
     {
         Sql<ISqlContext> sql = Sql();
 
@@ -567,7 +591,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 sql.Append($", SUM(CASE WHEN child.nodeObjectType IN ('{objectTypesForInClause}') THEN 1 ELSE 0 END) AS children");
             }
 
-            if (isContent || isMedia || isMember)
+            if (isContent || isMedia || isMember || isElement)
             {
                 sql
                     .AndSelect<ContentVersionDto>(x => Alias(x.Id, "versionId"), x => x.VersionDate)
@@ -586,6 +610,12 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                     .AndSelect<DocumentDto>(x => x.Published, x => x.Edited);
             }
 
+            if (isElement)
+            {
+                sql
+                    .AndSelect<ElementDto>(x => x.Published, x => x.Edited);
+            }
+
             if (isMedia)
             {
                 sql
@@ -596,7 +626,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         sql
             .From<NodeDto>();
 
-        if (isContent || isMedia || isMember)
+        if (isContent || isMedia || isMember || isElement)
         {
             sql
                 .LeftJoin<ContentVersionDto>()
@@ -612,6 +642,12 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         {
             sql
                 .LeftJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId);
+        }
+
+        if (isElement)
+        {
+            sql
+                .LeftJoin<ElementDto>().On<NodeDto, ElementDto>((left, right) => left.NodeId == right.NodeId);
         }
 
         if (isMedia)
@@ -637,10 +673,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     // gets the base SELECT + FROM [+ filter] + WHERE sql
     // for a given object type, with a given filter
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount,
+    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isElement, bool isCount,
         Action<Sql<ISqlContext>>? filter, Guid[] objectTypes)
     {
-        Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, filter, objectTypes, isCount);
+        Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, isElement, filter, objectTypes, isCount);
         if (objectTypes.Length > 0)
         {
             sql.WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
@@ -651,39 +687,39 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given node id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, int id)
+    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isElement, bool isCount, int id)
     {
-        Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, null, isCount)
+        Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, isElement, null, isCount)
             .Where<NodeDto>(x => x.NodeId == id);
-        return AddGroupBy(isContent, isMedia, isMember, sql, true);
+        return AddGroupBy(isContent, isMedia, isMember, isElement, sql, true);
     }
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given unique id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid uniqueId)
+    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isElement, bool isCount, Guid uniqueId)
     {
-        Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, null, isCount)
+        Sql<ISqlContext> sql = GetBase(isContent, isMedia, isMember, isElement, null, isCount)
             .Where<NodeDto>(x => x.UniqueId == uniqueId);
-        return AddGroupBy(isContent, isMedia, isMember, sql, true);
+        return AddGroupBy(isContent, isMedia, isMember, isElement, sql, true);
     }
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given object type and node id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid objectType,
+    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isElement, bool isCount, Guid objectType,
         int nodeId) =>
-        GetBase(isContent, isMedia, isMember, null, isCount)
+        GetBase(isContent, isMedia, isMember, isElement, null, isCount)
             .Where<NodeDto>(x => x.NodeId == nodeId && x.NodeObjectType == objectType);
 
     // gets the base SELECT + FROM + WHERE sql
     // for a given object type and unique id
-    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isCount, Guid objectType,
+    protected Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isMember, bool isElement, bool isCount, Guid objectType,
         Guid uniqueId) =>
-        GetBase(isContent, isMedia, isMember, null, isCount)
+        GetBase(isContent, isMedia, isMember, isElement, null, isCount)
             .Where<NodeDto>(x => x.UniqueId == uniqueId && x.NodeObjectType == objectType);
 
     // gets the GROUP BY / ORDER BY sql
     // required in order to count children
-    protected Sql<ISqlContext> AddGroupBy(bool isContent, bool isMedia, bool isMember, Sql<ISqlContext> sql,
+    protected Sql<ISqlContext> AddGroupBy(bool isContent, bool isMedia, bool isMember, bool isElement, Sql<ISqlContext> sql,
         bool defaultSort)
     {
         sql
@@ -696,6 +732,12 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 .AndBy<DocumentDto>(x => x.Published, x => x.Edited);
         }
 
+        if (isElement)
+        {
+            sql
+                .AndBy<ElementDto>(x => x.Published, x => x.Edited);
+        }
+
         if (isMedia)
         {
             sql
@@ -703,7 +745,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         }
 
 
-        if (isContent || isMedia || isMember)
+        if (isContent || isMedia || isMember || isElement)
         {
             sql
                 .AndBy<ContentVersionDto>(x => x.Id, x => x.VersionDate)
@@ -791,6 +833,17 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     ///     The DTO used to fetch results for a document item with its variation info
     /// </summary>
     private class DocumentEntityDto : BaseDto
+    {
+        public ContentVariation Variations { get; set; }
+
+        public bool Published { get; set; }
+        public bool Edited { get; set; }
+    }
+
+    /// <summary>
+    ///     The DTO used to fetch results for an element item with its variation info
+    /// </summary>
+    private class ElementEntityDto : BaseDto
     {
         public ContentVariation Variations { get; set; }
 
@@ -943,6 +996,23 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         BuildContentEntity(entity, dto);
 
         if (dto is DocumentEntityDto contentDto)
+        {
+            // fill in the invariant info
+            entity.Edited = contentDto.Edited;
+            entity.Published = contentDto.Published;
+            entity.Variations = contentDto.Variations;
+        }
+
+        return entity;
+    }
+
+    private static ElementEntitySlim BuildElementEntity(BaseDto dto)
+    {
+        // EntitySlim does not track changes
+        var entity = new ElementEntitySlim();
+        BuildContentEntity(entity, dto);
+
+        if (dto is ElementEntityDto contentDto)
         {
             // fill in the invariant info
             entity.Edited = contentDto.Edited;

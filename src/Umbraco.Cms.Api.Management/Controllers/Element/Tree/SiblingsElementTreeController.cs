@@ -1,0 +1,24 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Services;
+
+namespace Umbraco.Cms.Api.Management.Controllers.Element.Tree;
+
+public class SiblingsElementTreeController : ElementTreeControllerBase
+{
+    public SiblingsElementTreeController(IEntityService entityService, IUmbracoMapper umbracoMapper)
+        : base(entityService, umbracoMapper)
+    {
+    }
+
+    [HttpGet("siblings")]
+    [ProducesResponseType(typeof(IEnumerable<ElementTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public Task<ActionResult<IEnumerable<ElementTreeItemResponseModel>>> Siblings(
+        CancellationToken cancellationToken,
+        Guid target,
+        int before,
+        int after) =>
+        GetSiblings(target, before, after);
+}

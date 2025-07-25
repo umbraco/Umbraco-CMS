@@ -85,5 +85,10 @@ public static partial class Constants
         ///     Long-running operations.
         /// </summary>
         public const int LongRunningOperations = -344;
+
+        /// <summary>
+        ///     The entire element tree, i.e. all element items.
+        /// </summary>
+        public const int ElementTree = -345;
     }
 }
