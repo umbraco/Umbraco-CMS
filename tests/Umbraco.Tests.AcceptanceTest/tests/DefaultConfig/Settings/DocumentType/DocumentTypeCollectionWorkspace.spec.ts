@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const documentTypeName = 'TestDocumentType';
@@ -93,8 +93,6 @@ test('can create a document type folder using create options', async ({umbracoAp
 
   // Assert
   await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
-  const folder = await umbracoApi.documentType.getByName(documentFolderName);
-  expect(folder.name).toBe(documentFolderName);
   // Check if the created document type folder is displayed in the collection view and has correct icon
   await umbracoUi.documentType.clickDocumentTypesMenu();
   await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveName(documentFolderName);

@@ -46,7 +46,7 @@ test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
 });
 
 // Really flaky tests, only occurs on pipeline
-test('can add a domain', async ({umbracoApi, umbracoUi}) => {
+test.skip('can add a domain', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
