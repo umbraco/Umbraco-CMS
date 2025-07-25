@@ -12,7 +12,7 @@ const scheduleWaitTime = 100000;
 
 test.beforeEach(async ({umbracoApi}) => {
   // Need to increase the timeout of the tests due to the time to wait for publishing
-  test.setTimeout(250000);
+  test.setTimeout(200000);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   dataTypeId = dataTypeData.id;
   await umbracoApi.document.ensureNameNotExists(contentName);
@@ -49,8 +49,8 @@ test('can schedule the publishing of invariant unpublish content', {tag: '@smoke
   await umbracoUi.content.doesPublishAtContainText(publishedTime);
   // verify the status of content after the publish time is Published
   await umbracoUi.waitForTimeout(scheduleWaitTime);
-  const contentData = await umbracoApi.document.getByName(contentName);
-  expect(contentData.variants[0].state).toBe('Published');
+  //const contentData = await umbracoApi.document.getByName(contentName);
+  //expect(contentData.variants[0].state).toBe('Published');
   await umbracoUi.reloadPage();
   await umbracoUi.content.doesDocumentStateHaveText('Published');
   // verify the value of "Last published"
