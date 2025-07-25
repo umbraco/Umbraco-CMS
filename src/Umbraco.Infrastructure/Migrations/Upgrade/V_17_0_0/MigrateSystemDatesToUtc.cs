@@ -3,10 +3,12 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_0_0;
 
+/// <summary>
+/// Adds a migration to transform all system dates stored in the database from the local server timezone to UTC.
+/// </summary>
 public class MigrateSystemDatesToUtc : UnscopedMigrationBase
 {
     private readonly IScopeProvider _scopeProvider;
@@ -14,6 +16,14 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
     private readonly IOptions<SystemDateMigrationSettings> _migrationSettings;
     private readonly ILogger<MigrateSystemDatesToUtc> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigrateSystemDatesToUtc"/> class.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="scopeProvider"></param>
+    /// <param name="timeProvider"></param>
+    /// <param name="migrationSettings"></param>
+    /// <param name="logger"></param>
     public MigrateSystemDatesToUtc(
         IMigrationContext context,
         IScopeProvider scopeProvider,
@@ -28,6 +38,7 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         _logger = logger;
     }
 
+    /// <inheritdoc/>
     protected override void Migrate()
     {
         if (_migrationSettings.Value.Enabled is false)
