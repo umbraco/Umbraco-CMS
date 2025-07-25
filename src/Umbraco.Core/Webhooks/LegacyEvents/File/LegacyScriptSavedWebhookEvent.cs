@@ -20,6 +20,6 @@ public class LegacyScriptSavedWebhookEvent : WebhookEventBase<ScriptSavedNotific
 
     public override string Alias => Constants.WebhookEvents.Aliases.ScriptSaved;
 
-    public override object? ConvertNotificationToRequestPayload(ScriptSavedNotification notification)
+    public override object ConvertNotificationToRequestPayload(ScriptSavedNotification notification)
         => notification.SavedEntities;
 }

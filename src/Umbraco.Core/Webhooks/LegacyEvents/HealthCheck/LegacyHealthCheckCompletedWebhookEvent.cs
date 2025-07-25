@@ -15,7 +15,7 @@ public class LegacyHealthCheckCompletedWebhookEvent : WebhookEventBase<HealthChe
 
     public override string Alias => Constants.WebhookEvents.Aliases.HealthCheckCompleted;
 
-    public override object? ConvertNotificationToRequestPayload(HealthCheckCompletedNotification notification) =>
+    public override object ConvertNotificationToRequestPayload(HealthCheckCompletedNotification notification) =>
         new
         {
             notification.HealthCheckResults.AllChecksSuccessful,

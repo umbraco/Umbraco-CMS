@@ -235,7 +235,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// </summary>
     /// <param name="level">The level to retrieve Media from</param>
     /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
-    IEnumerable<IMedia>? GetByLevel(int level);
+    IEnumerable<IMedia> GetByLevel(int level);
 
     /// <summary>
     ///     Gets a specific version of an <see cref="IMedia" /> item.

@@ -21,7 +21,7 @@ public class UserForgotPasswordRequestedWebhookEvent : WebhookEventBase<UserForg
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserForgotPasswordRequested;
 
-    public override object? ConvertNotificationToRequestPayload(UserForgotPasswordRequestedNotification notification)
+    public override object ConvertNotificationToRequestPayload(UserForgotPasswordRequestedNotification notification)
         => new DefaultPayloadModel
         {
             Id = notification.AffectedUserId is not null &&

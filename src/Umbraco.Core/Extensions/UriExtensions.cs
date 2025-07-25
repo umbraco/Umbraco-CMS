@@ -181,7 +181,7 @@ public static class UriExtensions
     public static Uri WithoutPort(this Uri uri) =>
         new Uri(uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
 
-    private static string? GetSafeQuery(this Uri uri)
+    private static string GetSafeQuery(this Uri uri)
     {
         if (uri.IsAbsoluteUri)
         {

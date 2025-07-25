@@ -25,7 +25,7 @@ public class AssignedMemberRolesWebhookEvent : WebhookEventBase<AssignedMemberRo
 
     public override string Alias => Constants.WebhookEvents.Aliases.AssignedMemberRoles;
 
-    public override object? ConvertNotificationToRequestPayload(AssignedMemberRolesNotification notification)
+    public override object ConvertNotificationToRequestPayload(AssignedMemberRolesNotification notification)
         => new
         {
             Ids = notification.MemberIds.Select(id => _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Member).Result),

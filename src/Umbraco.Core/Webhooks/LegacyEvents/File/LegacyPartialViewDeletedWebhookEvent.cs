@@ -20,6 +20,6 @@ public class LegacyPartialViewDeletedWebhookEvent : WebhookEventBase<PartialView
 
     public override string Alias => Constants.WebhookEvents.Aliases.PartialViewDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(PartialViewDeletedNotification notification)
+    public override object ConvertNotificationToRequestPayload(PartialViewDeletedNotification notification)
         => notification.DeletedEntities;
 }

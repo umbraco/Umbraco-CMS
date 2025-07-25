@@ -20,5 +20,5 @@ public class LegacyPublicAccessEntryDeletedWebhookEvent : WebhookEventBase<Publi
 
     public override string Alias => Constants.WebhookEvents.Aliases.PublicAccessEntryDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(PublicAccessEntryDeletedNotification notification) => notification.DeletedEntities;
+    public override object ConvertNotificationToRequestPayload(PublicAccessEntryDeletedNotification notification) => notification.DeletedEntities;
 }

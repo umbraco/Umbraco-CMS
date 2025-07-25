@@ -20,7 +20,7 @@ public class UserUnlockedWebhookEvent : WebhookEventBase<UserUnlockedNotificatio
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserUnlocked;
 
-    public override object? ConvertNotificationToRequestPayload(UserUnlockedNotification notification)
+    public override object ConvertNotificationToRequestPayload(UserUnlockedNotification notification)
         => new
         {
             Id = notification.AffectedUserId is not null &&
