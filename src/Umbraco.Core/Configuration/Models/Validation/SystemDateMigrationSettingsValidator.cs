@@ -14,7 +14,7 @@ public class SystemDateMigrationSettingsValidator
     /// <inheritdoc />
     public ValidateOptionsResult Validate(string? name, SystemDateMigrationSettings options)
     {
-        if (string.IsNullOrWhiteSpace(options.LocalServerTimeZone) is true)
+        if (string.IsNullOrWhiteSpace(options.LocalServerTimeZone))
         {
             return ValidateOptionsResult.Success;
         }
