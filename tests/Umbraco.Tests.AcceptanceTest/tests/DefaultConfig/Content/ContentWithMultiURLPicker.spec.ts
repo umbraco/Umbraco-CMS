@@ -82,6 +82,7 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.waitForTimeout(500); // Wait for the document link to be selected
   await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveAndPublishButton();

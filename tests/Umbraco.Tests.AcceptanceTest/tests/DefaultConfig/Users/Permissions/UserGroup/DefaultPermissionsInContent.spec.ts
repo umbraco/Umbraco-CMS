@@ -593,6 +593,7 @@ test('can rollback content with rollback permission enabled', async ({umbracoApi
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedTextStringText);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
+  await umbracoUi.waitForTimeout(700); // Wait for the rollback items to load
   await umbracoUi.content.clickLatestRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
