@@ -85,5 +85,10 @@ public static partial class Constants
         ///     Long-running operations.
         /// </summary>
         public const int LongRunningOperations = -344;
+
+        /// <summary>
+        ///     All document URLs.
+        /// </summary>
+        public const int DocumentUrls = -345;
     }
 }

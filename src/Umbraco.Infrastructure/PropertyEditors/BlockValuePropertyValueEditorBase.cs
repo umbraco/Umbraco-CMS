@@ -362,7 +362,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         var mergedInvariant = UpdateSourceInvariantData(source, target, canUpdateInvariantData);
 
         // if the structure (invariant) is not defined after merger, the target content does not matter
-        if (mergedInvariant is null)
+        if (mergedInvariant?.Layout is null)
         {
             return null;
         }
@@ -393,14 +393,14 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         RestoreMissingValues(
             source.BlockValue.ContentData,
             target.BlockValue.ContentData,
-            mergedInvariant.Layout!,
+            mergedInvariant.Layout,
             (layoutItem, itemData) => layoutItem.ContentKey == itemData.Key,
             canUpdateInvariantData,
             allowedCultures);
         RestoreMissingValues(
             source.BlockValue.SettingsData,
             target.BlockValue.SettingsData,
-            mergedInvariant.Layout!,
+            mergedInvariant.Layout,
             (layoutItem, itemData) => layoutItem.SettingsKey == itemData.Key,
             canUpdateInvariantData,
             allowedCultures);
