@@ -106,8 +106,8 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
 
     private void MigrateDateColumn(IScope scope, string tableName, string columName, string timezoneName, TimeSpan timeZoneOffset)
     {
-        var offsetInMinutes = timeZoneOffset.TotalMinutes;
-        var offSetInMinutesString = timeZoneOffset.TotalMinutes > 0
+        var offsetInMinutes = -timeZoneOffset.TotalMinutes;
+        var offSetInMinutesString = offsetInMinutes > 0
             ? $"+{offsetInMinutes}"
             : $"{offsetInMinutes}";
 
@@ -115,7 +115,7 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         if (DatabaseType == DatabaseType.SQLite)
         {
             // SQLite does not support AT TIME ZONE, but we can use the offset to update the dates. It won't take account of daylight saving time, but
-            // given these are historical dates that are unlikely to be necessary to be 100% accurate, this is acceptable.
+            // given these are historical dates in expected non-production environments, that are unlikely to be necessary to be 100% accurate, this is acceptable.
             sql = Sql($"UPDATE {tableName} SET {columName} = DATETIME({columName}, '{offSetInMinutesString} minutes')");
         }
         else
