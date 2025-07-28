@@ -5,7 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-block-grid-column-span.element.js';
 
 export default {
-	title: 'Extension Type/Property Editor UI/Block Grid Column Span',
+	title: 'Extension Type/Property Editor UI/Block/Block Grid Column Span',
 	component: 'umb-property-editor-ui-block-grid-column-span',
 	id: 'umb-property-editor-ui-block-grid-column-span',
 } as Meta;
