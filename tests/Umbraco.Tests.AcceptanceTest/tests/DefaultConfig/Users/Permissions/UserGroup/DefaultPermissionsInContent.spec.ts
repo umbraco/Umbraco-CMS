@@ -195,6 +195,7 @@ test('can create content with create permission enabled', async ({umbracoApi, um
   // Assert
   await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
+  await umbracoUi.content.isDocumentReadOnly(true);
 });
 
 test('can not create content with create permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -353,10 +354,10 @@ test('can update content with update permission enabled', async ({umbracoApi, um
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
+  expect(await umbracoApi.document.doesNameExist(rootDocumentName)).toBeFalsy();
 });
 
-// TODO: the permission for update is not working, it is always enabled.
-test.skip('can not update content with update permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('can not update content with update permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -365,9 +366,11 @@ test.skip('can not update content with update permission disabled', async ({umbr
 
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+  await umbracoUi.content.goToContentWithName(rootDocumentName);
 
   // Assert
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
+  await umbracoUi.content.isDocumentReadOnly(true);
 });
 
 // Needs create permission to be enabled to duplicate content
@@ -627,3 +630,35 @@ test('can not see delete button in content for userGroup with delete permission 
   await umbracoUi.content.isPermissionInActionsMenuVisible('Delete…', false);
   await umbracoUi.content.isPermissionInActionsMenuVisible('Create…', true);
 });
+
+test('can create and update content with permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const updatedDocumentName = testDocumentName + ' Updated';
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateAndUpdateDocumentPermission(userGroupName);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateActionMenuOption();
+  await umbracoUi.content.chooseDocumentType(rootDocumentTypeName);
+  await umbracoUi.content.enterContentName(testDocumentName);
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.waitForContentToBeCreated();
+  expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
+  // Update the content
+  await umbracoUi.content.goToContentWithName(testDocumentName);
+  await umbracoUi.content.isDocumentReadOnly(false);
+  await umbracoUi.content.enterContentName(updatedDocumentName);
+  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  expect(await umbracoApi.document.doesNameExist(updatedDocumentName)).toBeTruthy();
+  await umbracoUi.content.doesDocumentHaveName(updatedDocumentName);
+
+  // Cleanup
+  await umbracoApi.document.ensureNameNotExists(updatedDocumentName);
+}); 

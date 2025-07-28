@@ -47,7 +47,16 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Saves a blueprint.
     /// </summary>
+    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 18.")]
     void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Saves a blueprint.
+    /// </summary>
+    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => SaveBlueprint(content, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Deletes a blueprint.

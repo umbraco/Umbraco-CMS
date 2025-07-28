@@ -72,8 +72,8 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	async #getExistingTags(query: string) {
-		if (!this.group || this.culture === undefined || !query) return;
-		const { data } = await this.#repository.queryTags(this.group, this.culture, query);
+		if (!this.group || !query) return;
+		const { data } = await this.#repository.queryTags(this.group, this.culture ?? null, query);
 		if (!data) return;
 		this._matches = data.items;
 	}

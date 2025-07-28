@@ -1,4 +1,6 @@
+using System.Linq.Expressions;
 using NPoco;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -81,5 +83,48 @@ internal static class UmbracoDatabaseExtensions
         var query = new Sql().Select("COUNT(*)").From().Append("(").Append(new Sql(sql.SQL, sql.Arguments)).Append(") as count_query");
 
         return database.ExecuteScalar<long>(query);
+    }
+
+    public static async Task<long> CountAsync(this IUmbracoDatabase database, Sql sql)
+    {
+        // We need to copy the sql into a new object, to avoid this method from changing the sql.
+        Sql query = new Sql().Select("COUNT(*)").From().Append("(").Append(new Sql(sql.SQL, sql.Arguments)).Append(") as count_query");
+
+        return await database.ExecuteScalarAsync<long>(query);
+    }
+
+    public static async Task<PagedModel<TResult>> PagedAsync<TDto, TResult>(
+        this IUmbracoDatabase database,
+        Sql<ISqlContext> sql,
+        int skip,
+        int take,
+        Action<Sql<ISqlContext>> sortingAction,
+        Func<TDto, TResult> mapper)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(skip, 0, nameof(skip));
+        ArgumentOutOfRangeException.ThrowIfLessThan(take, 0, nameof(take));
+
+        var count = await database.CountAsync(sql);
+        if (take == 0 || skip >= count)
+        {
+            return new PagedModel<TResult>
+            {
+                Total = count,
+                Items = [],
+            };
+        }
+
+        sortingAction(sql);
+
+        List<TDto> results = await database.SkipTakeAsync<TDto>(
+            skip,
+            take,
+            sql);
+
+        return new PagedModel<TResult>
+        {
+            Total = count,
+            Items = results.Select(mapper),
+        };
     }
 }

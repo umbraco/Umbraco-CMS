@@ -122,7 +122,7 @@ internal sealed class ContentBlueprintEditingService
         }
 
         // Save blueprint
-        await SaveAsync(blueprint, userKey);
+        await SaveAsync(blueprint, userKey, content);
 
         return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentCreateResult { Content = blueprint });
     }
@@ -240,10 +240,10 @@ internal sealed class ContentBlueprintEditingService
 
     protected override OperationResult? Delete(IContent content, int userId) => throw new NotImplementedException();
 
-    private async Task SaveAsync(IContent blueprint, Guid userKey)
+    private async Task SaveAsync(IContent blueprint, Guid userKey, IContent? createdFromContent = null)
     {
         var currentUserId = await GetUserIdAsync(userKey);
-        ContentService.SaveBlueprint(blueprint, currentUserId);
+        ContentService.SaveBlueprint(blueprint, createdFromContent, currentUserId);
     }
 
     private bool ValidateUniqueName(string name, IContent content)

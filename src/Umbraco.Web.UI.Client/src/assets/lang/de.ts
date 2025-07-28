@@ -1026,6 +1026,12 @@ export default {
 		lockoutWillOccur: 'Sie haben keine Tätigkeiten mehr durchgeführt und werden automatisch abgemeldet in',
 		renewSession: 'Erneuern Sie, um Ihre Arbeit zu speichern ...',
 	},
+	timeout: {
+		warningHeadline: 'Warnung: Ihre Sitzung läuft bald ab',
+		warningText: 'Ihre Sitzung ist bald abgelaufen und Sie werden in <strong>{0} Sekunden</strong> abgemeldet.',
+		warningLogoutAction: 'Abmelden',
+		warningContinueAction: 'Eingeloggt bleiben',
+	},
 	login: {
 		greeting0: 'Willkommen',
 		greeting1: 'Willkommen',
