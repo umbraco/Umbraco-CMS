@@ -106,7 +106,13 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                     fieldsToLoad.Add(field);
                 }
 
-                AppendPath(sb, UmbracoObjectTypes.Media, searchFrom, ignoreUserStartNodes, _entityService);
+                AppendPath(sb, UmbracoObjectTypes.Media, searchFrom, ignoreUserStartNodes, out var abortMediaQuery);
+                if (abortMediaQuery)
+                {
+                    totalFound = 0;
+                    return [];
+                }
+
                 break;
             case UmbracoEntityTypes.Document:
                 type = "content";
@@ -116,7 +122,13 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                     fieldsToLoad.Add(field);
                 }
 
-                AppendPath(sb, UmbracoObjectTypes.Document, searchFrom, ignoreUserStartNodes, _entityService);
+                AppendPath(sb, UmbracoObjectTypes.Document, searchFrom, ignoreUserStartNodes, out var abortContentQuery);
+                if (abortContentQuery)
+                {
+                    totalFound = 0;
+                    return [];
+                }
+
                 break;
             default:
                 throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
@@ -332,78 +344,68 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, string? searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
+    private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, string? searchFrom, bool ignoreUserStartNodes, out bool abortQuery)
     {
-        if (sb == null)
-        {
-            throw new ArgumentNullException(nameof(sb));
-        }
+        ArgumentNullException.ThrowIfNull(sb);
 
-        if (entityService == null)
-        {
-            throw new ArgumentNullException(nameof(entityService));
-        }
+        abortQuery = false;
 
-        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        var userStartNodes = currentUser is null ? null : GetStartNodes(currentUser, objectType);
-        if (userStartNodes is not { Length: > 0 })
+        var userStartNodes = GetUserStartNodes(objectType);
+        if (userStartNodes.Length == 0)
         {
-            // make sure we don't find anything
-            sb.Append("+__Path:none ");
+            // If the user has no start nodes, we can just abort the query and return no results.
+            abortQuery = true;
             return;
         }
 
-        Guid? entityKey = null;
-        if (Guid.TryParse(searchFrom, out Guid entityGuid))
+        TreeEntityPath? searchFromPath = GetEntityKey(searchFrom, objectType) is { } searchFromKey
+            ? _entityService.GetAllPaths(objectType, searchFromKey).FirstOrDefault()
+            : null;
+
+        if (searchFromPath is null && (ignoreUserStartNodes || userStartNodes.Contains(-1)))
         {
-            entityKey = entityGuid;
-        } // fallback to Udi for legacy reasons as the calling methods take string?
-        else if (UdiParser.TryParse(searchFrom, true, out Udi? udi) && udi is GuidUdi guidUdi)
-        {
-            entityKey = guidUdi.Guid;
-        }
-        else if (int.TryParse(searchFrom, NumberStyles.Integer, CultureInfo.InvariantCulture, out var entityId)
-                 && entityId > 0
-                 && entityService.GetKey(entityId, objectType) is { Success: true } attempt)
-        {
-            entityKey = attempt.Result;
+            // If the entity could not be found and the user either has access to the root node or we are ignoring user
+            // start nodes, we don't need to filter by path.
+            return;
         }
 
-        TreeEntityPath? entityPath = entityKey is null ? null : entityService.GetAllPaths(objectType, entityKey.Value).FirstOrDefault();
-        var entityPaths = entityService.GetAllPaths(objectType, userStartNodes).ToList();
+        List<TreeEntityPath> pathsToFilter;
+        var userStartNodePaths = _entityService.GetAllPaths(objectType, userStartNodes).ToList();
 
-        if (entityPath is not null)
+        if (searchFromPath is null)
         {
-            // If the entity was found, and we don't need to worry about user start nodes, we can simply append the path.
-            if (userStartNodes.Contains(-1) || ignoreUserStartNodes || entityPaths.Any(path => entityPath.Path.StartsWith(path.Path, StringComparison.Ordinal)))
+            // If the entity was not found, we just need to filter by the user start nodes.
+            pathsToFilter = userStartNodePaths;
+        }
+        else
+        {
+            // If we are ignoring start nodes OR the user has access to the entity, we can simply filter by the entity path.
+            if (ignoreUserStartNodes || userStartNodePaths.Any(userStartNodePath =>
+                    StartsWithPath(searchFromPath.Path, userStartNodePath.Path)))
             {
                 sb.Append("+__Path:");
-                AppendPath(sb, entityPath.Path, false);
+                AppendPath(sb, searchFromPath.Path, false);
                 sb.Append(' ');
                 return;
             }
 
-            // If we need to worry about the start nodes, then we can take the entity path and filter the start nodes to only include those that are under the entity path.
-            entityPaths = entityPaths.Where(ep => ep.Path.StartsWith(entityPath.Path, StringComparison.Ordinal)).ToList();
+            // If the user does not have access to the entity, let's filter the paths by the ones that start with the
+            // entity path (are descendants of the entity).
+            pathsToFilter = userStartNodePaths.Where(ep => StartsWithPath(ep.Path, searchFromPath.Path)).ToList();
         }
-        else if (userStartNodes.Contains(-1) || ignoreUserStartNodes)
+
+        // If we have no paths left, no need to perform the query at all, just return no results.
+        if (pathsToFilter.Count == 0)
         {
-            // If the entity could not be found and the user either has access to the root node or we are ignoring user start nodes, no need to filter by path.
+            abortQuery = true;
             return;
         }
 
-        if (entityPaths.Count == 0)
-        {
-            // No match, so we don't want to return any results
-            sb.Append("+__Path:none ");
-            return;
-        }
-
-        // for each start node, find the start node, and what's underneath
+        // For each start node, find the start node, and what's underneath
         // +__Path:(-1*,1234 -1*,1234,* -1*,5678 -1*,5678,* ...)
         sb.Append("+__Path:(");
         var first = true;
-        foreach (TreeEntityPath ep in entityPaths)
+        foreach (TreeEntityPath ep in pathsToFilter)
         {
             if (first)
             {
@@ -420,7 +422,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         sb.Append(") ");
     }
 
-    private void AppendPath(StringBuilder sb, string path, bool includeThisNode)
+    private static void AppendPath(StringBuilder sb, string path, bool includeThisNode)
     {
         path = path.Replace("-", "\\-").Replace(",", "\\,");
         if (includeThisNode)
@@ -433,11 +435,50 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         sb.Append("\\,*");
     }
 
-    private int[] GetStartNodes(IUser user, UmbracoObjectTypes objectType) =>
-        objectType switch
+    private static bool StartsWithPath(string path1, string path2)
+        => $"{path1},".StartsWith($"{path2},", StringComparison.Ordinal);
+
+    private int[] GetUserStartNodes(UmbracoObjectTypes objectType)
+    {
+        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        if (currentUser is null)
         {
-            UmbracoObjectTypes.Document => user.CalculateContentStartNodeIds(_entityService, _appCaches),
-            UmbracoObjectTypes.Media => user.CalculateMediaStartNodeIds(_entityService, _appCaches),
+            return [];
+        }
+
+        var startNodes = objectType switch
+        {
+            UmbracoObjectTypes.Document => currentUser.CalculateContentStartNodeIds(_entityService, _appCaches),
+            UmbracoObjectTypes.Media => currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches),
             _ => throw new NotSupportedException($"The object type {objectType} is not supported for start nodes."),
-        } ?? [];
+        };
+
+        return startNodes ?? [-1]; // If no start nodes are defined, we assume the user has access to the root node (-1).
+    }
+
+    private Guid? GetEntityKey(string? searchFrom, UmbracoObjectTypes objectType)
+    {
+        if (searchFrom is null)
+        {
+            return null;
+        }
+
+        Guid? entityKey = null;
+        if (Guid.TryParse(searchFrom, out Guid entityGuid))
+        {
+            entityKey = entityGuid;
+        } // fallback to Udi for legacy reasons as the calling methods take string?
+        else if (UdiParser.TryParse(searchFrom, true, out Udi? udi) && udi is GuidUdi guidUdi)
+        {
+            entityKey = guidUdi.Guid;
+        }
+        else if (int.TryParse(searchFrom, NumberStyles.Integer, CultureInfo.InvariantCulture, out var entityId)
+                 && entityId > 0
+                 && _entityService.GetKey(entityId, objectType) is { Success: true } attempt)
+        {
+            entityKey = attempt.Result;
+        }
+
+        return entityKey;
+    }
 }
