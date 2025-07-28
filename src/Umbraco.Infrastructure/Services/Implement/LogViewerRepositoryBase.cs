@@ -1,4 +1,5 @@
-﻿using Serilog.Events;
+﻿using Serilog;
+using Serilog.Events;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Logging.Serilog;
@@ -59,7 +60,12 @@ public abstract class LogViewerRepositoryBase : ILogViewerRepository
         return Enum.Parse<LogLevel>(minLevel.ToString());
     }
 
-    protected abstract LogEventLevel GetGlobalLogLevelEventMinLevel();
+    protected virtual LogEventLevel GetGlobalLogLevelEventMinLevel() =>
+        Enum.GetValues(typeof(LogEventLevel))
+            .Cast<LogEventLevel>()
+            .Where(Log.IsEnabled)
+            .DefaultIfEmpty(LogEventLevel.Information)
+            .Min();
 
     protected abstract IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, ILogFilter logFilter);
 }

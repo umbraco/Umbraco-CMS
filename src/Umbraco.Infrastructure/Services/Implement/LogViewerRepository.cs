@@ -28,13 +28,6 @@ public class LogViewerRepository : LogViewerRepositoryBase
         _jsonSerializer = jsonSerializer;
     }
 
-    protected override LogEventLevel GetGlobalLogLevelEventMinLevel() =>
-        Enum.GetValues(typeof(LogEventLevel))
-            .Cast<LogEventLevel>()
-            .Where(Log.IsEnabled)
-            .DefaultIfEmpty(LogEventLevel.Information)
-            .Min();
-
     protected override IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, ILogFilter logFilter)
     {
         var logs = new List<LogEvent>();
