@@ -1,6 +1,7 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Org.BouncyCastle.Crypto;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
@@ -1669,6 +1670,27 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         AddGetByQueryOrderBy(sql);
 
         return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<Guid> GetScheduledContentKeys(Guid[] keys)
+    {
+        var action = ContentScheduleAction.Release.ToString();
+        DateTime now = DateTime.UtcNow;
+
+        Sql<ISqlContext> sql = SqlContext.Sql();
+        sql
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<DocumentDto>()
+            .InnerJoin<ContentDto>().On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+            .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .WhereIn<NodeDto>(x => x.NodeId, Sql()
+                .Select<ContentScheduleDto>(x => x.NodeId)
+                .From<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x => x.Action == action && x.Date >= now));
+
+        return Database.Fetch<Guid>(sql);
     }
 
     /// <inheritdoc />
