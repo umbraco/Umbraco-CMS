@@ -300,14 +300,11 @@ export class UmbDashboardElement extends UmbLitElement {
 									style=${styleMap({gridColumn:`span ${element.columns}`,gridRow:`span ${element.rows}`})}
 									class="dashboard-app"
 									data-sorter-id=${element.key}>
-									<uui-box headline=${element.headline ?? ""}>
-										<div slot="header-actions">
 											${when(this._editMode,
 												()=>html`<uui-button color="danger" compact @click=${()=> this.#remove(element.key)}><umb-icon name="icon-trash"></umb-icon></uui-button>`
 											)}
-										</div>
 										${element.component}
-									</uui-box>
+
 								</div>`,
 					)}
 				</div>
@@ -371,46 +368,54 @@ export class UmbDashboardElement extends UmbLitElement {
 				position:relative;
 				display:block;
 				height:100%;
-			}
 
-			.dashboard-app::after {
-				content: '';
-				position: absolute;
-				z-index: 1;
-				pointer-events: none;
-				inset: 0;
-				border: 1px solid transparent;
-				border-radius: var(--uui-border-radius);
+				&::after {
+					content: '';
+					position: absolute;
+					z-index: 1;
+					pointer-events: none;
+					inset: 0;
+					border: 1px solid transparent;
+					border-radius: var(--uui-border-radius);
+					transition: border-color 240ms ease-in;
+				}
 
-				transition: border-color 240ms ease-in;
-			}
+				& > uui-button {
+					position:absolute;
+					top:0;
+					right:0;
+					z-index:1;
+				}
 
-			.dashboard-app[drag-placeholder] {
-				position: relative;
-				display: block;
-				--umb-block-grid-entry-actions-opacity: 0;
-			}
+				&[drag-placeholder] {
+					position: relative;
+					display: block;
+					--umb-block-grid-entry-actions-opacity: 0;
 
-			.dashboard-app[drag-placeholder]::after {
-				display: block;
-				border-width: 2px;
-				border-color: var(--uui-color-interactive-emphasis);
-				animation: ${UUIBlinkAnimationValue};
-			}
+					&::after {
+						display: block;
+						border-width: 2px;
+						border-color: var(--uui-color-interactive-emphasis);
+						animation: ${UUIBlinkAnimationValue};
+					}
 
-			.dashboard-app[drag-placeholder]::before {
-				content: '';
-				position: absolute;
-				pointer-events: none;
-				inset: 0;
-				border-radius: var(--uui-border-radius);
-				background-color: var(--uui-color-interactive-emphasis);
-				opacity: 0.12;
-			}
+					&::before {
+						content: '';
+						position: absolute;
+						pointer-events: none;
+						inset: 0;
+						border-radius: var(--uui-border-radius);
+						background-color: var(--uui-color-interactive-emphasis);
+						opacity: 0.12;
+					}
 
-			.dashboard-app[drag-placeholder] > * {
-				transition: opacity 50ms 16ms;
-				opacity: 0;
+					& > * {
+						transition: opacity 50ms 16ms;
+						opacity: 0;
+					}
+
+				}
+
 			}
 
 		`,
