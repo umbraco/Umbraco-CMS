@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
-internal class JsonContentNestedDataSerializerFactory : IContentCacheDataSerializerFactory
+internal sealed class JsonContentNestedDataSerializerFactory : IContentCacheDataSerializerFactory
 {
     private readonly Lazy<JsonContentNestedDataSerializer> _serializer = new();
 

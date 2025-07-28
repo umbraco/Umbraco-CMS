@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 ///     <para>Limited to objects that have a corresponding node (in umbracoNode table).</para>
 ///     <para>Returns <see cref="IEntitySlim" /> objects, i.e. lightweight representation of entities.</para>
 /// </remarks>
-internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
+internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 {
     public EntityRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
         : base(scopeAccessor, appCaches)
@@ -145,6 +145,59 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
+    /// <inheritdoc/>
+    public IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int before, int after, Ordering ordering)
+    {
+        // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
+        // without us also having to do a nested query for the parent ID too.
+        Sql<ISqlContext> parentIdQuery = Sql()
+            .Select<NodeDto>(x => x.ParentId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == targetKey);
+        var parentId = Database.ExecuteScalar<int>(parentIdQuery);
+
+        Sql<ISqlContext> orderingSql = Sql();
+        ApplyOrdering(ref orderingSql, ordering);
+
+        // Get all children of the parent node which is not trashed, ordered by SortOrder, and assign each a row number.
+        // These row numbers are important, we need them to select the "before" and "after" siblings of the target node.
+        Sql<ISqlContext> rowNumberSql = Sql()
+            .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS rn")
+            .AndSelect<NodeDto>(n => n.UniqueId)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == false);
+
+        // Find the specific row number of the target node.
+        // We need this to determine the bounds of the row numbers to select.
+        Sql<ISqlContext> targetRowSql = Sql()
+            .Select("rn")
+            .From().AppendSubQuery(rowNumberSql, "Target")
+            .Where<NodeDto>(x => x.UniqueId == targetKey, "Target");
+
+        // We have to reuse the target row sql arguments, however, we also need to add the "before" and "after" values to the arguments.
+        // If we try to do this directly in the params array it'll consider the initial argument array as a single argument.
+        IEnumerable<object> beforeArguments = targetRowSql.Arguments.Concat([before]);
+        IEnumerable<object> afterArguments = targetRowSql.Arguments.Concat([after]);
+
+        // Select the UniqueId of nodes which row number is within the specified range of the target node's row number.
+        Sql<ISqlContext>? mainSql = Sql()
+            .Select("UniqueId")
+            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .Where($"rn >= ({targetRowSql.SQL}) - @3", beforeArguments.ToArray())
+            .Where($"rn <= ({targetRowSql.SQL}) + @3", afterArguments.ToArray())
+            .OrderBy("rn");
+
+        List<Guid>? keys = Database.Fetch<Guid>(mainSql);
+
+        if (keys is null || keys.Count == 0)
+        {
+            return [];
+        }
+
+        return PerformGetAll(objectType, ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
+    }
+
+
     public IEntitySlim? Get(Guid key, Guid objectTypeId)
     {
         var isContent = objectTypeId == Constants.ObjectTypes.Document ||
@@ -213,6 +266,20 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         var isMember = objectType == Constants.ObjectTypes.Member;
 
         Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectType, filter);
+        return GetEntities(sql, isContent, isMedia, isMember);
+    }
+
+    private IEnumerable<IEntitySlim> PerformGetAll(
+        Guid objectType,
+        Ordering ordering,
+        Action<Sql<ISqlContext>>? filter = null)
+    {
+        var isContent = objectType == Constants.ObjectTypes.Document ||
+                        objectType == Constants.ObjectTypes.DocumentBlueprint;
+        var isMedia = objectType == Constants.ObjectTypes.Media;
+        var isMember = objectType == Constants.ObjectTypes.Member;
+
+        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectType, ordering, filter);
         return GetEntities(sql, isContent, isMedia, isMember);
     }
 
@@ -450,6 +517,21 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     {
         Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
         return AddGroupBy(isContent, isMedia, isMember, sql, true);
+    }
+
+    protected Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid objectType,
+        Ordering ordering,
+        Action<Sql<ISqlContext>>? filter)
+    {
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
+        AddGroupBy(isContent, isMedia, isMember, sql, false);
+        ApplyOrdering(ref sql, ordering);
+
+        return sql;
     }
 
     protected Sql<ISqlContext> GetBase(bool isContent, bool isMedia, bool isMember, Action<Sql<ISqlContext>>? filter, bool isCount = false)
@@ -700,7 +782,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a generic content item which could be either a document, media or a member
     /// </summary>
-    private class GenericContentEntityDto : DocumentEntityDto
+    private sealed class GenericContentEntityDto : DocumentEntityDto
     {
         public string? MediaPath { get; set; }
     }
@@ -719,7 +801,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a media item with its media path info
     /// </summary>
-    private class MediaEntityDto : BaseDto
+    private sealed class MediaEntityDto : BaseDto
     {
         public string? MediaPath { get; set; }
     }
@@ -727,7 +809,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a member item
     /// </summary>
-    private class MemberEntityDto : BaseDto
+    private sealed class MemberEntityDto : BaseDto
     {
     }
 
@@ -835,7 +917,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         entity.ListViewKey = dto.ListView;
     }
 
-    private MediaEntitySlim BuildMediaEntity(BaseDto dto)
+    private static MediaEntitySlim BuildMediaEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new MediaEntitySlim();
@@ -854,7 +936,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
-    private DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
+    private static DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new DocumentEntitySlim();
@@ -871,7 +953,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
-    private MemberEntitySlim BuildMemberEntity(BaseDto dto)
+    private static MemberEntitySlim BuildMemberEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new MemberEntitySlim();

@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Strings;
 ///     Copyright (c) by Matthias Hertel, http://www.mathertel.de
 ///     This work is licensed under a BSD style license. See http://www.mathertel.de/License.aspx
 /// </summary>
-internal class Diff
+internal sealed class Diff
 {
     /// <summary>
     ///     Find the difference in 2 texts, comparing by text lines.
@@ -500,7 +500,7 @@ internal class Diff
     /// <summary>
     ///     Data on one input file being compared.
     /// </summary>
-    internal class DiffData
+    internal sealed class DiffData
     {
         /// <summary>Buffer of numbers that will be compared.</summary>
         internal int[] Data;

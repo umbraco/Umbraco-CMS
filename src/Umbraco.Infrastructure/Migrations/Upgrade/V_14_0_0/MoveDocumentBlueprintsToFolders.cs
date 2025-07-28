@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
@@ -63,7 +63,7 @@ public class MoveDocumentBlueprintsToFolders : MigrationBase
             }
 
             blueprint.ParentId = container.Id;
-            _contentService.SaveBlueprint(blueprint);
+            _contentService.SaveBlueprint(blueprint, null);
         }
     }
 }

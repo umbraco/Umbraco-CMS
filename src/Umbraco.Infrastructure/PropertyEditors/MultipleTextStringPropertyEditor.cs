@@ -47,7 +47,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the multiple text string property editor.
     /// </summary>
-    internal class MultipleTextStringPropertyValueEditor : DataValueEditor
+    internal sealed class MultipleTextStringPropertyValueEditor : DataValueEditor
     {
         private static readonly string _newLine = "\n";
         private static readonly string[] _newLineDelimiters = { "\r\n", "\r", "\n" };
@@ -110,7 +110,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
     /// <summary>
     /// A custom <see href="IValueFormatValidator" /> to check each string against the configured format.
     /// </summary>
-    internal class MultipleTextStringFormatValidator : IValueFormatValidator
+    internal sealed class MultipleTextStringFormatValidator : IValueFormatValidator
     {
         /// <inheritdoc/>
         public IEnumerable<ValidationResult> ValidateFormat(object? value, string valueType, string format)
@@ -137,7 +137,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
     /// <summary>
     /// Validates the min/max configuration for the multiple text strings property editor.
     /// </summary>
-    internal class MinMaxValidator : IValueValidator
+    internal sealed class MinMaxValidator : IValueValidator
     {
         private readonly ILocalizedTextService _localizedTextService;
 

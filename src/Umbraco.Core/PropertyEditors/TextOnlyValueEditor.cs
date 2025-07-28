@@ -63,7 +63,7 @@ public class TextOnlyValueEditor : DataValueEditor
     /// <summary>
     /// A common length validator for both textbox and text area.
     /// </summary>
-    internal class LengthValidator : IValueValidator
+    internal sealed class LengthValidator : IValueValidator
     {
         private readonly ILocalizedTextService _localizedTextService;
 

@@ -408,7 +408,7 @@ public sealed class TypeLoader
     /// </summary>
     /// <seealso cref="System.Exception" />
     [Serializable]
-    internal class CachedTypeNotFoundInFileException : Exception
+    internal sealed class CachedTypeNotFoundInFileException : Exception
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="CachedTypeNotFoundInFileException" /> class.

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class TagDto
+internal sealed class TagDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Tag;
 

@@ -1,4 +1,5 @@
 import type { ManifestDashboard } from '@umbraco-cms/backoffice/dashboard';
+import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 const dashboard: ManifestDashboard = {
 	type: 'dashboard',
@@ -12,7 +13,7 @@ const dashboard: ManifestDashboard = {
 	},
 	conditions: [
 		{
-			alias: 'Umb.Condition.SectionAlias',
+			alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 			match: 'Umb.Section.Content',
 		},
 	],

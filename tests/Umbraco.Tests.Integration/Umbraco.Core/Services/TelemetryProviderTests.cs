@@ -54,6 +54,8 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
+    private IContentBlueprintEditingService ContentBlueprintEditingService => GetRequiredService<IContentBlueprintEditingService>();
+
     private readonly LanguageBuilder _languageBuilder = new();
 
     private readonly UserBuilder _userBuilder = new();
@@ -99,7 +101,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SectionService_Can_Get_Allowed_Sections_For_User()
+    public async Task SectionService_Can_Get_Allowed_Sections_For_User()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
@@ -114,9 +116,11 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         blueprint.SetValue("keywords", "blueprint 3");
         blueprint.SetValue("description", "blueprint 4");
 
-        ContentService.SaveBlueprint(blueprint);
+        ContentService.SaveBlueprint(blueprint, null);
 
-        var fromBlueprint = ContentService.CreateContentFromBlueprint(blueprint, "My test content");
+        var fromBlueprint = await ContentBlueprintEditingService.GetScaffoldedAsync(blueprint.Key);
+        Assert.IsNotNull(fromBlueprint);
+        fromBlueprint.Name = "My test content";
         ContentService.Save(fromBlueprint);
 
         IEnumerable<UsageInformation> result = null;

@@ -11,7 +11,7 @@ internal sealed class DeliveryApiMediaAccessAttribute : TypeFilterAttribute
     {
     }
 
-    private class DeliveryApiMediaAccessFilter : IActionFilter
+    private sealed class DeliveryApiMediaAccessFilter : IActionFilter
     {
         private readonly IApiAccessService _apiAccessService;
 

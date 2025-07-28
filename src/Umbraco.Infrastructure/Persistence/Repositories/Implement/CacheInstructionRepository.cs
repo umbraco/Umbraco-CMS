@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents the NPoco implementation of <see cref="ICacheInstructionRepository" />.
 /// </summary>
-internal class CacheInstructionRepository : ICacheInstructionRepository
+internal sealed class CacheInstructionRepository : ICacheInstructionRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 

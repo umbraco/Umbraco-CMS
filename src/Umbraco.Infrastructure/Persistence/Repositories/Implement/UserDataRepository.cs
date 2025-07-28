@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class UserDataRepository : IUserDataRepository
+internal sealed class UserDataRepository : IUserDataRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
@@ -76,7 +76,7 @@ internal class UserDataRepository : IUserDataRepository
         await _scopeAccessor.AmbientScope?.Database.ExecuteAsync(sql)!;
     }
 
-    private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, IUserDataFilter filter)
+    private static Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, IUserDataFilter filter)
     {
         if (filter.Groups?.Count > 0)
         {
@@ -96,10 +96,10 @@ internal class UserDataRepository : IUserDataRepository
         return sql;
     }
 
-    private IEnumerable<IUserData> DtosToModels(IEnumerable<UserDataDto> dtos)
+    private static IEnumerable<IUserData> DtosToModels(IEnumerable<UserDataDto> dtos)
         => dtos.Select(Map);
 
-    private IUserData Map(UserDataDto dto)
+    private static IUserData Map(UserDataDto dto)
         => new UserData
         {
             Key = dto.Key,
@@ -109,7 +109,7 @@ internal class UserDataRepository : IUserDataRepository
             UserKey = dto.UserKey,
         };
 
-    private UserDataDto Map(IUserData userData)
+    private static UserDataDto Map(IUserData userData)
         => new()
         {
             Key = userData.Key,

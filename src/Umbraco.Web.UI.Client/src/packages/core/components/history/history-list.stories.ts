@@ -3,7 +3,7 @@ import './history-item.element.js';
 
 import type { UmbHistoryListElement } from './history-list.element.js';
 import type { UmbHistoryItemElement } from './history-item.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {

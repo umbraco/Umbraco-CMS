@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Caching;
@@ -7,9 +8,13 @@ namespace Umbraco.Cms.Api.Delivery.Caching;
 internal sealed class DeliveryApiOutputCachePolicy : IOutputCachePolicy
 {
     private readonly TimeSpan _duration;
+    private readonly StringValues _varyByHeaderNames;
 
-    public DeliveryApiOutputCachePolicy(TimeSpan duration)
-        => _duration = duration;
+    public DeliveryApiOutputCachePolicy(TimeSpan duration, StringValues varyByHeaderNames)
+    {
+        _duration = duration;
+        _varyByHeaderNames = varyByHeaderNames;
+    }
 
     ValueTask IOutputCachePolicy.CacheRequestAsync(OutputCacheContext context, CancellationToken cancellationToken)
     {
@@ -20,6 +25,7 @@ internal sealed class DeliveryApiOutputCachePolicy : IOutputCachePolicy
 
         context.EnableOutputCaching = requestPreviewService.IsPreview() is false;
         context.ResponseExpirationTimeSpan = _duration;
+        context.CacheVaryByRules.HeaderNames = _varyByHeaderNames;
 
         return ValueTask.CompletedTask;
     }
