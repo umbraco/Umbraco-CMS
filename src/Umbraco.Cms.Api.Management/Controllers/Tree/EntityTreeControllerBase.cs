@@ -147,7 +147,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected virtual async Task PopulateSigns(TItem[] treeItemViewModels, IEnumerable<IEntitySlim> entities)
     {
-        foreach (ISignProvider signProvider in _signProviders)
+        foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideTreeSigns<TItem>()))
         {
             await signProvider.PopulateTreeSignsAsync(treeItemViewModels, entities);
         }

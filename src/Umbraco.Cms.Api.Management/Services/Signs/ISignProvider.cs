@@ -1,3 +1,4 @@
+using System.Diagnostics.Eventing.Reader;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Models.Entities;
 
@@ -8,6 +9,13 @@ namespace Umbraco.Cms.Api.Management.Services.Signs;
 /// </summary>
 public interface ISignProvider
 {
+    /// <summary>
+    /// Gets a value indicating whether this provider can provide tree signs for the specified item type.
+    /// </summary>
+    /// <typeparam name="TItem">Type of tree item view model.</typeparam>
+    /// <returns></returns>
+    bool CanProvideTreeSigns<TItem>();
+
     /// <summary>
     /// Populates the provided tree item view models with signs.
     /// </summary>

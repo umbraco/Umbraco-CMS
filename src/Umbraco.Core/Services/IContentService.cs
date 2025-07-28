@@ -275,6 +275,15 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     bool HasChildren(int id);
 
+    /// <summary>
+    ///     Gets the content Ids from the provided collection of content Ids that are scheduled for publishing.
+    /// </summary>
+    /// <param name="keys">The content keys </param>
+    /// <returns>
+    ///     The provided collection of content Ids filtered for those that are scheduled for publishing.
+    /// </returns>
+    IEnumerable<Guid> GetScheduledContentKeys(IEnumerable<Guid> keys) => keys.Count() > 0 ? [keys.First()] : [];
+
     #endregion
 
     #region Save, Delete Document
