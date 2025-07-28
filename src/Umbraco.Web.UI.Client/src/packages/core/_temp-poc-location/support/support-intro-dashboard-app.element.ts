@@ -1,21 +1,33 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type {
+	ManifestDashboardApp,
+	UmbDashboardAppElement,
+	UmbDashboardAppSize,
+} from '@umbraco-cms/backoffice/dashboard';
 
-const elementName = 'umb-support-intro-dashboard-app';
-@customElement(elementName)
-export class UmbSupportIntroDashboardAppElement extends UmbLitElement {
+@customElement('umb-support-intro-dashboard-app')
+export class UmbSupportIntroDashboardAppElement extends UmbLitElement implements UmbDashboardAppElement {
+	@property({ type: Object })
+	manifest?: ManifestDashboardApp;
+
+	@property({ type: String })
+	size?: UmbDashboardAppSize;
+
 	override render() {
 		return html`
-			<p>
-				<umb-localize key="settingsDashboard_supportDescription"></umb-localize>
-			</p>
-			<uui-button
-				look="outline"
-				href="https://umbraco.com/support/"
-				label=${this.localize.term('settingsDashboard_getSupport')}
-				target="_blank"
-				rel="noopener"></uui-button>
+			<umb-dashboard-app-layout headline=${this.localize.term('settingsDashboard_supportHeader')}>
+				<p>
+					<umb-localize key="settingsDashboard_supportDescription"></umb-localize>
+				</p>
+				<uui-button
+					look="outline"
+					href="https://umbraco.com/support/"
+					label=${this.localize.term('settingsDashboard_getSupport')}
+					target="_blank"
+					rel="noopener"></uui-button>
+			</umb-dashboard-app-layout>
 		`;
 	}
 
@@ -33,6 +45,6 @@ export { UmbSupportIntroDashboardAppElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbSupportIntroDashboardAppElement;
+		['umb-support-intro-dashboard-app']: UmbSupportIntroDashboardAppElement;
 	}
 }
