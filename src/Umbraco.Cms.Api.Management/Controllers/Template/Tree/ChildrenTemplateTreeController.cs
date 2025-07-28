@@ -1,17 +1,26 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Services.Signs;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 
 [ApiVersion("1.0")]
 public class ChildrenTemplateTreeController : TemplateTreeControllerBase
 {
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public ChildrenTemplateTreeController(IEntityService entityService)
         : base(entityService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ChildrenTemplateTreeController(IEntityService entityService, SignProviderCollection signProviders)
+        : base(entityService, signProviders)
     {
     }
 

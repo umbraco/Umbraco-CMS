@@ -1,10 +1,12 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Services.Signs;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
@@ -13,6 +15,12 @@ public class RootDictionaryTreeController : DictionaryTreeControllerBase
 {
     public RootDictionaryTreeController(IEntityService entityService, IDictionaryItemService dictionaryItemService)
         : base(entityService, dictionaryItemService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public RootDictionaryTreeController(IEntityService entityService, SignProviderCollection signProviders, IDictionaryItemService dictionaryItemService)
+        : base(entityService, signProviders, dictionaryItemService)
     {
     }
 

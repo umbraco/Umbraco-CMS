@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Extensions;
+using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Core.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
@@ -28,9 +31,16 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         }
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected FolderTreeControllerBase(IEntityService entityService)
-        : base(entityService) =>
-        // ReSharper disable once VirtualMemberCallInConstructor
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+    {
+    }
+
+    protected FolderTreeControllerBase(IEntityService entityService, SignProviderCollection signProviders)
+        : base(entityService, signProviders) =>
         _folderObjectTypeId = FolderObjectType.GetGuid();
 
     protected abstract UmbracoObjectTypes FolderObjectType { get; }

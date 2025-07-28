@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
@@ -7,9 +7,11 @@ using Umbraco.Cms.Api.Management.Middleware;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.Services;
+using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Extensions;
@@ -95,6 +97,15 @@ public static partial class UmbracoBuilderExtensions
             });
         }
 
+        builder.SignProviders();
+
         return builder;
     }
+
+    /// <summary>
+    /// Gets the sign providers collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    public static SignProviderCollectionBuilder SignProviders(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<SignProviderCollectionBuilder>();
 }
