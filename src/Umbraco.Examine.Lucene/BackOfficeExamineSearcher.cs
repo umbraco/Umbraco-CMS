@@ -350,38 +350,40 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
         abortQuery = false;
 
-        var userStartNodes = GetUserStartNodes(objectType);
-        if (userStartNodes.Length == 0)
+        if (searchFrom is "-1")
         {
-            // If the user has no start nodes, we can just abort the query and return no results.
-            abortQuery = true;
-            return;
+            searchFrom = null;
         }
 
-        TreeEntityPath? searchFromPath = GetEntityKey(searchFrom, objectType) is { } searchFromKey
-            ? _entityService.GetAllPaths(objectType, searchFromKey).FirstOrDefault()
-            : null;
-
-        if (searchFromPath is null && (ignoreUserStartNodes || userStartNodes.Contains(-1)))
+        var userStartNodes = ignoreUserStartNodes ? [-1] : GetUserStartNodes(objectType);
+        if (searchFrom is null && userStartNodes.Contains(-1))
         {
-            // If the entity could not be found and the user either has access to the root node or we are ignoring user
+            // If we have no searchFrom and the user either has access to the root node or we are ignoring user
             // start nodes, we don't need to filter by path.
             return;
         }
 
-        List<TreeEntityPath> pathsToFilter;
-        var userStartNodePaths = _entityService.GetAllPaths(objectType, userStartNodes).ToList();
-
-        if (searchFromPath is null)
+        string[] pathsToFilter;
+        if (searchFrom is null)
         {
-            // If the entity was not found, we just need to filter by the user start nodes.
-            pathsToFilter = userStartNodePaths;
+            // If we don't want to filter by a specific entity, we can simply use the user start nodes.
+            pathsToFilter = GetEntityPaths(objectType, userStartNodes);
         }
         else
         {
-            // If we are ignoring start nodes OR the user has access to the entity, we can simply filter by the entity path.
-            if (ignoreUserStartNodes || userStartNodePaths.Any(userStartNodePath =>
-                    StartsWithPath(searchFromPath.Path, userStartNodePath.Path)))
+            TreeEntityPath? searchFromPath = GetEntityPath(searchFrom, objectType);
+            if (searchFromPath is null)
+            {
+                // If the searchFrom cannot be found, return no results.
+                // This is to prevent showing entities outside the intended filter.
+                abortQuery = true;
+                return;
+            }
+
+            var userStartNodePaths = GetEntityPaths(objectType, userStartNodes);
+
+            // If the user has access to the entity, we can simply filter by the entity path.
+            if (userStartNodePaths.Any(userStartNodePath => StartsWithPath(searchFromPath.Path, userStartNodePath)))
             {
                 sb.Append("+__Path:");
                 AppendPath(sb, searchFromPath.Path, false);
@@ -391,11 +393,11 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
             // If the user does not have access to the entity, let's filter the paths by the ones that start with the
             // entity path (are descendants of the entity).
-            pathsToFilter = userStartNodePaths.Where(ep => StartsWithPath(ep.Path, searchFromPath.Path)).ToList();
+            pathsToFilter = userStartNodePaths.Where(ep => StartsWithPath(ep, searchFromPath.Path)).ToArray();
         }
 
         // If we have no paths left, no need to perform the query at all, just return no results.
-        if (pathsToFilter.Count == 0)
+        if (pathsToFilter.Length == 0)
         {
             abortQuery = true;
             return;
@@ -405,7 +407,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         // +__Path:(-1*,1234 -1*,1234,* -1*,5678 -1*,5678,* ...)
         sb.Append("+__Path:(");
         var first = true;
-        foreach (TreeEntityPath ep in pathsToFilter)
+        foreach (string pathToFilter in pathsToFilter)
         {
             if (first)
             {
@@ -416,7 +418,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 sb.Append(' ');
             }
 
-            AppendPath(sb, ep.Path, true);
+            AppendPath(sb, pathToFilter, true);
         }
 
         sb.Append(") ");
@@ -424,7 +426,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
     private static void AppendPath(StringBuilder sb, string path, bool includeThisNode)
     {
-        path = path.Replace("-", "\\-").Replace(",", "\\,");
+        path = path.Replace("-", "\\-");
         if (includeThisNode)
         {
             sb.Append(path);
@@ -432,7 +434,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
 
         sb.Append(path);
-        sb.Append("\\,*");
+        sb.Append(",*");
     }
 
     private static bool StartsWithPath(string path1, string path2)
@@ -456,7 +458,15 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         return startNodes ?? [-1]; // If no start nodes are defined, we assume the user has access to the root node (-1).
     }
 
-    private Guid? GetEntityKey(string? searchFrom, UmbracoObjectTypes objectType)
+    private string[] GetEntityPaths(UmbracoObjectTypes objectType, int[] entityIds) =>
+        entityIds switch
+        {
+            [] => [],
+            _ when entityIds.Contains(-1) => ["-1"],
+            _ => _entityService.GetAllPaths(objectType, entityIds).Select(x => x.Path).ToArray(),
+        };
+
+    private TreeEntityPath? GetEntityPath(string? searchFrom, UmbracoObjectTypes objectType)
     {
         if (searchFrom is null)
         {
@@ -479,6 +489,6 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             entityKey = attempt.Result;
         }
 
-        return entityKey;
+        return entityKey is null ? null : _entityService.GetAllPaths(objectType, entityKey.Value).FirstOrDefault();
     }
 }
