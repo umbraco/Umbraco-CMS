@@ -189,7 +189,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddRecurringBackgroundJob<WebhookFiring>();
         builder.Services.AddRecurringBackgroundJob<WebhookLoggingCleanup>();
         builder.Services.AddRecurringBackgroundJob<ReportSiteJob>();
-
+        builder.Services.AddRecurringBackgroundJob<CacheInstructionsPruningJob>();
+        builder.Services.AddRecurringBackgroundJob<LongRunningOperationsCleanupJob>();
 
         builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
         builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();

@@ -12,6 +12,16 @@ export const manifests: Array<UmbExtensionManifest> = [
 			group: 'common',
 			propertyEditorSchemaAlias: 'Umbraco.Label',
 			supportsReadOnly: true,
+			settings: {
+				properties: [
+					{
+						alias: 'labelTemplate',
+						label: 'Label template',
+						description: 'Enter a template for the label.',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					},
+				],
+			},
 		},
 	},
 	labelSchemaManifest,

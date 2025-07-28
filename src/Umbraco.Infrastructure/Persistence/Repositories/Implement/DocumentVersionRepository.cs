@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class DocumentVersionRepository : IDocumentVersionRepository
+internal sealed class DocumentVersionRepository : IDocumentVersionRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 

@@ -1,5 +1,5 @@
 import type { UmbTableElement, UmbTableColumn, UmbTableItem } from './table.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 import './table.element.js';

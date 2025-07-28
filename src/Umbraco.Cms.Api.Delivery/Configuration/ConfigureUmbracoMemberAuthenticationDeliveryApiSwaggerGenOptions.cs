@@ -26,7 +26,7 @@ public class ConfigureUmbracoMemberAuthenticationDeliveryApiSwaggerGenOptions : 
         options.OperationFilter<DeliveryApiSecurityFilter>();
     }
 
-    private class DeliveryApiSecurityFilter : SwaggerFilterBase<ContentApiControllerBase>, IOperationFilter, IDocumentFilter
+    private sealed class DeliveryApiSecurityFilter : SwaggerFilterBase<ContentApiControllerBase>, IOperationFilter, IDocumentFilter
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {

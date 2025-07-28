@@ -196,9 +196,9 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	/**
 	 * Get the permissions for the current user
-	 * @returns {Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel> | undefined} The permissions for the current user
+	 * @returns {unknown[] | undefined} The permissions for the current user
 	 */
-	getPermissions() {
+	getPermissions(): unknown[] | undefined {
 		return this.#currentUser.getValue()?.permissions;
 	}
 

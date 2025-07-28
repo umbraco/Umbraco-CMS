@@ -3745,6 +3745,37 @@ export type GetTreeDataTypeRootResponses = {
 
 export type GetTreeDataTypeRootResponse = GetTreeDataTypeRootResponses[keyof GetTreeDataTypeRootResponses];
 
+export type GetTreeDataTypeSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/data-type/siblings';
+};
+
+export type GetTreeDataTypeSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDataTypeSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: Array<DataTypeTreeItemResponseModel>;
+};
+
+export type GetTreeDataTypeSiblingsResponse = GetTreeDataTypeSiblingsResponses[keyof GetTreeDataTypeSiblingsResponses];
+
 export type GetDictionaryData = {
     body?: never;
     path?: never;
@@ -4652,6 +4683,37 @@ export type GetTreeDocumentBlueprintRootResponses = {
 
 export type GetTreeDocumentBlueprintRootResponse = GetTreeDocumentBlueprintRootResponses[keyof GetTreeDocumentBlueprintRootResponses];
 
+export type GetTreeDocumentBlueprintSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/document-blueprint/siblings';
+};
+
+export type GetTreeDocumentBlueprintSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDocumentBlueprintSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: Array<DocumentBlueprintTreeItemResponseModel>;
+};
+
+export type GetTreeDocumentBlueprintSiblingsResponse = GetTreeDocumentBlueprintSiblingsResponses[keyof GetTreeDocumentBlueprintSiblingsResponses];
+
 export type PostDocumentTypeData = {
     body?: CreateDocumentTypeRequestModel;
     path?: never;
@@ -5461,6 +5523,37 @@ export type GetTreeDocumentTypeRootResponses = {
 };
 
 export type GetTreeDocumentTypeRootResponse = GetTreeDocumentTypeRootResponses[keyof GetTreeDocumentTypeRootResponses];
+
+export type GetTreeDocumentTypeSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/document-type/siblings';
+};
+
+export type GetTreeDocumentTypeSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDocumentTypeSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: Array<DocumentTypeTreeItemResponseModel>;
+};
+
+export type GetTreeDocumentTypeSiblingsResponse = GetTreeDocumentTypeSiblingsResponses[keyof GetTreeDocumentTypeSiblingsResponses];
 
 export type GetDocumentVersionData = {
     body?: never;
@@ -7055,6 +7148,37 @@ export type GetTreeDocumentRootResponses = {
 };
 
 export type GetTreeDocumentRootResponse = GetTreeDocumentRootResponses[keyof GetTreeDocumentRootResponses];
+
+export type GetTreeDocumentSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/document/siblings';
+};
+
+export type GetTreeDocumentSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDocumentSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: Array<DocumentTreeItemResponseModel>;
+};
+
+export type GetTreeDocumentSiblingsResponse = GetTreeDocumentSiblingsResponses[keyof GetTreeDocumentSiblingsResponses];
 
 export type PostDynamicRootQueryData = {
     body?: DynamicRootRequestModel;
@@ -8920,6 +9044,37 @@ export type GetTreeMediaTypeRootResponses = {
 
 export type GetTreeMediaTypeRootResponse = GetTreeMediaTypeRootResponses[keyof GetTreeMediaTypeRootResponses];
 
+export type GetTreeMediaTypeSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/media-type/siblings';
+};
+
+export type GetTreeMediaTypeSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeMediaTypeSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: Array<MediaTypeTreeItemResponseModel>;
+};
+
+export type GetTreeMediaTypeSiblingsResponse = GetTreeMediaTypeSiblingsResponses[keyof GetTreeMediaTypeSiblingsResponses];
+
 export type GetCollectionMediaData = {
     body?: never;
     path?: never;
@@ -9853,6 +10008,37 @@ export type GetTreeMediaRootResponses = {
 };
 
 export type GetTreeMediaRootResponse = GetTreeMediaRootResponses[keyof GetTreeMediaRootResponses];
+
+export type GetTreeMediaSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/media/siblings';
+};
+
+export type GetTreeMediaSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeMediaSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: Array<MediaTreeItemResponseModel>;
+};
+
+export type GetTreeMediaSiblingsResponse = GetTreeMediaSiblingsResponses[keyof GetTreeMediaSiblingsResponses];
 
 export type GetItemMemberGroupData = {
     body?: never;
@@ -12841,10 +13027,6 @@ export type GetSegmentErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
 };
 
 export type GetSegmentError = GetSegmentErrors[keyof GetSegmentErrors];
@@ -13961,6 +14143,37 @@ export type GetTreeTemplateRootResponses = {
 };
 
 export type GetTreeTemplateRootResponse = GetTreeTemplateRootResponses[keyof GetTreeTemplateRootResponses];
+
+export type GetTreeTemplateSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/template/siblings';
+};
+
+export type GetTreeTemplateSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeTemplateSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: Array<NamedEntityTreeItemResponseModel>;
+};
+
+export type GetTreeTemplateSiblingsResponse = GetTreeTemplateSiblingsResponses[keyof GetTreeTemplateSiblingsResponses];
 
 export type PostTemporaryFileData = {
     body?: {
@@ -16081,6 +16294,10 @@ export type GetWebhookByIdLogsErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetWebhookByIdLogsResponses = {
@@ -16137,6 +16354,10 @@ export type GetWebhookLogsErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetWebhookLogsResponses = {

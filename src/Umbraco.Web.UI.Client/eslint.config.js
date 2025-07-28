@@ -1,7 +1,10 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+
 import js from '@eslint/js';
 import globals from 'globals';
 import importPlugin from 'eslint-plugin-import';
 import localRules from 'eslint-plugin-local-rules';
+import storybook from 'eslint-plugin-storybook';
 import wcPlugin from 'eslint-plugin-wc';
 import litPlugin from 'eslint-plugin-lit';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
@@ -13,8 +16,8 @@ export default [
 	js.configs.recommended,
 	...tseslint.configs.recommended,
 	wcPlugin.configs['flat/recommended'],
-	litPlugin.configs['flat/recommended'],
-	jsdoc.configs['flat/recommended'], // We use the non typescript version to allow types to be defined in the jsdoc comments. This will allow js docs as an alternative to typescript types.
+	litPlugin.configs['flat/recommended'], // We use the non typescript version to allow types to be defined in the jsdoc comments. This will allow js docs as an alternative to typescript types.
+	jsdoc.configs['flat/recommended'],
 	localRules.configs.all,
 	eslintPluginPrettierRecommended,
 
@@ -101,4 +104,5 @@ export default [
 			},
 		},
 	},
+	...storybook.configs['flat/recommended'],
 ];

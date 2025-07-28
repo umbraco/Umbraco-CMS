@@ -5,6 +5,7 @@ import { manifests as dashboardManifests } from './dashboard/manifests.js';
 import { manifests as debugManifests } from './debug/manifests.js';
 import { manifests as entityActionManifests } from './entity-action/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-action/manifests.js';
+import { manifests as entityManifests } from './entity/manifests.js';
 import { manifests as extensionManifests } from './extension-registry/manifests.js';
 import { manifests as iconRegistryManifests } from './icon-registry/manifests.js';
 import { manifests as localizationManifests } from './localization/manifests.js';
@@ -33,6 +34,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...debugManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
+	...entityManifests,
 	...extensionManifests,
 	...iconRegistryManifests,
 	...localizationManifests,
