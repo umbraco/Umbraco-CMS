@@ -100,7 +100,13 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
 
     public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
     {
-        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out var totalFound, searchFrom);
+        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(
+            query,
+            UmbracoEntityTypes.Document,
+            pageSize,
+            pageIndex,
+            out var totalFound,
+            searchFrom: searchFrom);
         return new EntitySearchResults(results, totalFound);
     }
 
@@ -399,7 +405,14 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
 
     public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null, string? culture = null)
     {
-        var results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out long totalFound, culture: culture, searchFrom: searchFrom);
+        var results = _treeSearcher.ExamineSearch(
+            query,
+            UmbracoEntityTypes.Document,
+            pageSize,
+            pageIndex,
+            out long totalFound,
+            culture: culture,
+            searchFrom: searchFrom);
         return new EntitySearchResults(results, totalFound);
     }
 }
