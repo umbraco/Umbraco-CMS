@@ -103,7 +103,6 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         MigrateDateColumn(scope, "umbracoUser", "invitedDate", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoUserGroup", "createDate", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoUserGroup", "updateDate", timeZoneName, timeZoneOffset);
-        MigrateDateColumn(scope, "umbracoWebhookLog", "date", timeZoneName, timeZoneOffset);
 
         scope.Complete();
         Context.Complete();
