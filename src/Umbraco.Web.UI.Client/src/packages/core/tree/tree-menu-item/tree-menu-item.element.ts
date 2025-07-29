@@ -17,6 +17,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 	_menuExpansion: UmbEntityExpansionModel = [];
 
 	#menuContext?: typeof UMB_MENU_CONTEXT.TYPE;
+	#localExpansionState: UmbEntityExpansionModel = [];
 
 	constructor() {
 		super();
@@ -29,6 +30,12 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 
 	#observeExpansion() {
 		this.observe(this.#menuContext?.expansion.expansion, (items) => {
+			const allEntriesExists = this.#localExpansionState.every((localItem) =>
+				items?.some((item) => item.unique === localItem.unique && item.entityType === localItem.entityType),
+			);
+
+			// Ensure that we only updates the expansion (and rerenders) if the state has been changed outside of the component.
+			if (allEntriesExists) return;
 			this._menuExpansion = items || [];
 		});
 	}
@@ -42,8 +49,12 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 		}
 
 		if (event.type === UmbExpansionEntityExpandedEvent.TYPE) {
+			this.#localExpansionState.push(eventEntity);
 			this.#menuContext?.expansion.expandItem(eventEntity);
 		} else if (event.type === UmbExpansionEntityCollapsedEvent.TYPE) {
+			this.#localExpansionState = this.#localExpansionState.filter(
+				(entity) => !(entity.unique === eventEntity.unique && entity.entityType === eventEntity.entityType),
+			);
 			this.#menuContext?.expansion.collapseItem(eventEntity);
 		}
 	}
