@@ -785,11 +785,11 @@ public class BackOfficeUserStore :
             user.LastLoginDate = identityUser.LastLoginDate;
         }
 
-        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.InviteDateUtc))
-            || user.InvitedDate?.ToUniversalTime() != identityUser.InviteDateUtc)
+        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.InviteDate))
+            || user.InvitedDate?.ToUniversalTime() != identityUser.InviteDate)
         {
             anythingChanged = true;
-            user.InvitedDate = identityUser.InviteDateUtc;
+            user.InvitedDate = identityUser.InviteDate;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDate))

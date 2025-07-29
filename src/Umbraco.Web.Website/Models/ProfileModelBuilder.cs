@@ -65,7 +65,7 @@ public class ProfileModelBuilder : MemberModelBuilderBase
             IsApproved = member.IsApproved,
             IsLockedOut = member.IsLockedOut,
             LastLockoutDate = member.LastLockoutDate,
-            CreatedDate = member.CreatedDate.Date,
+            CreatedDate = member.CreatedDate,
             LastLoginDate = member.LastLoginDate,
             LastPasswordChangedDate = member.LastPasswordChangeDate,
             RedirectUrl = _redirectUrl,

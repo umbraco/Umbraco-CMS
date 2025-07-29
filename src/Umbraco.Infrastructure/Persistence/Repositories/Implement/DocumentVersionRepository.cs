@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -181,20 +182,13 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
             .Where<ContentVersionDto>(x => x.Id == versionId);
 
         ContentVersionMeta? result = _scopeAccessor.AmbientScope?.Database.Single<ContentVersionMeta>(query);
-        EnsureUtcDate(result);
+        result?.EnsureUtc();
         return result;
     }
 
-    private static void EnsureUtcDate(ContentVersionMeta? version) => version?.EnsureUtc();
-
     private static void EnsureUtcDates(IEnumerable<ContentVersionMeta>? versions)
     {
-        if (versions is null)
-        {
-            return;
-        }
-
-        foreach (ContentVersionMeta version in versions)
+        foreach (ContentVersionMeta version in versions ?? [])
         {
             version.EnsureUtc();
         }

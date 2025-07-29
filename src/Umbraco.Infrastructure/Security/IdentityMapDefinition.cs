@@ -82,7 +82,7 @@ public class IdentityMapDefinition : IMapDefinition
         target.UserName = source.Username;
         target.LastPasswordChangeDate = source.LastPasswordChangeDate?.ToUniversalTime();
         target.LastLoginDate = source.LastLoginDate?.ToUniversalTime();
-        target.InviteDateUtc = source.InvitedDate?.ToUniversalTime();
+        target.InviteDate = source.InvitedDate?.ToUniversalTime();
         target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
         target.Name = source.Name;
         target.AccessFailedCount = source.FailedPasswordAttempts;
