@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Services.Signs;
 
 /// <summary>
-/// Implements a <see cref="SignProviderCollection"/> that provides signs for content items that have a schedule.
+/// Implements a <see cref="ISignProvider"/> that provides signs for content items that have a schedule.
 /// </summary>
 internal class HasScheduleSignProvider : ISignProvider
 {

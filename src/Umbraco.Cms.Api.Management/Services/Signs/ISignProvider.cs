@@ -1,4 +1,3 @@
-using System.Diagnostics.Eventing.Reader;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Models.Entities;
 
@@ -20,7 +19,7 @@ public interface ISignProvider
     /// Populates the provided tree item view models with signs.
     /// </summary>
     /// <typeparam name="TItem">Type of tree item view model.</typeparam>
-    /// <param name="treeItemViewModels">The collection of tree item view models populatw with signs.</param>
+    /// <param name="treeItemViewModels">The collection of tree item view models populated with signs.</param>
     /// <param name="entities">The entities from which the collection of tree item view models was populated.</param>
     Task PopulateTreeSignsAsync<TItem>(TItem[] treeItemViewModels, IEnumerable<IEntitySlim> entities)
         where TItem : EntityTreeItemResponseModel, new();
