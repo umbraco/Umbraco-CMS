@@ -1,5 +1,6 @@
 import { UmbAuthFlow } from './auth-flow.js';
 import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
+import { UmbAuthSessionTimeoutController } from './controllers/auth-session-timeout.controller.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { ManifestAuthProvider } from './auth-provider.extension.js';
 import { UMB_STORAGE_TOKEN_RESPONSE_NAME } from './constants.js';
@@ -18,6 +19,7 @@ import {
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
 
 export class UmbAuthContext extends UmbContextBase {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
@@ -73,12 +75,7 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#serverUrl = serverUrl;
 		this.#backofficePath = backofficePath;
 
-		this.#authFlow = new UmbAuthFlow(
-			serverUrl,
-			this.getRedirectUrl(),
-			this.getPostLogoutRedirectUrl(),
-			this.#isTimeout,
-		);
+		this.#authFlow = new UmbAuthFlow(serverUrl, this.getRedirectUrl(), this.getPostLogoutRedirectUrl());
 
 		// Observe the authorization signal and close the auth window
 		this.observe(
@@ -93,6 +90,11 @@ export class UmbAuthContext extends UmbContextBase {
 		// Observe changes to local storage and update the authorization state
 		// This establishes the tab-to-tab communication
 		window.addEventListener('storage', this.#onStorageEvent.bind(this));
+
+		if (!isTestEnvironment()) {
+			// Start the session timeout controller
+			new UmbAuthSessionTimeoutController(this, this.#authFlow);
+		}
 	}
 
 	override destroy(): void {

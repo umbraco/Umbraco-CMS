@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class RichTextEditorBlockValidator: BlockEditorValidatorBase<RichTextBlockValue, RichTextBlockLayoutItem>
+internal sealed class RichTextEditorBlockValidator: BlockEditorValidatorBase<RichTextBlockValue, RichTextBlockLayoutItem>
 {
     private readonly BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> _blockEditorValues;
     private readonly IJsonSerializer _jsonSerializer;

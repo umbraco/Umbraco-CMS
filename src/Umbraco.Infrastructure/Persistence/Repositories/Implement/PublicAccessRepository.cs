@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
+internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
 {
     public PublicAccessRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<PublicAccessRepository> logger)
         : base(scopeAccessor, cache, logger)

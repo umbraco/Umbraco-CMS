@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [ExplicitColumns]
 [PrimaryKey("Id")]
-internal class TwoFactorLoginDto
+internal sealed class TwoFactorLoginDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.TwoFactorLogin;
 
