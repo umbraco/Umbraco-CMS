@@ -6,7 +6,11 @@ import { css, html, customElement, property, state } from '@umbraco-cms/backoffi
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbExpansionEntityCollapsedEvent,
+	UmbExpansionEntityExpandedEvent,
+	type UmbEntityExpansionModel,
+} from '@umbraco-cms/backoffice/utils';
 
 // TODO: Move to separate file:
 const manifest: UmbExtensionManifestKind = {
@@ -39,7 +43,7 @@ export class UmbSectionSidebarMenuElement<
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
 
 	@state()
-	private _expansion: UmbEntityExpansionModel = [];
+	private _sectionSidebarMenuExpansion: UmbEntityExpansionModel = [];
 
 	constructor() {
 		super();
@@ -51,8 +55,23 @@ export class UmbSectionSidebarMenuElement<
 
 	#observeExpansion() {
 		this.observe(this.#sectionSidebarMenuContext?.expansion.expansion, (items) => {
-			this._expansion = items || [];
+			this._sectionSidebarMenuExpansion = items || [];
 		});
+	}
+
+	#onEntityExpansionChange(event: UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent) {
+		event.stopPropagation();
+		const eventEntity = event.entity;
+
+		if (!eventEntity) {
+			throw new Error('Entity is required to toggle expansion.');
+		}
+
+		if (event.type === UmbExpansionEntityExpandedEvent.TYPE) {
+			this.#sectionSidebarMenuContext?.expansion.expandItem(eventEntity);
+		} else if (event.type === UmbExpansionEntityCollapsedEvent.TYPE) {
+			this.#sectionSidebarMenuContext?.expansion.collapseItem(eventEntity);
+		}
 	}
 
 	override render() {
@@ -62,7 +81,11 @@ export class UmbSectionSidebarMenuElement<
 				type="menu"
 				.filter="${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}"
 				.props="${{
-					expansion: this._expansion,
+					expansion: this._sectionSidebarMenuExpansion,
+				}}"
+				.events="${{
+					'expansion-entity-expanded': this.#onEntityExpansionChange.bind(this),
+					'expansion-entity-collapsed': this.#onEntityExpansionChange.bind(this),
 				}}"
 				default-element="umb-menu"></umb-extension-slot>
 		`;
