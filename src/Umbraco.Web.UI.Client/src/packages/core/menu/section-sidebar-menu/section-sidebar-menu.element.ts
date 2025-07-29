@@ -57,9 +57,11 @@ export class UmbSectionSidebarMenuElement<
 
 	#observeExpansion() {
 		this.observe(this.#sectionSidebarMenuContext?.expansion.expansion, (items) => {
-			const allEntriesExists = this.#localExpansionState.every((localItem) =>
-				items?.some((item) => item.unique === localItem.unique && item.entityType === localItem.entityType),
-			);
+			const allEntriesExists =
+				this.#localExpansionState.length > 0 &&
+				this.#localExpansionState.every((localItem) =>
+					items?.some((item) => item.unique === localItem.unique && item.entityType === localItem.entityType),
+				);
 
 			// Ensure that we only updates the expansion (and rerenders) if the state has been changed outside of the component.
 			if (allEntriesExists) return;
