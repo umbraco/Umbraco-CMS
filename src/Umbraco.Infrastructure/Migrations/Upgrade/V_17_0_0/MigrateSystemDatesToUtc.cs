@@ -82,7 +82,6 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         MigrateDateColumn(scope, "umbracoAccess", "updateDate", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoAccessRule", "createDate", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoAccessRule", "updateDate", timeZoneName, timeZoneOffset);
-        MigrateDateColumn(scope, "umbracoAudit", "eventDateUtc", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoCreatedPackageSchema", "updateDate", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoContentVersion", "versionDate", timeZoneName, timeZoneOffset);
         MigrateDateColumn(scope, "umbracoContentVersionCleanupPolicy", "updated", timeZoneName, timeZoneOffset);
