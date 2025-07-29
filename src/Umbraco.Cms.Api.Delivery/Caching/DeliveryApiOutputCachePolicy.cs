@@ -18,7 +18,12 @@ internal sealed class DeliveryApiOutputCachePolicy : IOutputCachePolicy
             .RequestServices
             .GetRequiredService<IRequestPreviewService>();
 
-        context.EnableOutputCaching = requestPreviewService.IsPreview() is false;
+        IApiAccessService apiAccessService = context
+            .HttpContext
+            .RequestServices
+            .GetRequiredService<IApiAccessService>();
+
+        context.EnableOutputCaching = requestPreviewService.IsPreview() is false && apiAccessService.HasPublicAccess();
         context.ResponseExpirationTimeSpan = _duration;
 
         return ValueTask.CompletedTask;
