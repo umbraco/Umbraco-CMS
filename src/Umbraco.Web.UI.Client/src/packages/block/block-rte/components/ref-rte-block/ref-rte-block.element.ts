@@ -61,9 +61,11 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 			:host {
 				display: block;
 			}
+
 			uui-ref-node {
 				min-height: var(--uui-size-16);
 			}
+
 			:host([unpublished]) umb-icon,
 			:host([unpublished]) umb-ufm-render {
 				opacity: 0.6;
@@ -82,6 +84,9 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 			umb-ufm-render {
 				z-index: 1;
 
+				&::selection {
+					color: var(--uui-color-default-contrast);
+				}
 			}
 		`,
 	];

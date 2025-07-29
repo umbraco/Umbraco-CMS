@@ -358,8 +358,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				user-drag: auto;
 				white-space: nowrap;
 			}
+
 			:host(.ProseMirror-selectednode) {
 				umb-ref-rte-block {
+					--uui-color-default-contrast: initial;
 					outline: 3px solid var(--uui-color-focus);
 				}
 			}
