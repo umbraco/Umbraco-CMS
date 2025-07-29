@@ -1,5 +1,9 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, property, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import type { Ref } from '@umbraco-cms/backoffice/external/lit';
+import { createRef, css, customElement, html, property, ref, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+//import { jsonDefaults } from 'monaco-editor/esm/vs/language/json/monaco.contribution';
+//import { setupMode } from 'monaco-editor/esm/vs/language/json/jsonMode';
 
 //TODO consider adding a highlight prop to the code block, that could spin up/access monaco instance and highlight the code
 
@@ -18,6 +22,15 @@ export class UmbCodeBlockElement extends LitElement {
 	@state()
 	private _copyState: 'idle' | 'success' = 'idle';
 
+	private _lang = '';
+
+	private containerRef: Ref<HTMLElement> = createRef();
+
+	get container() {
+		if (!this.containerRef?.value) throw new Error('Container element not found');
+		return this.containerRef!.value;
+	}
+
 	async copyCode() {
 		const text = this.textContent;
 		if (text) {
@@ -29,10 +42,35 @@ export class UmbCodeBlockElement extends LitElement {
 		}
 	}
 
-	override render() {
+	constructor() {
+		super();
+		//setupMode(jsonDefaults);
+
+		if (this.language) {
+
+			this._lang = this.language.toLowerCase();
+
+			switch (this._lang) {
+				case 'c#':
+				case 'csharp':
+					this._lang = 'csharp';
+					break;
+				case 'typescript':
+					monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+						noSemanticValidation: false,
+						noSyntaxValidation: false,
+					});
+					break;
+			}
+
+			monaco.editor.colorizeElement(this.container, {});
+		}
+	}
+
+	render() {
 		return html`
 			${this.#renderHeader()}
-			<pre><uui-scroll-container><code><slot></slot></code></uui-scroll-container></pre>
+			<pre><uui-scroll-container><code ${ref(this.containerRef)} data-lang=${this._lang}><slot></slot></code></uui-scroll-container></pre>
 		`; // Avoid breaks between elements of <pre></pre>
 	}
 
