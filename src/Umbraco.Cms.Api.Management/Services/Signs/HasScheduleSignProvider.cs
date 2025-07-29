@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Services.Signs;
 
 /// <summary>
-/// Implements a <see cref="SignProviderCollection"/> that provides signs for documents that are scheduled for publication.
+/// Implements a <see cref="ISignProvider"/> that provides signs for documents that are scheduled for publication.
 /// </summary>
 internal class HasScheduleSignProvider : ISignProvider
 {
