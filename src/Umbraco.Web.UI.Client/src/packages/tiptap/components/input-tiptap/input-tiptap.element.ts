@@ -175,6 +175,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			editable: !this.readonly,
 			extensions: tiptapExtensions,
 			content: this.#value,
+			injectCSS: false, // Prevents injecting CSS into `window.document`, as it never applies to the shadow DOM. [LK]
 			//enableContentCheck: true,
 			onBeforeCreate: ({ editor }) => {
 				this._extensions.forEach((ext) => ext.setEditor(editor));
