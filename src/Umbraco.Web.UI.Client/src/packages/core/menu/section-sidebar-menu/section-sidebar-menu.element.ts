@@ -1,11 +1,12 @@
 import type { ManifestMenu } from '../menu.extension.js';
 import type { ManifestSectionSidebarAppBaseMenu, ManifestSectionSidebarAppMenuKind } from './types.js';
+import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from './context/section-sidebar-menu.context.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from './context/section-sidebar-menu.context.token.js';
+import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
 
 // TODO: Move to separate file:
 const manifest: UmbExtensionManifestKind = {
@@ -35,19 +36,22 @@ export class UmbSectionSidebarMenuElement<
 		return html`<h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>`;
 	}
 
-	#context?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
+	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
+
+	@state()
+	private _expansion: UmbEntityExpansionModel = [];
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_CONTEXT, (context) => {
-			this.#context = context;
+			this.#sectionSidebarMenuContext = context;
 			this.#observeExpansion();
 		});
 	}
 
 	#observeExpansion() {
-		this.observe(this.#context?.expansion.expansion, (items) => {
-			console.log('Expanded items:', items);
+		this.observe(this.#sectionSidebarMenuContext?.expansion.expansion, (items) => {
+			this._expansion = items || [];
 		});
 	}
 
@@ -57,6 +61,9 @@ export class UmbSectionSidebarMenuElement<
 			<umb-extension-slot
 				type="menu"
 				.filter="${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}"
+				.props="${{
+					expansion: this._expansion,
+				}}"
 				default-element="umb-menu"></umb-extension-slot>
 		`;
 	}
