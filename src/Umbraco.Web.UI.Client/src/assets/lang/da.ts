@@ -2664,8 +2664,8 @@ export default {
 		toolbar_removeGroup: 'Fjern gruppe',
 		toolbar_removeItem: 'Fjern handling',
 		toolbar_emptyGroup: 'Tom',
-		statusbar_characters: () => 'tegn',
-		statusbar_words: () => 'ord',
+		statusbar_characters: (count: number) => `${count.toLocaleString()} tegn`,
+		statusbar_words: (count: number) => `${count.toLocaleString()} ord`,
 	},
 	collection: {
 		noItemsTitle: 'Intet indhold',

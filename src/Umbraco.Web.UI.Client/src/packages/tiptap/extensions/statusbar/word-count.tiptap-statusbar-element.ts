@@ -41,8 +41,8 @@ export class UmbTiptapStatusbarWordCountElement extends UmbLitElement {
 
 	override render() {
 		const label = this._showCharacters
-			? this._characters.toLocaleString() + ' ' + this.localize.term('tiptap_statusbar_characters', this._characters)
-			: this._words.toLocaleString() + ' ' + this.localize.term('tiptap_statusbar_words', this._words);
+			? this.localize.term('tiptap_statusbar_characters', this._characters)
+			: this.localize.term('tiptap_statusbar_words', this._words);
 		return html`<uui-button compact label=${label} @click=${this.#onClick}></uui-button>`;
 	}
 }
