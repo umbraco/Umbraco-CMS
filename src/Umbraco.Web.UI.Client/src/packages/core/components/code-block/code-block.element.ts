@@ -65,7 +65,9 @@ export class UmbCodeBlockElement extends LitElement {
 	constructor() {
 		super();
 		//setupMode(jsonDefaults);
+	}
 
+	override firstUpdated(): void {
 		if (this.codeLang) {
 			//monaco.editor.colorizeElement(this.container, {});
 			monaco.editor.colorizeElement(this.shadowRoot!.querySelector<UUIScrollContainerElement>('uui-scroll-container')?.shadowRoot!.getElementById("code")!, {});
