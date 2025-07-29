@@ -105,9 +105,12 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 				this.#setParentData(structureItems);
 				this.#setAncestorData(data);
 
-				structureItems.forEach((item) => {
-					this.#sectionSidebarMenuContext?.expansion.expandItem({ entityType: item.entityType, unique: item.unique });
-				});
+				this.#sectionSidebarMenuContext?.expansion.expandItemBulk(
+					structureItems.map((item) => ({
+						entityType: item.entityType,
+						unique: item.unique,
+					})),
+				);
 			}
 		}
 	}
