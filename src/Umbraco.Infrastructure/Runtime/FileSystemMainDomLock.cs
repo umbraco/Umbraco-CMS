@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Runtime;
 
 namespace Umbraco.Cms.Infrastructure.Runtime;
 
-internal class FileSystemMainDomLock : IMainDomLock
+internal sealed class FileSystemMainDomLock : IMainDomLock
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -109,7 +109,7 @@ internal class FileSystemMainDomLock : IMainDomLock
 
     /// <summary>Releases the resources used by this <see cref="FileSystemMainDomLock" />.</summary>
     /// <param name="disposing">true to release both managed resources.</param>
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (disposing && !_disposed)
         {

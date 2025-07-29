@@ -11,7 +11,7 @@ internal sealed class DeliveryApiAccessAttribute : TypeFilterAttribute
     {
     }
 
-    private class DeliveryApiAccessFilter : IActionFilter
+    private sealed class DeliveryApiAccessFilter : IActionFilter
     {
         private readonly IApiAccessService _apiAccessService;
         private readonly IRequestPreviewService _requestPreviewService;

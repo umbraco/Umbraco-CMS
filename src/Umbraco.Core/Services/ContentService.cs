@@ -3611,6 +3611,9 @@ public class ContentService : RepositoryService, IContentService
     }
 
     public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+        => SaveBlueprint(content, null, userId);
+
+    public void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -3631,7 +3634,7 @@ public class ContentService : RepositoryService, IContentService
 
             Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
-            scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, evtMsgs));
+            scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, createdFromContent, evtMsgs));
             scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
             scope.Complete();

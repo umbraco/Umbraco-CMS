@@ -1,4 +1,4 @@
-import type { ManifestUfmFilter } from '../ufm-filter.extension.js';
+import type { ManifestUfmFilter } from '../extensions/ufm-filter.extension.js';
 
 export const manifests: Array<ManifestUfmFilter> = [
 	{

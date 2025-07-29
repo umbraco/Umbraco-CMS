@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Api.Management.Security;
 /// <summary>
 ///     Custom secure format that ensures the Identity in the ticket is verified <see cref="ClaimsIdentity" />
 /// </summary>
-internal class BackOfficeSecureDataFormat : ISecureDataFormat<AuthenticationTicket>
+internal sealed class BackOfficeSecureDataFormat : ISecureDataFormat<AuthenticationTicket>
 {
     private readonly TimeSpan _loginTimeout;
     private readonly ISecureDataFormat<AuthenticationTicket> _ticketDataFormat;

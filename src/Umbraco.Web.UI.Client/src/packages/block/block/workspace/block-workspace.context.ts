@@ -210,7 +210,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.observe(
 					contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
 					(blockType) => {
-						if (blockType?.editorSize) {
+						if (!blockType?.editorSize) return;
+
+						const editorConfig = manager.getEditorConfiguration();
+						const useInlineEditing = editorConfig?.find((x) => x.alias === 'useInlineEditingAsDefault')?.value;
+
+						if (!useInlineEditing) {
 							this.setEditorSize(blockType.editorSize);
 						}
 					},

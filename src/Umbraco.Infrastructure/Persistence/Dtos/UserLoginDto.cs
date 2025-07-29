@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("sessionId", AutoIncrement = false)]
 [ExplicitColumns]
-internal class UserLoginDto
+internal sealed class UserLoginDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.UserLogin;
 

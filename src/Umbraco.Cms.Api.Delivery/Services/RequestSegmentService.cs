@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
@@ -12,5 +12,5 @@ internal sealed class RequestSegmentService : RequestHeaderHandler, IRequestSegm
 
     /// <inheritdoc />
     public string? GetRequestedSegment()
-        => GetHeaderValue("Accept-Segment");
+        => GetHeaderValue(Core.Constants.DeliveryApi.HeaderNames.AcceptSegment);
 }
