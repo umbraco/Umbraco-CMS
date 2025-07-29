@@ -88,6 +88,18 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 	#props?: Record<string, unknown> = {};
 
+	@property({ type: Object, attribute: false })
+	set events(newVal: Record<string, (event: Event) => void> | undefined) {
+		this.#events = newVal;
+		if (this.#extensionsController) {
+			this.#addEventListenersToExtensionElement();
+		}
+	}
+	get events(): Record<string, (event: Event) => void> | undefined {
+		return this.#events;
+	}
+	#events?: Record<string, (event: Event) => void> = {};
+
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement?: string;
 
@@ -104,6 +116,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 	override disconnectedCallback(): void {
 		// _permitted is reset as the extensionsController fires a callback on destroy.
+		this.#removeEventListenersFromExtensionElement();
 		this.#attached = false;
 		this.#extensionsController?.destroy();
 		this.#extensionsController = undefined;
@@ -121,6 +134,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				this.filter,
 				(extensionControllers) => {
 					this._permitted = extensionControllers;
+					this.#addEventListenersToExtensionElement();
 				},
 				undefined, // We can leave the alias undefined as we destroy this our selfs.
 				this.defaultElement,
@@ -143,6 +157,34 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	#renderExtension = (ext: UmbExtensionElementInitializer, i: number) => {
 		return this.renderMethod ? this.renderMethod(ext, i) : ext.component;
 	};
+
+	#addEventListenersToExtensionElement() {
+		this._permitted?.forEach((initializer) => {
+			const component = initializer.component as HTMLElement;
+			if (!component) return;
+
+			const events = this.#events;
+			if (!events) return;
+
+			Object.entries(events).forEach(([eventName, handler]) => {
+				component.addEventListener(eventName, handler);
+			});
+		});
+	}
+
+	#removeEventListenersFromExtensionElement() {
+		this._permitted?.forEach((initializer) => {
+			const component = initializer.component as HTMLElement;
+			if (!component) return;
+
+			const events = this.#events;
+			if (!events) return;
+
+			Object.entries(events).forEach(([eventName, handler]) => {
+				component.removeEventListener(eventName, handler);
+			});
+		});
+	}
 
 	static override styles = css`
 		:host {
