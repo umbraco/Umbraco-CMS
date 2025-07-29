@@ -360,7 +360,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			}
 			:host(.ProseMirror-selectednode) {
 				umb-ref-rte-block {
-					cursor: not-allowed;
 					outline: 3px solid var(--uui-color-focus);
 				}
 			}
