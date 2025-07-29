@@ -67,6 +67,21 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 	}
 
 	/**
+	 * Expands multiple entities
+	 * @param {UmbEntityModel[]} entities The entities to open
+	 * @memberof UmbEntityExpansionManager
+	 * @returns {void}
+	 */
+	public expandItemBulk(entities: UmbEntityModel[]): void {
+		if (!entities || entities.length === 0) return;
+		this.#expansion.append(entities);
+		entities.forEach((entity) => {
+			this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
+		});
+		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
+	}
+
+	/**
 	 * Collapses an entity
 	 * @param {UmbEntityModel} entity The entity to close
 	 * @param {string} entity.entityType The entity type
