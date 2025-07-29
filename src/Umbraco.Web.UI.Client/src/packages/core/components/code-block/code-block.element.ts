@@ -31,6 +31,25 @@ export class UmbCodeBlockElement extends LitElement {
 		return this.containerRef!.value;
 	}
 
+	get codeLang() {
+		this._lang = this.language.toLowerCase();
+
+		switch (this._lang) {
+			case 'c#':
+			case 'csharp':
+				this._lang = 'csharp';
+				break;
+			case 'typescript':
+				monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+					noSemanticValidation: false,
+					noSyntaxValidation: false,
+				});
+				break;
+		}
+
+		return this._lang;
+	}
+
 	async copyCode() {
 		const text = this.textContent;
 		if (text) {
@@ -46,31 +65,15 @@ export class UmbCodeBlockElement extends LitElement {
 		super();
 		//setupMode(jsonDefaults);
 
-		if (this.language) {
-
-			this._lang = this.language.toLowerCase();
-
-			switch (this._lang) {
-				case 'c#':
-				case 'csharp':
-					this._lang = 'csharp';
-					break;
-				case 'typescript':
-					monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-						noSemanticValidation: false,
-						noSyntaxValidation: false,
-					});
-					break;
-			}
-
+		if (this.codeLang) {
 			monaco.editor.colorizeElement(this.container, {});
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderHeader()}
-			<pre><uui-scroll-container><code ${ref(this.containerRef)} data-lang=${this._lang}><slot></slot></code></uui-scroll-container></pre>
+			<pre><uui-scroll-container><code ${ref(this.containerRef)} data-lang=${this.codeLang}><slot></slot></code></uui-scroll-container></pre>
 		`; // Avoid breaks between elements of <pre></pre>
 	}
 
