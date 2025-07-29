@@ -49,7 +49,7 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 		const blockValue = { ...this.content, $settings: this.settings };
 		return html`
 			<uui-ref-node standalone href=${(this.config?.showContentEdit ? this._workspaceEditPath : undefined) ?? ''}>
-				<div class="selection-background">&emsp;</div>
+				<div class="selection-background" aria-hidden="true">&emsp;</div>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 			</uui-ref-node>
