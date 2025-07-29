@@ -185,15 +185,7 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
         return result;
     }
 
-    private static void EnsureUtcDate(ContentVersionMeta? version)
-    {
-        if (version is null)
-        {
-            return;
-        }
-
-        EnsureUtcDates([version]);
-    }
+    private static void EnsureUtcDate(ContentVersionMeta? version) => version?.EnsureUtc();
 
     private static void EnsureUtcDates(IEnumerable<ContentVersionMeta>? versions)
     {
