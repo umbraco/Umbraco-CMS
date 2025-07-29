@@ -1,5 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { Ref } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIScrollContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { createRef, css, customElement, html, property, ref, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 //import { jsonDefaults } from 'monaco-editor/esm/vs/language/json/monaco.contribution';
@@ -66,14 +67,15 @@ export class UmbCodeBlockElement extends LitElement {
 		//setupMode(jsonDefaults);
 
 		if (this.codeLang) {
-			monaco.editor.colorizeElement(this.container, {});
+			//monaco.editor.colorizeElement(this.container, {});
+			monaco.editor.colorizeElement(this.shadowRoot!.querySelector<UUIScrollContainerElement>('uui-scroll-container')?.shadowRoot!.getElementById("code")!, {});
 		}
 	}
 
 	override render() {
 		return html`
 			${this.#renderHeader()}
-			<pre><uui-scroll-container><code ${ref(this.containerRef)} data-lang=${this.codeLang}><slot></slot></code></uui-scroll-container></pre>
+			<pre><uui-scroll-container><code id="code" ${ref(this.containerRef)} data-lang=${this.codeLang}><slot></slot></code></uui-scroll-container></pre>
 		`; // Avoid breaks between elements of <pre></pre>
 	}
 
