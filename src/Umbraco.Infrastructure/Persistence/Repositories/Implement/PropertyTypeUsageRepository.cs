@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
+internal sealed class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
 {
     private static readonly Guid?[] NodeObjectTypes = new Guid?[]
     {

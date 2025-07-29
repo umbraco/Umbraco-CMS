@@ -1,5 +1,5 @@
 import type { UmbDocumentBlueprintDetailModel } from '../../types.js';
-import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDataSourceResponse, UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
@@ -9,7 +9,6 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -194,7 +193,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
-					entityType: UMB_DOCUMENT_PROPERTY_VALUE_ENTITY_TYPE,
+					entityType: UMB_DOCUMENT_BLUEPRINT_PROPERTY_VALUE_ENTITY_TYPE,
 					culture: value.culture || null,
 					segment: value.segment || null,
 					alias: value.alias,
@@ -203,13 +202,15 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			}),
 			variants: data.variants.map((variant) => {
 				return {
-					state: variant.state,
 					culture: variant.culture || null,
 					segment: variant.segment || null,
+					state: variant.state,
 					name: variant.name,
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
+					scheduledPublishDate: variant.scheduledPublishDate || null,
+					scheduledUnpublishDate: variant.scheduledUnpublishDate || null
 				};
 			}),
 			documentType: {
