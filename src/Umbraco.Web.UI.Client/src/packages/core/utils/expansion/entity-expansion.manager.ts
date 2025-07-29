@@ -76,7 +76,7 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 	 */
 	public async collapseItem(entity: UmbEntityModel): Promise<void> {
 		this.#expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
-		this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
+		this.getHostElement()?.dispatchEvent(new UmbExpansionEntityCollapsedEvent(entity));
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
