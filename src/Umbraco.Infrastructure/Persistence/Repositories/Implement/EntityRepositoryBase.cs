@@ -243,6 +243,6 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
             Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 }

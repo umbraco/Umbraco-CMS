@@ -18,8 +18,8 @@ public class PropertyGroupBuilderTests
         var testKey = Guid.NewGuid();
         const string testName = "Group1";
         const int testSortOrder = 555;
-        var testCreateDate = DateTime.Now.AddHours(-1);
-        var testUpdateDate = DateTime.Now;
+        var testCreateDate = DateTime.UtcNow.AddHours(-1);
+        var testUpdateDate = DateTime.UtcNow;
         const int testPropertyTypeId = 3;
 
         var builder = new PropertyGroupBuilder();

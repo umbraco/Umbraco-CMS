@@ -49,7 +49,7 @@ public class AuditEntry : EntityBase, IAuditEntry
     }
 
     /// <inheritdoc />
-    public DateTime EventDateUtc
+    public DateTime EventDate
     {
         get => CreateDate;
         set => CreateDate = value;

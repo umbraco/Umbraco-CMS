@@ -194,7 +194,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             {
                 Name = definition.Name,
                 Value = _xmlParser.ToXml(definition).ToString(),
-                UpdateDate = DateTime.Now,
+                UpdateDate = DateTime.UtcNow,
                 PackageId = Guid.NewGuid(),
             };
 
@@ -218,7 +218,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             Value = _xmlParser.ToXml(definition).ToString(),
             Id = definition.Id,
             PackageId = definition.PackageId,
-            UpdateDate = DateTime.Now,
+            UpdateDate = DateTime.UtcNow,
         };
         Database?.Update(updatedDto);
 

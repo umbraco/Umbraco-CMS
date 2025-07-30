@@ -42,7 +42,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
         Sql<ISqlContext> sql = Sql()
             .Select<AuditEntryDto>()
             .From<AuditEntryDto>()
-            .OrderByDescending<AuditEntryDto>(x => x.EventDateUtc);
+            .OrderByDescending<AuditEntryDto>(x => x.EventDate);
 
         Page<AuditEntryDto> page = Database.Page<AuditEntryDto>(pageIndex + 1, pageCount, sql);
         records = page.TotalItems;
@@ -133,7 +133,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
                 x => x.PerformingUserId,
                 x => x.PerformingDetails,
                 x => x.PerformingIp,
-                x => x.EventDateUtc,
+                x => x.EventDate,
                 x => x.AffectedUserId,
                 x => x.AffectedDetails,
                 x => x.EventType,

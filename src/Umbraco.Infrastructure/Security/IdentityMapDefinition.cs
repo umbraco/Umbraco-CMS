@@ -80,9 +80,9 @@ public class IdentityMapDefinition : IMapDefinition
         target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
         target.Email = source.Email;
         target.UserName = source.Username;
-        target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate?.ToUniversalTime();
-        target.LastLoginDateUtc = source.LastLoginDate?.ToUniversalTime();
-        target.InviteDateUtc = source.InvitedDate?.ToUniversalTime();
+        target.LastPasswordChangeDate = source.LastPasswordChangeDate?.ToUniversalTime();
+        target.LastLoginDate = source.LastLoginDate?.ToUniversalTime();
+        target.InviteDate = source.InvitedDate?.ToUniversalTime();
         target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
         target.Name = source.Name;
         target.AccessFailedCount = source.FailedPasswordAttempts;
@@ -104,8 +104,8 @@ public class IdentityMapDefinition : IMapDefinition
     {
         target.Email = source.Email;
         target.UserName = source.Username;
-        target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate?.ToUniversalTime();
-        target.LastLoginDateUtc = source.LastLoginDate?.ToUniversalTime();
+        target.LastPasswordChangeDate = source.LastPasswordChangeDate?.ToUniversalTime();
+        target.LastLoginDate = source.LastLoginDate?.ToUniversalTime();
         target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
         target.Name = source.Name;
         target.AccessFailedCount = source.FailedPasswordAttempts;
@@ -116,10 +116,10 @@ public class IdentityMapDefinition : IMapDefinition
         DateTime? lockedOutUntil = source.LastLockoutDate?.AddMinutes(_securitySettings.MemberDefaultLockoutTimeInMinutes);
         target.LockoutEnd = source.IsLockedOut ? (lockedOutUntil ?? DateTime.MaxValue).ToUniversalTime() : null;
         target.Comments = source.Comments;
-        target.LastLockoutDateUtc = source.LastLockoutDate == DateTime.MinValue
+        target.LastLockoutDate = source.LastLockoutDate == DateTime.MinValue
             ? null
             : source.LastLockoutDate?.ToUniversalTime();
-        target.CreatedDateUtc = source.CreateDate.ToUniversalTime();
+        target.CreatedDate = source.CreateDate.ToUniversalTime();
         target.Key = source.Key;
         target.MemberTypeAlias = source.ContentTypeAlias;
         target.TwoFactorEnabled = _twoFactorLoginService.IsTwoFactorEnabledAsync(source.Key).GetAwaiter().GetResult();

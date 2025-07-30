@@ -787,7 +787,7 @@ internal partial class UserService : RepositoryService, IUserService
             throw new PanicException("Was unable to get user after creating it");
         }
 
-        invitedUser.InvitedDate = DateTime.Now;
+        invitedUser.InvitedDate = DateTime.UtcNow;
         invitedUser.ClearGroups();
         foreach(IUserGroup userGroup in userGroups)
         {
@@ -827,7 +827,7 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         // re-inviting so update invite date
-        invitedUser.InvitedDate = DateTime.Now;
+        invitedUser.InvitedDate = DateTime.UtcNow;
         await userStore.SaveAsync(invitedUser);
 
         Attempt<UserInvitationResult, UserOperationStatus> invitationAttempt = await SendInvitationAsync(performingUser, serviceScope, invitedUser, model.Message);

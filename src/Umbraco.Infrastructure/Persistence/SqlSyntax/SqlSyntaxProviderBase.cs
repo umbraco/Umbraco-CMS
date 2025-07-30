@@ -611,6 +611,10 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         {
             column.DefaultValue = SystemMethods.CurrentDateTime;
         }
+        else if (string.Equals(column.DefaultValue.ToString(), "GETUTCDATE()", StringComparison.OrdinalIgnoreCase))
+        {
+            column.DefaultValue = SystemMethods.CurrentUTCDateTime;
+        }
 
         // see if this is for a system method
         if (column.DefaultValue is SystemMethods)

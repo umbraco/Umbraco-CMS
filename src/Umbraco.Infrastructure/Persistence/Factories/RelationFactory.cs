@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -14,9 +15,9 @@ internal static class RelationFactory
             entity.DisableChangeTracking();
 
             entity.Comment = dto.Comment;
-            entity.CreateDate = dto.Datetime;
+            entity.CreateDate = dto.Datetime.EnsureUtc();
             entity.Id = dto.Id;
-            entity.UpdateDate = dto.Datetime;
+            entity.UpdateDate = dto.Datetime.EnsureUtc();
 
             // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);

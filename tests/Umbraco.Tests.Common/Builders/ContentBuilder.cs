@@ -226,8 +226,8 @@ public class ContentBuilder
         var key = _key ?? Guid.NewGuid();
         var parentId = _parentId ?? -1;
         var parent = _parent;
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var name = _name ?? Guid.NewGuid().ToString();
         var creatorId = _creatorId ?? 0;
         var level = _level ?? 1;
