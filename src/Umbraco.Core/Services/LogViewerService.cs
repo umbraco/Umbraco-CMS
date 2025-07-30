@@ -6,11 +6,17 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Represents a service for viewing logs in Umbraco.
+/// </summary>
 public class LogViewerService : LogViewerServiceBase
 {
     private const int FileSizeCap = 100;
     private readonly ILoggingConfiguration _loggingConfiguration;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LogViewerService"/> class.
+    /// </summary>
     public LogViewerService(
         ILogViewerQueryRepository logViewerQueryRepository,
         ICoreScopeProvider provider,
@@ -24,15 +30,18 @@ public class LogViewerService : LogViewerServiceBase
         _loggingConfiguration = loggingConfiguration;
     }
 
+    /// <inheritdoc/>
     protected override string RepositoryLoggerName => "UmbracoFile";
 
+    /// <inheritdoc/>
     public override Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(LogTimePeriod logTimePeriod)
     {
         bool isAllowed = CanViewLogs(logTimePeriod);
 
         if (isAllowed == false)
         {
-            return Task.FromResult(Attempt.FailWithStatus(LogViewerOperationStatus.CancelledByLogsSizeValidation,
+            return Task.FromResult(Attempt.FailWithStatus(
+                LogViewerOperationStatus.CancelledByLogsSizeValidation,
                 isAllowed));
         }
 

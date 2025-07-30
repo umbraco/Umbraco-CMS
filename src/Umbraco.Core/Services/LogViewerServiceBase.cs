@@ -9,12 +9,18 @@ using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Base class for log viewer services that provides common functionality for managing log entries and queries.
+/// </summary>
 public abstract class LogViewerServiceBase : ILogViewerService
 {
     private readonly ILogViewerRepository _logViewerRepository;
     private readonly ILogViewerQueryRepository _logViewerQueryRepository;
     private readonly ICoreScopeProvider _provider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LogViewerServiceBase"/> class.
+    /// </summary>
     protected LogViewerServiceBase(
         ILogViewerQueryRepository logViewerQueryRepository,
         ICoreScopeProvider provider,
@@ -25,6 +31,9 @@ public abstract class LogViewerServiceBase : ILogViewerService
         _logViewerRepository = logViewerRepository;
     }
 
+    /// <summary>
+    /// Gets the name of the logger.
+    /// </summary>
     protected abstract string RepositoryLoggerName { get; }
 
     /// <inheritdoc/>
@@ -50,8 +59,7 @@ public abstract class LogViewerServiceBase : ILogViewerService
     }
 
     /// <inheritdoc/>
-    public virtual async Task<Attempt<ILogViewerQuery?, LogViewerOperationStatus>> AddSavedLogQueryAsync(string name,
-        string query)
+    public virtual async Task<Attempt<ILogViewerQuery?, LogViewerOperationStatus>> AddSavedLogQueryAsync(string name, string query)
     {
         ILogViewerQuery? logViewerQuery = await GetSavedLogQueryByNameAsync(name);
 
@@ -66,7 +74,8 @@ public abstract class LogViewerServiceBase : ILogViewerService
         using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
         _logViewerQueryRepository.Save(logViewerQuery);
 
-        return Attempt.SucceedWithStatus<ILogViewerQuery?, LogViewerOperationStatus>(LogViewerOperationStatus.Success,
+        return Attempt.SucceedWithStatus<ILogViewerQuery?, LogViewerOperationStatus>(
+            LogViewerOperationStatus.Success,
             logViewerQuery);
     }
 
@@ -84,7 +93,8 @@ public abstract class LogViewerServiceBase : ILogViewerService
         using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
         _logViewerQueryRepository.Delete(logViewerQuery);
 
-        return Attempt.SucceedWithStatus<ILogViewerQuery?, LogViewerOperationStatus>(LogViewerOperationStatus.Success,
+        return Attempt.SucceedWithStatus<ILogViewerQuery?, LogViewerOperationStatus>(
+            LogViewerOperationStatus.Success,
             logViewerQuery);
     }
 
@@ -179,6 +189,9 @@ public abstract class LogViewerServiceBase : ILogViewerService
         DateTimeOffset? endDate)
         => CanViewLogsAsync(GetTimePeriod(startDate, endDate));
 
+    /// <summary>
+    /// Checks if the logs for the specified time period can be viewed.
+    /// </summary>
     public abstract Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(LogTimePeriod logTimePeriod);
 
 
@@ -193,20 +206,16 @@ public abstract class LogViewerServiceBase : ILogViewerService
         if (startDate is null || endDate is null)
         {
             DateTime now = DateTime.Now;
-            if (startDate is null)
-            {
-                startDate = now.AddDays(-1);
-            }
-
-            if (endDate is null)
-            {
-                endDate = now;
-            }
+            startDate ??= now.AddDays(-1);
+            endDate ??= now;
         }
 
         return new LogTimePeriod(startDate.Value.LocalDateTime, endDate.Value.LocalDateTime);
     }
 
+    /// <summary>
+    /// Gets a filtered page of logs from storage based on the provided parameters.
+    /// </summary>
     protected PagedModel<ILogEntry> GetFilteredLogs(
         LogTimePeriod logTimePeriod,
         string? filterExpression,

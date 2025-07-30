@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
 using Umbraco.Cms.Core.Logging;
@@ -10,12 +9,18 @@ using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
+/// <summary>
+/// Repository for accessing log entries from the Umbraco log files stored on disk.
+/// </summary>
 public class LogViewerRepository : LogViewerRepositoryBase
 {
     private readonly ILoggingConfiguration _loggingConfiguration;
     private readonly ILogger<LogViewerRepository> _logger;
     private readonly IJsonSerializer _jsonSerializer;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LogViewerRepository"/> class.
+    /// </summary>
     public LogViewerRepository(
         ILoggingConfiguration loggingConfiguration,
         ILogger<LogViewerRepository> logger,
@@ -28,6 +33,7 @@ public class LogViewerRepository : LogViewerRepositoryBase
         _jsonSerializer = jsonSerializer;
     }
 
+    /// <inheritdoc/>
     protected override IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, ILogFilter logFilter)
     {
         var logs = new List<LogEvent>();
@@ -114,7 +120,7 @@ public class LogViewerRepository : LogViewerRepositoryBase
         return result.AsReadOnly();
     }
 
-    private string GetSearchPattern(DateTime day) => $"*{day:yyyyMMdd}*.json";
+    private static string GetSearchPattern(DateTime day) => $"*{day:yyyyMMdd}*.json";
 
     private bool TryRead(LogEventReader reader, out LogEvent? evt)
     {

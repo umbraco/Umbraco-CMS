@@ -1,4 +1,4 @@
-﻿using Serilog;
+using Serilog;
 using Serilog.Events;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Services;
@@ -7,14 +7,18 @@ using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
+/// <summary>
+/// Provides a base class for log viewer repository implementations.
+/// </summary>
 public abstract class LogViewerRepositoryBase : ILogViewerRepository
 {
     private readonly UmbracoFileConfiguration _umbracoFileConfig;
 
-    public LogViewerRepositoryBase(UmbracoFileConfiguration umbracoFileConfig)
-    {
-        _umbracoFileConfig = umbracoFileConfig;
-    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LogViewerRepositoryBase"/> class.
+    /// </summary>
+    /// <param name="umbracoFileConfig"></param>
+    public LogViewerRepositoryBase(UmbracoFileConfiguration umbracoFileConfig) => _umbracoFileConfig = umbracoFileConfig;
 
     /// <inheritdoc />
     public virtual IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, string? filterExpression = null)
@@ -54,12 +58,18 @@ public abstract class LogViewerRepositoryBase : ILogViewerRepository
         return Enum.Parse<LogLevel>(logLevel.ToString());
     }
 
+    /// <summary>
+    /// Gets the minimum-level log value from the config file.
+    /// </summary>
     public virtual LogLevel RestrictedToMinimumLevel()
     {
         LogEventLevel minLevel = _umbracoFileConfig.RestrictedToMinimumLevel;
         return Enum.Parse<LogLevel>(minLevel.ToString());
     }
 
+    /// <summary>
+    /// Gets the minimum log level from the global Serilog configuration.
+    /// </summary>
     protected virtual LogEventLevel GetGlobalLogLevelEventMinLevel() =>
         Enum.GetValues(typeof(LogEventLevel))
             .Cast<LogEventLevel>()
@@ -67,5 +77,8 @@ public abstract class LogViewerRepositoryBase : ILogViewerRepository
             .DefaultIfEmpty(LogEventLevel.Information)
             .Min();
 
+    /// <summary>
+    /// Retrieves the logs for a specified time period and filter.
+    /// </summary>
     protected abstract IEnumerable<ILogEntry> GetLogs(LogTimePeriod logTimePeriod, ILogFilter logFilter);
 }
