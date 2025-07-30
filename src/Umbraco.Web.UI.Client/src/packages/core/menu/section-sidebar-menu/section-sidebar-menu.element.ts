@@ -3,27 +3,12 @@ import type { ManifestSectionSidebarAppBaseMenu, ManifestSectionSidebarAppMenuKi
 import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from './context/section-sidebar-menu.context.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UmbExpansionEntityCollapsedEvent,
 	UmbExpansionEntityExpandedEvent,
 	type UmbEntityExpansionModel,
 } from '@umbraco-cms/backoffice/utils';
-
-// TODO: Move to separate file:
-const manifest: UmbExtensionManifestKind = {
-	type: 'kind',
-	alias: 'Umb.Kind.SectionSidebarAppMenu',
-	matchKind: 'menu',
-	matchType: 'sectionSidebarApp',
-	manifest: {
-		type: 'sectionSidebarApp',
-		elementName: 'umb-section-sidebar-menu',
-	},
-};
-umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement<
