@@ -1,4 +1,4 @@
-import type { UmbEntityExpansionModel } from './types.js';
+import type { UmbEntityExpansionEntryModel, UmbEntityExpansionModel } from './types.js';
 import {
 	UmbExpansionEntityExpandedEvent,
 	UmbExpansionEntityCollapsedEvent,
@@ -15,7 +15,7 @@ import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observab
  * @augments {UmbControllerBase}
  */
 export class UmbEntityExpansionManager extends UmbControllerBase {
-	#expansion = new UmbArrayState<UmbEntityModel>([], (x) => x.entityType + x.unique);
+	#expansion = new UmbArrayState<UmbEntityExpansionEntryModel>([], (x) => x.entityType + x.unique);
 	expansion = this.#expansion.asObservable();
 
 	/**
@@ -54,13 +54,16 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 
 	/**
 	 * Expands an entity
-	 * @param {UmbEntityModel} entity The entity to open
+	 * @param {UmbEntityExpansionEntryModel} entity The entity to open
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
+	 * @param {UmbEntityModel} entity.target The target entity to look up
+	 * @param {string} entity.target.entityType The target entity type
+	 * @param {string} entity.target.unique The target unique key
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {Promise<void>}
 	 */
-	public async expandItem(entity: UmbEntityModel): Promise<void> {
+	public async expandItem(entity: UmbEntityExpansionEntryModel): Promise<void> {
 		this.#expansion.appendOne(entity);
 		this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
@@ -68,11 +71,11 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 
 	/**
 	 * Expands multiple entities
-	 * @param {UmbEntityModel[]} entities The entities to open
+	 * @param {UmbEntityExpansionModel} entities The entities to open
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {void}
 	 */
-	public expandItems(entities: UmbEntityModel[]): void {
+	public expandItems(entities: UmbEntityExpansionModel): void {
 		if (!entities || entities.length === 0) return;
 		this.#expansion.append(entities);
 		entities.forEach((entity) => {
@@ -83,9 +86,12 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 
 	/**
 	 * Collapses an entity
-	 * @param {UmbEntityModel} entity The entity to close
+	 * @param {UmbEntityExpansionEntryModel} entity The entity to open
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
+	 * @param {UmbEntityModel} entity.target The target entity to look up
+	 * @param {string} entity.target.entityType The target entity type
+	 * @param {string} entity.target.unique The target unique key
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {Promise<void>}
 	 */
