@@ -187,7 +187,7 @@ public class LogViewerService : ILogViewerService
     {
         if (startDate is null || endDate is null)
         {
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             if (startDate is null)
             {
                 startDate = now.AddDays(-1);

@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -48,7 +49,9 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
             .Where<ContentVersionDto>(x => !x.PreventCleanup) // Never delete "pinned" versions
             .Where<DocumentVersionDto>(x => !x.Published); // Never delete published version
 
-        return _scopeAccessor.AmbientScope?.Database.Fetch<ContentVersionMeta>(query);
+        List<ContentVersionMeta>? results = _scopeAccessor.AmbientScope?.Database.Fetch<ContentVersionMeta>(query);
+        EnsureUtcDates(results);
+        return results;
     }
 
     /// <inheritdoc />
@@ -99,19 +102,11 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
         Page<ContentVersionMeta>? page =
             _scopeAccessor.AmbientScope?.Database.Page<ContentVersionMeta>(pageIndex + 1, pageSize, query);
 
-        // Dates stored in the database are local server time, but for SQL Server, will be considered
-        // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
-        if (page is not null)
-        {
-            foreach (ContentVersionMeta item in page.Items)
-            {
-                item.SpecifyVersionDateKind(DateTimeKind.Local);
-            }
-        }
-
         totalRecords = page?.TotalItems ?? 0;
 
-        return page?.Items;
+        List<ContentVersionMeta>? results = page?.Items;
+        EnsureUtcDates(results);
+        return results;
     }
 
     /// <inheritdoc />
@@ -186,6 +181,16 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
             .On<UserDto, ContentVersionDto>(left => left.Id, right => right.UserId)
             .Where<ContentVersionDto>(x => x.Id == versionId);
 
-        return _scopeAccessor.AmbientScope?.Database.Single<ContentVersionMeta>(query);
+        ContentVersionMeta? result = _scopeAccessor.AmbientScope?.Database.Single<ContentVersionMeta>(query);
+        result?.EnsureUtc();
+        return result;
+    }
+
+    private static void EnsureUtcDates(IEnumerable<ContentVersionMeta>? versions)
+    {
+        foreach (ContentVersionMeta version in versions ?? [])
+        {
+            version.EnsureUtc();
+        }
     }
 }

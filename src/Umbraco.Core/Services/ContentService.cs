@@ -1240,7 +1240,7 @@ public class ContentService : RepositoryService, IContentService
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
-            var publishTime = DateTime.Now;
+            var publishTime = DateTime.UtcNow;
             foreach (CultureImpact? impact in impacts)
             {
                 content.PublishCulture(impact, publishTime, _propertyEditorCollection);
@@ -1955,7 +1955,7 @@ public class ContentService : RepositoryService, IContentService
         // variant content type - publish specified cultures
         // invariant content type - publish only the invariant culture
 
-        var publishTime = DateTime.Now;
+        var publishTime = DateTime.UtcNow;
         if (content.ContentType.VariesByCulture())
         {
             return culturesToPublish.All(culture =>
@@ -2370,7 +2370,7 @@ public class ContentService : RepositoryService, IContentService
             if (deletePriorVersions)
             {
                 IContent? content = GetVersion(versionId);
-                DeleteVersions(id, content?.UpdateDate ?? DateTime.Now, userId);
+                DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
             }
 
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -3141,7 +3141,7 @@ public class ContentService : RepositoryService, IContentService
                     .ToArray();
 
         // publish the culture(s)
-        var publishTime = DateTime.Now;
+        var publishTime = DateTime.UtcNow;
         if (!impactsToPublish.All(impact => content.PublishCulture(impact, publishTime, _propertyEditorCollection)))
         {
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
@@ -3409,7 +3409,7 @@ public class ContentService : RepositoryService, IContentService
         // otherwise it would remain released == published
         ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
         IReadOnlyList<ContentSchedule> pastReleases =
-            contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.Now);
+            contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.UtcNow);
         foreach (ContentSchedule p in pastReleases)
         {
             contentSchedule.Remove(p);
@@ -3684,7 +3684,7 @@ public class ContentService : RepositoryService, IContentService
             scope.Complete();
         }
 
-        DateTime now = DateTime.Now;
+        DateTime now = DateTime.UtcNow;
         foreach (var culture in cultures)
         {
             foreach (IProperty property in blueprint.Properties)
