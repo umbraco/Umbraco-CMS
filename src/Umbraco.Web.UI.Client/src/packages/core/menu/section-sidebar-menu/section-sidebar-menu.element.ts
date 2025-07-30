@@ -2,13 +2,10 @@ import type { ManifestMenu } from '../menu.extension.js';
 import type { ManifestSectionSidebarAppBaseMenu, ManifestSectionSidebarAppMenuKind } from './types.js';
 import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from './context/section-sidebar-menu.context.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UmbExpansionEntityCollapsedEvent,
-	UmbExpansionEntityExpandedEvent,
-	type UmbEntityExpansionModel,
-} from '@umbraco-cms/backoffice/utils';
+import { UmbExpansionEntityCollapsedEvent, UmbExpansionEntityExpandedEvent } from '@umbraco-cms/backoffice/utils';
+import { UmbExtensionSlotElement } from '../../extension-registry/components/index.js';
 
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement<
@@ -27,23 +24,38 @@ export class UmbSectionSidebarMenuElement<
 
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
 
-	@state()
-	private _sectionSidebarMenuExpansion: UmbEntityExpansionModel = [];
-
+	#extensionSlotElement = new UmbExtensionSlotElement();
 	#muteStateUpdate = false;
 
 	constructor() {
 		super();
+		this.#initExtensionSlotElement();
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_CONTEXT, (context) => {
 			this.#sectionSidebarMenuContext = context;
 			this.#observeExpansion();
 		});
 	}
 
+	#initExtensionSlotElement() {
+		/* For better performance and UX we prevent lit from doing unnecessary rerenders we programmatically create the element,
+		and manually update the props when needed. */
+
+		this.#extensionSlotElement.type = 'menu';
+		this.#extensionSlotElement.filter = (menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu;
+		this.#extensionSlotElement.defaultElement = 'umb-menu';
+		this.#extensionSlotElement.events = {
+			'expansion-entity-expanded': this.#onEntityExpansionChange.bind(this),
+			'expansion-entity-collapsed': this.#onEntityExpansionChange.bind(this),
+		};
+	}
+
 	#observeExpansion() {
 		this.observe(this.#sectionSidebarMenuContext?.expansion.expansion, (items) => {
 			if (this.#muteStateUpdate) return;
-			this._sectionSidebarMenuExpansion = items || [];
+
+			this.#extensionSlotElement.props = {
+				expansion: items || [],
+			};
 		});
 	}
 
@@ -67,20 +79,7 @@ export class UmbSectionSidebarMenuElement<
 	}
 
 	override render() {
-		return html`
-			${this.renderHeader()}
-			<umb-extension-slot
-				type="menu"
-				.filter="${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}"
-				.props="${{
-					expansion: this._sectionSidebarMenuExpansion,
-				}}"
-				.events="${{
-					'expansion-entity-expanded': this.#onEntityExpansionChange.bind(this),
-					'expansion-entity-collapsed': this.#onEntityExpansionChange.bind(this),
-				}}"
-				default-element="umb-menu"></umb-extension-slot>
-		`;
+		return html` ${this.renderHeader()} ${this.#extensionSlotElement}`;
 	}
 
 	static override styles = [
