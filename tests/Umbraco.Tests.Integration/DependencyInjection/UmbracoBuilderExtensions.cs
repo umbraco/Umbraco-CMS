@@ -158,14 +158,14 @@ public static class UmbracoBuilderExtensions
             ILogger<ExamineIndexRebuilder> logger,
             IExamineManager examineManager,
             IEnumerable<IIndexPopulator> populators,
-            IBackgroundTaskQueue backgroundTaskQueue)
+            ILongRunningOperationService longRunningOperationService)
             : base(
             mainDom,
             runtimeState,
             logger,
             examineManager,
             populators,
-            backgroundTaskQueue)
+            longRunningOperationService)
         {
         }
 

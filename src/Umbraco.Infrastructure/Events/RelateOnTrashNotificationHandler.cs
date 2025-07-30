@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
@@ -15,14 +17,17 @@ namespace Umbraco.Cms.Core.Events;
 public sealed class RelateOnTrashNotificationHandler :
     INotificationHandler<ContentMovedNotification>,
     INotificationHandler<ContentMovedToRecycleBinNotification>,
+    INotificationAsyncHandler<ContentMovedToRecycleBinNotification>,
     INotificationHandler<MediaMovedNotification>,
-    INotificationHandler<MediaMovedToRecycleBinNotification>
+    INotificationHandler<MediaMovedToRecycleBinNotification>,
+    INotificationAsyncHandler<MediaMovedToRecycleBinNotification>
 {
     private readonly IAuditService _auditService;
     private readonly IEntityService _entityService;
     private readonly IRelationService _relationService;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ILocalizedTextService _textService;
 
     public RelateOnTrashNotificationHandler(
@@ -31,7 +36,8 @@ public sealed class RelateOnTrashNotificationHandler :
         ILocalizedTextService textService,
         IAuditService auditService,
         IScopeProvider scopeProvider,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUserIdKeyResolver userIdKeyResolver)
     {
         _relationService = relationService;
         _entityService = entityService;
@@ -39,6 +45,26 @@ public sealed class RelateOnTrashNotificationHandler :
         _auditService = auditService;
         _scopeProvider = scopeProvider;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _userIdKeyResolver = userIdKeyResolver;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in V19.")]
+    public RelateOnTrashNotificationHandler(
+        IRelationService relationService,
+        IEntityService entityService,
+        ILocalizedTextService textService,
+        IAuditService auditService,
+        IScopeProvider scopeProvider,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : this(
+            relationService,
+            entityService,
+            textService,
+            auditService,
+            scopeProvider,
+            backOfficeSecurityAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
     }
 
     public void Handle(ContentMovedNotification notification)
@@ -57,7 +83,8 @@ public sealed class RelateOnTrashNotificationHandler :
         }
     }
 
-    public void Handle(ContentMovedToRecycleBinNotification notification)
+    /// <inheritdoc />
+    public async Task HandleAsync(ContentMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
     {
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
@@ -91,9 +118,9 @@ public sealed class RelateOnTrashNotificationHandler :
                         new Relation(originalParentId, item.Entity.Id, relationType);
                     _relationService.Save(relation);
 
-                    _auditService.Add(
+                    await _auditService.AddAsync(
                         AuditType.Delete,
-                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? item.Entity.WriterId,
+                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? await _userIdKeyResolver.GetAsync(item.Entity.WriterId),
                         item.Entity.Id,
                         UmbracoObjectTypes.Document.GetName(),
                         string.Format(_textService.Localize("recycleBin", "contentTrashed"), item.Entity.Id, originalParentId));
@@ -103,6 +130,10 @@ public sealed class RelateOnTrashNotificationHandler :
             scope.Complete();
         }
     }
+
+    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
+    public void Handle(ContentMovedToRecycleBinNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 
     public void Handle(MediaMovedNotification notification)
     {
@@ -119,7 +150,8 @@ public sealed class RelateOnTrashNotificationHandler :
         }
     }
 
-    public void Handle(MediaMovedToRecycleBinNotification notification)
+    /// <inheritdoc />
+    public async Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
     {
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
@@ -151,9 +183,9 @@ public sealed class RelateOnTrashNotificationHandler :
                         _relationService.GetByParentAndChildId(originalParentId, item.Entity.Id, relationType) ??
                         new Relation(originalParentId, item.Entity.Id, relationType);
                     _relationService.Save(relation);
-                    _auditService.Add(
+                    await _auditService.AddAsync(
                         AuditType.Delete,
-                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? item.Entity.WriterId,
+                        _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? await _userIdKeyResolver.GetAsync(item.Entity.WriterId),
                         item.Entity.Id,
                         UmbracoObjectTypes.Media.GetName(),
                         string.Format(_textService.Localize("recycleBin", "mediaTrashed"), item.Entity.Id, originalParentId));
@@ -163,4 +195,8 @@ public sealed class RelateOnTrashNotificationHandler :
             scope.Complete();
         }
     }
+
+    [Obsolete("Use the INotificationAsyncHandler.HandleAsync implementation instead. Scheduled for removal in V19.")]
+    public void Handle(MediaMovedToRecycleBinNotification notification)
+        => HandleAsync(notification, CancellationToken.None).GetAwaiter().GetResult();
 }

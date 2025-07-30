@@ -1290,10 +1290,10 @@ export default {
 	},
 	colorPickerConfigurations: {
 		colorsTitle: 'Colours',
-		colorsDescription: 'Add, remove or sort colours',
+		colorsDescription: 'Add, remove or sort colours (and labels).',
 		showLabelTitle: 'Include labels?',
 		showLabelDescription:
-			'Stores colours as a JSON object containing both the colour hex string and label, rather than just the hex string.',
+			'Displays coloured field and a label for each colour in the colour picker, rather than just a coloured field.',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
@@ -2812,6 +2812,8 @@ export default {
 		charmap_extlatin: 'Extended Latin',
 		charmap_symbols: 'Symbols',
 		charmap_arrows: 'Arrows',
+		statusbar_characters: (count: number) => `${count.toLocaleString()} ${count === 1 ? 'character' : 'characters'}`,
+		statusbar_words: (count: number) => `${count.toLocaleString()} ${count === 1 ? 'word' : 'words'}`,
 	},
 	linkPicker: {
 		modalSource: 'Source',

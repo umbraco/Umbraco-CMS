@@ -43,7 +43,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         // When disposing examine, it does a final write, which ends up locking the file if the indexing is not done yet. So we have this wait to circumvent that.
         Thread.Sleep(1500);
         // Sometimes we do not dispose all services in time and the test fails because the log file is locked. Resulting in all other tests failing as well
-        Services.DisposeIfDisposable();
+        (Services as IDisposable)?.Dispose();
     }
 
     private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();

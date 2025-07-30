@@ -11,13 +11,13 @@ internal static class AuditLogBuilderExtensions
     internal static IUmbracoBuilder AddAuditLogs(this IUmbracoBuilder builder)
     {
         builder.Services.AddTransient<IAuditLogPresentationFactory, AuditLogPresentationFactory>();
-        builder.AddNotificationHandler<UserLoginSuccessNotification, BackOfficeUserManagerAuditer>();
-        builder.AddNotificationHandler<UserLogoutSuccessNotification, BackOfficeUserManagerAuditer>();
-        builder.AddNotificationHandler<UserLoginFailedNotification, BackOfficeUserManagerAuditer>();
-        builder.AddNotificationHandler<UserForgotPasswordRequestedNotification, BackOfficeUserManagerAuditer>();
-        builder.AddNotificationHandler<UserForgotPasswordChangedNotification, BackOfficeUserManagerAuditer>();
-        builder.AddNotificationHandler<UserPasswordChangedNotification, BackOfficeUserManagerAuditer>();
-        builder.AddNotificationHandler<UserPasswordResetNotification, BackOfficeUserManagerAuditer>();
+        builder.AddNotificationAsyncHandler<UserLoginSuccessNotification, BackOfficeUserManagerAuditer>();
+        builder.AddNotificationAsyncHandler<UserLogoutSuccessNotification, BackOfficeUserManagerAuditer>();
+        builder.AddNotificationAsyncHandler<UserLoginFailedNotification, BackOfficeUserManagerAuditer>();
+        builder.AddNotificationAsyncHandler<UserForgotPasswordRequestedNotification, BackOfficeUserManagerAuditer>();
+        builder.AddNotificationAsyncHandler<UserForgotPasswordChangedNotification, BackOfficeUserManagerAuditer>();
+        builder.AddNotificationAsyncHandler<UserPasswordChangedNotification, BackOfficeUserManagerAuditer>();
+        builder.AddNotificationAsyncHandler<UserPasswordResetNotification, BackOfficeUserManagerAuditer>();
 
         return builder;
     }

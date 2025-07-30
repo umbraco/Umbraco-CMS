@@ -339,11 +339,11 @@ public static partial class UmbracoBuilderExtensions
 
         // add handlers for building content relations
         builder
-            .AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>()
             .AddNotificationHandler<ContentMovedNotification, RelateOnTrashNotificationHandler>()
-            .AddNotificationHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+            .AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
             .AddNotificationHandler<MediaMovedNotification, RelateOnTrashNotificationHandler>()
-            .AddNotificationHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
+            .AddNotificationAsyncHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
         // add notification handlers for property editors
         builder
@@ -412,15 +412,15 @@ public static partial class UmbracoBuilderExtensions
 
         // add notification handlers for auditing
         builder
-            .AddNotificationHandler<MemberSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<MemberDeletedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<AssignedMemberRolesNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<RemovedMemberRolesNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<ExportedMemberNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<UserSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+            .AddNotificationAsyncHandler<MemberSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<MemberDeletedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<AssignedMemberRolesNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<RemovedMemberRolesNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<ExportedMemberNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<UserSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<UserDeletedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
 
         // Handlers for publish warnings
         builder.AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();

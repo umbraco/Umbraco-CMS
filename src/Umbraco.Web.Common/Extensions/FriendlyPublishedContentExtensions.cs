@@ -676,28 +676,6 @@ public static class FriendlyPublishedContentExtensions
         => content.Url(PublishedUrlProvider, culture, mode);
 
     /// <summary>
-    ///     Gets the children of the content in a DataTable.
-    /// </summary>
-    /// <param name="content">The content.</param>
-    /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
-    /// <param name="culture">
-    ///     The specific culture to filter for. If null is used the current culture is used. (Default is
-    ///     null)
-    /// </param>
-    /// <returns>The children of the content.</returns>
-    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
-    public static DataTable ChildrenAsTable(this IPublishedContent content, string contentTypeAliasFilter = "", string? culture = null)
-        => content.ChildrenAsTable(
-            GetNavigationQueryService(content),
-            GetPublishedStatusFilteringService(content),
-            ContentTypeService,
-            MediaTypeService,
-            MemberTypeService,
-            PublishedUrlProvider,
-            contentTypeAliasFilter,
-            culture);
-
-    /// <summary>
     ///     Gets the url for a media.
     /// </summary>
     /// <param name="content">The content item.</param>

@@ -369,6 +369,7 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (toSave.Count > 0)
         {
+            scope.WriteLock(Constants.Locks.DocumentUrls);
             _documentUrlRepository.Save(toSave);
         }
 
