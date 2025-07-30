@@ -4,6 +4,7 @@ import type { UUIScrollContainerElement } from '@umbraco-cms/backoffice/external
 import { createRef, css, customElement, html, property, ref, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
 //import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
+
 //import { jsonDefaults } from 'monaco-editor/esm/vs/language/json/monaco.contribution';
 //import { setupMode } from 'monaco-editor/esm/vs/language/json/jsonMode';
 
@@ -41,11 +42,17 @@ export class UmbCodeBlockElement extends LitElement {
 			case 'csharp':
 				this._lang = 'csharp';
 				break;
+			case 'ts':
 			case 'typescript':
 				monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
 					noSemanticValidation: false,
 					noSyntaxValidation: false,
 				});
+				this._lang = 'typescript';
+				break;
+			case 'js':
+			case 'javascript':
+				this._lang = 'javascript';
 				break;
 		}
 
@@ -82,11 +89,24 @@ export class UmbCodeBlockElement extends LitElement {
 	#syntaxHighlight() {
 		if (!this.codeLang) return;
 
-		//monaco.editor.colorizeElement(this.container, {});
+		monaco.editor.colorizeElement(this.container, {});
 		//monaco.editor.colorizeElement(this.shadowRoot!.getElementById("code")!, {});
 
-		monaco.editor.colorize(this.textContent, this.codeLang)
-			.then(html => { this.container.innerHTML = html })
+		let mimeType = '';
+
+		if (this.codeLang === 'json') {
+			mimeType = 'application/json';
+		}
+		else if (this.codeLang === 'css') {
+			mimeType = 'text/css';
+		}
+
+		monaco.editor.colorize(this.textContent, this.codeLang, {
+			mimeType: mimeType,
+		})
+		.then(html => {
+			this.container.innerHTML = html;
+		});
 	}
 
 	#onSlotChanged(event: Event) {
@@ -96,7 +116,8 @@ export class UmbCodeBlockElement extends LitElement {
 		console.log("onSlotChanged")
 
 		this.#syntaxHighlight();
-		this.requestUpdate();
+		
+		//this.requestUpdate();
 	}
 
 	#renderHeader() {
