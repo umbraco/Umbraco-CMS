@@ -22,8 +22,8 @@ public class ContentVersionDto
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,current", IncludeColumns = "id,versionDate,text,userId,preventCleanup")]
     public int NodeId { get; set; }
 
-    [Column("versionDate", ForceToUtc = false)] // TODO: db rename to 'updateDate'
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("versionDate")] // TODO: db rename to 'updateDate'
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime VersionDate { get; set; }
 
     [Column("userId")] // TODO: db rename to 'updateUserId'

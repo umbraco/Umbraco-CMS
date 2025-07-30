@@ -24,7 +24,7 @@ internal sealed class UserLoginDto
     /// </summary>
     [Column("loggedInUtc")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    public DateTime LoggedInUtc { get; set; }
+    public DateTime LoggedIn { get; set; }
 
     /// <summary>
     ///     Updated every time a user's session is validated
@@ -42,14 +42,14 @@ internal sealed class UserLoginDto
     [Column("lastValidatedUtc")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserLogin_lastValidatedUtc")]
-    public DateTime LastValidatedUtc { get; set; }
+    public DateTime LastValidated { get; set; }
 
     /// <summary>
     ///     Tracks when the session is removed when the user's account is logged out
     /// </summary>
     [Column("loggedOutUtc")]
     [NullSetting(NullSetting = NullSettings.Null)]
-    public DateTime? LoggedOutUtc { get; set; }
+    public DateTime? LoggedOut { get; set; }
 
     /// <summary>
     ///     Logs the IP address of the session if available

@@ -66,8 +66,8 @@ public class PropertyBuilder
     {
         var id = _id ?? 1;
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
 
         if (_propertyTypeBuilder is null && _propertyType is null)
         {

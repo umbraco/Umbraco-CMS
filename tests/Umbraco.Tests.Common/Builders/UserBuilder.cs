@@ -216,8 +216,8 @@ public class UserBuilder<TParent>
         var defaultLang = _defaultLang ?? "en";
         var globalSettings = new GlobalSettings { DefaultUILanguage = defaultLang };
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var name = _name ?? "TestUser" + _suffix;
         var language = _language ?? globalSettings.DefaultUILanguage;
         var username = _username ?? "TestUser" + _suffix;
@@ -226,9 +226,9 @@ public class UserBuilder<TParent>
         var failedPasswordAttempts = _failedPasswordAttempts ?? 0;
         var isApproved = _isApproved ?? false;
         var isLockedOut = _isLockedOut ?? false;
-        var lastLockoutDate = _lastLockoutDate ?? DateTime.Now;
-        var lastLoginDate = _lastLoginDate ?? DateTime.Now;
-        var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
+        var lastLockoutDate = _lastLockoutDate ?? DateTime.UtcNow;
+        var lastLoginDate = _lastLoginDate ?? DateTime.UtcNow;
+        var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.UtcNow;
         var comments = _comments ?? string.Empty;
         var sessionTimeout = _sessionTimeout ?? 0;
         var startContentIds = _startContentIds ?? new[] { -1 };
