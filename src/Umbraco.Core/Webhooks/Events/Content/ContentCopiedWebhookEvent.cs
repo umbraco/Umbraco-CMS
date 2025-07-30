@@ -24,7 +24,7 @@ public class ContentCopiedWebhookEvent : WebhookEventBase<ContentCopiedNotificat
 
     public override string Alias => Constants.WebhookEvents.Aliases.ContentCopied;
 
-    public override object? ConvertNotificationToRequestPayload(ContentCopiedNotification notification)
+    public override object ConvertNotificationToRequestPayload(ContentCopiedNotification notification)
     {
         return new
         {

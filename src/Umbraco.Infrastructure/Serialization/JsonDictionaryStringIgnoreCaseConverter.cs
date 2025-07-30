@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Serialization;
 public sealed class JsonDictionaryStringIgnoreCaseConverter<TValue> : ReadOnlyJsonConverter<Dictionary<string, TValue>>
 {
     /// <inheritdoc />
-    public override Dictionary<string, TValue>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override Dictionary<string, TValue> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {

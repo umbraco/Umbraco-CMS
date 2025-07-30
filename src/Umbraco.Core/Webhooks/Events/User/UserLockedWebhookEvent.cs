@@ -21,7 +21,7 @@ public class UserLockedWebhookEvent : WebhookEventBase<UserLockedNotification>
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserLocked;
 
-    public override object? ConvertNotificationToRequestPayload(UserLockedNotification notification)
+    public override object ConvertNotificationToRequestPayload(UserLockedNotification notification)
         => new DefaultPayloadModel
         {
             Id = notification.AffectedUserId is not null &&

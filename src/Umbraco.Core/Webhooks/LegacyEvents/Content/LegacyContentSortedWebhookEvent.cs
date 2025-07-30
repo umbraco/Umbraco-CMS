@@ -35,7 +35,7 @@ public class LegacyContentSortedWebhookEvent : WebhookEventBase<ContentSortedNot
 
     public override string Alias => Constants.WebhookEvents.Aliases.ContentSorted;
 
-    public override object? ConvertNotificationToRequestPayload(ContentSortedNotification notification)
+    public override object ConvertNotificationToRequestPayload(ContentSortedNotification notification)
     {
         var sortedEntities = new List<object?>();
         foreach (var entity in notification.SortedEntities)
