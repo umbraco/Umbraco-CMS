@@ -1,8 +1,8 @@
-import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from '../core/menu/section-sidebar-menu/context/section-sidebar-menu.context.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
