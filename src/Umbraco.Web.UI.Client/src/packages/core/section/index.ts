@@ -1,5 +1,3 @@
-export * from '../menu/section-sidebar-menu-with-entity-actions/index.js';
-export * from '../menu/section-sidebar-menu/index.js';
 export * from './components/index.js';
 export * from './constants.js';
 export * from './default/default-section.element.js';
