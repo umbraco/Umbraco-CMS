@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 let memberId = '';
@@ -39,6 +39,7 @@ test('can create a member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
 
   // Assert
   await umbracoUi.member.waitForMemberToBeCreated();
+  await umbracoUi.member.isSuccessStateIconVisible()
   await umbracoUi.member.clickMembersSidebarButton();
   await umbracoUi.member.isMemberWithNameVisible(memberName, true);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
