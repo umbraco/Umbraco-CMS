@@ -12,23 +12,26 @@ public static class VariationContextAccessorExtensions
         this IVariationContextAccessor variationContextAccessor,
         ContentVariation variations,
         ref string? culture,
-        ref string? segment)
-        => variationContextAccessor.ContextualizeVariation(variations, null, ref culture, ref segment);
+        ref string? segment,
+        string? propertyAlias)
+        => variationContextAccessor.ContextualizeVariation(variations, null, ref culture, ref segment, propertyAlias);
 
     public static void ContextualizeVariation(
         this IVariationContextAccessor variationContextAccessor,
         ContentVariation variations,
         int contentId,
         ref string? culture,
-        ref string? segment)
-        => variationContextAccessor.ContextualizeVariation(variations, (int?)contentId, ref culture, ref segment);
+        ref string? segment,
+        string? propertyAlias)
+        => variationContextAccessor.ContextualizeVariation(variations, (int?)contentId, ref culture, ref segment, propertyAlias);
 
     private static void ContextualizeVariation(
         this IVariationContextAccessor variationContextAccessor,
         ContentVariation variations,
         int? contentId,
         ref string? culture,
-        ref string? segment)
+        ref string? segment,
+        string? propertyAlias)
     {
         if (culture != null && segment != null)
         {
@@ -48,7 +51,7 @@ public static class VariationContextAccessorExtensions
             {
                 segment = contentId == null
                     ? publishedVariationContext?.Segment
-                    : publishedVariationContext?.GetSegment(contentId.Value);
+                    : publishedVariationContext?.GetSegment(contentId.Value, propertyAlias);
             }
             else
             {
