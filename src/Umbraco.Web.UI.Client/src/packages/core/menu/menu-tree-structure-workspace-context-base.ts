@@ -8,6 +8,7 @@ import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/back
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -105,12 +106,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 				this.#setParentData(structureItems);
 				this.#setAncestorData(data);
 
-				this.#sectionSidebarMenuContext?.expansion.expandItems(
-					structureItems.map((item) => ({
-						entityType: item.entityType,
-						unique: item.unique,
-					})),
-				);
+				this.#sectionSidebarMenuContext?.expansion.expandItems(linkEntityExpansionEntries(data));
 			}
 		}
 	}
