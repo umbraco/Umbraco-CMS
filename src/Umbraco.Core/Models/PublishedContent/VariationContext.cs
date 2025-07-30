@@ -37,5 +37,5 @@ public class VariationContext
     /// <param name="contentId"></param>
     /// <param name="propertyAlias"></param>
     /// <returns></returns>
-    public virtual string GetSegment(int contentId, string? propertyAlias = null) => Segment;
+    public virtual string GetSegment(int contentId, string propertyAlias) => Segment;
 }

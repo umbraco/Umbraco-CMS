@@ -49,9 +49,16 @@ public static class VariationContextAccessorExtensions
         {
             if (variations.VariesBySegment())
             {
-                segment = contentId == null
-                    ? publishedVariationContext?.Segment
-                    : publishedVariationContext?.GetSegment(contentId.Value, propertyAlias);
+                if (contentId == null)
+                {
+                    segment = publishedVariationContext?.Segment;
+                }
+                else
+                {
+                    segment = propertyAlias == null ?
+                        publishedVariationContext?.GetSegment(contentId.Value) :
+                        publishedVariationContext?.GetSegment(contentId.Value, propertyAlias);
+                }
             }
             else
             {
