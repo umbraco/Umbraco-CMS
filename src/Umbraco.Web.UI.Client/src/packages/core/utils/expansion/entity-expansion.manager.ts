@@ -72,7 +72,7 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {void}
 	 */
-	public expandItemBulk(entities: UmbEntityModel[]): void {
+	public expandItems(entities: UmbEntityModel[]): void {
 		if (!entities || entities.length === 0) return;
 		this.#expansion.append(entities);
 		entities.forEach((entity) => {
