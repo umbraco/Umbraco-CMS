@@ -69,17 +69,34 @@ export class UmbCodeBlockElement extends LitElement {
 	}
 
 	override firstUpdated(): void {
-		if (this.codeLang) {
-			//monaco.editor.colorizeElement(this.container, {});
-			monaco.editor.colorizeElement(this.shadowRoot!.querySelector<UUIScrollContainerElement>('uui-scroll-container')?.shadowRoot!.getElementById("code")!, {});
-		}
+		
 	}
 
 	override render() {
 		return html`
 			${this.#renderHeader()}
-			<pre><uui-scroll-container><code id="code" ${ref(this.containerRef)} data-lang=${this.codeLang}><slot></slot></code></uui-scroll-container></pre>
+			<pre><uui-scroll-container><code id="code" ${ref(this.containerRef)} data-lang=${this.codeLang}><slot @slotchange=${this.#onSlotChanged}></slot></code></uui-scroll-container></pre>
 		`; // Avoid breaks between elements of <pre></pre>
+	}
+
+	#syntaxHighlight() {
+		if (!this.codeLang) return;
+
+		//monaco.editor.colorizeElement(this.container, {});
+		//monaco.editor.colorizeElement(this.shadowRoot!.getElementById("code")!, {});
+
+		monaco.editor.colorize(this.textContent, this.codeLang)
+			.then(html => { this.container.innerHTML = html })
+	}
+
+	#onSlotChanged(event: Event) {
+		const slot = event.target as HTMLSlotElement;
+		const name = slot.name;
+
+		console.log("onSlotChanged")
+
+		this.#syntaxHighlight();
+		this.requestUpdate();
 	}
 
 	#renderHeader() {
