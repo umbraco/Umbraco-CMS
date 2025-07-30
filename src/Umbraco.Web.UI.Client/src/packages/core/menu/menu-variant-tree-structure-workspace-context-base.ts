@@ -115,8 +115,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);
 			this.#setAncestorData(data);
-
-			this.#sectionSidebarMenuContext?.expansion.expandItems(linkEntityExpansionEntries(structureItems));
+			this.#expandSectionSidebarMenu(structureItems);
 		}
 	}
 
@@ -156,5 +155,11 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
 
 		this.#ancestorContext.setAncestors(ancestorEntities);
+	}
+
+	#expandSectionSidebarMenu(structureItems: Array<UmbVariantStructureItemModel>) {
+		// Filter out the current entity as we don't want to expand it
+		const expandableItems = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
+		this.#sectionSidebarMenuContext?.expansion.expandItems(linkEntityExpansionEntries(expandableItems));
 	}
 }
