@@ -76,5 +76,5 @@ public class LogViewerService : LogViewerServiceBase
         return logSizeAsMegabytes <= FileSizeCap;
     }
 
-    private string GetSearchPattern(DateTime day) => $"*{day:yyyyMMdd}*.json";
+    private static string GetSearchPattern(DateTime day) => $"*{day:yyyyMMdd}*.json";
 }
