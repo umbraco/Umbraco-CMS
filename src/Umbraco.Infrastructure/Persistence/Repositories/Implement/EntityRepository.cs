@@ -181,7 +181,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
             {
                 rowNumberSql.Where(filterClause.Item1, filterClause.Item2);
-                beforeAfterParameterIndexOffset++;
+                beforeAfterParameterIndexOffset += filterClause.Item2.Length;
             }
         }
 
