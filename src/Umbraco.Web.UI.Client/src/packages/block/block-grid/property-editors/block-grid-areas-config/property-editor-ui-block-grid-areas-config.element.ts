@@ -43,17 +43,10 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 		},
 	});
 
-	override updated(changedProperties: Map<string | number | symbol, unknown>) {
-		super.updated(changedProperties); 
-
-		if (changedProperties.has('value')) {
-			this.#sorter.setModel(this.value ?? []);
-		}
-	}
-
 	@property({ type: Array })
 	public set value(value: Array<UmbBlockGridTypeAreaType>) {
 		this._value = value ?? [];
+		this.#sorter.setModel(this._value);
 	}
 	public get value(): Array<UmbBlockGridTypeAreaType> {
 		return this._value;
