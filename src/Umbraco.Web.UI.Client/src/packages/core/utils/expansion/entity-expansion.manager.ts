@@ -16,8 +16,8 @@ import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observab
 export class UmbEntityExpansionManager<
 	EntryModelType extends UmbEntityExpansionEntryModel = UmbEntityExpansionEntryModel,
 > extends UmbControllerBase {
-	#expansion = new UmbArrayState<EntryModelType>([], (x) => x.entityType + x.unique);
-	expansion = this.#expansion.asObservable();
+	protected _expansion = new UmbArrayState<EntryModelType>([], (x) => x.entityType + x.unique);
+	expansion = this._expansion.asObservable();
 
 	/**
 	 * Checks if an entity is expanded
@@ -26,7 +26,7 @@ export class UmbEntityExpansionManager<
 	 * @memberof UmbEntityExpansionManager
 	 */
 	isExpanded(entity: EntryModelType): Observable<boolean> {
-		return this.#expansion.asObservablePart((entries) =>
+		return this._expansion.asObservablePart((entries) =>
 			entries?.some((entry) => entry.entityType === entity.entityType && entry.unique === entity.unique),
 		);
 	}
@@ -38,7 +38,7 @@ export class UmbEntityExpansionManager<
 	 * @returns {void}
 	 */
 	setExpansion(expansion: UmbEntityExpansionModel<EntryModelType>): void {
-		this.#expansion.setValue(expansion);
+		this._expansion.setValue(expansion);
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
@@ -48,7 +48,7 @@ export class UmbEntityExpansionManager<
 	 * @returns {UmbEntityExpansionModel} The expansion state
 	 */
 	getExpansion(): UmbEntityExpansionModel<EntryModelType> {
-		return this.#expansion.getValue();
+		return this._expansion.getValue();
 	}
 
 	/**
@@ -58,7 +58,7 @@ export class UmbEntityExpansionManager<
 	 * @returns {Promise<void>}
 	 */
 	public async expandItem(entity: EntryModelType): Promise<void> {
-		this.#expansion.appendOne(entity);
+		this._expansion.appendOne(entity);
 		this.getHostElement()?.dispatchEvent(
 			new UmbExpansionEntityExpandedEvent({ entityType: entity.entityType, unique: entity.unique }),
 		);
@@ -73,7 +73,7 @@ export class UmbEntityExpansionManager<
 	 */
 	public expandItems(entities: UmbEntityExpansionModel<EntryModelType>): void {
 		if (!entities || entities.length === 0) return;
-		this.#expansion.append(entities);
+		this._expansion.append(entities);
 		entities.forEach((entity) => {
 			this.getHostElement()?.dispatchEvent(
 				new UmbExpansionEntityExpandedEvent({ entityType: entity.entityType, unique: entity.unique }),
@@ -89,7 +89,7 @@ export class UmbEntityExpansionManager<
 	 * @returns {Promise<void>}
 	 */
 	public async collapseItem(entity: EntryModelType): Promise<void> {
-		this.#expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
+		this._expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
 		this.getHostElement()?.dispatchEvent(
 			new UmbExpansionEntityCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
 		);
@@ -104,7 +104,7 @@ export class UmbEntityExpansionManager<
 	 */
 	public collapseItems(entities: UmbEntityExpansionModel<EntryModelType>): void {
 		if (!entities || entities.length === 0) return;
-		this.#expansion.filter(
+		this._expansion.filter(
 			(x) => !entities.some((entity) => entity.entityType === x.entityType && entity.unique === x.unique),
 		);
 		entities.forEach((entity) => {
@@ -121,7 +121,7 @@ export class UmbEntityExpansionManager<
 	 * @returns {Promise<void>}
 	 */
 	public async collapseAll(): Promise<void> {
-		this.#expansion.setValue([]);
+		this._expansion.setValue([]);
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 }

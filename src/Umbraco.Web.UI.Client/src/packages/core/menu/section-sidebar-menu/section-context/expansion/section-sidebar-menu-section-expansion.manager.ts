@@ -47,10 +47,9 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	}
 
 	#observeGlobalMenuExpansion() {
-		this.observe(this.#globalContext?.expansion.expansion, (expansion) => {
-			const expansionForCurrentSection =
-				expansion?.filter((item) => item.sectionAlias === this.#currentSectionAlias) || [];
-			this.#manager.setExpansion(expansionForCurrentSection);
+		if (!this.#globalContext || !this.#currentSectionAlias) return;
+		this.observe(this.#globalContext?.expansion.expansionBySectionAlias(this.#currentSectionAlias), (expansion) => {
+			this.#manager.setExpansion(expansion);
 		});
 	}
 
