@@ -38,21 +38,23 @@ export class UmbPendingUserInvitesDashboardAppElement extends UmbLitElement impl
 
 	override render() {
 		return html`
-			${this._pendingUserInvites.map(
-				(user) => html`
-					<umb-dashboard-app-layout>
-						<uui-ref-node-user name=${user.name} href=${UMB_USER_WORKSPACE_PATH + '/edit/' + user.unique}>
-							<umb-user-avatar
-								style="font-size: 0.5em"
-								slot="icon"
-								.name=${user.name}
-								.kind=${user.kind}
-								.imgUrls=${user.avatarUrls}>
-							</umb-user-avatar>
-						</uui-ref-node-user>
-					</umb-dashboard-app-layout>
-				`,
-			)}
+			<umb-dashboard-app-layout>
+				${this._pendingUserInvites.map(
+					(user) => html`
+
+							<uui-ref-node-user name=${user.name} href=${UMB_USER_WORKSPACE_PATH + '/edit/' + user.unique}>
+								<umb-user-avatar
+									style="font-size: 0.5em"
+									slot="icon"
+									.name=${user.name}
+									.kind=${user.kind}
+									.imgUrls=${user.avatarUrls}>
+								</umb-user-avatar>
+							</uui-ref-node-user>
+
+					`,
+				)}
+			</umb-dashboard-app-layout>
 		`;
 	}
 
