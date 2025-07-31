@@ -106,10 +106,9 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
 
     private static int[] GetAllowedIds(string[] userStartNodePaths, int parentId)
     {
-        // if one or more of the user start nodes are descendants of the requested parent, find the "next child IDs" in those user start node paths
+        // If one or more of the user start nodes are descendants of the requested parent, find the "next child IDs" in those user start node paths
         // that are the final entries in the path.
-        // E.g. given the user start node path "-1,2,3,4,5", if the requested parent ID is 4, the "next child ID" is 5.
-        // But if 3 is requested, the next child of 4 should not be allowed, because it's not the final entry in the path, and hence the start node.
+        // E.g. given the user start node path "-1,2,3,4,5", if the requested parent ID is 3, the "next child ID" is 4.
         var userStartNodePathIds = userStartNodePaths.Select(path => path.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray()).ToArray();
         return userStartNodePathIds
             .Where(ids => ids.Contains(parentId))
