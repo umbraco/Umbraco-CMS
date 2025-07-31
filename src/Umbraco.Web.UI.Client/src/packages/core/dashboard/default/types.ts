@@ -1,4 +1,5 @@
 import type { ManifestDashboard, MetaDashboard } from '../dashboard.extension.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export interface ManifestDashboardDefaultKind extends ManifestDashboard {
 	type: 'dashboard';
@@ -10,13 +11,13 @@ export interface MetaDashboardDefaultKind extends MetaDashboard {
 }
 
 export interface DashboardAppInstance {
-	key : string;
+	unique: string;
 	/** Dashboard App Alias */
-	alias : string;
-	rows? : number;
-	columns? : number;
-	headline? : string;
-	component? : HTMLElement;
+	alias: string;
+	rows?: number;
+	columns?: number;
+	headline?: string;
+	component?: UmbControllerHostElement;
 }
 
 /**
@@ -24,11 +25,11 @@ export interface DashboardAppInstance {
  */
 export type ConfiguredDashboardApp = {
 	/** Dashboard App Alias */
-	alias : string;
-}
+	alias: string;
+};
 
 export interface UserDashboardAppConfiguration {
-	apps : ConfiguredDashboardApp[];
+	apps: ConfiguredDashboardApp[];
 }
 
 declare global {

@@ -8,7 +8,15 @@ export class UmbDashboardAppLayoutElement extends UmbLitElement {
 	headline: string | null = null;
 
 	override render() {
-		return html`<uui-box .headline=${this.headline}><slot></slot></uui-box>`;
+		return html`<uui-box .headline=${this.headline}>${this.#renderActions()}<slot></slot></uui-box>`;
+	}
+
+	#renderActions() {
+		return html`<div slot="header-actions">
+			<umb-entity-actions-dropdown compact>
+				<uui-symbol-more slot="label" label=${this.localize.term('general_actions')}></uui-symbol-more>
+			</umb-entity-actions-dropdown>
+		</div>`;
 	}
 
 	static override styles = [

@@ -17,6 +17,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UserDataService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-dashboard')
 export class UmbDashboardElement extends UmbLitElement {
@@ -61,7 +62,7 @@ export class UmbDashboardElement extends UmbLitElement {
 			itemSelector: '.dashboard-app',
 			containerSelector: '.grid-container',
 			getUniqueOfElement: (element) => element.getAttribute('data-sorter-id'),
-			getUniqueOfModel: (modelEntry) => modelEntry.key,
+			getUniqueOfModel: (modelEntry) => modelEntry.unique,
 			onChange: ({ model }) => {
 				const oldValue = this._apps;
 				this._apps = model;
@@ -118,7 +119,7 @@ export class UmbDashboardElement extends UmbLitElement {
 				if (!appElementCtor) return;
 
 				apps.push({
-					key: UmbId.new(),
+					unique: UmbId.new(),
 					alias: controller.alias,
 					columns: gridSize.columns,
 					rows: gridSize?.rows,
@@ -161,7 +162,7 @@ export class UmbDashboardElement extends UmbLitElement {
 				if (!appElementCtor) return;
 
 				apps.push({
-					key: UmbId.new(),
+					unique: UmbId.new(),
 					alias: controller.alias,
 					columns: gridSize.columns,
 					rows: gridSize?.rows,
@@ -241,7 +242,7 @@ export class UmbDashboardElement extends UmbLitElement {
 	}
 
 	async #remove(elementKey: string) {
-		this._apps = this._apps.filter((x) => x.key != elementKey);
+		this._apps = this._apps.filter((x) => x.unique != elementKey);
 	}
 
 	override render() {
@@ -277,25 +278,35 @@ export class UmbDashboardElement extends UmbLitElement {
 				<div class="grid-container">
 					${repeat(
 						this._apps,
-						(element) => element.key,
+						(element) => element.unique,
 						(element) =>
 							html` <div
 								style=${styleMap({ gridColumn: `span ${element.columns}`, gridRow: `span ${element.rows}` })}
 								class="dashboard-app"
-								data-sorter-id=${element.key}>
+								data-sorter-id=${element.unique}>
 								${when(
 									this._editMode,
 									() =>
-										html`<uui-button color="danger" compact @click=${() => this.#remove(element.key)}
+										html`<uui-button color="danger" compact @click=${() => this.#remove(element.unique)}
 											><umb-icon name="icon-trash"></umb-icon
 										></uui-button>`,
 								)}
-								${element.component}
+								${this.#renderComponent(element)}
 							</div>`,
 					)}
 				</div>
 			</section>
 		`;
+	}
+
+	#renderComponent(element: DashboardAppInstance) {
+		// TODO: Hacky rendering of component and entity context
+		const component = element.component;
+		if (!component) throw new Error('Dashboard app component is not defined');
+		const entityContext = new UmbEntityContext(component);
+		entityContext.setEntityType('dashboardApp');
+		entityContext.setUnique(element.unique);
+		return html`${element.component}`;
 	}
 
 	static override styles = [
