@@ -5,7 +5,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExpansionEntityCollapsedEvent, UmbExpansionEntityExpandedEvent } from '@umbraco-cms/backoffice/utils';
-import { UmbExtensionSlotElement } from '../../extension-registry/components/index.js';
+import { UmbExtensionSlotElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement<
