@@ -74,6 +74,7 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 			/* HACK: Stretches a space character (&emsp;) to be full-width to make the RTE block appear text-selectable. [LK,NL] */
 			.selection-background {
 				position: absolute;
+				pointer-events: none;
 				font-size: 100vw;
 				inset: 0;
 				overflow: hidden;
