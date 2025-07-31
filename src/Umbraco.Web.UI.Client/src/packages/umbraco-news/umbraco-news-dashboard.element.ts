@@ -38,7 +38,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (context) => {
 			this.#context = context;
-			this.#observeExpansion();
+			this.#observeSectionExpansion();
 		});
 	}
 
@@ -58,7 +58,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 		this.#context?.expansion.collapseAll();
 	}
 
-	#observeExpansion() {
+	#observeSectionExpansion() {
 		this.observe(this.#context?.expansion.expansion, (items) => {
 			this._expansion = items || [];
 		});
@@ -66,24 +66,24 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 
 	override render() {
 		return html`
+			<div style="margin-bottom: var(--uui-size-space-6);">
+				<button @click=${this.#onExpand}>Expand</button>
+				<button @click=${this.#onCollapseAll}>Collapse All</button>
+				${repeat(
+					this._expansion,
+					(item) => item.unique,
+					(item) =>
+						html`<div style="margin-bottom: var(--uui-size-space-2);">
+							${item.entityType} + ${item.unique}<button
+								@click=${(event: PointerEvent) => this.#onCollapse(event, item)}>
+								Collapse
+							</button>
+						</div> `,
+				)}
+			</div>
+
 			<div id="info-links" class="uui-text">
 				<uui-box id="our-umbraco">
-					<div style="margin-bottom: var(--uui-size-space-6);">
-						<button @click=${this.#onExpand}>Expand</button>
-						<button @click=${this.#onCollapseAll}>Collapse All</button>
-						${repeat(
-							this._expansion,
-							(item) => item.unique,
-							(item) =>
-								html`<div style="margin-bottom: var(--uui-size-space-2);">
-									${item.entityType} + ${item.unique}<button
-										@click=${(event: PointerEvent) => this.#onCollapse(event, item)}>
-										Collapse
-									</button>
-								</div> `,
-						)}
-					</div>
-
 					<div>
 						<h2 class="uui-h3">${this.localize.term('welcomeDashboard_ourUmbracoHeadline')}</h2>
 						<p>${this.localize.term('welcomeDashboard_ourUmbracoDescription')}</p>
