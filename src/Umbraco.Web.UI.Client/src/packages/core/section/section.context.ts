@@ -3,6 +3,8 @@ import { UMB_SECTION_CONTEXT } from './section.context.token.js';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbSectionContext extends UmbContextBase {
 	#manifestAlias = new UmbStringState<string | undefined>(undefined);
@@ -12,8 +14,11 @@ export class UmbSectionContext extends UmbContextBase {
 	public readonly pathname = this.#manifestPathname.asObservable();
 	public readonly label = this.#manifestLabel.asObservable();
 
+	#sectionContextExtensionController?: UmbExtensionsApiInitializer<any>;
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SECTION_CONTEXT);
+		this.#createSectionContextExtensions();
 	}
 
 	public setManifest(manifest?: ManifestSection) {
@@ -24,5 +29,19 @@ export class UmbSectionContext extends UmbContextBase {
 
 	getPathname() {
 		return this.#manifestPathname.getValue();
+	}
+
+	#createSectionContextExtensions() {
+		if (this.#sectionContextExtensionController) {
+			this.#sectionContextExtensionController.destroy();
+		}
+
+		this.#sectionContextExtensionController = new UmbExtensionsApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'sectionContext',
+			[],
+			undefined,
+		);
 	}
 }
