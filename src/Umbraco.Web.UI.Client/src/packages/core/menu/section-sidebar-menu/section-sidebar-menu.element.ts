@@ -59,7 +59,8 @@ export class UmbSectionSidebarMenuElement<
 		});
 	}
 
-	#onEntityExpansionChange(event: UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent) {
+	#onEntityExpansionChange(e: Event) {
+		const event = e as UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent;
 		event.stopPropagation();
 		const eventEntity = event.entity;
 
