@@ -61,7 +61,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	private _format: string = 'yyyy-MM-dd HH:mm:ss';
 
 	@state()
-	private _displayTimeZones: Array<string> = [];
+	private _displayLocalTime: boolean = true;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -90,10 +90,10 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	}
 
 	#prefillTimeZones(config: UmbPropertyEditorConfigCollection) {
-		this._displayTimeZones = config.getValueByAlias<Array<string>>('timeZonesToDisplay') || [];
+		this._displayLocalTime = config.getValueByAlias<boolean>('displayLocalTime') ?? false;
 
 		// Retrieve the time zones from the config
-		const timeZones = config.getValueByAlias<Array<string>>('timeZonesToEdit') || [];
+		const timeZones = config.getValueByAlias<Array<string>>('timeZones') || [];
 
 		// If no time zones are provided, we default to the client time zone
 		const clientTimeZone = this.#getClientTimeZone();
@@ -206,15 +206,9 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		}
 
 		this._currentDate = newDate;
-		if(this._mode === 'local') {
-			this._value = {
-				date:this._currentDate.toUTC().toISO()|| '',
-				timeZone: 'UTC' };
-		}else{
-			this._value = {
+		this._value = {
 				date: this._currentDate.toISO() || '',
 				timeZone: timeZone };
-		}
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -231,14 +225,14 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				</umb-input-date>
 				${this.#renderTimeZones()}
 			</div>
-			${this.#renderInfo()}
+			${this._currentDate && this._displayLocalTime ? html`<span><b>Local:</b> ${this._currentDate.toLocal().toFormat(this._format)}</span>` : nothing}
 		`;
 	}
 
 	#renderTimeZones() {
 		if(this._mode === 'local') {
 			return html`
-				<span title="UTC${this._timeZoneOffset}">Local (${this._timeZoneOptions[0].name})</span>
+				<span title="UTC${this._timeZoneOffset}">${this._timeZoneOptions[0].name} (Local)</span>
 				`;
 		}
 
@@ -251,18 +245,6 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				@change=${this.#onTimeZoneChange}
 				title="UTC${this._timeZoneOffset}"
 				?readonly=${this.readonly || this._timeZoneOptions.length === 1}></uui-select>
-		`;
-	}
-
-	#renderInfo() {
-		if (!this._currentDate || this._displayTimeZones.length === 0) {
-			return nothing;
-		}
-		return html`
-			<div class="info">
-				${this._displayTimeZones.includes('Local') ? html`<span><b>Local:</b> ${this._currentDate.toLocal().toFormat(this._format)}</span>` : nothing}
-				${this._displayTimeZones.includes('UTC') ? html`<span><b>UTC:</b> ${this._currentDate.toUTC().toFormat(this._format)}</span>`: nothing}
-			</div>
 		`;
 	}
 
