@@ -267,6 +267,6 @@ public partial class PreviewController : Controller
     [GeneratedRegex("^\\/(?<id>\\d*)(\\?culture=(?<culture>[\\w-]*))?$")]
     private static partial Regex DefaultPreviewRedirectRegex();
 
-    [GeneratedRegex(@"^[a-zA-Z0-9-]+$")]
+    [GeneratedRegex(@"^[a-z]{2,3}[-0-9a-z]*$", RegexOptions.IgnoreCase)]
     private static partial Regex CultureCodeRegex();
 }
