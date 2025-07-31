@@ -1,19 +1,21 @@
 import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET, type UmbBlockGridTypeAreaType } from '../../index.js';
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/constants.js';
+import type { UmbBlockGridAreaConfigEntryElement } from '../../../block-grid/components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
 import { UmbBlockGridAreaTypeEntriesContext } from './block-grid-area-type-entries.context.js';
+import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { incrementString } from '@umbraco-cms/backoffice/utils';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { incrementString } from '@umbraco-cms/backoffice/utils';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
-import { type UmbBlockGridAreaConfigEntryElement } from '../../../block-grid/components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
+
 import '../../components/block-grid-area-config-entry/block-grid-area-config-entry.element.js';
+
 @customElement('umb-property-editor-ui-block-grid-areas-config')
 export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	extends UmbLitElement
@@ -156,13 +158,12 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
-			.umb-block-grid__area{
+			.umb-block-grid__area {
 				cursor: pointer;
 			}
-		`
-	]
+		`,
+	];
 }
 
 export default UmbPropertyEditorUIBlockGridAreasConfigElement;
