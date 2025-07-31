@@ -36,8 +36,11 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 			return modelEntry.key;
 		},
 		onChange: ({ model }) => {
+			const oldValue = this._value;
 			this._value = model;
-		}
+			this.requestUpdate('_value', oldValue);
+			this.dispatchEvent(new UmbChangeEvent());
+		},
 	});
 
 	override updated(changedProperties: Map<string | number | symbol, unknown>) {
