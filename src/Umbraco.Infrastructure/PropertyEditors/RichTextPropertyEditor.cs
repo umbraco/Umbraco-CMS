@@ -263,8 +263,6 @@ public class RichTextPropertyEditor : DataEditor
             richTextEditorValue?.EnsurePropertyTypePopulatedOnBlocks(_elementTypeCache);
             currentRichTextEditorValue?.EnsurePropertyTypePopulatedOnBlocks(_elementTypeCache);
 
-            RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueFromEditor(blockValue, currentRichTextEditorValue?.Blocks, editorValue.ContentKey));
-
             if (string.IsNullOrWhiteSpace(richTextEditorValue?.Markup))
             {
                 return null;
@@ -284,6 +282,7 @@ public class RichTextPropertyEditor : DataEditor
             var sanitized = _htmlSanitizer.Sanitize(editorValueWithMediaUrlsRemoved);
 
             richTextEditorValue.Markup = sanitized.NullOrWhiteSpaceAsNull() ?? string.Empty;
+            RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueFromEditor(blockValue, currentRichTextEditorValue?.Blocks, editorValue.ContentKey));
 
             // return json
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(cleanedUpRichTextEditorValue, _jsonSerializer);
