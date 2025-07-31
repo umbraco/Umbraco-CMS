@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUIBlockGridColumnSpanElement } from './property-editor-ui-block-grid-column-span.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-block-grid-column-span.element.js';

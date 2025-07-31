@@ -1,5 +1,5 @@
 import type { UmbModelsBuilderDashboardElement } from './models-builder-dashboard.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './models-builder-dashboard.element.js';

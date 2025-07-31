@@ -3,7 +3,7 @@ import './document-schedule-modal.element.js';
 import { UmbDocumentVariantState } from '../../../types.js';
 import type { UmbDocumentScheduleModalData, UmbDocumentScheduleModalValue } from './document-schedule-modal.token.js';
 import type { UmbDocumentScheduleModalElement } from './document-schedule-modal.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentScheduleModalData = {

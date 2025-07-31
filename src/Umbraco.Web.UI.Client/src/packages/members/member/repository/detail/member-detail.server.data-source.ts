@@ -5,41 +5,43 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import {umbDeepMerge, type UmbDeepPartialObject} from '@umbraco-cms/backoffice/utils';
+import { UmbMemberTypeDetailServerDataSource } from '@umbraco-cms/backoffice/member-type';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * A data source for the Member that fetches data from the server
  * @class UmbMemberServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberDetailModel> {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbMemberServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbMemberServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
+export class UmbMemberServerDataSource extends UmbControllerBase implements UmbDetailDataSource<UmbMemberDetailModel> {
 	/**
 	 * Creates a new Member scaffold
 	 * @param {Partial<UmbMemberDetailModel>} [preset]
 	 * @returns { CreateMemberRequestModel }
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async createScaffold(preset: Partial<UmbMemberDetailModel> = {}) {
-		const data: UmbMemberDetailModel = {
+	async createScaffold(preset: UmbDeepPartialObject<UmbMemberDetailModel> = {}) {
+		let memberTypeIcon = '';
+
+		const memberTypeUnique = preset.memberType?.unique;
+
+		if (!memberTypeUnique) {
+			throw new Error('Document type unique is missing');
+		}
+
+		const { data } = await new UmbMemberTypeDetailServerDataSource(this).read(memberTypeUnique);
+		memberTypeIcon = data?.icon ?? '';
+
+		const defaultData: UmbMemberDetailModel = {
 			entityType: UMB_MEMBER_ENTITY_TYPE,
 			unique: UmbId.new(),
 			email: '',
 			username: '',
 			memberType: {
-				unique: '',
-				icon: '',
+				unique: memberTypeUnique,
+				icon: memberTypeIcon,
 			},
 			isApproved: false,
 			isLockedOut: false,
@@ -60,10 +62,11 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 					updateDate: new Date().toISOString(),
 				},
 			],
-			...preset,
 		};
 
-		return { data };
+		const scaffold = umbDeepMerge(preset, defaultData);
+
+		return { data: scaffold };
 	}
 
 	/**
@@ -75,7 +78,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, MemberService.getMemberById({ path: { id: unique } }));
+		const { data, error } = await tryExecute(this, MemberService.getMemberById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -147,7 +150,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		};
 
 		const { data, error } = await tryExecute(
-			this.#host,
+			this,
 			MemberService.postMember({
 				body,
 			}),
@@ -185,7 +188,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		};
 
 		const { error } = await tryExecute(
-			this.#host,
+			this,
 			MemberService.putMemberById({
 				path: { id: model.unique },
 				body,
@@ -209,7 +212,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(
-			this.#host,
+			this,
 			MemberService.deleteMemberById({
 				path: { id: unique },
 			}),

@@ -1,5 +1,5 @@
 import type { UmbDashboardHealthCheckOverviewElement } from './views/health-check-overview.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './views/health-check-overview.element.js';

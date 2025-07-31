@@ -509,8 +509,7 @@ public static class StringExtensions
         var convertToHex = input.ConvertToHex();
         var hexLength = convertToHex.Length < 32 ? convertToHex.Length : 32;
         var hex = convertToHex[..hexLength].PadLeft(32, '0');
-        Guid output = Guid.Empty;
-        return Guid.TryParse(hex, out output) ? output : Guid.Empty;
+        return Guid.TryParse(hex, out Guid output) ? output : Guid.Empty;
     }
 
     /// <summary>
@@ -1575,4 +1574,22 @@ public static class StringExtensions
     // this is by far the fastest way to find string needles in a string haystack
     public static int CountOccurrences(this string haystack, string needle)
         => haystack.Length - haystack.Replace(needle, string.Empty).Length;
+
+    /// <summary>
+    /// Verifies the provided string is a valid culture code and returns it in a consistent casing.
+    /// </summary>
+    /// <param name="culture">Culture code.</param>
+    /// <returns>Culture code in standard casing.</returns>
+    public static string? EnsureCultureCode(this string? culture)
+    {
+        if (string.IsNullOrEmpty(culture) || culture == "*")
+        {
+            return culture;
+        }
+
+        // Create as CultureInfo instance from provided name so we can ensure consistent casing of culture code when persisting.
+        // This will accept mixed case but once created have a `Name` property that is consistently and correctly cased.
+        // Will throw in an invalid culture code is provided.
+        return new CultureInfo(culture).Name;
+    }
 }

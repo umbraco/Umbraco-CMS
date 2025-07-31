@@ -22,8 +22,7 @@ test('can create a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.script.createScriptFolder(scriptFolderName);
 
   // Assert
-  //await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.script.isErrorNotificationVisible(false);
+  await umbracoUi.script.waitForScriptToBeCreated();
   expect(await umbracoApi.script.doesFolderExist(scriptFolderName)).toBeTruthy();
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptFolderName);
 });
@@ -36,11 +35,10 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Act
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
-  await umbracoUi.script.deleteFolder();
+  await umbracoUi.script.clickDeleteAndConfirmButton();
 
   // Assert
-  //await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.deleted);
-  await umbracoUi.script.isErrorNotificationVisible(false);
+  await umbracoUi.script.waitForScriptToBeDeleted();
   expect(await umbracoApi.script.doesFolderExist(scriptFolderName)).toBeFalsy();
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptFolderName, false, false);
 });
@@ -54,15 +52,14 @@ test('can create a script in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
-  await umbracoUi.script.clickCreateButton();
+  await umbracoUi.script.clickCreateOptionsActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.enterScriptContent(scriptContent);
   await umbracoUi.script.clickSaveButton();
 
   // Assert
-  //await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.script.isErrorNotificationVisible(false);
+  await umbracoUi.script.waitForScriptToBeCreated();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName);
   expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + scriptName);
@@ -84,8 +81,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.script.createScriptFolder(childFolderName);
 
   // Assert
-  //await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.script.isErrorNotificationVisible(false);
+  await umbracoUi.script.waitForScriptToBeCreated();
   expect(await umbracoApi.script.doesNameExist(childFolderName)).toBeTruthy();
   const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName);
   expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + childFolderName);
@@ -108,8 +104,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.script.createScriptFolder(childOfChildFolderName);
 
   // Assert
-  //await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.script.isErrorNotificationVisible(false);
+  await umbracoUi.script.waitForScriptToBeCreated();
   expect(await umbracoApi.script.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName + '/' + childFolderName);
   expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + childFolderName + '/' + childOfChildFolderName);
@@ -128,14 +123,13 @@ test('can create a script in a folder in a folder', async ({umbracoApi, umbracoU
   await umbracoUi.script.reloadScriptTree();
   await umbracoUi.script.clickCaretButtonForName(scriptFolderName);
   await umbracoUi.script.clickActionsMenuForScript(childFolderName);
-  await umbracoUi.script.clickCreateButton();
+  await umbracoUi.script.clickCreateOptionsActionMenuOption();
   await umbracoUi.script.clickNewJavascriptFileButton();
   await umbracoUi.script.enterScriptName(scriptName);
   await umbracoUi.script.clickSaveButton();
 
   // Assert
-  //await umbracoUi.script.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.script.isErrorNotificationVisible(false);
+  await umbracoUi.script.waitForScriptToBeCreated();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
   const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName + '/' + childFolderName);
   expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + childFolderName + '/' + scriptName);

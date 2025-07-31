@@ -1,6 +1,6 @@
 import type { UmbPropertyEditorUIPickerModalElement } from './property-editor-ui-picker-modal.element.js';
 import type { UmbPropertyEditorUIPickerModalValue } from './property-editor-ui-picker-modal.token.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-picker-modal.element.js';

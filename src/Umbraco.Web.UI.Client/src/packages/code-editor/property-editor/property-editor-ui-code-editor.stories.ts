@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUICodeEditorElement } from './property-editor-ui-code-editor.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-code-editor.element.js';

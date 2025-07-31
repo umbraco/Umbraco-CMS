@@ -140,6 +140,7 @@ const documentTypeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeIte
 		name: item.name,
 		icon: item.icon,
 		isElement: item.isElement,
+		description: item.description ?? undefined,
 	};
 };
 

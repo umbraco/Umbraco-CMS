@@ -7,6 +7,7 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 export abstract class UmbDetailRepositoryBase<
 		DetailModelType extends UmbEntityModel,
@@ -33,22 +34,23 @@ export abstract class UmbDetailRepositoryBase<
 		this.detailDataSource = new detailSource(host) as UmbDetailDataSourceType;
 
 		// TODO: ideally no preventTimeouts here.. [NL]
-		this.#init = Promise.all([
-			this.consumeContext(detailStoreContextAlias, (instance) => {
-				if (instance) {
-					this.#detailStore = instance;
-				}
-			}).asPromise({ preventTimeout: true }),
-		]);
+		this.#init = this.consumeContext(detailStoreContextAlias, (instance) => {
+			this.#detailStore = instance;
+		})
+			.asPromise({ preventTimeout: true })
+			// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+			.catch(() => undefined);
 	}
 
 	/**
 	 * Creates a scaffold
-	 * @param {Partial<DetailModelType>} [preset]
+	 * @param {UmbDeepPartialObject<DetailModelType>} [preset]
 	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async createScaffold(preset?: Partial<DetailModelType>): Promise<UmbRepositoryResponse<DetailModelType>> {
+	async createScaffold(
+		preset?: UmbDeepPartialObject<DetailModelType>,
+	): Promise<UmbRepositoryResponse<DetailModelType>> {
 		return this.detailDataSource.createScaffold(preset);
 	}
 
@@ -58,7 +60,7 @@ export abstract class UmbDetailRepositoryBase<
 	 * @returns {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType>> {
+	async requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType | undefined>> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
@@ -71,7 +73,7 @@ export abstract class UmbDetailRepositoryBase<
 		return {
 			data,
 			error,
-			asObservable: () => this.#detailStore!.byUnique(unique),
+			asObservable: () => this.#detailStore?.byUnique(unique),
 		};
 	}
 

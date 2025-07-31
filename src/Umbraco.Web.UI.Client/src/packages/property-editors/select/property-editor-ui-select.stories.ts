@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUISelectElement } from './property-editor-ui-select.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-select.element.js';

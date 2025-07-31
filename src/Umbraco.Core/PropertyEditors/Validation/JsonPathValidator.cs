@@ -55,7 +55,7 @@ internal static class JsonPathValidator
         return errors;
     }
 
-    private class JsonPathValidationTreeItem
+    private sealed class JsonPathValidationTreeItem
     {
         public required string JsonPath { get; init; }
 

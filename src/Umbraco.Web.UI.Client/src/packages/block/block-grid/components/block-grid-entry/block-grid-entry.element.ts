@@ -93,6 +93,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_unsupported?: boolean;
 
 	@state()
+	_showActions?: boolean;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -211,6 +214,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				this.#updateBlockViewProps({ unsupported: unsupported });
 				this._unsupported = unsupported;
 				this.toggleAttribute('unsupported', unsupported);
+			},
+			null,
+		);
+		this.observe(
+			this.#context.actionsVisibility,
+			(showActions) => {
+				this._showActions = showActions;
 			},
 			null,
 		);
@@ -427,6 +437,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		if (ext.component) {
 			ext.component.classList.add('umb-block-grid__block--view');
+			ext.component.setAttribute('part', 'component');
 		}
 		if (this._exposed) {
 			return ext.component;
@@ -545,12 +556,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderActionBar() {
-		return html`
-			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
-				${this.#renderDeleteAction()}</uui-action-bar
-			>
-		`;
+		return this._showActions
+			? html`
+					<uui-action-bar>
+						${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+						${this.#renderDeleteAction()}</uui-action-bar
+					>
+				`
+			: nothing;
 	}
 
 	#renderEditAction() {
@@ -639,6 +652,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
 				border-color: var(--uui-color-invalid);
+			}
+
+			umb-extension-slot::part(component) {
+				position: relative;
+				z-index: 0;
 			}
 
 			#invalidLocation {

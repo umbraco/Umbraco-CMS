@@ -144,6 +144,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 								.value=${{
 									entityType: item.entityType,
 									unique: item.unique,
+									name: item.name,
 								}}></umb-entity-actions-table-column-view>`,
 						};
 					}
