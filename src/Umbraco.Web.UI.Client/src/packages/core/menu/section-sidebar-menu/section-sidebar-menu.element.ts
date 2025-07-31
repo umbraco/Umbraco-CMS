@@ -83,6 +83,11 @@ export class UmbSectionSidebarMenuElement<
 		return html` ${this.renderHeader()} ${this.#extensionSlotElement}`;
 	}
 
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#extensionSlotElement.destroy();
+	}
+
 	static override styles = [
 		UmbTextStyles,
 		css`
