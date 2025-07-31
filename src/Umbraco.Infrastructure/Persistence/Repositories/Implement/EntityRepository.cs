@@ -146,7 +146,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
     /// <inheritdoc/>
-    public IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int before, int after, Ordering ordering)
+    public IEnumerable<IEntitySlim> GetSiblings(
+        Guid objectType,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering)
     {
         // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
         // without us also having to do a nested query for the parent ID too.
@@ -167,6 +173,18 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             .From<NodeDto>()
             .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == false);
 
+        // Apply the filter if provided.  Note that in doing this, we'll add more parameters to the query, so need to track
+        // how many so we can offset the parameter indexes for the "before" and "after" values added later.
+        int beforeAfterParameterIndexOffset = 0;
+        if (filter != null)
+        {
+            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+            {
+                rowNumberSql.Where(filterClause.Item1, filterClause.Item2);
+                beforeAfterParameterIndexOffset++;
+            }
+        }
+
         // Find the specific row number of the target node.
         // We need this to determine the bounds of the row numbers to select.
         Sql<ISqlContext> targetRowSql = Sql()
@@ -180,11 +198,12 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         IEnumerable<object> afterArguments = targetRowSql.Arguments.Concat([after]);
 
         // Select the UniqueId of nodes which row number is within the specified range of the target node's row number.
+        const int BeforeAfterParameterIndex = 3;
         Sql<ISqlContext>? mainSql = Sql()
             .Select("UniqueId")
             .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
-            .Where($"rn >= ({targetRowSql.SQL}) - @3", beforeArguments.ToArray())
-            .Where($"rn <= ({targetRowSql.SQL}) + @3", afterArguments.ToArray())
+            .Where($"rn >= ({targetRowSql.SQL}) - @{BeforeAfterParameterIndex + beforeAfterParameterIndexOffset}", beforeArguments.ToArray())
+            .Where($"rn <= ({targetRowSql.SQL}) + @{BeforeAfterParameterIndex + beforeAfterParameterIndexOffset}", afterArguments.ToArray())
             .OrderBy("rn");
 
         List<Guid>? keys = Database.Fetch<Guid>(mainSql);

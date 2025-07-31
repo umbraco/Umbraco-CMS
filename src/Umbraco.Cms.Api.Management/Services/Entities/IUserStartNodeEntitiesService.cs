@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Models.Entities;
@@ -63,6 +63,28 @@ public interface IUserStartNodeEntitiesService
     /// Some candidate entities may be filtered out if they are not applicable for the user scope.
     /// </remarks>
     IEnumerable<UserAccessEntity> ChildUserAccessEntities(IEnumerable<IEntitySlim> candidateChildren, string[] userStartNodePaths);
+
+    /// <summary>
+    /// Calculates the applicable sibling entities for a given object type for users without root access.
+    /// </summary>
+    /// <param name="umbracoObjectType">The object type.</param>
+    /// <param name="userStartNodePaths">The calculated start node paths for the user.</param>
+    /// <param name="targetKey">The key of the target.</param>
+    /// <param name="before">The number of applicable siblings to retrieve before the target.</param>
+    /// <param name="after">The number of applicable siblings to retrieve after the target.</param>
+    /// <param name="ordering">The ordering to apply when fetching and paginating the children.</param>
+    /// <returns>A list of sibling entities applicable for the user.</returns>
+    /// <remarks>
+    /// The returned entities may include entities that outside of the user start node scope, but are needed to
+    /// for browsing to the actual user start nodes. These entities will be marked as "no access" entities.
+    /// </remarks>
+    IEnumerable<UserAccessEntity> SiblingUserAccessEntities(
+        UmbracoObjectTypes umbracoObjectType,
+        string[] userStartNodePaths,
+        Guid targetKey,
+        int before,
+        int after,
+        Ordering ordering) => [];
 
     /// <summary>
     /// Calculates the access level of a collection of entities for users without root access.
