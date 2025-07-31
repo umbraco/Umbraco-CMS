@@ -1,4 +1,4 @@
-import { manifests as sectionContextManifests } from './context/manifests.js';
+import { manifests as sectionContextManifests } from './section-context/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [

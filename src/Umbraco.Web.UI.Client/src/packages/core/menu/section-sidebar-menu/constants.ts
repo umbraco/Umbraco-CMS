@@ -1,1 +1,1 @@
-export * from './context/constants.js';
+export * from './section-context/constants.js';
