@@ -66,22 +66,6 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			<div style="margin-bottom: var(--uui-size-space-6);">
-				<button @click=${this.#onExpand}>Expand</button>
-				<button @click=${this.#onCollapseAll}>Collapse All</button>
-				${repeat(
-					this._expansion,
-					(item) => item.unique,
-					(item) =>
-						html`<div style="margin-bottom: var(--uui-size-space-2);">
-							${item.entityType} + ${item.unique}<button
-								@click=${(event: PointerEvent) => this.#onCollapse(event, item)}>
-								Collapse
-							</button>
-						</div> `,
-				)}
-			</div>
-
 			<div id="info-links" class="uui-text">
 				<uui-box id="our-umbraco">
 					<div>

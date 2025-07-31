@@ -27,11 +27,6 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			${repeat(
-				this._expansion,
-				(item) => item.unique,
-				(item) => html`<div style="margin-bottom: var(--uui-size-space-2);">${item.entityType} + ${item.unique}</div> `,
-			)}
 			<section id="settings-dashboard" class="uui-text">
 				<uui-box headline=${this.localize.term('settingsDashboard_documentationHeader')}>
 					<p>
