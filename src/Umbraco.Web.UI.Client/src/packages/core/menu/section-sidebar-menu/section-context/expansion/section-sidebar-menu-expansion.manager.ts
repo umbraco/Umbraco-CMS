@@ -9,6 +9,7 @@ import {
 	type UmbEntityExpansionEntryModel,
 	type UmbEntityExpansionModel,
 } from '@umbraco-cms/backoffice/utils';
+import type { UmbEntityExpansionSectionEntryModel } from '../../types.js';
 
 /**
  * Manages the expansion state of a section sidebar menu.
@@ -38,18 +39,18 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 		});
 	}
 
-	#observeGlobalMenuExpansion() {
-		this.observe(this.#globalContext?.expansion.expansion, (expansion) => {
-			const globalExpansion = expansion || [];
-			this.#manager.setExpansion(globalExpansion);
-		});
-	}
-
 	#observeCurrentSectionAlias() {
 		this.observe(this.#sectionContext?.alias, (alias) => {
 			if (!alias) return;
 			this.#currentSectionAlias = alias;
-			console.log(`SectionSidebarMenuExpansionManager: Current section alias set to: ${this.#currentSectionAlias}`);
+		});
+	}
+
+	#observeGlobalMenuExpansion() {
+		this.observe(this.#globalContext?.expansion.expansion, (expansion) => {
+			const expansionForCurrentSection =
+				expansion?.filter((item) => item.sectionAlias === this.#currentSectionAlias) || [];
+			this.#manager.setExpansion(expansionForCurrentSection);
 		});
 	}
 
@@ -73,7 +74,8 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 */
 	setExpansion(expansion: UmbEntityExpansionModel): void {
 		this.#manager.setExpansion(expansion);
-		this.#globalContext?.expansion.setExpansion(expansion);
+		const entries = this.#bindEntriesToSection(expansion);
+		this.#globalContext?.expansion.setExpansion(entries);
 	}
 
 	/**
@@ -98,7 +100,8 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 */
 	public async expandItem(entity: UmbEntityExpansionEntryModel): Promise<void> {
 		this.#manager.expandItem(entity);
-		this.#globalContext?.expansion.expandItem(entity);
+		const entries = this.#bindEntriesToSection([entity]);
+		this.#globalContext?.expansion.expandItem(entries[0]);
 	}
 
 	/**
@@ -109,7 +112,8 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 */
 	public expandItems(entities: UmbEntityExpansionModel): void {
 		this.#manager.expandItems(entities);
-		this.#globalContext?.expansion.expandItems(entities);
+		const entries = this.#bindEntriesToSection(entities);
+		this.#globalContext?.expansion.expandItems(entries);
 	}
 
 	/**
@@ -117,15 +121,13 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 * @param {UmbEntityExpansionEntryModel} entity The entity to open
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
-	 * @param {UmbEntityModel} entity.target The target entity to look up
-	 * @param {string} entity.target.entityType The target entity type
-	 * @param {string} entity.target.unique The target unique key
 	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
 	 * @returns {Promise<void>}
 	 */
-	public async collapseItem(entity: UmbEntityExpansionEntryModel): Promise<void> {
+	public async collapseItem(entity: UmbEntityModel): Promise<void> {
 		this.#manager.collapseItem(entity);
-		this.#globalContext?.expansion.collapseItem(entity);
+		const entries = this.#bindEntriesToSection([entity]);
+		this.#globalContext?.expansion.collapseItem(entries[0]);
 	}
 
 	/**
@@ -135,5 +137,15 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 */
 	public async collapseAll(): Promise<void> {
 		this.#manager.collapseAll();
+		// Collapse all items in the global context matching the current section
+		const entries = this.#bindEntriesToSection(this.#manager.getExpansion());
+		this.#globalContext?.expansion.collapseItems(entries);
+	}
+
+	#bindEntriesToSection(expansion: UmbEntityExpansionModel): Array<UmbEntityExpansionSectionEntryModel> {
+		return expansion.map((item) => ({
+			...item,
+			sectionAlias: this.#currentSectionAlias,
+		}));
 	}
 }
