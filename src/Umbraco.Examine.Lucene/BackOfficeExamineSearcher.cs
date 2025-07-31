@@ -438,7 +438,14 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
     }
 
     private static bool StartsWithPath(string path1, string path2)
-        => $"{path1},".StartsWith($"{path2},", StringComparison.Ordinal);
+    {
+        if (path1.StartsWith(path2) == false)
+        {
+            return false;
+        }
+
+        return path1.Length == path2.Length || path1[path2.Length] == ',';
+    }
 
     private int[] GetUserStartNodes(UmbracoObjectTypes objectType)
     {
