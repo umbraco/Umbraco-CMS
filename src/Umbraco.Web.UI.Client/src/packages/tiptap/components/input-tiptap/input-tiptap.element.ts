@@ -240,8 +240,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				position: relative;
 				z-index: 0;
 
-				width: var(--umb-rte-width, 'unset');
-				min-width: var(--umb-rte-min-width, 'unset');
+				width: var(--umb-rte-width, unset);
+				min-width: var(--umb-rte-min-width, unset);
 				max-width: var(--umb-rte-max-width, 100%);
 			}
 
