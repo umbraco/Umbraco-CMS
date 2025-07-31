@@ -160,7 +160,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	static override styles = [
 		css`
 			.umb-block-grid__area {
-				cursor: pointer;
+				cursor: move;
 			}
 		`,
 	];
