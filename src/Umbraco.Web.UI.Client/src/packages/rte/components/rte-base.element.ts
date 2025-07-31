@@ -17,6 +17,7 @@ import {
 } from '@umbraco-cms/backoffice/validation';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 
 export abstract class UmbPropertyEditorUiRteElementBase
 	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
@@ -31,6 +32,12 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		this.#managerContext.setBlockTypes(blocks);
 
 		this.#managerContext.setEditorConfiguration(config);
+
+		const dimensions = config.getValueByAlias<{ width?: number; height?: number }>('dimensions');
+		this._css = {
+			'--umb-rte-max-width': dimensions?.width ? `${dimensions.width}px` : '100%',
+			'--umb-rte-height': dimensions?.height ? `${dimensions.height}px` : 'unset',
+		};
 	}
 
 	@property({
@@ -93,6 +100,9 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 	@state()
 	protected _config?: UmbPropertyEditorConfigCollection;
+
+	@state()
+	protected _css: StyleInfo = {};
 
 	/**
 	 * @deprecated _value is depreacated, use `super.value` instead.
