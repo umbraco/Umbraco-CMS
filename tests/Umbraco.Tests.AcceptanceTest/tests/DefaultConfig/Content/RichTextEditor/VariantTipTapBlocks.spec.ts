@@ -61,7 +61,7 @@ test('invariant document type with invariant tiptap RTE with invariant block wit
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementInRTEWithName(blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
 });
 
@@ -128,7 +128,7 @@ test('variant document type with variant tiptap RTE with variant block with an v
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementInRTEWithName(blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
 });
 
@@ -154,7 +154,7 @@ test('variant document type with invariant tiptap RTE with variant block with an
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementInRTEWithName(blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
 });
 
@@ -180,6 +180,6 @@ test('variant document type with invariant tiptap RTE with variant block with an
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.isDocumentPublished(contentId)).toBeTruthy();
   await umbracoUi.reloadPage();
-  await umbracoUi.content.clickBlockElementWithName(blockName);
+  await umbracoUi.content.clickBlockElementInRTEWithName(blockName);
   await umbracoUi.content.doesPropertyContainValue(textStringName, textStringText);
 });
