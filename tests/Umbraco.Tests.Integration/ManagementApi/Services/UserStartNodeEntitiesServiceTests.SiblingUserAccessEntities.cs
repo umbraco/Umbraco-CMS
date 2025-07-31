@@ -32,6 +32,54 @@ public partial class UserStartNodeEntitiesServiceTests
     }
 
     [Test]
+    public async Task SiblingUserAccessEntities_WithStartNodeOfTargetParentAndTarget_YieldsOnlyTarget_AsAllowed()
+    {
+        // See notes on ChildUserAccessEntities_ChildAndGrandchildAsStartNode_AllowsOnlyGrandchild.
+
+        var contentStartNodePaths = await CreateUserAndGetStartNodePaths(_contentByName["1"].Id, _contentByName["1-5"].Id);
+
+        var siblings = UserStartNodeEntitiesService
+            .SiblingUserAccessEntities(
+                UmbracoObjectTypes.Document,
+                contentStartNodePaths,
+                _contentByName["1-5"].Key,
+                2,
+                2,
+                BySortOrder)
+            .ToArray();
+
+        Assert.AreEqual(1, siblings.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(_contentByName[$"1-5"].Key, siblings[0].Entity.Key);
+            Assert.IsTrue(siblings[0].HasAccess);
+        });
+    }
+
+    [Test]
+    public async Task SiblingUserAccessEntities_WithStartNodeOfTarget_YieldsOnlyTarget_AsAllowed()
+    {
+        var contentStartNodePaths = await CreateUserAndGetStartNodePaths(_contentByName["1-5"].Id);
+
+        var siblings = UserStartNodeEntitiesService
+            .SiblingUserAccessEntities(
+                UmbracoObjectTypes.Document,
+                contentStartNodePaths,
+                _contentByName["1-5"].Key,
+                2,
+                2,
+                BySortOrder)
+            .ToArray();
+
+        Assert.AreEqual(1, siblings.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(_contentByName[$"1-5"].Key, siblings[0].Entity.Key);
+            Assert.IsTrue(siblings[0].HasAccess);
+        });
+    }
+
+    [Test]
     public async Task SiblingUserAccessEntities_WithStartsNodesOfTargetAndSiblings_YieldsOnlyPermitted_AsAllowed()
     {
         var contentStartNodePaths = await CreateUserAndGetStartNodePaths(_contentByName["1-3"].Id, _contentByName["1-5"].Id, _contentByName["1-7"].Id);
