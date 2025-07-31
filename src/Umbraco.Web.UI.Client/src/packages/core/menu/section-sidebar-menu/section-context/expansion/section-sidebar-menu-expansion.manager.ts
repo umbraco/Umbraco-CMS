@@ -1,4 +1,5 @@
 import { UMB_SECTION_SIDEBAR_MENU_GLOBAL_CONTEXT } from '../../global-context/section-sidebar-menu.global-context.token.js';
+import type { UmbEntityExpansionSectionEntryModel } from '../../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -9,7 +10,6 @@ import {
 	type UmbEntityExpansionEntryModel,
 	type UmbEntityExpansionModel,
 } from '@umbraco-cms/backoffice/utils';
-import type { UmbEntityExpansionSectionEntryModel } from '../../types.js';
 
 /**
  * Manages the expansion state of a section sidebar menu.

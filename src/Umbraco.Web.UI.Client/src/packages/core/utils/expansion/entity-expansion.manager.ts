@@ -5,7 +5,6 @@ import {
 	UmbExpansionChangeEvent,
 } from './events/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
@@ -14,19 +13,19 @@ import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observab
  * @class UmbEntityExpansionManager
  * @augments {UmbControllerBase}
  */
-export class UmbEntityExpansionManager extends UmbControllerBase {
-	#expansion = new UmbArrayState<UmbEntityExpansionEntryModel>([], (x) => x.entityType + x.unique);
+export class UmbEntityExpansionManager<
+	EntryModelType extends UmbEntityExpansionEntryModel = UmbEntityExpansionEntryModel,
+> extends UmbControllerBase {
+	#expansion = new UmbArrayState<EntryModelType>([], (x) => x.entityType + x.unique);
 	expansion = this.#expansion.asObservable();
 
 	/**
 	 * Checks if an entity is expanded
-	 * @param {UmbEntityModel} entity The entity to check
-	 * @param {string} entity.entityType The entity type
-	 * @param {string} entity.unique The unique key
+	 * @param {EntryModelType} entity The entity to check
 	 * @returns {Observable<boolean>} True if the entity is expanded
 	 * @memberof UmbEntityExpansionManager
 	 */
-	isExpanded(entity: UmbEntityModel): Observable<boolean> {
+	isExpanded(entity: EntryModelType): Observable<boolean> {
 		return this.#expansion.asObservablePart((entries) =>
 			entries?.some((entry) => entry.entityType === entity.entityType && entry.unique === entity.unique),
 		);
@@ -34,11 +33,11 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 
 	/**
 	 * Sets the expansion state
-	 * @param {UmbEntityExpansionModel | undefined} expansion The expansion state
+	 * @param {UmbEntityExpansionModel<EntryModelType> | undefined} expansion The expansion state
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {void}
 	 */
-	setExpansion(expansion: UmbEntityExpansionModel): void {
+	setExpansion(expansion: UmbEntityExpansionModel<EntryModelType>): void {
 		this.#expansion.setValue(expansion);
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
@@ -48,69 +47,70 @@ export class UmbEntityExpansionManager extends UmbControllerBase {
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {UmbEntityExpansionModel} The expansion state
 	 */
-	getExpansion(): UmbEntityExpansionModel {
+	getExpansion(): UmbEntityExpansionModel<EntryModelType> {
 		return this.#expansion.getValue();
 	}
 
 	/**
 	 * Expands an entity
-	 * @param {UmbEntityExpansionEntryModel} entity The entity to open
-	 * @param {string} entity.entityType The entity type
-	 * @param {string} entity.unique The unique key
-	 * @param {UmbEntityModel} entity.target The target entity to look up
-	 * @param {string} entity.target.entityType The target entity type
-	 * @param {string} entity.target.unique The target unique key
+	 * @param {EntryModelType} entity The entity to open
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {Promise<void>}
 	 */
-	public async expandItem(entity: UmbEntityExpansionEntryModel): Promise<void> {
+	public async expandItem(entity: EntryModelType): Promise<void> {
 		this.#expansion.appendOne(entity);
-		this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
+		this.getHostElement()?.dispatchEvent(
+			new UmbExpansionEntityExpandedEvent({ entityType: entity.entityType, unique: entity.unique }),
+		);
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
 	 * Expands multiple entities
-	 * @param {UmbEntityExpansionModel} entities The entities to open
+	 * @param {UmbEntityExpansionModel<EntryModelType>} entities The entities to open
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {void}
 	 */
-	public expandItems(entities: UmbEntityExpansionModel): void {
+	public expandItems(entities: UmbEntityExpansionModel<EntryModelType>): void {
 		if (!entities || entities.length === 0) return;
 		this.#expansion.append(entities);
 		entities.forEach((entity) => {
-			this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
+			this.getHostElement()?.dispatchEvent(
+				new UmbExpansionEntityExpandedEvent({ entityType: entity.entityType, unique: entity.unique }),
+			);
 		});
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
 	 * Collapses an entity
-	 * @param {UmbEntityExpansionEntryModel} entity The entity to open
-	 * @param {string} entity.entityType The entity type
-	 * @param {string} entity.unique The unique key
+	 * @param {EntryModelType} entity The entity to open
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {Promise<void>}
 	 */
-	public async collapseItem(entity: UmbEntityModel): Promise<void> {
+	public async collapseItem(entity: EntryModelType): Promise<void> {
 		this.#expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
-		this.getHostElement()?.dispatchEvent(new UmbExpansionEntityCollapsedEvent(entity));
+		this.getHostElement()?.dispatchEvent(
+			new UmbExpansionEntityCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
+		);
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
 	 * Collapses multiple entities
-	 * @param {UmbEntityExpansionModel} entities The entities to close
+	 * @param {UmbEntityExpansionModel<EntryModelType>} entities The entities to close
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {void}
 	 */
-	public collapseItems(entities: UmbEntityExpansionModel): void {
+	public collapseItems(entities: UmbEntityExpansionModel<EntryModelType>): void {
 		if (!entities || entities.length === 0) return;
 		this.#expansion.filter(
 			(x) => !entities.some((entity) => entity.entityType === x.entityType && entity.unique === x.unique),
 		);
 		entities.forEach((entity) => {
-			this.getHostElement()?.dispatchEvent(new UmbExpansionEntityCollapsedEvent(entity));
+			this.getHostElement()?.dispatchEvent(
+				new UmbExpansionEntityCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
+			);
 		});
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
