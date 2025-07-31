@@ -1,1 +1,1 @@
-export * from './section-sidebar-menu.context.token.js';
+export * from './section-sidebar-menu.section-context.token.js';

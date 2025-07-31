@@ -1,6 +1,6 @@
 import type { ManifestMenu } from '../menu.extension.js';
 import type { ManifestSectionSidebarAppBaseMenu, ManifestSectionSidebarAppMenuKind } from './types.js';
-import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from './section-context/section-sidebar-menu.context.token.js';
+import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-context/section-sidebar-menu.section-context.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -22,7 +22,7 @@ export class UmbSectionSidebarMenuElement<
 		return html`<h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>`;
 	}
 
-	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
+	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 
 	#extensionSlotElement = new UmbExtensionSlotElement();
 	#muteStateUpdate = false;
@@ -30,7 +30,7 @@ export class UmbSectionSidebarMenuElement<
 	constructor() {
 		super();
 		this.#initExtensionSlotElement();
-		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_CONTEXT, (context) => {
+		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (context) => {
 			this.#sectionSidebarMenuContext = context;
 			this.#observeExpansion();
 		});

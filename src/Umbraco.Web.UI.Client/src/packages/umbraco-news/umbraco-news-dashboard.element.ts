@@ -2,7 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from '@umbraco-cms/backoffice/menu';
+import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
@@ -29,14 +29,14 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 		},
 	];
 
-	#context?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
+	#context?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 
 	@state()
 	_expansion: Array<UmbEntityModel> = [];
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_CONTEXT, (context) => {
+		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (context) => {
 			this.#context = context;
 			this.#observeExpansion();
 		});

@@ -1,6 +1,6 @@
 import type { UmbVariantStructureItemModel } from './types.js';
 import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from './menu-variant-structure-workspace-context.context-token.js';
-import { UMB_SECTION_SIDEBAR_MENU_CONTEXT } from './section-sidebar-menu/section-context/section-sidebar-menu.context.token.js';
+import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/section-context/section-sidebar-menu.section-context.token.js';
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -31,7 +31,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
-	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_CONTEXT.TYPE;
+	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
@@ -41,7 +41,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
 
-		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_CONTEXT, (instance) => {
+		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
 			this.#sectionSidebarMenuContext = instance;
 		});
 
