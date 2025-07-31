@@ -1,6 +1,7 @@
 import type { ManifestSectionRoute } from '../extensions/section-route.extension.js';
 import type { UmbSectionMainViewElement } from '../section-main-views/section-main-views.element.js';
 import type { ManifestSection, UmbSectionElement } from '../types.js';
+import { UmbDefaultSectionContext } from './default-section.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -15,7 +16,6 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { aliasToPath } from '@umbraco-cms/backoffice/utils';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
-import { UmbDefaultSectionContext } from './default-section.context.js';
 
 /**
  * @class UmbBaseSectionElement

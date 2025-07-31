@@ -1,3 +1,4 @@
+import { manifests as sectionContextManifests } from './context/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -11,4 +12,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			element: () => import('./section-sidebar-menu.element.js'),
 		},
 	},
+	...sectionContextManifests,
 ];

@@ -10,3 +10,5 @@ export class UmbSectionSidebarMenuContext extends UmbContextBase {
 		super(host, UMB_SECTION_SIDEBAR_MENU_CONTEXT);
 	}
 }
+
+export { UmbSectionSidebarMenuContext as api };
