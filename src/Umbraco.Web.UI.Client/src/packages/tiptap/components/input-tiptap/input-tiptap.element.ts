@@ -247,6 +247,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				display: block;
 				position: relative;
 				z-index: 0;
+
+				width: var(--umb-rte-width, 'unset');
+				min-width: var(--umb-rte-min-width, 'unset');
+				max-width: var(--umb-rte-max-width, 100%);
 			}
 
 			:host([readonly]) {
@@ -279,7 +283,11 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				border: 1px solid var(--umb-tiptap-edge-border-color, var(--uui-color-border));
 				padding: 1rem;
 				box-sizing: border-box;
-				height: 100%;
+
+				height: var(--umb-rte-height, 100%);
+				min-height: var(--umb-rte-min-height, 100%);
+				max-height: var(--umb-rte-max-height, 100%);
+
 				width: 100%;
 				max-width: 100%;
 
