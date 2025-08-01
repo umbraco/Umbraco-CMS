@@ -76,8 +76,13 @@ public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, I
     public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex,
         string? searchFrom = null)
     {
-        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Media, pageSize,
-            pageIndex, out var totalFound, searchFrom);
+        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(
+            query,
+            UmbracoEntityTypes.Media,
+            pageSize,
+            pageIndex,
+            out var totalFound,
+            searchFrom: searchFrom);
         return new EntitySearchResults(results, totalFound);
     }
 
