@@ -178,26 +178,31 @@ public partial class PreviewController : Controller
         return RedirectPermanent($"../../{id}{query}");
     }
 
-    private static bool ValidateProvidedCulture(string culture)
+    /// <summary>
+    /// Validates the provided culture code.
+    /// </summary>
+    /// <remarks>
+    /// Marked as internal to expose for unit tests.
+    /// </remarks>
+    internal static bool ValidateProvidedCulture(string culture)
     {
         if (string.IsNullOrEmpty(culture))
         {
             return true;
         }
 
-        // We can be confident the backoffice will have provided a valid culture in linking to the
-        // preview, so we don't need to check that the culture matches an Umbraco language.
-        // We are only concerned here with protecting against XSS attacks from a fiddled preview
-        // URL, so we can just confirm we have a valid culture.
-        try
-        {
-            CultureInfo.GetCultureInfo(culture, true);
-            return true;
-        }
-        catch (CultureNotFoundException)
+        // Culture codes are expected to match this pattern.
+        if (CultureCodeRegex().IsMatch(culture) is false)
         {
             return false;
         }
+
+        // We can be confident the backoffice will have provided a valid culture in linking to the
+        // preview, so we don't need to check that the culture matches an Umbraco language (or is even a
+        // valid culture code).
+        // We are only concerned here with protecting against XSS attacks from a fiddled preview
+        // URL, so we can proceed if the the regex is matched.
+        return true;
     }
 
     public ActionResult? EnterPreview(int id)
@@ -261,4 +266,7 @@ public partial class PreviewController : Controller
 
     [GeneratedRegex("^\\/(?<id>\\d*)(\\?culture=(?<culture>[\\w-]*))?$")]
     private static partial Regex DefaultPreviewRedirectRegex();
+
+    [GeneratedRegex(@"^[a-z]{2,3}[-0-9a-z]*$", RegexOptions.IgnoreCase)]
+    private static partial Regex CultureCodeRegex();
 }
