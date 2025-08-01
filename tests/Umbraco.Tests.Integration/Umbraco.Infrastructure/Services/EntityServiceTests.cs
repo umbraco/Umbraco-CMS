@@ -977,7 +977,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         IQuery<IUmbracoEntity> filter = ScopeProvider.CreateQuery<IUmbracoEntity>().Where(x => !keysToExclude.Contains(x.Key));
 
         var target = children[2];
-        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, filter).ToArray();
+        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, out long totalBefore, out long totalAfter, filter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(6, totalAfter);
         Assert.AreEqual(3, result.Length);
         Assert.IsFalse(result.Any(x => x.Key == keysToExclude[0]));
         Assert.IsTrue(result[0].Key == children[0].Key);
