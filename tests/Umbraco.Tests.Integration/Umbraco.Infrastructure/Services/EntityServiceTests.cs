@@ -964,7 +964,26 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_SkipsFilteredEntities()
+    public void EntityService_Siblings_SkipsFilteredEntities_UsingFilterWithSet()
+    {
+        var children = CreateSiblingsTestData();
+
+        // Apply a filter that excludes the child at index 1. We'd expect to not get this, but
+        // get still get one previous sibling, i.e. the entity at index 0.
+        Guid[] keysToExclude = [children[1].Key];
+        IQuery<IUmbracoEntity> filter = ScopeProvider.CreateQuery<IUmbracoEntity>().Where(x => !keysToExclude.Contains(x.Key));
+
+        var target = children[2];
+        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, filter).ToArray();
+        Assert.AreEqual(3, result.Length);
+        Assert.IsFalse(result.Any(x => x.Key == keysToExclude[0]));
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[2].Key);
+        Assert.IsTrue(result[2].Key == children[3].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_SkipsFilteredEntities_UsingFilterWithoutSet()
     {
         var children = CreateSiblingsTestData();
 
