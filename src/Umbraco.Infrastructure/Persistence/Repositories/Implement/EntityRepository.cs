@@ -183,7 +183,12 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
             {
                 rowNumberSql.Where(filterClause.Item1, filterClause.Item2);
-                beforeAfterParameterIndexOffset += filterClause.Item2.Length - 1;
+
+                // We need to offset by one for each non-array parameter in the filter clause.
+                // If a query is created using Contains or some other set based operation, we'll get both the array and the
+                // items in the array provided in the where clauses. It's only the latter that count for applying parameters
+                // to the SQL statement, and hence we should only offset by them.
+                beforeAfterParameterIndexOffset += filterClause.Item2.Count(x => !x.GetType().IsArray);
             }
         }
 
