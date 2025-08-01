@@ -25,17 +25,15 @@ public class VariationContext
     public string Segment { get; }
 
     /// <summary>
-    ///     Gets the segment for the content item
+    ///     Gets the segment for the content item.
     /// </summary>
     /// <param name="contentId"></param>
-    /// <returns</returns>
     public virtual string GetSegment(int contentId) => Segment;
 
     /// <summary>
-    ///     Gets the segment for the content item
+    ///     Gets the segment for the content item.
     /// </summary>
     /// <param name="contentId"></param>
     /// <param name="propertyAlias"></param>
-    /// <returns></returns>
     public virtual string GetSegment(int contentId, string propertyAlias) => Segment;
 }

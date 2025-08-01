@@ -114,7 +114,7 @@ internal class Property : PublishedPropertyBase
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment, PropertyType.Alias);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, PropertyType.Alias, ref culture, ref segment);
 
         var value = GetSourceValue(culture, segment);
         var hasValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -148,7 +148,7 @@ internal class Property : PublishedPropertyBase
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_sourceVariations, _content.Id, ref culture, ref segment, PropertyType.Alias);
+        _content.VariationContextAccessor.ContextualizeVariation(_sourceVariations, _content.Id, PropertyType.Alias, ref culture, ref segment);
 
         // source values are tightly bound to the property/schema culture and segment configurations, so we need to
         // sanitize the contextualized culture/segment states before using them to access the source values.
@@ -262,7 +262,7 @@ internal class Property : PublishedPropertyBase
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment, PropertyType.Alias);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, PropertyType.Alias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
@@ -285,7 +285,7 @@ internal class Property : PublishedPropertyBase
     [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override object? GetXPathValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment, PropertyType.Alias);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, PropertyType.Alias, ref culture, ref segment);
 
         CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
 
@@ -304,7 +304,7 @@ internal class Property : PublishedPropertyBase
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment, PropertyType.Alias);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, PropertyType.Alias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);

@@ -30,7 +30,7 @@ public class PublishedValueFallback : IPublishedValueFallback
     /// <inheritdoc />
     public bool TryGetValue<T>(IPublishedProperty property, string? culture, string? segment, Fallback fallback, T? defaultValue, out T? value)
     {
-        _variationContextAccessor.ContextualizeVariation(property.PropertyType.Variations, ref culture, ref segment, property.Alias);
+        _variationContextAccessor.ContextualizeVariation(property.PropertyType.Variations, property.Alias, ref culture, ref segment);
 
         foreach (var f in fallback)
         {
@@ -78,7 +78,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             return false;
         }
 
-        _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment, alias);
+        _variationContextAccessor.ContextualizeVariation(propertyType.Variations, alias, ref culture, ref segment);
 
         foreach (var f in fallback)
         {
@@ -124,7 +124,7 @@ public class PublishedValueFallback : IPublishedValueFallback
         IPublishedPropertyType? propertyType = content.ContentType.GetPropertyType(alias);
         if (propertyType != null)
         {
-            _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, ref culture, ref segment, alias);
+            _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, alias, ref culture, ref segment);
             noValueProperty = content.GetProperty(alias);
         }
 
@@ -195,7 +195,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             {
                 culture = null;
                 segment = null;
-                _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, ref culture, ref segment, alias);
+                _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, alias, ref culture, ref segment);
             }
 
             property = content?.GetProperty(alias);
