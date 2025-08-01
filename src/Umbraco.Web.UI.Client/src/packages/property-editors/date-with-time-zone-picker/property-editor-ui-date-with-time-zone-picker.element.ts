@@ -31,23 +31,20 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		return this._value;
 	}
 
-	/**
-	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
-	 * @type {boolean}
-	 * @attr
-	 * @default false
-	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
 	@state()
-	private _format: 'date-only' | 'date-time' | 'date-time-timezone' = 'date-time-timezone';
+	private _dateFormat: string = 'date-time';
 
 	@state()
 	private _dateInputType: InputDateType = 'datetime-local';
 
 	@state()
-	private _dateInputFormat: string = 'yyyy-MM-dd HH:mm';
+	private _dateInputFormat: string = 'yyyy-MM-dd HH:mm:ss';
+
+	@state()
+	private _dateInputStep: number = 1;
 
 	@state()
 	private _currentDate?: DateTime;
@@ -56,41 +53,36 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	private _datePickerValue: string = '';
 
 	@state()
-	private _timeZoneOffset: string = '';
-
-	@state()
 	private _timeZoneOptions: Array<Option> = [];
 
 	@state()
 	private _clientTimeZone: TimeZone = getClientTimeZone();
 
 	@state()
-	private _selectedTimeZone?: string;
+	private _selectedTimeZone: string | undefined;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const format = config.getValueByAlias<string>('format') ?? 'date-time-timezone';
-		switch (format) {
+		this._dateFormat = config.getValueByAlias<string>('format') ?? 'date-time';
+		const timeFormat = config.getValueByAlias<string>('timeFormat') ?? 'HH:mm';
+		switch (this._dateFormat) {
 			case 'date-only':
-				this._format = 'date-only';
 				this._dateInputType = 'date';
 				this._dateInputFormat = 'yyyy-MM-dd';
 				break;
-			case 'date-time':
-				this._format = 'date-time';
-				this._dateInputType = 'datetime-local';
-				this._dateInputFormat = 'yyyy-MM-dd HH:mm';
+			case 'time-only':
+				this._dateInputType = 'time';
+				this._dateInputFormat = 'HH:mm:ss';
+				this.#setDateInputStep(timeFormat);
 				break;
-			case 'date-time-timezone':
 			default:
-				this._format = 'date-time-timezone';
 				this._dateInputType = 'datetime-local';
-				this._dateInputFormat = 'yyyy-MM-dd HH:mm';
+				this.#setDateInputStep(timeFormat);
+				this.#prefillTimeZones(config);
 				break;
 		}
 
-		this.#prefillTimeZones(config);
 		this.#prefillValue();
 	}
 
@@ -98,11 +90,10 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		const value = this._value;
 		const zone = this._selectedTimeZone;
 		if (!value?.date) {
-			this._timeZoneOffset = DateTime.now().setZone(zone).toFormat('ZZ');
 			return;
 		}
 
-		const dateTime = DateTime.fromISO(value.date, { zone: zone });
+		const dateTime = DateTime.fromISO(value.date, { zone: zone ?? 'UTC' });
 		if (!dateTime.isValid) {
 			console.warn(`[UmbDateWithTimeZonePicker] Invalid date format: ${value.date}`);
 			return;
@@ -110,27 +101,24 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 
 		this._currentDate = dateTime;
 		this._datePickerValue = dateTime.toFormat(this._dateInputFormat);
-		this._timeZoneOffset = dateTime.toFormat('ZZ');
 	}
 
 	#prefillTimeZones(config: UmbPropertyEditorConfigCollection) {
 		// Retrieve the time zones from the config
-		const timeZonePickerConfig = config.getValueByAlias<UmbTimeZonePickerValue>('timeZones') || {
-			mode: 'all',
-			timeZones: [],
-		};
+		const timeZonePickerConfig = config.getValueByAlias<UmbTimeZonePickerValue>('timeZones');
 
 		// Retrieve the time zones from the config
-		switch (timeZonePickerConfig.mode) {
+		switch (timeZonePickerConfig?.mode) {
 			case 'all':
 				this._timeZoneOptions = getTimeZoneList().map((tz) => this.#mapTimeZoneOption(tz, false));
 				this.#preselectTimeZone();
 				break;
-			case 'local':
-				this._timeZoneOptions = [this.#mapTimeZoneOption(getClientTimeZone(), true)];
-				this._selectedTimeZone = getClientTimeZone().value;
-				this._timeZoneOffset = DateTime.now().toFormat('ZZ');
+			case 'local': {
+				const clientTimeZone = getClientTimeZone();
+				this._timeZoneOptions = [this.#mapTimeZoneOption(clientTimeZone, true)];
+				this._selectedTimeZone = clientTimeZone.value;
 				return;
+			}
 			case 'custom':
 				this._timeZoneOptions = getTimeZoneList(timeZonePickerConfig.timeZones).map((tz) =>
 					this.#mapTimeZoneOption(tz, false),
@@ -138,7 +126,6 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				this.#preselectTimeZone();
 				break;
 			default:
-				console.warn(`[UmbDateWithTimeZonePicker] Unknown time zone mode: ${timeZonePickerConfig.mode}`);
 				return;
 		}
 	}
@@ -176,6 +163,17 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		this._selectedTimeZone = firstOption.value;
 	}
 
+	#setDateInputStep(timeFormat: string) {
+		switch (timeFormat) {
+			case 'HH:mm':
+				this._dateInputStep = 60; // 1 hour
+				break;
+			case 'HH:mm:ss':
+				this._dateInputStep = 1; // 1 second
+				break;
+		}
+	}
+
 	#mapTimeZoneOption(timeZone: TimeZone, selected: boolean): Option {
 		return {
 			name: timeZone.name,
@@ -202,12 +200,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		}
 
 		this._datePickerValue = newPickerValue;
-		if (!this._selectedTimeZone) {
-			console.warn(`[UmbDateWithTimeZonePicker] No time zone selected, cannot update value.`);
-			return;
-		}
-
-		this.#updateValue(value, this._selectedTimeZone);
+		this.#updateValue(value);
 		console.log(`[UmbDateWithTimeZonePicker] Value changed: ${value}`);
 	}
 
@@ -218,13 +211,13 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 			return;
 		}
 
-		this.#updateValue(this._currentDate.toISO({ includeOffset: false }) || '', timeZoneValue);
+		this.#updateValue(this._currentDate.toISO({ includeOffset: false }) || '');
 		console.log(`[UmbDateWithTimeZonePicker] TimeZone changed: ${timeZoneValue}`);
 	}
 
-	#updateValue(date: string, timeZone: string) {
+	#updateValue(date: string) {
 		// Try to parse the date with the selected time zone
-		const newDate = DateTime.fromISO(date, { zone: timeZone });
+		const newDate = DateTime.fromISO(date, { zone: this._selectedTimeZone ?? 'UTC' });
 
 		// If the date is invalid, we reset the value
 		if (!newDate.isValid) {
@@ -236,10 +229,21 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 
 		this._currentDate = newDate;
 		this._value = {
-			date: this._currentDate.toISO() || '',
-			timeZone: timeZone,
+			date: this.#getCurrentDateValue(),
+			timeZone: this._selectedTimeZone,
 		};
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#getCurrentDateValue(): string | undefined {
+		switch (this._dateFormat) {
+			case 'date-only':
+				return this._currentDate?.toFormat('yyyy-MM-dd');
+			case 'time-only':
+				return this._currentDate?.toFormat('HH:mm:ss');
+			default:
+				return this._currentDate?.toISO({ includeOffset: !!this._selectedTimeZone }) ?? undefined;
+		}
 	}
 
 	override render() {
@@ -248,25 +252,20 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				<umb-input-date
 					label=${this.localize.term('placeholders_enterdate')}
 					.value=${this._datePickerValue}
-					.step=${60}
+					.step=${this._dateInputStep}
 					type=${this._dateInputType}
 					@change=${this.#onValueChange}
 					?readonly=${this.readonly}>
 				</umb-input-date>
 				${this.#renderTimeZones()}
 			</div>
-			${this._selectedTimeZone !== this._clientTimeZone.value && this._currentDate
-				? html`<span class="info">
-						The selected time (${this._currentDate.offsetNameShort}) is equivalent to
-						${this._currentDate.toLocal().toFormat('ff')} in your local time.</span
-					>`
-				: nothing}
+			${this.#renderTimeZoneInfo()}
 		`;
 	}
 
 	#renderTimeZones() {
-		if (this._) {
-			return html` <span>${this._timeZoneOptions[0].name} (Local)</span> `;
+		if (this._timeZoneOptions.length === 0) {
+			return nothing;
 		}
 
 		return html`
@@ -274,10 +273,28 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				id="timeZone"
 				name="timeZone"
 				label="timeZone"
-				.options=${this._timeZoneOptions || []}
+				.options=${this._timeZoneOptions}
 				@change=${this.#onTimeZoneChange}
 				?readonly=${this.readonly || this._timeZoneOptions.length === 1}></uui-select>
+			${this._timeZoneOptions.length === 1 && this._timeZoneOptions[0].value === this._clientTimeZone.value
+				? ' (Local)'
+				: nothing}
 		`;
+	}
+
+	#renderTimeZoneInfo() {
+		if (
+			this._timeZoneOptions.length === 0 ||
+			!this._currentDate ||
+			this._selectedTimeZone === this._clientTimeZone.value
+		) {
+			return nothing;
+		}
+
+		return html` <span class="info">
+			The selected time (${this._currentDate.offsetNameShort}) is equivalent to
+			${this._currentDate.toLocal().toFormat('ff')} in your local time.</span
+		>`;
 	}
 
 	static override readonly styles = [

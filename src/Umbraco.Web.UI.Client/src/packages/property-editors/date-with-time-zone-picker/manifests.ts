@@ -17,32 +17,48 @@ export const manifests: Array<UmbExtensionManifest> = [
 					{
 						alias: 'format',
 						label: 'Format',
-						description: "Select the date format.",
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
 						config: [
 							{
 								alias: 'items',
 								value: [
-									{ name: 'Date only', value: 'date-only' },
 									{ name: 'Date and time', value: 'date-time' },
-									{ name: 'Date and time with time zone', value: 'date-time-timezone' },
+									{ name: 'Date only', value: 'date-only' },
+									{ name: 'Time only', value: 'time-only' },
 								],
 							},
-
+						],
+					},
+					{
+						alias: 'timeFormat',
+						label: 'Time format',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
+						config: [
+							{
+								alias: 'items',
+								value: [
+									{ name: 'HH:mm', value: 'HH:mm' },
+									{ name: 'HH:mm:ss', value: 'HH:mm:ss' },
+								],
+							},
 						],
 					},
 					{
 						alias: 'timeZones',
 						label: 'Time zones',
-						description: "Select the time zones to be available in the picker. Only relevant when 'Date and time with time zone' is selected as format.",
+						description: "Only applicable when format is set to 'Date and time'.",
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TimeZonePicker',
 						config: [],
-					}
+					},
 				],
 				defaultData: [
 					{
 						alias: 'format',
-						value: 'date-time-timezone',
+						value: 'date-time',
+					},
+					{
+						alias: 'timeFormat',
+						value: 'HH:mm',
 					},
 					{
 						alias: 'timeZones',

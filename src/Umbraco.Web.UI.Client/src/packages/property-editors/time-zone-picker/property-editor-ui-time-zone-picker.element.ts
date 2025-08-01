@@ -15,14 +15,14 @@ import { getTimeZoneList, isEquivalentTimeZone } from '@umbraco-cms/backoffice/u
 @customElement('umb-property-editor-ui-time-zone-picker')
 export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@state()
-	private _value: UmbTimeZonePickerValue = { mode: 'all', timeZones: [] };
+	private _value: UmbTimeZonePickerValue | undefined;
 
 	@property({ type: Object })
 	public set value(value: UmbTimeZonePickerValue | undefined) {
-		this._value = value || { mode: 'all', timeZones: [] };
+		this._value = value;
 	}
 
-	public get value(): UmbTimeZonePickerValue {
+	public get value(): UmbTimeZonePickerValue | undefined {
 		return this._value;
 	}
 
@@ -52,7 +52,7 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 			value: option.value,
 			name: option.name,
 			selected:
-				this._value.timeZones &&
+				this._value?.timeZones &&
 				(this._value.timeZones.includes(option.value) ||
 					this._value.timeZones.some((v) => isEquivalentTimeZone(v, option.value))),
 		}));
@@ -60,6 +60,10 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 
 	#onInput(event: UUIRadioEvent) {
 		switch (event.target.value) {
+			case 'none':
+				this.value = undefined;
+				this._displayTimeZonePicker = false;
+				break;
 			case 'all':
 				this.value = { mode: 'all', timeZones: [] };
 				this._displayTimeZonePicker = false;
@@ -90,10 +94,11 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 
 	override render() {
 		return html`
-			<uui-radio-group required @input=${this.#onInput} .value=${this.value.mode}>
-				<uui-radio name="order" label="All" value="all"></uui-radio>
-				<uui-radio name="order" label="Local" value="local"></uui-radio>
-				<uui-radio name="order" label="Custom" value="custom"></uui-radio>
+			<uui-radio-group required @input=${this.#onInput} .value=${this.value?.mode ?? 'none'}>
+				<uui-radio name="order" label="Disabled" value="none"></uui-radio>
+				<uui-radio name="order" label="All - Display all available time zones" value="all"></uui-radio>
+				<uui-radio name="order" label="Local - Display only the local time zone" value="local"></uui-radio>
+				<uui-radio name="order" label="Custom - Display a pre-defined list of time zones" value="custom"></uui-radio>
 			</uui-radio-group>
 			<div class="timezone-picker-container" ?hidden=${!this._displayTimeZonePicker}>
 				<select id="timezone-select" multiple @change=${this.#onSelectedChange} size="15">
@@ -102,10 +107,10 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 						(item) => html`<option value=${item.value} ?selected=${item.selected}>${item.name}</option>`,
 					)}
 				</select>
-				<div ?hidden=${!this.value.timeZones?.length}>
+				<div ?hidden=${!this.value?.timeZones?.length}>
 					<span>Selected time zones:</span>
 					<ul>
-						${map(this.value.timeZones, (item) => html`<li>${this._list.find((i) => i.value === item)?.name}</li>`)}
+						${map(this.value?.timeZones, (item) => html`<li>${this._list.find((i) => i.value === item)?.name}</li>`)}
 					</ul>
 				</div>
 			</div>
