@@ -54,7 +54,8 @@ public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeCo
         IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(
             query,
             UmbracoEntityTypes.Member,
-            pageSize, pageIndex,
+            pageSize,
+            pageIndex,
             out var totalFound,
             searchFrom: searchFrom);
         return new EntitySearchResults(results, totalFound);
