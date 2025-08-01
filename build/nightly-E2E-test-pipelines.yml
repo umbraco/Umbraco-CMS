@@ -9,7 +9,6 @@ schedules:
     branches:
       include:
         - v15/dev
-        - release/16.0
         - main
 
 parameters:
