@@ -15,29 +15,42 @@ export const manifests: Array<UmbExtensionManifest> = [
 			settings: {
 				properties: [
 					{
-						alias: 'timeZones',
-						label: 'Time zones',
-						description: 'Select the time zones that the editor should be able to select from. If left empty, only the local time zone will be displayed.',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TimeZonePicker',
-						config: [],
+						alias: 'format',
+						label: 'Format',
+						description: "Select the date format.",
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
+						config: [
+							{
+								alias: 'items',
+								value: [
+									{ name: 'Date only', value: 'date-only' },
+									{ name: 'Date and time', value: 'date-time' },
+									{ name: 'Date and time with time zone', value: 'date-time-timezone' },
+								],
+							},
+
+						],
 					},
 					{
-						alias: 'displayLocalTime',
-						label: 'Display local time',
-						description: "Selecting this option will display the user's local time below the date input.",
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-						config: []
+						alias: 'timeZones',
+						label: 'Time zones',
+						description: "Select the time zones to be available in the picker. Only relevant when 'Date and time with time zone' is selected as format.",
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TimeZonePicker',
+						config: [],
 					}
 				],
 				defaultData: [
 					{
-						alias: 'timeZones',
-						value: [],
+						alias: 'format',
+						value: 'date-time-timezone',
 					},
 					{
-						alias: 'displayLocalTime',
-						value: false,
-					}
+						alias: 'timeZones',
+						value: {
+							mode: 'all',
+							timeZones: [],
+						},
+					},
 				],
 			},
 		},
