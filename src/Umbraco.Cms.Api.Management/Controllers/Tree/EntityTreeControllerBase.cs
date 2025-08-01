@@ -158,7 +158,6 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     protected PagedViewModel<TItem> PagedViewModel(IEnumerable<TItem> treeItemViewModels, long totalItems)
         => new() { Total = totalItems, Items = treeItemViewModels };
 
-
     protected SubsetViewModel<TItem> SubsetViewModel(IEnumerable<TItem> treeItemViewModels, long totalBefore, long totalAfter)
         => new() { TotalBefore = totalBefore, TotalAfter = totalAfter, Items = treeItemViewModels };
 }
