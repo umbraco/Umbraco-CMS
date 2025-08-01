@@ -2823,6 +2823,8 @@ export default {
 		charmap_extlatin: 'Udvidet latinsk',
 		charmap_symbols: 'Symboler',
 		charmap_arrows: 'Pile',
+		statusbar_characters: (count: number) => `${count.toLocaleString()} tegn`,
+		statusbar_words: (count: number) => `${count.toLocaleString()} ord`,
 	},
 	collection: {
 		noItemsTitle: 'Intet indhold',
