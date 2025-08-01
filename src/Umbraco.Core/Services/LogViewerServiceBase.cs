@@ -14,7 +14,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public abstract class LogViewerServiceBase : ILogViewerService
 {
-    private readonly ILogViewerRepository _logViewerRepository;
     private readonly ILogViewerQueryRepository _logViewerQueryRepository;
     private readonly ICoreScopeProvider _provider;
 
@@ -28,8 +27,13 @@ public abstract class LogViewerServiceBase : ILogViewerService
     {
         _logViewerQueryRepository = logViewerQueryRepository;
         _provider = provider;
-        _logViewerRepository = logViewerRepository;
+        LogViewerRepository = logViewerRepository;
     }
+
+    /// <summary>
+    /// Gets the <see cref="ILogViewerRepository"/>.
+    /// </summary>
+    protected ILogViewerRepository LogViewerRepository { get; }
 
     /// <summary>
     /// Gets the name of the logger.
@@ -42,14 +46,14 @@ public abstract class LogViewerServiceBase : ILogViewerService
         var configuredLogLevels = new Dictionary<string, LogLevel>
         {
             { "Global", GetGlobalMinLogLevel() },
-            { LoggerName, _logViewerRepository.RestrictedToMinimumLevel() },
+            { LoggerName, LogViewerRepository.RestrictedToMinimumLevel() },
         };
 
         return configuredLogLevels.AsReadOnly();
     }
 
     /// <inheritdoc/>
-    public virtual LogLevel GetGlobalMinLogLevel() => _logViewerRepository.GetGlobalMinLogLevel();
+    public virtual LogLevel GetGlobalMinLogLevel() => LogViewerRepository.GetGlobalMinLogLevel();
 
     /// <inheritdoc/>
     public virtual Task<ILogViewerQuery?> GetSavedLogQueryByNameAsync(string name)
@@ -123,7 +127,7 @@ public abstract class LogViewerServiceBase : ILogViewerService
                 null);
         }
 
-        LogLevelCounts counter = _logViewerRepository.GetLogCount(logTimePeriod);
+        LogLevelCounts counter = LogViewerRepository.GetLogCount(logTimePeriod);
 
         return Attempt.SucceedWithStatus<LogLevelCounts?, LogViewerOperationStatus>(
             LogViewerOperationStatus.Success,
@@ -146,7 +150,7 @@ public abstract class LogViewerServiceBase : ILogViewerService
                 null!);
         }
 
-        LogTemplate[] messageTemplates = _logViewerRepository.GetMessageTemplates(logTimePeriod);
+        LogTemplate[] messageTemplates = LogViewerRepository.GetMessageTemplates(logTimePeriod);
 
         return Attempt.SucceedWithStatus(
             LogViewerOperationStatus.Success,
@@ -224,7 +228,7 @@ public abstract class LogViewerServiceBase : ILogViewerService
         int skip,
         int take)
     {
-        IEnumerable<ILogEntry> logs = _logViewerRepository.GetLogs(logTimePeriod, filterExpression).ToArray();
+        IEnumerable<ILogEntry> logs = LogViewerRepository.GetLogs(logTimePeriod, filterExpression).ToArray();
 
         // This is user used the checkbox UI to toggle which log levels they wish to see
         // If an empty array or null - its implied all levels to be viewed
