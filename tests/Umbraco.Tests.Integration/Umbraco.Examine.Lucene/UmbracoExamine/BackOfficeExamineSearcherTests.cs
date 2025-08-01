@@ -71,7 +71,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         builder.Services.AddHostedService<QueuedHostedService>();
     }
 
-    private IEnumerable<ISearchResult> BackOfficeExamineSearch(string query, int pageSize = 20, int pageIndex = 0) =>
+    private IEnumerable<ISearchResult> BackOfficeExamineSearch(string query, int pageSize = 20, int pageIndex = 0, bool ignoreUserStartNodes = false) =>
         BackOfficeExamineSearcher.Search(
             query,
             UmbracoEntityTypes.Document,
@@ -80,7 +80,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
             out _,
             null,
             null,
-            ignoreUserStartNodes: true);
+            ignoreUserStartNodes: ignoreUserStartNodes);
 
     private async Task SetupUserIdentity(string userId)
     {
