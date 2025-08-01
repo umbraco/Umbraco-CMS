@@ -31,7 +31,7 @@ public class LogViewerService : LogViewerServiceBase
     }
 
     /// <inheritdoc/>
-    protected override string RepositoryLoggerName => "UmbracoFile";
+    protected override string LoggerName => "UmbracoFile";
 
     /// <inheritdoc/>
     public override Task<Attempt<bool, LogViewerOperationStatus>> CanViewLogsAsync(LogTimePeriod logTimePeriod)

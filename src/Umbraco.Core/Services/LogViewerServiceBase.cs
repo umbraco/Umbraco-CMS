@@ -34,7 +34,7 @@ public abstract class LogViewerServiceBase : ILogViewerService
     /// <summary>
     /// Gets the name of the logger.
     /// </summary>
-    protected abstract string RepositoryLoggerName { get; }
+    protected abstract string LoggerName { get; }
 
     /// <inheritdoc/>
     public virtual ReadOnlyDictionary<string, LogLevel> GetLogLevelsFromSinks()
@@ -42,7 +42,7 @@ public abstract class LogViewerServiceBase : ILogViewerService
         var configuredLogLevels = new Dictionary<string, LogLevel>
         {
             { "Global", GetGlobalMinLogLevel() },
-            { RepositoryLoggerName, _logViewerRepository.RestrictedToMinimumLevel() },
+            { LoggerName, _logViewerRepository.RestrictedToMinimumLevel() },
         };
 
         return configuredLogLevels.AsReadOnly();
