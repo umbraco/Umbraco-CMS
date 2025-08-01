@@ -90,7 +90,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 }
 
                 if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId &&
-                    searchFrom.Trim() != "-1")
+                    searchFrom.Trim() != Constants.System.RootString)
                 {
                     sb.Append("+__NodeTypeAlias:");
                     sb.Append(searchFrom);
@@ -350,13 +350,13 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
 
         abortQuery = false;
 
-        if (searchFrom is "-1")
+        if (searchFrom is Constants.System.RootString)
         {
             searchFrom = null;
         }
 
-        var userStartNodes = ignoreUserStartNodes ? [-1] : GetUserStartNodes(objectType);
-        if (searchFrom is null && userStartNodes.Contains(-1))
+        var userStartNodes = ignoreUserStartNodes ? [Constants.System.Root] : GetUserStartNodes(objectType);
+        if (searchFrom is null && userStartNodes.Contains(Constants.System.Root))
         {
             // If we have no searchFrom and the user either has access to the root node or we are ignoring user
             // start nodes, we don't need to filter by path.
@@ -462,14 +462,14 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
             _ => throw new NotSupportedException($"The object type {objectType} is not supported for start nodes."),
         };
 
-        return startNodes ?? [-1]; // If no start nodes are defined, we assume the user has access to the root node (-1).
+        return startNodes ?? [Constants.System.Root]; // If no start nodes are defined, we assume the user has access to the root node (-1).
     }
 
     private string[] GetEntityPaths(UmbracoObjectTypes objectType, int[] entityIds) =>
         entityIds switch
         {
             [] => [],
-            _ when entityIds.Contains(-1) => ["-1"],
+            _ when entityIds.Contains(Constants.System.Root) => [Constants.System.RootString],
             _ => _entityService.GetAllPaths(objectType, entityIds).Select(x => x.Path).ToArray(),
         };
 
