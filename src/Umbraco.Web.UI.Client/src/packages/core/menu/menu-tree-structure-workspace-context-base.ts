@@ -1,5 +1,6 @@
 import type { UmbStructureItemModel } from './types.js';
 import { UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT } from './menu-structure-workspace-context.context-token.js';
+import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
 import type { UmbTreeRepository, UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -7,6 +8,7 @@ import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/back
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -28,12 +30,17 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
+	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
 		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
+
+		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
+			this.#sectionSidebarMenuContext = instance;
+		});
 
 		this.consumeContext(UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -98,6 +105,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 				this.#structure.setValue(structureItems);
 				this.#setParentData(structureItems);
 				this.#setAncestorData(data);
+				this.#expandSectionSidebarMenu(structureItems);
 			}
 		}
 	}
@@ -138,5 +146,11 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 			.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
 
 		this.#ancestorContext.setAncestors(ancestorEntities);
+	}
+
+	#expandSectionSidebarMenu(structureItems: Array<UmbStructureItemModel>) {
+		// Filter out the current entity as we don't want to expand it
+		const expandableItems = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
+		this.#sectionSidebarMenuContext?.expansion.expandItems(linkEntityExpansionEntries(expandableItems));
 	}
 }

@@ -1,5 +1,6 @@
 import type { UmbVariantStructureItemModel } from './types.js';
 import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from './menu-variant-structure-workspace-context.context-token.js';
+import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/section-context/section-sidebar-menu.section-context.token.js';
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -7,6 +8,7 @@ import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observabl
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -29,6 +31,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
+	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
@@ -37,6 +40,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
+
+		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
+			this.#sectionSidebarMenuContext = instance;
+		});
 
 		this.consumeContext(UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -108,6 +115,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);
 			this.#setAncestorData(data);
+			this.#expandSectionSidebarMenu(structureItems);
 		}
 	}
 
@@ -147,5 +155,11 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
 
 		this.#ancestorContext.setAncestors(ancestorEntities);
+	}
+
+	#expandSectionSidebarMenu(structureItems: Array<UmbVariantStructureItemModel>) {
+		// Filter out the current entity as we don't want to expand it
+		const expandableItems = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
+		this.#sectionSidebarMenuContext?.expansion.expandItems(linkEntityExpansionEntries(expandableItems));
 	}
 }

@@ -1,4 +1,4 @@
-import type { ManifestMenuItem, MetaMenuItem } from '../../../menu-item.extension.js';
+import type { ManifestMenuItem, MetaMenuItem } from '../../../menu-item/types.js';
 
 export interface ManifestMenuItemLinkKind extends ManifestMenuItem {
 	type: 'menuItem';

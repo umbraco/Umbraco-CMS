@@ -1,23 +1,11 @@
 import type { ManifestMenu } from '../menu.extension.js';
 import type { ManifestSectionSidebarAppBaseMenu, ManifestSectionSidebarAppMenuKind } from './types.js';
+import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-context/section-sidebar-menu.section-context.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
-// TODO: Move to separate file:
-const manifest: UmbExtensionManifestKind = {
-	type: 'kind',
-	alias: 'Umb.Kind.SectionSidebarAppMenu',
-	matchKind: 'menu',
-	matchType: 'sectionSidebarApp',
-	manifest: {
-		type: 'sectionSidebarApp',
-		elementName: 'umb-section-sidebar-menu',
-	},
-};
-umbExtensionsRegistry.register(manifest);
+import { UmbExpansionEntityCollapsedEvent, UmbExpansionEntityExpandedEvent } from '@umbraco-cms/backoffice/utils';
+import { UmbExtensionSlotElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement<
@@ -34,14 +22,70 @@ export class UmbSectionSidebarMenuElement<
 		return html`<h3>${this.localize.string(this.manifest?.meta?.label ?? '')}</h3>`;
 	}
 
+	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
+
+	#extensionSlotElement = new UmbExtensionSlotElement();
+	#muteStateUpdate = false;
+
+	constructor() {
+		super();
+		this.#initExtensionSlotElement();
+		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (context) => {
+			this.#sectionSidebarMenuContext = context;
+			this.#observeExpansion();
+		});
+	}
+
+	#initExtensionSlotElement() {
+		/* For better performance and UX we prevent lit from doing unnecessary rerenders we programmatically create the element,
+		and manually update the props when needed. */
+
+		this.#extensionSlotElement.type = 'menu';
+		this.#extensionSlotElement.filter = (menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu;
+		this.#extensionSlotElement.defaultElement = 'umb-menu';
+		this.#extensionSlotElement.events = {
+			'expansion-entity-expanded': this.#onEntityExpansionChange.bind(this),
+			'expansion-entity-collapsed': this.#onEntityExpansionChange.bind(this),
+		};
+	}
+
+	#observeExpansion() {
+		this.observe(this.#sectionSidebarMenuContext?.expansion.expansion, (items) => {
+			if (this.#muteStateUpdate) return;
+
+			this.#extensionSlotElement.props = {
+				expansion: items || [],
+			};
+		});
+	}
+
+	#onEntityExpansionChange(e: Event) {
+		const event = e as UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent;
+		event.stopPropagation();
+		const eventEntity = event.entity;
+
+		if (!eventEntity) {
+			throw new Error('Entity is required to toggle expansion.');
+		}
+
+		if (event.type === UmbExpansionEntityExpandedEvent.TYPE) {
+			this.#muteStateUpdate = true;
+			this.#sectionSidebarMenuContext?.expansion.expandItem(eventEntity);
+			this.#muteStateUpdate = false;
+		} else if (event.type === UmbExpansionEntityCollapsedEvent.TYPE) {
+			this.#muteStateUpdate = true;
+			this.#sectionSidebarMenuContext?.expansion.collapseItem(eventEntity);
+			this.#muteStateUpdate = false;
+		}
+	}
+
 	override render() {
-		return html`
-			${this.renderHeader()}
-			<umb-extension-slot
-				type="menu"
-				.filter="${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}"
-				default-element="umb-menu"></umb-extension-slot>
-		`;
+		return html` ${this.renderHeader()} ${this.#extensionSlotElement}`;
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#extensionSlotElement.destroy();
 	}
 
 	static override styles = [
