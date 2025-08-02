@@ -5,7 +5,7 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const itemHandlers = [
 	rest.get(umbracoPath(`/item${UMB_SLUG}`), (req, res, ctx) => {
-		const paths = req.url.searchParams.getAll('paths');
+		const paths = req.url.searchParams.getAll('path');
 		if (!paths) return res(ctx.status(400, 'no body found'));
 		const items = umbStaticFileMockDb.item.getItems(paths);
 		return res(ctx.status(200), ctx.json(items));

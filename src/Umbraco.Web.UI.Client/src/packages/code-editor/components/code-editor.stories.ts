@@ -7,7 +7,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './code-editor.element.js';
 
 const meta: Meta<UmbCodeEditorElement> = {
-	title: 'Components/Code Editor',
+	title: 'Generic Components/Code Editor',
 	component: 'umb-code-editor',
 	decorators: [(story) => html`<div style="--editor-height: 400px">${story()}</div>`],
 	parameters: { layout: 'fullscreen' },

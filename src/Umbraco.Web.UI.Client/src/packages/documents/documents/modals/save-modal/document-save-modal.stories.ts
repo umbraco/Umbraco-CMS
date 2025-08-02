@@ -88,7 +88,7 @@ const modalValue: UmbDocumentSaveModalValue = {
 };
 
 const meta: Meta<UmbDocumentSaveModalElement> = {
-	title: 'Workspaces/Document/Modals/Save',
+	title: 'Entity/Document/Modals/Save',
 	component: 'umb-document-save-modal',
 	id: 'umb-document-save-modal',
 	args: {
@@ -166,4 +166,4 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentSaveModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
