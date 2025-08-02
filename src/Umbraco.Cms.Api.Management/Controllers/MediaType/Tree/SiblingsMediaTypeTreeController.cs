@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
@@ -13,7 +14,7 @@ public class SiblingsMediaTypeTreeController : MediaTypeTreeControllerBase
     }
 
     [HttpGet("siblings")]
-    [ProducesResponseType(typeof(IEnumerable<MediaTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<IEnumerable<MediaTypeTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after)
+    [ProducesResponseType(typeof(SubsetViewModel<MediaTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public Task<ActionResult<SubsetViewModel<MediaTypeTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after)
         => GetSiblings(target, before, after);
 }
