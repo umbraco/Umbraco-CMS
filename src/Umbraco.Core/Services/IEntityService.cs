@@ -177,6 +177,7 @@ public interface IEntityService
     /// <param name="objectType">The object type key of the entities.</param>
     /// <param name="before">The number of siblings to retrieve before the target entity. Needs to be greater or equal to 0.</param>
     /// <param name="after">The number of siblings to retrieve after the target entity. Needs to be greater or equal to 0.</param>
+    /// <param name="filter">An optional filter to apply to the result set.</param>
     /// <param name="ordering">The ordering to apply to the siblings.</param>
     /// <returns>Enumerable of sibling entities.</returns>
     IEnumerable<IEntitySlim> GetSiblings(
@@ -184,6 +185,7 @@ public interface IEntityService
         UmbracoObjectTypes objectType,
         int before,
         int after,
+        IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null) => [];
 
     /// <summary>

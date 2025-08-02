@@ -24,6 +24,9 @@ public class SiblingsMediaTreeController : MediaTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(IEnumerable<MediaTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<IEnumerable<MediaTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after)
-        => GetSiblings(target, before, after);
+    public Task<ActionResult<IEnumerable<MediaTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after, Guid? dataTypeId = null)
+    {
+        IgnoreUserStartNodesForDataType(dataTypeId);
+        return GetSiblings(target, before, after);
+    }
 }

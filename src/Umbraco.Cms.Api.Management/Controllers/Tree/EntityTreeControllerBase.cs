@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -46,7 +46,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected Task<ActionResult<IEnumerable<TItem>>> GetSiblings(Guid target, int before, int after)
     {
-        IEntitySlim[] siblings = EntityService.GetSiblings(target, ItemObjectType, before, after, ItemOrdering).ToArray();
+        IEntitySlim[] siblings = GetSiblingEntities(target, before, after);
         if (siblings.Length == 0)
         {
             return Task.FromResult<ActionResult<IEnumerable<TItem>>>(NotFound());
@@ -110,7 +110,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             .ToArray();
 
     protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems) =>
-        EntityService.GetPagedChildren(
+        EntityService
+            .GetPagedChildren(
                 parentKey,
                 ItemObjectType,
                 skip,
@@ -118,6 +119,16 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 out totalItems,
                 ordering: ItemOrdering)
             .ToArray();
+
+    protected virtual IEntitySlim[] GetSiblingEntities(Guid target, int before, int after) =>
+        EntityService
+            .GetSiblings(
+                target,
+                ItemObjectType,
+                before,
+                after,
+                ordering: ItemOrdering)
+        .ToArray();
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();

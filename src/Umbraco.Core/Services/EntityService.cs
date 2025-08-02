@@ -324,6 +324,7 @@ public class EntityService : RepositoryService, IEntityService
         UmbracoObjectTypes objectType,
         int before,
         int after,
+        IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null)
     {
         if (before < 0)
@@ -345,6 +346,7 @@ public class EntityService : RepositoryService, IEntityService
             key,
             before,
             after,
+            filter,
             ordering);
 
         scope.Complete();

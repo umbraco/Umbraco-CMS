@@ -35,6 +35,9 @@ public class SiblingsDocumentTreeController : DocumentTreeControllerBase
     [HttpGet("siblings")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<IEnumerable<DocumentTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after)
-        => GetSiblings(target, before, after);
+    public Task<ActionResult<IEnumerable<DocumentTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after, Guid? dataTypeId = null)
+    {
+        IgnoreUserStartNodesForDataType(dataTypeId);
+        return GetSiblings(target, before, after);
+    }
 }
