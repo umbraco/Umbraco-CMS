@@ -22,7 +22,7 @@ internal sealed class CustomDbContextUmbracoProviderTests : UmbracoIntegrationTe
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        builder.Services.AddUmbracoDbContext<CustomDbContext>((serviceProvider, options) =>
+        builder.Services.AddUmbracoDbContext<CustomDbContext>((serviceProvider, options, connectionString, providerName) =>
         {
             options.UseUmbracoDatabaseProvider(serviceProvider);
         });
@@ -53,7 +53,7 @@ public class CustomDbContextCustomSqliteProviderTests : UmbracoIntegrationTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        builder.Services.AddUmbracoDbContext<CustomDbContext>((serviceProvider, options) =>
+        builder.Services.AddUmbracoDbContext<CustomDbContext>((serviceProvider, options, connectionString, providerName) =>
         {
             options.UseSqlite("Data Source=:memory:;Version=3;New=True;");
         });
