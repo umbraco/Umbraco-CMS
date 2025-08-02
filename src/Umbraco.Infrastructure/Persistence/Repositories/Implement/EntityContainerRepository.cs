@@ -149,7 +149,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     {
         NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
-            .Where<NodeDto>(dto => dto.Text == name &&  dto.NodeObjectType == NodeObjectTypeId && dto.ParentId == parentId));
+            .Where<NodeDto>(dto => dto.Text == name && dto.NodeObjectType == NodeObjectTypeId && dto.ParentId == parentId));
 
         return nodeDto is not null;
     }
