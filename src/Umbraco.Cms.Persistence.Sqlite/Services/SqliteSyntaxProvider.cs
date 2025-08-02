@@ -162,6 +162,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     public override string ConvertDateToOrderableString => "{0}";
 
+    public override string ConvertUniqueIdentifierToString => "{0}";
+
     public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
     /// <inheritdoc />

@@ -469,6 +469,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual string ConvertDecimalToOrderableString => "REPLACE(STR({0}, 20, 9), SPACE(1), '0')";
 
+    public virtual string ConvertUniqueIdentifierToString => "CONVERT(nvarchar(36), {0})";
+
     private DbTypes InitColumnTypeMap()
     {
         var dbTypeMap = new DbTypesFactory();
