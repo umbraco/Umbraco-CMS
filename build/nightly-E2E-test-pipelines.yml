@@ -484,17 +484,17 @@ stages:
               searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
               testRunTitle: "$(Agent.JobName)"
 
-      - stage: NotifySlackBot
-        displayName: Notify Slack on Failure
-        dependsOn: E2ETests
-        condition: failed()
-        jobs:
-          - job: PostToSlack
-            displayName: Send Slack Notification
-            pool:
-              vmImage: 'ubuntu-latest'
-            steps:
-              - bash: |
+  - stage: NotifySlackBot
+    displayName: Notify Slack on Failure
+    dependsOn: E2ETests
+    condition: failed()
+    jobs:
+        - job: PostToSlack
+          displayName: Send Slack Notification
+          pool:
+            vmImage: 'ubuntu-latest'
+          steps:
+            - bash: |
                   PIPELINE_URL="${SYSTEM_TEAMFOUNDATIONURI}${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}"
 
                   PAYLOAD="{
@@ -512,5 +512,5 @@ stages:
                   curl -X POST -H 'Content-type: application/json' \
                     --data "$PAYLOAD" \
                     "$SLACK_WEBHOOK_URL"
-                env:
-                  SLACK_WEBHOOK_URL: $(SLACKWEBHOOKURL)
+              env:
+                SLACK_WEBHOOK_URL: $(SLACKWEBHOOKURL)
