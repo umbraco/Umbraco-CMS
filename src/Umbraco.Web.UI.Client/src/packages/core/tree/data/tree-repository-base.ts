@@ -48,24 +48,28 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Creates an instance of UmbTreeRepositoryBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @param {UmbTreeDataSourceConstructor<TreeItemType>} treeSourceConstructor
-	 * @param {(string | UmbContextToken<any, any>)} treeStoreContextAlias
+	 * @param {UmbTreeDataSourceConstructor<TreeItemType>} treeSourceConstructor - The constructor for the tree data source
+	 * @param {(string | UmbContextToken<any, any> | undefined)} treeStoreContextAlias - The context alias for the tree store, if any
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	constructor(
 		host: UmbControllerHost,
 		treeSourceConstructor: UmbTreeDataSourceConstructor<TreeItemType>,
-		treeStoreContextAlias: string | UmbContextToken<any, any>,
+		treeStoreContextAlias?: string | UmbContextToken<any, any>,
 	) {
 		super(host);
 		this._treeSource = new treeSourceConstructor(this);
 
-		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
-			this._treeStore = instance;
-		})
-			.asPromise({ preventTimeout: true })
-			// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
-			.catch(() => undefined);
+		if (treeStoreContextAlias) {
+			this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
+				this._treeStore = instance;
+			})
+				.asPromise({ preventTimeout: true })
+				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+				.catch(() => undefined);
+		} else {
+			this._init = Promise.resolve();
+		}
 	}
 
 	/**
@@ -89,6 +93,9 @@ export abstract class UmbTreeRepositoryBase<
 		if (!this._treeStore) {
 			// If the tree store is not available, then we most likely are in a destructed setting.
 			return {
+				data,
+				error,
+				// Return an observable that does not emit any items, since the store is not available
 				asObservable: () => undefined,
 			};
 		}
@@ -118,6 +125,9 @@ export abstract class UmbTreeRepositoryBase<
 		if (!this._treeStore) {
 			// If the tree store is not available, then we most likely are in a destructed setting.
 			return {
+				data,
+				error,
+				// Return an observable that does not emit any items, since the store is not available
 				asObservable: () => undefined,
 			};
 		}
@@ -150,6 +160,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * Returns a promise with an observable of tree root items
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
+	 * @deprecated Use `requestTreeRootItems` instead. This method requires the tree store to be available, which is not always the case. It will be removed in Umbraco 18.
 	 */
 	async rootTreeItems() {
 		await this._init;
@@ -162,6 +173,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @param {(string | null)} parentUnique
 	 * @returns {*}
 	 * @memberof UmbTreeRepositoryBase
+	 * @deprecated Use `requestTreeItemsOf` instead. This method requires the tree store to be available, which is not always the case. It will be removed in Umbraco 18.
 	 */
 	async treeItemsOf(parentUnique: string | null) {
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
