@@ -12,12 +12,13 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
+import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 
 export abstract class UmbPropertyEditorUiRteElementBase
 	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
@@ -126,6 +127,10 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	readonly #entriesContext = new UmbBlockRteEntriesContext(this);
 
 	readonly #validationContext = new UmbValidationContext(this);
+
+	readonly #unusedLayoutLookup: Map<string, UmbBlockRteLayoutModel> = new Map();
+	readonly #unusedContentLookup: Map<string, UmbBlockDataModel> = new Map();
+	readonly #unusedSettingsLookup: Map<string, UmbBlockDataModel> = new Map();
 
 	constructor() {
 		super();
@@ -262,8 +267,65 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		);
 	}
 
+	#setUnusedBlockLookups(unusedLayouts: Array<UmbBlockRteLayoutModel>) {
+		if (unusedLayouts.length) {
+			unusedLayouts.forEach((layout) => {
+				if (layout.contentKey) {
+					this.#unusedLayoutLookup.set(layout.contentKey, layout);
+
+					const contentBlock = this.#managerContext.getContentOf(layout.contentKey);
+					if (contentBlock) {
+						this.#unusedContentLookup.set(layout.contentKey, contentBlock);
+					}
+
+					if (layout.settingsKey) {
+						const settingsBlock = this.#managerContext.getSettingsOf(layout.settingsKey);
+						if (settingsBlock) {
+							this.#unusedSettingsLookup.set(layout.settingsKey, settingsBlock);
+						}
+					}
+				}
+			});
+		}
+	}
+
+	#restoreUnusedBlocks(usedContentKeys: Array<string | null>) {
+		if (usedContentKeys.length) {
+			usedContentKeys.forEach((contentKey) => {
+				if (contentKey && this.#unusedLayoutLookup.has(contentKey)) {
+					const layout = this.#unusedLayoutLookup.get(contentKey);
+
+					if (layout) {
+						this.#managerContext.setOneLayout(layout);
+						this.#unusedLayoutLookup.delete(contentKey);
+
+						if (this.#unusedContentLookup.has(contentKey)) {
+							const contentBlock = this.#unusedContentLookup.get(contentKey);
+							if (contentBlock) {
+								this.#managerContext.setOneContent(contentBlock);
+								this.#unusedContentLookup.delete(contentKey);
+							}
+
+							if (layout.settingsKey && this.#unusedSettingsLookup.has(layout.settingsKey)) {
+								const settingsBlock = this.#unusedSettingsLookup.get(layout.settingsKey);
+								if (settingsBlock) {
+									this.#managerContext.setOneSettings(settingsBlock);
+									this.#unusedSettingsLookup.delete(layout.settingsKey);
+								}
+							}
+						}
+					}
+				}
+			});
+		}
+	}
+
 	protected _filterUnusedBlocks(usedContentKeys: (string | null)[]) {
 		const unusedLayouts = this.#managerContext.getLayouts().filter((x) => usedContentKeys.indexOf(x.contentKey) === -1);
+
+		// Temporarily set the unused layouts to the lookup, as they could be restored later, e.g. via an RTE undo action. [LK]
+		this.#setUnusedBlockLookups(unusedLayouts);
+		this.#restoreUnusedBlocks(usedContentKeys);
 
 		const unusedContentKeys = unusedLayouts.map((x) => x.contentKey);
 
@@ -278,5 +340,12 @@ export abstract class UmbPropertyEditorUiRteElementBase
 
 	protected _fireChangeEvent() {
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	override destroy() {
+		super.destroy();
+		this.#unusedLayoutLookup.clear();
+		this.#unusedContentLookup.clear();
+		this.#unusedSettingsLookup.clear();
 	}
 }
