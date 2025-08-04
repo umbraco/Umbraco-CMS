@@ -163,8 +163,7 @@ test('cannot add number of block element greater than the maximum amount', async
   await umbracoUi.content.clickCreateModalButton();
 
   // Assert
-  await umbracoUi.content.doesFormValidationMessageContainText('Maximum');
-  await umbracoUi.content.doesFormValidationMessageContainText('too many');
+  await umbracoUi.content.doesFormValidationMessageContainText('Maximum 0 entries, you have entered 1 too many.');
 });
 
 test('can set the label of create button in root', async ({umbracoApi, umbracoUi}) => {
