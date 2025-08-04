@@ -218,6 +218,53 @@ export abstract class UmbTreeItemContextBase<
 		this.#isLoading.setValue(false);
 	}
 
+	async #loadChildrenWithTarget(target: { unique: string; entityType: string }) {
+		debugger;
+		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
+		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
+
+		// TODO: wait for tree context to be ready
+		const repository = this.treeContext?.getRepository();
+		if (!repository) throw new Error('Could not request children, repository is missing');
+
+		this.#isLoading.setValue(true);
+
+		const targetPagination = {
+			treeItem: {
+				unique: target.unique,
+				entityType: target.entityType,
+			},
+			before: 10,
+			after: 10,
+		};
+		const foldersOnly = this.#foldersOnly.getValue();
+		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
+
+		const { data } = await repository.requestTreeItemsOf({
+			parent: {
+				unique: this.unique,
+				entityType: this.entityType,
+			},
+			foldersOnly,
+			target: targetPagination,
+			...additionalArgs,
+		});
+
+		if (data) {
+			debugger;
+
+			this.#childItems.setValue(data.items);
+
+			const hasChildren = data.total > 0;
+			this.#hasChildren.setValue(hasChildren);
+			this.#hasChildrenContext.setHasChildren(hasChildren);
+
+			this.pagination.setTotalItems(data.total);
+		}
+
+		this.#isLoading.setValue(false);
+	}
+
 	public toggleContextMenu() {
 		if (!this.getTreeItem() || !this.entityType || this.unique === undefined) {
 			throw new Error('Could not request children, tree item is not set');
@@ -401,12 +448,24 @@ export abstract class UmbTreeItemContextBase<
 		if (this.unique === undefined) return;
 		if (!this.entityType) return;
 
+		const entity: UmbEntityModel = {
+			entityType: this.entityType,
+			unique: this.unique,
+		};
+
 		this.observe(
-			this.treeContext?.expansion.isExpanded({ entityType: this.entityType, unique: this.unique }),
-			(isExpanded) => {
+			this.treeContext?.expansion.isExpanded(entity),
+			async (isExpanded) => {
 				// If this item has children, load them
 				if (isExpanded && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
-					this.loadChildren();
+					const expansionEntry = await this.treeContext?.expansion.getItem(entity);
+					const target = expansionEntry?.target;
+
+					if (target) {
+						this.#loadChildrenWithTarget(target);
+					} else {
+						this.#loadChildren(false);
+					}
 				}
 
 				this.#isOpen.setValue(isExpanded ?? false);
