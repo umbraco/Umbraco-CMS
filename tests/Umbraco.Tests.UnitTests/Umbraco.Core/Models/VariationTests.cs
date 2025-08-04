@@ -644,7 +644,7 @@ public class VariationTests
             dataValueEditorFactory,
             ioHelper);
 
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory());
 
         var mockDataTypeService = new Mock<IDataTypeService>();
         Mock.Get(dataTypeService).Setup(x => x.GetDataType(It.Is<int>(y => y == Constants.DataTypes.Textbox)))

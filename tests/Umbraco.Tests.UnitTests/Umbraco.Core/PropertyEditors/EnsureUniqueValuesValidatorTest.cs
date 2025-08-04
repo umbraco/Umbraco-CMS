@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 public class EnsureUniqueValuesValidatorTest
 {
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer()
-        => new SystemTextConfigurationEditorJsonSerializer();
+        => new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory());
 
     [Test]
     public void Expects_Array_Of_String_Not_Single_String()

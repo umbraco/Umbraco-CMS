@@ -28,7 +28,7 @@ public class PropertyCacheLevelTests
 
         var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[] { converter });
 
-        var configurationEditorJsonSerializer = new SystemTextConfigurationEditorJsonSerializer();
+        var configurationEditorJsonSerializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory());
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), configurationEditorJsonSerializer)
@@ -103,7 +103,7 @@ public class PropertyCacheLevelTests
 
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
-            new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer())
+            new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory()))
         { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -171,7 +171,7 @@ public class PropertyCacheLevelTests
 
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
-            new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer())
+            new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory()))
         { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 

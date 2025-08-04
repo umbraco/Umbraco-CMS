@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 public class ColorListValidatorTest
 {
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer()
-        => new SystemTextConfigurationEditorJsonSerializer();
+        => new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory());
 
     [Test]
     public void Expects_Array_Of_ColorPickerItems_Not_Single_String()
