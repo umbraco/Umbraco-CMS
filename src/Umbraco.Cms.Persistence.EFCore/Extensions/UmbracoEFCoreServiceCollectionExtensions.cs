@@ -12,15 +12,22 @@ namespace Umbraco.Extensions;
 
 public static class UmbracoEFCoreServiceCollectionExtensions
 {
-    public delegate void DefaultEFCoreOptionsAction(DbContextOptionsBuilder optionsBuilder, string? providerName, string? connectionString);
+    public delegate void DefaultEFCoreOptionsAction(DbContextOptionsBuilder options, string? providerName, string? connectionString);
 
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="services"></param>
-    /// <param name="optionsAction"></param>
-    /// <returns></returns>
+    [Obsolete("Please use the method overload that takes all parameters for the optionsAction. Scheduled for removal in Umbraco 18.")]
+    public static IServiceCollection AddUmbracoDbContext<T>(
+        this IServiceCollection services,
+        Action<DbContextOptionsBuilder>? optionsAction = null)
+        where T : DbContext
+        => AddUmbracoDbContext<T>(services, (sp, optionsBuilder, connectionString, providerName) => optionsAction?.Invoke(optionsBuilder));
+
+
+    /// <summary>
+    /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
+    /// </summary>
     public static IServiceCollection AddUmbracoDbContext<T>(
         this IServiceCollection services,
         Action<DbContextOptionsBuilder, string?, string?, IServiceProvider?>? optionsAction = null)
@@ -36,10 +43,16 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="services"></param>
-    /// <param name="optionsAction"></param>
-    /// <returns></returns>
+    [Obsolete("Please use the method overload that takes all parameters for the optionsAction. Scheduled for removal in Umbraco 18.")]
+    public static IServiceCollection AddUmbracoDbContext<T>(
+        this IServiceCollection services,
+        Action<IServiceProvider, DbContextOptionsBuilder>? optionsAction = null)
+        where T : DbContext
+        => AddUmbracoDbContext<T>(services, (sp, optionsBuilder, connectionString, providerName) => optionsAction?.Invoke(sp, optionsBuilder));
+
+    /// <summary>
+    /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
+    /// </summary>
     public static IServiceCollection AddUmbracoDbContext<T>(
         this IServiceCollection services,
         Action<IServiceProvider, DbContextOptionsBuilder, string?, string?>? optionsAction = null)

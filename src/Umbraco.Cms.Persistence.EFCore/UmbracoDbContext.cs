@@ -42,10 +42,6 @@ public class UmbracoDbContext : DbContext
 
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
-#if DEBUG
-        // Debugger.Launch();
-#endif
-
         var extensions = options.Extensions.FirstOrDefault() as Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension;
         IServiceProvider? serviceProvider = extensions?.ApplicationServiceProvider;
         serviceProvider ??= StaticServiceProvider.Instance;
