@@ -600,6 +600,7 @@ export default {
 			'Proces traje duže od očekivanog, provjerite Umbraco log zapis da vidite\n       da li je bilo grešaka tijekom ove operacije\n    ',
 		indexCannotRebuild: 'Ovaj indeks se ne može ponovo obnoviti jer mu nije dodijeljen',
 		iIndexPopulator: 'IIndexPopulator',
+		totalResults: 'Ukupno',
 	},
 	placeholders: {
 		username: 'Upišite svoje korisničko ime',

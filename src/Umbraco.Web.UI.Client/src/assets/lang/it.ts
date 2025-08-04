@@ -600,6 +600,7 @@ export default {
 			'Il processo sta impiegando più tempo del previsto, controlla il log di Umbraco per vedere se ci sono stati errori durante questa operazione',
 		indexCannotRebuild: 'Questo indice non può essere ricostruito perché non ha assegnato',
 		iIndexPopulator: 'IIndexPopulator',
+		totalResults: 'Totale',
 	},
 	placeholders: {
 		username: 'Inserisci il tuo username',

@@ -8,6 +8,8 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 interface ExposedSearchResultField {
 	name: string;
@@ -34,6 +36,17 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	@state()
 	private _workspacePath = 'aa';
 
+	@state()
+	_totalPages = 1;
+
+	@state()
+	_currentPage = 1;
+
+	@state()
+	_total = 0;
+
+	#paginationManager = new UmbPaginationManager();
+
 	private _onKeyPress(e: KeyboardEvent) {
 		if (e.key == 'Enter') {
 			this._onSearch();
@@ -44,6 +57,12 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		this.#paginationManager.setPageSize(100);
+
+		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPage = number));
+		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number));
+
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(':entityType')
 			.onSetup((routingInfo) => {
@@ -64,13 +83,15 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 				path: { searcherName: this.searcherName },
 				query: {
 					term: this._searchInput.value,
-					take: 100,
-					skip: 0,
+					take: this.#paginationManager.getPageSize(),
+					skip: this.#paginationManager.getSkip(),
 				},
 			}),
 		);
 
 		this._searchResults = data?.items ?? [];
+		this.#paginationManager.setTotalItems(data.total);
+		this._total = data.total;
 		this._updateFieldFilter();
 		this._searchLoading = false;
 	}
@@ -158,13 +179,19 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		}
 	}
 
+	#onPageChange(event: UUIPaginationEvent) {
+		this.#paginationManager.setCurrentPageNumber(event.target?.current);
+		this._onSearch();
+	}
+
 	private renderSearchResults() {
 		if (this._searchLoading) return html`<uui-loader></uui-loader>`;
 		if (!this._searchResults) return nothing;
 		if (!this._searchResults.length) {
 			return html`<p>${this.localize.term('examineManagement_noResults')}</p>`;
 		}
-		return html`<div class="table-container">
+		return html`<div>${this.localize.term('examineManagement_totalResults')}: ${this._total}</div>
+		<div class="table-container">
 			<uui-scroll-container>
 				<uui-table class="search">
 					<uui-table-head>
@@ -212,7 +239,19 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 					</uui-tag>
 				</uui-icon-registry-essential>
 			</button>
-		</div>`;
+		</div>
+		<div style="resize: horizontal; overflow: hidden; padding: 6px;">
+			<uui-pagination 
+			.total=${this._totalPages}
+			.current=${this._currentPage}
+			firstlabel=${this.localize.term('general_first')}
+            previouslabel=${this.localize.term('general_previous')}
+            nextlabel=${this.localize.term('general_next')}
+            lastlabel=${this.localize.term('general_last')}	
+			@change=${this.#onPageChange}
+			}></uui-pagination>
+		</div>
+			 `;
 	}
 
 	renderHeadCells() {
