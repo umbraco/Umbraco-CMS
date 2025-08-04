@@ -487,7 +487,9 @@ stages:
   - stage: NotifySlackBot
     displayName: Notify Slack on Failure
     dependsOn: E2E
-    condition: or(failed(), eq(variables['Agent.JobStatus'], 'SucceededWithIssues'))
+    condition: or(
+      eq(dependencies.E2E.result, 'failed'),
+      eq(dependencies.E2E.result, 'succeededWithIssues'))
     jobs:
       - job: PostToSlack
         displayName: Send Slack Notification
