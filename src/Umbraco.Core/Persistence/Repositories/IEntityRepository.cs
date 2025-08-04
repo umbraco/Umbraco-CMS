@@ -26,9 +26,25 @@ public interface IEntityRepository : IRepository
     /// <param name="targetKey">The key of the target entity whose siblings are to be retrieved.</param>
     /// <param name="before">The number of siblings to retrieve before the target entity.</param>
     /// <param name="after">The number of siblings to retrieve after the target entity.</param>
+    /// <param name="filter">An optional filter to apply to the result set.</param>
     /// <param name="ordering">The ordering to apply to the siblings.</param>
+    /// <param name="totalBefore">Outputs the total number of siblings before the target entity.</param>
+    /// <param name="totalAfter">Outputs the total number of siblings after the target entity.</param>
     /// <returns>Enumerable of sibling entities.</returns>
-    IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int before, int after, Ordering ordering) => [];
+    IEnumerable<IEntitySlim> GetSiblings(
+        Guid objectType,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
+    {
+        totalBefore = 0;
+        totalAfter = 0;
+        return [];
+    }
 
     /// <summary>
     ///     Gets entities for a query
