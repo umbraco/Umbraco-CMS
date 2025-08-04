@@ -24,7 +24,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         where T : DbContext
         => AddUmbracoDbContext<T>(services, (sp, optionsBuilder, connectionString, providerName) => optionsAction?.Invoke(optionsBuilder));
 
-
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
     /// </summary>
