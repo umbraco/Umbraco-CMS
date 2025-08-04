@@ -40,6 +40,11 @@ public class DefaultDatabaseAvailabilityCheckTests
     [TestCase(6, false)]
     public void IsDatabaseAvailable_WithDatabaseImmediatelyAvailableAfterMultipleAttempts_ReturnsExpectedResult(int attemptsUntilConnection, bool expectedResult)
     {
+        if (attemptsUntilConnection < 1)
+        {
+            throw new ArgumentException($"{nameof(attemptsUntilConnection)} must be greater than or equal to 1.", nameof(attemptsUntilConnection));
+        }
+
         var attemptResults = new Queue<bool>();
         for (var i = 0; i < attemptsUntilConnection - 1; i++)
         {
