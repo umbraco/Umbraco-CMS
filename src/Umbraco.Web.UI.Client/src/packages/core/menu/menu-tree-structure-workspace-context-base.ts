@@ -149,8 +149,9 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	}
 
 	#expandSectionSidebarMenu(structureItems: Array<UmbStructureItemModel>) {
+		const linkedEntries = linkEntityExpansionEntries(structureItems);
 		// Filter out the current entity as we don't want to expand it
-		const expandableItems = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
-		this.#sectionSidebarMenuContext?.expansion.expandItems(linkEntityExpansionEntries(expandableItems));
+		const expandableItems = linkedEntries.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
+		this.#sectionSidebarMenuContext?.expansion.expandItems(expandableItems);
 	}
 }
