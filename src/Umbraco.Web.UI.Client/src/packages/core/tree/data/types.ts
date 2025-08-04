@@ -1,9 +1,19 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
+interface UmbTargetPagination {
+	treeItem: {
+		unique: string;
+		entityType: string;
+	};
+	before: number;
+	after: number;
+}
+
 export interface UmbTreeRootItemsRequestArgs {
 	foldersOnly?: boolean;
 	skip?: number;
 	take?: number;
+	target?: UmbTargetPagination;
 }
 
 export interface UmbTreeChildrenOfRequestArgs {
@@ -11,6 +21,7 @@ export interface UmbTreeChildrenOfRequestArgs {
 	foldersOnly?: boolean;
 	skip?: number;
 	take?: number;
+	target?: UmbTargetPagination;
 }
 
 export interface UmbTreeAncestorsOfRequestArgs {
