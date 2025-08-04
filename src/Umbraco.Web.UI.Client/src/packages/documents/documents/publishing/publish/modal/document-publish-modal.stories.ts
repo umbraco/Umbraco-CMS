@@ -88,7 +88,7 @@ const modalValue: UmbDocumentPublishModalValue = {
 };
 
 const meta: Meta<UmbDocumentPublishModalElement> = {
-	title: 'Workspaces/Document/Modals/Publish',
+	title: 'Entity/Document/Modals/Publish',
 	component: 'umb-document-publish-modal',
 	id: 'umb-document-publish-modal',
 	args: {
@@ -166,4 +166,4 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentPublishModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
