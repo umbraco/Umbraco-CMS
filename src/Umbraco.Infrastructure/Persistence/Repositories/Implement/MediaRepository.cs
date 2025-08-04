@@ -78,6 +78,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             repositoryCacheVersionService);
     }
 
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public MediaRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,

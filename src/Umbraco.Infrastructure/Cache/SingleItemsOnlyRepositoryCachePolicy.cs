@@ -32,6 +32,7 @@ internal class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : DefaultRepos
     {
     }
 
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public SingleItemsOnlyRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
         : this(
             cache,

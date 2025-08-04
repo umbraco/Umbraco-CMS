@@ -56,6 +56,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public UserGroupRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
