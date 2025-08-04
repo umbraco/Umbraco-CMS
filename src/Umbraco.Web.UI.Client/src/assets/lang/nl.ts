@@ -560,7 +560,6 @@ export default {
 			'Het proces duurt langer dan verwacht, controleer het Umbraco logboek om te kijken\n      of er geen fouten waren tijdens deze operatie\n    ',
 		indexCannotRebuild: 'Deze index kan niet opnieuw worden opgebouwd want het heeft geen toegewezen',
 		iIndexPopulator: 'IIndexPopulator',
-		totalResults: 'Totaal',
 	},
 	placeholders: {
 		username: 'Typ jouw gebruikersnaam',

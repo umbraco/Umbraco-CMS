@@ -689,7 +689,6 @@ export default {
 		searchResultsFound: 'Showing %0% - %1% of %2% result(s) - Page %3% of %4%',
 		corruptStatus: 'Possible corrupt index detected',
 		corruptErrorDescription: 'Error received when evaluating the index:',
-		totalResults: 'Total',
 	},
 	placeholders: {
 		username: 'Enter your username',

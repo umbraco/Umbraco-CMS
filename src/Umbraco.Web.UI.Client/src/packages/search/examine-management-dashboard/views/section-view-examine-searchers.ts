@@ -43,7 +43,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	_currentPage = 1;
 
 	@state()
-	_total = 0;
+	_totalNumberOfResults = 0;
 
 	#paginationManager = new UmbPaginationManager();
 
@@ -91,7 +91,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 		this._searchResults = data?.items ?? [];
 		this.#paginationManager.setTotalItems(data.total);
-		this._total = data.total;
+		this._totalNumberOfResults = data.total;
 		this._updateFieldFilter();
 		this._searchLoading = false;
 	}
@@ -190,7 +190,17 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		if (!this._searchResults.length) {
 			return html`<p>${this.localize.term('examineManagement_noResults')}</p>`;
 		}
-		return html`<div>${this.localize.term('examineManagement_totalResults')}: ${this._total}</div>
+		return html`
+			<div>
+				${this.localize.term(
+					'examineManagement_searchResultsFound',
+					this.#paginationManager.getDisplayStart(),
+					this.#paginationManager.getDisplayEnd(),
+					this._totalNumberOfResults,
+					this._currentPage,
+					this._totalPages,
+				)}
+			</div>
 		<div class="table-container">
 			<uui-scroll-container>
 				<uui-table class="search">
@@ -240,18 +250,15 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 				</uui-icon-registry-essential>
 			</button>
 		</div>
-		<div style="resize: horizontal; overflow: hidden; padding: 6px;">
-			<uui-pagination 
-			.total=${this._totalPages}
-			.current=${this._currentPage}
-			firstlabel=${this.localize.term('general_first')}
-            previouslabel=${this.localize.term('general_previous')}
-            nextlabel=${this.localize.term('general_next')}
-            lastlabel=${this.localize.term('general_last')}	
-			@change=${this.#onPageChange}
-			}></uui-pagination>
-		</div>
-			 `;
+			<uui-pagination
+				.total=${this._totalPages}
+				.current=${this._currentPage}
+				firstlabel=${this.localize.term('general_first')}
+				previouslabel=${this.localize.term('general_previous')}
+				nextlabel=${this.localize.term('general_next')}
+				lastlabel=${this.localize.term('general_last')}
+				@change=${this.#onPageChange}></uui-pagination>
+		`;
 	}
 
 	renderHeadCells() {

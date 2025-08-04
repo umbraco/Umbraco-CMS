@@ -683,7 +683,6 @@ export default {
 		searchResultsFound: 'A mostrar %0% - %1% de %2% resultado(s) - Página %3% de %4%',
 		corruptStatus: 'Possível índice corrompido detetado',
 		corruptErrorDescription: 'Erro recebido ao avaliar o índice:',
-		totalResults: 'Total',
 	},
 	placeholders: {
 		username: 'Introduza o seu nome de utilizador',

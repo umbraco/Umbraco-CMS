@@ -625,7 +625,6 @@ export default {
 		contentInIndex: 'Cynnwys yn y mynegai',
 		noResults: 'Ni ddarganfuwyd unrhyw ganlyniadau',
 		searchResultsFound: 'Dangos %0% - %1% o %2% canlyniad(au) - Tudalen %3% o %4%',
-		totalResults: 'Cyfanswm',
 	},
 	placeholders: {
 		username: 'Darparwch eich enw defnyddiwr',

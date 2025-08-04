@@ -529,7 +529,6 @@ export default {
 			'Proces trvá déle, než se očekávalo, zkontrolujte Umbraco log a zkontrolujte, zda během této operace nedošlo k chybám',
 		indexCannotRebuild: 'Tento index nelze znovu sestavit, protože nemá přiřazen',
 		iIndexPopulator: 'IIndexPopulator',
-		totalResults: 'Celkový',
 	},
 	placeholders: {
 		username: 'Zadejte Vaše uživatelské jméno',

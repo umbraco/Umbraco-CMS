@@ -688,7 +688,6 @@ export default {
 		searchResultsFound: 'Viser %0% - %1% af %2% resultat(er) - Side %3% af %4%',
 		corruptStatus: 'Mulig korrupt indeks opdaget',
 		corruptErrorDescription: 'Fejl modtaget ved evaluering af indekset:',
-		totalResults: 'Total',
 	},
 	placeholders: {
 		username: 'Indtast dit brugernavn',

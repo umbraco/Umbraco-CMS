@@ -541,7 +541,6 @@ export default {
 			'İşlem beklenenden uzun sürüyor, bu işlem sırasında herhangi bir hata olup olmadığını görmek için Umbraco günlüğünü kontrol edin',
 		indexCannotRebuild: 'Bu dizin, atanmış olmadığı için yeniden oluşturulamaz',
 		iIndexPopulator: 'IIndexPopulator',
-		totalResults: 'Toplam',
 	},
 	placeholders: {
 		username: 'Kullanıcı adınızı girin',

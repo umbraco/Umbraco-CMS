@@ -548,7 +548,6 @@ export default {
 			"Le processus dure plus de temps que prévu, vérifiez les logs Umbraco afin de voir s'il y a eu des erreurs pendant cette opératon",
 		indexCannotRebuild: "Cet index ne peut pas être reconstruit parce qu'on ne lui a pas assigné de",
 		iIndexPopulator: 'IIndexPopulator',
-		totalResults: 'Total',
 	},
 	placeholders: {
 		username: "Votre nom d'utilisateur",
