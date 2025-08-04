@@ -12,7 +12,7 @@ schedules:
         - main
 
 parameters:
-    # Skipped due to DB locks
+  # Skipped due to DB locks
   - name: sqliteAcceptanceTests
     displayName: Run SQLite Acceptance Tests
     type: boolean
@@ -489,28 +489,28 @@ stages:
     dependsOn: E2ETests
     condition: failed()
     jobs:
-        - job: PostToSlack
-          displayName: Send Slack Notification
-          pool:
-            vmImage: 'ubuntu-latest'
-          steps:
-            - bash: |
-                  PIPELINE_URL="${SYSTEM_TEAMFOUNDATIONURI}${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}"
+      - job: PostToSlack
+        displayName: Send Slack Notification
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - bash: |
+              PIPELINE_URL="${SYSTEM_TEAMFOUNDATIONURI}${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}"
 
-                  PAYLOAD="{
-                    \"attachments\": [
-                      {
-                        \"color\": \"#ff0000\",
-                        \"pretext\": \"A nightly E2E pipeline ran with failing E2E tests\",
-                        \"title\": \"View Failed E2E Test Results\",
-                        \"title_link\": \"$PIPELINE_URL\"
-                      }
-                    ]
-                  }"
+              PAYLOAD="{
+                \"attachments\": [
+                  {
+                    \"color\": \"#ff0000\",
+                    \"pretext\": \"A nightly E2E pipeline ran with failing E2E tests\",
+                    \"title\": \"View Failed E2E Test Results\",
+                    \"title_link\": \"$PIPELINE_URL\"
+                  }
+                ]
+              }"
 
-                  echo "Sending Slack message to: $PIPELINE_URL"
-                  curl -X POST -H 'Content-type: application/json' \
-                    --data "$PAYLOAD" \
-                    "$SLACK_WEBHOOK_URL"
-              env:
-                SLACK_WEBHOOK_URL: $(SLACKWEBHOOKURL)
+              echo "Sending Slack message to: $PIPELINE_URL"
+              curl -X POST -H 'Content-type: application/json' \
+                --data "$PAYLOAD" \
+                "$SLACK_WEBHOOK_URL"
+            env:
+              SLACK_WEBHOOK_URL: $(SLACKWEBHOOKURL)
