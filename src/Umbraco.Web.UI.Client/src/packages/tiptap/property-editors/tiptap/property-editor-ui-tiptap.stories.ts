@@ -45,7 +45,7 @@ const config = new UmbPropertyEditorConfigCollection([
 ]);
 
 const meta: Meta<UmbPropertyEditorUiTiptapElement> = {
-	title: 'Property Editor UIs/Tiptap',
+	title: 'Extension Type/Property Editor UI/Tiptap',
 	component: 'umb-property-editor-ui-tiptap',
 	id: 'umb-property-editor-ui-tiptap',
 	args: {

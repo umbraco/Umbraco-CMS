@@ -2789,7 +2789,7 @@ export default {
 		anchor: 'Âncora',
 		anchor_input: 'Introduza um ID de âncora',
 		config_dimensions_description:
-			'Defina a largura e altura máximas do editor. Isto exclui a altura da barra de ferramentas.',
+			'Definir uma largura e altura fixas para o editor. Isso exclui as alturas da barra de ferramentas e da barra de estado.',
 		config_extensions: 'Capacidades',
 		config_statusbar: 'Barra de estado',
 		config_toolbar: 'Barra de ferramentas',

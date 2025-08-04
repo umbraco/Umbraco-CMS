@@ -2781,7 +2781,8 @@ export default {
 	tiptap: {
 		anchor: 'Anchor',
 		anchor_input: 'Enter an anchor ID',
-		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
+		config_dimensions_description:
+			'Sets the fixed width and height of the editor. This excludes the toolbar and statusbar heights.',
 		config_extensions: 'Capabilities',
 		config_statusbar: 'Statusbar',
 		config_toolbar: 'Toolbar',
