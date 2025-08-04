@@ -1,13 +1,5 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-
-interface UmbTargetPagination {
-	item: {
-		unique: string;
-		entityType: string;
-	};
-	before: number;
-	after: number;
-}
+import type { UmbTargetPagination } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbTreeRootItemsRequestArgs {
 	foldersOnly?: boolean;
