@@ -1,16 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
-import './input-radio-button-list.element.js';
 import type { UmbInputRadioButtonListElement } from './input-radio-button-list.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import './input-radio-button-list.element.js';
 
 const meta: Meta<UmbInputRadioButtonListElement> = {
-	title: 'Components/Inputs/Radio Button List',
+	title: 'Generic Components/Inputs/Radio Button List',
 	component: 'umb-input-radio-button-list',
 };
 
 export default meta;
 type Story = StoryObj<UmbInputRadioButtonListElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	args: {
 		list: [
 			{ label: 'One', value: '1' },

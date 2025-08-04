@@ -69,6 +69,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ImagingSettings>()
             .AddUmbracoOptions<IndexingSettings>()
             .AddUmbracoOptions<LoggingSettings>()
+            .AddUmbracoOptions<LongRunningOperationsSettings>()
             .AddUmbracoOptions<MemberPasswordConfigurationSettings>()
             .AddUmbracoOptions<NuCacheSettings>()
             .AddUmbracoOptions<RequestHandlerSettings>()

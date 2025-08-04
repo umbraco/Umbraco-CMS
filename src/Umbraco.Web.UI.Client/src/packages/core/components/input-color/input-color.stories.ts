@@ -1,10 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
-import './input-color.element.js';
 import type { UmbInputColorElement } from './input-color.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+
+import './input-color.element.js';
 
 const meta: Meta<UmbInputColorElement> = {
-	title: 'Components/Inputs/Color',
+	title: 'Generic Components/Inputs/Color',
 	component: 'umb-input-color',
+	render: (args) => html`<umb-input-color .swatches=${args.swatches} .showLabels=${args.showLabels}></umb-input-color>`,
 };
 
 export default meta;

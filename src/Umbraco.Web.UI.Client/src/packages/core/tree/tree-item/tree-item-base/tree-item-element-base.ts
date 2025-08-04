@@ -220,6 +220,6 @@ export abstract class UmbTreeItemElementBase<
 			return nothing;
 		}
 
-		return html` <uui-button @click=${this.#onLoadMoreClick} label="Load more"></uui-button> `;
+		return html` <umb-tree-load-more-button @click=${this.#onLoadMoreClick}></umb-tree-load-more-button> `;
 	}
 }

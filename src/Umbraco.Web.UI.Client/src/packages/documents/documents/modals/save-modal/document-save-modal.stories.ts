@@ -3,7 +3,7 @@ import './document-save-modal.element.js';
 import { UmbDocumentVariantState } from '../../types.js';
 import type { UmbDocumentSaveModalData, UmbDocumentSaveModalValue } from './document-save-modal.token.js';
 import type { UmbDocumentSaveModalElement } from './document-save-modal.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentSaveModalData = {
@@ -88,7 +88,7 @@ const modalValue: UmbDocumentSaveModalValue = {
 };
 
 const meta: Meta<UmbDocumentSaveModalElement> = {
-	title: 'Workspaces/Document/Modals/Save',
+	title: 'Entity/Document/Modals/Save',
 	component: 'umb-document-save-modal',
 	id: 'umb-document-save-modal',
 	args: {
@@ -166,4 +166,4 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentSaveModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};

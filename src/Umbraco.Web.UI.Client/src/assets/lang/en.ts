@@ -73,6 +73,7 @@ export default {
 		wasDeleted: 'was deleted',
 		wasMovedTo: 'was moved to',
 		viewActionsFor: (name) => (name ? `View actions for '${name}'` : 'View actions'),
+		loadMore: 'Load more',
 	},
 	actionCategories: {
 		content: 'Content',
@@ -372,6 +373,14 @@ export default {
 		notFoundDescription: (entityType: string) => {
 			const entityName = entityType ?? 'item';
 			return `The requested ${entityName} could not be found. Please check the URL and try again.`;
+		},
+		forbiddenTitle: (entityType: string) => {
+			const entityName = entityType ?? 'item';
+			return `Access denied to this ${entityName}`;
+		},
+		forbiddenDescription: (entityType: string) => {
+			const entityName = entityType ?? 'item';
+			return `You do not have permission to access this ${entityName}. Please contact your administrator for assistance.`;
 		},
 	},
 	media: {
@@ -1123,6 +1132,12 @@ export default {
 	lockout: {
 		lockoutWillOccur: "You've been idle and logout will automatically occur in",
 		renewSession: 'Renew now to save your work',
+	},
+	timeout: {
+		warningHeadline: 'Session timeout',
+		warningText: 'Your session is about to expire and you will be logged out in <strong>{0} seconds</strong>.',
+		warningLogoutAction: 'Log out',
+		warningContinueAction: 'Stay logged in',
 	},
 	login: {
 		greeting0: 'Welcome',
@@ -2735,6 +2750,9 @@ export default {
 	routing: {
 		routeNotFoundTitle: 'Not found',
 		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
+		routeForbiddenTitle: 'Access denied',
+		routeForbiddenDescription:
+			'You do not have permission to access this resource. Please contact your administrator for assistance.',
 	},
 	codeEditor: {
 		label: 'Code editor',
@@ -2763,7 +2781,8 @@ export default {
 	tiptap: {
 		anchor: 'Anchor',
 		anchor_input: 'Enter an anchor ID',
-		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
+		config_dimensions_description:
+			'Sets the fixed width and height of the editor. This excludes the toolbar and statusbar heights.',
 		config_extensions: 'Capabilities',
 		config_statusbar: 'Statusbar',
 		config_toolbar: 'Toolbar',
@@ -2794,6 +2813,8 @@ export default {
 		charmap_extlatin: 'Extended Latin',
 		charmap_symbols: 'Symbols',
 		charmap_arrows: 'Arrows',
+		statusbar_characters: (count: number) => `${count.toLocaleString()} ${count === 1 ? 'character' : 'characters'}`,
+		statusbar_words: (count: number) => `${count.toLocaleString()} ${count === 1 ? 'word' : 'words'}`,
 	},
 	linkPicker: {
 		modalSource: 'Source',

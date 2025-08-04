@@ -85,7 +85,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 
 		if (this._hasRootGroups) {
 			routes.push({
-				path: `root`,
+				path: 'root',
 				component: () => import('./content-editor-tab.element.js'),
 				setup: (component) => {
 					(component as UmbContentWorkspaceViewEditTabElement).containerId = null;
@@ -108,16 +108,16 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 
 		if (routes.length !== 0) {
 			routes.push({
+				...routes[0],
+				unique: routes[0].path,
 				path: '',
-				pathMatch: 'full',
-				redirectTo: routes[0].path,
-			});
-
-			routes.push({
-				path: `**`,
-				component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
 			});
 		}
+
+		routes.push({
+			path: `**`,
+			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+		});
 
 		this._routes = routes;
 	}
@@ -131,20 +131,22 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 							${this._hasRootGroups && this._tabs.length > 0
 								? html`
 										<uui-tab
-											.label=${this.localize.term('general_generic')}
-											.active=${this._routerPath + '/root' === this._activePath}
-											.href=${this._routerPath + '/root'}></uui-tab>
+											label=${this.localize.term('general_generic')}
+											.active=${this._routerPath + '/root' === this._activePath ||
+											this._routerPath + '/' === this._activePath}
+											href=${this._routerPath + '/root'}></uui-tab>
 									`
 								: ''}
 							${repeat(
 								this._tabs,
 								(tab) => tab.name,
-								(tab) => {
+								(tab, index) => {
 									const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 									return html`<uui-tab
-										.label=${this.localize.string(tab.name ?? '#general_unnamed')}
-										.active=${path === this._activePath}
-										.href=${path}></uui-tab>`;
+										label=${this.localize.string(tab.name ?? '#general_unnamed')}
+										.active=${path === this._activePath ||
+										(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath)}
+										href=${path}></uui-tab>`;
 								},
 							)}
 						</uui-tab-group>`

@@ -1,13 +1,13 @@
 import './confirm-modal.element.js';
 
 import type { UmbConfirmModalElement } from './confirm-modal.element.js';
-import type { Meta, StoryFn } from '@storybook/web-components';
+import type { Meta, StoryFn } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 
 export default {
-	title: 'API/Modals/Layouts/Confirm',
+	title: 'Extension Type/Modal/Confirm',
 	component: 'umb-confirm-modal',
 	id: 'umb-confirm-modal',
 } as Meta;

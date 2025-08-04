@@ -169,7 +169,7 @@ public class EventNameExtractor
         return words[0].EndsWith("ing") == false;
     }
 
-    private class EventInfoArgs
+    private sealed class EventInfoArgs
     {
         public EventInfoArgs(EventInfo eventInfo, Type[] genericArgs)
         {
