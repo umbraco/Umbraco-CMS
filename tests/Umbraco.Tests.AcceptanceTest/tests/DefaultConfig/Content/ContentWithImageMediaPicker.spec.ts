@@ -142,7 +142,8 @@ test.skip('image count can not be more than max amount set in image media picker
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.clickMediaWithName(mediaName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 

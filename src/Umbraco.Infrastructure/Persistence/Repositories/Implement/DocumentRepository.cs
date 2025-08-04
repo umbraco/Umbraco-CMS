@@ -576,14 +576,14 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
     }
 
-    private class ContentVariation
+    private sealed class ContentVariation
     {
         public string? Culture { get; set; }
         public string? Name { get; set; }
         public DateTime Date { get; set; }
     }
 
-    private class DocumentVariation
+    private sealed class DocumentVariation
     {
         public string? Culture { get; set; }
         public bool Edited { get; set; }
@@ -1553,7 +1553,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     // reading repository purely for looking up by GUID
     // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
     // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
-    private class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
+    private sealed class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
     {
         private readonly DocumentRepository _outerRepo;
 
@@ -1821,7 +1821,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
-    private class CultureNodeName
+    private sealed class CultureNodeName
     {
         public int Id { get; set; }
         public string? Name { get; set; }

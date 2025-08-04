@@ -12,7 +12,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQuery>, ILogViewerQueryRepository
+internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQuery>, ILogViewerQueryRepository
 {
     public LogViewerQueryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LogViewerQueryRepository> logger)
         : base(scopeAccessor, cache, logger)
@@ -101,14 +101,14 @@ internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQu
         // use the underlying GetAll which will force cache all log queries
         GetMany().FirstOrDefault(x => x.Id == id);
 
-    private ILogViewerQuery ConvertFromDto(LogViewerQueryDto dto)
+    private static ILogViewerQuery ConvertFromDto(LogViewerQueryDto dto)
     {
         var factory = new LogViewerQueryModelFactory();
         ILogViewerQuery entity = factory.BuildEntity(dto);
         return entity;
     }
 
-    internal class LogViewerQueryModelFactory
+    internal sealed class LogViewerQueryModelFactory
     {
         public ILogViewerQuery BuildEntity(LogViewerQueryDto dto)
         {

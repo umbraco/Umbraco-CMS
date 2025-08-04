@@ -6,6 +6,9 @@ export type UmbDocumentBlueprintRootEntityType = typeof UMB_DOCUMENT_BLUEPRINT_R
 export type UmbDocumentBlueprintEntityType = typeof UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE;
 export type UmbDocumentBlueprintFolderEntityType = typeof UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE;
 
+export const UMB_DOCUMENT_BLUEPRINT_PROPERTY_VALUE_ENTITY_TYPE = `${UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE}-property-value`;
+export type UmbDocumentBlueprintPropertyValueEntityType = typeof UMB_DOCUMENT_BLUEPRINT_PROPERTY_VALUE_ENTITY_TYPE;
+
 export type UmbDocumentBlueprintEntityTypeUnion =
 	| UmbDocumentBlueprintRootEntityType
 	| UmbDocumentBlueprintEntityType

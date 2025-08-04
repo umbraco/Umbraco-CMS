@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Composing;
 /// <summary>
 ///     Handles the composers.
 /// </summary>
-internal class ComposerGraph
+internal sealed class ComposerGraph
 {
     private readonly IUmbracoBuilder _builder;
     private readonly IEnumerable<Type> _composerTypes;
@@ -415,7 +415,7 @@ internal class ComposerGraph
         }
     }
 
-    private class EnableInfo
+    private sealed class EnableInfo
     {
         public bool Enabled { get; set; }
 

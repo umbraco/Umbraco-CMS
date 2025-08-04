@@ -2,6 +2,7 @@ import { css, customElement, html, property, state } from '@umbraco-cms/backoffi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
 /**
  * @element umb-ref-rte-block
@@ -27,6 +28,9 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	@state()
 	_workspaceEditPath?: string;
 
+	@property({ attribute: false })
+	config?: UmbBlockEditorCustomViewConfiguration;
+
 	constructor() {
 		super();
 
@@ -44,7 +48,8 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	override render() {
 		const blockValue = { ...this.content, $settings: this.settings };
 		return html`
-			<uui-ref-node standalone href=${this._workspaceEditPath ?? '#'}>
+			<uui-ref-node standalone href=${(this.config?.showContentEdit ? this._workspaceEditPath : undefined) ?? ''}>
+				<div class="selection-background" aria-hidden="true">&emsp;</div>
 				<umb-icon slot="icon" .name=${this.icon}></umb-icon>
 				<umb-ufm-render slot="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 			</uui-ref-node>
@@ -56,12 +61,33 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 			:host {
 				display: block;
 			}
+
 			uui-ref-node {
 				min-height: var(--uui-size-16);
 			}
+
 			:host([unpublished]) umb-icon,
 			:host([unpublished]) umb-ufm-render {
 				opacity: 0.6;
+			}
+
+			/* HACK: Stretches a space character (&emsp;) to be full-width to make the RTE block appear text-selectable. [LK,NL] */
+			.selection-background {
+				position: absolute;
+				pointer-events: none;
+				font-size: 100vw;
+				inset: 0;
+				overflow: hidden;
+				z-index: 0;
+			}
+
+			umb-icon,
+			umb-ufm-render {
+				z-index: 1;
+
+				&::selection {
+					color: var(--uui-color-default-contrast);
+				}
 			}
 		`,
 	];

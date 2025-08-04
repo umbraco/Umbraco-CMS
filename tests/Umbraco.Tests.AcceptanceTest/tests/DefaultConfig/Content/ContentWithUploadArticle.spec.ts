@@ -88,8 +88,7 @@ for (const uploadFile of uploadFiles) {
   });
 }
 
-// TODO: Remove skip when the front-end is ready. Currently the uploaded file still displays after removing.
-test.skip('can remove an article file in the content', async ({umbracoApi, umbracoUi}) => {
+test('can remove an article file in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadFileName = 'Article.pdf';
   const mimeType = 'application/pdf';

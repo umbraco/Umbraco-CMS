@@ -178,13 +178,16 @@ test('can update a specific content with update permission enabled', async ({umb
 
   // Act
   await umbracoUi.content.goToContentWithName(firstDocumentName);
+  await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(testDocumentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(testDocumentName)).toBeTruthy();
+  await umbracoUi.content.goToContentWithName(secondDocumentName);
   await umbracoUi.content.isActionsMenuForNameVisible(secondDocumentName, false);
+  await umbracoUi.content.isDocumentReadOnly(true);
 });
 
 test('can duplicate a specific content with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -266,6 +269,7 @@ test('can set culture and hostnames for a specific content with culture and host
 
   // Assert
   await umbracoUi.content.waitForDomainToBeCreated();
+  await umbracoUi.waitForTimeout(500); // Wait for the domain to be set
   const document = await umbracoApi.document.getByName(firstDocumentName);
   const domains = await umbracoApi.document.getDomains(document.id);
   expect(domains.domains[0].domainName).toEqual(domainName);

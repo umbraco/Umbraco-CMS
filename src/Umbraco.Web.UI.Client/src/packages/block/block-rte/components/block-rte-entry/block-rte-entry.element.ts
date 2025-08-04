@@ -301,7 +301,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-ref-rte-block>`;
+			.settings=${this._blockViewProps.settings}
+			.config=${this._blockViewProps.config}></umb-ref-rte-block>`;
 	}
 
 	#renderEditAction() {
@@ -353,13 +354,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			:host {
 				position: relative;
 				display: block;
-				user-select: none;
+				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
 			}
+
 			:host(.ProseMirror-selectednode) {
 				umb-ref-rte-block {
-					cursor: not-allowed;
+					--uui-color-default-contrast: initial;
 					outline: 3px solid var(--uui-color-focus);
 				}
 			}

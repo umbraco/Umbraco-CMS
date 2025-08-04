@@ -46,8 +46,7 @@ test('can access members section with section enabled', {tag: '@release'}, async
   await umbracoUi.member.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource, false);
 });
 
-// TODO: unskip when member creation is fixed
-test.skip('can create member with members section set', async ({umbracoApi, umbracoUi}) => {
+test('can create member with members section set', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId, [], true, [], false, 'en-us');
@@ -57,7 +56,7 @@ test.skip('can create member with members section set', async ({umbracoApi, umbr
   await umbracoUi.member.clickMembersMenu();
 
   // Act
-  await umbracoUi.member.clickCreateButton();
+  await umbracoUi.member.clickCreateMembersButton();
   await umbracoUi.member.enterMemberName(memberName);
   await umbracoUi.member.clickInfoTab();
   await umbracoUi.member.enterUsername(username);
@@ -74,8 +73,7 @@ test.skip('can create member with members section set', async ({umbracoApi, umbr
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
 });
 
-// TODO: unskip when member creation is fixed
-test.skip('can update member with members section set', async ({umbracoApi, umbracoUi}) => {
+test('can update member with members section set', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithMemberSection(userGroupName);
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
@@ -85,6 +83,7 @@ test.skip('can update member with members section set', async ({umbracoApi, umbr
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.member.goToSection(ConstantHelper.sections.members, false);
+  await umbracoUi.member.clickMembersMenu();
 
   // Act
   await umbracoUi.member.clickMemberLinkByName(memberName);

@@ -50,6 +50,10 @@ export class UmbUfmRenderElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				position: relative;
+			}
+
 			* {
 				max-width: 100%;
 				word-wrap: break-word;
@@ -57,6 +61,14 @@ export class UmbUfmRenderElement extends UmbLitElement {
 
 			pre {
 				overflow: auto;
+			}
+
+			code {
+				font-family: var(--uui-font-monospace);
+				white-space: pre-wrap;
+				background-color: var(--uui-color-background);
+				border-radius: var(--uui-border-radius);
+				padding: 0.2em 0.4em;
 			}
 
 			:host > :first-child {

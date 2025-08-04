@@ -120,7 +120,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
         RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
         RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
-
     }
 
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)

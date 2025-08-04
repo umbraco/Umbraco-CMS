@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Core.Services;
 
 /// <inheritdoc cref="Umbraco.Cms.Core.Services.IUserTwoFactorLoginService" />
-internal class UserTwoFactorLoginService : TwoFactorLoginServiceBase, IUserTwoFactorLoginService
+internal sealed class UserTwoFactorLoginService : TwoFactorLoginServiceBase, IUserTwoFactorLoginService
 {
     private readonly IUserService _userService;
 

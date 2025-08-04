@@ -52,7 +52,7 @@ public class MediaPicker3PropertyEditor : DataEditor
     /// <summary>
     /// Defines the value editor for the media picker property editor.
     /// </summary>
-    internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
+    internal sealed class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IDataTypeConfigurationCache _dataTypeReadCache;
         private readonly IJsonSerializer _jsonSerializer;
@@ -257,7 +257,7 @@ public class MediaPicker3PropertyEditor : DataEditor
         /// <summary>
         ///     Model/DTO that represents the JSON that the MediaPicker3 stores.
         /// </summary>
-        internal class MediaWithCropsDto
+        internal sealed class MediaWithCropsDto
         {
             /// <summary>
             /// Gets or sets the key.
@@ -338,7 +338,7 @@ public class MediaPicker3PropertyEditor : DataEditor
         /// <summary>
         /// Validates the min/max configuration for the media picker property editor.
         /// </summary>
-        internal class MinMaxValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal sealed class MinMaxValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 
@@ -399,7 +399,7 @@ public class MediaPicker3PropertyEditor : DataEditor
         /// <summary>
         /// Validates the allowed type configuration for the media picker property editor.
         /// </summary>
-        internal class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal sealed class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaTypeService _mediaTypeService;
@@ -472,7 +472,7 @@ public class MediaPicker3PropertyEditor : DataEditor
         /// <summary>
         /// Validates the start node configuration for the media picker property editor.
         /// </summary>
-        internal class StartNodeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal sealed class StartNodeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
