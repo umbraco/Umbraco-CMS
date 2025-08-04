@@ -1,17 +1,25 @@
+import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
+
 export interface TimeZone {
 	value: string;
 	name: string;
+	offset: string;
 }
 
 /**
  * Retrieves a list of supported time zones in the browser.
  * @param {Array<string>} [filter] - An optional array of time zone identifiers to filter the result on.
+ * @param {DateTime} [selectedDate] - An optional Luxon DateTime object to format the offset for each time zone.
  * @returns {Array<TimeZone>} An array of objects containing time zone values and names.
  */
-export function getTimeZoneList(filter: Array<string> | undefined = undefined): Array<TimeZone> {
+export function getTimeZoneList(
+	filter: Array<string> | undefined = undefined,
+	selectedDate: DateTime | undefined = undefined,
+): Array<TimeZone> {
 	const timeZones = Intl.supportedValuesOf('timeZone')
 		// Exclude offset time zones, e.g. 'Etc/GMT+2', as they are not consistent between browsers
-		.filter((value) =>
+		.filter(
+			(value) =>
 				value !== 'UTC' && !value.startsWith('Etc/') && (!filter || filter.some((f) => isEquivalentTimeZone(f, value))),
 		);
 
@@ -20,19 +28,36 @@ export function getTimeZoneList(filter: Array<string> | undefined = undefined): 
 		timeZones.unshift('UTC');
 	}
 
-	return timeZones.map((tz) => ({ value: tz, name: getTimeZoneName(tz) }));
+	const date = selectedDate ?? DateTime.now();
+	return timeZones.map((tz) => ({
+		value: tz,
+		name: getTimeZoneName(tz),
+		offset: getTimeZoneOffset(tz, date),
+	}));
 }
 
 /**
  * Retrieves the client's time zone information.
+ * @param {DateTime} [selectedDate] - An optional Luxon DateTime object to format the offset of the time zone.
  * @returns {TimeZone} An object containing the client's time zone name and value.
  */
-export function getClientTimeZone(): TimeZone {
+export function getClientTimeZone(selectedDate: DateTime | undefined = undefined): TimeZone {
 	const clientTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 	return {
-		name: getTimeZoneName(clientTimeZone),
 		value: clientTimeZone,
+		name: getTimeZoneName(clientTimeZone),
+		offset: getTimeZoneOffset(clientTimeZone, selectedDate ?? DateTime.now()),
 	};
+}
+
+/**
+ * Returns the time zone offset for a given time zone ID and date.
+ * @param timeZoneId - The time zone identifier (e.g., 'America/New_York').
+ * @param date - The Luxon DateTime object for which to get the offset.
+ * @returns {string} The time zone offset
+ */
+function getTimeZoneOffset(timeZoneId: string, date: DateTime): string {
+	return date.setZone(timeZoneId).toFormat('Z');
 }
 
 /**

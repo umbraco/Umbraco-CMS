@@ -62,10 +62,10 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	private _datePickerValue: string = '';
 
 	@state()
-	private _timeZoneOptions: Array<Option> = [];
+	private _timeZoneOptions: Array<TimeZone> = [];
 
 	@state()
-	private _filteredTimeZoneOptions: Array<Option> = [];
+	private _filteredTimeZoneOptions: Array<TimeZone> = [];
 
 	@state()
 	private _clientTimeZone: TimeZone = getClientTimeZone();
@@ -78,6 +78,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 
 		this._dateFormat = config.getValueByAlias<string>('format') ?? 'date-time';
 		const timeFormat = config.getValueByAlias<string>('timeFormat') ?? 'HH:mm';
+		let includeTimeZones = false;
 		switch (this._dateFormat) {
 			case 'date-only':
 				this._dateInputType = 'date';
@@ -91,49 +92,60 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 			default:
 				this._dateInputType = 'datetime-local';
 				this.#setDateInputStep(timeFormat);
-				this.#prefillTimeZones(config);
+				includeTimeZones = true;
 				break;
 		}
 
-		this.#prefillValue();
+		this.#prefillValue(config, includeTimeZones);
 	}
 
-	#prefillValue() {
-		const value = this._value;
-		const zone = this._selectedTimeZone;
-		if (!value?.date) {
+	#prefillValue(config: UmbPropertyEditorConfigCollection, includeTimeZones: boolean) {
+		const date = this._value?.date;
+		const zone = this.value?.timeZone;
+
+		if (!date) {
+			if (includeTimeZones) {
+				this.#prefillTimeZones(config, DateTime.now());
+			}
 			return;
 		}
-
-		const dateTime = DateTime.fromISO(value.date, { zone: zone ?? 'UTC' });
+		const dateTime = DateTime.fromISO(date, { zone: zone ?? 'UTC' });
 		if (!dateTime.isValid) {
-			console.warn(`[UmbDateWithTimeZonePicker] Invalid date format: ${value.date}`);
+			if (includeTimeZones) {
+				this.#prefillTimeZones(config, DateTime.now());
+			}
+			console.warn(`[UmbDateWithTimeZonePicker] Invalid date format: ${date}`);
 			return;
 		}
 
 		this._currentDate = dateTime;
 		this._datePickerValue = dateTime.toFormat(this._dateInputFormat);
+
+		if (includeTimeZones) {
+			this.#prefillTimeZones(config, dateTime);
+		}
 	}
 
-	#prefillTimeZones(config: UmbPropertyEditorConfigCollection) {
+	#prefillTimeZones(config: UmbPropertyEditorConfigCollection, selectedDate: DateTime | undefined) {
 		// Retrieve the time zones from the config
 		const timeZonePickerConfig = config.getValueByAlias<UmbTimeZonePickerValue>('timeZones');
 
 		// Retrieve the time zones from the config
 		switch (timeZonePickerConfig?.mode) {
 			case 'all':
-				this._timeZoneOptions = this._filteredTimeZoneOptions = getTimeZoneList().map((tz) => this.#mapTimeZoneOption(tz, false));
+				this._timeZoneOptions = this._filteredTimeZoneOptions = getTimeZoneList(undefined, selectedDate);
 				this.#preselectTimeZone();
 				break;
 			case 'local': {
-				const clientTimeZone = getClientTimeZone();
-				this._timeZoneOptions = this._filteredTimeZoneOptions = [this.#mapTimeZoneOption(clientTimeZone, true)];
+				const clientTimeZone = getClientTimeZone(selectedDate);
+				this._timeZoneOptions = this._filteredTimeZoneOptions = [clientTimeZone];
 				this._selectedTimeZone = clientTimeZone.value;
 				return;
 			}
 			case 'custom':
-				this._timeZoneOptions = this._filteredTimeZoneOptions = getTimeZoneList(timeZonePickerConfig.timeZones).map(
-					(tz) => this.#mapTimeZoneOption(tz, false),
+				this._timeZoneOptions = this._filteredTimeZoneOptions = getTimeZoneList(
+					timeZonePickerConfig.timeZones,
+					selectedDate,
 				);
 				this.#preselectTimeZone();
 				break;
@@ -151,7 +163,6 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				(option) => isEquivalentTimeZone(option.value, selectedTimezone),
 			);
 			if (pickedTimeZone) {
-				pickedTimeZone.selected = true;
 				this._selectedTimeZone = pickedTimeZone.value;
 				return;
 			}
@@ -164,14 +175,12 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 			(option) => isEquivalentTimeZone(option.value, clientTimeZone.value),
 		);
 		if (clientTimeZoneOpt) {
-			clientTimeZoneOpt.selected = true;
 			this._selectedTimeZone = clientTimeZoneOpt.value;
 			return;
 		}
 
 		// If no time zone was selected still, we can default to the first option
 		const firstOption = this._timeZoneOptions[0];
-		firstOption.selected = true;
 		this._selectedTimeZone = firstOption.value;
 	}
 
@@ -184,14 +193,6 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				this._dateInputStep = 1; // 1 second
 				break;
 		}
-	}
-
-	#mapTimeZoneOption(timeZone: TimeZone, selected: boolean): Option {
-		return {
-			name: timeZone.name,
-			value: timeZone.value,
-			selected: selected,
-		};
 	}
 
 	#onValueChange(event: CustomEvent & { target: UmbInputDateElement }) {
@@ -212,12 +213,15 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		}
 
 		this._datePickerValue = newPickerValue;
-		this.#updateValue(value);
-		console.log(`[UmbDateWithTimeZonePicker] Value changed: ${value}`);
+		this.#updateValue(value, true);
 	}
 
 	#onTimeZoneChange(event: UUIComboboxEvent) {
 		const timeZoneValue = (event.target as UUIComboboxElement).value.toString();
+		if (timeZoneValue === this._selectedTimeZone) {
+			return; // No change in time zone selection
+		}
+
 		this._selectedTimeZone = timeZoneValue;
 
 		if (!this._selectedTimeZone) {
@@ -234,7 +238,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		console.log(`[UmbDateWithTimeZonePicker] TimeZone changed: ${timeZoneValue}`);
 	}
 
-	#updateValue(date: string) {
+	#updateValue(date: string, updateOffsets = false) {
 		// Try to parse the date with the selected time zone
 		const newDate = DateTime.fromISO(date, { zone: this._selectedTimeZone ?? 'UTC' });
 
@@ -251,6 +255,14 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 			date: this.#getCurrentDateValue(),
 			timeZone: this._selectedTimeZone,
 		};
+
+		if (updateOffsets) {
+			this._timeZoneOptions.forEach((opt) => {
+				opt.offset = newDate.setZone(opt.value).toFormat('Z');
+			});
+			// Update the time zone options (mostly for the offset)
+			this._filteredTimeZoneOptions = this._timeZoneOptions;
+		}
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -297,7 +309,6 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		return html`
 			<uui-combobox
 				pristine
-				search=""
 				@search="${this.#onTimeZoneSearch}"
 				@change="${this.#onTimeZoneChange}"
 				value=${this._selectedTimeZone || ''}
@@ -311,8 +322,8 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 
 	#onTimeZoneSearch(event: UUIComboboxEvent) {
 		const searchTerm = (event.target as UUIComboboxElement)?.search;
-		this._filteredTimeZoneOptions = this._timeZoneOptions.filter((option) =>
-			option.name.toLowerCase().includes(searchTerm),
+		this._filteredTimeZoneOptions = this._timeZoneOptions.filter(
+			(option) => option.name.toLowerCase().includes(searchTerm) || option.offset === searchTerm,
 		);
 	}
 
