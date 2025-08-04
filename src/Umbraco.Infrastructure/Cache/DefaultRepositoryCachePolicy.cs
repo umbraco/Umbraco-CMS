@@ -34,7 +34,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         : base(cache, scopeAccessor, repositoryCacheVersionService) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
 
-    [Obsolete("Use the constructor with RepositoryCachePolicyOptions parameter instead.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DefaultRepositoryCachePolicy(
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,

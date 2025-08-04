@@ -30,7 +30,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     {
         _logger.LogDebug("Checking if cache for {EntityType} is synced", typeof(TEntity).Name);
 
-        // We have to take a read lock to ensure the cache is not being updated while we check the version
+        // We have to take a read lock to ensure the cache is not being updated while we check the version.
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(Constants.Locks.CacheVersion);
 
@@ -77,7 +77,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-        // We have to take a write lock to ensure the cache is not being read while we update the version
+        // We have to take a write lock to ensure the cache is not being read while we update the version.
         scope.WriteLock(Constants.Locks.CacheVersion);
 
         var cacheKey = GetCacheKey<TEntity>();

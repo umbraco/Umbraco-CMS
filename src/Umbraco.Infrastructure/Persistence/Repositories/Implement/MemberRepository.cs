@@ -84,7 +84,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             new MemberRepositoryUsernameCachePolicy(GlobalIsolatedCache, ScopeAccessor, DefaultOptions, repositoryCacheVersionService);
     }
 
-    [Obsolete("Use the constructor with IRepositoryCacheVersionService parameter instead. Scheduled for removal in v18.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public MemberRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,

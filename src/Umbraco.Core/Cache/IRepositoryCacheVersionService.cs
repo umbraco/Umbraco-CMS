@@ -22,7 +22,7 @@ public interface IRepositoryCacheVersionService
         where TEntity : class;
 
     /// <summary>
-    /// Registers that the cache has been synced with the database
+    /// Registers that the cache has been synced with the database.
     /// </summary>
     Task SetCachesSyncedAsync();
 }

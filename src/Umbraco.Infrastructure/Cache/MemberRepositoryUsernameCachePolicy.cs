@@ -20,7 +20,7 @@ public class MemberRepositoryUsernameCachePolicy : DefaultRepositoryCachePolicy<
     {
     }
 
-    [Obsolete("Use the constructor with IRepositoryCacheVersionService instead. Scheuled for removal in V18.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public MemberRepositoryUsernameCachePolicy(
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,

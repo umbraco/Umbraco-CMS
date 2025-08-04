@@ -87,7 +87,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             repositoryCacheVersionService);
     }
 
-    [Obsolete("Use constructor with IRepositoryCacheVersionService instead. Scheduled for removal in v18.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,

@@ -32,7 +32,7 @@ public abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCache
         _cacheVersionService = cacheVersionService;
     }
 
-    [Obsolete("Use the constructor with IRepositoryCacheVersionService parameter instead. Scheduled for removal in V18.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     protected RepositoryCachePolicyBase(IAppPolicyCache globalCache, IScopeAccessor scopeAccessor)
     : this(
         globalCache,

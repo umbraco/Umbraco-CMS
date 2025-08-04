@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _eventAggregator = eventAggregator;
         }
 
-        [Obsolete("Use the constructor with IRepositoryCacheVersionService instead. Scheduled for removal in v18.")]
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
         protected ContentRepositoryBase(
             IScopeAccessor scopeAccessor,
             AppCaches cache,

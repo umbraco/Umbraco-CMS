@@ -84,6 +84,6 @@ public static partial class Constants
         /// <summary>
         ///    The cache version.
         /// </summary>
-        public const int CacheVersion = -344;
+        public const int CacheVersion = -346;
     }
 }

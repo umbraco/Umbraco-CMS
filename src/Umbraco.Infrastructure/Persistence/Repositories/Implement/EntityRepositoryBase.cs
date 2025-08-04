@@ -41,7 +41,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    [Obsolete("Use the constructor with IRepositoryCacheVersionService instead. Scheduled for removal in v18.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     protected EntityRepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches,
         ILogger<EntityRepositoryBase<TId, TEntity>> logger)
         : this(
