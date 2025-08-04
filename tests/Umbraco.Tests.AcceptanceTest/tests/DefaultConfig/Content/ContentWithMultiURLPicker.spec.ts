@@ -190,6 +190,7 @@ test('can add multiple links in the content', {tag: '@release'}, async ({umbraco
   await umbracoUi.content.selectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickAddButton();
+  await umbracoUi.waitForTimeout(500); // Wait for the media link to be added
   // Add external link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();

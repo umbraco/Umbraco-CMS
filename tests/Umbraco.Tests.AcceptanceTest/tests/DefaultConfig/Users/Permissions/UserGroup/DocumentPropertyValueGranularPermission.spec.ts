@@ -50,7 +50,7 @@ test('can only see property values for specific document with read UI enabled', 
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly(firstPropertyName[1]);
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly(secondPropertyName[1]);
   await umbracoUi.content.goToContentWithName(secondDocumentName);
-  await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
 });
 
 test('cannot see specific property value without UI read permission enabled', async ({umbracoApi, umbracoUi}) => {

@@ -70,7 +70,7 @@ test('cannot open content without document read permission even with UI read per
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert
-  await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
 });
 
 test('cannot edit property values without UI write permission', async ({umbracoApi, umbracoUi}) => {
