@@ -104,7 +104,15 @@ export abstract class UmbTreeServerDataSourceBase<
 
 		if (data) {
 			const items = data?.items.map((item: ServerTreeItemType) => this.#mapper(item));
-			return { data: { total: data.total, items } };
+			debugger;
+			return {
+				data: {
+					total: data.total,
+					totalBefore: data.totalBefore,
+					totalAfter: data.totalAfter,
+					items,
+				},
+			};
 		}
 
 		return { error };
