@@ -408,7 +408,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -467,7 +467,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -771,6 +771,12 @@ export type DocumentTypeItemResponseModel = {
     isElement: boolean;
     icon?: string | null;
     description?: string | null;
+};
+
+export type DocumentTypePermissionPresentationModel = {
+    $type: string;
+    verbs: Array<string>;
+    documentTypeAlias: string;
 };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
@@ -2382,6 +2388,48 @@ export type StylesheetResponseModel = {
     content: string;
 };
 
+export type SubsetDataTypeTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DataTypeTreeItemResponseModel>;
+};
+
+export type SubsetDocumentBlueprintTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentBlueprintTreeItemResponseModel>;
+};
+
+export type SubsetDocumentTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentTreeItemResponseModel>;
+};
+
+export type SubsetDocumentTypeTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentTypeTreeItemResponseModel>;
+};
+
+export type SubsetMediaTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<MediaTreeItemResponseModel>;
+};
+
+export type SubsetMediaTypeTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<MediaTypeTreeItemResponseModel>;
+};
+
+export type SubsetNamedEntityTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<NamedEntityTreeItemResponseModel>;
+};
+
 export type TagResponseModel = {
     id: string;
     text?: string | null;
@@ -2777,7 +2825,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2884,7 +2932,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
@@ -3771,7 +3819,7 @@ export type GetTreeDataTypeSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<DataTypeTreeItemResponseModel>;
+    200: SubsetDataTypeTreeItemResponseModel;
 };
 
 export type GetTreeDataTypeSiblingsResponse = GetTreeDataTypeSiblingsResponses[keyof GetTreeDataTypeSiblingsResponses];
@@ -4709,7 +4757,7 @@ export type GetTreeDocumentBlueprintSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<DocumentBlueprintTreeItemResponseModel>;
+    200: SubsetDocumentBlueprintTreeItemResponseModel;
 };
 
 export type GetTreeDocumentBlueprintSiblingsResponse = GetTreeDocumentBlueprintSiblingsResponses[keyof GetTreeDocumentBlueprintSiblingsResponses];
@@ -5550,7 +5598,7 @@ export type GetTreeDocumentTypeSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<DocumentTypeTreeItemResponseModel>;
+    200: SubsetDocumentTypeTreeItemResponseModel;
 };
 
 export type GetTreeDocumentTypeSiblingsResponse = GetTreeDocumentTypeSiblingsResponses[keyof GetTreeDocumentTypeSiblingsResponses];
@@ -7156,6 +7204,7 @@ export type GetTreeDocumentSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/tree/document/siblings';
 };
@@ -7175,7 +7224,7 @@ export type GetTreeDocumentSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<DocumentTreeItemResponseModel>;
+    200: SubsetDocumentTreeItemResponseModel;
 };
 
 export type GetTreeDocumentSiblingsResponse = GetTreeDocumentSiblingsResponses[keyof GetTreeDocumentSiblingsResponses];
@@ -9070,7 +9119,7 @@ export type GetTreeMediaTypeSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<MediaTypeTreeItemResponseModel>;
+    200: SubsetMediaTypeTreeItemResponseModel;
 };
 
 export type GetTreeMediaTypeSiblingsResponse = GetTreeMediaTypeSiblingsResponses[keyof GetTreeMediaTypeSiblingsResponses];
@@ -10016,6 +10065,7 @@ export type GetTreeMediaSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/tree/media/siblings';
 };
@@ -10035,7 +10085,7 @@ export type GetTreeMediaSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<MediaTreeItemResponseModel>;
+    200: SubsetMediaTreeItemResponseModel;
 };
 
 export type GetTreeMediaSiblingsResponse = GetTreeMediaSiblingsResponses[keyof GetTreeMediaSiblingsResponses];
@@ -14170,7 +14220,7 @@ export type GetTreeTemplateSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<NamedEntityTreeItemResponseModel>;
+    200: SubsetNamedEntityTreeItemResponseModel;
 };
 
 export type GetTreeTemplateSiblingsResponse = GetTreeTemplateSiblingsResponses[keyof GetTreeTemplateSiblingsResponses];
