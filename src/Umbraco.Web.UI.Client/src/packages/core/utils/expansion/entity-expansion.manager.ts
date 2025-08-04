@@ -124,4 +124,15 @@ export class UmbEntityExpansionManager<
 		this._expansion.setValue([]);
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
+
+	/**
+	 * Gets an item from the expansion state
+	 * @param {EntryModelType} entity The entity to get
+	 * @returns {*}  {(Promise<UmbEntityExpansionEntryModel | undefined>)}
+	 * @memberof UmbEntityExpansionManager
+	 */
+	public async getItem(entity: EntryModelType): Promise<EntryModelType | undefined> {
+		const expansion = this._expansion.getValue();
+		return expansion.find((x) => x.entityType === entity.entityType && x.unique === entity.unique);
+	}
 }
