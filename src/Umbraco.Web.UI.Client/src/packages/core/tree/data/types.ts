@@ -1,7 +1,7 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 interface UmbTargetPagination {
-	treeItem: {
+	item: {
 		unique: string;
 		entityType: string;
 	};

@@ -41,7 +41,7 @@ const getRootItems = (args: UmbDocumentTreeRootItemsRequestArgs) => {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentService.getTreeDocumentSiblings({
 			query: {
-				target: args.target.treeItem.unique,
+				target: args.target.item.unique,
 				before: args.target.before,
 				after: args.target.after,
 			},
@@ -62,7 +62,7 @@ const getChildrenOf = async (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 			// eslint-disable-next-line local-rules/no-direct-api-import
 			const { data } = await DocumentService.getTreeDocumentSiblings({
 				query: {
-					target: args.target.treeItem.unique,
+					target: args.target.item.unique,
 					before: args.target.before,
 					after: args.target.after,
 				},
