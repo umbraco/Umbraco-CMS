@@ -114,5 +114,5 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
 
     internal string GetCacheKey<TEntity>()
         where TEntity : class =>
-        typeof(TEntity).Name;
+        typeof(TEntity).FullName ?? typeof(TEntity).Name;
 }
