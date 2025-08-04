@@ -6,7 +6,7 @@ import './input-dropzone.element.js';
 
 const meta: Meta<UmbInputDropzoneElement> = {
 	id: 'umb-input-dropzone',
-	title: 'Components/Inputs/Dropzone',
+	title: 'Entity/Media/Components/Input Dropzone',
 	component: 'umb-input-dropzone',
 	args: {
 		disabled: false,
@@ -25,7 +25,7 @@ export default meta;
 
 type Story = StoryObj<UmbInputDropzoneElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
 
 export const WithDisabled: Story = {
 	args: {
