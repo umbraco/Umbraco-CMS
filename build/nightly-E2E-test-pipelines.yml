@@ -501,9 +501,21 @@ stages:
                 \"attachments\": [
                   {
                     \"color\": \"#ff0000\",
-                    \"pretext\": \"A nightly E2E pipeline ran with failing E2E tests\",
+                    \"pretext\": \"E2E pipeline *${BUILD_DEFINITIONNAME}* (#${BUILD_BUILDNUMBER}) failed!\",
                     \"title\": \"View Failed E2E Test Results\",
-                    \"title_link\": \"$PIPELINE_URL\"
+                    \"title_link\": \"$PIPELINE_URL\",
+                    \"fields\": [
+                      {
+                        \"title\": \"Pipeline\",
+                        \"value\": \"${BUILD_DEFINITIONNAME}\",
+                        \"short\": true
+                      },
+                      {
+                      \"title\": \"Build ID\",
+                      \"value\": \"${BUILD_BUILDID}\",
+                      \"short\": true
+                      }
+                    ]
                   }
                 ]
               }"
