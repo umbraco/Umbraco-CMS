@@ -486,7 +486,7 @@ stages:
 
   - stage: NotifySlackBot
     displayName: Notify Slack on Failure
-    dependsOn: E2ETests
+    dependsOn: E2E
     condition: failed()
     jobs:
       - job: PostToSlack
