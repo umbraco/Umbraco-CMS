@@ -32,4 +32,7 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	loadChildren(): void;
 	showChildren(): void;
 	hideChildren(): void;
+	// TODO: v18 make these non-optional
+	loadPrevItems?(): void;
+	loadNextItems?(): void;
 }
