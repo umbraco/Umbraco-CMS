@@ -197,6 +197,7 @@ export abstract class UmbTreeItemContextBase<
 
 	/**
 	 * Load more children of the tree item
+	 * @deprecated Use `loadNextItems` instead. Will be removed in v18.0.0.
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {void}
 	 */
