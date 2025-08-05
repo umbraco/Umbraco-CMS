@@ -132,12 +132,12 @@ export abstract class UmbTreeItemElementBase<
 
 	#onLoadPrev(event: any) {
 		event.stopPropagation();
-		this.#api?.loadPrevItems();
+		this.#api?.loadPrevItems?.();
 	}
 
 	#onLoadNext(event: any) {
 		event.stopPropagation();
-		this.#api?.loadNextItems();
+		this.#api?.loadNextItems?.();
 	}
 
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
