@@ -529,4 +529,4 @@ stages:
                 --data "$PAYLOAD" \
                 "$SLACK_WEBHOOK_URL"
             env:
-              SLACK_WEBHOOK_URL: $(SLACKWEBHOOKURL)
+              SLACK_WEBHOOK_URL: $(E2ESlackWebhookUrl)
