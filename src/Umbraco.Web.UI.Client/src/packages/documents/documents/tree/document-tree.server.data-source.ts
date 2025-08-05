@@ -36,21 +36,39 @@ export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase
 	}
 }
 
-const getRootItems = (args: UmbDocumentTreeRootItemsRequestArgs) => {
+const getRootItems = async (args: UmbDocumentTreeRootItemsRequestArgs) => {
 	if (args.target) {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentService.getTreeDocumentSiblings({
+		const { data } = await DocumentService.getTreeDocumentSiblings({
 			query: {
 				target: args.target.item.unique,
 				before: args.target.before,
 				after: args.target.after,
 			},
 		});
+
+		return {
+			data: {
+				items: data.items,
+				total: data.totalBefore + data.items.length + data.totalAfter,
+				totalBefore: data.totalBefore,
+				totalAfter: data.totalAfter,
+			},
+		};
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentService.getTreeDocumentRoot({
+		const { data } = await DocumentService.getTreeDocumentRoot({
 			query: { dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
 		});
+
+		return {
+			data: {
+				items: data.items,
+				total: data.total,
+				totalBefore: 0,
+				totalAfter: data.total - data.items.length,
+			},
+		};
 	}
 };
 
@@ -78,9 +96,18 @@ const getChildrenOf = async (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 			};
 		} else {
 			// eslint-disable-next-line local-rules/no-direct-api-import
-			return DocumentService.getTreeDocumentChildren({
+			const { data } = await DocumentService.getTreeDocumentChildren({
 				query: { parentId: args.parent.unique, dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
 			});
+
+			return {
+				data: {
+					items: data.items,
+					total: data.total,
+					totalBefore: 0,
+					totalAfter: data.total - data.items.length,
+				},
+			};
 		}
 	}
 };

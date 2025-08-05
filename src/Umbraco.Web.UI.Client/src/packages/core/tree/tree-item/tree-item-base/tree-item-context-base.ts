@@ -227,16 +227,6 @@ export abstract class UmbTreeItemContextBase<
 
 		this.#isLoading.setValue(true);
 
-		const something = target
-			? {
-					item: {
-						unique: target.unique,
-						entityType: target.entityType,
-					},
-					before: 4,
-					after: 9,
-				}
-			: undefined;
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
@@ -245,8 +235,17 @@ export abstract class UmbTreeItemContextBase<
 				unique: this.unique,
 				entityType: this.entityType,
 			},
+			target: target
+				? {
+						item: {
+							unique: target.unique,
+							entityType: target.entityType,
+						},
+						before: 4,
+						after: 9,
+					}
+				: undefined,
 			foldersOnly,
-			target: something,
 			...additionalArgs,
 		});
 
@@ -298,7 +297,7 @@ export abstract class UmbTreeItemContextBase<
 		});
 
 		if (data) {
-			const reversedItems = data.items.reverse();
+			const reversedItems = [...data.items].reverse();
 			this.#childItems.prepend(reversedItems);
 
 			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
