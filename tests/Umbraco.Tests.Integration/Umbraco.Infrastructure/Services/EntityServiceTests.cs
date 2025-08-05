@@ -1071,7 +1071,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var result = EntityService.GetSiblings(_documentTypeSubContainer2Key, objectTypes, 1, 1, out long totalBefore, out long totalAfter).ToArray();
         Assert.AreEqual(0, totalBefore);
         Assert.AreEqual(0, totalAfter);
-        Assert.AreEqual(foldersOnly ? 2 : 3, result.Length);
+
+        var expectedCount = foldersOnly ? 2 : 3;
+        Assert.AreEqual(expectedCount, result.Length);
         Assert.IsTrue(result[0].Key == _documentTypeSubContainer1Key);
         Assert.IsTrue(result[1].Key == _documentTypeSubContainer2Key);
         if (foldersOnly is false)
