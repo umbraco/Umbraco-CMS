@@ -6,10 +6,10 @@ export interface UmbPagedModel<T> {
 	total: number;
 }
 
-export interface UmbTargetPagedModel<T> {
-	items: Array<T>;
-	totalAfter: number;
-	totalBefore: number;
+export interface UmbTargetPagedModel<T> extends UmbPagedModel<T> {
+	// TODO: v18: make mandatory
+	totalAfter?: number;
+	totalBefore?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

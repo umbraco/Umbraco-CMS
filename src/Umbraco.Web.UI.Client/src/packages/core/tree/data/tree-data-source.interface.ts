@@ -4,7 +4,7 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import type { UmbPagedModel, UmbDataSourceResponse, UmbTargetPagedModel } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbTargetPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
