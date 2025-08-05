@@ -308,25 +308,25 @@ stages:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
-#            LinuxPart2Of3:
-#              testCommand: "npm run test -- --shard=2/3"
-#              vmImage: "ubuntu-latest"
-#              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-#              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
-#            LinuxPart3Of3:
-#              testCommand: "npm run test -- --shard=3/3"
-#              vmImage: "ubuntu-latest"
-#              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-#              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
-#            WindowsPart1Of3:
-#              vmImage: "windows-latest"
-#              testCommand: "npm run test -- --shard=1/3"
-#            WindowsPart2Of3:
-#              vmImage: "windows-latest"
-#              testCommand: "npm run test -- --shard=2/3"
-#            WindowsPart3Of3:
-#              vmImage: "windows-latest"
-#              testCommand: "npm run test -- --shard=3/3"
+            LinuxPart2Of3:
+              testCommand: "npm run test -- --shard=2/3"
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
+            LinuxPart3Of3:
+              testCommand: "npm run test -- --shard=3/3"
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
+            WindowsPart1Of3:
+              vmImage: "windows-latest"
+              testCommand: "npm run test -- --shard=1/3"
+            WindowsPart2Of3:
+              vmImage: "windows-latest"
+              testCommand: "npm run test -- --shard=2/3"
+            WindowsPart3Of3:
+              vmImage: "windows-latest"
+              testCommand: "npm run test -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -487,9 +487,9 @@ stages:
   - stage: NotifySlackBot
     displayName: Notify Slack on Failure
     dependsOn: E2E
-#    condition: or(
-#      eq(dependencies.E2E.result, 'failed'),
-#      eq(dependencies.E2E.result, 'succeededWithIssues'))
+    condition: or(
+      eq(dependencies.E2E.result, 'failed'),
+      eq(dependencies.E2E.result, 'succeededWithIssues'))
     jobs:
       - job: PostToSlack
         displayName: Send Slack Notification
@@ -497,8 +497,8 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
           - bash: |
-              PIPELINE_URL="$(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)"
-              SECONDPIPELINE_URL="${SYSTEM_TEAMFOUNDATIONURI}${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}"
+              PIPELINE_URL="$(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)&view=ms.vss-test-web.build-test-results-tab"
+              TEST_RESULTS_URL="$(PIPELINE_URL)&view=ms.vss-test-web.build-test-results-tab"
 
               PAYLOAD="{
                 \"attachments\": [
@@ -506,7 +506,7 @@ stages:
                     \"color\": \"#ff0000\",
                     \"pretext\": \"E2E pipeline *${BUILD_DEFINITIONNAME}* (#${BUILD_BUILDNUMBER}) failed!\",
                     \"title\": \"View Failed E2E Test Results\",
-                    \"title_link\": \"$PIPELINE_URL\",
+                    \"title_link\": \"TEST_RESULTS_URL\",
                     \"fields\": [
                       {
                         \"title\": \"Pipeline\",
@@ -515,6 +515,7 @@ stages:
                       },
                       {
                       \"title\": \"Build ID\",
+                      \"title_link\": \"PIPELINE_URL\",
                       \"value\": \"${BUILD_BUILDID}\",
                       \"short\": true
                       }
@@ -524,7 +525,6 @@ stages:
               }"
 
               echo "Sending Slack message to: $PIPELINE_URL"
-              echo "Sending Slack second message to: $SECONDPIPELINE_URL"
               curl -X POST -H 'Content-type: application/json' \
                 --data "$PAYLOAD" \
                 "$SLACK_WEBHOOK_URL"
