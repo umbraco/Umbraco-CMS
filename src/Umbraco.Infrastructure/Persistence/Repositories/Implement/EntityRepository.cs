@@ -225,7 +225,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         }
 
         // To re-use this method we need to provide a single object type. By convention for folder based trees, we provide the primary object type last.
-        return PerformGetAll([.. objectTypes], ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
+        return PerformGetAll(objectTypes.ToArray(), ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
     }
 
     private static int GetBeforeAfterParameterOffset(ISet<Guid> objectTypes, IQuery<IUmbracoEntity>? filter)
@@ -233,7 +233,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         int beforeAfterParameterIndexOffset = 0;
 
         // Increment for each object type.
-        beforeAfterParameterIndexOffset += objectTypes.Count();
+        beforeAfterParameterIndexOffset += objectTypes.Count;
 
         // Increment for the provided filter.
         if (filter != null)
