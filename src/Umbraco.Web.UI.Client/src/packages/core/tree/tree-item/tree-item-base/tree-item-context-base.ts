@@ -38,11 +38,25 @@ export abstract class UmbTreeItemContextBase<
 	public unique?: UmbEntityUnique;
 	public entityType?: string;
 
-	public readonly paginationPrev = new UmbTargetPaginationManager(this);
-	public readonly paginationNext = new UmbTargetPaginationManager(this);
-
-	// TODO: rename to paginationNext$
+	/**
+	 *
+	 * The pagination manager for the tree item context.
+	 * @deprecated Use `paginationPrev` and `paginationNext` instead.
+	 * @memberof UmbTreeItemContextBase
+	 */
 	public readonly pagination = new UmbPaginationManager();
+
+	/**
+	 * The pagination manager for the previous items in the tree item context.
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public readonly paginationPrev = new UmbTargetPaginationManager(this);
+
+	/**
+	 * The pagination manager for the next items in the tree item context.
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public readonly paginationNext = new UmbTargetPaginationManager(this);
 
 	#manifest?: ManifestType;
 
