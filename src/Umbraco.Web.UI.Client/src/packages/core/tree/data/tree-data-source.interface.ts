@@ -4,7 +4,7 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbPagedModel, UmbDataSourceResponse, UmbTargetPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -32,14 +32,14 @@ export interface UmbTreeDataSource<
 	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */
-	getRootItems(args: TreeRootItemsRequestArgsType): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
+	getRootItems(args: TreeRootItemsRequestArgsType): Promise<UmbDataSourceResponse<UmbTargetPagedModel<TreeItemType>>>;
 
 	/**
 	 * Gets the children of the given parent item.
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */
-	getChildrenOf(args: TreeChildrenOfRequestArgsType): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
+	getChildrenOf(args: TreeChildrenOfRequestArgsType): Promise<UmbDataSourceResponse<UmbTargetPagedModel<TreeItemType>>>;
 
 	/**
 	 * Gets the ancestors of the given item.
