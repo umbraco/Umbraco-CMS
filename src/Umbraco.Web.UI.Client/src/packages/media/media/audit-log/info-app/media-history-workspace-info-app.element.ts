@@ -42,7 +42,9 @@ export class UmbMediaHistoryWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	async #requestAuditLogs() {
-		const unique = this.#workspaceContext?.getUnique();
+		if (!this.#workspaceContext) return;
+
+		const unique = this.#workspaceContext.getUnique();
 		if (!unique) throw new Error('Media unique is required');
 
 		const { data } = await this.#auditLogRepository.requestAuditLog({

@@ -76,9 +76,7 @@ test('can not browse content node with permission disabled', async ({umbracoApi,
   await umbracoUi.content.goToContentWithName(rootDocumentName);
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible();
-  // TODO: Uncomment this when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18533
-  //await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
 });
 
 test('can create document blueprint with permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -127,7 +125,8 @@ test('can delete content with delete permission enabled', async ({umbracoApi, um
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  await umbracoUi.content.waitForContentToBeTrashed();
+  await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName);
 });
 
 test('can not delete content with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -159,7 +158,8 @@ test('can empty recycle bin with delete permission enabled', async ({umbracoApi,
   await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
+  await umbracoUi.content.waitForRecycleBinToBeEmptied();
+  await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName, false, false);
 });
 
 test('can not empty recycle bin with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -270,7 +270,8 @@ test('can not publish content with publish permission disabled', async ({umbraco
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Bug, does nothing in the frontend.
+// Remove .skip when the front-end is ready. Currently there is no "Permissions" menu item displays
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19339
 test.skip('can set permissions with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName);
@@ -539,8 +540,7 @@ test('can not set culture and hostnames with culture and hostnames permission di
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// TODO: Notification is not correct 'Public access setting created' should be 'access'
-test.skip('can set public access with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can set public access with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermission(userGroupName);
   const testMemberGroup = 'TestMemberGroup';
@@ -593,6 +593,7 @@ test('can rollback content with rollback permission enabled', async ({umbracoApi
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedTextStringText);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
+  await umbracoUi.waitForTimeout(700); // Wait for the rollback items to load
   await umbracoUi.content.clickLatestRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
