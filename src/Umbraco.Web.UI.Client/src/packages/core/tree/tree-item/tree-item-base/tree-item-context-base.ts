@@ -22,7 +22,6 @@ import {
 	UmbPaginationManager,
 	UmbTargetPaginationManager,
 	debounce,
-	type UmbTargetPagination,
 } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
