@@ -32,7 +32,7 @@ public class MigrateCheckboxListDataTypesAndPropertyData : AsyncMigrationBase
 
         // Copy from varcharValue to textValue and set varcharValue to null for all property data stored using data types based on
         // the Umbraco.CheckBoxList property editor.
-        string sql = @"
+        string sql = $@"
 UPDATE umbracoPropertyData
 SET textValue = varcharValue, varcharValue = NULL
 WHERE propertyTypeId IN (
@@ -41,7 +41,7 @@ WHERE propertyTypeId IN (
 	WHERE dataTypeId IN (
 		SELECT nodeId
         FROM umbracoDataType
-        WHERE propertyEditorAlias = '{CheckBoxListEditorAlias}'
+        WHERE propertyEditorAlias = '{Constants.PropertyEditors.Aliases.CheckBoxList}'
 	)
 )
 AND varcharValue IS NOT NULL";
