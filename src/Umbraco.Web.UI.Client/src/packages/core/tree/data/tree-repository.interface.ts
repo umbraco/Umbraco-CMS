@@ -5,9 +5,9 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
 import type {
-	UmbPagedModel,
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
+	UmbTargetPagedModel,
 } from '@umbraco-cms/backoffice/repository';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
