@@ -4,7 +4,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-tree-load-prev-button')
 export class UmbTreeLoadPrevButtonElement extends UmbLitElement {
 	override render() {
-		return html`<uui-button data-mark="tree:load-prev" id="load-prev" look="secondary" label="Load prev"></uui-button>`;
+		return html`<uui-button
+			data-mark="tree:load-prev"
+			id="load-prev"
+			look="secondary"
+			label=${this.localize.term('actions_loadMore')}></uui-button>`;
 	}
 
 	static override readonly styles = css`
