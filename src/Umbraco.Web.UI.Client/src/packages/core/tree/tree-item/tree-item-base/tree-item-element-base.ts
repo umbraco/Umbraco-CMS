@@ -130,14 +130,14 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.pagination.setCurrentPageNumber(next);
 	};
 
-	#onLoadNext(event: any) {
-		event.stopPropagation();
-		console.log('Load next page');
-	}
-
 	#onLoadPrev(event: any) {
 		event.stopPropagation();
-		console.log('Load previous page');
+		this.#api?.loadPrevItems();
+	}
+
+	#onLoadNext(event: any) {
+		event.stopPropagation();
+		this.#api?.loadNextItems();
 	}
 
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.

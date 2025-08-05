@@ -95,6 +95,9 @@ export abstract class UmbTreeItemContextBase<
 	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
+	#startTarget: any = undefined; // TODO: fix this type
+	#endTarget: any = undefined; // TODO: fix this type
+
 	#pagingPrev = {
 		take: 5,
 	};
@@ -183,14 +186,30 @@ export abstract class UmbTreeItemContextBase<
 	/**
 	 * Load children of the tree item
 	 * @memberof UmbTreeItemContextBase
+	 * @returns {void}
 	 */
 	public loadChildren = () => this.#loadChildren();
 
 	/**
 	 * Load more children of the tree item
 	 * @memberof UmbTreeItemContextBase
+	 * @returns {void}
 	 */
 	public loadMore = () => this.#loadChildren(true);
+
+	/**
+	 * Load previous items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {void}
+	 */
+	public loadPrevItems = () => this.#loadPrevItemsFromTarget();
+
+	/**
+	 * Load next items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {void}
+	 */
+	public loadNextItems = () => this.#loadNextItemsFromTarget();
 
 	async #loadChildren(loadMore = false) {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
@@ -236,7 +255,7 @@ export abstract class UmbTreeItemContextBase<
 		this.#isLoading.setValue(false);
 	}
 
-	async #loadChildrenWithTarget(target: { unique: string; entityType: string }) {
+	async #loadItemsFromTarget(target: { unique: string; entityType: string }) {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
 
@@ -246,14 +265,6 @@ export abstract class UmbTreeItemContextBase<
 
 		this.#isLoading.setValue(true);
 
-		const targetPagination: UmbTargetPagination = {
-			item: {
-				unique: target.unique,
-				entityType: target.entityType,
-			},
-			before: this.#pagingPrev.take,
-			after: this.#pagingNext.take,
-		};
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
@@ -263,20 +274,108 @@ export abstract class UmbTreeItemContextBase<
 				entityType: this.entityType,
 			},
 			foldersOnly,
-			target: targetPagination,
+			target: {
+				item: {
+					unique: target.unique,
+					entityType: target.entityType,
+				},
+				before: 4,
+				after: 9,
+			},
 			...additionalArgs,
 		});
 
 		if (data) {
-			debugger;
-
 			this.#childItems.setValue(data.items);
 
 			const hasChildren = data.total > 0;
 			this.#hasChildren.setValue(hasChildren);
 			this.#hasChildrenContext.setHasChildren(hasChildren);
 
+			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
+			this.#startTarget = firstItem ? { unique: firstItem.unique, entityType: firstItem.entityType } : undefined;
+
+			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
+			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
+
 			this.paginationPrev.setTotalItems(data.totalBefore);
+			this.paginationNext.setTotalItems(data.totalAfter);
+		}
+
+		this.#isLoading.setValue(false);
+	}
+
+	async #loadPrevItemsFromTarget() {
+		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
+		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
+
+		const repository = this.treeContext?.getRepository();
+		if (!repository) throw new Error('Could not request children, repository is missing');
+
+		this.#isLoading.setValue(true);
+
+		const foldersOnly = this.#foldersOnly.getValue();
+		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
+
+		const { data } = await repository.requestTreeItemsOf({
+			parent: {
+				unique: this.unique,
+				entityType: this.entityType,
+			},
+			foldersOnly,
+			target: {
+				item: this.#startTarget,
+				before: 5,
+				after: 0,
+			},
+			...additionalArgs,
+		});
+
+		if (data) {
+			const reversedItems = data.items.reverse();
+			this.#childItems.prepend(reversedItems);
+
+			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
+			this.#startTarget = firstItem ? { unique: firstItem.unique, entityType: firstItem.entityType } : undefined;
+
+			this.paginationPrev.setTotalItems(data.totalBefore);
+		}
+
+		this.#isLoading.setValue(false);
+	}
+
+	async #loadNextItemsFromTarget() {
+		if (this.unique === undefined) throw new Error('Could not request next items, unique key is missing');
+		if (this.entityType === undefined) throw new Error('Could not request next items, entity type is missing');
+
+		const repository = this.treeContext?.getRepository();
+		if (!repository) throw new Error('Could not request next items, repository is missing');
+
+		this.#isLoading.setValue(true);
+
+		const foldersOnly = this.#foldersOnly.getValue();
+		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
+
+		const { data } = await repository.requestTreeItemsOf({
+			parent: {
+				unique: this.unique,
+				entityType: this.entityType,
+			},
+			foldersOnly,
+			target: {
+				item: this.#endTarget,
+				before: 0,
+				after: 5,
+			},
+			...additionalArgs,
+		});
+
+		if (data) {
+			this.#childItems.append(data.items);
+
+			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
+			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
+
 			this.paginationNext.setTotalItems(data.totalAfter);
 		}
 
@@ -480,7 +579,7 @@ export abstract class UmbTreeItemContextBase<
 					const target = expansionEntry?.target;
 
 					if (target) {
-						this.#loadChildrenWithTarget(target);
+						this.#loadItemsFromTarget(target);
 					} else {
 						this.#loadChildren(false);
 					}

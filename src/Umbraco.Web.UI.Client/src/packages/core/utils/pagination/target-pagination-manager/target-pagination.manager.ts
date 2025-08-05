@@ -50,7 +50,6 @@ export class UmbTargetPaginationManager extends UmbControllerBase {
 	 */
 	public setTotalItems(totalItems: number) {
 		this.#totalItems.setValue(totalItems);
-		debugger;
 		this.#hasMoreItems.setValue(totalItems > 0);
 	}
 
