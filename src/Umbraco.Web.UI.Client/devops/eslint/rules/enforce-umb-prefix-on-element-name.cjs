@@ -1,3 +1,5 @@
+const ALLOWED_PREFIXES = ['umb-', 'ufm-', 'test-', 'example-'];
+
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
 	meta: {
@@ -23,9 +25,8 @@ module.exports = {
 				if (isCustomElementDecorator) {
 					const elementName = node.arguments[0].value;
 
-					// check if the element name starts with 'umb-', 'ufm-', or 'test-', to be allow tests to have custom elements:
-					const prefixes = ['umb-', 'ufm-', 'test-'];
-					const isElementNameValid = prefixes.some((prefix) => elementName.startsWith(prefix));
+					// check if the element name starts with an allowed prefix:
+					const isElementNameValid = ALLOWED_PREFIXES.some((prefix) => elementName.startsWith(prefix));
 
 					if (!isElementNameValid) {
 						context.report({
