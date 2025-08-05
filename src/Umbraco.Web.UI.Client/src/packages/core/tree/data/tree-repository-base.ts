@@ -12,6 +12,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { of } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Base class for a tree repository.
@@ -61,6 +62,16 @@ export abstract class UmbTreeRepositoryBase<
 		this._treeSource = new treeSourceConstructor(this);
 
 		if (treeStoreContextAlias) {
+			if (false === treeStoreContextAlias.toString().startsWith('Umb')) {
+				new UmbDeprecation({
+					deprecated: `TreeRepository "${this.constructor.name}" is using a tree store context with alias "${treeStoreContextAlias.toString()}".`,
+					removeInVersion: '18.0.0',
+					solution:
+						'You do not need to supply a tree store context alias, as the tree repository will be queried each time it is needed.',
+				}).warn();
+			}
+
+			// TODO: Remember to remove this in Umbraco 18, as the tree store will not be available in the repository anymore.
 			this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
 				this._treeStore = instance;
 			})
