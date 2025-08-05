@@ -127,7 +127,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         EntityService
             .GetSiblings(
                 target,
-                ItemObjectType,
+                [ItemObjectType],
                 before,
                 after,
                 out totalBefore,

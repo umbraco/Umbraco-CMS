@@ -174,7 +174,7 @@ public interface IEntityService
     /// Gets sibling entities of a specified target entity, within a given range before and after the target, ordered as specified.
     /// </summary>
     /// <param name="key">The key of the target entity whose siblings are to be retrieved.</param>
-    /// <param name="objectType">The object type key of the entities.</param>
+    /// <param name="objectTypes">The object types of the entities.</param>
     /// <param name="before">The number of siblings to retrieve before the target entity. Needs to be greater or equal to 0.</param>
     /// <param name="after">The number of siblings to retrieve after the target entity. Needs to be greater or equal to 0.</param>
     /// <param name="filter">An optional filter to apply to the result set.</param>
@@ -184,7 +184,7 @@ public interface IEntityService
     /// <returns>Enumerable of sibling entities.</returns>
     IEnumerable<IEntitySlim> GetSiblings(
         Guid key,
-        UmbracoObjectTypes objectType,
+        IEnumerable<UmbracoObjectTypes> objectTypes,
         int before,
         int after,
         out long totalBefore,

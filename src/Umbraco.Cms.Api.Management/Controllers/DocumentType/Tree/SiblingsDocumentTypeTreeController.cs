@@ -15,10 +15,14 @@ public class SiblingsDocumentTypeTreeController : DocumentTypeTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<DocumentTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<SubsetViewModel<DocumentTypeTreeItemResponseModel>>> Siblings(
+    public async Task<ActionResult<SubsetViewModel<DocumentTypeTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,
         int before,
-        int after) =>
-        GetSiblings(target, before, after);
+        int after,
+        bool foldersOnly = false)
+    {
+        RenderFoldersOnly(foldersOnly);
+        return await GetSiblings(target, before, after);
+    }
 }

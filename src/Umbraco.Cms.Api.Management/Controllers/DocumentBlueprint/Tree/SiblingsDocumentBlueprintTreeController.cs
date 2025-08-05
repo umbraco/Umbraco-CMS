@@ -16,10 +16,14 @@ public class SiblingsDocumentBlueprintTreeController : DocumentBlueprintTreeCont
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<DocumentBlueprintTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<SubsetViewModel<DocumentBlueprintTreeItemResponseModel>>> Siblings(
+    public async Task<ActionResult<SubsetViewModel<DocumentBlueprintTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,
         int before,
-        int after) =>
-        GetSiblings(target, before, after);
+        int after,
+        bool foldersOnly = false)
+    {
+        RenderFoldersOnly(foldersOnly);
+        return await GetSiblings(target, before, after);
+    }
 }
