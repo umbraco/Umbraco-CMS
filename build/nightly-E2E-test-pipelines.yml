@@ -497,7 +497,6 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
           - bash: |
-              // We need to URL encode the project name to ensure it works in the URL
               PROJECT_NAME_ENCODED=$(echo -n "$SYSTEM_TEAMPROJECT" | jq -s -R -r @uri)
               PIPELINE_URL="${SYSTEM_TEAMFOUNDATIONCOLLECTIONURI}${PROJECT_NAME_ENCODED}/_build/results?buildId=${BUILD_BUILDID}&view=ms.vss-test-web.build-test-results-tab"
 
@@ -507,7 +506,7 @@ stages:
                     \"color\": \"#ff0000\",
                     \"pretext\": \"E2E pipeline *${BUILD_DEFINITIONNAME}* (#${BUILD_BUILDNUMBER}) failed!\",
                     \"title\": \"View Failed E2E Test Results\",
-                    \"title_link\": \"PIPELINE_URL\",
+                    \"title_link\": \"$PIPELINE_URL\",
                     \"fields\": [
                       {
                         \"title\": \"Pipeline\",
@@ -515,9 +514,9 @@ stages:
                         \"short\": true
                       },
                       {
-                      \"title\": \"Build ID\",
-                      \"value\": \"${BUILD_BUILDID}\",
-                      \"short\": true
+                        \"title\": \"Build ID\",
+                        \"value\": \"${BUILD_BUILDID}\",
+                        \"short\": true
                       }
                     ]
                   }
