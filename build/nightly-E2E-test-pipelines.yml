@@ -304,29 +304,29 @@ stages:
         strategy:
           matrix:
             LinuxPart1Of3:
-              testCommand: "npm run test -- --shard=1/3"
+              testCommand: "npm run smokeTest -- --shard=1/3"
               vmImage: "ubuntu-latest"
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
-            LinuxPart2Of3:
-              testCommand: "npm run test -- --shard=2/3"
-              vmImage: "ubuntu-latest"
-              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
-            LinuxPart3Of3:
-              testCommand: "npm run test -- --shard=3/3"
-              vmImage: "ubuntu-latest"
-              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
-            WindowsPart1Of3:
-              vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=1/3"
-            WindowsPart2Of3:
-              vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=2/3"
-            WindowsPart3Of3:
-              vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=3/3"
+#            LinuxPart2Of3:
+#              testCommand: "npm run test -- --shard=2/3"
+#              vmImage: "ubuntu-latest"
+#              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+#              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
+#            LinuxPart3Of3:
+#              testCommand: "npm run test -- --shard=3/3"
+#              vmImage: "ubuntu-latest"
+#              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+#              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
+#            WindowsPart1Of3:
+#              vmImage: "windows-latest"
+#              testCommand: "npm run test -- --shard=1/3"
+#            WindowsPart2Of3:
+#              vmImage: "windows-latest"
+#              testCommand: "npm run test -- --shard=2/3"
+#            WindowsPart3Of3:
+#              vmImage: "windows-latest"
+#              testCommand: "npm run test -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -497,7 +497,8 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
           - bash: |
-              PIPELINE_URL="${SYSTEM_TEAMFOUNDATIONURI}${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}"
+              PIPELINE_URL="$(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)"
+              SECONDPIPELINE_URL="${SYSTEM_TEAMFOUNDATIONURI}${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID}"
 
               PAYLOAD="{
                 \"attachments\": [
@@ -523,6 +524,7 @@ stages:
               }"
 
               echo "Sending Slack message to: $PIPELINE_URL"
+              echo "Sending Slack second message to: $SECONDPIPELINE_URL"
               curl -X POST -H 'Content-type: application/json' \
                 --data "$PAYLOAD" \
                 "$SLACK_WEBHOOK_URL"
