@@ -1,24 +1,20 @@
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbBooleanState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbTargetPaginationManager extends EventTarget {
+export class UmbTargetPaginationManager extends UmbControllerBase {
 	#defaultValues = {
+		take: 10,
 		totalItems: 0,
-		totalPages: 1,
-		currentPage: 1,
 	};
 
-	#pageSize = new UmbNumberState(10);
+	#pageSize = new UmbNumberState(this.#defaultValues.take);
 	public readonly pageSize = this.#pageSize.asObservable();
 
 	#totalItems = new UmbNumberState(this.#defaultValues.totalItems);
 	public readonly totalItems = this.#totalItems.asObservable();
 
-	#totalPages = new UmbNumberState(this.#defaultValues.totalPages);
-	public readonly totalPages = this.#totalPages.asObservable();
-
-	#currentPage = new UmbNumberState(this.#defaultValues.currentPage);
-	public readonly currentPage = this.#currentPage.asObservable();
+	#hasMoreItems = new UmbBooleanState(false);
+	public readonly hasMoreItems = this.#hasMoreItems.asObservable();
 
 	/**
 	 * Sets the number of items per page and recalculates the total number of pages
@@ -27,7 +23,6 @@ export class UmbTargetPaginationManager extends EventTarget {
 	 */
 	public setPageSize(pageSize: number) {
 		this.#pageSize.setValue(pageSize);
-		this.#calculateTotalPages();
 	}
 
 	/**
@@ -55,43 +50,8 @@ export class UmbTargetPaginationManager extends EventTarget {
 	 */
 	public setTotalItems(totalItems: number) {
 		this.#totalItems.setValue(totalItems);
-		this.#calculateTotalPages();
-	}
-
-	/**
-	 * Gets the total number of pages
-	 * @returns {number}
-	 * @memberof UmbPaginationManager
-	 */
-	public getTotalPages() {
-		return this.#totalPages.getValue();
-	}
-
-	/**
-	 * Gets the current page number
-	 * @returns {number}
-	 * @memberof UmbPaginationManager
-	 */
-	public getCurrentPageNumber() {
-		return this.#currentPage.getValue();
-	}
-
-	/**
-	 * Sets the current page number
-	 * @param {number} pageNumber
-	 * @memberof UmbPaginationManager
-	 */
-	public setCurrentPageNumber(pageNumber: number) {
-		if (pageNumber < 1) {
-			pageNumber = 1;
-		}
-
-		if (pageNumber > this.#totalPages.getValue()) {
-			pageNumber = this.#totalPages.getValue();
-		}
-
-		this.#currentPage.setValue(pageNumber);
-		this.dispatchEvent(new UmbChangeEvent());
+		debugger;
+		this.#hasMoreItems.setValue(totalItems > 0);
 	}
 
 	/**
@@ -100,23 +60,5 @@ export class UmbTargetPaginationManager extends EventTarget {
 	 */
 	public clear() {
 		this.#totalItems.setValue(this.#defaultValues.totalItems);
-		this.#totalPages.setValue(this.#defaultValues.totalPages);
-		this.#currentPage.setValue(this.#defaultValues.currentPage);
-	}
-
-	/**
-	 * Calculates the total number of pages
-	 * @memberof UmbPaginationManager
-	 */
-	#calculateTotalPages() {
-		let totalPages = Math.ceil(this.#totalItems.getValue() / this.#pageSize.getValue());
-		totalPages = totalPages === 0 ? 1 : totalPages;
-		this.#totalPages.setValue(totalPages);
-
-		/* If we currently are on a page higher than the total pages. We need to reset the current page to the last page.
-    This can happen if we have a filter that returns less items than the current page size. */
-		if (this.getCurrentPageNumber() > totalPages) {
-			this.setCurrentPageNumber(totalPages);
-		}
 	}
 }

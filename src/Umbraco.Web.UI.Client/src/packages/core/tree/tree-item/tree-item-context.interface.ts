@@ -3,6 +3,7 @@ import type { UmbPaginationManager } from '../../utils/pagination-manager/pagina
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextMinimal } from '@umbraco-cms/backoffice/context-api';
+import type { UmbTargetPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> extends UmbApi, UmbContextMinimal {
 	unique?: string | null;
@@ -19,6 +20,8 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	hasActions: Observable<boolean>;
 	path: Observable<string>;
 	pagination: UmbPaginationManager;
+	paginationPrev?: UmbTargetPaginationManager;
+	paginationNext?: UmbTargetPaginationManager;
 	getTreeItem(): TreeItemType | undefined;
 	setTreeItem(treeItem: TreeItemType | undefined): void;
 	loadChildren(): void;

@@ -41,6 +41,10 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.path, (value) => (this._href = value));
 			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value));
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value));
+
+			this.observe(this.#api.paginationPrev?.hasMoreItems, (value) => (this._hasPreviousItems = value || false));
+			this.observe(this.#api.paginationNext?.hasMoreItems, (value) => (this._hasNextItems = value || false));
+
 			this.#initTreeItem();
 		}
 	}
@@ -88,6 +92,12 @@ export abstract class UmbTreeItemElementBase<
 	@state()
 	private _currentPage = 1;
 
+	@state()
+	private _hasPreviousItems = false;
+
+	@state()
+	private _hasNextItems = false;
+
 	#initTreeItem() {
 		if (!this.#api) return;
 		if (!this._item) return;
@@ -120,6 +130,16 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.pagination.setCurrentPageNumber(next);
 	};
 
+	#onLoadNext(event: any) {
+		event.stopPropagation();
+		console.log('Load next page');
+	}
+
+	#onLoadPrev(event: any) {
+		event.stopPropagation();
+		console.log('Load previous page');
+	}
+
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
 	override render() {
@@ -137,11 +157,12 @@ export abstract class UmbTreeItemElementBase<
 				.hasChildren=${this._hasChildren}
 				.showChildren=${this._isOpen}
 				.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
-				label=${this._label}
+				label=${ifDefined(this._label)}
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
-				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
+				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
+				${this.#renderChildItems()}
 				<slot></slot>
-				${this.#renderPaging()}
+				${this.#renderPaging()} ${this.#renderLoadNextButton()}
 			</uui-menu-item>
 		`;
 	}
@@ -213,6 +234,16 @@ export abstract class UmbTreeItemElementBase<
 					)
 				: ''}
 		`;
+	}
+
+	#renderLoadPrevButton() {
+		if (!this._hasPreviousItems) return nothing;
+		return html` <umb-tree-load-prev-button @click=${this.#onLoadPrev}></umb-tree-load-prev-button>`;
+	}
+
+	#renderLoadNextButton() {
+		if (!this._hasNextItems) return nothing;
+		return html` <umb-tree-load-more-button @click=${this.#onLoadNext}></umb-tree-load-more-button> `;
 	}
 
 	#renderPaging() {

@@ -17,7 +17,13 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbDeprecation, UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbDeprecation,
+	UmbPaginationManager,
+	UmbTargetPaginationManager,
+	debounce,
+	type UmbTargetPagination,
+} from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
@@ -32,6 +38,11 @@ export abstract class UmbTreeItemContextBase<
 {
 	public unique?: UmbEntityUnique;
 	public entityType?: string;
+
+	public readonly paginationPrev = new UmbTargetPaginationManager(this);
+	public readonly paginationNext = new UmbTargetPaginationManager(this);
+
+	// TODO: rename to paginationNext$
 	public readonly pagination = new UmbPaginationManager();
 
 	#manifest?: ManifestType;
@@ -84,7 +95,14 @@ export abstract class UmbTreeItemContextBase<
 	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
-	// TODO: get this from the tree context
+	#pagingPrev = {
+		take: 5,
+	};
+
+	#pagingNext = {
+		take: 5,
+	};
+
 	#paging = {
 		skip: 0,
 		take: 50,
@@ -219,7 +237,6 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	async #loadChildrenWithTarget(target: { unique: string; entityType: string }) {
-		debugger;
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
 
@@ -229,13 +246,13 @@ export abstract class UmbTreeItemContextBase<
 
 		this.#isLoading.setValue(true);
 
-		const targetPagination = {
-			treeItem: {
+		const targetPagination: UmbTargetPagination = {
+			item: {
 				unique: target.unique,
 				entityType: target.entityType,
 			},
-			before: 10,
-			after: 10,
+			before: this.#pagingPrev.take,
+			after: this.#pagingNext.take,
 		};
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
@@ -259,7 +276,8 @@ export abstract class UmbTreeItemContextBase<
 			this.#hasChildren.setValue(hasChildren);
 			this.#hasChildrenContext.setHasChildren(hasChildren);
 
-			this.pagination.setTotalItems(data.total);
+			this.paginationPrev.setTotalItems(data.totalBefore);
+			this.paginationNext.setTotalItems(data.totalAfter);
 		}
 
 		this.#isLoading.setValue(false);
