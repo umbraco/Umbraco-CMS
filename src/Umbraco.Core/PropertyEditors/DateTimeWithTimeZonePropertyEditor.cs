@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -22,21 +23,29 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class DateTimeWithTimeZonePropertyEditor : DataEditor
 {
     private readonly IIOHelper _ioHelper;
+    private readonly IDateTimeWithTimeZonePropertyIndexValueFactory _propertyIndexValueFactory;
 
     public DateTimeWithTimeZonePropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper)
+        IIOHelper ioHelper,
+        IDateTimeWithTimeZonePropertyIndexValueFactory propertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
+        _propertyIndexValueFactory = propertyIndexValueFactory;
         SupportsReadOnly = true;
     }
 
+    /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new DateWithTimeZoneConfigurationEditor(_ioHelper);
 
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<DateTimeWithTimeZoneDataValueEditor>(Attribute!);
+
+    /// <inheritdoc/>
+    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _propertyIndexValueFactory;
 
     private class DateTimeWithTimeZoneDataValueEditor : DataValueEditor
     {
@@ -88,33 +97,13 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment);
-            if (value is not string valueString)
-            {
-                return null;
-            }
-
-            if (JsonNode.Parse(valueString) is not JsonObject valueAsJsonObject)
-            {
-                return null;
-            }
-
-            var selectedDate = valueAsJsonObject["date"]?.GetValue<string>();
-            if (selectedDate.IsNullOrWhiteSpace() || !DateTimeOffset.TryParse(selectedDate, null, DateTimeStyles.AssumeUniversal, out DateTimeOffset dateTimeOffset))
+            if (value is not string valueString || JsonNode.Parse(valueString) is not JsonObject valueAsJsonObject)
             {
                 return null;
             }
 
             DateWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
-            if (configuration is not null)
-            {
-                valueAsJsonObject["date"] = configuration.Format switch
-                {
-                    DateWithTimeZoneFormat.DateOnly => DateOnly.FromDateTime(dateTimeOffset.DateTime).ToString("o"),
-                    DateWithTimeZoneFormat.TimeOnly => TimeOnly.FromDateTime(dateTimeOffset.DateTime).ToString("o"),
-                    DateWithTimeZoneFormat.DateTime when configuration.TimeZones is null => dateTimeOffset.DateTime.ToString("o"),
-                    _ => dateTimeOffset.ToString("o"),
-                };
-            }
+            valueAsJsonObject["date"] = DateTimeWithTimeZoneValueConverter.GetValueAsString(valueAsJsonObject, configuration);
 
             return valueAsJsonObject;
         }

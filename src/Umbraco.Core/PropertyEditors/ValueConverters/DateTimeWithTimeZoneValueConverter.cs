@@ -1,5 +1,6 @@
+using System.Globalization;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -10,11 +11,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter]
 public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
 {
-    private readonly IJsonSerializer _jsonSerializer;
-
-    public DateTimeWithTimeZoneValueConverter(IJsonSerializer jsonSerializer)
-        => _jsonSerializer = jsonSerializer;
-
     /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone);
@@ -24,13 +20,7 @@ public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
     {
         DateWithTimeZoneConfiguration? config =
             ConfigurationEditor.ConfigurationAs<DateWithTimeZoneConfiguration>(propertyType.DataType.ConfigurationObject);
-        return config?.Format switch
-        {
-            DateWithTimeZoneFormat.DateOnly => typeof(DateOnly?),
-            DateWithTimeZoneFormat.TimeOnly => typeof(TimeOnly?),
-            DateWithTimeZoneFormat.DateTime when config.TimeZones is null => typeof(DateTime?),
-            _ => typeof(DateTimeOffset?),
-        };
+        return GetPropertyValueType(config);
     }
 
     /// <inheritdoc />
@@ -44,11 +34,29 @@ public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
         object? source,
         bool preview)
     {
-        Type propertyValueType = GetPropertyValueType(propertyType);
+        DateWithTimeZoneConfiguration? config =
+            ConfigurationEditor.ConfigurationAs<DateWithTimeZoneConfiguration>(propertyType.DataType.ConfigurationObject);
         var sourceStr = source?.ToString();
-        if (sourceStr is null
-            || !_jsonSerializer.TryDeserialize(sourceStr, out DateTimeWithTimeZone? dateTimeWithTimezone)
-            || !DateTimeOffset.TryParse(dateTimeWithTimezone.Date, out DateTimeOffset dateTimeOffset))
+        return GetValue(sourceStr, config);
+    }
+
+    private static Type GetPropertyValueType(DateWithTimeZoneConfiguration? config) =>
+        config?.Format switch
+        {
+            DateWithTimeZoneFormat.DateOnly => typeof(DateOnly?),
+            DateWithTimeZoneFormat.TimeOnly => typeof(TimeOnly?),
+            DateWithTimeZoneFormat.DateTime when config.TimeZones is null => typeof(DateTime?),
+            _ => typeof(DateTimeOffset?),
+        };
+
+    internal static object? GetValue(string? value, DateWithTimeZoneConfiguration? configuration)
+        => GetValue(value is null ? null : JsonNode.Parse(value) as JsonObject, configuration);
+
+    internal static object? GetValue(JsonObject? value, DateWithTimeZoneConfiguration? configuration)
+    {
+        Type propertyValueType = GetPropertyValueType(configuration);
+        if (value is null
+            || !DateTimeOffset.TryParse(value["date"]?.GetValue<string>(), null, DateTimeStyles.AssumeUniversal, out DateTimeOffset dateTimeOffset))
         {
             return propertyValueType.GetDefaultValue();
         }
@@ -71,10 +79,20 @@ public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
         return dateTimeOffset;
     }
 
-    internal class DateTimeWithTimeZone
-    {
-        public required string Date { get; set; }
+    internal static string? GetValueAsString(string? value, DateWithTimeZoneConfiguration? configuration)
+        => GetValueAsString(value is null ? null : JsonNode.Parse(value) as JsonObject, configuration);
 
-        public string? TimeZone { get; set; }
+    internal static string? GetValueAsString(JsonObject? value, DateWithTimeZoneConfiguration? configuration)
+    {
+        var objectValue = GetValue(value, configuration);
+        return objectValue switch
+        {
+            DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("o"),
+            DateOnly dateOnly => dateOnly.ToString("o"),
+            TimeOnly timeOnly => timeOnly.ToString("o"),
+            DateTime dateTime => dateTime.ToString("o"),
+            null => null,
+            _ => throw new ArgumentOutOfRangeException(nameof(objectValue), $"Unsupported type: {objectValue?.GetType().FullName}"),
+        };
     }
 }
