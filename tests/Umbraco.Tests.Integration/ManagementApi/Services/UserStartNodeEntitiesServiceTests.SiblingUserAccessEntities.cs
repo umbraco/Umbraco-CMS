@@ -17,9 +17,13 @@ public partial class UserStartNodeEntitiesServiceTests
                 _contentByName["1-5"].Key,
                 2,
                 2,
-                BySortOrder)
+                BySortOrder,
+                out long totalBefore,
+                out long totalAfter)
             .ToArray();
 
+        Assert.AreEqual(2, totalBefore);
+        Assert.AreEqual(3, totalAfter);
         Assert.AreEqual(5, siblings.Length);
         Assert.Multiple(() =>
         {
@@ -45,9 +49,13 @@ public partial class UserStartNodeEntitiesServiceTests
                 _contentByName["1-5"].Key,
                 2,
                 2,
-                BySortOrder)
+                BySortOrder,
+                out long totalBefore,
+                out long totalAfter)
             .ToArray();
 
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(0, totalAfter);
         Assert.AreEqual(1, siblings.Length);
         Assert.Multiple(() =>
         {
@@ -68,9 +76,13 @@ public partial class UserStartNodeEntitiesServiceTests
                 _contentByName["1-5"].Key,
                 2,
                 2,
-                BySortOrder)
+                BySortOrder,
+                out long totalBefore,
+                out long totalAfter)
             .ToArray();
 
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(0, totalAfter);
         Assert.AreEqual(1, siblings.Length);
         Assert.Multiple(() =>
         {
@@ -82,19 +94,24 @@ public partial class UserStartNodeEntitiesServiceTests
     [Test]
     public async Task SiblingUserAccessEntities_WithStartsNodesOfTargetAndSiblings_YieldsOnlyPermitted_AsAllowed()
     {
-        var contentStartNodePaths = await CreateUserAndGetStartNodePaths(_contentByName["1-3"].Id, _contentByName["1-5"].Id, _contentByName["1-7"].Id);
+        var contentStartNodePaths = await CreateUserAndGetStartNodePaths(_contentByName["1-3"].Id, _contentByName["1-5"].Id, _contentByName["1-7"].Id, _contentByName["1-10"].Id);
 
         var siblings = UserStartNodeEntitiesService
             .SiblingUserAccessEntities(
                 UmbracoObjectTypes.Document,
                 contentStartNodePaths,
                 _contentByName["1-5"].Key,
-                2,
-                2,
-                BySortOrder)
+                1,
+                1,
+                BySortOrder,
+                out long totalBefore,
+                out long totalAfter)
             .ToArray();
 
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(1, totalAfter);
         Assert.AreEqual(3, siblings.Length);
+
         Assert.Multiple(() =>
         {
             Assert.AreEqual(_contentByName[$"1-3"].Key, siblings[0].Entity.Key);
@@ -118,9 +135,13 @@ public partial class UserStartNodeEntitiesServiceTests
                 _contentByName["1-5"].Key,
                 2,
                 2,
-                BySortOrder)
+                BySortOrder,
+                out long totalBefore,
+                out long totalAfter)
             .ToArray();
 
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(0, totalAfter);
         Assert.AreEqual(1, siblings.Length);
         Assert.Multiple(() =>
         {

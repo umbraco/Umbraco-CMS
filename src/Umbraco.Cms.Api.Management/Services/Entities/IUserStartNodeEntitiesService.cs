@@ -73,6 +73,8 @@ public interface IUserStartNodeEntitiesService
     /// <param name="before">The number of applicable siblings to retrieve before the target.</param>
     /// <param name="after">The number of applicable siblings to retrieve after the target.</param>
     /// <param name="ordering">The ordering to apply when fetching and paginating the children.</param>
+    /// <param name="totalBefore">Outputs the total number of siblings before the target entity.</param>
+    /// <param name="totalAfter">Outputs the total number of siblings after the target entity.</param>
     /// <returns>A list of sibling entities applicable for the user.</returns>
     /// <remarks>
     /// The returned entities may include entities that outside of the user start node scope, but are needed to
@@ -84,7 +86,14 @@ public interface IUserStartNodeEntitiesService
         Guid targetKey,
         int before,
         int after,
-        Ordering ordering) => [];
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
+    {
+        totalBefore = 0;
+        totalAfter = 0;
+        return [];
+    }
 
     /// <summary>
     /// Calculates the access level of a collection of entities for users without root access.

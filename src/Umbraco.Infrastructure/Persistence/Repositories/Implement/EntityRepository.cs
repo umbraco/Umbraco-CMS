@@ -152,7 +152,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         int before,
         int after,
         IQuery<IUmbracoEntity>? filter,
-        Ordering ordering)
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
     {
         // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
         // without us also having to do a nested query for the parent ID too.
@@ -204,14 +206,20 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
         // Select the UniqueId of nodes which row number is within the specified range of the target node's row number.
         const int BeforeAfterParameterIndex = 3;
+        var beforeAfterParameterIndex = BeforeAfterParameterIndex + beforeAfterParameterIndexOffset;
+        var beforeArgumentsArray = beforeArguments.ToArray();
+        var afterArgumentsArray = afterArguments.ToArray();
         Sql<ISqlContext>? mainSql = Sql()
             .Select("UniqueId")
             .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
-            .Where($"rn >= ({targetRowSql.SQL}) - @{BeforeAfterParameterIndex + beforeAfterParameterIndexOffset}", beforeArguments.ToArray())
-            .Where($"rn <= ({targetRowSql.SQL}) + @{BeforeAfterParameterIndex + beforeAfterParameterIndexOffset}", afterArguments.ToArray())
+            .Where($"rn >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
+            .Where($"rn <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
             .OrderBy("rn");
 
         List<Guid>? keys = Database.Fetch<Guid>(mainSql);
+
+        totalBefore = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, beforeArgumentsArray, true);
+        totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
 
         if (keys is null || keys.Count == 0)
         {
@@ -219,6 +227,20 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         }
 
         return PerformGetAll(objectType, ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
+    }
+
+    private long GetNumberOfSiblingsOutsideSiblingRange(
+        Sql<ISqlContext> rowNumberSql,
+        Sql<ISqlContext> targetRowSql,
+        int parameterIndex,
+        object[] arguments,
+        bool getBefore)
+    {
+        Sql<ISqlContext>? sql = Sql()
+            .SelectCount()
+            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .Where($"rn {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
+        return Database.ExecuteScalar<long>(sql);
     }
 
 

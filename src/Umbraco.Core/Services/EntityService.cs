@@ -324,6 +324,8 @@ public class EntityService : RepositoryService, IEntityService
         UmbracoObjectTypes objectType,
         int before,
         int after,
+        out long totalBefore,
+        out long totalAfter,
         IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null)
     {
@@ -347,7 +349,9 @@ public class EntityService : RepositoryService, IEntityService
             before,
             after,
             filter,
-            ordering);
+            ordering,
+            out totalBefore,
+            out totalAfter);
 
         scope.Complete();
         return siblings;
