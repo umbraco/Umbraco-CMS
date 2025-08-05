@@ -97,14 +97,6 @@ export abstract class UmbTreeItemContextBase<
 	#startTarget: any = undefined; // TODO: fix this type
 	#endTarget: any = undefined; // TODO: fix this type
 
-	#pagingPrev = {
-		take: 5,
-	};
-
-	#pagingNext = {
-		take: 5,
-	};
-
 	#paging = {
 		skip: 0,
 		take: 50,
