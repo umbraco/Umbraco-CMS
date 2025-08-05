@@ -487,9 +487,9 @@ stages:
   - stage: NotifySlackBot
     displayName: Notify Slack on Failure
     dependsOn: E2E
-    condition: or(
-      eq(dependencies.E2E.result, 'failed'),
-      eq(dependencies.E2E.result, 'succeededWithIssues'))
+#    condition: or(
+#      eq(dependencies.E2E.result, 'failed'),
+#      eq(dependencies.E2E.result, 'succeededWithIssues'))
     jobs:
       - job: PostToSlack
         displayName: Send Slack Notification
@@ -529,4 +529,4 @@ stages:
                 --data "$PAYLOAD" \
                 "$SLACK_WEBHOOK_URL"
             env:
-              SLACK_WEBHOOK_URL: $(E2ESlackWebhookUrl)
+              SLACK_WEBHOOK_URL: $(E2ESLACKWEBHOOKURL)
