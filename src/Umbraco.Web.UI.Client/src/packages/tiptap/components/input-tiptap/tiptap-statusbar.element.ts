@@ -99,6 +99,7 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 			border-top-left-radius: 0;
 			border-top-right-radius: 0;
 			border-top: 0;
+			box-sizing: border-box;
 
 			min-height: var(--uui-size-layout-1);
 			max-height: var(--uui-size-layout-2);

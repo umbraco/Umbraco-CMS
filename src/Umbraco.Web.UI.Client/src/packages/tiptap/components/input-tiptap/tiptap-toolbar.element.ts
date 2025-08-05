@@ -105,6 +105,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			border-top-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
 			border-left-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
 			border-right-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+			box-sizing: border-box;
 
 			background-color: var(--uui-color-surface);
 			color: var(--color-text);
