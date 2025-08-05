@@ -11,6 +11,7 @@ import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 import './log-viewer-search-input-modal.element.js';
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-log-viewer-search-input')
 export class UmbLogViewerSearchInputElement extends UmbLitElement {
@@ -101,7 +102,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	async #removeSearch(name: string) {
 		await umbConfirmModal(this, {
 			headline: this.localize.term('logViewer_deleteSavedSearch'),
-			content: `${this.localize.term('defaultdialogs_confirmdelete')} ${name}?`,
+			content: this.localize.term('defaultdialogs_confirmdelete', escapeHTML(name)),
 			color: 'danger',
 			confirmLabel: 'Delete',
 		});
