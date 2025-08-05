@@ -103,7 +103,19 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
             }
 
             DateWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
-            valueAsJsonObject["date"] = DateTimeWithTimeZoneValueConverter.GetValueAsString(valueAsJsonObject, configuration);
+            var valueObject = DateTimeWithTimeZoneValueConverter.GetValue(valueAsJsonObject, configuration);
+            if (valueObject is DateTimeOffset && valueAsJsonObject["timeZone"] is null)
+            {
+                // If the time zone is not set, we assume the date is in UTC.
+                valueAsJsonObject["timeZone"] = "UTC";
+            }
+            else if (valueObject is not null && valueObject is not DateTimeOffset)
+            {
+                // If the value is not a DateTimeOffset, clean the time zone.
+                valueAsJsonObject["timeZone"] = null;
+            }
+
+            valueAsJsonObject["date"] = DateTimeWithTimeZoneValueConverter.GetDateValueAsString(valueObject, configuration);
 
             return valueAsJsonObject;
         }

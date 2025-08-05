@@ -63,36 +63,30 @@ public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
 
         if (propertyValueType == typeof(DateOnly?))
         {
-            return DateOnly.FromDateTime(dateTimeOffset.DateTime);
+            return DateOnly.FromDateTime(dateTimeOffset.UtcDateTime);
         }
 
         if (propertyValueType == typeof(TimeOnly?))
         {
-            return TimeOnly.FromDateTime(dateTimeOffset.DateTime);
+            return TimeOnly.FromDateTime(dateTimeOffset.UtcDateTime);
         }
 
         if (propertyValueType == typeof(DateTime?))
         {
-            return DateTime.SpecifyKind(dateTimeOffset.DateTime, DateTimeKind.Unspecified);
+            return DateTime.SpecifyKind(dateTimeOffset.UtcDateTime, DateTimeKind.Unspecified);
         }
 
         return dateTimeOffset;
     }
 
-    internal static string? GetValueAsString(string? value, DateWithTimeZoneConfiguration? configuration)
-        => GetValueAsString(value is null ? null : JsonNode.Parse(value) as JsonObject, configuration);
-
-    internal static string? GetValueAsString(JsonObject? value, DateWithTimeZoneConfiguration? configuration)
-    {
-        var objectValue = GetValue(value, configuration);
-        return objectValue switch
+    internal static string? GetDateValueAsString(object? value, DateWithTimeZoneConfiguration? configuration) =>
+        value switch
         {
             DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("o"),
             DateOnly dateOnly => dateOnly.ToString("o"),
             TimeOnly timeOnly => timeOnly.ToString("o"),
             DateTime dateTime => dateTime.ToString("o"),
             null => null,
-            _ => throw new ArgumentOutOfRangeException(nameof(objectValue), $"Unsupported type: {objectValue?.GetType().FullName}"),
+            _ => throw new ArgumentOutOfRangeException(nameof(value), $"Unsupported type: {value.GetType().FullName}"),
         };
-    }
 }
