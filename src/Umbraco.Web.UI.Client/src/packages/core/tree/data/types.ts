@@ -1,11 +1,11 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbTargetPagination } from '@umbraco-cms/backoffice/utils';
+import type { UmbTargetPaginationModel } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbTreeRootItemsRequestArgs {
 	foldersOnly?: boolean;
 	skip?: number;
 	take?: number;
-	target?: UmbTargetPagination;
+	target?: UmbTargetPaginationModel;
 }
 
 export interface UmbTreeChildrenOfRequestArgs {
@@ -13,7 +13,7 @@ export interface UmbTreeChildrenOfRequestArgs {
 	foldersOnly?: boolean;
 	skip?: number;
 	take?: number;
-	target?: UmbTargetPagination;
+	target?: UmbTargetPaginationModel;
 }
 
 export interface UmbTreeAncestorsOfRequestArgs {

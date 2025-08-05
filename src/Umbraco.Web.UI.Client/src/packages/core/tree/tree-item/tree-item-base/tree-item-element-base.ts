@@ -124,12 +124,6 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.hideChildren();
 	}
 
-	#onLoadMoreClick = (event: any) => {
-		event.stopPropagation();
-		const next = (this._currentPage = this._currentPage + 1);
-		this.#api?.pagination.setCurrentPageNumber(next);
-	};
-
 	#onLoadPrev(event: any) {
 		event.stopPropagation();
 		this.#api?.loadPrevItems?.();
@@ -162,7 +156,7 @@ export abstract class UmbTreeItemElementBase<
 				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
 				${this.#renderChildItems()}
 				<slot></slot>
-				${this.#renderPaging()} ${this.#renderLoadNextButton()}
+				${this.#renderLoadNextButton()}
 			</uui-menu-item>
 		`;
 	}
@@ -244,13 +238,5 @@ export abstract class UmbTreeItemElementBase<
 	#renderLoadNextButton() {
 		if (!this._hasNextItems) return nothing;
 		return html` <umb-tree-load-more-button @click=${this.#onLoadNext}></umb-tree-load-more-button> `;
-	}
-
-	#renderPaging() {
-		if (this._totalPages <= 1 || this._currentPage === this._totalPages) {
-			return nothing;
-		}
-
-		return html` <umb-tree-load-more-button @click=${this.#onLoadMoreClick}></umb-tree-load-more-button> `;
 	}
 }
