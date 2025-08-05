@@ -36,14 +36,14 @@ export interface UmbTreeDataSource<
 
 	/**
 	 * Gets the children of the given parent item.
-	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>}
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */
 	getChildrenOf(args: TreeChildrenOfRequestArgsType): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
 
 	/**
 	 * Gets the ancestors of the given item.
-	 * @returns {*}  {Promise<UmbDataSourceResponse<Array<TreeItemType>>}
+	 * @returns {Promise<UmbDataSourceResponse<Array<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */
 	getAncestorsOf(args: TreeAncestorsOfRequestArgsType): Promise<UmbDataSourceResponse<Array<TreeItemType>>>;
