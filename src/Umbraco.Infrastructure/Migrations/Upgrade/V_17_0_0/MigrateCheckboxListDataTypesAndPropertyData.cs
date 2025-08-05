@@ -23,7 +23,7 @@ public class MigrateCheckboxListDataTypesAndPropertyData : AsyncMigrationBase
     protected override async Task MigrateAsync()
     {
         // Update the definition of the datatypes.
-        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetByEditorAliasAsync("Umbraco.CheckBoxList");
+        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.CheckBoxList);
         foreach (IDataType dataType in dataTypes)
         {
             dataType.DatabaseType = ValueStorageType.Ntext;
@@ -41,7 +41,7 @@ WHERE propertyTypeId IN (
 	WHERE dataTypeId IN (
 		SELECT nodeId
         FROM umbracoDataType
-        WHERE propertyEditorAlias = 'Umbraco.CheckBoxList'
+        WHERE propertyEditorAlias = '{CheckBoxListEditorAlias}'
 	)
 )
 AND varcharValue IS NOT NULL";
