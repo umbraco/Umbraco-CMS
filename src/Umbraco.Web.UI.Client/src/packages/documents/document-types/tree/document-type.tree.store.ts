@@ -6,6 +6,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
  * @class UmbDocumentTypeTreeStore
  * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Document Types
+ * @deprecated - Use `UmbDocumentTypeTreeRepository` instead. This will be removed in Umbraco 18.
  */
 export class UmbDocumentTypeTreeStore extends UmbUniqueTreeStore {
 	/**
