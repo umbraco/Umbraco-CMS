@@ -323,7 +323,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	#onTimeZoneSearch(event: UUIComboboxEvent) {
 		const searchTerm = (event.target as UUIComboboxElement)?.search;
 		this._filteredTimeZoneOptions = this._timeZoneOptions.filter(
-			(option) => option.name.toLowerCase().includes(searchTerm) || option.offset === searchTerm,
+			(option) => new RegExp(searchTerm, 'i').test(option.name) || option.offset === searchTerm,
 		);
 	}
 
