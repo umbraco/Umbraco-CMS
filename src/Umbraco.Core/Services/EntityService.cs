@@ -319,6 +319,45 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     /// <inheritdoc />
+    public IEnumerable<IEntitySlim> GetSiblings(
+        Guid key,
+        UmbracoObjectTypes objectType,
+        int before,
+        int after,
+        out long totalBefore,
+        out long totalAfter,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        if (before < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(before), "The 'before' parameter must be greater than or equal to 0.");
+        }
+
+        if (after < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(after), "The 'after' parameter must be greater than or equal to 0.");
+        }
+
+        ordering ??= new Ordering("sortOrder");
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IEnumerable<IEntitySlim> siblings = _entityRepository.GetSiblings(
+            objectType.GetGuid(),
+            key,
+            before,
+            after,
+            filter,
+            ordering,
+            out totalBefore,
+            out totalAfter);
+
+        scope.Complete();
+        return siblings;
+    }
+
+    /// <inheritdoc />
     public virtual IEnumerable<IEntitySlim> GetDescendants(int id)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))

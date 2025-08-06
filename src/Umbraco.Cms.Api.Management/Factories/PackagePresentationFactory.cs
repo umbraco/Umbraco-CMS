@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal class PackagePresentationFactory : IPackagePresentationFactory
+internal sealed class PackagePresentationFactory : IPackagePresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IRuntimeState _runtimeState;

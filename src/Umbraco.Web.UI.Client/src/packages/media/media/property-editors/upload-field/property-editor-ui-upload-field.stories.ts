@@ -5,11 +5,10 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-upload-field.element.js';
 
 export default {
-	title: 'Property Editor UIs/Upload Field',
+	title: 'Extension Type/Property Editor UI/Upload Field',
 	component: 'umb-property-editor-ui-upload-field',
 	id: 'umb-property-editor-ui-upload-field',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIUploadFieldElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIUploadFieldElement> = () =>
 	html`<umb-property-editor-ui-upload-field></umb-property-editor-ui-upload-field>`;
-AAAOverview.storyName = 'Overview';

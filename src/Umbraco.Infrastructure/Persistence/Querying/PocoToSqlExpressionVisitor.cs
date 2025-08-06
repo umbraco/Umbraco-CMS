@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying;
 /// </summary>
 /// <typeparam name="TDto">The type of the DTO.</typeparam>
 /// <remarks>This visitor is stateful and cannot be reused.</remarks>
-internal class PocoToSqlExpressionVisitor<TDto> : ExpressionVisitorBase
+internal sealed class PocoToSqlExpressionVisitor<TDto> : ExpressionVisitorBase
 {
     private readonly string? _alias;
     private readonly PocoData _pd;
@@ -96,7 +96,7 @@ internal class PocoToSqlExpressionVisitor<TDto> : ExpressionVisitorBase
         return Visited ? string.Empty : "@" + (SqlParameters.Count - 1);
     }
 
-    protected virtual string GetFieldName(PocoData pocoData, string name, string? alias)
+    private string GetFieldName(PocoData pocoData, string name, string? alias)
     {
         KeyValuePair<string, PocoColumn> column =
             pocoData.Columns.FirstOrDefault(x => x.Value.MemberInfoData.Name == name);
@@ -113,7 +113,7 @@ internal class PocoToSqlExpressionVisitor<TDto> : ExpressionVisitorBase
 /// <typeparam name="TDto1">The type of DTO 1.</typeparam>
 /// <typeparam name="TDto2">The type of DTO 2.</typeparam>
 /// <remarks>This visitor is stateful and cannot be reused.</remarks>
-internal class PocoToSqlExpressionVisitor<TDto1, TDto2> : ExpressionVisitorBase
+internal sealed class PocoToSqlExpressionVisitor<TDto1, TDto2> : ExpressionVisitorBase
 {
     private readonly string? _alias1;
     private readonly string? _alias2;
@@ -194,7 +194,7 @@ internal class PocoToSqlExpressionVisitor<TDto1, TDto2> : ExpressionVisitorBase
         return Visited ? string.Empty : "@" + (SqlParameters.Count - 1);
     }
 
-    protected virtual string GetFieldName(PocoData pocoData, string name, string? alias)
+    private string GetFieldName(PocoData pocoData, string name, string? alias)
     {
         KeyValuePair<string, PocoColumn> column =
             pocoData.Columns.FirstOrDefault(x => x.Value.MemberInfoData.Name == name);
@@ -212,7 +212,7 @@ internal class PocoToSqlExpressionVisitor<TDto1, TDto2> : ExpressionVisitorBase
 /// <typeparam name="TDto2">The type of DTO 2.</typeparam>
 /// <typeparam name="TDto3">The type of DTO 3.</typeparam>
 /// <remarks>This visitor is stateful and cannot be reused.</remarks>
-internal class PocoToSqlExpressionVisitor<TDto1, TDto2, TDto3> : ExpressionVisitorBase
+internal sealed class PocoToSqlExpressionVisitor<TDto1, TDto2, TDto3> : ExpressionVisitorBase
 {
     private readonly string? _alias1;
     private readonly string? _alias2;
@@ -309,7 +309,7 @@ internal class PocoToSqlExpressionVisitor<TDto1, TDto2, TDto3> : ExpressionVisit
         return Visited ? string.Empty : "@" + (SqlParameters.Count - 1);
     }
 
-    protected virtual string GetFieldName(PocoData pocoData, string name, string? alias)
+    private string GetFieldName(PocoData pocoData, string name, string? alias)
     {
         KeyValuePair<string, PocoColumn> column =
             pocoData.Columns.FirstOrDefault(x => x.Value.MemberInfoData.Name == name);

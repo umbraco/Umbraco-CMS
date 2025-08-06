@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IMemberType" />
 /// </summary>
-internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
+internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
 {
     private readonly IShortStringHelper _shortStringHelper;
 
@@ -27,9 +28,10 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
         ILogger<MemberTypeRepository> logger,
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
-        IShortStringHelper shortStringHelper)
-        : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper) =>
-        _shortStringHelper = shortStringHelper;
+        IShortStringHelper shortStringHelper,
+        IIdKeyMap idKeyMap)
+        : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper, idKeyMap)
+         => _shortStringHelper = shortStringHelper;
 
     protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;
 

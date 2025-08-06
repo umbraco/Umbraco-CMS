@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import {expect} from '@playwright/test';
 import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const testUser = ConstantHelper.testUserCredentials;
@@ -35,7 +35,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-test('can only see property values for specific document with read UI enabled', async ({umbracoApi, umbracoUi}) => {
+test('can only see property values for specific document with read UI enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], true, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -50,7 +50,7 @@ test('can only see property values for specific document with read UI enabled', 
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly(firstPropertyName[1]);
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly(secondPropertyName[1]);
   await umbracoUi.content.goToContentWithName(secondDocumentName);
-  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.permissionDenied);
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
 });
 
 test('cannot see specific property value without UI read permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -69,7 +69,7 @@ test('cannot see specific property value without UI read permission enabled', as
   await umbracoUi.content.isPropertyEditorUiWithNameVisible(secondPropertyName[1], false);
 });
 
-test('can see specific property values with UI read permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can see specific property values with UI read permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], true, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -85,7 +85,7 @@ test('can see specific property values with UI read permission enabled', async (
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly(secondPropertyName[1]);
 });
 
-test('can see property with UI read enabled but not another property with UI read disabled in the same document', async ({umbracoApi, umbracoUi}) => {
+test('can see property with UI read enabled but not another property with UI read disabled in the same document', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], false, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -101,9 +101,9 @@ test('can see property with UI read enabled but not another property with UI rea
   await umbracoUi.content.isPropertyEditorUiWithNameVisible(secondPropertyName[1], false);
 });
 
-// Remove .skip when the front-end is ready. 
+// Remove .skip when the front-end is ready.
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
-test.skip('can edit specific property values with UI read and write permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.skip('can edit specific property values with UI read and write permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const inputText = 'This is test text';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, true, secondPropertyName[0], true, true);
@@ -126,7 +126,7 @@ test.skip('can edit specific property values with UI read and write permission e
   expect(firstDocumentData.values[1].value).toEqual(true);
 });
 
-test('cannot see specific property values with UI write permission enabled and UI read permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('cannot see specific property values with UI write permission enabled and UI read permission disabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], false, true, secondPropertyName[0], false, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);

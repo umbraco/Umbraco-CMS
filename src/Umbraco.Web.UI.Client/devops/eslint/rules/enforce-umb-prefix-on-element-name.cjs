@@ -1,3 +1,5 @@
+const ALLOWED_PREFIXES = ['umb-', 'ufm-', 'test-', 'example-'];
+
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
 	meta: {
@@ -23,13 +25,13 @@ module.exports = {
 				if (isCustomElementDecorator) {
 					const elementName = node.arguments[0].value;
 
-					// check if the element name starts with 'umb-', or 'test-', to be allow tests to have custom elements:
-					const isElementNameValid = elementName.startsWith('umb-') ? true : elementName.startsWith('test-');
+					// check if the element name starts with an allowed prefix:
+					const isElementNameValid = ALLOWED_PREFIXES.some((prefix) => elementName.startsWith(prefix));
 
 					if (!isElementNameValid) {
 						context.report({
 							node,
-							message: 'Custom Element name should start with "umb-".',
+							message: 'Custom Element name should start with "umb-" or "ufm-".',
 							// There is no fixer on purpose because it's not safe to automatically rename the element name.
 							// Renaming should be done manually with consideration of potential impacts.
 						});

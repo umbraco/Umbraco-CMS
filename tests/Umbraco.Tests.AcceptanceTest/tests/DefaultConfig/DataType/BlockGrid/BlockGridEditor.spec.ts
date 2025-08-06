@@ -93,7 +93,7 @@ test('can add a block to a block grid editor', {tag: '@smoke'}, async ({umbracoA
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can add multiple blocks to a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can add multiple blocks to a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondElementName = 'SecondBlockGridElement';
@@ -138,7 +138,7 @@ test('can remove a block from a block grid editor', {tag: '@smoke'}, async ({umb
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can add a block to a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can add a block to a group in a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -242,7 +242,7 @@ test.skip('can delete a group in a block grid editor', async ({umbracoApi, umbra
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
 });
 
-test('can add a min and max amount to a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can add a min and max amount to a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 1;
   const maxAmount = 2;
@@ -282,7 +282,7 @@ test('max can not be less than min in a block grid editor', async ({umbracoApi, 
   expect(dataTypeData.values[0].value.max).toBe(oldMaxAmount);
 });
 
-test('can enable live editing mode in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can enable live editing mode in a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
 
@@ -310,7 +310,7 @@ test('can disable live editing mode in a block grid editor', async ({umbracoApi,
   expect(await umbracoApi.dataType.isLiveEditingModeEnabledForBlockEditor(blockGridEditorName, false)).toBeTruthy();
 });
 
-test('can add editor width in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can add editor width in a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyEditorWidth = '100%';
   await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
@@ -341,7 +341,7 @@ test('can remove editor width in a block grid editor', async ({umbracoApi, umbra
   expect(await umbracoApi.dataType.doesMaxPropertyContainWidthForBlockEditor(blockGridEditorName, '')).toBeTruthy();
 });
 
-test('can add a create button label in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can add a create button label in a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const createButtonLabel = 'Create Block';
   await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
@@ -392,5 +392,22 @@ test('can update grid columns in a block grid editor', async ({umbracoApi, umbra
 test.skip('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
 });
 
-test.skip('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const stylesheetName = 'TestStylesheet.css';
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  await umbracoApi.dataType.createBlockGridWithLayoutStylesheet(blockGridEditorName, stylesheetName);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.clickRemoveStylesheetButton(stylesheetName);
+  await umbracoUi.dataType.clickConfirmRemoveButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  expect(await umbracoApi.dataType.doesBlockGridContainLayoutStylesheet(blockGridEditorName, stylesheetName)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });

@@ -1,5 +1,5 @@
-import type { UfmToken } from '../plugins/marked-ufm.plugin.js';
-import type { UmbUfmComponentApi } from '../ufm-component.extension.js';
+import type { UfmToken } from '../plugins/types.js';
+import type { UmbUfmComponentApi } from '../extensions/ufm-component.extension.js';
 
 export abstract class UmbUfmComponentBase implements UmbUfmComponentApi {
 	protected getAttributes(text: string): string | null {

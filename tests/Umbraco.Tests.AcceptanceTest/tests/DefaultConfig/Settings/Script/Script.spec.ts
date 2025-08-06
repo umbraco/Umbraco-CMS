@@ -101,7 +101,7 @@ test('can rename a script', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.script.doesNameExist(wrongScriptName)).toBeFalsy();
 });
 
-test('cannot create a script with an empty name', async ({umbracoApi, umbracoUi}) => {
+test('cannot create a script with an empty name', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
 

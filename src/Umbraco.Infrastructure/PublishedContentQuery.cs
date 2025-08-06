@@ -330,7 +330,7 @@ public class PublishedContentQuery : IPublishedContentQuery
     ///     This is used to contextualize the values in the search results when enumerating over them, so that the correct
     ///     culture values are used.
     /// </summary>
-    private class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
+    private sealed class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
     {
         private readonly string _culture;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -365,7 +365,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         /// <summary>
         ///     Resets the variation context when this is disposed.
         /// </summary>
-        private class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
+        private sealed class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
         {
             private readonly VariationContext? _originalContext;
             private readonly IVariationContextAccessor _variationContextAccessor;
