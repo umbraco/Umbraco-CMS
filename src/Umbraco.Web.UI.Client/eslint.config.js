@@ -38,15 +38,6 @@ export default [
 
 	// Global config
 	{
-		languageOptions: {
-			parserOptions: {
-				project: true,
-				tsconfigRootDir: import.meta.dirname,
-			},
-			globals: {
-				...globals.browser,
-			},
-		},
 		plugins: {
 			import: importPlugin,
 			'local-rules': localRules,
@@ -77,13 +68,6 @@ export default [
 					excludedFileNames: ['umbraco-package'],
 				},
 			],
-			'@typescript-eslint/no-non-null-assertion': 'off',
-			'@typescript-eslint/no-explicit-any': 'warn',
-			'@typescript-eslint/no-unused-vars': 'error',
-			'@typescript-eslint/consistent-type-exports': 'error',
-			'@typescript-eslint/consistent-type-imports': 'error',
-			'@typescript-eslint/no-import-type-side-effects': 'warn',
-			'@typescript-eslint/no-deprecated': 'warn',
 			'jsdoc/check-tag-names': [
 				'warn',
 				{
@@ -95,6 +79,27 @@ export default [
 	},
 
 	// Pattern-specific overrides
+	{
+		files: ['**/*.ts'],
+		languageOptions: {
+			parserOptions: {
+				project: true,
+				tsconfigRootDir: import.meta.dirname,
+			},
+			globals: {
+				...globals.browser,
+			},
+		},
+		rules: {
+			'@typescript-eslint/no-non-null-assertion': 'off',
+			'@typescript-eslint/no-explicit-any': 'warn',
+			'@typescript-eslint/no-unused-vars': 'error',
+			'@typescript-eslint/consistent-type-exports': 'error',
+			'@typescript-eslint/consistent-type-imports': 'error',
+			'@typescript-eslint/no-import-type-side-effects': 'warn',
+			'@typescript-eslint/no-deprecated': 'warn',
+		},
+	},
 	{
 		files: ['**/*.js'],
 		...tseslint.configs.disableTypeChecked,
