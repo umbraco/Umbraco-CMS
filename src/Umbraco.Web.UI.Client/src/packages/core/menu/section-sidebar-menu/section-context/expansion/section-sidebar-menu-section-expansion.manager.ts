@@ -1,15 +1,11 @@
 import { UMB_SECTION_SIDEBAR_MENU_GLOBAL_CONTEXT } from '../../global-context/section-sidebar-menu.global-context.token.js';
 import type { UmbEntityExpansionSectionEntryModel } from '../../types.js';
+import type { UmbMenuItemExpansionEntryModel } from '../../../components/menu/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
-import {
-	UmbEntityExpansionManager,
-	type UmbEntityExpansionEntryModel,
-	type UmbEntityExpansionModel,
-} from '@umbraco-cms/backoffice/utils';
+import { UmbEntityExpansionManager, type UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Manages the expansion state of a section sidebar menu.
@@ -18,7 +14,7 @@ import {
  * @augments {UmbControllerBase}
  */
 export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerBase {
-	#manager = new UmbEntityExpansionManager(this);
+	#manager = new UmbEntityExpansionManager<UmbMenuItemExpansionEntryModel>(this);
 	public readonly expansion = this.#manager.expansion;
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
@@ -54,24 +50,22 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	}
 
 	/**
-	 * Checks if an entity is expanded
-	 * @param {UmbEntityModel} entity The entity to check
-	 * @param {string} entity.entityType The entity type
-	 * @param {string} entity.unique The unique key
-	 * @returns {Observable<boolean>} True if the entity is expanded
+	 * Checks if an entry is expanded
+	 * @param {UmbMenuItemExpansionEntryModel} entry The entry to check
+	 * @returns {Observable<boolean>} True if the entry is expanded
 	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
 	 */
-	isExpanded(entity: UmbEntityModel): Observable<boolean> {
-		return this.#manager.isExpanded(entity);
+	isExpanded(entry: UmbMenuItemExpansionEntryModel): Observable<boolean> {
+		return this.#manager.isExpanded(entry);
 	}
 
 	/**
 	 * Sets the expansion state
-	 * @param {UmbEntityExpansionModel | undefined} expansion The expansion state
+	 * @param {UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel> | undefined} expansion The expansion state
 	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
 	 * @returns {void}
 	 */
-	setExpansion(expansion: UmbEntityExpansionModel): void {
+	setExpansion(expansion: UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>): void {
 		this.#manager.setExpansion(expansion);
 		const entries = this.#bindEntriesToSection(expansion);
 		this.#globalContext?.expansion.setExpansion(entries);
@@ -80,52 +74,45 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	/**
 	 * Gets the expansion state
 	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
-	 * @returns {UmbEntityExpansionModel} The expansion state
+	 * @returns {UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>} The expansion state
 	 */
-	getExpansion(): UmbEntityExpansionModel {
+	getExpansion(): UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel> {
 		return this.#manager.getExpansion();
 	}
 
 	/**
 	 * Opens a menu item
-	 * @param {UmbEntityExpansionEntryModel} entity The entity to open
-	 * @param {string} entity.entityType The entity type
-	 * @param {string} entity.unique The unique key
-	 * @param {UmbEntityModel} entity.target The target entity to look up
-	 * @param {string} entity.target.entityType The target entity type
-	 * @param {string} entity.target.unique The target unique key
+	 * @param {UmbMenuItemExpansionEntryModel} entry The item to open
 	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
 	 * @returns {Promise<void>}
 	 */
-	public async expandItem(entity: UmbEntityExpansionEntryModel): Promise<void> {
-		this.#manager.expandItem(entity);
-		const entries = this.#bindEntriesToSection([entity]);
+	public async expandItem(entry: UmbMenuItemExpansionEntryModel): Promise<void> {
+		this.#manager.expandItem(entry);
+		const entries = this.#bindEntriesToSection([entry]);
 		this.#globalContext?.expansion.expandItem(entries[0]);
 	}
 
 	/**
 	 * Expands multiple entities
-	 * @param {UmbEntityExpansionModel} entities The entities to open
+	 * @param {UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>} entries The entities to open
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {void}
 	 */
-	public expandItems(entities: UmbEntityExpansionModel): void {
-		this.#manager.expandItems(entities);
-		const entries = this.#bindEntriesToSection(entities);
-		this.#globalContext?.expansion.expandItems(entries);
+	public expandItems(entries: UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>): void {
+		this.#manager.expandItems(entries);
+		const entriesWithSectionAlias = this.#bindEntriesToSection(entries);
+		this.#globalContext?.expansion.expandItems(entriesWithSectionAlias);
 	}
 
 	/**
 	 * Closes a menu item
-	 * @param {UmbEntityExpansionEntryModel} entity The entity to open
-	 * @param {string} entity.entityType The entity type
-	 * @param {string} entity.unique The unique key
+	 * @param {UmbMenuItemExpansionEntryModel} entry The item to close
 	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
 	 * @returns {Promise<void>}
 	 */
-	public async collapseItem(entity: UmbEntityModel): Promise<void> {
-		this.#manager.collapseItem(entity);
-		const entries = this.#bindEntriesToSection([entity]);
+	public async collapseItem(entry: UmbMenuItemExpansionEntryModel): Promise<void> {
+		this.#manager.collapseItem(entry);
+		const entries = this.#bindEntriesToSection([entry]);
 		this.#globalContext?.expansion.collapseItem(entries[0]);
 	}
 
@@ -141,7 +128,9 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 		this.#globalContext?.expansion.collapseItems(entries);
 	}
 
-	#bindEntriesToSection(expansion: UmbEntityExpansionModel): Array<UmbEntityExpansionSectionEntryModel> {
+	#bindEntriesToSection(
+		expansion: UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>,
+	): UmbEntityExpansionModel<UmbEntityExpansionSectionEntryModel> {
 		return expansion.map((item) => ({
 			...item,
 			sectionAlias: this.#currentSectionAlias,
