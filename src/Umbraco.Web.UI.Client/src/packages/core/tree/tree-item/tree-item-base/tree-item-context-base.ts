@@ -112,8 +112,7 @@ export abstract class UmbTreeItemContextBase<
 	#endTarget: any = undefined; // TODO: fix this type
 
 	#paging = {
-		skip: 0,
-		take: 50,
+		take: 5,
 	};
 
 	constructor(host: UmbControllerHost) {
@@ -201,7 +200,7 @@ export abstract class UmbTreeItemContextBase<
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {void}
 	 */
-	public loadMore = () => this.#loadChildren(this.#endTarget);
+	public loadMore = () => this.#loadNextItemsFromTarget();
 
 	/**
 	 * Load previous items of the tree item
@@ -235,14 +234,16 @@ export abstract class UmbTreeItemContextBase<
 				unique: this.unique,
 				entityType: this.entityType,
 			},
+			take: this.pagination.getPageSize(),
+			skip: this.pagination.getSkip(),
 			target: target
 				? {
 						item: {
 							unique: target.unique,
 							entityType: target.entityType,
 						},
-						before: 4,
-						after: 9,
+						before: 5,
+						after: this.pagination.getPageSize(),
 					}
 				: undefined,
 			foldersOnly,
@@ -250,7 +251,6 @@ export abstract class UmbTreeItemContextBase<
 		});
 
 		if (data) {
-			debugger;
 			this.#childItems.setValue(data.items);
 
 			const hasChildren = data.total > 0;
@@ -263,8 +263,12 @@ export abstract class UmbTreeItemContextBase<
 			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
 			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
 
-			this.paginationPrev.setTotalItems(data.totalBefore);
-			this.paginationNext.setTotalItems(data.totalAfter);
+			const totalBefore = data.totalBefore !== undefined ? data.totalBefore : 0;
+			const totalAfter = data.totalAfter !== undefined ? data.totalAfter : data.total - this.pagination.getPageSize();
+
+			this.paginationPrev.setTotalItems(totalBefore);
+			this.paginationNext.setTotalItems(totalAfter);
+			this.pagination.setTotalItems(data.total);
 		}
 
 		this.#isLoading.setValue(false);
@@ -290,7 +294,7 @@ export abstract class UmbTreeItemContextBase<
 			foldersOnly,
 			target: {
 				item: this.#startTarget,
-				before: 5,
+				before: this.pagination.getPageSize(),
 				after: 0,
 			},
 			...additionalArgs,
@@ -303,13 +307,19 @@ export abstract class UmbTreeItemContextBase<
 			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
 			this.#startTarget = firstItem ? { unique: firstItem.unique, entityType: firstItem.entityType } : undefined;
 
+			if (data.totalBefore === undefined) {
+				throw new Error('totalBefore is missing in the response');
+			}
+
 			this.paginationPrev.setTotalItems(data.totalBefore);
+			this.pagination.setTotalItems(data.total);
 		}
 
 		this.#isLoading.setValue(false);
 	}
 
 	async #loadNextItemsFromTarget() {
+		debugger;
 		if (this.unique === undefined) throw new Error('Could not request next items, unique key is missing');
 		if (this.entityType === undefined) throw new Error('Could not request next items, entity type is missing');
 
@@ -326,11 +336,13 @@ export abstract class UmbTreeItemContextBase<
 				unique: this.unique,
 				entityType: this.entityType,
 			},
+			take: this.pagination.getPageSize(),
+			skip: this.pagination.getSkip(),
 			foldersOnly,
 			target: {
 				item: this.#endTarget,
 				before: 0,
-				after: 5,
+				after: this.pagination.getPageSize(),
 			},
 			...additionalArgs,
 		});
@@ -341,7 +353,10 @@ export abstract class UmbTreeItemContextBase<
 			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
 			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
 
-			this.paginationNext.setTotalItems(data.totalAfter);
+			const totalAfter = data.totalAfter !== undefined ? data.totalAfter : data.total - this.pagination.getPageSize();
+			this.paginationNext.setTotalItems(totalAfter);
+
+			this.pagination.setTotalItems(data.total);
 		}
 
 		this.#isLoading.setValue(false);
@@ -569,11 +584,7 @@ export abstract class UmbTreeItemContextBase<
 		}
 	};
 
-	#onPageChange = (event: UmbChangeEvent) => {
-		const target = event.target as UmbPaginationManager;
-		this.#paging.skip = target.getSkip();
-		this.loadMore();
-	};
+	#onPageChange = () => this.#loadNextItemsFromTarget();
 
 	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
 
