@@ -1,6 +1,7 @@
 import type { ManifestMenu } from '../../menu.extension.js';
 import type { ManifestMenuItem } from '../../menu-item/types.js';
 import { UmbDefaultMenuContext } from './menu.context.js';
+import type { UmbEntityExpansionMenuItemEntryModel } from './types.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
@@ -12,10 +13,10 @@ export class UmbMenuElement extends UmbLitElement {
 	@property({ attribute: false })
 	manifest?: ManifestMenu;
 
-	public get expansion(): UmbEntityExpansionModel {
+	public get expansion(): UmbEntityExpansionModel<UmbEntityExpansionMenuItemEntryModel> {
 		return this.#context.expansion.getExpansion();
 	}
-	public set expansion(value: UmbEntityExpansionModel) {
+	public set expansion(value: UmbEntityExpansionModel<UmbEntityExpansionMenuItemEntryModel>) {
 		this.#context.expansion.setExpansion(value);
 	}
 

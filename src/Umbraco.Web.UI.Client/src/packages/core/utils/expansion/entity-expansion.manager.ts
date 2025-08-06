@@ -59,9 +59,7 @@ export class UmbEntityExpansionManager<
 	 */
 	public async expandItem(entity: EntryModelType): Promise<void> {
 		this._expansion.appendOne(entity);
-		this.getHostElement()?.dispatchEvent(
-			new UmbExpansionEntityExpandedEvent({ entityType: entity.entityType, unique: entity.unique }),
-		);
+		this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
@@ -75,9 +73,7 @@ export class UmbEntityExpansionManager<
 		if (!entities || entities.length === 0) return;
 		this._expansion.append(entities);
 		entities.forEach((entity) => {
-			this.getHostElement()?.dispatchEvent(
-				new UmbExpansionEntityExpandedEvent({ entityType: entity.entityType, unique: entity.unique }),
-			);
+			this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
 		});
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}

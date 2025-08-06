@@ -2,11 +2,11 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbExpansionEntityExpandedEvent extends Event {
 	public static readonly TYPE = 'expansion-entity-expanded';
-	entity: UmbEntityModel;
+	entry: UmbEntityModel;
 
-	public constructor(entity: UmbEntityModel) {
+	public constructor(entry: UmbEntityModel) {
 		// mimics the native change event
 		super(UmbExpansionEntityExpandedEvent.TYPE, { bubbles: true, composed: false, cancelable: false });
-		this.entity = entity;
+		this.entry = entry;
 	}
 }
