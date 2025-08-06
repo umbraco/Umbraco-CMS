@@ -14,7 +14,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
 
-test('can not create a empty media file', async ({umbracoApi, umbracoUi}) => {
+test('can not create a empty media file', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
@@ -58,7 +58,7 @@ const mediaFileTypes = [
 ];
 
 for (const mediaFileType of mediaFileTypes) {
-  test(`can create a media file with the ${mediaFileType.fileName} type`, async ({umbracoApi, umbracoUi}) => {
+  test(`can create a media file with the ${mediaFileType.fileName} type`, {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.media.ensureNameNotExists(mediaFileType.fileName);
     await umbracoUi.media.goToSection(ConstantHelper.sections.media);
@@ -230,7 +230,7 @@ test('can delete a media item from the recycle bin', async ({umbracoApi, umbraco
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
 });
 
-test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
+test('can empty the recycle bin', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.media.emptyRecycleBin();
   await umbracoApi.media.createDefaultMediaFile(mediaFileName);
@@ -249,7 +249,7 @@ test('can empty the recycle bin', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(mediaFileName)).toBeFalsy();
 });
 
-test('can trash a media node with a relation', async ({umbracoApi, umbracoUi}) => {
+test('can trash a media node with a relation', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentPickerName = ['TestPicker', 'DocumentTypeForPicker'];
   await umbracoApi.media.emptyRecycleBin();

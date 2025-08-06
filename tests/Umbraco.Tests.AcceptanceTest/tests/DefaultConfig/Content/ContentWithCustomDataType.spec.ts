@@ -265,7 +265,7 @@ test('can create content with the custom data type with slider property editor',
   expect(contentData.values).toEqual([]);
 });
 
-test('can change slider value in the content section', async ({umbracoApi, umbracoUi}) => {
+test('can change slider value in the content section', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   customDataTypeName = 'Slider';
   const sliderValue = 10;
