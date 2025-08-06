@@ -42,7 +42,7 @@ test.skip('can remove a custom view from a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.goToBlockAdvancedTab();
 });
 
-// TODO: Remove skip and update test when the front-end is ready. Currently stylesheets are saved as arrays
+// TODO: Remove skip and update test when the front-end is ready. Currently it is not possible to add a custom stylesheet to a block
 test.skip('can remove a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css'

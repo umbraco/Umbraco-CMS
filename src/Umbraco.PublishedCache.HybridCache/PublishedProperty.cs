@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
@@ -20,6 +20,8 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     private readonly object? _sourceValue;
     private readonly ContentVariation _variations;
     private readonly ContentVariation _sourceVariations;
+
+    private readonly string _propertyTypeAlias;
 
     // the variant and non-variant object values
     private bool _interInitialized;
@@ -71,6 +73,8 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         // it must be set to the union of variance (the combination of content type and property type variance).
         _variations = propertyType.Variations | content.ContentType.Variations;
         _sourceVariations = propertyType.Variations;
+
+        _propertyTypeAlias = propertyType.Alias;
     }
 
     // used to cache the CacheValues of this property
@@ -89,7 +93,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         var value = GetSourceValue(culture, segment);
         var hasValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -103,7 +107,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_sourceVariations, _content.Id, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_sourceVariations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         // source values are tightly bound to the property/schema culture and segment configurations, so we need to
         // sanitize the contextualized culture/segment states before using them to access the source values.
@@ -146,7 +150,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
@@ -209,7 +213,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);

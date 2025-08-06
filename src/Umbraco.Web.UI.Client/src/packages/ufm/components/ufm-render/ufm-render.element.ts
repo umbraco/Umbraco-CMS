@@ -50,6 +50,10 @@ export class UmbUfmRenderElement extends UmbLitElement {
 	static override styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				position: relative;
+			}
+
 			* {
 				max-width: 100%;
 				word-wrap: break-word;

@@ -22,6 +22,7 @@ public class UmbracoFileConfiguration
         {
             IConfigurationSection? args = umbracoFileAppSettings.GetSection("Args");
 
+            Enabled = args.GetValue(nameof(Enabled), Enabled);
             RestrictedToMinimumLevel = args.GetValue(nameof(RestrictedToMinimumLevel), RestrictedToMinimumLevel);
             FileSizeLimitBytes = args.GetValue(nameof(FileSizeLimitBytes), FileSizeLimitBytes);
             RollingInterval = args.GetValue(nameof(RollingInterval), RollingInterval);
@@ -30,6 +31,8 @@ public class UmbracoFileConfiguration
             RetainedFileCountLimit = args.GetValue(nameof(RetainedFileCountLimit), RetainedFileCountLimit);
         }
     }
+
+    public bool Enabled { get; set; } = true;
 
     public LogEventLevel RestrictedToMinimumLevel { get; set; } = LogEventLevel.Verbose;
 

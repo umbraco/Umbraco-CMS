@@ -1,22 +1,23 @@
 import type { UmbPropertyEditorRteValueType } from '../types.js';
 import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
-import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import {
+	UmbFormControlMixin,
+	UmbValidationContext,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+} from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import {
-	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-	UmbFormControlMixin,
-	UmbValidationContext,
-} from '@umbraco-cms/backoffice/validation';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
+import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 
 export abstract class UmbPropertyEditorUiRteElementBase
 	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
@@ -31,6 +32,12 @@ export abstract class UmbPropertyEditorUiRteElementBase
 		this.#managerContext.setBlockTypes(blocks);
 
 		this.#managerContext.setEditorConfiguration(config);
+
+		const dimensions = config.getValueByAlias<{ width?: number; height?: number }>('dimensions');
+		this._css = {
+			'--umb-rte-max-width': dimensions?.width ? `${dimensions.width}px` : '100%',
+			'--umb-rte-height': dimensions?.height ? `${dimensions.height}px` : 'unset',
+		};
 	}
 
 	@property({
@@ -94,8 +101,12 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	@state()
 	protected _config?: UmbPropertyEditorConfigCollection;
 
+	@state()
+	protected _css: StyleInfo = {};
+
 	/**
 	 * @deprecated _value is depreacated, use `super.value` instead.
+	 * @returns {UmbPropertyEditorRteValueType | undefined} The value of the property editor.
 	 */
 	@state()
 	protected get _value(): UmbPropertyEditorRteValueType | undefined {
