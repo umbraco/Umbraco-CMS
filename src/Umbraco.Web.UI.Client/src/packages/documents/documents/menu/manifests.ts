@@ -1,5 +1,6 @@
 import { UMB_DOCUMENT_TREE_ALIAS } from '../tree/index.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_DOCUMENT_MENU_ITEM_ALIAS } from './constants.js';
 
 export const UMB_CONTENT_MENU_ALIAS = 'Umb.Menu.Content';
 
@@ -12,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',
-		alias: 'Umb.MenuItem.Document',
+		alias: UMB_DOCUMENT_MENU_ITEM_ALIAS,
 		name: 'Document Menu Item',
 		weight: 200,
 		meta: {
@@ -39,6 +40,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'variantMenuBreadcrumb',
 		alias: 'Umb.WorkspaceFooterApp.Document.Breadcrumb',
 		name: 'Document Breadcrumb Workspace Footer App',
+		meta: {
+			menuItemAlias: UMB_DOCUMENT_MENU_ITEM_ALIAS,
+		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
