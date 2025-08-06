@@ -10,6 +10,7 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
@@ -309,6 +310,7 @@ export abstract class UmbPropertyEditorUiRteElementBase
 						const contentBlock = this.#unusedContentLookup.get(contentKey);
 						if (contentBlock) {
 							this.#managerContext.setOneContent(contentBlock);
+							this.#managerContext.setOneExpose(contentKey, UmbVariantId.CreateInvariant());
 							this.#unusedContentLookup.delete(contentKey);
 						}
 
