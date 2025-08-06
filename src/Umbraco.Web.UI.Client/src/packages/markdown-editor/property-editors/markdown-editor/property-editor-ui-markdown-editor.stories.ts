@@ -5,11 +5,10 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-markdown-editor.element.js';
 
 export default {
-	title: 'Property Editor UIs/Markdown Editor',
+	title: 'Extension Type/Property Editor UI/Markdown Editor',
 	component: 'umb-property-editor-ui-markdown-editor',
 	id: 'umb-property-editor-ui-markdown-editor',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIMarkdownEditorElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIMarkdownEditorElement> = () =>
 	html`<umb-property-editor-ui-markdown-editor></umb-property-editor-ui-markdown-editor>`;
-AAAOverview.storyName = 'Overview';

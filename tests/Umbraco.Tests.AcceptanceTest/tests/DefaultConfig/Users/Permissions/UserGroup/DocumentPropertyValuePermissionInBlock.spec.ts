@@ -31,7 +31,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('can see property values in block list with UI read but not UI write permission', async ({umbracoApi, umbracoUi}) => {
+test('can see property values in block list with UI read but not UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithABlockListEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionAndReadPropertyValuePermission(userGroupName, true, true);
@@ -51,7 +51,7 @@ test('can see property values in block list with UI read but not UI write permis
 
 // Remove .skip when the front-end is ready. 
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
-test.skip('can edit property values in block list with UI write permission', async ({umbracoApi, umbracoUi}) => {
+test.skip('can edit property values in block list with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
   await umbracoApi.document.createDefaultDocumentWithABlockListEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
@@ -90,7 +90,7 @@ test('cannot see property values in block list with only UI write but no UI read
   await umbracoUi.content.isPropertyEditorUiWithNameVisible('block-list', false);
 });
 
-test('can see property values in block grid with UI read but not UI write permission', async ({umbracoApi, umbracoUi}) => {
+test('can see property values in block grid with UI read but not UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionAndReadPropertyValuePermission(userGroupName, true, true);
@@ -110,7 +110,7 @@ test('can see property values in block grid with UI read but not UI write permis
 
 // Remove .skip when the front-end is ready. 
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
-test.skip('can edit property values in block grid with UI write permission', async ({umbracoApi, umbracoUi}) => {
+test.skip('can edit property values in block grid with UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
   await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
@@ -133,7 +133,7 @@ test.skip('can edit property values in block grid with UI write permission', asy
   expect(documentData.values[0].value.contentData[0].values[0].value).toEqual(updatedText);
 });
 
-test('cannot see property values in block grid with only UI write but no UI read permission', async ({umbracoApi, umbracoUi}) => {
+test('cannot see property values in block grid with only UI write but no UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithABlockGridEditor(documentName, elementTypeId, documentTypeName, customDataTypeName);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionAndWritePropertyValuePermission(userGroupName, true, true, false);

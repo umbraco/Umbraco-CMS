@@ -178,8 +178,7 @@ test('can set the label of block element in the content', async ({umbracoApi, um
   await umbracoUi.content.doesBlockElementHaveName(blockLabel);
 });
 
-// TODO: Remove skip when front-end is ready. Currently, it is impossible to create content with blocklist that has a setting model
-test.skip('can add settings model for the block in the content', async ({umbracoApi, umbracoUi}) => {
+test('can add settings model for the block in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const contentBlockInputText = 'This is textstring';
   const settingBlockInputText = 'This is textarea';
