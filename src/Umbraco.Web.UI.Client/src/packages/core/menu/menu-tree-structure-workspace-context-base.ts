@@ -4,7 +4,10 @@ import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu
 import type { UmbTreeRepository, UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
+	type ManifestWorkspaceFooterAppMenuBreadcrumbKind,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -16,6 +19,8 @@ interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 
 // TODO: introduce base class for all menu structure workspaces to handle ancestors and parent
 export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContextBase {
+	manifest?: ManifestWorkspaceFooterAppMenuBreadcrumbKind;
+
 	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
 	#args: UmbMenuTreeStructureWorkspaceContextBaseArgs;
 
@@ -152,6 +157,8 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		const linkedEntries = linkEntityExpansionEntries(structureItems);
 		// Filter out the current entity as we don't want to expand it
 		const expandableItems = linkedEntries.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
+		console.log(this.manifest);
+		debugger;
 		this.#sectionSidebarMenuContext?.expansion.expandItems(expandableItems);
 	}
 }

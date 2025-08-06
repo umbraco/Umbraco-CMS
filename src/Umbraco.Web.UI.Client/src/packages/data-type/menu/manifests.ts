@@ -20,6 +20,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Data Type Menu Structure Workspace Context',
 		alias: 'Umb.Context.DataType.Menu.Structure',
 		api: () => import('./data-type-menu-structure.context.js'),
+		meta: {
+			menuItemAlias: UMB_DATA_TYPE_MENU_ITEM_ALIAS,
+		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
@@ -32,9 +35,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'menuBreadcrumb',
 		alias: 'Umb.WorkspaceFooterApp.DataType.Breadcrumb',
 		name: 'Data Type Breadcrumb Workspace Footer App',
-		meta: {
-			menuItemAlias: UMB_DATA_TYPE_MENU_ITEM_ALIAS,
-		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
