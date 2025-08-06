@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
@@ -13,8 +14,8 @@ public class SiblingsTemplateTreeController : TemplateTreeControllerBase
     }
 
     [HttpGet("siblings")]
-    [ProducesResponseType(typeof(IEnumerable<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<IEnumerable<NamedEntityTreeItemResponseModel>>> Siblings(
+    [ProducesResponseType(typeof(SubsetViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public Task<ActionResult<SubsetViewModel<NamedEntityTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,
         int before,

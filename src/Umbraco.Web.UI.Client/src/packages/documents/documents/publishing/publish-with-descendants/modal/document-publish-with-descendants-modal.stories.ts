@@ -91,7 +91,7 @@ const modalValue: UmbDocumentPublishWithDescendantsModalValue = {
 };
 
 const meta: Meta<UmbDocumentPublishWithDescendantsModalElement> = {
-	title: 'Workspaces/Document/Modals/Publish With Descendants Modal',
+	title: 'Entity/Document/Modals/Publish With Descendants Modal',
 	component: 'umb-document-publish-with-descendants-modal',
 	id: 'umb-document-publish-with-descendants-modal',
 	args: {
@@ -169,7 +169,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentPublishWithDescendantsModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
 
 export const Invariant: Story = {
 	args: {

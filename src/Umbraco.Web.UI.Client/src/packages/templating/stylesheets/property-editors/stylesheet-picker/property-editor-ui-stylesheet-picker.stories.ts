@@ -8,14 +8,14 @@ import './property-editor-ui-stylesheet-picker.element.js';
 const dataTypeData = umbDataTypeMockDb.read('dt-richTextEditor') as unknown as UmbDataTypeDetailModel;
 
 export default {
-	title: 'Property Editor UIs/Stylesheet Picker',
+	title: 'Extension Type/Property Editor UI/Stylesheet Picker',
 	component: 'umb-property-editor-ui-stylesheet-picker',
 	id: 'umb-property-editor-ui-stylesheet-picker',
 } as Meta;
 
-export const AAAOverview = ({ value }: any) =>
+export const Docs = ({ value }: any) =>
 	html`<umb-property-editor-ui-stylesheet-picker .value=${value}></umb-property-editor-ui-stylesheet-picker>`;
-AAAOverview.storyName = 'Overview';
-AAAOverview.args = {
+
+Docs.args = {
 	value: dataTypeData?.values?.find((x) => x.alias === 'stylesheets')?.value ?? [],
 };
