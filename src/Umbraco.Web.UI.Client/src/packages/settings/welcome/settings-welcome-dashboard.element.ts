@@ -1,5 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from '@umbraco-cms/backoffice/menu';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
