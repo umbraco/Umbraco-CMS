@@ -64,7 +64,14 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
     }
 
     /// <inheritdoc/>
-    public IEnumerable<UserAccessEntity> ChildUserAccessEntities(UmbracoObjectTypes umbracoObjectType, string[] userStartNodePaths, Guid parentKey, int skip, int take, Ordering ordering, out long totalItems)
+    public IEnumerable<UserAccessEntity> ChildUserAccessEntities(
+        UmbracoObjectTypes umbracoObjectType,
+        string[] userStartNodePaths,
+        Guid parentKey,
+        int skip,
+        int take,
+        Ordering ordering,
+        out long totalItems)
     {
         Attempt<int> parentIdAttempt = _idKeyMap.GetIdForKey(parentKey, umbracoObjectType);
         if (parentIdAttempt.Success is false)
@@ -142,11 +149,22 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         }).WhereNotNull().ToArray();
 
     /// <inheritdoc />
-    public IEnumerable<UserAccessEntity> SiblingUserAccessEntities(UmbracoObjectTypes umbracoObjectType, string[] userStartNodePaths, Guid targetKey, int before, int after, Ordering ordering)
+    public IEnumerable<UserAccessEntity> SiblingUserAccessEntities(
+        UmbracoObjectTypes umbracoObjectType,
+        string[] userStartNodePaths,
+        Guid targetKey,
+        int before,
+        int after,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter
+        )
     {
         Attempt<int> targetIdAttempt = _idKeyMap.GetIdForKey(targetKey, umbracoObjectType);
         if (targetIdAttempt.Success is false)
         {
+            totalBefore = 0;
+            totalAfter = 0;
             return [];
         }
 
@@ -154,6 +172,8 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         IEntitySlim? target = _entityService.Get(targetId);
         if (target is null)
         {
+            totalBefore = 0;
+            totalAfter = 0;
             return [];
         }
 
@@ -162,13 +182,15 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         IEntitySlim? targetParent = _entityService.Get(target.ParentId);
         if (targetParent is null) // Even if the parent is the root, we still expect to get a value here.
         {
+            totalBefore = 0;
+            totalAfter = 0;
             return [];
         }
 
         if (userStartNodePaths.Any(path => $"{targetParent?.Path},".StartsWith($"{path},")))
         {
             // The requested parent of the target is one of the user start nodes (or a descendant of one), all siblings are by definition allowed.
-            siblings = _entityService.GetSiblings(targetKey, umbracoObjectType, before, after, ordering: ordering).ToArray();
+            siblings = _entityService.GetSiblings(targetKey, umbracoObjectType, before, after, out totalBefore, out totalAfter, ordering: ordering).ToArray();
             return ChildUserAccessEntities(siblings, userStartNodePaths);
         }
 
@@ -177,12 +199,14 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         if (allowedSiblingIds.Length == 0)
         {
             // The requested target is outside the scope of any user start nodes.
+            totalBefore = 0;
+            totalAfter = 0;
             return [];
         }
 
         // Even though we know the IDs of the allowed sibling entities to fetch, we still use a Query to yield correctly sorted children.
         IQuery<IUmbracoEntity> query = _scopeProvider.CreateQuery<IUmbracoEntity>().Where(x => allowedSiblingIds.Contains(x.Id));
-        siblings = _entityService.GetSiblings(targetKey, umbracoObjectType, before, after, query, ordering).ToArray();
+        siblings = _entityService.GetSiblings(targetKey, umbracoObjectType, before, after, out totalBefore, out totalAfter, query, ordering).ToArray();
         return ChildUserAccessEntities(siblings, userStartNodePaths);
     }
 

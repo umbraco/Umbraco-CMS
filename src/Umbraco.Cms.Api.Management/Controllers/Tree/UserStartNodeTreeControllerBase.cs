@@ -59,11 +59,11 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
         return CalculateAccessMap(() => userAccessEntities, out _);
     }
 
-    protected override IEntitySlim[] GetSiblingEntities(Guid target, int before, int after)
+    protected override IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter)
     {
         if (UserHasRootAccess() || IgnoreUserStartNodes())
         {
-            return base.GetSiblingEntities(target, before, after);
+            return base.GetSiblingEntities(target, before, after, out totalBefore, out totalAfter);
         }
 
         IEnumerable<UserAccessEntity> userAccessEntities = _userStartNodeEntitiesService.SiblingUserAccessEntities(
@@ -72,7 +72,9 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
             target,
             before,
             after,
-            ItemOrdering);
+            ItemOrdering,
+            out totalBefore,
+            out totalAfter);
 
         return CalculateAccessMap(() => userAccessEntities, out _);
     }

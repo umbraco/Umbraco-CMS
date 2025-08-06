@@ -929,7 +929,6 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var result2 = EntityService.GetPathKeys(grandChild, omitSelf: true);
         Assert.AreEqual($"{root.Key},{child.Key}", string.Join(",", result2));
-
     }
 
     [Test]
@@ -939,7 +938,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var target = children[1];
 
-        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1).ToArray();
+        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(7, totalAfter);
         Assert.AreEqual(3, result.Length);
         Assert.IsTrue(result[0].Key == children[0].Key);
         Assert.IsTrue(result[1].Key == children[1].Key);
@@ -955,7 +956,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         ContentService.MoveToRecycleBin(trash);
 
         var target = children[2];
-        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1).ToArray();
+        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(6, totalAfter);
         Assert.AreEqual(3, result.Length);
         Assert.IsFalse(result.Any(x => x.Key == trash.Key));
         Assert.IsTrue(result[0].Key == children[0].Key);
@@ -974,7 +977,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         IQuery<IUmbracoEntity> filter = ScopeProvider.CreateQuery<IUmbracoEntity>().Where(x => !keysToExclude.Contains(x.Key));
 
         var target = children[2];
-        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, filter).ToArray();
+        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, out long totalBefore, out long totalAfter, filter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(6, totalAfter);
         Assert.AreEqual(3, result.Length);
         Assert.IsFalse(result.Any(x => x.Key == keysToExclude[0]));
         Assert.IsTrue(result[0].Key == children[0].Key);
@@ -993,7 +998,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         IQuery<IUmbracoEntity> filter = ScopeProvider.CreateQuery<IUmbracoEntity>().Where(x => x.Key != keyToExclude);
 
         var target = children[2];
-        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, filter).ToArray();
+        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, out long totalBefore, out long totalAfter, filter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(6, totalAfter);
         Assert.AreEqual(3, result.Length);
         Assert.IsFalse(result.Any(x => x.Key == keyToExclude));
         Assert.IsTrue(result[0].Key == children[0].Key);
@@ -1010,7 +1017,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         children = children.OrderBy(x => x.Name).ToList();
 
         var target = children[1];
-        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, ordering: Ordering.By(nameof(NodeDto.Text))).ToArray();
+        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 1, out long totalBefore, out long totalAfter, ordering: Ordering.By(nameof(NodeDto.Text))).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(7, totalAfter);
         Assert.AreEqual(3, result.Length);
         Assert.IsTrue(result[0].Key == children[0].Key);
         Assert.IsTrue(result[1].Key == children[1].Key);
@@ -1023,7 +1032,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var children = CreateSiblingsTestData();
 
         var target = children[1];
-        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 100, 1).ToArray();
+        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 100, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(7, totalAfter);
         Assert.AreEqual(3, result.Length);
         Assert.IsTrue(result[0].Key == children[0].Key);
         Assert.IsTrue(result[1].Key == children[1].Key);
@@ -1036,7 +1047,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         var children = CreateSiblingsTestData();
 
         var target = children[^2];
-        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 100).ToArray();
+        var result = EntityService.GetSiblings(target.Key, UmbracoObjectTypes.Document, 1, 100, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(7, totalBefore);
+        Assert.AreEqual(0, totalAfter);
         Assert.AreEqual(3, result.Length);
         Assert.IsTrue(result[^1].Key == children[^1].Key);
         Assert.IsTrue(result[^2].Key == children[^2].Key);
