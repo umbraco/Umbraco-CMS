@@ -122,9 +122,9 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 * @returns {Promise<void>}
 	 */
 	public async collapseAll(): Promise<void> {
-		this.#manager.collapseAll();
 		// Collapse all items in the global context matching the current section
 		const entries = this.#bindEntriesToSection(this.#manager.getExpansion());
+		this.#manager.collapseAll();
 		this.#globalContext?.expansion.collapseItems(entries);
 	}
 

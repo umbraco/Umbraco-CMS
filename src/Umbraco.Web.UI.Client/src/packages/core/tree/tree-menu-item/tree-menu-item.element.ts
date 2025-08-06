@@ -32,7 +32,6 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 		this.observe(this.#menuItemContext?.expansion.expansion, (items) => {
 			if (this.#muteStateUpdate) return;
 			this._menuItemExpansion = items || [];
-			console.log(`Menu item expansion updated:  ${this.manifest?.alias}`, this._menuItemExpansion);
 		});
 	}
 

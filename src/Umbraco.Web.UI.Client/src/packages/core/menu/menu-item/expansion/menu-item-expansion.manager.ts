@@ -109,8 +109,8 @@ export class UmbMenuItemExpansionManager extends UmbControllerBase {
 	 * @returns {Promise<void>}
 	 */
 	public async collapseAll(): Promise<void> {
-		this.#manager.collapseAll();
 		const localEntries = this.#manager.getExpansion();
+		this.#manager.collapseAll();
 		this.#menuContext?.expansion.collapseItems(localEntries);
 	}
 }
