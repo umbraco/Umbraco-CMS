@@ -50,7 +50,7 @@ test('can only see property values for specific document with read UI enabled', 
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly(firstPropertyName[1]);
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly(secondPropertyName[1]);
   await umbracoUi.content.goToContentWithName(secondDocumentName);
-  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.permissionDenied);
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Access denied');
 });
 
 test('cannot see specific property value without UI read permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -101,7 +101,7 @@ test('can see property with UI read enabled but not another property with UI rea
   await umbracoUi.content.isPropertyEditorUiWithNameVisible(secondPropertyName[1], false);
 });
 
-// Remove .skip when the front-end is ready. 
+// Remove .skip when the front-end is ready.
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
 test.skip('can edit specific property values with UI read and write permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
