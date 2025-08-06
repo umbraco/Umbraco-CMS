@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.AuditEntry)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class AuditEntryDto
+internal sealed class AuditEntryDto
 {
     [Column("id")]
     [PrimaryKeyColumn]
@@ -19,6 +19,10 @@ internal class AuditEntryDto
     // users can still be identified via the details free-form text fields.
     [Column("performingUserId")]
     public int PerformingUserId { get; set; }
+
+    [Column("performingUserKey")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public Guid? PerformingUserKey { get; set; }
 
     [Column("performingDetails")]
     [NullSetting(NullSetting = NullSettings.Null)]
@@ -36,6 +40,10 @@ internal class AuditEntryDto
 
     [Column("affectedUserId")]
     public int AffectedUserId { get; set; }
+
+    [Column("affectedUserKey")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public Guid? AffectedUserKey { get; set; }
 
     [Column("affectedDetails")]
     [NullSetting(NullSetting = NullSettings.Null)]

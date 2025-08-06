@@ -134,14 +134,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		const element = this.shadowRoot?.querySelector('#editor');
 		if (!element) return;
 
-		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
-		if (dimensions?.width) {
-			this.setAttribute('style', `max-width: ${dimensions.width}px;`);
-		}
-		if (dimensions?.height) {
-			element.setAttribute('style', `height: ${dimensions.height}px;`);
-		}
-
 		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
 		if (stylesheets?.length) {
 			stylesheets.forEach((stylesheet) => {
@@ -175,6 +167,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			editable: !this.readonly,
 			extensions: tiptapExtensions,
 			content: this.#value,
+			injectCSS: false, // Prevents injecting CSS into `window.document`, as it never applies to the shadow DOM. [LK]
 			//enableContentCheck: true,
 			onBeforeCreate: ({ editor }) => {
 				this._extensions.forEach((ext) => ext.setEditor(editor));
@@ -246,6 +239,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				display: block;
 				position: relative;
 				z-index: 0;
+
+				width: var(--umb-rte-width, unset);
+				min-width: var(--umb-rte-min-width, unset);
+				max-width: var(--umb-rte-max-width, 100%);
 			}
 
 			:host([readonly]) {
@@ -278,7 +275,11 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				border: 1px solid var(--umb-tiptap-edge-border-color, var(--uui-color-border));
 				padding: 1rem;
 				box-sizing: border-box;
-				height: 100%;
+
+				height: var(--umb-rte-height, 100%);
+				min-height: var(--umb-rte-min-height, 100%);
+				max-height: var(--umb-rte-max-height, 100%);
+
 				width: 100%;
 				max-width: 100%;
 

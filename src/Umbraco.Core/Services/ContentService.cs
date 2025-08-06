@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class ContentService : RepositoryService, IContentService
 {
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IContentTypeRepository _contentTypeRepository;
     private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
     private readonly IDocumentRepository _documentRepository;
@@ -52,7 +52,7 @@ public class ContentService : RepositoryService, IContentService
         IEventMessagesFactory eventMessagesFactory,
         IDocumentRepository documentRepository,
         IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
         IDocumentBlueprintRepository documentBlueprintRepository,
         ILanguageRepository languageRepository,
@@ -68,7 +68,7 @@ public class ContentService : RepositoryService, IContentService
     {
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _contentTypeRepository = contentTypeRepository;
         _documentBlueprintRepository = documentBlueprintRepository;
         _languageRepository = languageRepository;
@@ -87,8 +87,7 @@ public class ContentService : RepositoryService, IContentService
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
-    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V17.")]
-
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -104,14 +103,16 @@ public class ContentService : RepositoryService, IContentService
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
         PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
         : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
             documentRepository,
             entityRepository,
-            auditRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
             contentTypeRepository,
             documentBlueprintRepository,
             languageRepository,
@@ -121,11 +122,12 @@ public class ContentService : RepositoryService, IContentService
             userIdKeyResolver,
             propertyEditorCollection,
             idKeyMap,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IRelationService>())
+            optionsMonitor,
+            relationService)
     {
     }
-    [Obsolete("Use non-obsolete constructor. Scheduled for removal in V17.")]
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -133,6 +135,7 @@ public class ContentService : RepositoryService, IContentService
         IDocumentRepository documentRepository,
         IEntityRepository entityRepository,
         IAuditRepository auditRepository,
+        IAuditService auditService,
         IContentTypeRepository contentTypeRepository,
         IDocumentBlueprintRepository documentBlueprintRepository,
         ILanguageRepository languageRepository,
@@ -140,14 +143,17 @@ public class ContentService : RepositoryService, IContentService
         IShortStringHelper shortStringHelper,
         ICultureImpactFactory cultureImpactFactory,
         IUserIdKeyResolver userIdKeyResolver,
-        PropertyEditorCollection propertyEditorCollection)
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
         : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
             documentRepository,
             entityRepository,
-            auditRepository,
+            auditService,
             contentTypeRepository,
             documentBlueprintRepository,
             languageRepository,
@@ -156,7 +162,9 @@ public class ContentService : RepositoryService, IContentService
             cultureImpactFactory,
             userIdKeyResolver,
             propertyEditorCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+            idKeyMap,
+            optionsMonitor,
+            relationService)
     {
     }
 
@@ -3084,7 +3092,20 @@ public class ContentService : RepositoryService, IContentService
     #region Private Methods
 
     private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message, parameters));
+        AuditAsync(type, userId, objectId, message, parameters).GetAwaiter().GetResult();
+
+    private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
+    {
+        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            UmbracoObjectTypes.Document.GetName(),
+            message,
+            parameters);
+    }
 
     private string GetLanguageDetailsForAuditEntry(IEnumerable<string> affectedCultures)
         => GetLanguageDetailsForAuditEntry(_languageRepository.GetMany(), affectedCultures);

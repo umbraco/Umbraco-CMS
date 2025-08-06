@@ -24,7 +24,7 @@ public class LegacyContentDeletedVersionsWebhookEvent : WebhookEventBase<Content
 
     public override string Alias => Constants.WebhookEvents.Aliases.ContentDeletedVersions;
 
-    public override object? ConvertNotificationToRequestPayload(ContentDeletedVersionsNotification notification)
+    public override object ConvertNotificationToRequestPayload(ContentDeletedVersionsNotification notification)
     {
         return new
         {

@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Dictionary;
 ///     fast
 ///     (even though there is caching involved, if there's lots of dictionary items the caching is not great)
 /// </remarks>
-internal class DefaultCultureDictionary : ICultureDictionary
+internal sealed class DefaultCultureDictionary : ICultureDictionary
 {
     private readonly ILocalizationService _localizationService;
     private readonly IAppCache _requestCache;
@@ -81,7 +81,7 @@ internal class DefaultCultureDictionary : ICultureDictionary
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public string? this[string key]
+    public string this[string key]
     {
         get
         {

@@ -150,7 +150,7 @@ public static class UmbracoBuilderExtensions
     }
 
     // replace the default so there is no background index rebuilder
-    private class TestBackgroundIndexRebuilder : ExamineIndexRebuilder
+    private sealed class TestBackgroundIndexRebuilder : ExamineIndexRebuilder
     {
         public TestBackgroundIndexRebuilder(
             IMainDom mainDom,
@@ -158,14 +158,14 @@ public static class UmbracoBuilderExtensions
             ILogger<ExamineIndexRebuilder> logger,
             IExamineManager examineManager,
             IEnumerable<IIndexPopulator> populators,
-            IBackgroundTaskQueue backgroundTaskQueue)
+            ILongRunningOperationService longRunningOperationService)
             : base(
             mainDom,
             runtimeState,
             logger,
             examineManager,
             populators,
-            backgroundTaskQueue)
+            longRunningOperationService)
         {
         }
 

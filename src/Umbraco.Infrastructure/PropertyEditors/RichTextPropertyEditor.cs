@@ -89,7 +89,7 @@ public class RichTextPropertyEditor : DataEditor
     ///     A custom value editor to ensure that images and blocks are parsed when being persisted and formatted correctly for
     ///     display in the editor
     /// </summary>
-    internal class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
+    internal sealed class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IHtmlSanitizer _htmlSanitizer;
@@ -263,8 +263,6 @@ public class RichTextPropertyEditor : DataEditor
             richTextEditorValue?.EnsurePropertyTypePopulatedOnBlocks(_elementTypeCache);
             currentRichTextEditorValue?.EnsurePropertyTypePopulatedOnBlocks(_elementTypeCache);
 
-            RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueFromEditor(blockValue, currentRichTextEditorValue?.Blocks, editorValue.ContentKey));
-
             if (string.IsNullOrWhiteSpace(richTextEditorValue?.Markup))
             {
                 return null;
@@ -284,6 +282,7 @@ public class RichTextPropertyEditor : DataEditor
             var sanitized = _htmlSanitizer.Sanitize(editorValueWithMediaUrlsRemoved);
 
             richTextEditorValue.Markup = sanitized.NullOrWhiteSpaceAsNull() ?? string.Empty;
+            RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueFromEditor(blockValue, currentRichTextEditorValue?.Blocks, editorValue.ContentKey));
 
             // return json
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(cleanedUpRichTextEditorValue, _jsonSerializer);
@@ -320,7 +319,7 @@ public class RichTextPropertyEditor : DataEditor
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(mergedEditorValue, _jsonSerializer);
         }
 
-        private string MergeMarkupValue(
+        private static string MergeMarkupValue(
             string source,
             string target,
             RichTextBlockValue? mergedBlockValue,

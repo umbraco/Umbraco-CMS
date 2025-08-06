@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 /// <summary>
 /// Custom validator for block value required validation.
 /// </summary>
-internal class BlockListValueRequiredValidator : RequiredValidator
+internal sealed class BlockListValueRequiredValidator : RequiredValidator
 {
     private readonly IJsonSerializer _jsonSerializer;
 

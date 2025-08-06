@@ -62,7 +62,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test.fixme('can rename content with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
+// Remove .skip when the front-end is ready. Currently the content name is read-only so cannot remane it.
+test.skip('can rename content with language set in userGroup', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedContentName = 'UpdatedContentName';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithLanguageAndContentSection(userGroupName, englishIsoCode);
@@ -75,7 +76,6 @@ test.fixme('can rename content with language set in userGroup', async ({umbracoA
   // Act
   await umbracoUi.content.isDocumentReadOnly(false);
   await umbracoUi.content.enterContentName(updatedContentName);
-  // Fix this later. Currently the "Save" button changed to "Save..." button
   await umbracoUi.content.clickSaveButton();
   await umbracoUi.content.clickSaveAndCloseButton();
 

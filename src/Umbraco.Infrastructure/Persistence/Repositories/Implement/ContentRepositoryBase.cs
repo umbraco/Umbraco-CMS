@@ -1073,7 +1073,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public abstract int RecycleBinId { get; }
 
-        public virtual IEnumerable<TEntity>? GetRecycleBin()
+        public virtual IEnumerable<TEntity> GetRecycleBin()
         {
             return Get(Query<TEntity>().Where(entity => entity.Trashed));
         }
@@ -1231,7 +1231,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        private class NodeIdKey
+        private sealed class NodeIdKey
         {
             [Column("id")]
             public int NodeId { get; set; }

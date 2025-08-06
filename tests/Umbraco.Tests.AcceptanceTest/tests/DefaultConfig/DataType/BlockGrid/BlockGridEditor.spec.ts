@@ -392,5 +392,22 @@ test('can update grid columns in a block grid editor', async ({umbracoApi, umbra
 test.skip('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
 });
 
-test.skip('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const stylesheetName = 'TestStylesheet.css';
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  await umbracoApi.dataType.createBlockGridWithLayoutStylesheet(blockGridEditorName, stylesheetName);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.clickRemoveStylesheetButton(stylesheetName);
+  await umbracoUi.dataType.clickConfirmRemoveButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  expect(await umbracoApi.dataType.doesBlockGridContainLayoutStylesheet(blockGridEditorName, stylesheetName)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });

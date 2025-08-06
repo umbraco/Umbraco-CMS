@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Web;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Web.Common.Constants;
@@ -65,14 +66,7 @@ public class EncryptionHelper
         string? additionalRouteValsAsQuery;
         if (additionalRouteVals != null)
         {
-            if (additionalRouteVals is Dictionary<string, object> additionalRouteValsAsDictionary)
-            {
-                additionalRouteValsAsQuery = additionalRouteValsAsDictionary.ToQueryString();
-            }
-            else
-            {
-                additionalRouteValsAsQuery = additionalRouteVals.ToDictionary<object>().ToQueryString();
-            }
+            additionalRouteValsAsQuery = new RouteValueDictionary(additionalRouteVals).ToQueryString();
         }
         else
         {
