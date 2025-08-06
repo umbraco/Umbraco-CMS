@@ -1,10 +1,11 @@
+import { UMB_DATA_TYPE_MENU_ITEM_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',
-		alias: 'Umb.MenuItem.DataTypes',
+		alias: UMB_DATA_TYPE_MENU_ITEM_ALIAS,
 		name: 'Data Types Menu Item',
 		weight: 600,
 		meta: {
@@ -31,6 +32,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'menuBreadcrumb',
 		alias: 'Umb.WorkspaceFooterApp.DataType.Breadcrumb',
 		name: 'Data Type Breadcrumb Workspace Footer App',
+		meta: {
+			menuItemAlias: UMB_DATA_TYPE_MENU_ITEM_ALIAS,
+		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
