@@ -102,7 +102,7 @@ test('can rename a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   expect(await umbracoApi.stylesheet.doesNameExist(wrongStylesheetName)).toBeFalsy();
 });
 
-test('cannot create a stylesheet with an empty name', async ({umbracoApi, umbracoUi}) => {
+test('cannot create a stylesheet with an empty name', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 

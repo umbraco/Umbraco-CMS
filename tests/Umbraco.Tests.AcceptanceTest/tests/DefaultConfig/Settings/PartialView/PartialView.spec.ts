@@ -280,7 +280,7 @@ test('can show returned items in query builder ', async ({umbracoApi, umbracoUi}
   await umbracoApi.document.ensureNameNotExists(childContentName);
 });
 
-test('cannot create a partial view with an empty name', async ({umbracoApi, umbracoUi}) => {
+test('cannot create a partial view with an empty name', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.partialView.clickActionsMenuAtRoot();
   await umbracoUi.partialView.clickCreateOptionsActionMenuOption();

@@ -153,7 +153,7 @@ test('can create a document type with a property in a tab', {tag: '@smoke'}, asy
   expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, dataTypeName, documentTypeData.properties[0].dataType.id, tabName, groupName)).toBeTruthy();
 });
 
-test('can create a document type with multiple groups', async ({umbracoApi, umbracoUi}) => {
+test('can create a document type with multiple groups', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeName = 'Image Media Picker';
@@ -176,7 +176,7 @@ test('can create a document type with multiple groups', async ({umbracoApi, umbr
   expect(await umbracoApi.documentType.doesGroupContainCorrectPropertyEditor(documentTypeName, secondDataTypeName, secondDataType.id, secondGroupName)).toBeTruthy();
 });
 
-test('can create a document type with multiple tabs', async ({umbracoApi, umbracoUi}) => {
+test('can create a document type with multiple tabs', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeName = 'Image Media Picker';
@@ -373,7 +373,7 @@ test('can set is mandatory for a property in a document type', {tag: '@smoke'}, 
   expect(documentTypeData.properties[0].validation.mandatory).toBeTruthy();
 });
 
-test('can enable validation for a property in a document type', async ({umbracoApi, umbracoUi}) => {
+test('can enable validation for a property in a document type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const regex = '^[a-zA-Z0-9]*$';
