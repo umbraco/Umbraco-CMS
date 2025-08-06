@@ -1,15 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Examine;
 using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -28,9 +29,26 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
     private readonly IExamineManager _examineManager;
-    private readonly ILocalizationService _languageService;
+    private readonly ILanguageService _languageService;
     private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
 
+    public BackOfficeExamineSearcher(
+        IExamineManager examineManager,
+        ILanguageService languageService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IEntityService entityService,
+        IUmbracoTreeSearcherFields treeSearcherFields,
+        AppCaches appCaches)
+    {
+        _examineManager = examineManager;
+        _languageService = languageService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _entityService = entityService;
+        _treeSearcherFields = treeSearcherFields;
+        _appCaches = appCaches;
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V18.")]
     public BackOfficeExamineSearcher(
         IExamineManager examineManager,
         ILocalizationService languageService,
@@ -40,13 +58,35 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         AppCaches appCaches,
         IUmbracoMapper umbracoMapper,
         IPublishedUrlProvider publishedUrlProvider)
+        : this(
+            examineManager,
+            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
+            backOfficeSecurityAccessor,
+            entityService,
+            treeSearcherFields,
+            appCaches)
     {
-        _examineManager = examineManager;
-        _languageService = languageService;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _entityService = entityService;
-        _treeSearcherFields = treeSearcherFields;
-        _appCaches = appCaches;
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V18.")]
+    public BackOfficeExamineSearcher(
+        IExamineManager examineManager,
+        ILocalizationService localizationService,
+        ILanguageService languageService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IEntityService entityService,
+        IUmbracoTreeSearcherFields treeSearcherFields,
+        AppCaches appCaches,
+        IUmbracoMapper umbracoMapper,
+        IPublishedUrlProvider publishedUrlProvider)
+        : this(
+            examineManager,
+            languageService,
+            backOfficeSecurityAccessor,
+            entityService,
+            treeSearcherFields,
+            appCaches)
+    {
     }
 
     [Obsolete("Please use the method that accepts all parameters. Will be removed in V17.")]
@@ -190,7 +230,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         if (!BuildQuery(sb, query, searchFrom, fields, type))
         {
             totalFound = 0;
-            return Enumerable.Empty<ISearchResult>();
+            return [];
         }
 
         ISearchResults? result = index.Searcher
@@ -220,7 +260,9 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         // then nodeName will be matched normally with wildcards
         // the rest will be normal without wildcards
 
-        var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
+        var allLangs = _languageService.GetAllAsync().GetAwaiter().GetResult()
+            .Select(x => x.IsoCode.ToLowerInvariant())
+            .ToList();
 
         // the chars [*-_] in the query will mess everything up so let's remove those
         // However we cannot just remove - and _  since these signify a space, so we instead replace them with that.
