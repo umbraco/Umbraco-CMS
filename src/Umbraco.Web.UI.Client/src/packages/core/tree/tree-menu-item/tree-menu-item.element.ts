@@ -37,19 +37,23 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 
 	#onEntityExpansionChange(event: UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent) {
 		event.stopPropagation();
-		const eventEntity = event.entity;
+		const eventEntry = event.entry;
 
-		if (!eventEntity) {
-			throw new Error('Entity is required to toggle expansion.');
+		if (!eventEntry) {
+			throw new Error('Entry is required to toggle expansion.');
+		}
+
+		if (!this.manifest) {
+			throw new Error('Manifest is required to toggle expansion.');
 		}
 
 		if (event.type === UmbExpansionEntityExpandedEvent.TYPE) {
 			this.#muteStateUpdate = true;
-			this.#menuContext?.expansion.expandItem(eventEntity);
+			this.#menuContext?.expansion.expandItem({ ...eventEntry, menuItemAlias: this.manifest.alias });
 			this.#muteStateUpdate = false;
 		} else if (event.type === UmbExpansionEntityCollapsedEvent.TYPE) {
 			this.#muteStateUpdate = true;
-			this.#menuContext?.expansion.collapseItem(eventEntity);
+			this.#menuContext?.expansion.collapseItem({ ...eventEntry, menuItemAlias: this.manifest.alias });
 			this.#muteStateUpdate = false;
 		}
 	}
