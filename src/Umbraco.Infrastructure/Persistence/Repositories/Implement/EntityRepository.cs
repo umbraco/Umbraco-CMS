@@ -95,10 +95,6 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             ApplyOrdering(ref sql, ordering);
         }
 
-        // TODO: we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
-        // no matter what we always must have node id ordered at the end
-        sql = ordering.Direction == Direction.Ascending ? sql.OrderBy("NodeId") : sql.OrderByDescending("NodeId");
-
         // for content we must query for ContentEntityDto entities to produce the correct culture variant entity names
         var pageIndexToFetch = pageIndex + 1;
         IEnumerable<BaseDto> dtos;
@@ -845,17 +841,14 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 sql.OrderByDescending(orderBy);
             }
 
-            if (runner.OrderBy?.ToUpperInvariant() == "SORTORDER")
+            // Order by node Id as well to ensure consistent results when the provided sort yields entities with the same value.
+            if (runner.Direction == Direction.Ascending)
             {
-                // Order by node Id as well to ensure consistent results when sort order is 0 or otherwise the same between nodes.
-                if (runner.Direction == Direction.Ascending)
-                {
-                    sql.OrderBy<NodeDto>(x => x.NodeId);
-                }
-                else
-                {
-                    sql.OrderByDescending<NodeDto>(x => x.NodeId);
-                }
+                sql.OrderBy<NodeDto>(x => x.NodeId);
+            }
+            else
+            {
+                sql.OrderByDescending<NodeDto>(x => x.NodeId);
             }
 
             runner = runner.Next;

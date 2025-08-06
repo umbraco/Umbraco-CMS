@@ -385,9 +385,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         Assert.That(total, Is.EqualTo(10));
     }
 
-    [Test]
-    public async Task EntityService_Can_Get_Paged_Document_Type_Children()
+    [TestCase("")]
+    [TestCase("sortOrder")]
+    public async Task EntityService_Can_Get_Paged_Document_Type_Children(string orderBy)
     {
+        Ordering? ordering = string.IsNullOrEmpty(orderBy)
+            ? null
+            : Ordering.By(orderBy, Direction.Ascending);
         IEnumerable<IEntitySlim> children = EntityService.GetPagedChildren(
             _documentTypeRootContainerKey,
             [UmbracoObjectTypes.DocumentTypeContainer],
@@ -395,13 +399,14 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             0,
             10,
             false,
-            out long totalRecords);
+            out long totalRecords,
+            ordering: ordering);
 
         Assert.AreEqual(3, totalRecords);
         Assert.AreEqual(3, children.Count());
         Assert.IsTrue(children.Single(x => x.Key == _documentTypeSubContainer1Key).HasChildren);     // Has a single folder as a child.
         Assert.IsTrue(children.Single(x => x.Key == _documentTypeSubContainer2Key).HasChildren);     // Has a single document type as a child.
-        Assert.IsFalse(children.Single(x => x.Key == _documentType1Key).HasChildren);         // Is a document type (has no children).
+        Assert.IsFalse(children.Single(x => x.Key == _documentType1Key).HasChildren);                // Is a document type (has no children).
     }
 
     [Test]
