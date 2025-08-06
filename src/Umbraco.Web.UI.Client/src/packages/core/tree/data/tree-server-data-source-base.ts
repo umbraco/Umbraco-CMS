@@ -7,7 +7,7 @@ import type {
 } from './types.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbPagedModel, UmbTargetPagedModel } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeServerDataSourceBaseArgs<
 	ServerTreeItemType extends { hasChildren: boolean },
@@ -18,10 +18,10 @@ export interface UmbTreeServerDataSourceBaseArgs<
 > {
 	getRootItems: (
 		args: TreeRootItemsRequestArgsType,
-	) => Promise<UmbDataSourceResponse<UmbPagedModel<ServerTreeItemType>>>;
+	) => Promise<UmbDataSourceResponse<UmbTargetPagedModel<ServerTreeItemType>>>;
 	getChildrenOf: (
 		args: TreeChildrenOfRequestArgsType,
-	) => Promise<UmbDataSourceResponse<UmbPagedModel<ServerTreeItemType>>>;
+	) => Promise<UmbDataSourceResponse<UmbTargetPagedModel<ServerTreeItemType>>>;
 	getAncestorsOf: (args: TreeAncestorsOfRequestArgsType) => Promise<UmbDataSourceResponse<Array<ServerTreeItemType>>>;
 	mapper: (item: ServerTreeItemType) => ClientTreeItemType;
 }
@@ -104,7 +104,6 @@ export abstract class UmbTreeServerDataSourceBase<
 
 		if (data) {
 			const items = data?.items.map((item: ServerTreeItemType) => this.#mapper(item));
-			debugger;
 			return {
 				data: {
 					total: data.total,

@@ -319,7 +319,6 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	async #loadNextItemsFromTarget() {
-		debugger;
 		if (this.unique === undefined) throw new Error('Could not request next items, unique key is missing');
 		if (this.entityType === undefined) throw new Error('Could not request next items, entity type is missing');
 
