@@ -637,7 +637,7 @@ public class VariationTests
                 attribute,
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IShortStringHelper>(),
-                new SystemTextJsonSerializer(),
+                new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
                 Mock.Of<IIOHelper>()));
 
         var textBoxEditor = new TextboxPropertyEditor(
