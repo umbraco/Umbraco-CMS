@@ -223,7 +223,7 @@ test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
-test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) => {
+test('cannot create member with invalid email', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const invalidEmail = 'invalidemail';
   await umbracoUi.member.goToMembers();

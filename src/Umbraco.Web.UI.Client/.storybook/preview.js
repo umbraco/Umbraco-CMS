@@ -128,6 +128,7 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'globalContext', [this]);
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'store', [this]);
+		// TODO: Remove this in Umbraco 18, use the repository instead
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'treeStore', [this]);
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'itemStore', [this]);
 
