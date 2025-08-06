@@ -1,3 +1,5 @@
+const ALLOWED_PREFIXES = ['Umb', 'Example'];
+
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
 	meta: {
@@ -11,10 +13,10 @@ module.exports = {
 	},
 	create: function (context) {
 		function checkClassName(node) {
-			if (node.id && node.id.name && !node.id.name.startsWith('Umb')) {
+			if (node.id && node.id.name && !ALLOWED_PREFIXES.some((prefix) => node.id.name.startsWith(prefix))) {
 				context.report({
 					node: node.id,
-					message: 'Class declaration should be prefixed with "Umb"',
+					message: `Class declaration should be prefixed with one of the following prefixes: ${ALLOWED_PREFIXES.join(', ')}`,
 				});
 			}
 		}
