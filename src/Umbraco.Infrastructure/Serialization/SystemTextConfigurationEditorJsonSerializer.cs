@@ -19,19 +19,20 @@ public sealed class SystemTextConfigurationEditorJsonSerializer : SystemTextJson
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public SystemTextConfigurationEditorJsonSerializer()
         : this(
-              StaticServiceProvider.Instance.GetRequiredService<IConfigurationEditorJsonSerializerEncoderFactory>())
+              StaticServiceProvider.Instance.GetRequiredService<IJsonSerializerEncoderFactory>())
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SystemTextConfigurationEditorJsonSerializer" /> class.
     /// </summary>
-    public SystemTextConfigurationEditorJsonSerializer(IConfigurationEditorJsonSerializerEncoderFactory configurationEditorJsonSerializerEncoderFactory)
+    public SystemTextConfigurationEditorJsonSerializer(IJsonSerializerEncoderFactory jsonSerializerEncoderFactory)
+        : base(jsonSerializerEncoderFactory)
         => _jsonSerializerOptions = new JsonSerializerOptions()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 
-            Encoder = configurationEditorJsonSerializerEncoderFactory.CreateEncoder(),
+            Encoder = CreateEncoder(nameof(SystemTextConfigurationEditorJsonSerializer)),
 
             // In some cases, configs aren't camel cased in the DB, so we have to resort to case insensitive
             // property name resolving when creating configuration objects (deserializing DB configs).

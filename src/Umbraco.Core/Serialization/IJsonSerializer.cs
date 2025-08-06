@@ -16,7 +16,6 @@ public interface IJsonSerializer
     /// </returns>
     string Serialize(object? input);
 
-
     /// <summary>
     /// Parses the text representing a single JSON value into an instance of the type specified by a generic type parameter.
     /// </summary>

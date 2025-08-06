@@ -61,7 +61,7 @@ public class DataValueReferenceFactoryCollectionTests
         var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory());
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var property =
             new Property(
                 new PropertyType(ShortStringHelper, new DataType(labelEditor, serializer))
@@ -105,7 +105,7 @@ public class DataValueReferenceFactoryCollectionTests
         var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory());
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var property =
             new Property(
                 new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
@@ -149,7 +149,7 @@ public class DataValueReferenceFactoryCollectionTests
         var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory());
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var property =
             new Property(new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
             {
@@ -198,7 +198,7 @@ public class DataValueReferenceFactoryCollectionTests
 
         var labelPropertyEditor = new LabelPropertyEditor(DataValueEditorFactory, IOHelper);
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelPropertyEditor.Yield()));
-        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory());
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
 
