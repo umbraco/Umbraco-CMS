@@ -1,5 +1,6 @@
 import type { UmbTiptapToolbarValue } from '../types.js';
-import { css, customElement, html, map, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -17,10 +18,12 @@ import '../cascading-menu-popover/cascading-menu-popover.element.js';
 @customElement('umb-tiptap-toolbar')
 export class UmbTiptapToolbarElement extends UmbLitElement {
 	#attached = false;
+
+	#debouncer = debounce(() => this.requestUpdate(), 100);
+
 	#extensionsController?: UmbExtensionsElementAndApiInitializer;
 
-	@state()
-	private _lookup?: Map<string, unknown>;
+	#lookup: Map<string, unknown> = new Map();
 
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
@@ -58,12 +61,13 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			[],
 			(manifest) => this.toolbar.flat(2).includes(manifest.alias),
 			(extensionControllers) => {
-				this._lookup = new Map(
-					extensionControllers.map((ext) => {
+				extensionControllers.forEach((ext) => {
+					if (!this.#lookup.has(ext.alias)) {
 						(ext.component as HTMLElement)?.setAttribute('data-mark', `action:tiptap-toolbar:${ext.alias}`);
-						return [ext.alias, ext.component];
-					}),
-				);
+						this.#lookup.set(ext.alias, ext.component);
+						this.#debouncer();
+					}
+				});
 			},
 			undefined,
 			undefined,
@@ -76,18 +80,23 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 	override render() {
 		if (!this.toolbar.flat(2).length) return nothing;
+		return this.#renderRows(this.toolbar);
+	}
 
-		return map(
-			this.toolbar,
-			(row) => html`
-				<div class="row">
-					${map(
-						row,
-						(group) => html`<div class="group">${map(group, (alias) => this._lookup?.get(alias) ?? nothing)}</div>`,
-					)}
-				</div>
-			`,
-		);
+	#renderRows(rows: UmbTiptapToolbarValue) {
+		return repeat(rows, (row) => html`<div class="row">${this.#renderGroups(row)}</div>`);
+	}
+
+	#renderGroups(groups: Array<Array<string>>) {
+		return repeat(groups, (group) => html`<div class="group">${this.#renderActions(group)}</div>`);
+	}
+
+	#renderActions(aliases: Array<string>) {
+		return repeat(aliases, (alias) => this.#lookup?.get(alias) ?? this.#renderActionPlaceholder());
+	}
+
+	#renderActionPlaceholder() {
+		return html`<span class="skeleton" role="none"></span>`;
 	}
 
 	static override readonly styles = css`
@@ -149,6 +158,13 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 					margin: 0 var(--uui-size-3);
 				}
 			}
+		}
+
+		.skeleton {
+			background-color: var(--uui-color-background);
+			height: var(--uui-size-12, 36px);
+			width: var(--uui-size-10, 30px);
+			margin-left: 1px;
 		}
 	`;
 }
