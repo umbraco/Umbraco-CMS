@@ -1,5 +1,5 @@
 import { UMB_SECTION_SIDEBAR_MENU_GLOBAL_CONTEXT } from '../../global-context/section-sidebar-menu.global-context.token.js';
-import type { UmbEntityExpansionSectionEntryModel } from '../../types.js';
+import type { UmbSectionMenuItemExpansionEntryModel } from '../../types.js';
 import type { UmbMenuItemExpansionEntryModel } from '../../../components/menu/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -130,7 +130,7 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 
 	#bindEntriesToSection(
 		expansion: UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>,
-	): UmbEntityExpansionModel<UmbEntityExpansionSectionEntryModel> {
+	): UmbEntityExpansionModel<UmbSectionMenuItemExpansionEntryModel> {
 		return expansion.map((item) => ({
 			...item,
 			sectionAlias: this.#currentSectionAlias,

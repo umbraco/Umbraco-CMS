@@ -26,6 +26,6 @@ export interface MetaSectionSidebarAppMenuWithEntityActionsKind extends MetaSect
 	entityType: string;
 }
 
-export interface UmbEntityExpansionSectionEntryModel extends UmbMenuItemExpansionEntryModel {
+export interface UmbSectionMenuItemExpansionEntryModel extends UmbMenuItemExpansionEntryModel {
 	sectionAlias?: string;
 }
