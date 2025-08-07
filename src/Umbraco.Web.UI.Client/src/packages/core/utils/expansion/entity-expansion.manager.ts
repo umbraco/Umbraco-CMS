@@ -80,33 +80,29 @@ export class UmbEntityExpansionManager<
 
 	/**
 	 * Collapses an entity
-	 * @param {EntryModelType} entity The entity to open
+	 * @param {EntryModelType} entry The entity to open
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {Promise<void>}
 	 */
-	public async collapseItem(entity: EntryModelType): Promise<void> {
-		this._expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
-		this.getHostElement()?.dispatchEvent(
-			new UmbExpansionEntryCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
-		);
+	public async collapseItem(entry: EntryModelType): Promise<void> {
+		this._expansion.filter((x) => x.entityType !== entry.entityType || x.unique !== entry.unique);
+		this.getHostElement()?.dispatchEvent(new UmbExpansionEntryCollapsedEvent(entry));
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
 	 * Collapses multiple entities
-	 * @param {UmbEntityExpansionModel<EntryModelType>} entities The entities to close
+	 * @param {UmbEntityExpansionModel<EntryModelType>} entries The entities to close
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {void}
 	 */
-	public collapseItems(entities: UmbEntityExpansionModel<EntryModelType>): void {
-		if (!entities || entities.length === 0) return;
+	public collapseItems(entries: UmbEntityExpansionModel<EntryModelType>): void {
+		if (!entries || entries.length === 0) return;
 		this._expansion.filter(
-			(x) => !entities.some((entity) => entity.entityType === x.entityType && entity.unique === x.unique),
+			(x) => !entries.some((entry) => entry.entityType === x.entityType && entry.unique === x.unique),
 		);
-		entities.forEach((entity) => {
-			this.getHostElement()?.dispatchEvent(
-				new UmbExpansionEntryCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
-			);
+		entries.forEach((entry) => {
+			this.getHostElement()?.dispatchEvent(new UmbExpansionEntryCollapsedEvent(entry));
 		});
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
