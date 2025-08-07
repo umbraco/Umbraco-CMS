@@ -112,6 +112,10 @@ export default [
 				{
 					selector: ['variableLike', 'memberLike'],
 					modifiers: ['public'],
+					filter: {
+						regex: '^_host$',
+						match: false,
+					},
 					format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
 					leadingUnderscore: 'forbid',
 					trailingUnderscore: 'forbid',
