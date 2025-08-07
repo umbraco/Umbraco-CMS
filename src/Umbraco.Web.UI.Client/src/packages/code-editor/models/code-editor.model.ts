@@ -203,6 +203,7 @@ export interface CodeEditorConstructorOptions {
 	letterSpacing?: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface CodeEditorSearchOptions {
 	/**
 	 *   Limit the searching to only search inside the editable range of the model.
