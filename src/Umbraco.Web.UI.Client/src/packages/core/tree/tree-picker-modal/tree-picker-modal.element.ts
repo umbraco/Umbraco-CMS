@@ -7,6 +7,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
@@ -33,9 +34,15 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	_searchQuery?: string;
 
 	#pickerContext = new UmbTreeItemPickerContext(this);
+	#dataType?: { unique: string };
 
 	constructor() {
 		super();
+		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
+			this.observe(context?.dataType, (dataType) => {
+				this.#dataType = dataType;
+			});
+		});
 		this.#pickerContext.selection.setSelectable(true);
 		this.observe(this.#pickerContext.selection.hasSelection, (hasSelection) => {
 			this._hasSelection = hasSelection;
@@ -57,6 +64,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				this.#pickerContext.search.updateConfig({
 					...this.data.search,
 					searchFrom: this.data.startNode,
+					dataTypeUnique: this.#dataType?.unique,
 				});
 			}
 

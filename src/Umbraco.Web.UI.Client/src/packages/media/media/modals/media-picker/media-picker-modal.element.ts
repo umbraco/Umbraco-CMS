@@ -213,6 +213,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			includeTrashed: false,
 			searchFrom: this._searchFrom,
 			culture: this.#contextCulture,
+			dataTypeUnique: this.#dataType?.unique,
 			...this.data?.search?.queryParams,
 		});
 
