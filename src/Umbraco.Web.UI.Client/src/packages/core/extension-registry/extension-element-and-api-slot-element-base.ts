@@ -34,10 +34,10 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 	#extensionController?: UmbExtensionElementAndApiInitializer<ManifestType>;
 
 	@state()
-	private _api: ManifestType['API_TYPE'] | undefined;
+	protected _api: ManifestType['API_TYPE'] | undefined;
 
 	@state()
-	private _element: ManifestType['ELEMENT_TYPE'] | undefined;
+	protected _element: ManifestType['ELEMENT_TYPE'] | undefined;
 
 	abstract getExtensionType(): string;
 	abstract getDefaultElementName(): string;

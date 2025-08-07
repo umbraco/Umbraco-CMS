@@ -22,7 +22,7 @@ export abstract class UmbPickerSearchResultItemElementBase<ItemType extends UmbN
 	disabled?: boolean;
 
 	@state()
-	private _isSelected = false;
+	protected _isSelected = false;
 
 	constructor() {
 		super();
