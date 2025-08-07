@@ -30,10 +30,15 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 {
     private readonly IShortStringHelper _shortStringHelper;
 
-    protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache,
-        ILogger<ContentTypeRepositoryBase<TEntity>> logger, IContentTypeCommonRepository commonRepository,
-        ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
-        : base(scopeAccessor, cache, logger)
+    protected ContentTypeRepositoryBase(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<ContentTypeRepositoryBase<TEntity>> logger,
+        IContentTypeCommonRepository commonRepository,
+        ILanguageRepository languageRepository,
+        IShortStringHelper shortStringHelper,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
     {
         _shortStringHelper = shortStringHelper;
         CommonRepository = commonRepository;

@@ -27,8 +27,16 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
         ILogger<MemberTypeRepository> logger,
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
-        IShortStringHelper shortStringHelper)
-        : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper) =>
+        IShortStringHelper shortStringHelper,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            commonRepository,
+            languageRepository,
+            shortStringHelper,
+            repositoryCacheVersionService) =>
         _shortStringHelper = shortStringHelper;
 
     protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;

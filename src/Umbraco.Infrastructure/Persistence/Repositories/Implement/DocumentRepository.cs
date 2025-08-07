@@ -1,8 +1,10 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -33,31 +35,59 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     private readonly ILoggerFactory _loggerFactory;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly IJsonSerializer _serializer;
+    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
     private readonly ITagRepository _tagRepository;
     private readonly ITemplateRepository _templateRepository;
     private PermissionRepository<IContent>? _permissionRepository;
 
-    /// <summary>
-    ///     Constructor
-    /// </summary>
-    /// <param name="scopeAccessor"></param>
-    /// <param name="appCaches"></param>
-    /// <param name="logger"></param>
-    /// <param name="loggerFactory"></param>
-    /// <param name="contentTypeRepository"></param>
-    /// <param name="templateRepository"></param>
-    /// <param name="tagRepository"></param>
-    /// <param name="languageRepository"></param>
-    /// <param name="relationRepository"></param>
-    /// <param name="relationTypeRepository"></param>
-    /// <param name="dataValueReferenceFactories"></param>
-    /// <param name="dataTypeService"></param>
-    /// <param name="serializer"></param>
-    /// <param name="eventAggregator"></param>
-    /// <param name="propertyEditors">
-    ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors
-    ///     require services, yet these services require property editors
-    /// </param>
+    public DocumentRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches appCaches,
+        ILogger<DocumentRepository> logger,
+        ILoggerFactory loggerFactory,
+        IContentTypeRepository contentTypeRepository,
+        ITemplateRepository templateRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(
+            scopeAccessor,
+            appCaches,
+            logger,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            eventAggregator,
+            repositoryCacheVersionService)
+    {
+        _contentTypeRepository =
+            contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
+        _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
+        _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
+        _serializer = serializer;
+        _repositoryCacheVersionService = repositoryCacheVersionService;
+        _appCaches = appCaches;
+        _loggerFactory = loggerFactory;
+        _scopeAccessor = scopeAccessor;
+        _contentByGuidReadRepository = new ContentByGuidReadRepository(
+            this,
+            scopeAccessor,
+            appCaches,
+            loggerFactory.CreateLogger<ContentByGuidReadRepository>(),
+            repositoryCacheVersionService);
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -74,19 +104,24 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
-        : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository,
-            propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
+        : this(
+            scopeAccessor,
+            appCaches,
+            logger,
+            loggerFactory,
+            contentTypeRepository,
+            templateRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
     {
-        _contentTypeRepository =
-            contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
-        _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
-        _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
-        _serializer = serializer;
-        _appCaches = appCaches;
-        _loggerFactory = loggerFactory;
-        _scopeAccessor = scopeAccessor;
-        _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeAccessor, appCaches,
-            loggerFactory.CreateLogger<ContentByGuidReadRepository>());
     }
 
     protected override DocumentRepository This => this;
@@ -101,7 +136,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                                                                        new PermissionRepository<IContent>(
                                                                            _scopeAccessor,
                                                                            _appCaches,
-                                                                           _loggerFactory.CreateLogger<PermissionRepository<IContent>>());
+                                                                           _loggerFactory.CreateLogger<PermissionRepository<IContent>>(),
+                                                                           _repositoryCacheVersionService);
 
     /// <inheritdoc />
     public ContentScheduleCollection GetContentSchedule(int contentId)
@@ -1557,9 +1593,13 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     {
         private readonly DocumentRepository _outerRepo;
 
-        public ContentByGuidReadRepository(DocumentRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache,
-            ILogger<ContentByGuidReadRepository> logger)
-            : base(scopeAccessor, cache, logger) =>
+        public ContentByGuidReadRepository(
+            DocumentRepository outerRepo,
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<ContentByGuidReadRepository> logger,
+            IRepositoryCacheVersionService repositoryCacheVersionService)
+            : base(scopeAccessor, cache, logger, repositoryCacheVersionService) =>
             _outerRepo = outerRepo;
 
         protected override IContent? PerformGet(Guid id)

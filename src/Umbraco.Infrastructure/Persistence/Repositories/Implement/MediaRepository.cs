@@ -1,8 +1,10 @@
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -48,9 +50,20 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
-        IEventAggregator eventAggregator)
-        : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository,
-            propertyEditorCollection, dataValueReferenceFactories, dataTypeService, eventAggregator)
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditorCollection,
+            dataValueReferenceFactories,
+            dataTypeService,
+            eventAggregator,
+            repositoryCacheVersionService)
     {
         _cache = cache;
         _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
@@ -61,7 +74,45 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             this,
             scopeAccessor,
             cache,
-            loggerFactory.CreateLogger<MediaByGuidReadRepository>());
+            loggerFactory.CreateLogger<MediaByGuidReadRepository>(),
+            repositoryCacheVersionService);
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    public MediaRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MediaRepository> logger,
+        ILoggerFactory loggerFactory,
+        IMediaTypeRepository mediaTypeRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        PropertyEditorCollection propertyEditorCollection,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator)
+        : this(scopeAccessor,
+            cache,
+            logger,
+            loggerFactory,
+            mediaTypeRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditorCollection,
+            mediaUrlGenerators,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>()
+            )
+    {
     }
 
     protected override MediaRepository This => this;
@@ -526,8 +577,13 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     {
         private readonly MediaRepository _outerRepo;
 
-        public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MediaByGuidReadRepository> logger)
-            : base(scopeAccessor, cache, logger) =>
+        public MediaByGuidReadRepository(
+            MediaRepository outerRepo,
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<MediaByGuidReadRepository> logger,
+            IRepositoryCacheVersionService repositoryCacheVersionService)
+            : base(scopeAccessor, cache, logger,  repositoryCacheVersionService) =>
             _outerRepo = outerRepo;
 
         protected override IMedia? PerformGet(Guid id)

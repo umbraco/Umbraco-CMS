@@ -67,5 +67,11 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_15_0_0.AddDocumentUrl>("{B9133686-B758-404D-AF12-708AA80C7E44}");
         To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{EEB1F012-B44D-4AB4-8756-F7FB547345B4}");
         To<V_14_0_0.AddListViewKeysToDocumentTypes>("{0F49E1A4-AFD8-4673-A91B-F64E78C48174}");
+
+        // To 16.2.0
+        // The lock and table are required to access caches.
+        // When logging in, we save the user to the cache so these need to have run.
+        To<V_16_2_0.AddCacheVersionDatabaseLock>("{1DC39DC7-A88A-4912-8E60-4FD36246E8D1}");
+        To<V_16_2_0.AddRepositoryCacheVersionTable>("{A1B3F5D6-4C8B-4E7A-9F8C-1D2B3E4F5A6B}");
     }
 }
