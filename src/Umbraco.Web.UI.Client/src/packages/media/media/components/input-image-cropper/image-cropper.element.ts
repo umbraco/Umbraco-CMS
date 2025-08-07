@@ -178,7 +178,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 		const currentScale = Math.max(currentScaleX, currentScaleY);
 		// Calculate the zoom level based on the current scale
 		// This finds the alpha value in the range of min and max scale.
-		this.zoom = inverseLerp(this.#minImageScale, this.#maxImageScale, currentScale);
+		this.#zoom = inverseLerp(this.#minImageScale, this.#maxImageScale, currentScale);
 	}
 
 	#updateImageScale(amount: number, mouseX?: number, mouseY?: number) {
