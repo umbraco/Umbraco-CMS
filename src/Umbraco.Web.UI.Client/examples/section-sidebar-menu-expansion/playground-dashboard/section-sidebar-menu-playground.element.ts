@@ -3,6 +3,7 @@ import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import {
 	UMB_SECTION_SIDEBAR_MENU_GLOBAL_CONTEXT,
 	UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT,
+	type UmbEntityExpansionSectionEntryModel,
 } from '@umbraco-cms/backoffice/menu';
 
 @customElement('example-section-sidebar-menu-playground-dashboard')
@@ -11,10 +12,10 @@ export class ExampleSectionSidebarMenuPlaygroundDashboard extends UmbElementMixi
 	#sectionContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 
 	@state()
-	_globalExpansion: Array<any> = [];
+	_globalExpansion: Array<UmbEntityExpansionSectionEntryModel> = [];
 
 	@state()
-	_sectionExpansion: Array<any> = [];
+	_sectionExpansion: Array<UmbEntityExpansionSectionEntryModel> = [];
 
 	constructor() {
 		super();
@@ -61,7 +62,7 @@ export class ExampleSectionSidebarMenuPlaygroundDashboard extends UmbElementMixi
 		</umb-stack>`;
 	}
 
-	#renderItem(item: any) {
+	#renderItem(item: UmbEntityExpansionSectionEntryModel) {
 		return html`<div class="expansion-entry">
 			<div>
 				<span class="label">Entity Type:</span>
