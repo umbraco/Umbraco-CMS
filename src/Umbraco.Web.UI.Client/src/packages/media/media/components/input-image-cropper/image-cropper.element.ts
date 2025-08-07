@@ -183,7 +183,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 
 	#updateImageScale(amount: number, mouseX?: number, mouseY?: number) {
 		this.#oldImageScale = this.#getImageScale;
-		this.zoom = clamp(this.zoom + amount, 0, 1);
+		this.#zoom = clamp(this.zoom + amount, 0, 1);
 		const newImageScale = this.#getImageScale;
 
 		const mask = this.maskElement.getBoundingClientRect();
