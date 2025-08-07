@@ -147,7 +147,7 @@ export default [
 					selector: 'typeLike',
 					modifiers: ['exported'],
 					format: ['PascalCase'],
-					prefix: ['Umb', 'Example']
+					prefix: ['Umb', 'Ufm', 'Example']
 				},
 				// All exported constants should be UPPER_CASE with leading 'UMB_'
 				// Example: UMB_EXAMPLE_CONSTANT
