@@ -19,12 +19,12 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.template.ensureNameNotExists(templateName);
 });
 
-test('can get a silbling of a content item of a different content type using SiblingsOfType extension', async ({umbracoApi, umbracoUi}) => {
+test('can get a sibling of a content item of a different content type using SiblingsOfType method', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(secondDocumentTypeName);
   const secondContentId = await umbracoApi.document.createDefaultDocument(secondContentName, secondDocumentTypeId);
   await umbracoApi.document.publish(secondContentId);
-  const templateId = await umbracoApi.template.createTemplateUsingSiblingOfTypeExtension(templateName, secondDocumentTypeName);
+  const templateId = await umbracoApi.template.createTemplateUsingSiblingOfTypeMethod(templateName, secondDocumentTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId, true);
   const contentId = await umbracoApi.document.createDocumentWithTemplate(contentName, documentTypeId, templateId);
   await umbracoApi.document.publish(contentId);
