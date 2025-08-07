@@ -23,6 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceContext',
+		kind: 'menuStructure',
 		name: 'Media Menu Structure Workspace Context',
 		alias: 'Umb.Context.Media.Menu.Structure',
 		api: () => import('./media-menu-structure.context.js'),

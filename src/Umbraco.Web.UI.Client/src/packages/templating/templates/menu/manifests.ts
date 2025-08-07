@@ -18,6 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceContext',
+		kind: 'menuStructure',
 		name: 'Template Menu Structure Workspace Context',
 		alias: 'Umb.Context.Template.Menu.Structure',
 		api: () => import('./template-menu-structure.context.js'),
