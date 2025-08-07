@@ -57,8 +57,8 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             Options.Create(new UserPasswordConfigurationSettings()),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             mockRuntimeState.Object,
-            PermissionMappers,
-            Mock.Of<IRepositoryCacheVersionService>());
+            Mock.Of<IRepositoryCacheVersionService>(),
+            PermissionMappers);
         return repository;
     }
 
@@ -165,9 +165,8 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 Options.Create(new UserPasswordConfigurationSettings()),
                 new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
                 mockRuntimeState.Object,
-                PermissionMappers,
-                AppPolicyCache,
-                Mock.Of<IRepositoryCacheVersionService>());
+                Mock.Of<IRepositoryCacheVersionService>(),
+                PermissionMappers);
 
             repository2.Delete(user);
 

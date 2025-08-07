@@ -90,6 +90,8 @@ public class DatabaseSchemaCreator
         typeof(WebhookLogDto),
         typeof(WebhookRequestDto),
         typeof(UserDataDto),
+        typeof(LongRunningOperationDto),
+        typeof(LastSyncedDto),
         typeof(RepositoryCacheVersionDto),
         typeof(LongRunningOperationDto),
     };
