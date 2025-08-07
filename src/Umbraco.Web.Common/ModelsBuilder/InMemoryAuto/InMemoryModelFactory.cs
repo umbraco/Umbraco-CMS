@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Frozen;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -21,12 +22,24 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 {
-    internal sealed class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
+    internal sealed partial class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
     {
-        private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
-        private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
-        private static readonly Regex s_assemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
-        private static readonly string[] s_ourFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
+        private static readonly Regex s_usingRegex = GetUsingRegex();
+
+        [GeneratedRegex("^using(.*);", RegexOptions.Multiline | RegexOptions.Compiled)]
+        private static partial Regex GetUsingRegex();
+
+        private static readonly Regex s_aattrRegex = GetAssemblyRegex();
+
+        [GeneratedRegex("^\\[assembly:(.*)\\]", RegexOptions.Multiline | RegexOptions.Compiled)]
+        private static partial Regex GetAssemblyRegex();
+
+        private static readonly Regex s_assemblyVersionRegex = GetAssemblyVersionRegex();
+
+        [GeneratedRegex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled)]
+        private static partial Regex GetAssemblyVersionRegex();
+
+        private static readonly FrozenSet<string> s_ourFiles = FrozenSet.Create("models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled");
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<InMemoryModelFactory> _logger;
@@ -797,7 +810,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             // }
 
             // always ignore our own file changes
-            if (s_ourFiles.Contains(changed))
+            if (changed != null && s_ourFiles.Contains(changed))
             {
                 return;
             }
