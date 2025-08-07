@@ -45,8 +45,8 @@ export class UmbSectionSidebarMenuElement<
 		this.#extensionSlotElement.filter = (menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu;
 		this.#extensionSlotElement.defaultElement = 'umb-menu';
 		this.#extensionSlotElement.events = {
-			'expansion-entry-expanded': this.#onEntityExpansionChange.bind(this),
-			'expansion-entry-collapsed': this.#onEntityExpansionChange.bind(this),
+			'expansion-entry-expanded': this.#onExpansionChange.bind(this),
+			'expansion-entry-collapsed': this.#onExpansionChange.bind(this),
 		};
 	}
 
@@ -60,7 +60,7 @@ export class UmbSectionSidebarMenuElement<
 		});
 	}
 
-	#onEntityExpansionChange(e: Event) {
+	#onExpansionChange(e: Event) {
 		const event = e as UmbExpansionEntryExpandedEvent | UmbExpansionEntryCollapsedEvent;
 		event.stopPropagation();
 		const eventEntry = event.entry;
