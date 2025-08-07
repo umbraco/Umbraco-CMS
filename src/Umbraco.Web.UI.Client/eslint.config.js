@@ -62,12 +62,6 @@ export default [
 					exceptions: ['@umbraco-cms', '@open-wc/testing', '@storybook', 'msw', '.', 'vite', 'uuid', 'diff'],
 				},
 			],
-			'local-rules/exported-string-constant-naming': [
-				'error',
-				{
-					excludedFileNames: ['umbraco-package'],
-				},
-			],
 			'jsdoc/check-tag-names': [
 				'warn',
 				{
@@ -98,6 +92,92 @@ export default [
 			'@typescript-eslint/consistent-type-imports': 'error',
 			'@typescript-eslint/no-import-type-side-effects': 'warn',
 			'@typescript-eslint/no-deprecated': 'warn',
+			'@typescript-eslint/naming-convention': [
+				'error',
+				// All private members should be camelCase with leading underscore
+				// This is to ensure that private members are not used outside the class, as they
+				// are not part of the public API.
+				// Example NOT OK: private myPrivateVariable
+				// Example OK: private _myPrivateVariable
+				{
+					selector: 'memberLike',
+					modifiers: ['private'],
+					format: ['camelCase'],
+					leadingUnderscore: 'require',
+					trailingUnderscore: 'forbid',
+				},
+				// All public members and variables should be camelCase without leading underscore
+				// Example: myPublicVariable, myPublicMethod
+				{
+					selector: ['variableLike', 'memberLike'],
+					modifiers: ['public'],
+					format: ['camelCase'],
+					leadingUnderscore: 'forbid',
+					trailingUnderscore: 'forbid',
+				},
+				// All #private members and variables should be camelCase without leading underscore
+				// Example: #myPublicVariable, #myPublicMethod
+				{
+					selector: ['variableLike', 'memberLike'],
+					modifiers: ['private'],
+					format: ['camelCase'],
+					leadingUnderscore: 'forbid',
+					trailingUnderscore: 'forbid',
+				},
+				// All protected members and variables should be camelCase without leading underscore
+				// Example: protected myPublicVariable, protected myPublicMethod
+				{
+					selector: ['variableLike', 'memberLike'],
+					modifiers: ['protected'],
+					format: ['camelCase'],
+					leadingUnderscore: 'forbid',
+					trailingUnderscore: 'forbid',
+				},
+				// Allow quoted properties, as they are often used in JSON or when the property name is not a valid identifier
+				// This is to ensure that properties can be used in JSON or when the property name
+				// is not a valid identifier (e.g. contains spaces or special characters)
+				// Example: { "umb-some-component": UmbSomeComponent }
+				{
+					selector: ['objectLiteralProperty', 'typeProperty', 'enumMember'],
+					modifiers: ['requiresQuotes'],
+					format: null,
+				},
+				// All (exported) types should be PascalCase with leading 'Umb' or 'Example'
+				// Example: UmbExampleType, ExampleTypeLike
+				{
+					selector: 'typeLike',
+					modifiers: ['exported'],
+					format: ['PascalCase'],
+					prefix: ['Umb', 'Example']
+				},
+				// All exported constants should be UPPER_CASE with leading 'UMB_'
+				// Example: UMB_EXAMPLE_CONSTANT
+				{
+					selector: 'variable',
+					modifiers: ['exported', 'const'],
+					format: ['UPPER_CASE'],
+					filter: {
+						// Exclude variables that are not manifest(s)
+						regex: '^manifests?$',
+						match: false,
+					},
+					prefix: ['UMB_'],
+				},
+				// All boolean variables should be camelCase with leading 'is', 'should', 'has', 'can', 'did', 'will'
+				// Example: isActive, shouldUpdate, hasPermission, canEdit, didSave, willSubmit
+				{
+					selector: "variable",
+					types: ["boolean"],
+					format: ["PascalCase"],
+					prefix: ["is", "should", "has", "can", "did", "will"]
+				},
+				// Allow destructured variables to be named as they are in the object
+				{
+					selector: "variable",
+					modifiers: ["destructured"],
+					format: null,
+				},
+			],
 		},
 	},
 	{
