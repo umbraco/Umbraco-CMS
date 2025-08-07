@@ -1,11 +1,12 @@
 import { UMB_MEDIA_TYPE_TREE_ALIAS } from '../constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
+import { UMB_MEDIA_TYPE_MENU_ITEM_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',
-		alias: 'Umb.MenuItem.MediaTypes',
+		alias: UMB_MEDIA_TYPE_MENU_ITEM_ALIAS,
 		name: 'Media Types Menu Item',
 		weight: 800,
 		meta: {
@@ -19,6 +20,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Media Type Menu Structure Workspace Context',
 		alias: 'Umb.Context.MediaType.Menu.Structure',
 		api: () => import('./media-type-menu-structure.context.js'),
+		meta: {
+			menuItemAlias: UMB_MEDIA_TYPE_MENU_ITEM_ALIAS,
+		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
