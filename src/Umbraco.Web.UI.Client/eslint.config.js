@@ -125,8 +125,8 @@ export default [
 				{
 					selector: ['variableLike', 'memberLike'],
 					modifiers: ['#private'],
-					format: ['camelCase'],
-					leadingUnderscore: 'forbid',
+					format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
+					leadingUnderscore: 'allowDouble',
 					trailingUnderscore: 'forbid',
 				},
 				// All protected members and variables should be camelCase with optional leading underscore (if needed to be pseudo-private)
