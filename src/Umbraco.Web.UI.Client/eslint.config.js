@@ -157,7 +157,7 @@ export default [
 					format: ['UPPER_CASE'],
 					filter: {
 						// Exclude variables that are not manifest(s)
-						regex: '^manifests?$',
+						regex: '^(manifests?|name|extensions)$',
 						match: false,
 					},
 					prefix: ['UMB_'],
