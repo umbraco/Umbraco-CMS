@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Item;
 
@@ -14,11 +15,16 @@ public class SearchDocumentItemController : DocumentItemControllerBase
 {
     private readonly IIndexedEntitySearchService _indexedEntitySearchService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
+    private readonly IDataTypeService _dataTypeService;
 
-    public SearchDocumentItemController(IIndexedEntitySearchService indexedEntitySearchService, IDocumentPresentationFactory documentPresentationFactory)
+    public SearchDocumentItemController(
+        IIndexedEntitySearchService indexedEntitySearchService,
+        IDocumentPresentationFactory documentPresentationFactory,
+        IDataTypeService dataTypeService)
     {
         _indexedEntitySearchService = indexedEntitySearchService;
         _documentPresentationFactory = documentPresentationFactory;
+        _dataTypeService = dataTypeService;
     }
 
     [HttpGet("search")]
@@ -32,9 +38,21 @@ public class SearchDocumentItemController : DocumentItemControllerBase
         int skip = 0,
         int take = 100,
         Guid? parentId = null,
-        [FromQuery] IEnumerable<Guid>? allowedDocumentTypes = null)
+        [FromQuery] IEnumerable<Guid>? allowedDocumentTypes = null,
+        Guid? dataTypeId = null)
     {
-        PagedModel<IEntitySlim> searchResult = await _indexedEntitySearchService.SearchAsync(UmbracoObjectTypes.Document, query, parentId, allowedDocumentTypes, trashed, culture, skip, take);
+        var ignoreUserStartNodes = await IgnoreUserStartNodes(dataTypeId);
+        PagedModel<IEntitySlim> searchResult = await _indexedEntitySearchService.SearchAsync(
+            UmbracoObjectTypes.Document,
+            query,
+            parentId,
+            allowedDocumentTypes,
+            trashed,
+            culture,
+            skip,
+            take,
+            ignoreUserStartNodes);
+
         var result = new PagedModel<DocumentItemResponseModel>
         {
             Items = searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModel),
@@ -43,4 +61,7 @@ public class SearchDocumentItemController : DocumentItemControllerBase
 
         return Ok(result);
     }
+
+    private async Task<bool> IgnoreUserStartNodes(Guid? dataTypeKey) =>
+        dataTypeKey is not null && await _dataTypeService.IsDataTypeIgnoringUserStartNodesAsync(dataTypeKey.Value);
 }
