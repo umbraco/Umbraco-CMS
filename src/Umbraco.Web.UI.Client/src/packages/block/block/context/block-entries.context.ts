@@ -17,8 +17,8 @@ export abstract class UmbBlockEntriesContext<
 	BlockOriginData extends UmbBlockWorkspaceOriginData,
 > extends UmbContextBase {
 	//
-	_manager?: BlockManagerContextType;
-	_retrieveManager;
+	private _manager?: BlockManagerContextType;
+	private _retrieveManager;
 
 	protected _catalogueRouteBuilderState = new UmbBasicState<UmbModalRouteBuilder | undefined>(undefined);
 	readonly catalogueRouteBuilder = this._catalogueRouteBuilderState.asObservable();

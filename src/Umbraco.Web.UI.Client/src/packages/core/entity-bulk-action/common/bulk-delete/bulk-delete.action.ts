@@ -17,7 +17,7 @@ export class UmbDeleteEntityBulkAction<
 	MetaKindType extends MetaEntityBulkActionDeleteKind = MetaEntityBulkActionDeleteKind,
 > extends UmbEntityBulkActionBase<MetaKindType> {
 	#localize = new UmbLocalizationController(this);
-	_items: Array<any> = [];
+	#items: Array<any> = [];
 
 	override async execute() {
 		if (this.selection?.length === 0) {
@@ -26,7 +26,7 @@ export class UmbDeleteEntityBulkAction<
 
 		// TODO: Move item look up to a future bulk action context
 		await this.#requestItems();
-		await this._confirmDelete(this._items);
+		await this._confirmDelete(this.#items);
 		await this.#requestBulkDelete(this.selection);
 	}
 
@@ -51,7 +51,7 @@ export class UmbDeleteEntityBulkAction<
 
 		const { data } = await itemRepository.requestItems(this.selection);
 
-		this._items = data ?? [];
+		this.#items = data ?? [];
 	}
 
 	async #requestBulkDelete(uniques: Array<string>) {
@@ -105,7 +105,7 @@ export class UmbDeleteEntityBulkAction<
 			eventContext.dispatchEvent(reloadStructure);
 		}
 
-		const succeededItems = this._items.filter((item) => succeeded.includes(item.unique));
+		const succeededItems = this.#items.filter((item) => succeeded.includes(item.unique));
 
 		succeededItems.forEach((item) => {
 			const deletedEvent = new UmbEntityDeletedEvent({
