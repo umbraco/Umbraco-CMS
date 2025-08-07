@@ -160,14 +160,6 @@ export default [
 					format: ['UPPER_CASE'],
 					prefix: ['UMB_'],
 				},
-				// All boolean variables should be camelCase with leading 'is', 'should', 'has', 'can', 'did', 'will'
-				// Example: isActive, shouldUpdate, hasPermission, canEdit, didSave, willSubmit
-				{
-					selector: "variable",
-					types: ["boolean"],
-					format: ["PascalCase"],
-					prefix: ["is", "should", "has", "can", "did", "will"]
-				},
 				// Allow destructured variables to be named as they are in the object
 				{
 					selector: "variable",
