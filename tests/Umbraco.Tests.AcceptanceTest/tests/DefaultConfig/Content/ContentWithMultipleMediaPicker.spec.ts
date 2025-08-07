@@ -97,7 +97,7 @@ test('can add multiple media files to the multiple media picker', async ({umbrac
   expect(contentData.values[0].value[1].mediaTypeAlias).toEqual(secondMediaTypeName);
 });
 
-test('can remove a media picker in the content', async ({umbracoApi, umbracoUi}) => {
+test('can remove a media picker in the content', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
