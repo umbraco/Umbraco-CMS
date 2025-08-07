@@ -122,7 +122,7 @@ test('cannot update a variant block list with invalid text', {tag: '@release'}, 
   // Arrange
   const textStringElementDataTypeName = 'Textstring';
   const textStringElementRegex = '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+';
-  const wrongPropertyValue = 'This is a test with wrong value**';
+  const wrongPropertyValue = 'This is an invalid email';
   const correctPropertyValue = 'validemail@test.com';
   // Create a new language
   await umbracoApi.language.createDanishLanguage();
