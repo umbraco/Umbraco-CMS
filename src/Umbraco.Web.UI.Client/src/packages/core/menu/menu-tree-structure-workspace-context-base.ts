@@ -9,6 +9,7 @@ import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observabl
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -33,12 +34,17 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
+	#isModalContext: boolean = false;
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
 		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
+
+		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
+			this.#isModalContext = modalContext !== undefined;
+		});
 
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
 			this.#sectionSidebarMenuContext = instance;
@@ -109,7 +115,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 				this.#setAncestorData(data);
 
 				const menuItemAlias = this.manifest?.meta?.menuItemAlias;
-				if (menuItemAlias) {
+				if (menuItemAlias && !this.#isModalContext) {
 					this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 				}
 			}
