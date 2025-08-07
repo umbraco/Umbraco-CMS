@@ -387,6 +387,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     [TestCase("")]
     [TestCase("sortOrder")]
+    [TestCase("nodeId")]
     public async Task EntityService_Can_Get_Paged_Document_Type_Children(string orderBy)
     {
         Ordering? ordering = string.IsNullOrEmpty(orderBy)

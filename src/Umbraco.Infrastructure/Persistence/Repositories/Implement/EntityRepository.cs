@@ -815,6 +815,8 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
         Ordering? runner = ordering;
 
+        Direction lastDirection = Direction.Ascending;
+        bool orderingIncludesNodeId = false;
         do
         {
 
@@ -826,7 +828,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 case "PATH":
                     orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
                     break;
-
+                case "NODEID":
+                    orderBy = runner.OrderBy;
+                    orderingIncludesNodeId = true;
+                    break;
                 default:
                     orderBy = runner.OrderBy ?? string.Empty;
                     break;
@@ -841,8 +846,17 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 sql.OrderByDescending(orderBy);
             }
 
-            // Order by node Id as well to ensure consistent results when the provided sort yields entities with the same value.
-            if (runner.Direction == Direction.Ascending)
+            lastDirection = runner.Direction;
+
+            runner = runner.Next;
+        }
+        while (runner is not null);
+
+        // If we haven't already included the node Id in the order by clause, order by node Id as well to ensure consistent results
+        // when the provided sort yields entities with the same value.
+        if (orderingIncludesNodeId is false)
+        {
+            if (lastDirection == Direction.Ascending)
             {
                 sql.OrderBy<NodeDto>(x => x.NodeId);
             }
@@ -850,12 +864,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             {
                 sql.OrderByDescending<NodeDto>(x => x.NodeId);
             }
-
-            runner = runner.Next;
         }
-        while (runner is not null);
-
-
     }
 
     #endregion
