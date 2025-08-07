@@ -117,14 +117,14 @@ export default [
 						match: false,
 					},
 					format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
-					leadingUnderscore: 'forbid',
+					leadingUnderscore: 'allowDouble',
 					trailingUnderscore: 'forbid',
 				},
 				// All #private members and variables should be camelCase without leading underscore
 				// Example: #myPublicVariable, #myPublicMethod
 				{
 					selector: ['variableLike', 'memberLike'],
-					modifiers: ['private'],
+					modifiers: ['#private'],
 					format: ['camelCase'],
 					leadingUnderscore: 'forbid',
 					trailingUnderscore: 'forbid',
