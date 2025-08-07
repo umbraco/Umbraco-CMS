@@ -40,7 +40,7 @@ export class UmbImageCropperElement extends UmbLitElement {
 	#mouseOffsetY = 0;
 
 	get #getImageScale() {
-		return lerp(this.#minImageScale, this.#maxImageScale, this.zoom);
+		return lerp(this.#minImageScale, this.#maxImageScale, this.#zoom);
 	}
 
 	override connectedCallback() {
