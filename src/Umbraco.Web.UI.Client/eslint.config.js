@@ -72,7 +72,7 @@ export default [
 	// Pattern-specific overrides
 	{
 		files: ['**/*.ts'],
-		ignores: ['.storybook', '**/*.stories.ts', '**/umbraco-package.ts'],
+		ignores: ['.storybook', '**/*.stories.ts', '**/umbraco-package.ts', 'src/assets/lang/*.ts'],
 		languageOptions: {
 			parserOptions: {
 				project: true,
