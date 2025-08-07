@@ -520,7 +520,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                 //       the containers and their parent relationships in the model, so it's ok
                 container => model.Containers.First(c => c.Key == container.ParentKey).Name);
 
-        IEnumerable<IPropertyType> existingPropertyTypes = contentType.PropertyTypes.ToArray();
+        var existingPropertyTypes = contentType.PropertyTypes.ToList();
 
         // handle properties in groups
         PropertyGroup[] propertyGroups = model.Containers.Select(container =>
