@@ -1,4 +1,5 @@
 import type { ManifestMenu } from '../menu.extension.js';
+import { isMenuItemExpansionEntry } from '../menu-item/expansion/is-menu-item-expansion-entry.guard.js';
 import type { ManifestSectionSidebarAppBaseMenu, ManifestSectionSidebarAppMenuKind } from './types.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-context/section-sidebar-menu.section-context.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -62,19 +63,22 @@ export class UmbSectionSidebarMenuElement<
 	#onEntityExpansionChange(e: Event) {
 		const event = e as UmbExpansionEntryExpandedEvent | UmbExpansionEntryCollapsedEvent;
 		event.stopPropagation();
-		const eventEntity = event.entry;
+		const eventEntry = event.entry;
 
-		if (!eventEntity) {
+		if (!eventEntry) {
 			throw new Error('Entity is required to toggle expansion.');
 		}
 
+		// Only react to the event if it is a valid Menu Item Expansion Entry
+		if (isMenuItemExpansionEntry(eventEntry) === false) return;
+
 		if (event.type === UmbExpansionEntryExpandedEvent.TYPE) {
 			this.#muteStateUpdate = true;
-			this.#sectionSidebarMenuContext?.expansion.expandItem(eventEntity);
+			this.#sectionSidebarMenuContext?.expansion.expandItem(eventEntry);
 			this.#muteStateUpdate = false;
 		} else if (event.type === UmbExpansionEntryCollapsedEvent.TYPE) {
 			this.#muteStateUpdate = true;
-			this.#sectionSidebarMenuContext?.expansion.collapseItem(eventEntity);
+			this.#sectionSidebarMenuContext?.expansion.collapseItem(eventEntry);
 			this.#muteStateUpdate = false;
 		}
 	}
