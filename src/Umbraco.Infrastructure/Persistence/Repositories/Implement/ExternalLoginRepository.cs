@@ -14,7 +14,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginWithKeyRepository
+internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginWithKeyRepository
 {
     public ExternalLoginRepository(
         IScopeAccessor scopeAccessor,
@@ -266,7 +266,7 @@ internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUser
         }
     }
 
-    private IEnumerable<IIdentityUserLogin> ConvertFromDtos(IEnumerable<ExternalLoginDto> dtos)
+    private static IEnumerable<IIdentityUserLogin> ConvertFromDtos(IEnumerable<ExternalLoginDto> dtos)
     {
         foreach (IIdentityUserLogin entity in dtos.Select(ExternalLoginFactory.BuildEntity))
         {

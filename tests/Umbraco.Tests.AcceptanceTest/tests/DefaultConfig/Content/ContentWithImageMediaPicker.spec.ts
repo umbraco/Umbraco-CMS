@@ -18,7 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can save content with a image media picker', async ({umbracoApi, umbracoUi}) => {
+test('can create content with a image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
@@ -60,7 +60,7 @@ test('can publish content with a image media picker', async ({umbracoApi, umbrac
   expect(contentData.variants[0].state).toBe(expectedState);
 });
 
-test('can add an image to the image media picker', async ({umbracoApi, umbracoUi}) => {
+test('can add an image to the image media picker', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.media.ensureNameNotExists(mediaName);
@@ -142,7 +142,8 @@ test.skip('image count can not be more than max amount set in image media picker
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.clickMediaWithName(mediaName);
   await umbracoUi.content.clickSubmitButton();
   await umbracoUi.content.clickSaveButton();
 

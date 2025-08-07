@@ -573,7 +573,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     // A reading repository purely for looking up by GUID
     // TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
     // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
-    private class MediaByGuidReadRepository : EntityRepositoryBase<Guid, IMedia>
+    private sealed class MediaByGuidReadRepository : EntityRepositoryBase<Guid, IMedia>
     {
         private readonly MediaRepository _outerRepo;
 

@@ -56,7 +56,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
         var languageRepository =
             new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>());
-        mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>());
+        mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap);
         var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>(), Mock.Of<IRepositoryCacheVersionService>());
         var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>());
         var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);

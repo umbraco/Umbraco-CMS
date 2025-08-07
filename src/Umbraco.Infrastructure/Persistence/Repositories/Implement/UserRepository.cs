@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
 /// </summary>
-internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserRepository
+internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserRepository
 {
     private readonly IMapperCollection _mapperCollection;
     private readonly GlobalSettings _globalSettings;
@@ -36,8 +36,6 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     private bool _passwordConfigInitialized;
     private readonly Lock _sqliteValidateSessionLock = new();
     private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
-    private readonly IAppPolicyCache _globalCache;
-    private readonly IScopeAccessor _scopeAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -72,19 +70,16 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
-        IEnumerable<IPermissionMapper> permissionMappers,
-        IAppPolicyCache globalCache,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        IEnumerable<IPermissionMapper> permissionMappers)
         : base(scopeAccessor, appCaches, logger, repositoryCacheVersionService)
     {
-        _scopeAccessor = scopeAccessor;
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         _passwordConfiguration =
             passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         _jsonSerializer = jsonSerializer;
         _runtimeState = runtimeState;
-        _globalCache = globalCache;
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
@@ -1272,13 +1267,14 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     /// <inheritdoc />
     public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentLoginProviders)
     {
-        // Get all the user or member keys associated with the removed providers.
+        // Get all the user keys associated with the removed providers.
         Sql<ISqlContext> idsQuery = SqlContext.Sql()
             .Select<ExternalLoginDto>(x => x.UserOrMemberKey)
             .From<ExternalLoginDto>()
+            .Where<ExternalLoginDto>(x => !x.LoginProvider.StartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix)) // Only invalidate sessions relating to backoffice users, not members.
             .WhereNotIn<ExternalLoginDto>(x => x.LoginProvider, currentLoginProviders);
-        List<Guid> userAndMemberKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
-        if (userAndMemberKeysAssociatedWithRemovedProviders.Count == 0)
+        List<Guid> userKeysAssociatedWithRemovedProviders = Database.Fetch<Guid>(idsQuery);
+        if (userKeysAssociatedWithRemovedProviders.Count == 0)
         {
             return;
         }
@@ -1286,12 +1282,12 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         // Invalidate the security stamps on the users associated with the removed providers.
         Sql<ISqlContext> updateSecurityStampsQuery = Sql()
             .Update<UserDto>(u => u.Set(x => x.SecurityStampToken, "0".PadLeft(32, '0')))
-            .WhereIn<UserDto>(x => x.Key, userAndMemberKeysAssociatedWithRemovedProviders);
+            .WhereIn<UserDto>(x => x.Key, userKeysAssociatedWithRemovedProviders);
         Database.Execute(updateSecurityStampsQuery);
 
         // Delete the OpenIddict tokens for the users associated with the removed providers.
         // The following is safe from SQL injection as we are dealing with GUIDs, not strings.
-        var userKeysForInClause = string.Join("','", userAndMemberKeysAssociatedWithRemovedProviders.Select(x => x.ToString()));
+        var userKeysForInClause = string.Join("','", userKeysAssociatedWithRemovedProviders.Select(x => x.ToString()));
         Database.Execute("DELETE FROM umbracoOpenIddictTokens WHERE Subject IN ('" + userKeysForInClause + "')");
     }
 

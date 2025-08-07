@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents the NPoco implementation of <see cref="IConsentRepository" />.
 /// </summary>
-internal class ConsentRepository : EntityRepositoryBase<int, IConsent>, IConsentRepository
+internal sealed class ConsentRepository : EntityRepositoryBase<int, IConsent>, IConsentRepository
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConsentRepository" /> class.

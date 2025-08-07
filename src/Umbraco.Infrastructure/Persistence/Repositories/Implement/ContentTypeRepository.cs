@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IContentType" />
 /// </summary>
-internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
+internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
 {
     public ContentTypeRepository(
         IScopeAccessor scopeAccessor,
@@ -26,7 +27,8 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        IIdKeyMap idKeyMap)
         : base(
             scopeAccessor,
             cache,
@@ -34,7 +36,8 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
             commonRepository,
             languageRepository,
             shortStringHelper,
-            repositoryCacheVersionService)
+            repositoryCacheVersionService,
+            idKeyMap)
     {
     }
 

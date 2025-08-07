@@ -69,7 +69,7 @@ test('can publish content with multiple image media picker data type', async ({u
   expect(contentData.values).toEqual([]);
 });
 
-test('can add multiple images to the multiple image media picker', async ({umbracoApi, umbracoUi}) => {
+test('can add multiple images to the multiple image media picker', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);

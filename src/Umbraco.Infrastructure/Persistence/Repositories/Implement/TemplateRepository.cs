@@ -22,9 +22,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents the Template Repository
 /// </summary>
-internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITemplateRepository
+internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITemplateRepository
 {
-    private readonly IIOHelper _ioHelper;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IFileSystem? _viewsFileSystem;
     private readonly IViewHelper _viewHelper;
@@ -35,14 +34,12 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         AppCaches cache,
         ILogger<TemplateRepository> logger,
         FileSystems fileSystems,
-        IIOHelper ioHelper,
         IShortStringHelper shortStringHelper,
         IViewHelper viewHelper,
         IOptionsMonitor<RuntimeSettings> runtimeSettings,
         IRepositoryCacheVersionService repositoryCacheVersionService)
         : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
     {
-        _ioHelper = ioHelper;
         _shortStringHelper = shortStringHelper;
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;
         _viewHelper = viewHelper;
@@ -209,7 +206,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         return string.Empty;
     }
 
-    private string? GetFileContent(ITemplate template, IFileSystem? fs, string filename, bool init)
+    private static string? GetFileContent(ITemplate template, IFileSystem? fs, string filename, bool init)
     {
         // do not update .UpdateDate as that would make it dirty (side-effect)
         // unless initializing, because we have to do it once
@@ -230,7 +227,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         return init ? null : GetFileContent(fs, filename);
     }
 
-    private string? GetFileContent(IFileSystem? fs, string filename)
+    private static string? GetFileContent(IFileSystem? fs, string filename)
     {
         if (fs is null)
         {
@@ -628,7 +625,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         return descendants;
     }
 
-    private void AddChildren(ITemplate[]? all, List<ITemplate> descendants, string masterAlias)
+    private static void AddChildren(ITemplate[]? all, List<ITemplate> descendants, string masterAlias)
     {
         ITemplate[]? c = all?.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
         if (c is null || c.Any() == false)

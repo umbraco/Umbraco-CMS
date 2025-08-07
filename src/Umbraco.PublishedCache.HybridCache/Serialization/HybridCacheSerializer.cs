@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 
-internal class HybridCacheSerializer : IHybridCacheSerializer<ContentCacheNode>
+internal sealed class HybridCacheSerializer : IHybridCacheSerializer<ContentCacheNode>
 {
     private readonly ILogger<HybridCacheSerializer> _logger;
     private readonly MessagePackSerializerOptions _options;

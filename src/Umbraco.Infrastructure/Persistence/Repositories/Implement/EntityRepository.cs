@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 ///     <para>Limited to objects that have a corresponding node (in umbracoNode table).</para>
 ///     <para>Returns <see cref="IEntitySlim" /> objects, i.e. lightweight representation of entities.</para>
 /// </remarks>
-internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
+internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 {
     public EntityRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
         : base(scopeAccessor, appCaches)
@@ -146,7 +146,15 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     }
 
     /// <inheritdoc/>
-    public IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int before, int after, Ordering ordering)
+    public IEnumerable<IEntitySlim> GetSiblings(
+        Guid objectType,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
     {
         // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
         // without us also having to do a nested query for the parent ID too.
@@ -167,6 +175,23 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             .From<NodeDto>()
             .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == false);
 
+        // Apply the filter if provided.  Note that in doing this, we'll add more parameters to the query, so need to track
+        // how many so we can offset the parameter indexes for the "before" and "after" values added later.
+        int beforeAfterParameterIndexOffset = 0;
+        if (filter != null)
+        {
+            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+            {
+                rowNumberSql.Where(filterClause.Item1, filterClause.Item2);
+
+                // We need to offset by one for each non-array parameter in the filter clause.
+                // If a query is created using Contains or some other set based operation, we'll get both the array and the
+                // items in the array provided in the where clauses. It's only the latter that count for applying parameters
+                // to the SQL statement, and hence we should only offset by them.
+                beforeAfterParameterIndexOffset += filterClause.Item2.Count(x => !x.GetType().IsArray);
+            }
+        }
+
         // Find the specific row number of the target node.
         // We need this to determine the bounds of the row numbers to select.
         Sql<ISqlContext> targetRowSql = Sql()
@@ -180,14 +205,21 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         IEnumerable<object> afterArguments = targetRowSql.Arguments.Concat([after]);
 
         // Select the UniqueId of nodes which row number is within the specified range of the target node's row number.
+        const int BeforeAfterParameterIndex = 3;
+        var beforeAfterParameterIndex = BeforeAfterParameterIndex + beforeAfterParameterIndexOffset;
+        var beforeArgumentsArray = beforeArguments.ToArray();
+        var afterArgumentsArray = afterArguments.ToArray();
         Sql<ISqlContext>? mainSql = Sql()
             .Select("UniqueId")
             .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
-            .Where($"rn >= ({targetRowSql.SQL}) - @3", beforeArguments.ToArray())
-            .Where($"rn <= ({targetRowSql.SQL}) + @3", afterArguments.ToArray())
+            .Where($"rn >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
+            .Where($"rn <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
             .OrderBy("rn");
 
         List<Guid>? keys = Database.Fetch<Guid>(mainSql);
+
+        totalBefore = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, beforeArgumentsArray, true);
+        totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
 
         if (keys is null || keys.Count == 0)
         {
@@ -195,6 +227,20 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         }
 
         return PerformGetAll(objectType, ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
+    }
+
+    private long GetNumberOfSiblingsOutsideSiblingRange(
+        Sql<ISqlContext> rowNumberSql,
+        Sql<ISqlContext> targetRowSql,
+        int parameterIndex,
+        object[] arguments,
+        bool getBefore)
+    {
+        Sql<ISqlContext>? sql = Sql()
+            .SelectCount()
+            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .Where($"rn {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
+        return Database.ExecuteScalar<long>(sql);
     }
 
 
@@ -782,7 +828,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a generic content item which could be either a document, media or a member
     /// </summary>
-    private class GenericContentEntityDto : DocumentEntityDto
+    private sealed class GenericContentEntityDto : DocumentEntityDto
     {
         public string? MediaPath { get; set; }
     }
@@ -801,7 +847,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a media item with its media path info
     /// </summary>
-    private class MediaEntityDto : BaseDto
+    private sealed class MediaEntityDto : BaseDto
     {
         public string? MediaPath { get; set; }
     }
@@ -809,7 +855,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     /// <summary>
     ///     The DTO used to fetch results for a member item
     /// </summary>
-    private class MemberEntityDto : BaseDto
+    private sealed class MemberEntityDto : BaseDto
     {
     }
 
@@ -917,7 +963,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         entity.ListViewKey = dto.ListView;
     }
 
-    private MediaEntitySlim BuildMediaEntity(BaseDto dto)
+    private static MediaEntitySlim BuildMediaEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new MediaEntitySlim();
@@ -936,7 +982,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
-    private DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
+    private static DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new DocumentEntitySlim();
@@ -953,7 +999,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return entity;
     }
 
-    private MemberEntitySlim BuildMemberEntity(BaseDto dto)
+    private static MemberEntitySlim BuildMemberEntity(BaseDto dto)
     {
         // EntitySlim does not track changes
         var entity = new MemberEntitySlim();

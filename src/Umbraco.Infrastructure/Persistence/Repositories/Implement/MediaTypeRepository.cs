@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -16,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IMediaType" />
 /// </summary>
-internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
+internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
 {
     public MediaTypeRepository(
         IScopeAccessor scopeAccessor,
@@ -25,7 +26,8 @@ internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMed
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        IIdKeyMap idKeyMap)
         : base(
             scopeAccessor,
             cache,
@@ -33,7 +35,8 @@ internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMed
             commonRepository,
             languageRepository,
             shortStringHelper,
-            repositoryCacheVersionService)
+            repositoryCacheVersionService,
+            idKeyMap)
     {
     }
 

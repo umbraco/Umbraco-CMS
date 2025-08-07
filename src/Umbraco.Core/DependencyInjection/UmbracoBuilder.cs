@@ -34,6 +34,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
@@ -342,6 +343,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));
             Services.AddUnique<IRepositoryCacheVersionService, RepositoryCacheVersionService>();
+            Services.AddUnique<ILongRunningOperationService, LongRunningOperationService>();
 
             Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 

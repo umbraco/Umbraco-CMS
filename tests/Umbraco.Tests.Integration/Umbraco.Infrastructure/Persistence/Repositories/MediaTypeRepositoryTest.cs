@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -412,7 +413,7 @@ internal sealed class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     private MediaTypeRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), CommonRepository, LanguageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>());
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), CommonRepository, LanguageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap);
 
     private EntityContainerRepository CreateContainerRepository(IScopeProvider provider) =>
         new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<EntityContainerRepository>(), Constants.ObjectTypes.MediaTypeContainer, Mock.Of<IRepositoryCacheVersionService>());

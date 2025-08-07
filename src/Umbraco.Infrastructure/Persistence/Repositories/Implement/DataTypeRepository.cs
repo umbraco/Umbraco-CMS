@@ -1,7 +1,5 @@
 using System.Data;
 using System.Globalization;
-using System.Linq.Expressions;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -16,7 +14,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -27,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="DataType" />
 /// </summary>
-internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataTypeRepository
+internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataTypeRepository
 {
     private readonly ILogger<IDataType> _dataTypeLogger;
     private readonly PropertyEditorCollection _editors;
@@ -240,7 +237,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
     }
 
     [TableName(Constants.DatabaseSchema.Tables.ContentType)]
-    private class ContentTypeReferenceDto : ContentTypeDto
+    private sealed class ContentTypeReferenceDto : ContentTypeDto
     {
         [ResultColumn]
         [Reference(ReferenceType.Many)]
@@ -248,7 +245,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
     }
 
     [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
-    private class PropertyTypeReferenceDto
+    private sealed class PropertyTypeReferenceDto
     {
         [Column("ptAlias")]
         public string? Alias { get; set; }

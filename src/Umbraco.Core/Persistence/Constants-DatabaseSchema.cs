@@ -99,6 +99,8 @@ public static partial class Constants
             public const string WebhookLog = Webhook + "Log";
             public const string WebhookRequest = Webhook + "Request";
 
+            public const string LongRunningOperation = TableNamePrefix + "LongRunningOperation";
+
             public const string RepositoryCacheVersion = TableNamePrefix + "RepositoryCacheVersion";
         }
     }

@@ -87,7 +87,6 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 AppCaches.Disabled,
                 LoggerFactory.CreateLogger<TemplateRepository>(),
                 FileSystems,
-                IOHelper,
                 ShortStringHelper,
                 Mock.Of<IViewHelper>(),
                 runtimeSettingsMock.Object,

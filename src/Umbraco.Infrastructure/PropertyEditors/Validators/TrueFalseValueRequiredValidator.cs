@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 /// <summary>
 /// Custom validator for true/false (toggle) required validation.
 /// </summary>
-internal class TrueFalseValueRequiredValidator : RequiredValidator
+internal sealed class TrueFalseValueRequiredValidator : RequiredValidator
 {
     /// <inheritdoc/>
     public override IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)

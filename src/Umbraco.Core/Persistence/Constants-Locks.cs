@@ -85,5 +85,15 @@ public static partial class Constants
         ///    The cache version.
         /// </summary>
         public const int CacheVersion = -346;
+
+        /// <summary>
+        ///     Long-running operations.
+        /// </summary>
+        public const int LongRunningOperations = -344;
+
+        /// <summary>
+        ///     All document URLs.
+        /// </summary>
+        public const int DocumentUrls = -345;
     }
 }

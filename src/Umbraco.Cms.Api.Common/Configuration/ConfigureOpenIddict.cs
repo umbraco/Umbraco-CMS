@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Api.Common.Configuration;
 
-internal class ConfigureOpenIddict : IConfigureOptions<OpenIddictServerAspNetCoreOptions>
+internal sealed class ConfigureOpenIddict : IConfigureOptions<OpenIddictServerAspNetCoreOptions>
 {
     private readonly IOptions<GlobalSettings> _globalSettings;
 

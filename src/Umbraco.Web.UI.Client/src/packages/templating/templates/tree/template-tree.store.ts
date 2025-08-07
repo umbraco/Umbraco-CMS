@@ -6,6 +6,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
  * @class UmbTemplateTreeStore
  * @augments {UmbStoreBase}
  * @description - Tree Data Store for Template Items
+ * @deprecated - Use `UmbTemplateTreeRepository` instead. This will be removed in Umbraco 18.
  */
 export class UmbTemplateTreeStore extends UmbUniqueTreeStore {
 	/**
