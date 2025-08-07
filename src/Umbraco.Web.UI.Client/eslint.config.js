@@ -19,6 +19,7 @@ export default [
 	wcPlugin.configs['flat/recommended'],
 	litPlugin.configs['flat/recommended'], // We use the non typescript version to allow types to be defined in the jsdoc comments. This will allow js docs as an alternative to typescript types.
 	jsdoc.configs['flat/recommended'],
+	...storybook.configs['flat/recommended'],
 	localRules.configs.all,
 	eslintPluginPrettierRecommended,
 
@@ -71,6 +72,7 @@ export default [
 	// Pattern-specific overrides
 	{
 		files: ['**/*.ts'],
+		ignores: ['.storybook', '**/*.stories.ts'],
 		languageOptions: {
 			parserOptions: {
 				project: true,
@@ -188,5 +190,4 @@ export default [
 			},
 		},
 	},
-	...storybook.configs['flat/recommended'],
 ];
