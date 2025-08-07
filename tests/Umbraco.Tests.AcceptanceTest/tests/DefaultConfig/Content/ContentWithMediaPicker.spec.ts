@@ -68,7 +68,7 @@ test('can publish content with the media picker data type', async ({umbracoApi, 
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
