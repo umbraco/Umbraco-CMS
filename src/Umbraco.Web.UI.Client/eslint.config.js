@@ -125,13 +125,13 @@ export default [
 					leadingUnderscore: 'forbid',
 					trailingUnderscore: 'forbid',
 				},
-				// All protected members and variables should be camelCase without leading underscore
-				// Example: protected myPublicVariable, protected myPublicMethod
+				// All protected members and variables should be camelCase with optional leading underscore (if needed to be pseudo-private)
+				// Example: protected myPublicVariable, protected _myPublicMethod
 				{
 					selector: ['variableLike', 'memberLike'],
 					modifiers: ['protected'],
 					format: ['camelCase'],
-					leadingUnderscore: 'forbid',
+					leadingUnderscore: 'allow',
 					trailingUnderscore: 'forbid',
 				},
 				// Allow quoted properties, as they are often used in JSON or when the property name is not a valid identifier
