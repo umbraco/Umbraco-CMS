@@ -77,9 +77,10 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
             UmbracoEntityTypes.Document,
             pageSize,
             pageIndex,
-            out _,
-            null,
-            null,
+            totalFound: out _,
+            contentTypeAliases: null,
+            trashed: null,
+            searchFrom: null,
             ignoreUserStartNodes: ignoreUserStartNodes);
 
     private async Task SetupUserIdentity(string userId)
