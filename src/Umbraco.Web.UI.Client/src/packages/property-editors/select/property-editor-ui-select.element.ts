@@ -57,8 +57,6 @@ export class UmbPropertyEditorUISelectElement extends UmbLitElement implements U
 			const updatedOptions = updateItemsSelectedState(this._options, [this._value], 'selected');
 			if (updatedOptions !== this._options) {
 				this._options = updatedOptions;
-				// Trigger a re-render only when state actually changed
-				this.requestUpdate();
 			}
 		}
 	}

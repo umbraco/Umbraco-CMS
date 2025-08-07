@@ -13,7 +13,6 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 
-
 /**
  * @element umb-property-editor-ui-checkbox-list
  */
@@ -104,8 +103,6 @@ export class UmbPropertyEditorUICheckboxListElement
 			const updatedList = updateItemsSelectedState(this._list, this.#selection, 'checked');
 			if (updatedList !== this._list) {
 				this._list = updatedList;
-				// Trigger a re-render only when state actually changed
-				this.requestUpdate();
 			}
 		}
 	}

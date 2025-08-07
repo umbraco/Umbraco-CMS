@@ -100,8 +100,6 @@ export class UmbPropertyEditorUIDropdownElement
 		}
 	}
 
-
-
 	#onChange(event: CustomEvent & { target: UmbInputDropdownListElement }) {
 		const value = event.target.value as string;
 		this.#setValue(value ? [value] : []);
@@ -132,8 +130,6 @@ export class UmbPropertyEditorUIDropdownElement
 			const updatedOptions = updateItemsSelectedState(this._options, this.#selection, 'selected');
 			if (updatedOptions !== this._options) {
 				this._options = updatedOptions;
-				// Trigger a re-render only when state actually changed
-				this.requestUpdate();
 			}
 		}
 	}
