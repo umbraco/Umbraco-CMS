@@ -1,6 +1,10 @@
 import { mergeAttributes, Node } from '@tiptap/core';
 
-export const umbEmbeddedMedia = Node.create({
+export interface UmbEmbeddedMediaOptions {
+	inline: boolean;
+}
+
+export const umbEmbeddedMedia = Node.create<UmbEmbeddedMediaOptions>({
 	name: 'umbEmbeddedMedia',
 	group() {
 		return this.options.inline ? 'inline' : 'block';
