@@ -344,6 +344,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));
             Services.AddUnique<IRepositoryCacheVersionService, RepositoryCacheVersionService>();
             Services.AddUnique<ILongRunningOperationService, LongRunningOperationService>();
+            Services.AddUnique<ILastSyncedManager, LastSyncedManager>();
 
             Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 

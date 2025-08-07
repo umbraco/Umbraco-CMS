@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+﻿namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 public interface ILastSyncedRepository
 {

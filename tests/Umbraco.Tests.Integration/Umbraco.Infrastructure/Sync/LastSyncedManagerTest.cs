@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;

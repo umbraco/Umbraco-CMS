@@ -1,7 +1,7 @@
-﻿using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+﻿using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Cms.Infrastructure.Sync;
+namespace Umbraco.Cms.Core.Sync;
 
 public class LastSyncedManager : ILastSyncedManager
 {

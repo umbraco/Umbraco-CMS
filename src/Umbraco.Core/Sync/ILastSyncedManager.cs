@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Sync;
+﻿namespace Umbraco.Cms.Core.Sync;
 
 public interface ILastSyncedManager
 {

@@ -1,6 +1,7 @@
 ﻿using NPoco;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Factories;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
