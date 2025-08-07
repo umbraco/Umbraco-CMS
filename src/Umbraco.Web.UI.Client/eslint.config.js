@@ -112,7 +112,7 @@ export default [
 				{
 					selector: ['variableLike', 'memberLike'],
 					modifiers: ['public'],
-					format: ['camelCase', 'UPPER_CASE'],
+					format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
 					leadingUnderscore: 'forbid',
 					trailingUnderscore: 'forbid',
 				},
@@ -151,7 +151,7 @@ export default [
 					format: ['PascalCase'],
 					prefix: ['Umb', 'Ufm', 'Manifest', 'Meta', 'Example']
 				},
-				// All exported constants should be UPPER_CASE with leading 'UMB_'
+				// All exported string constants should be UPPER_CASE with leading 'UMB_'
 				// Example: UMB_EXAMPLE_CONSTANT
 				{
 					selector: 'variable',
