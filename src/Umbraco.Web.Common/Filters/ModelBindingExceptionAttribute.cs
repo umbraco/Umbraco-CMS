@@ -85,7 +85,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
         ///         The application is in an unstable state and is going to be restarted. The application is restarting now.
         ///     </para>
         /// </remarks>
-        private bool IsMessageAboutTheSameModelType(string exceptionMessage)
+        private static bool IsMessageAboutTheSameModelType(string exceptionMessage)
         {
             MatchCollection matches = GetPublishedModelsTypesRegex.Matches(exceptionMessage);
 
