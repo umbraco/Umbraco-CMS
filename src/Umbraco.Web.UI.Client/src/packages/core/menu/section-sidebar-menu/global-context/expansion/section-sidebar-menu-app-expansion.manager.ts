@@ -1,4 +1,4 @@
-import type { UmbEntityExpansionSectionEntryModel } from '../../types.js';
+import type { UmbSectionMenuItemExpansionEntryModel } from '../../types.js';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UmbEntityExpansionManager } from '@umbraco-cms/backoffice/utils';
 
@@ -8,14 +8,14 @@ import { UmbEntityExpansionManager } from '@umbraco-cms/backoffice/utils';
  * @class UmbSectionSidebarMenuAppExpansionManager
  * @augments {UmbControllerBase}
  */
-export class UmbSectionSidebarMenuAppExpansionManager extends UmbEntityExpansionManager<UmbEntityExpansionSectionEntryModel> {
+export class UmbSectionSidebarMenuAppExpansionManager extends UmbEntityExpansionManager<UmbSectionMenuItemExpansionEntryModel> {
 	/**
 	 * Returns an observable of the expansion state filtered by section alias.
 	 * @param {string} sectionAlias The alias of the section to filter by.
-	 * @returns {Observable<UmbEntityExpansionSectionEntryModel[]>} An observable of the expansion state for the specified section alias.
+	 * @returns {Observable<UmbSectionMenuItemExpansionEntryModel[]>} An observable of the expansion state for the specified section alias.
 	 * @memberof UmbSectionSidebarMenuAppExpansionManager
 	 */
-	expansionBySectionAlias(sectionAlias: string): Observable<UmbEntityExpansionSectionEntryModel[]> {
+	expansionBySectionAlias(sectionAlias: string): Observable<UmbSectionMenuItemExpansionEntryModel[]> {
 		return this._expansion.asObservablePart((entries) =>
 			entries.filter((entry) => entry.sectionAlias === sectionAlias),
 		);

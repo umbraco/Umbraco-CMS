@@ -1,7 +1,7 @@
 import type { ManifestMenuItemTreeKind } from './types.js';
 import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_MENU_CONTEXT, type UmbMenuItemElement } from '@umbraco-cms/backoffice/menu';
+import { UMB_MENU_ITEM_CONTEXT, type UmbMenuItemElement } from '@umbraco-cms/backoffice/menu';
 import {
 	UmbExpansionEntityCollapsedEvent,
 	UmbExpansionEntityExpandedEvent,
@@ -14,42 +14,46 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 	manifest?: ManifestMenuItemTreeKind;
 
 	@state()
-	_menuExpansion: UmbEntityExpansionModel = [];
+	_menuItemExpansion: UmbEntityExpansionModel = [];
 
-	#menuContext?: typeof UMB_MENU_CONTEXT.TYPE;
+	#menuItemContext?: typeof UMB_MENU_ITEM_CONTEXT.TYPE;
 	#muteStateUpdate = false;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MENU_CONTEXT, (context) => {
-			this.#menuContext = context;
+		this.consumeContext(UMB_MENU_ITEM_CONTEXT, (context) => {
+			this.#menuItemContext = context;
 			this.#observeExpansion();
 		});
 	}
 
 	#observeExpansion() {
-		this.observe(this.#menuContext?.expansion.expansion, (items) => {
+		this.observe(this.#menuItemContext?.expansion.expansion, (items) => {
 			if (this.#muteStateUpdate) return;
-			this._menuExpansion = items || [];
+			this._menuItemExpansion = items || [];
 		});
 	}
 
 	#onEntityExpansionChange(event: UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent) {
 		event.stopPropagation();
-		const eventEntity = event.entity;
+		const eventEntry = event.entry;
 
-		if (!eventEntity) {
-			throw new Error('Entity is required to toggle expansion.');
+		if (!eventEntry) {
+			throw new Error('Entry is required to toggle expansion.');
+		}
+
+		if (!this.manifest) {
+			throw new Error('Manifest is required to toggle expansion.');
 		}
 
 		if (event.type === UmbExpansionEntityExpandedEvent.TYPE) {
 			this.#muteStateUpdate = true;
-			this.#menuContext?.expansion.expandItem(eventEntity);
+			this.#menuItemContext?.expansion.expandItem({ ...eventEntry, menuItemAlias: this.manifest.alias });
 			this.#muteStateUpdate = false;
 		} else if (event.type === UmbExpansionEntityCollapsedEvent.TYPE) {
 			this.#muteStateUpdate = true;
-			this.#menuContext?.expansion.collapseItem(eventEntity);
+			this.#menuItemContext?.expansion.collapseItem({ ...eventEntry, menuItemAlias: this.manifest.alias });
 			this.#muteStateUpdate = false;
 		}
 	}
@@ -65,7 +69,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 								selectable: false,
 								multiple: false,
 							},
-							expansion: this._menuExpansion,
+							expansion: this._menuItemExpansion,
 						}}
 						@expansion-entity-expanded=${this.#onEntityExpansionChange}
 						@expansion-entity-collapsed=${this.#onEntityExpansionChange}></umb-tree>

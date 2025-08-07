@@ -7,7 +7,10 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
+	type ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind,
+} from '@umbraco-cms/backoffice/workspace';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
@@ -16,7 +19,8 @@ interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 
 // TODO: introduce base class for all menu structure workspaces to handle ancestors and parent
 export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase {
-	//
+	manifest?: ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind;
+
 	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
 	#args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
 
@@ -115,7 +119,11 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);
 			this.#setAncestorData(data);
-			this.#expandSectionSidebarMenu(structureItems);
+
+			const menuItemAlias = this.manifest?.meta?.menuItemAlias;
+			if (menuItemAlias) {
+				this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
+			}
 		}
 	}
 
@@ -157,10 +165,16 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		this.#ancestorContext.setAncestors(ancestorEntities);
 	}
 
-	#expandSectionSidebarMenu(structureItems: Array<UmbVariantStructureItemModel>) {
+	#expandSectionSidebarMenu(structureItems: Array<UmbVariantStructureItemModel>, menuItemAlias: string) {
 		const linkedEntries = linkEntityExpansionEntries(structureItems);
 		// Filter out the current entity as we don't want to expand it
 		const expandableItems = linkedEntries.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
-		this.#sectionSidebarMenuContext?.expansion.expandItems(expandableItems);
+		const expandableItemsWithMenuItem = expandableItems.map((item) => {
+			return {
+				...item,
+				menuItemAlias,
+			};
+		});
+		this.#sectionSidebarMenuContext?.expansion.expandItems(expandableItemsWithMenuItem);
 	}
 }

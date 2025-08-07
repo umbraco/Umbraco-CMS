@@ -1,52 +1,43 @@
-import { UMB_SECTION_SIDEBAR_MENU_GLOBAL_CONTEXT } from '../../global-context/section-sidebar-menu.global-context.token.js';
-import type { UmbSectionMenuItemExpansionEntryModel } from '../../types.js';
-import type { UmbMenuItemExpansionEntryModel } from '../../../components/menu/types.js';
+import type { UmbMenuItemExpansionEntryModel } from '../../components/menu/types.js';
+import { UMB_MENU_CONTEXT } from '../../components/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbEntityExpansionManager, type UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
 
 /**
- * Manages the expansion state of a section sidebar menu.
+ * Manages the expansion state of a menu item
  * @exports
- * @class UmbSectionSidebarMenuSectionExpansionManager
+ * @class UmbMenuItemExpansionManager
  * @augments {UmbControllerBase}
  */
-export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerBase {
+export class UmbMenuItemExpansionManager extends UmbControllerBase {
 	#manager = new UmbEntityExpansionManager<UmbMenuItemExpansionEntryModel>(this);
 	public readonly expansion = this.#manager.expansion;
 
-	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
-	#globalContext?: typeof UMB_SECTION_SIDEBAR_MENU_GLOBAL_CONTEXT.TYPE;
-	#currentSectionAlias?: string;
+	#menuItemAlias?: string;
+	#menuContext?: typeof UMB_MENU_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.consumeContext(UMB_SECTION_CONTEXT, (sectionContext) => {
-			this.#sectionContext = sectionContext;
-			this.#observeCurrentSectionAlias();
-		});
-
-		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_GLOBAL_CONTEXT, (globalContext) => {
-			this.#globalContext = globalContext;
-			this.#observeGlobalMenuExpansion();
+		this.consumeContext(UMB_MENU_CONTEXT, (menuContext) => {
+			this.#menuContext = menuContext;
+			this.#observeMenuExpansion();
 		});
 	}
 
-	#observeCurrentSectionAlias() {
-		this.observe(this.#sectionContext?.alias, (alias) => {
-			if (!alias) return;
-			this.#currentSectionAlias = alias;
+	#observeMenuExpansion() {
+		if (!this.#menuItemAlias) return;
+		this.observe(this.#menuContext?.expansion.expansion, (items) => {
+			const itemsForMenuItem = items?.filter((item) => item.menuItemAlias === this.#menuItemAlias) || [];
+			this.#manager.setExpansion(itemsForMenuItem);
 		});
 	}
 
-	#observeGlobalMenuExpansion() {
-		if (!this.#globalContext || !this.#currentSectionAlias) return;
-		this.observe(this.#globalContext?.expansion.expansionBySectionAlias(this.#currentSectionAlias), (expansion) => {
-			this.#manager.setExpansion(expansion);
-		});
+	setMenuItemAlias(alias: string | undefined): void {
+		this.#menuItemAlias = alias;
+		this.#observeMenuExpansion();
 	}
 
 	/**
@@ -67,8 +58,7 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 */
 	setExpansion(expansion: UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>): void {
 		this.#manager.setExpansion(expansion);
-		const entries = this.#bindEntriesToSection(expansion);
-		this.#globalContext?.expansion.setExpansion(entries);
+		this.#menuContext?.expansion.setExpansion(expansion);
 	}
 
 	/**
@@ -88,8 +78,7 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 */
 	public async expandItem(entry: UmbMenuItemExpansionEntryModel): Promise<void> {
 		this.#manager.expandItem(entry);
-		const entries = this.#bindEntriesToSection([entry]);
-		this.#globalContext?.expansion.expandItem(entries[0]);
+		this.#menuContext?.expansion.expandItem(entry);
 	}
 
 	/**
@@ -100,8 +89,7 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 */
 	public expandItems(entries: UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>): void {
 		this.#manager.expandItems(entries);
-		const entriesWithSectionAlias = this.#bindEntriesToSection(entries);
-		this.#globalContext?.expansion.expandItems(entriesWithSectionAlias);
+		this.#menuContext?.expansion.expandItems(entries);
 	}
 
 	/**
@@ -112,8 +100,7 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 */
 	public async collapseItem(entry: UmbMenuItemExpansionEntryModel): Promise<void> {
 		this.#manager.collapseItem(entry);
-		const entries = this.#bindEntriesToSection([entry]);
-		this.#globalContext?.expansion.collapseItem(entries[0]);
+		this.#menuContext?.expansion.collapseItem(entry);
 	}
 
 	/**
@@ -122,18 +109,8 @@ export class UmbSectionSidebarMenuSectionExpansionManager extends UmbControllerB
 	 * @returns {Promise<void>}
 	 */
 	public async collapseAll(): Promise<void> {
-		// Collapse all items in the global context matching the current section
-		const entries = this.#bindEntriesToSection(this.#manager.getExpansion());
+		const localEntries = this.#manager.getExpansion();
 		this.#manager.collapseAll();
-		this.#globalContext?.expansion.collapseItems(entries);
-	}
-
-	#bindEntriesToSection(
-		expansion: UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>,
-	): UmbEntityExpansionModel<UmbSectionMenuItemExpansionEntryModel> {
-		return expansion.map((item) => ({
-			...item,
-			sectionAlias: this.#currentSectionAlias,
-		}));
+		this.#menuContext?.expansion.collapseItems(localEntries);
 	}
 }

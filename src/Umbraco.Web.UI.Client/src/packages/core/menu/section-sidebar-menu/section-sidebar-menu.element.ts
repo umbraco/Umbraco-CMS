@@ -62,7 +62,7 @@ export class UmbSectionSidebarMenuElement<
 	#onEntityExpansionChange(e: Event) {
 		const event = e as UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent;
 		event.stopPropagation();
-		const eventEntity = event.entity;
+		const eventEntity = event.entry;
 
 		if (!eventEntity) {
 			throw new Error('Entity is required to toggle expansion.');
