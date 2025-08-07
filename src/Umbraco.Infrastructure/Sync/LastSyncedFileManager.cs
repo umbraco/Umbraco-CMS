@@ -4,6 +4,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Sync;
 
+[Obsolete("Use the LastSyncedManager class instead.")]
 public sealed class LastSyncedFileManager
 {
     private readonly IHostingEnvironment _hostingEnvironment;
