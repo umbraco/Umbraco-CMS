@@ -32,7 +32,7 @@ public sealed class SystemTextConfigurationEditorJsonSerializer : SystemTextJson
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 
-            Encoder = CreateEncoder(nameof(SystemTextConfigurationEditorJsonSerializer)),
+            Encoder = jsonSerializerEncoderFactory.CreateEncoder<SystemTextConfigurationEditorJsonSerializer>(),
 
             // In some cases, configs aren't camel cased in the DB, so we have to resort to case insensitive
             // property name resolving when creating configuration objects (deserializing DB configs).

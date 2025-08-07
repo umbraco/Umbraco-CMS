@@ -30,7 +30,7 @@ public sealed class SystemTextWebhookJsonSerializer : SystemTextJsonSerializerBa
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 
-            Encoder = CreateEncoder(nameof(SystemTextWebhookJsonSerializer)),
+            Encoder = jsonSerializerEncoderFactory.CreateEncoder<SystemTextWebhookJsonSerializer>(),
 
             Converters =
             {

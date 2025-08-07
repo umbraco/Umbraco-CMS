@@ -57,9 +57,4 @@ public abstract class SystemTextJsonSerializerBase : IJsonSerializer
             : Deserialize<T>(jsonString);
         return value != null;
     }
-
-    /// <summary>
-    /// Creates a <see cref="JavaScriptEncoder"/> for use in the serialization of configuration editor JSON.
-    /// </summary>
-    protected JavaScriptEncoder CreateEncoder(string serializerName) => _jsonSerializerEncoderFactory.CreateEncoder(serializerName);
 }

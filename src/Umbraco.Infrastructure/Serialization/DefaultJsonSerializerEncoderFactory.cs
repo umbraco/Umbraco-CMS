@@ -8,5 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Serialization;
 public sealed class DefaultJsonSerializerEncoderFactory : IJsonSerializerEncoderFactory
 {
     /// <inheritdoc />
-    public JavaScriptEncoder CreateEncoder(string serializerName) => JavaScriptEncoder.Create(UnicodeRanges.BasicLatin);
+    public JavaScriptEncoder CreateEncoder<TSerializer>()
+        where TSerializer : IJsonSerializer
+        => JavaScriptEncoder.Create(UnicodeRanges.BasicLatin);
 }

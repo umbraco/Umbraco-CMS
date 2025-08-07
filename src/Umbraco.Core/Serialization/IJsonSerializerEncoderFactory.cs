@@ -10,7 +10,8 @@ public interface IJsonSerializerEncoderFactory
     /// <summary>
     /// Creates a <see cref="JavaScriptEncoder"/> for use in the serialization of configuration editor JSON.
     /// </summary>
-    /// <param name="serializerName">The name of the serializer. If there's a need for different encodings for different serializers, this can be used to distinguish them.</param>
+    /// <typeparam name="TSerializer">The type of the serializer for which the encoder is being created.</typeparam>
     /// <returns>A <see cref="JavaScriptEncoder"/> instance.</returns>
-    JavaScriptEncoder CreateEncoder(string serializerName);
+    JavaScriptEncoder CreateEncoder<TSerializer>()
+        where TSerializer : IJsonSerializer;
 }
