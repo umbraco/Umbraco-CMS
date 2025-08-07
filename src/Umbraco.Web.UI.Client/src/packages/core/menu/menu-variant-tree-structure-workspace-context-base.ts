@@ -1,4 +1,4 @@
-import type { UmbVariantStructureItemModel } from './types.js';
+import type { ManifestWorkspaceContextMenuStructureKind, UmbVariantStructureItemModel } from './types.js';
 import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from './menu-variant-structure-workspace-context.context-token.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/section-context/section-sidebar-menu.section-context.token.js';
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
@@ -7,10 +7,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import {
-	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
-	type ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind,
-} from '@umbraco-cms/backoffice/workspace';
+import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
@@ -19,7 +16,7 @@ interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 
 // TODO: introduce base class for all menu structure workspaces to handle ancestors and parent
 export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase {
-	manifest?: ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind;
+	manifest?: ManifestWorkspaceContextMenuStructureKind;
 
 	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
 	#args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
