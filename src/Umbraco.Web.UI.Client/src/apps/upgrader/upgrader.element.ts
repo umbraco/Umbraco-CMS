@@ -36,7 +36,7 @@ export class UmbUpgraderElement extends UmbLitElement {
 				.upgrading=${this._upgrading}
 				.settings=${this._upgradeSettings}
 				.errorMessage=${this._errorMessage}
-				@onAuthorizeUpgrade=${this._handleSubmit}></umb-upgrader-view>
+				@onAuthorizeUpgrade=${this.#handleSubmit}></umb-upgrader-view>
 		</umb-installer-layout>`;
 	}
 
@@ -56,7 +56,7 @@ export class UmbUpgraderElement extends UmbLitElement {
 		this._fetching = false;
 	}
 
-	_handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
+	#handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
 		e.stopPropagation();
 		this._errorMessage = '';
 		this._upgrading = true;
