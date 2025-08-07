@@ -14,6 +14,7 @@ import jsdoc from 'eslint-plugin-jsdoc';
 export default [
 	// Recommended config applied to all files
 	js.configs.recommended,
+	importPlugin.flatConfigs.recommended,
 	...tseslint.configs.recommended,
 	wcPlugin.configs['flat/recommended'],
 	litPlugin.configs['flat/recommended'], // We use the non typescript version to allow types to be defined in the jsdoc comments. This will allow js docs as an alternative to typescript types.
@@ -39,22 +40,17 @@ export default [
 	// Global config
 	{
 		plugins: {
-			import: importPlugin,
 			'local-rules': localRules,
 		},
 		rules: {
 			semi: ['warn', 'always'],
 			'prettier/prettier': ['warn', { endOfLine: 'auto' }],
-			'no-unused-vars': 'off', //Let '@typescript-eslint/no-unused-vars' catch the errors to allow unused function parameters (ex: in interfaces)
 			'no-var': 'error',
-			...importPlugin.configs.recommended.rules,
 			'import/namespace': 'off',
 			'import/no-unresolved': 'off',
 			'import/order': ['warn', { groups: ['builtin', 'parent', 'sibling', 'index', 'external'] }],
 			'import/no-self-import': 'error',
 			'import/no-cycle': ['error', { maxDepth: 6, allowUnsafeDynamicCyclicDependency: true }],
-			'import/no-named-as-default': 'off', // Does not work with eslint 9
-			'import/no-named-as-default-member': 'off', // Does not work with eslint 9
 			'local-rules/prefer-static-styles-last': 'warn',
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
@@ -84,7 +80,10 @@ export default [
 				...globals.browser,
 			},
 		},
+		...importPlugin.flatConfigs.typescript,
 		rules: {
+			'no-unused-vars': 'off', //Let '@typescript-eslint/no-unused-vars' catch the errors to allow unused function parameters (ex: in interfaces)
+			'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
 			'@typescript-eslint/no-non-null-assertion': 'off',
 			'@typescript-eslint/no-explicit-any': 'warn',
 			'@typescript-eslint/no-unused-vars': 'error',
