@@ -14,40 +14,37 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
     private ILastSyncedManager manager => GetRequiredService<ILastSyncedManager>();
 
     [Test]
-    public void Get_Last_Synced_Internal_Id()
+    public async Task Get_Last_Synced_Internal_Id()
     {
-        var value = manager.GetLastSyncedInternalAsync();
-        Assert.IsNotNull(value);
-
-        value = manager.GetLastSyncedExternalAsync();
-        Assert.IsNotNull(value);
+        var value = await manager.GetLastSyncedInternalAsync();
+        Assert.IsNull(value);
     }
 
     [Test]
-    public void Get_Last_Synced_External_Id()
+    public async Task Get_Last_Synced_External_Id()
     {
-        var value = manager.GetLastSyncedExternalAsync();
-        Assert.IsNotNull(value);
+        var value = await manager.GetLastSyncedExternalAsync();
+        Assert.IsNull(value);
     }
 
     [Test]
-    public void Save_Last_Synced_Internal_Id()
+    public async Task Save_Last_Synced_Internal_Id()
     {
         Random random = new Random();
         int testId = random.Next();
-        manager.SaveLastSyncedInternalAsync(testId);
-        int? lastSynced = manager.GetLastSyncedInternalAsync().Result;
+        await manager.SaveLastSyncedInternalAsync(testId);
+        int? lastSynced = await manager.GetLastSyncedInternalAsync();
 
         Assert.AreEqual(testId, lastSynced);
     }
 
     [Test]
-    public void Save_Last_Synced_External_Id()
+    public async Task Save_Last_Synced_External_Id()
     {
         Random random = new Random();
         int testId = random.Next();
-        manager.SaveLastSyncedExternalAsync(testId);
-        int? lastSynced = manager.GetLastSyncedExternalAsync().Result;
+        await manager.SaveLastSyncedExternalAsync(testId);
+        int? lastSynced = await manager.GetLastSyncedExternalAsync();
 
         Assert.AreEqual(testId, lastSynced);
     }

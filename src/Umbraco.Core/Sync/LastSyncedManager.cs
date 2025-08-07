@@ -32,14 +32,14 @@ public class LastSyncedManager : ILastSyncedManager
         return externalId;
     }
 
-    public async void SaveLastSyncedInternalAsync(int id)
+    public async Task SaveLastSyncedInternalAsync(int id)
     {
         using ICoreScope coreScope = _coreScopeProvider.CreateCoreScope();
         await _lastSyncedRepository.SaveInternal(id);
         coreScope.Complete();
     }
 
-    public async void SaveLastSyncedExternalAsync(int id)
+    public async Task SaveLastSyncedExternalAsync(int id)
     {
         using ICoreScope coreScope = _coreScopeProvider.CreateCoreScope();
         await _lastSyncedRepository.SaveExternal(id);

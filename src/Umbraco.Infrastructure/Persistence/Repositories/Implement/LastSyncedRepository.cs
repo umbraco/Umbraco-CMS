@@ -21,20 +21,24 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
 
     public async Task<int?> GetInternal()
     {
+        string machineName = _machineInfoFactory.GetMachineName();
+
         Sql<ISqlContext>? sql = Database.SqlContext.Sql()
             .Select<LastSyncedDto>(x => x.LastSyncedInternalId)
             .From<LastSyncedDto>()
-            .Where<LastSyncedDto>(x => x.MachineId == _machineInfoFactory.GetMachineName());
+            .Where<LastSyncedDto>(x => x.MachineId == machineName);
 
         return await Database.ExecuteScalarAsync<int?>(sql);
     }
 
     public async Task<int?> GetExternal()
     {
+        string machineName = _machineInfoFactory.GetMachineName();
+
         Sql<ISqlContext>? sql = Database.SqlContext.Sql()
             .Select<LastSyncedDto>(x => x.LastSyncedExternalId)
             .From<LastSyncedDto>()
-            .Where<LastSyncedDto>(x => x.MachineId == _machineInfoFactory.GetMachineName());
+            .Where<LastSyncedDto>(x => x.MachineId == machineName);
 
         return await Database.ExecuteScalarAsync<int?>(sql);
     }
@@ -53,8 +57,9 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
             "SET LastSyncedInternalId=@LastSyncedInternalId, LastSyncedDate=@LastSyncedDate WHERE MachineId=@MachineId",
             new
             {
-                lastSyncedInternalId = dto.LastSyncedInternalId,
-                lastSyncedDate = dto.LastSyncedDate,
+                dto.LastSyncedInternalId,
+                dto.LastSyncedDate,
+                dto.MachineId,
             });
     }
 
@@ -72,8 +77,9 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
             "SET LastSyncedExternalId=@LastSyncedExternalId, LastSyncedDate=@LastSyncedDate WHERE MachineId=@MachineId",
             new
             {
-                lastSyncedInternalId = dto.LastSyncedExternalId,
-                lastSyncedDate = dto.LastSyncedDate,
+                dto.LastSyncedExternalId,
+                dto.LastSyncedDate,
+                dto.MachineId,
             });
     }
 }

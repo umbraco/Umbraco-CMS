@@ -6,7 +6,7 @@ public interface ILastSyncedManager
 
     Task<int?> GetLastSyncedExternalAsync();
 
-    void SaveLastSyncedInternalAsync(int id);
+    Task SaveLastSyncedInternalAsync(int id);
 
-    void SaveLastSyncedExternalAsync(int id);
+    Task SaveLastSyncedExternalAsync(int id);
 }
