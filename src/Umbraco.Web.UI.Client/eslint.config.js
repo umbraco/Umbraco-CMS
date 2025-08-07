@@ -112,7 +112,7 @@ export default [
 				{
 					selector: ['variableLike', 'memberLike'],
 					modifiers: ['public'],
-					format: ['camelCase'],
+					format: ['camelCase', 'UPPER_CASE'],
 					leadingUnderscore: 'forbid',
 					trailingUnderscore: 'forbid',
 				},
@@ -156,12 +156,8 @@ export default [
 				{
 					selector: 'variable',
 					modifiers: ['exported', 'const'],
+					types: ['string', 'number', 'boolean'],
 					format: ['UPPER_CASE'],
-					filter: {
-						// Exclude variables that are not manifest(s)
-						regex: '^(manifests?|name|extensions)$',
-						match: false,
-					},
 					prefix: ['UMB_'],
 				},
 				// All boolean variables should be camelCase with leading 'is', 'should', 'has', 'can', 'did', 'will'
