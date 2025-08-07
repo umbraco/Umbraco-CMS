@@ -45,7 +45,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 		}
 	}
 
-	private renderProfilingStatus() {
+	#renderProfilingStatus() {
 		return this._isDebugMode
 			? html`
 					${unsafeHTML(this.localize.term('profiling_performanceProfilingDescription'))}
@@ -67,7 +67,9 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-box headline=${this.localize.term('profiling_performanceProfiling')}>
-				${typeof this._profilingStatus === 'undefined' ? html`<uui-loader></uui-loader>` : this.renderProfilingStatus()}
+				${typeof this._profilingStatus === 'undefined'
+					? html`<uui-loader></uui-loader>`
+					: this.#renderProfilingStatus()}
 			</uui-box>
 		`;
 	}

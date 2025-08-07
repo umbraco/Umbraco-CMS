@@ -1,4 +1,4 @@
-export type UrlParametersRecord = Record<string, string | number | { toString: () => string } | null>;
+export type UmbUrlParametersRecord = Record<string, string | number | { toString: () => string } | null>;
 
 const PARAM_IDENTIFIER = /:([^/]+)/g;
 
@@ -7,7 +7,7 @@ const PARAM_IDENTIFIER = /:([^/]+)/g;
  * @param pattern
  * @param params
  */
-export function umbUrlPatternToString(pattern: string, params: UrlParametersRecord | null): string {
+export function umbUrlPatternToString(pattern: string, params: UmbUrlParametersRecord | null): string {
 	return params
 		? pattern.replace(PARAM_IDENTIFIER, (_substring: string, ...args: string[]) => {
 				const segmentValue = params![args[0]]; // (segmentValue is the value to replace the parameter)

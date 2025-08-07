@@ -18,7 +18,7 @@ export class UmbTrashEntityBulkAction<
 	MetaKindType extends MetaEntityBulkActionTrashKind = MetaEntityBulkActionTrashKind,
 > extends UmbEntityBulkActionBase<MetaKindType> {
 	#localize = new UmbLocalizationController(this);
-	_items: Array<any> = [];
+	#items: Array<any> = [];
 
 	override async execute() {
 		if (this.selection?.length === 0) {
@@ -27,7 +27,7 @@ export class UmbTrashEntityBulkAction<
 
 		// TODO: Move item look up to a future bulk action context
 		await this.#requestItems();
-		await this._confirmTrash(this._items);
+		await this._confirmTrash(this.#items);
 		await this.#requestBulkTrash(this.selection);
 	}
 
@@ -52,7 +52,7 @@ export class UmbTrashEntityBulkAction<
 
 		const { data } = await itemRepository.requestItems(this.selection);
 
-		this._items = data ?? [];
+		this.#items = data ?? [];
 	}
 
 	async #requestBulkTrash(uniques: Array<string>) {
@@ -106,7 +106,7 @@ export class UmbTrashEntityBulkAction<
 			eventContext.dispatchEvent(reloadStructure);
 		}
 
-		const succeededItems = this._items.filter((item) => succeeded.includes(item.unique));
+		const succeededItems = this.#items.filter((item) => succeeded.includes(item.unique));
 
 		succeededItems.forEach((item) => {
 			const trashedEvent = new UmbEntityTrashedEvent({
