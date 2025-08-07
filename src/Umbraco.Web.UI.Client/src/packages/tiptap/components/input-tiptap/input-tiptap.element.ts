@@ -1,3 +1,4 @@
+import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapStatusbarValue, UmbTiptapToolbarValue } from '../types.js';
 import {
@@ -33,6 +34,8 @@ const STYLESHEET_ROOT_PATH = '/css';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
+	#context = new UmbTiptapRteContext(this);
+
 	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
 
 	@property({ type: String })
@@ -181,6 +184,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});
+
+		this.#context.setEditor(this._editor);
 	}
 
 	override render() {
