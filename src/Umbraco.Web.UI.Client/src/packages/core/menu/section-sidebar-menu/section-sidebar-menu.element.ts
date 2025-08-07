@@ -4,7 +4,7 @@ import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-context/sect
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbExpansionEntityCollapsedEvent, UmbExpansionEntityExpandedEvent } from '@umbraco-cms/backoffice/utils';
+import { UmbExpansionEntryCollapsedEvent, UmbExpansionEntryExpandedEvent } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionSlotElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-section-sidebar-menu')
@@ -44,8 +44,8 @@ export class UmbSectionSidebarMenuElement<
 		this.#extensionSlotElement.filter = (menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu;
 		this.#extensionSlotElement.defaultElement = 'umb-menu';
 		this.#extensionSlotElement.events = {
-			'expansion-entity-expanded': this.#onEntityExpansionChange.bind(this),
-			'expansion-entity-collapsed': this.#onEntityExpansionChange.bind(this),
+			'expansion-entry-expanded': this.#onEntityExpansionChange.bind(this),
+			'expansion-entry-collapsed': this.#onEntityExpansionChange.bind(this),
 		};
 	}
 
@@ -60,7 +60,7 @@ export class UmbSectionSidebarMenuElement<
 	}
 
 	#onEntityExpansionChange(e: Event) {
-		const event = e as UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent;
+		const event = e as UmbExpansionEntryExpandedEvent | UmbExpansionEntryCollapsedEvent;
 		event.stopPropagation();
 		const eventEntity = event.entry;
 
@@ -68,11 +68,11 @@ export class UmbSectionSidebarMenuElement<
 			throw new Error('Entity is required to toggle expansion.');
 		}
 
-		if (event.type === UmbExpansionEntityExpandedEvent.TYPE) {
+		if (event.type === UmbExpansionEntryExpandedEvent.TYPE) {
 			this.#muteStateUpdate = true;
 			this.#sectionSidebarMenuContext?.expansion.expandItem(eventEntity);
 			this.#muteStateUpdate = false;
-		} else if (event.type === UmbExpansionEntityCollapsedEvent.TYPE) {
+		} else if (event.type === UmbExpansionEntryCollapsedEvent.TYPE) {
 			this.#muteStateUpdate = true;
 			this.#sectionSidebarMenuContext?.expansion.collapseItem(eventEntity);
 			this.#muteStateUpdate = false;

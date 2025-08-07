@@ -3,8 +3,8 @@ import { html, nothing, customElement, property, state } from '@umbraco-cms/back
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MENU_ITEM_CONTEXT, type UmbMenuItemElement } from '@umbraco-cms/backoffice/menu';
 import {
-	UmbExpansionEntityCollapsedEvent,
-	UmbExpansionEntityExpandedEvent,
+	UmbExpansionEntryCollapsedEvent,
+	UmbExpansionEntryExpandedEvent,
 	type UmbEntityExpansionModel,
 } from '@umbraco-cms/backoffice/utils';
 
@@ -35,7 +35,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 		});
 	}
 
-	#onEntityExpansionChange(event: UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent) {
+	#onExpansionChange(event: UmbExpansionEntryExpandedEvent | UmbExpansionEntryCollapsedEvent) {
 		event.stopPropagation();
 		const eventEntry = event.entry;
 
@@ -47,11 +47,11 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 			throw new Error('Manifest is required to toggle expansion.');
 		}
 
-		if (event.type === UmbExpansionEntityExpandedEvent.TYPE) {
+		if (event.type === UmbExpansionEntryExpandedEvent.TYPE) {
 			this.#muteStateUpdate = true;
 			this.#menuItemContext?.expansion.expandItem({ ...eventEntry, menuItemAlias: this.manifest.alias });
 			this.#muteStateUpdate = false;
-		} else if (event.type === UmbExpansionEntityCollapsedEvent.TYPE) {
+		} else if (event.type === UmbExpansionEntryCollapsedEvent.TYPE) {
 			this.#muteStateUpdate = true;
 			this.#menuItemContext?.expansion.collapseItem({ ...eventEntry, menuItemAlias: this.manifest.alias });
 			this.#muteStateUpdate = false;
@@ -71,8 +71,8 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 							},
 							expansion: this._menuItemExpansion,
 						}}
-						@expansion-entity-expanded=${this.#onEntityExpansionChange}
-						@expansion-entity-collapsed=${this.#onEntityExpansionChange}></umb-tree>
+						@expansion-entry-expanded=${this.#onExpansionChange}
+						@expansion-entry-collapsed=${this.#onExpansionChange}></umb-tree>
 				`
 			: nothing;
 	}

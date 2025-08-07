@@ -1,7 +1,7 @@
 import type { UmbEntityExpansionEntryModel, UmbEntityExpansionModel } from './types.js';
 import {
-	UmbExpansionEntityExpandedEvent,
-	UmbExpansionEntityCollapsedEvent,
+	UmbExpansionEntryExpandedEvent,
+	UmbExpansionEntryCollapsedEvent,
 	UmbExpansionChangeEvent,
 } from './events/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -59,7 +59,7 @@ export class UmbEntityExpansionManager<
 	 */
 	public async expandItem(entity: EntryModelType): Promise<void> {
 		this._expansion.appendOne(entity);
-		this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
+		this.getHostElement()?.dispatchEvent(new UmbExpansionEntryExpandedEvent(entity));
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
@@ -73,7 +73,7 @@ export class UmbEntityExpansionManager<
 		if (!entities || entities.length === 0) return;
 		this._expansion.append(entities);
 		entities.forEach((entity) => {
-			this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
+			this.getHostElement()?.dispatchEvent(new UmbExpansionEntryExpandedEvent(entity));
 		});
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
@@ -87,7 +87,7 @@ export class UmbEntityExpansionManager<
 	public async collapseItem(entity: EntryModelType): Promise<void> {
 		this._expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
 		this.getHostElement()?.dispatchEvent(
-			new UmbExpansionEntityCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
+			new UmbExpansionEntryCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
 		);
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
@@ -105,7 +105,7 @@ export class UmbEntityExpansionManager<
 		);
 		entities.forEach((entity) => {
 			this.getHostElement()?.dispatchEvent(
-				new UmbExpansionEntityCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
+				new UmbExpansionEntryCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
 			);
 		});
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
