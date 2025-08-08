@@ -9,6 +9,7 @@ export interface UmbLanguageDetailModel {
 	entityType: UmbLanguageEntityType;
 	unique: string;
 	name: string;
+	sortOrder: number;
 	isDefault: boolean;
 	isMandatory: boolean;
 	fallbackIsoCode: string | null;

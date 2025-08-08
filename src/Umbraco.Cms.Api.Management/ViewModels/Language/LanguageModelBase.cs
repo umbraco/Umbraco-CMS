@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Language;
 
@@ -12,4 +12,6 @@ public class LanguageModelBase
     public bool IsMandatory { get; set; }
 
     public string? FallbackIsoCode { get; set; }
+
+    public int SortOrder { get; set; }
 }
