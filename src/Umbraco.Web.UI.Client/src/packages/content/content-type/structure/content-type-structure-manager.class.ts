@@ -220,8 +220,6 @@ export class UmbContentTypeStructureManager<
 			return Promise.reject(new UmbError(msg));
 		});
 
-		console.log('dd', this.#contentTypes.getValue());
-
 		this.#initResolver?.(result);
 		return { data: result, asObservable: () => this.ownerContentType };
 	}
