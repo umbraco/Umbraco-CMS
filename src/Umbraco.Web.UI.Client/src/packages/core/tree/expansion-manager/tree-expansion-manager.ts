@@ -2,7 +2,7 @@ import type { UmbTreeExpansionModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
-import { UmbEntityExpansionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbEntityExpansionManager, type UmbEntityExpansionEntryModel } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Manages the expansion state of a tree
@@ -53,7 +53,7 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @memberof UmbTreeExpansionManager
 	 * @returns {Promise<void>}
 	 */
-	public async expandItem(entity: UmbEntityModel): Promise<void> {
+	public async expandItem(entity: UmbEntityExpansionEntryModel): Promise<void> {
 		this.#manager.expandItem(entity);
 	}
 
@@ -76,5 +76,17 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 */
 	public async collapseAll(): Promise<void> {
 		this.#manager.collapseAll();
+	}
+
+	/**
+	 * Gets a tree item from the expansion state
+	 * @param {UmbEntityModel} entity The entity to get
+	 * @param {string} entity.entityType The entity type
+	 * @param {string} entity.unique The unique key
+	 * @returns {*}  {(Promise<UmbEntityExpansionEntryModel | undefined>)}
+	 * @memberof UmbEntityExpansionManager
+	 */
+	public async getItem(entity: UmbEntityModel): Promise<UmbEntityExpansionEntryModel | undefined> {
+		return this.#manager.getItem(entity);
 	}
 }

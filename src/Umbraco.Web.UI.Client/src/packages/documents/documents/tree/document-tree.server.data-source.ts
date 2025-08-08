@@ -36,20 +36,79 @@ export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase
 	}
 }
 
-const getRootItems = (args: UmbDocumentTreeRootItemsRequestArgs) =>
-	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentService.getTreeDocumentRoot({
-		query: { dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
-	});
+const getRootItems = async (args: UmbDocumentTreeRootItemsRequestArgs) => {
+	if (args.target) {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		const { data } = await DocumentService.getTreeDocumentSiblings({
+			query: {
+				target: args.target.item.unique,
+				before: args.target.before,
+				after: args.target.after,
+			},
+		});
 
-const getChildrenOf = (args: UmbDocumentTreeChildrenOfRequestArgs) => {
+		return {
+			data: {
+				items: data.items,
+				total: data.totalBefore + data.items.length + data.totalAfter,
+				totalBefore: data.totalBefore,
+				totalAfter: data.totalAfter,
+			},
+		};
+	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		const { data } = await DocumentService.getTreeDocumentRoot({
+			query: { dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
+		});
+
+		return {
+			data: {
+				items: data.items,
+				total: data.total,
+				totalBefore: 0,
+				totalAfter: data.total - data.items.length,
+			},
+		};
+	}
+};
+
+const getChildrenOf = async (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentService.getTreeDocumentChildren({
-			query: { parentId: args.parent.unique, dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
-		});
+		if (args.target) {
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			const { data } = await DocumentService.getTreeDocumentSiblings({
+				query: {
+					target: args.target.item.unique,
+					before: args.target.before,
+					after: args.target.after,
+				},
+			});
+
+			return {
+				data: {
+					items: data.items,
+					total: data.totalBefore + data.items.length + data.totalAfter,
+					totalBefore: data.totalBefore,
+					totalAfter: data.totalAfter,
+				},
+			};
+		} else {
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			const { data } = await DocumentService.getTreeDocumentChildren({
+				query: { parentId: args.parent.unique, dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
+			});
+
+			return {
+				data: {
+					items: data.items,
+					total: data.total,
+					totalBefore: 0,
+					totalAfter: data.total - data.items.length,
+				},
+			};
+		}
 	}
 };
 
