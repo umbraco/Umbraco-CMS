@@ -165,7 +165,7 @@
 //
 //     protected static DataType[] GetDefaultDataTypes()
 //     {
-//         var serializer = new SystemTextConfigurationEditorJsonSerializer();
+//         var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultConfigurationEditorJsonSerializerEncoderFactory());
 //
 //         // create data types, property types and content types
 //         var dataType =

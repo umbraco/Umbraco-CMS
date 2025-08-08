@@ -145,7 +145,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(childOfChildFolderName, true, false);
 });
 
-test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
+test('cannot delete non-empty folder', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childFolderName = 'ChildFolderName';
   await umbracoApi.partialView.createFolder(folderName);

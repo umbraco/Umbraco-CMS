@@ -6,6 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @class UmbDocumentTreeStore
  * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Document Items
+ * @deprecated - Use `UmbDocumentTreeRepository` instead. This will be removed in Umbraco 18.
  */
 export class UmbDocumentTreeStore extends UmbUniqueTreeStore {
 	/**

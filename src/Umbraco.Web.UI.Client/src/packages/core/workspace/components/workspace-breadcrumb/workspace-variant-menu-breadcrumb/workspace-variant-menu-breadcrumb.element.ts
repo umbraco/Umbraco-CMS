@@ -13,16 +13,16 @@ import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu'
 @customElement('umb-workspace-variant-menu-breadcrumb')
 export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	@state()
-	_name: string = '';
+	private _name: string = '';
 
 	@state()
-	_structure: Array<UmbVariantStructureItemModel> = [];
+	private _structure: Array<UmbVariantStructureItemModel> = [];
 
 	@state()
-	_workspaceActiveVariantId?: UmbVariantId;
+	private _workspaceActiveVariantId?: UmbVariantId;
 
 	@state()
-	_appDefaultCulture?: string;
+	private _appDefaultCulture?: string;
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 	#workspaceContext?: UmbVariantDatasetWorkspaceContext;

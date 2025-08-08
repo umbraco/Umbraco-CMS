@@ -120,17 +120,17 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 				</p>
 				<div id="health-status">${this.#renderHealthStatus(this._indexData.healthStatus)}</div>
 			</uui-box>
-			${this.renderIndexSearch()} ${this.renderPropertyList()} ${this.renderTools()}
+			${this.#renderIndexSearch()} ${this.#renderPropertyList()} ${this.#renderTools()}
 		`;
 	}
 
-	private renderIndexSearch() {
+	#renderIndexSearch() {
 		// Do we want to show the search while rebuilding?
 		if (!this._indexData || this._indexData.healthStatus.status === HealthStatusModel.REBUILDING) return nothing;
 		return html`<umb-dashboard-examine-searcher .searcherName="${this.indexName}"></umb-dashboard-examine-searcher>`;
 	}
 
-	private renderPropertyList() {
+	#renderPropertyList() {
 		if (!this._indexData) return nothing;
 
 		return html`<uui-box headline=${this.localize.term('examineManagement_indexInfo')}>
@@ -160,7 +160,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		</uui-box>`;
 	}
 
-	private renderTools() {
+	#renderTools() {
 		return html` <uui-box headline=${this.localize.term('examineManagement_tools')}>
 			<p><umb-localize key="examineManagement_toolsDescription">Tools to manage the ${this.indexName}</umb-localize></p>
 			<uui-button

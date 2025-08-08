@@ -97,7 +97,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		return `${this.#hostEl?.lang || umbLocalizationManager.documentLanguage}`.toLowerCase();
 	}
 
-	private getLocalizationData(lang: string) {
+	#getLocalizationData(lang: string) {
 		const locale = new Intl.Locale(lang);
 		const language = locale?.language.toLowerCase();
 		const region = locale?.region?.toLowerCase() ?? '';
@@ -120,7 +120,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 			this.#usedKeys.push(key);
 		}
 
-		const { primary, secondary } = this.getLocalizationData(this.lang());
+		const { primary, secondary } = this.#getLocalizationData(this.lang());
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		let term: any;

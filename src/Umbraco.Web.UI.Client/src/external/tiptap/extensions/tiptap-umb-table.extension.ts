@@ -38,6 +38,7 @@ export const UmbTable = Table.configure({ resizable: true, View: UmbTableView })
 
 export const UmbTableRow = TableRow.extend({
 	allowGapCursor: false,
+	content: '(tableCell | tableHeader)*',
 });
 
 export const UmbTableHeader = TableHeader.extend({
@@ -70,7 +71,8 @@ export const UmbTableHeader = TableHeader.extend({
 			UmbBubbleMenuPlugin(this.editor, {
 				unique: 'table-column-menu',
 				placement: 'top',
-				elementName: 'umb-tiptap-table-column-menu',
+				elementName: 'umb-tiptap-menu',
+				menuAlias: 'Umb.Menu.Tiptap.TableColumn',
 				shouldShow(props) {
 					return isColumnGripSelected(props);
 				},
@@ -162,7 +164,8 @@ export const UmbTableCell = TableCell.extend({
 			UmbBubbleMenuPlugin(this.editor, {
 				unique: 'table-row-menu',
 				placement: 'left',
-				elementName: 'umb-tiptap-table-row-menu',
+				elementName: 'umb-tiptap-menu',
+				menuAlias: 'Umb.Menu.Tiptap.TableRow',
 				shouldShow(props) {
 					return isRowGripSelected(props);
 				},

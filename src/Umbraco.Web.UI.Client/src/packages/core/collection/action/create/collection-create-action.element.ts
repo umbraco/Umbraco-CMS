@@ -20,7 +20,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	private _apiControllers: Array<UmbExtensionApiInitializer<ManifestType>> = [];
 
 	@state()
-	_hrefList: Array<string | undefined> = [];
+	private _hrefList: Array<string | undefined> = [];
 
 	#createLabel = this.localize.term('general_create');
 	#entityContext?: typeof UMB_ENTITY_CONTEXT.TYPE;

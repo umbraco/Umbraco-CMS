@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Models.Entities;
+using Umbraco.Cms.Api.Management.Models.Entities;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
@@ -55,6 +55,26 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
             take,
             ItemOrdering,
             out totalItems);
+
+        return CalculateAccessMap(() => userAccessEntities, out _);
+    }
+
+    protected override IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter)
+    {
+        if (UserHasRootAccess() || IgnoreUserStartNodes())
+        {
+            return base.GetSiblingEntities(target, before, after, out totalBefore, out totalAfter);
+        }
+
+        IEnumerable<UserAccessEntity> userAccessEntities = _userStartNodeEntitiesService.SiblingUserAccessEntities(
+            ItemObjectType,
+            UserStartNodePaths,
+            target,
+            before,
+            after,
+            ItemOrdering,
+            out totalBefore,
+            out totalAfter);
 
         return CalculateAccessMap(() => userAccessEntities, out _);
     }
