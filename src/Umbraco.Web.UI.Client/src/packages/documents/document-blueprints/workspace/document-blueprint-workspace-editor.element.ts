@@ -51,13 +51,6 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-	private _handleVariantFolderPart(index: number, folderPart: string) {
-		const variantSplit = folderPart.split('_');
-		const culture = variantSplit[0];
-		const segment = variantSplit[1];
-		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
-	}
-
 	private async _generateRoutes() {
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
@@ -71,10 +64,7 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 					component: this._splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
-						const variantSplit = info.match.fragments.consumed.split('_&_');
-						variantSplit.forEach((part, index) => {
-							this._handleVariantFolderPart(index, part);
-						});
+						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
 					},
 				});
 			});
@@ -89,7 +79,7 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);
-					this._handleVariantFolderPart(0, info.match.fragments.consumed);
+					this.#workspaceContext?.splitView.handleVariantFolderPart(0, info.match.fragments.consumed);
 				},
 			});
 		});
