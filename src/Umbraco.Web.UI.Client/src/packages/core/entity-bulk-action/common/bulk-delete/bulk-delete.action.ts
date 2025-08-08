@@ -18,6 +18,18 @@ export class UmbDeleteEntityBulkAction<
 > extends UmbEntityBulkActionBase<MetaKindType> {
 	#localize = new UmbLocalizationController(this);
 	#items: Array<any> = [];
+	/**
+	 * @deprecated this has been turned into a private property and cannot be used from v.18. Will be removed in v.18
+	 * */
+	protected get _items() {
+		return this.#items;
+	}
+	/**
+	 * @deprecated this has been turned into a private property and cannot be used from v.18. Will be removed in v.18
+	 * */
+	protected set _items(value: Array<any>) {
+		this.#items = value;
+	}
 
 	override async execute() {
 		if (this.selection?.length === 0) {
