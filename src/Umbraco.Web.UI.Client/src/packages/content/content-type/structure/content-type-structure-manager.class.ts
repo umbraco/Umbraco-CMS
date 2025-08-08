@@ -67,8 +67,6 @@ export class UmbContentTypeStructureManager<
 
 	async whenLoaded() {
 		await this.#init;
-		// TODO..
-
 		return true;
 	}
 
@@ -211,6 +209,13 @@ export class UmbContentTypeStructureManager<
 			}
 			const allSuccess = !statuses.some((status) => status.state.type !== 'success');
 			return allSuccess;
+		}).catch(() => {
+			this.#initRejection?.(`Content Type structure manager could not load: ${unique}`);
+			return Promise.reject(
+				new UmbError(
+					`Content Type structure manager could not load: ${unique}. Not all Content Types loaded successfully.`,
+				),
+			);
 		});
 
 		this.#initResolver?.(result);
