@@ -6,6 +6,7 @@ export type UmbCoreConditionConfigs = SwitchConditionConfig | UmbConditionConfig
 /**
  * @deprecated instead use global UmbExtensionConditionConfig, will be removed in v.17
  */
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type ConditionTypes = UmbCoreConditionConfigs;
 
 type UnionOfProperties<T> = T extends object ? T[keyof T] : never;
