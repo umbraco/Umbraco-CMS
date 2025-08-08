@@ -20,6 +20,7 @@ import {
 	filterFrozenArray,
 	createObservablePart,
 	observationAsPromise,
+	mergeObservables,
 } from '@umbraco-cms/backoffice/observable-api';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -114,6 +115,13 @@ export class UmbContentTypeStructureManager<
 	readonly contentTypeUniques = this.#contentTypes.asObservablePart((x) => x.map((y) => y.unique));
 	readonly contentTypeAliases = this.#contentTypes.asObservablePart((x) => x.map((y) => y.alias));
 
+	readonly contentTypeLoaded = mergeObservables(
+		[this.contentTypeCompositions, this.contentTypeUniques],
+		([comps, uniques]) => {
+			return comps.every((x) => uniques.includes(x.contentType.unique));
+		},
+	);
+
 	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
 	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
 
@@ -202,21 +210,17 @@ export class UmbContentTypeStructureManager<
 				asObservable: () => observable,
 			};
 		}
+
 		// Awaits that everything is loaded:
-		await observationAsPromise(this.#repoManager!.statuses, async (statuses) => {
-			if (statuses.length === 0) {
-				return Promise.reject();
-			}
-			const allSuccess = !statuses.some((status) => status.state.type !== 'success');
-			return allSuccess;
+		await observationAsPromise(this.contentTypeLoaded, async (loaded) => {
+			return loaded === true;
 		}).catch(() => {
-			this.#initRejection?.(`Content Type structure manager could not load: ${unique}`);
-			return Promise.reject(
-				new UmbError(
-					`Content Type structure manager could not load: ${unique}. Not all Content Types loaded successfully.`,
-				),
-			);
+			const msg = `Content Type structure manager could not load: ${unique}. Not all Content Types loaded successfully.`;
+			this.#initRejection?.(msg);
+			return Promise.reject(new UmbError(msg));
 		});
+
+		console.log('dd', this.#contentTypes.getValue());
 
 		this.#initResolver?.(result);
 		return { data: result, asObservable: () => this.ownerContentType };
