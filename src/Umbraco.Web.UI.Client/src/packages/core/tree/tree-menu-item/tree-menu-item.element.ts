@@ -14,7 +14,7 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 	manifest?: ManifestMenuItemTreeKind;
 
 	@state()
-	_menuItemExpansion: UmbEntityExpansionModel = [];
+	private _menuItemExpansion: UmbEntityExpansionModel = [];
 
 	#menuItemContext?: typeof UMB_MENU_ITEM_CONTEXT.TYPE;
 	#muteStateUpdate = false;

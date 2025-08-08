@@ -1,8 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
@@ -28,25 +26,6 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			href: 'https://umbraco.com/training/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=training',
 		},
 	];
-
-	#context?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
-
-	@state()
-	_expansion: Array<UmbEntityModel> = [];
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (context) => {
-			this.#context = context;
-			this.#observeSectionExpansion();
-		});
-	}
-
-	#observeSectionExpansion() {
-		this.observe(this.#context?.expansion.expansion, (items) => {
-			this._expansion = items || [];
-		});
-	}
 
 	override render() {
 		return html`

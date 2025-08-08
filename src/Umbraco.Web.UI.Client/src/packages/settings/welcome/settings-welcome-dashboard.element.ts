@@ -1,30 +1,9 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from '@umbraco-cms/backoffice/menu';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-settings-welcome-dashboard')
 export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
-	#context?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
-
-	@state()
-	_expansion: Array<UmbEntityModel> = [];
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (context) => {
-			this.#context = context;
-			this.#observeSectionExpansion();
-		});
-	}
-
-	#observeSectionExpansion() {
-		this.observe(this.#context?.expansion.expansion, (items) => {
-			this._expansion = items || [];
-		});
-	}
-
 	override render() {
 		return html`
 			<section id="settings-dashboard" class="uui-text">
