@@ -15,10 +15,10 @@ public class SiblingsTemplateTreeController : TemplateTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<SubsetViewModel<NamedEntityTreeItemResponseModel>>> Siblings(
+    public async Task<ActionResult<SubsetViewModel<NamedEntityTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,
         int before,
         int after) =>
-        GetSiblings(target, before, after);
+        await GetSiblings(target, before, after);
 }
