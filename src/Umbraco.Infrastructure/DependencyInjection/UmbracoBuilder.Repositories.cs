@@ -84,6 +84,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IPublishStatusRepository, PublishStatusRepository>();
         builder.Services.AddUnique<IRepositoryCacheVersionRepository, RepositoryCacheVersionRepository>();
         builder.Services.AddUnique<ILongRunningOperationRepository, LongRunningOperationRepository>();
+        builder.Services.AddUnique<ILastSyncedRepository, LastSyncedRepository>();
 
         return builder;
     }

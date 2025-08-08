@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
@@ -15,6 +15,7 @@ public class CacheInstructionsPruningJob : IRecurringBackgroundJob
     private readonly ICacheInstructionRepository _cacheInstructionRepository;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly TimeProvider _timeProvider;
+    private readonly ILastSyncedManager _lastSyncedManager;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CacheInstructionsPruningJob"/> class.
@@ -27,13 +28,15 @@ public class CacheInstructionsPruningJob : IRecurringBackgroundJob
         IOptions<GlobalSettings> globalSettings,
         ICacheInstructionRepository cacheInstructionRepository,
         ICoreScopeProvider scopeProvider,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        ILastSyncedManager lastSyncedManager)
     {
         _globalSettings = globalSettings;
         _cacheInstructionRepository = cacheInstructionRepository;
         _scopeProvider = scopeProvider;
         _timeProvider = timeProvider;
         Period = globalSettings.Value.DatabaseServerMessenger.TimeBetweenPruneOperations;
+        _lastSyncedManager = lastSyncedManager;
     }
 
     /// <inheritdoc />
@@ -53,6 +56,7 @@ public class CacheInstructionsPruningJob : IRecurringBackgroundJob
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             _cacheInstructionRepository.DeleteInstructionsOlderThan(pruneDate.DateTime);
+            _lastSyncedManager.DeleteOlderThanAsync(pruneDate.DateTime).GetAwaiter().GetResult();
             scope.Complete();
         }
 
