@@ -22,7 +22,7 @@ export class UmbUserMediaStartNodeElement extends UmbLitElement {
 	readonly = false;
 
 	@state()
-	_displayValue: Array<any> = [];
+	private _displayValue: Array<any> = [];
 
 	async #observeItems() {
 		// TODO: get back to this when documents have been decoupled from users.

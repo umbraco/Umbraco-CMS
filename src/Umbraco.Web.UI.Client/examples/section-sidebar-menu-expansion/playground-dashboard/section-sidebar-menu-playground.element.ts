@@ -12,10 +12,10 @@ export class ExampleSectionSidebarMenuPlaygroundDashboard extends UmbElementMixi
 	#sectionContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 
 	@state()
-	_globalExpansion: Array<UmbSectionMenuItemExpansionEntryModel> = [];
+	private _globalExpansion: Array<UmbSectionMenuItemExpansionEntryModel> = [];
 
 	@state()
-	_sectionExpansion: Array<UmbSectionMenuItemExpansionEntryModel> = [];
+	private _sectionExpansion: Array<UmbSectionMenuItemExpansionEntryModel> = [];
 
 	constructor() {
 		super();
@@ -48,9 +48,17 @@ export class ExampleSectionSidebarMenuPlaygroundDashboard extends UmbElementMixi
 		this.#sectionContext?.expansion.collapseItem(item);
 	}
 
+	#onCollapseSection() {
+		this.#sectionContext?.expansion.collapseAll();
+	}
+
 	override render() {
 		return html` <umb-stack>
 			<uui-box headline="Open Items for this section">
+				<uui-button slot="header-actions" @click=${this.#onCollapseSection} compact>
+					<uui-icon name="icon-wand"></uui-icon>
+					Collapse All</uui-button
+				>
 				${repeat(
 					this._sectionExpansion,
 					(item) => item.entityType + item.unique,

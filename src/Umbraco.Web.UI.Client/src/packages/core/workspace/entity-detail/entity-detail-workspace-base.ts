@@ -63,12 +63,15 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#createUnderParent = new UmbObjectState<UmbEntityModel | undefined>(undefined);
-	_internal_createUnderParent = this.#createUnderParent.asObservable();
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	public readonly _internal_createUnderParent = this.#createUnderParent.asObservable();
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public readonly _internal_createUnderParentEntityUnique = this.#createUnderParent.asObservablePart((parent) =>
 		parent ? parent.unique : undefined,
 	);
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public readonly _internal_createUnderParentEntityType = this.#createUnderParent.asObservablePart((parent) =>
 		parent ? parent.entityType : undefined,
 	);
@@ -177,6 +180,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Gets the parent that a new entity will be created under.
 	 * @returns { UmbEntityModel | undefined } The parent entity
 	 */
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_internal_getCreateUnderParent(): UmbEntityModel | undefined {
 		return this.#createUnderParent.getValue();
 	}
@@ -185,6 +189,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Sets the parent that a new entity will be created under.
 	 * @param {UmbEntityModel} parent The parent entity
 	 */
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_internal_setCreateUnderParent(parent: UmbEntityModel): void {
 		this.#createUnderParent.setValue(parent);
 	}

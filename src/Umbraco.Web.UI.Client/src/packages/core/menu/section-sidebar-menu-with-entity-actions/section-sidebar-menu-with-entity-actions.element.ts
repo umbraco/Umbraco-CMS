@@ -6,10 +6,10 @@ import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 @customElement('umb-section-sidebar-menu-with-entity-actions')
 export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSidebarMenuElement<ManifestSectionSidebarAppMenuWithEntityActionsKind> {
 	@state()
-	_unique = null;
+	private _unique = null;
 
 	@state()
-	_entityType?: string | null;
+	private _entityType?: string | null;
 
 	#parentContext = new UmbParentEntityContext(this);
 

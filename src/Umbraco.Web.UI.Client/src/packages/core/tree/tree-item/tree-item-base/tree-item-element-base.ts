@@ -23,7 +23,7 @@ export abstract class UmbTreeItemElementBase<
 	protected _item?: TreeItemModelType;
 
 	@state()
-	_label?: string;
+	private _label?: string;
 
 	@property({ type: Object, attribute: false })
 	public set api(value: TreeItemContextType | undefined) {
