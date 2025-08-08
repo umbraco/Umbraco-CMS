@@ -193,7 +193,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return html`
 			${when(loading, () => html`<div id="loader"><uui-loader></uui-loader></div>`)}
 			${when(!loading, () => html`${this.#renderStyles()}${this.#renderToolbar()}`)}
-			<div id="editor" data-mark="input:tiptap-rte"></div>
+			<div id="editor" data-mark="input:tiptap-rte" ?data-loaded=${!loading}></div>
 			${when(!loading, () => this.#renderStatusbar())}
 		`;
 	}
@@ -277,7 +277,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				display: flex;
 				overflow: auto;
 				border-radius: var(--uui-border-radius);
-				border: 1px solid var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+				border: 1px solid transparent;
 				padding: 1rem;
 				box-sizing: border-box;
 
@@ -287,6 +287,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 				width: 100%;
 				max-width: 100%;
+
+				&[data-loaded] {
+					border-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+				}
 
 				> .tiptap {
 					height: 100%;
