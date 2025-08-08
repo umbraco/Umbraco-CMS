@@ -41,6 +41,10 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 
 	#statuses = new UmbArrayState<UmbRepositoryRequestStatus>([], (x) => x.unique);
 	statuses = this.#statuses.asObservable();
+	allSuccess = this.#statuses.asObservablePart(
+		// If there are no other statuses than success, then we consider it all successful.
+		(statuses) => statuses.length > 0 && !statuses.some((status) => status.state.type !== 'success'),
+	);
 
 	/**
 	 * Creates an instance of UmbRepositoryDetailsManager.
