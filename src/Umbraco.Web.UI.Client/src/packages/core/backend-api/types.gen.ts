@@ -6802,6 +6802,7 @@ export type GetItemDocumentSearchData = {
         take?: number;
         parentId?: string;
         allowedDocumentTypes?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/item/document/search';
 };
@@ -9156,6 +9157,7 @@ export type GetItemMediaSearchData = {
         take?: number;
         parentId?: string;
         allowedMediaTypes?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/item/media/search';
 };

@@ -4,4 +4,5 @@ export interface UmbPickerSearchManagerConfig<QueryParamsType = Record<string, u
 	providerAlias: string;
 	searchFrom?: UmbEntityModel;
 	queryParams?: QueryParamsType;
+	dataTypeUnique?: string;
 }
