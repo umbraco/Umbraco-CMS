@@ -9,4 +9,6 @@ public interface ILastSyncedManager
     Task SaveLastSyncedInternalAsync(int id);
 
     Task SaveLastSyncedExternalAsync(int id);
+
+    Task DeleteOlderThanAsync(DateTime date);
 }

@@ -45,4 +45,11 @@ public class LastSyncedManager : ILastSyncedManager
         await _lastSyncedRepository.SaveExternal(id);
         coreScope.Complete();
     }
+
+    public async Task DeleteOlderThanAsync(DateTime date)
+    {
+        using ICoreScope coreScope = _coreScopeProvider.CreateCoreScope();
+        await _lastSyncedRepository.DeleteEntriesOlderThan(date);
+        coreScope.Complete();
+    }
 }

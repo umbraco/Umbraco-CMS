@@ -9,4 +9,6 @@ public interface ILastSyncedRepository
     Task SaveInternal(int id);
 
     Task SaveExternal(int id);
+
+    Task DeleteEntriesOlderThan(DateTime pruneDate);
 }

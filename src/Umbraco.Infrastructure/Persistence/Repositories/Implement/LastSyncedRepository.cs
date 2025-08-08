@@ -82,4 +82,16 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
                 dto.MachineId,
             });
     }
+
+    public async Task DeleteEntriesOlderThan(DateTime pruneDate)
+    {
+        var maxId = Database.ExecuteScalar<int>($"SELECT MAX(Id) FROM umbracoCacheInstruction;");
+
+        Sql sql =
+            new Sql().Append(
+                @"DELETE FROM umbracoLastSynced WHERE LastSyncedDate < @pruneDate OR LastSyncedInternalId > @maxId AND LastSyncedExternalId > @maxId;",
+                new { pruneDate, maxId });
+
+        await Database.ExecuteAsync(sql);
+    }
 }

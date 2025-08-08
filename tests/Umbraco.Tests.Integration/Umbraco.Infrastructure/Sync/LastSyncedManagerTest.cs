@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.Sync;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -47,5 +49,63 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
         int? lastSynced = await manager.GetLastSyncedExternalAsync();
 
         Assert.AreEqual(testId, lastSynced);
+    }
+
+    [Test]
+    public async Task Delete_Old_Synced_External_Id()
+    {
+        Random random = new Random();
+        int testId = random.Next();
+        await manager.SaveLastSyncedExternalAsync(testId);
+
+        // Make sure not to delete if not too old.
+        await manager.DeleteOlderThanAsync(DateTime.Now - TimeSpan.FromDays(1));
+        int? lastSynced = await manager.GetLastSyncedExternalAsync();
+        Assert.NotNull(lastSynced);
+
+        // Make sure to delete if too old.
+        await manager.DeleteOlderThanAsync(DateTime.Now + TimeSpan.FromDays(1));
+        lastSynced = await manager.GetLastSyncedExternalAsync();
+        Assert.Null(lastSynced);
+    }
+
+    [Test]
+    public async Task Delete_Old_Synced_Internal_Id()
+    {
+        Random random = new Random();
+        int testId = random.Next();
+        await manager.SaveLastSyncedInternalAsync(testId);
+
+        // Make sure not to delete if not too old.
+        await manager.DeleteOlderThanAsync(DateTime.Now - TimeSpan.FromDays(1));
+        int? lastSynced = await manager.GetLastSyncedInternalAsync();
+        Assert.NotNull(lastSynced);
+
+        // Make sure to delete if too old.
+        await manager.DeleteOlderThanAsync(DateTime.Now + TimeSpan.FromDays(1));
+        lastSynced = await manager.GetLastSyncedInternalAsync();
+        Assert.Null(lastSynced);
+    }
+
+    [Test]
+    public async Task Delete_Out_Of_Sync_Id()
+    {
+        var sp = ScopeProvider;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var repo = new CacheInstructionRepository((IScopeAccessor)sp);
+            repo.Add(new CacheInstruction(0, DateTime.Now, "{}", "Test", 1));
+
+            Assert.IsTrue(repo.Exists(1));
+
+            await manager.SaveLastSyncedExternalAsync(2);
+            await manager.SaveLastSyncedInternalAsync(2);
+
+            Assert.NotNull(await manager.GetLastSyncedExternalAsync());
+
+            await manager.DeleteOlderThanAsync(DateTime.Now);
+
+            Assert.Null(await manager.GetLastSyncedExternalAsync());
+        }
     }
 }
