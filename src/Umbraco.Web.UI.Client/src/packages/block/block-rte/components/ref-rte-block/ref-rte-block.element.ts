@@ -26,7 +26,7 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	settings?: UmbBlockDataType;
 
 	@state()
-	_workspaceEditPath?: string;
+	private _workspaceEditPath?: string;
 
 	@property({ attribute: false })
 	config?: UmbBlockEditorCustomViewConfiguration;

@@ -40,16 +40,16 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	editContentTypePath?: string;
 
 	@state()
-	_groupId?: string;
+	private _groupId?: string;
 
 	@state()
-	_hasOwnerContainer?: boolean;
+	private _hasOwnerContainer?: boolean;
 
 	@state()
-	_inherited?: boolean;
+	private _inherited?: boolean;
 
 	@state()
-	_inheritedFrom?: Array<UmbContentTypeModel>;
+	private _inheritedFrom?: Array<UmbContentTypeModel>;
 
 	#checkInherited() {
 		if (this.groupStructureHelper && this.group) {
@@ -81,7 +81,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		}
 	}
 
-	_singleValueUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
+	#singleValueUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
 		if (!this._groupStructureHelper || !this.group) return;
 
 		const partialObject = {} as any;
@@ -99,7 +99,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		if (changedName) {
 			newName = changedName;
 		}
-		this._singleValueUpdate('name', newName);
+		this.#singleValueUpdate('name', newName);
 		(e.target as HTMLInputElement).value = newName;
 	}
 
@@ -110,7 +110,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 			const changedName = this.groupStructureHelper
 				.getStructureManager()!
 				.makeEmptyContainerName(this._group.id, 'Group', this._group.parent?.id ?? null);
-			this._singleValueUpdate('name', changedName);
+			this.#singleValueUpdate('name', changedName);
 			(e.target as HTMLInputElement).value = changedName;
 		}
 	}
@@ -202,7 +202,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 							.value=${this.group!.sortOrder.toString()}
 							?disabled=${!this._hasOwnerContainer}
 							@change=${(e: UUIInputEvent) =>
-								this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) ?? 0)}></uui-input>
+								this.#singleValueUpdate('sortOrder', parseInt(e.target.value as string) ?? 0)}></uui-input>
 					`,
 				)}
 			</div>

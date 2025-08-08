@@ -44,7 +44,7 @@ export class UmbDefaultSectionElement extends UmbLitElement implements UmbSectio
 	private _sidebarApps?: Array<UmbExtensionElementInitializer<any>>;
 
 	@state()
-	_splitPanelPosition = '300px';
+	private _splitPanelPosition = '300px';
 
 	// TODO: v17: Move this to a manifest api. It will have to wait for a major as it will be a breaking change.
 	#api = new UmbDefaultSectionContext(this);

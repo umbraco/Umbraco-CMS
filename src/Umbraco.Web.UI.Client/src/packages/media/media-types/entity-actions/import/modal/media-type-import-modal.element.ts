@@ -18,7 +18,7 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 	UmbMediaTypeImportModalData,
 	UmbMediaTypeImportModalValue
 > {
-	#MediaTypeImportRepository = new UmbMediaTypeImportRepository(this);
+	#mediaTypeImportRepository = new UmbMediaTypeImportRepository(this);
 	#temporaryUnique?: string;
 	#fileReader;
 
@@ -54,7 +54,7 @@ export class UmbMediaTypeImportModalLayout extends UmbModalBaseElement<
 
 	async #onFileImport() {
 		if (!this.#temporaryUnique) return;
-		const { error } = await this.#MediaTypeImportRepository.requestImport(this.#temporaryUnique);
+		const { error } = await this.#mediaTypeImportRepository.requestImport(this.#temporaryUnique);
 		if (error) return;
 		this._submitModal();
 	}

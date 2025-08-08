@@ -1,6 +1,6 @@
 import type {
-	PoolingCOnfig,
-	PoolingInterval,
+	UmbPoolingConfig,
+	UmbPoolingInterval,
 	UmbLogViewerWorkspaceContext,
 } from '../../../logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
@@ -11,11 +11,12 @@ import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 @customElement('umb-log-viewer-polling-button')
 export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 	@query('#polling-rate-dropdown')
-	private dropdownElement?: UmbDropdownElement;
-	@state()
-	private _poolingConfig: PoolingCOnfig = { enabled: false, interval: 0 };
+	private _dropdownElement?: UmbDropdownElement;
 
-	#pollingIntervals: PoolingInterval[] = [2000, 5000, 10000, 20000, 30000];
+	@state()
+	private _poolingConfig: UmbPoolingConfig = { enabled: false, interval: 0 };
+
+	#pollingIntervals: UmbPoolingInterval[] = [2000, 5000, 10000, 20000, 30000];
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
@@ -39,15 +40,15 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		this.#logViewerContext?.togglePolling();
 	}
 
-	#setPolingInterval = (interval: PoolingInterval) => {
+	#setPolingInterval = (interval: UmbPoolingInterval) => {
 		this.#logViewerContext?.setPollingInterval(interval);
 
 		this.#closePoolingPopover();
 	};
 
 	#closePoolingPopover() {
-		if (this.dropdownElement) {
-			this.dropdownElement.open = false;
+		if (this._dropdownElement) {
+			this._dropdownElement.open = false;
 		}
 
 		this.#togglePolling();
@@ -65,7 +66,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 
 				<umb-dropdown id="polling-rate-dropdown" compact label="Choose pooling time">
 					${this.#pollingIntervals.map(
-						(interval: PoolingInterval) =>
+						(interval: UmbPoolingInterval) =>
 							html`<uui-menu-item
 								label="Every ${interval / 1000} seconds"
 								@click-label=${() => this.#setPolingInterval(interval)}></uui-menu-item>`,

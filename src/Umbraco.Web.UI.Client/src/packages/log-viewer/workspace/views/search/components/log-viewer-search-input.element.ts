@@ -31,7 +31,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	private _isQuerySaved = false;
 
 	// TODO: Revisit this code, to not use RxJS directly:
-	private inputQuery$ = new Subject<string>();
+	#inputQuery$ = new Subject<string>();
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
@@ -43,7 +43,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 			this.#logViewerContext?.getSavedSearches();
 		});
 
-		this.inputQuery$
+		this.#inputQuery$
 			.pipe(
 				tap(() => (this._showLoader = true)),
 				debounceTime(250),
@@ -71,11 +71,11 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	#setQuery(event: Event) {
 		const target = event.target as UUIInputElement;
-		this.inputQuery$.next(target.value as string);
+		this.#inputQuery$.next(target.value as string);
 	}
 
 	#setQueryFromSavedSearch(query: string) {
-		this.inputQuery$.next(query);
+		this.#inputQuery$.next(query);
 		this._searchDropdownElement.open = false;
 	}
 
@@ -91,7 +91,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#clearQuery() {
-		this.inputQuery$.next('');
+		this.#inputQuery$.next('');
 		this.#logViewerContext?.setFilterExpression('');
 	}
 

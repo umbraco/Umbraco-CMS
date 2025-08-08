@@ -61,7 +61,7 @@ export class UmbDocumentWorkspaceSplitViewVariantSelectorElement extends UmbWork
 		return this.localize.term(term);
 	}
 
-	override _renderVariantDetails(variantOption: UmbDocumentVariantOptionModel) {
+	protected override _renderVariantDetails(variantOption: UmbDocumentVariantOptionModel) {
 		return html` ${this.#getVariantState(variantOption)}`;
 	}
 }
