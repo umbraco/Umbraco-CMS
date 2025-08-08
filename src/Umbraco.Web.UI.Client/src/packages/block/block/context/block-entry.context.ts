@@ -282,7 +282,7 @@ export abstract class UmbBlockEntryContext<
 	/**
 	 * @deprecated Use {@link _settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
 	 */
-	// eslint-disable-next-line @typescript-eslint/naming-convention @typescript-eslint/no-unused-vars
+	// eslint-disable-next-line
 	private readonly settingsDataContentTypeKey = this._settingsDataContentTypeKey;
 
 	#settingsValuesObservable?: Observable<UmbBlockDataType | undefined>;
