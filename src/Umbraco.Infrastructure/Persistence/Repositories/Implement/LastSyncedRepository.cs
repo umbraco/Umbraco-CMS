@@ -8,6 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <inheritdoc cref="ILastSyncedRepository"/>
 public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
 {
     private readonly IMachineInfoFactory  _machineInfoFactory;
@@ -19,11 +20,12 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
     }
 
 
-    public async Task<int?> GetInternal()
+    /// <inheritdoc />
+    public async Task<int?> GetInternalIdAsync()
     {
-        string machineName = _machineInfoFactory.GetMachineName();
+        string machineName = _machineInfoFactory.GetMachineIdentifier();
 
-        Sql<ISqlContext>? sql = Database.SqlContext.Sql()
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Select<LastSyncedDto>(x => x.LastSyncedInternalId)
             .From<LastSyncedDto>()
             .Where<LastSyncedDto>(x => x.MachineId == machineName);
@@ -31,11 +33,12 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
         return await Database.ExecuteScalarAsync<int?>(sql);
     }
 
-    public async Task<int?> GetExternal()
+    /// <inheritdoc />
+    public async Task<int?> GetExternalIdAsync()
     {
-        string machineName = _machineInfoFactory.GetMachineName();
+        string machineName = _machineInfoFactory.GetMachineIdentifier();
 
-        Sql<ISqlContext>? sql = Database.SqlContext.Sql()
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Select<LastSyncedDto>(x => x.LastSyncedExternalId)
             .From<LastSyncedDto>()
             .Where<LastSyncedDto>(x => x.MachineId == machineName);
@@ -43,18 +46,19 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
         return await Database.ExecuteScalarAsync<int?>(sql);
     }
 
-    public async Task SaveInternal(int id)
+    /// <inheritdoc />
+    public async Task SaveInternalIdAsync(int id)
     {
         LastSyncedDto dto = new LastSyncedDto()
         {
-            MachineId = _machineInfoFactory.GetMachineName(),
+            MachineId = _machineInfoFactory.GetMachineIdentifier(),
             LastSyncedInternalId = id,
             LastSyncedDate = DateTime.Now,
         };
 
         await Database.InsertOrUpdateAsync(
             dto,
-            "SET LastSyncedInternalId=@LastSyncedInternalId, LastSyncedDate=@LastSyncedDate WHERE MachineId=@MachineId",
+            "SET lastSyncedInternalId=@LastSyncedInternalId, lastSyncedDate=@LastSyncedDate WHERE machineId=@MachineId",
             new
             {
                 dto.LastSyncedInternalId,
@@ -63,18 +67,19 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
             });
     }
 
-    public async Task SaveExternal(int id)
+    /// <inheritdoc />
+    public async Task SaveExternalIdAsync(int id)
     {
         LastSyncedDto dto = new LastSyncedDto()
         {
-            MachineId = _machineInfoFactory.GetMachineName(),
+            MachineId = _machineInfoFactory.GetMachineIdentifier(),
             LastSyncedExternalId = id,
             LastSyncedDate = DateTime.Now,
         };
 
         await Database.InsertOrUpdateAsync(
             dto,
-            "SET LastSyncedExternalId=@LastSyncedExternalId, LastSyncedDate=@LastSyncedDate WHERE MachineId=@MachineId",
+            "SET lastSyncedExternalId=@LastSyncedExternalId, lastSyncedDate=@LastSyncedDate WHERE machineId=@MachineId",
             new
             {
                 dto.LastSyncedExternalId,
@@ -83,13 +88,14 @@ public class LastSyncedRepository : RepositoryBase, ILastSyncedRepository
             });
     }
 
-    public async Task DeleteEntriesOlderThan(DateTime pruneDate)
+    /// <inheritdoc />
+    public async Task DeleteEntriesOlderThanAsync(DateTime pruneDate)
     {
         var maxId = Database.ExecuteScalar<int>($"SELECT MAX(Id) FROM umbracoCacheInstruction;");
 
         Sql sql =
             new Sql().Append(
-                @"DELETE FROM umbracoLastSynced WHERE LastSyncedDate < @pruneDate OR LastSyncedInternalId > @maxId AND LastSyncedExternalId > @maxId;",
+                @"DELETE FROM umbracoLastSynced WHERE lastSyncedDate < @pruneDate OR lastSyncedInternalId > @maxId AND lastSyncedExternalId > @maxId;",
                 new { pruneDate, maxId });
 
         await Database.ExecuteAsync(sql);

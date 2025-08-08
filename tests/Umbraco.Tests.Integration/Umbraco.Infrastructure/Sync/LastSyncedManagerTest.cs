@@ -16,17 +16,29 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
     private ILastSyncedManager manager => GetRequiredService<ILastSyncedManager>();
 
     [Test]
-    public async Task Get_Last_Synced_Internal_Id()
+    public async Task Last_Synced_Internal_Id_Is_Initially_Null()
     {
         var value = await manager.GetLastSyncedInternalAsync();
         Assert.IsNull(value);
     }
 
     [Test]
-    public async Task Get_Last_Synced_External_Id()
+    public async Task Last_Synced_External_Id_Is_Initially_Null()
     {
         var value = await manager.GetLastSyncedExternalAsync();
         Assert.IsNull(value);
+    }
+
+    [Test]
+    public async Task Last_Synced_Internal_Id_Cannot_Be_Negative()
+    {
+        Assert.Throws<Exception>(() => manager.SaveLastSyncedInternalAsync(-1).GetAwaiter().GetResult());
+    }
+
+    [Test]
+    public async Task Last_Synced_External_Id_Cannot_Be_Negative()
+    {
+        Assert.Throws<Exception>(() => manager.SaveLastSyncedExternalAsync(-1).GetAwaiter().GetResult());
     }
 
     [Test]
@@ -90,10 +102,9 @@ public class LastSyncedManagerTest : UmbracoIntegrationTest
     [Test]
     public async Task Delete_Out_Of_Sync_Id()
     {
-        var sp = ScopeProvider;
-        using (var scope = ScopeProvider.CreateScope())
+        using (ScopeProvider.CreateScope())
         {
-            var repo = new CacheInstructionRepository((IScopeAccessor)sp);
+            var repo = new CacheInstructionRepository((IScopeAccessor)ScopeProvider);
             repo.Add(new CacheInstruction(0, DateTime.Now, "{}", "Test", 1));
 
             Assert.IsTrue(repo.Exists(1));

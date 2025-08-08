@@ -6,22 +6,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 
 [TableName(TableName)]
+[PrimaryKey("machineId", AutoIncrement = false)]
 [ExplicitColumns]
 public class LastSyncedDto
 {
     internal const string TableName = Constants.DatabaseSchema.Tables.LastSynced;
 
-    [Column("MachineId")]
+    [Column("machineId")]
+    [PrimaryKeyColumn(Name = "PK_lastSyncedMachineId", AutoIncrement = false, Clustered = true)]
     public required string MachineId { get; set; }
 
-    [Column("LastSyncedInternalId")]
+    [Column("lastSyncedInternalId")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? LastSyncedInternalId { get; set; }
 
-    [Column("LastSyncedExternalId")]
+    [Column("lastSyncedExternalId")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? LastSyncedExternalId { get; set; }
 
-    [Column("LastSyncedDate")]
+    [Column("lastSyncedDate")]
     public DateTime LastSyncedDate { get; set; }
 }

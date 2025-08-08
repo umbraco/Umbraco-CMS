@@ -4,7 +4,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_2_0;
 
 public class AddLastSyncedTable : AsyncMigrationBase
 {
-    public AddLastSyncedTable(IMigrationContext context) : base(context)
+    public AddLastSyncedTable(IMigrationContext context)
+        : base(context)
     {
     }
 
