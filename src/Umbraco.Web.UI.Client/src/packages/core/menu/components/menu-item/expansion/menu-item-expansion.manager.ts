@@ -1,5 +1,5 @@
-import type { UmbMenuItemExpansionEntryModel } from '../../components/menu/types.js';
-import { UMB_MENU_CONTEXT } from '../../components/index.js';
+import type { UmbMenuItemExpansionEntryModel } from '../../menu/types.js';
+import { UMB_MENU_CONTEXT } from '../../menu/constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';

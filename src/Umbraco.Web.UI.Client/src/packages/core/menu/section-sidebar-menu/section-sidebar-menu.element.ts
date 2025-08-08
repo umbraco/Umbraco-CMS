@@ -1,5 +1,5 @@
 import type { ManifestMenu } from '../menu.extension.js';
-import { isMenuItemExpansionEntry } from '../menu-item/expansion/is-menu-item-expansion-entry.guard.js';
+import { isMenuItemExpansionEntry } from '../components/menu-item/expansion/is-menu-item-expansion-entry.guard.js';
 import type { ManifestSectionSidebarAppBaseMenu, ManifestSectionSidebarAppMenuKind } from './types.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-context/section-sidebar-menu.section-context.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
