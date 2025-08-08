@@ -1,4 +1,8 @@
 export type UmbUrlParametersRecord = Record<string, string | number | { toString: () => string } | null>;
+/**
+ * @deprecated Use `UmbUrlParametersRecord` instead. Will be removed in v.18
+ */
+export type UrlParametersRecord = UmbUrlParametersRecord;
 
 const PARAM_IDENTIFIER = /:([^/]+)/g;
 
