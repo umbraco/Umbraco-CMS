@@ -7,7 +7,7 @@ import type {
 } from './types.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbDataSourceResponse, UmbPagedModel, UmbTargetPagedModel } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbTargetPagedModel } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeServerDataSourceBaseArgs<
 	ServerTreeItemType extends { hasChildren: boolean },
@@ -85,7 +85,14 @@ export abstract class UmbTreeServerDataSourceBase<
 
 		if (data) {
 			const items = data?.items.map((item) => this.#mapper(item));
-			return { data: { total: data.total, items } };
+			return {
+				data: {
+					total: data.total,
+					totalBefore: data.totalBefore,
+					totalAfter: data.totalAfter,
+					items,
+				},
+			};
 		}
 
 		return { error };
