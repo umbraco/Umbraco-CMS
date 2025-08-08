@@ -33,19 +33,12 @@ export const Anchor = Node.create({
 
 	addOptions() {
 		return {
-			HTMLAttributes: {
-				id: 'id',
-			},
+			HTMLAttributes: { id: '' },
 		};
 	},
 
 	parseHTML() {
-		return [
-			{
-				tag: 'a[id]',
-				getAttrs: (element) => (element.innerHTML === '' ? {} : false),
-			},
-		];
+		return [{ tag: 'a[id]', getAttrs: (element) => (element.innerHTML === '' ? {} : false) }];
 	},
 
 	renderHTML({ HTMLAttributes }) {
