@@ -1,12 +1,14 @@
 import { css, customElement, html, ifDefined, property, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import type { ManifestMenu } from '@umbraco-cms/backoffice/menu';
 
 export type UmbCascadingMenuItem = {
 	label: string;
 	icon?: string;
 	items?: Array<UmbCascadingMenuItem>;
 	element?: HTMLElement;
+	menu?: string;
 	separatorAfter?: boolean;
 	style?: string;
 	isActive?: () => boolean | undefined;
@@ -27,7 +29,7 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 	}
 
 	#onMouseEnter(item: UmbCascadingMenuItem, popoverId?: string) {
-		if (!item.items?.length || !popoverId) return;
+		if (!(item.items?.length || item.menu) || !popoverId) return;
 
 		const popover = this.#getPopoverById(popoverId);
 		if (!popover) return;
@@ -65,17 +67,16 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 	override render() {
 		return html`
 			<uui-scroll-container>
-				${when(
-					this.items?.length,
-					() => html`${repeat(this.items!, (item, index) => this.#renderItem(item, index))} ${super.render()}`,
-					() => super.render(),
-				)}
+				${when(this.items?.length, () => repeat(this.items!, (item, index) => this.#renderItem(item, index)))}
+				${super.render()}
 			</uui-scroll-container>
 		`;
 	}
 
 	#renderItem(item: UmbCascadingMenuItem, index: number) {
-		const popoverId = item.items ? `menu-${index}` : undefined;
+		const hasChildMenu = item.items?.length || !!item.menu;
+
+		const popoverId = hasChildMenu ? `menu-${index}` : undefined;
 
 		const element = item.element;
 		if (element && popoverId) {
@@ -103,7 +104,7 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 							${when(item.icon, (icon) => html`<uui-icon slot="icon" name=${icon}></uui-icon>`)}
 							<div slot="label" class="menu-item">
 								<span style=${ifDefined(item.style)}>${label}</span>
-								${when(item.items, () => html`<uui-symbol-expand></uui-symbol-expand>`)}
+								${when(hasChildMenu, () => html`<uui-symbol-expand></uui-symbol-expand>`)}
 							</div>
 						</uui-menu-item>
 					`,
@@ -112,6 +113,16 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 					popoverId,
 					(popoverId) => html`
 						<umb-cascading-menu-popover id=${popoverId} placement="right-start" .items=${item.items}>
+							${when(
+								item.menu,
+								(menuAlias) => html`
+									<umb-extension-slot
+										type="menu"
+										default-element="umb-tiptap-menu"
+										single
+										.filter=${(menu: ManifestMenu) => menu.alias === menuAlias}></umb-extension-slot>
+								`,
+							)}
 						</umb-cascading-menu-popover>
 					`,
 				)}

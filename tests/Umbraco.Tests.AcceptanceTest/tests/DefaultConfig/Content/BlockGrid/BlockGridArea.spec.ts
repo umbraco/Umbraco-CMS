@@ -155,8 +155,7 @@ test('can create content with block grid area with row span', async ({umbracoApi
   await umbracoUi.content.doesBlockAreaContainRowSpan(firstElementTypeName, firstAreaName, rowSpan, 0);
 });
 
-// Remove fixme when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18639
-test.fixme('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
@@ -169,7 +168,7 @@ test.fixme('can create content with block grid area with min allowed', async ({u
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickAddBlockGridElementWithName('content');
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
@@ -187,8 +186,7 @@ test.fixme('can create content with block grid area with min allowed', async ({u
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
 
-// Remove fixme when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18639
-test.fixme('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   firstElementTypeId = await umbracoApi.documentType.createEmptyElementType(firstElementTypeName);
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
@@ -201,11 +199,11 @@ test.fixme('can create content with block grid area with max allowed', async ({u
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  await umbracoUi.content.clickAddBlockGridElementWithName(firstElementTypeName);
+  await umbracoUi.content.clickAddBlockGridElementWithName('content');
   await umbracoUi.content.clickSelectBlockElementWithName(firstElementTypeName);
   await umbracoUi.content.clickLinkWithName(areaCreateLabel);
   await umbracoUi.content.clickSelectBlockElementInAreaWithName(secondElementTypeName);
-  await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, 1 too many.');
+  await umbracoUi.content.isTextWithExactNameVisible('Maximum 0 entries, you have entered 1 too many.');
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.removeBlockFromArea(firstElementTypeName, firstAreaName, secondElementTypeName);

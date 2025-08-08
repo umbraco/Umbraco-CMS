@@ -1,4 +1,5 @@
 using System.Configuration;
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,14 +18,14 @@ namespace Umbraco.Cms.Persistence.EFCore;
 /// and insure the 'src/Umbraco.Web.UI/appsettings.json' have a connection string set with the right provider.
 ///
 /// Create a migration for each provider.
-/// <code>dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer -c UmbracoDbContext -- --provider SqlServer</code>
+/// <code>dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer -c UmbracoDbContext</code>
 ///
-/// <code>dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite -c UmbracoDbContext  -- --provider Sqlite</code>
+/// <code>dotnet ef migrations add %Name% -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite -c UmbracoDbContext</code>
 ///
 /// Remove the last migration for each provider.
-/// <code>dotnet ef migrations remove -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer -- --provider SqlServer</code>
+/// <code>dotnet ef migrations remove -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.SqlServer</code>
 ///
-/// <code>dotnet ef migrations remove -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite -- --provider Sqlite</code>
+/// <code>dotnet ef migrations remove -s src/Umbraco.Web.UI -p src/Umbraco.Cms.Persistence.EFCore.Sqlite</code>
 ///
 /// To find documentation about this way of working with the context see
 /// https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/providers?tabs=dotnet-core-cli#using-one-context-type
@@ -37,28 +38,35 @@ public class UmbracoDbContext : DbContext
     /// <param name="options"></param>
     public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options)
         : base(ConfigureOptions(options))
-    {
-
-    }
+    { }
 
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
-        IOptionsMonitor<ConnectionStrings> connectionStringsOptionsMonitor = StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
-
-        ConnectionStrings connectionStrings = connectionStringsOptionsMonitor.CurrentValue;
-
-        if (string.IsNullOrWhiteSpace(connectionStrings.ConnectionString))
+        var extensions = options.Extensions.FirstOrDefault() as Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension;
+        IServiceProvider? serviceProvider = extensions?.ApplicationServiceProvider;
+        serviceProvider ??= StaticServiceProvider.Instance;
+        if (serviceProvider == null)
         {
-            ILogger<UmbracoDbContext> logger = StaticServiceProvider.Instance.GetRequiredService<ILogger<UmbracoDbContext>>();
-            logger.LogCritical("No connection string was found, cannot setup Umbraco EF Core context");
+            // If the service provider is null, we cannot resolve the connection string or migration provider.
+            throw new InvalidOperationException("The service provider is not configured. Ensure that UmbracoDbContext is registered correctly.");
+        }
+
+        IOptionsMonitor<ConnectionStrings>? connectionStringsOptionsMonitor = serviceProvider?.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
+
+        ConnectionStrings? connectionStrings = connectionStringsOptionsMonitor?.CurrentValue;
+
+        if (string.IsNullOrWhiteSpace(connectionStrings?.ConnectionString))
+        {
+            ILogger<UmbracoDbContext>? logger = serviceProvider?.GetRequiredService<ILogger<UmbracoDbContext>>();
+            logger?.LogCritical("No connection string was found, cannot setup Umbraco EF Core context");
 
             // we're throwing an exception here to make it abundantly clear that one should never utilize (or have a
             // dependency on) the DbContext before the connection string has been initialized by the installer.
             throw new InvalidOperationException("No connection string was found, cannot setup Umbraco EF Core context");
         }
 
-        IEnumerable<IMigrationProviderSetup> migrationProviders = StaticServiceProvider.Instance.GetServices<IMigrationProviderSetup>();
-        IMigrationProviderSetup? migrationProvider = migrationProviders.FirstOrDefault(x => x.ProviderName.CompareProviderNames(connectionStrings.ProviderName));
+        IEnumerable<IMigrationProviderSetup>? migrationProviders = serviceProvider?.GetServices<IMigrationProviderSetup>();
+        IMigrationProviderSetup? migrationProvider = migrationProviders?.FirstOrDefault(x => x.ProviderName.CompareProviderNames(connectionStrings.ProviderName));
 
         if (migrationProvider == null && connectionStrings.ProviderName != null)
         {

@@ -31,7 +31,7 @@ public class MultiValuePropertyEditorTests
     public void MultipleValueEditor_WithMultipleValues_Format_Data_For_Cache()
     {
         var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(
             dataValueEditorFactoryMock.Object,
             Mock.Of<IIOHelper>(),
@@ -66,7 +66,7 @@ public class MultiValuePropertyEditorTests
     public void MultipleValueEditor_WithSingleValue_Format_Data_For_Cache()
     {
         var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(
             dataValueEditorFactoryMock.Object,
             Mock.Of<IIOHelper>(),
@@ -100,7 +100,7 @@ public class MultiValuePropertyEditorTests
     {
         var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
 
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(
             dataValueEditorFactoryMock.Object,
             Mock.Of<IIOHelper>(),

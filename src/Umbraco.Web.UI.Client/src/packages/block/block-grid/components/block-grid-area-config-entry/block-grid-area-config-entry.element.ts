@@ -1,7 +1,9 @@
 import { UmbBlockGridAreaConfigEntryContext } from './block-grid-area-config-entry.context.js';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+
+import '../block-scale-handler/block-scale-handler.element.js';
 
 /**
  * @element umb-block-area-config-entry

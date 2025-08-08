@@ -5,11 +5,10 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './layout-configuration.element.js';
 
 export default {
-	title: 'Property Editor UIs/Collection Layout Configuration',
+	title: 'Extension Type/Property Editor UI/Collection Layout Configuration',
 	component: 'umb-property-editor-ui-collection-layout-configuration',
 	id: 'umb-property-editor-ui-collection-layout-configuration',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUICollectionLayoutConfigurationElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUICollectionLayoutConfigurationElement> = () =>
 	html`<umb-property-editor-ui-collection-layout-configuration></umb-property-editor-ui-collection-layout-configuration>`;
-AAAOverview.storyName = 'Overview';

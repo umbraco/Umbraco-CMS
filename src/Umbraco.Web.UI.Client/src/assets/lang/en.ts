@@ -176,6 +176,7 @@ export default {
 		confirmActionConfirm: 'Confirm',
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
+		viewSystemDetails:"View Umbraco CMS system information and version number"
 	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',
@@ -2782,7 +2783,8 @@ export default {
 	tiptap: {
 		anchor: 'Anchor',
 		anchor_input: 'Enter an anchor ID',
-		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
+		config_dimensions_description:
+			'Sets the fixed width and height of the editor. This excludes the toolbar and statusbar heights.',
 		config_extensions: 'Capabilities',
 		config_statusbar: 'Statusbar',
 		config_toolbar: 'Toolbar',
@@ -2813,6 +2815,8 @@ export default {
 		charmap_extlatin: 'Extended Latin',
 		charmap_symbols: 'Symbols',
 		charmap_arrows: 'Arrows',
+		statusbar_characters: (count: number) => `${count.toLocaleString()} ${count === 1 ? 'character' : 'characters'}`,
+		statusbar_words: (count: number) => `${count.toLocaleString()} ${count === 1 ? 'word' : 'words'}`,
 	},
 	linkPicker: {
 		modalSource: 'Source',

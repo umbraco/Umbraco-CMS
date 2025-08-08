@@ -95,7 +95,7 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.clickAddBlockGridElementWithName(richTextEditorElementTypeName);
   await umbracoUi.content.clickExactLinkWithName(richTextEditorElementTypeName);
   await umbracoUi.content.clickInsertBlockButton();
-  await umbracoUi.content.clickExactLinkWithName(blockListElementTypeName);
+  await umbracoUi.content.clickExactLinkWithName(blockListElementTypeName, true);
   await umbracoUi.content.clickAddBlockGridElementWithName(textStringElementTypeName);
   await umbracoUi.content.clickExactLinkWithName(textStringElementTypeName);
   // Enter text in the textstring block that won't match regex
@@ -108,7 +108,7 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.content.isFailedStateButtonVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished, true, true);
   // Updates the textstring block with the correct value
-  await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
+  await umbracoUi.content.clickBlockElementInRTEWithName(blockListElementTypeName);
   await umbracoUi.content.clickEditBlockListEntryWithName(textStringElementTypeName);
   await umbracoUi.content.enterPropertyValue(textStringElementDataTypeName, correctPropertyValue);
   await umbracoUi.content.clickUpdateButtonForModalWithElementTypeNameAndGroupName(textStringElementTypeName, textStringElementGroupName);
@@ -124,7 +124,7 @@ test('can update property value nested in a block grid area with an RTE with a b
   await umbracoUi.reloadPage();
   // Waits to make sure the page has loaded
   await umbracoUi.waitForTimeout(2000);
-  await umbracoUi.content.clickBlockElementWithName(blockListElementTypeName);
+  await umbracoUi.content.clickBlockElementInRTEWithName(blockListElementTypeName);
   // Needs to wait to make sure it has loaded
   await umbracoUi.waitForTimeout(2000);
   await umbracoUi.content.clickEditBlockListEntryWithName(textStringElementTypeName);
