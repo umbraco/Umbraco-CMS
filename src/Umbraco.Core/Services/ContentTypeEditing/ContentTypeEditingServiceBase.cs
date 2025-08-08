@@ -520,6 +520,8 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                 //       the containers and their parent relationships in the model, so it's ok
                 container => model.Containers.First(c => c.Key == container.ParentKey).Name);
 
+        // Store the existing property types in a list to reference when processing properties.
+        // This ensures we correctly handle property types that may have been filtered out from groups.
         var existingPropertyTypes = contentType.PropertyTypes.ToList();
 
         // handle properties in groups
@@ -620,10 +622,9 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         propertyType.SortOrder = property.SortOrder;
         propertyType.LabelOnTop = property.Appearance.LabelOnTop;
 
-        if (propertyGroup is not null)
-        {
-            propertyType.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id, false);
-        }
+        propertyType.PropertyGroupId = propertyGroup is null
+            ? null
+            : new Lazy<int>(() => propertyGroup.Id, false);
 
         return propertyType;
     }

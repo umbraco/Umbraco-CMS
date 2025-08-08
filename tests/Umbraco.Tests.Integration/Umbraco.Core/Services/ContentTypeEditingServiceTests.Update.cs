@@ -393,18 +393,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         var createModel = ContentTypeCreateModel("Test", "test", isElement: isElement);
         var container1 = ContentTypePropertyContainerModel("One");
         var container2 = ContentTypePropertyContainerModel("Two");
-        createModel.Containers = new[] { container1, container2 };
+        createModel.Containers = [container1, container2];
 
         var propertyType1 = ContentTypePropertyTypeModel("Test Property 1", "testProperty1", containerKey: container1.Key);
         var propertyType2 = ContentTypePropertyTypeModel("Test Property 2", "testProperty2", containerKey: container2.Key);
-        createModel.Properties = new[] { propertyType1, propertyType2 };
+        createModel.Properties = [propertyType1, propertyType2];
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
-        updateModel.Containers = new[] { container1 };
+        updateModel.Containers = [container1];
         propertyType2.ContainerKey = null;
-        updateModel.Properties = new[] { propertyType1, propertyType2 };
+        updateModel.Properties = [propertyType1, propertyType2];
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
