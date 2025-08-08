@@ -12,10 +12,10 @@ export class ExampleSectionSidebarMenuPlaygroundDashboard extends UmbElementMixi
 	#sectionContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 
 	@state()
-	_globalExpansion: Array<UmbSectionMenuItemExpansionEntryModel> = [];
+	private _globalExpansion: Array<UmbSectionMenuItemExpansionEntryModel> = [];
 
 	@state()
-	_sectionExpansion: Array<UmbSectionMenuItemExpansionEntryModel> = [];
+	private _sectionExpansion: Array<UmbSectionMenuItemExpansionEntryModel> = [];
 
 	constructor() {
 		super();
