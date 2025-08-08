@@ -1,8 +1,10 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -17,6 +19,7 @@ public class SearchMediaItemController : MediaItemControllerBase
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly IDataTypeService _dataTypeService;
 
+    [ActivatorUtilitiesConstructor]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory,
@@ -25,6 +28,17 @@ public class SearchMediaItemController : MediaItemControllerBase
         _indexedEntitySearchService = indexedEntitySearchService;
         _mediaPresentationFactory = mediaPresentationFactory;
         _dataTypeService = dataTypeService;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead, will be removed in v18")]
+    public SearchMediaItemController(
+        IIndexedEntitySearchService indexedEntitySearchService,
+        IMediaPresentationFactory mediaPresentationFactory)
+        : this(
+            indexedEntitySearchService,
+            mediaPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeService>())
+    {
     }
 
     [HttpGet("search")]

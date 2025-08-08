@@ -1,8 +1,10 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -17,6 +19,7 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IDataTypeService _dataTypeService;
 
+    [ActivatorUtilitiesConstructor]
     public SearchDocumentItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IDocumentPresentationFactory documentPresentationFactory,
@@ -25,6 +28,17 @@ public class SearchDocumentItemController : DocumentItemControllerBase
         _indexedEntitySearchService = indexedEntitySearchService;
         _documentPresentationFactory = documentPresentationFactory;
         _dataTypeService = dataTypeService;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead, will be removed in v18")]
+    public SearchDocumentItemController(
+        IIndexedEntitySearchService indexedEntitySearchService,
+        IDocumentPresentationFactory documentPresentationFactory)
+        : this(
+            indexedEntitySearchService,
+            documentPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeService>())
+    {
     }
 
     [HttpGet("search")]
