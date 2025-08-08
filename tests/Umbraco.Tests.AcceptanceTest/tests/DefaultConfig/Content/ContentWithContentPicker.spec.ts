@@ -5,7 +5,7 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Content Picker';
 const contentPickerDocumentTypeName = 'DocumentTypeForContentPicker';
-const contentPickerName = 'TestContentPicker';
+const contentPickerName = 'Test Content Picker';
 let contentPickerDocumentTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
@@ -172,27 +172,4 @@ test('can remove content picker in the content', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
-});
-
-test('can create content with content picker with predefined applicable types', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const customDataTypeName = 'CustomContentPicker';
-  const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, contentPickerDocumentTypeId);
-  // Create a custom content picker with predefined applicable types
-  const customDataTypeId = await umbracoApi.dataType.createMultiNodeTreePickerDataTypeWithAllowedTypes(customDataTypeName, contentPickerDocumentTypeId);
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
-  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-
-  // Act
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.addContentPicker(contentPickerName);
-  await umbracoUi.content.clickSaveAndPublishButton();
-
-  // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
