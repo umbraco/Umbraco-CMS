@@ -36,13 +36,13 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	}
 
 	@state()
-	_dataOwner?: UmbBlockElementManager;
+	private _dataOwner?: UmbBlockElementManager;
 
 	@state()
-	_workspaceVariantId?: UmbVariantId;
+	private _workspaceVariantId?: UmbVariantId;
 
 	@state()
-	_visibleProperties?: Array<UmbPropertyTypeModel>;
+	private _visibleProperties?: Array<UmbPropertyTypeModel>;
 
 	@state()
 	private _ownerEntityType?: string;

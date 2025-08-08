@@ -21,10 +21,10 @@ export class UmbDocumentPropertyValueUserPermissionFlowPropertyTypeModalElement 
 	private _documentTypeName?: string;
 
 	@state()
-	_selectedItem: UmbPropertyTypeModel | null = null;
+	private _selectedItem: UmbPropertyTypeModel | null = null;
 
 	@state()
-	_pickableFilter: (propertyType: UmbPropertyTypeModel) => boolean = () => true;
+	private _pickableFilter: (propertyType: UmbPropertyTypeModel) => boolean = () => true;
 
 	#detailRepository = new UmbDocumentTypeDetailRepository(this);
 

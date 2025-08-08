@@ -166,7 +166,7 @@ export class UmbDocumentTypeWorkspaceContext
 		this.createScaffold({ parent, preset });
 	}
 
-	override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
+	protected override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
 		// TODO: move this responsibility to the template package
 		if (this.createTemplateMode) {
 			await this.#createAndAssignTemplate();

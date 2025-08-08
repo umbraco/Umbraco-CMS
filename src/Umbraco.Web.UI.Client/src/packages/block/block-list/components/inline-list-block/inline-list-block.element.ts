@@ -43,7 +43,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	private _exposed?: boolean;
 
 	@state()
-	_isOpen = false;
+	private _isOpen = false;
 
 	@state()
 	private _ownerContentTypeName?: string;

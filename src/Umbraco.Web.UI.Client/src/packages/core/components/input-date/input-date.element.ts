@@ -1,6 +1,7 @@
 import { customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type InputDateType = 'date' | 'time' | 'datetime-local';
 
 /**

@@ -16,7 +16,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 	#item?: UmbEntityModel;
 
 	@state()
-	_component?: any; // TODO: Add type
+	private _component?: any; // TODO: Add type
 
 	@property({ type: Object, attribute: false })
 	public get item(): UmbEntityModel | undefined {
