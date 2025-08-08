@@ -1,4 +1,4 @@
-import type { UmbVariantStructureItemModel } from './types.js';
+import type { ManifestWorkspaceContextMenuStructureKind, UmbVariantStructureItemModel } from './types.js';
 import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from './menu-variant-structure-workspace-context.context-token.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/section-context/section-sidebar-menu.section-context.token.js';
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
@@ -7,11 +7,9 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import {
-	UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
-	type ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind,
-} from '@umbraco-cms/backoffice/workspace';
+import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -19,7 +17,7 @@ interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 
 // TODO: introduce base class for all menu structure workspaces to handle ancestors and parent
 export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase {
-	manifest?: ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind;
+	manifest?: ManifestWorkspaceContextMenuStructureKind;
 
 	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
 	#args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
@@ -36,6 +34,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
+	#isModalContext: boolean = false;
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
@@ -44,6 +43,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
+
+		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
+			this.#isModalContext = modalContext !== undefined;
+		});
 
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
 			this.#sectionSidebarMenuContext = instance;
@@ -121,7 +124,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			this.#setAncestorData(data);
 
 			const menuItemAlias = this.manifest?.meta?.menuItemAlias;
-			if (menuItemAlias) {
+			if (menuItemAlias && !this.#isModalContext) {
 				this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 			}
 		}

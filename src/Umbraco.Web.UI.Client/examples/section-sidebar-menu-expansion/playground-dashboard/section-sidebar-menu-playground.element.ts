@@ -43,6 +43,11 @@ export class ExampleSectionSidebarMenuPlaygroundDashboard extends UmbElementMixi
 		});
 	}
 
+	#onCloseItem(event: PointerEvent, item: UmbSectionMenuItemExpansionEntryModel) {
+		event.stopPropagation();
+		this.#sectionContext?.expansion.collapseItem(item);
+	}
+
 	override render() {
 		return html` <umb-stack>
 			<uui-box headline="Open Items for this section">
@@ -63,24 +68,11 @@ export class ExampleSectionSidebarMenuPlaygroundDashboard extends UmbElementMixi
 	}
 
 	#renderItem(item: UmbSectionMenuItemExpansionEntryModel) {
-		return html`<div class="expansion-entry">
-			<div>
-				<span class="label">Entity Type:</span>
-				${item.entityType}
-			</div>
-			<div>
-				<span class="label">Unique:</span>
-				${item.unique}
-			</div>
-			<div>
-				<span class="label">Menu Item Alias:</span>
-				${item.menuItemAlias}
-			</div>
-			<div>
-				<span class="label">Section Alias:</span>
-				${item.sectionAlias}
-			</div>
-		</div>`;
+		return html` <uui-ref-node
+			name=${item.entityType}
+			detail=${item.unique + ', ' + item.menuItemAlias + ', ' + item.sectionAlias}>
+			<uui-button slot="actions" @click=${(event: PointerEvent) => this.#onCloseItem(event, item)}>Close</uui-button>
+		</uui-ref-node>`;
 	}
 
 	static override styles = [
@@ -88,16 +80,6 @@ export class ExampleSectionSidebarMenuPlaygroundDashboard extends UmbElementMixi
 			:host {
 				display: block;
 				padding: var(--uui-size-layout-1);
-			}
-
-			.expansion-entry {
-				border-bottom: 1px solid var(--uui-color-border);
-				padding: var(--uui-size-space-2);
-				margin-bottom: var(--uui-size-space-2);
-			}
-
-			.label {
-				font-weight: bold;
 			}
 		`,
 	];

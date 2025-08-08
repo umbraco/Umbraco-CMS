@@ -1,7 +1,7 @@
 import type { UmbEntityExpansionEntryModel, UmbEntityExpansionModel } from './types.js';
 import {
-	UmbExpansionEntityExpandedEvent,
-	UmbExpansionEntityCollapsedEvent,
+	UmbExpansionEntryExpandedEvent,
+	UmbExpansionEntryCollapsedEvent,
 	UmbExpansionChangeEvent,
 } from './events/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -59,7 +59,7 @@ export class UmbEntityExpansionManager<
 	 */
 	public async expandItem(entity: EntryModelType): Promise<void> {
 		this._expansion.appendOne(entity);
-		this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
+		this.getHostElement()?.dispatchEvent(new UmbExpansionEntryExpandedEvent(entity));
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
@@ -73,40 +73,36 @@ export class UmbEntityExpansionManager<
 		if (!entities || entities.length === 0) return;
 		this._expansion.append(entities);
 		entities.forEach((entity) => {
-			this.getHostElement()?.dispatchEvent(new UmbExpansionEntityExpandedEvent(entity));
+			this.getHostElement()?.dispatchEvent(new UmbExpansionEntryExpandedEvent(entity));
 		});
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
 	 * Collapses an entity
-	 * @param {EntryModelType} entity The entity to open
+	 * @param {EntryModelType} entry The entity to open
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {Promise<void>}
 	 */
-	public async collapseItem(entity: EntryModelType): Promise<void> {
-		this._expansion.filter((x) => x.entityType !== entity.entityType || x.unique !== entity.unique);
-		this.getHostElement()?.dispatchEvent(
-			new UmbExpansionEntityCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
-		);
+	public async collapseItem(entry: EntryModelType): Promise<void> {
+		this._expansion.filter((x) => x.entityType !== entry.entityType || x.unique !== entry.unique);
+		this.getHostElement()?.dispatchEvent(new UmbExpansionEntryCollapsedEvent(entry));
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}
 
 	/**
 	 * Collapses multiple entities
-	 * @param {UmbEntityExpansionModel<EntryModelType>} entities The entities to close
+	 * @param {UmbEntityExpansionModel<EntryModelType>} entries The entities to close
 	 * @memberof UmbEntityExpansionManager
 	 * @returns {void}
 	 */
-	public collapseItems(entities: UmbEntityExpansionModel<EntryModelType>): void {
-		if (!entities || entities.length === 0) return;
+	public collapseItems(entries: UmbEntityExpansionModel<EntryModelType>): void {
+		if (!entries || entries.length === 0) return;
 		this._expansion.filter(
-			(x) => !entities.some((entity) => entity.entityType === x.entityType && entity.unique === x.unique),
+			(x) => !entries.some((entry) => entry.entityType === x.entityType && entry.unique === x.unique),
 		);
-		entities.forEach((entity) => {
-			this.getHostElement()?.dispatchEvent(
-				new UmbExpansionEntityCollapsedEvent({ entityType: entity.entityType, unique: entity.unique }),
-			);
+		entries.forEach((entry) => {
+			this.getHostElement()?.dispatchEvent(new UmbExpansionEntryCollapsedEvent(entry));
 		});
 		this.getHostElement()?.dispatchEvent(new UmbExpansionChangeEvent());
 	}

@@ -2,7 +2,6 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export type * from './components/types.js';
 export type * from './conditions/types.js';
-export type * from './menu-item/types.js';
 export type * from './menu-structure/types.js';
 export type * from './menu.extension.js';
 export type * from './section-sidebar-menu/types.js';

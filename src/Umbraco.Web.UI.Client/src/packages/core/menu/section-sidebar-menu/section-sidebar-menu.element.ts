@@ -1,10 +1,11 @@
 import type { ManifestMenu } from '../menu.extension.js';
+import { isMenuItemExpansionEntry } from '../components/menu-item/expansion/is-menu-item-expansion-entry.guard.js';
 import type { ManifestSectionSidebarAppBaseMenu, ManifestSectionSidebarAppMenuKind } from './types.js';
 import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-context/section-sidebar-menu.section-context.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbExpansionEntityCollapsedEvent, UmbExpansionEntityExpandedEvent } from '@umbraco-cms/backoffice/utils';
+import { UmbExpansionEntryCollapsedEvent, UmbExpansionEntryExpandedEvent } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionSlotElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-section-sidebar-menu')
@@ -44,8 +45,8 @@ export class UmbSectionSidebarMenuElement<
 		this.#extensionSlotElement.filter = (menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu;
 		this.#extensionSlotElement.defaultElement = 'umb-menu';
 		this.#extensionSlotElement.events = {
-			'expansion-entity-expanded': this.#onEntityExpansionChange.bind(this),
-			'expansion-entity-collapsed': this.#onEntityExpansionChange.bind(this),
+			'expansion-entry-expanded': this.#onExpansionChange.bind(this),
+			'expansion-entry-collapsed': this.#onExpansionChange.bind(this),
 		};
 	}
 
@@ -59,22 +60,25 @@ export class UmbSectionSidebarMenuElement<
 		});
 	}
 
-	#onEntityExpansionChange(e: Event) {
-		const event = e as UmbExpansionEntityExpandedEvent | UmbExpansionEntityCollapsedEvent;
+	#onExpansionChange(e: Event) {
+		const event = e as UmbExpansionEntryExpandedEvent | UmbExpansionEntryCollapsedEvent;
 		event.stopPropagation();
-		const eventEntity = event.entry;
+		const eventEntry = event.entry;
 
-		if (!eventEntity) {
+		if (!eventEntry) {
 			throw new Error('Entity is required to toggle expansion.');
 		}
 
-		if (event.type === UmbExpansionEntityExpandedEvent.TYPE) {
+		// Only react to the event if it is a valid Menu Item Expansion Entry
+		if (isMenuItemExpansionEntry(eventEntry) === false) return;
+
+		if (event.type === UmbExpansionEntryExpandedEvent.TYPE) {
 			this.#muteStateUpdate = true;
-			this.#sectionSidebarMenuContext?.expansion.expandItem(eventEntity);
+			this.#sectionSidebarMenuContext?.expansion.expandItem(eventEntry);
 			this.#muteStateUpdate = false;
-		} else if (event.type === UmbExpansionEntityCollapsedEvent.TYPE) {
+		} else if (event.type === UmbExpansionEntryCollapsedEvent.TYPE) {
 			this.#muteStateUpdate = true;
-			this.#sectionSidebarMenuContext?.expansion.collapseItem(eventEntity);
+			this.#sectionSidebarMenuContext?.expansion.collapseItem(eventEntry);
 			this.#muteStateUpdate = false;
 		}
 	}

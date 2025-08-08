@@ -1,5 +1,5 @@
 import type { ManifestMenuItem } from '../../types.js';
-import { UmbMenuItemExpansionManager } from '../../menu-item/expansion/menu-item-expansion.manager.js';
+import { UmbMenuItemExpansionManager } from './expansion/menu-item-expansion.manager.js';
 import { UMB_MENU_ITEM_CONTEXT } from './menu-item.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
