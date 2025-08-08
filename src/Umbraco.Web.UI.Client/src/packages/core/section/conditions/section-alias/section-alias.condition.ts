@@ -1,8 +1,8 @@
-import { UmbConditionBase } from '../../../extension-registry/conditions/condition-base.controller.js';
-import { UMB_SECTION_CONTEXT } from '../../section.context.js';
 import type { SectionAliasConditionConfig } from '../types.js';
+import { UMB_SECTION_CONTEXT } from '../../section.context.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbSectionAliasCondition
 	extends UmbConditionBase<SectionAliasConditionConfig>
