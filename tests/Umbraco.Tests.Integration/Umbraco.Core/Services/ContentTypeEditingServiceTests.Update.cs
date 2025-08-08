@@ -312,11 +312,15 @@ internal sealed partial class ContentTypeEditingServiceTests
         ToLater,
     }
 
-    [TestCase(GroupContainerType, PropertyMoveOperation.ToEarlier)]
-    [TestCase(TabContainerType, PropertyMoveOperation.ToEarlier)]
-    [TestCase(GroupContainerType, PropertyMoveOperation.ToLater)]
-    [TestCase(TabContainerType, PropertyMoveOperation.ToLater)]
-    public async Task Can_Move_Properties_To_Another_Container(string containerType, PropertyMoveOperation propertyMoveOperation)
+    [TestCase(GroupContainerType, PropertyMoveOperation.ToEarlier, false)]
+    [TestCase(TabContainerType, PropertyMoveOperation.ToEarlier, false)]
+    [TestCase(GroupContainerType, PropertyMoveOperation.ToLater, false)]
+    [TestCase(TabContainerType, PropertyMoveOperation.ToLater, false)]
+    [TestCase(GroupContainerType, PropertyMoveOperation.ToEarlier, true)]
+    [TestCase(TabContainerType, PropertyMoveOperation.ToEarlier, true)]
+    [TestCase(GroupContainerType, PropertyMoveOperation.ToLater, true)]
+    [TestCase(TabContainerType, PropertyMoveOperation.ToLater, true)]
+    public async Task Can_Move_Properties_To_Another_Container(string containerType, PropertyMoveOperation propertyMoveOperation, bool isElement)
     {
         var container1 = ContentTypePropertyContainerModel($"{containerType} 1", containerType);
         var container2 = ContentTypePropertyContainerModel($"{containerType} 2", containerType);
@@ -328,7 +332,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         var createModel = ContentTypeCreateModel(
             "Test Content Type",
             containers: [container1, container2],
-            propertyTypes: properties);
+            propertyTypes: properties,
+            isElement: isElement);
 
         var createAttempt = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
