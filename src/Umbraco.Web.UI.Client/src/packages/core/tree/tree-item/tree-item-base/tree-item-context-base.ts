@@ -41,7 +41,6 @@ export abstract class UmbTreeItemContextBase<
 	/**
 	 *
 	 * The pagination manager for the tree item context.
-	 * @deprecated Use `paginationPrev` and `paginationNext` instead.
 	 * @memberof UmbTreeItemContextBase
 	 */
 	public readonly pagination = new UmbPaginationManager();
@@ -234,8 +233,8 @@ export abstract class UmbTreeItemContextBase<
 				unique: this.unique,
 				entityType: this.entityType,
 			},
-			take: this.pagination.getPageSize(),
 			skip: this.pagination.getSkip(),
+			take: this.pagination.getPageSize(),
 			target: target
 				? {
 						item: {
@@ -264,7 +263,8 @@ export abstract class UmbTreeItemContextBase<
 			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
 
 			const totalBefore = data.totalBefore !== undefined ? data.totalBefore : 0;
-			const totalAfter = data.totalAfter !== undefined ? data.totalAfter : data.total - this.pagination.getPageSize();
+			const totalAfter =
+				data.totalAfter !== undefined ? data.totalAfter : data.total - this.#childItems.getValue().length;
 
 			this.paginationPrev.setTotalItems(totalBefore);
 			this.paginationNext.setTotalItems(totalAfter);
@@ -352,7 +352,8 @@ export abstract class UmbTreeItemContextBase<
 			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
 			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
 
-			const totalAfter = data.totalAfter !== undefined ? data.totalAfter : data.total - this.pagination.getPageSize();
+			const totalAfter =
+				data.totalAfter !== undefined ? data.totalAfter : data.total - this.#childItems.getValue().length;
 			this.paginationNext.setTotalItems(totalAfter);
 
 			this.pagination.setTotalItems(data.total);
