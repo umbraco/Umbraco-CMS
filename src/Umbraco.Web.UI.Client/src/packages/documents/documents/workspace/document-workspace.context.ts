@@ -155,6 +155,8 @@ export class UmbDocumentWorkspaceContext
 						documentTypeUnique,
 						blueprintUnique,
 					);
+					// TODO: make sure to capture promise rejection here [NL]
+					// Also check what the router does when setup is rejected...
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -415,7 +417,7 @@ export class UmbDocumentWorkspaceContext
 		this.readOnlyGuard?.addRule({
 			unique: identifier,
 			message,
-			/* This guard is a bit backwards. The rule is permitted to be read-only. 
+			/* This guard is a bit backwards. The rule is permitted to be read-only.
 			If the user does not have permission, we set it to true = permitted to be read-only. */
 			permitted: true,
 		});

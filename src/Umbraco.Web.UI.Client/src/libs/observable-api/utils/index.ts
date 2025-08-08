@@ -7,6 +7,7 @@ export * from './default-memoization.function.js';
 export * from './filter-frozen-array.function.js';
 export * from './json-string-comparison.function.js';
 export * from './merge-observables.function.js';
+export * from './observation-as-promise.function.js';
 export * from './observe-multiple.function.js';
 export * from './partial-update-frozen-array.function.js';
 export * from './push-at-to-unique-array.function.js';
