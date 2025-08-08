@@ -1746,7 +1746,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		defaultTemplate: { id: 'all-rtes-document-type-id' },
 		id: 'all-rtes-document-type-id',
 		alias: 'allRtesDocumentType',
-		name: 'All RTEs document type',
+		name: 'Rich Text Editor document type',
 		description: null,
 		icon: 'icon-document',
 		allowedAsRoot: true,
