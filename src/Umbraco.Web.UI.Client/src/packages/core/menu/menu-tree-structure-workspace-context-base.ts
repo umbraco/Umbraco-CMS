@@ -180,4 +180,12 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		});
 		this.#sectionSidebarMenuContext?.expansion.expandItems(expandableItemsWithMenuItem);
 	}
+
+	override destroy(): void {
+		super.destroy();
+		this.#structure.destroy();
+		this.#parent.destroy();
+		this.#parentContext.destroy();
+		this.#ancestorContext.destroy();
+	}
 }
