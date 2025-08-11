@@ -5,6 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-content-workspace-property')
 export class UmbContentWorkspacePropertyElement extends UmbLitElement {
@@ -20,22 +21,25 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	@state()
-	_datasetVariantId?: UmbVariantId;
+	private _datasetVariantId?: UmbVariantId;
 
 	@state()
-	_dataPath?: string;
+	private _dataPath?: string;
 
 	@state()
-	_viewable?: boolean;
+	private _viewable?: boolean;
 
 	@state()
-	_writeable?: boolean;
+	private _writeable?: boolean;
 
 	@state()
-	_workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
+	private _workspaceContext?: typeof UMB_CONTENT_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_propertyType?: UmbPropertyTypeModel;
+	private _propertyType?: UmbPropertyTypeModel;
+
+	@state()
+	private _hasAccessToSensitiveData = false;
 
 	constructor() {
 		super();
@@ -50,6 +54,12 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this._workspaceContext = workspaceContext;
 			this.#observePropertyType();
+		});
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(context?.hasAccessToSensitiveData, (hasAccessToSensitiveData) => {
+				this._hasAccessToSensitiveData = hasAccessToSensitiveData === true;
+			});
 		});
 	}
 
@@ -119,6 +129,7 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 	override render() {
 		if (!this._viewable) return nothing;
 		if (!this._dataPath || this._writeable === undefined) return nothing;
+		if (!this._hasAccessToSensitiveData && this._propertyType?.isSensitive) return nothing;
 
 		return html`<umb-property-type-based-property
 			data-path=${this._dataPath}

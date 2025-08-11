@@ -152,7 +152,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * @param { UmbEntityModel } parent The parent entity
 	 * @memberof UmbContentTypeWorkspaceContextBase
 	 */
-	override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
+	protected override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
 		try {
 			await this.structure.create(parent?.unique);
 
@@ -178,7 +178,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * Updates the content type for the workspace
 	 * @memberof UmbContentTypeWorkspaceContextBase
 	 */
-	override async _update() {
+	protected override async _update() {
 		try {
 			await this.structure.save();
 

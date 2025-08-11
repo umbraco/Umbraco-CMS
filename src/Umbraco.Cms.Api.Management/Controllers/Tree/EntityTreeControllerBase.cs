@@ -64,9 +64,9 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         return Ok(result);
     }
 
-    protected async Task<ActionResult<IEnumerable<TItem>>> GetSiblings(Guid target, int before, int after)
+    protected async Task<ActionResult<SubsetViewModel<TItem>>> GetSiblings(Guid target, int before, int after)
     {
-        IEntitySlim[] siblings = EntityService.GetSiblings(target, ItemObjectType, before, after, ItemOrdering).ToArray();
+        IEntitySlim[] siblings = GetSiblingEntities(target, before, after, out var totalBefore, out var totalAfter);
         if (siblings.Length == 0)
         {
             return NotFound();
@@ -78,8 +78,12 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             : Constants.System.RootKey;
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(parentKey, siblings);
+
         await PopulateSigns(treeItemViewModels, siblings);
-        return Ok(treeItemViewModels);
+
+        SubsetViewModel<TItem> result = SubsetViewModel(treeItemViewModels, totalBefore, totalAfter);
+
+        return Ok(result);
     }
 
     protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
@@ -133,7 +137,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             .ToArray();
 
     protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems) =>
-        EntityService.GetPagedChildren(
+        EntityService
+            .GetPagedChildren(
                 parentKey,
                 ItemObjectType,
                 skip,
@@ -141,6 +146,18 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 out totalItems,
                 ordering: ItemOrdering)
             .ToArray();
+
+    protected virtual IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter) =>
+        EntityService
+            .GetSiblings(
+                target,
+                [ItemObjectType],
+                before,
+                after,
+                out totalBefore,
+                out totalAfter,
+                ordering: ItemOrdering)
+        .ToArray();
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
@@ -172,4 +189,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected PagedViewModel<TItem> PagedViewModel(IEnumerable<TItem> treeItemViewModels, long totalItems)
         => new() { Total = totalItems, Items = treeItemViewModels };
+
+    protected SubsetViewModel<TItem> SubsetViewModel(IEnumerable<TItem> treeItemViewModels, long totalBefore, long totalAfter)
+        => new() { TotalBefore = totalBefore, TotalAfter = totalAfter, Items = treeItemViewModels };
 }

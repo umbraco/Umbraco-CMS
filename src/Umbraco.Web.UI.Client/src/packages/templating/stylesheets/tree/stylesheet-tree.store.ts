@@ -6,6 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @class UmbStylesheetTreeStore
  * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Stylesheets
+ * @deprecated - Use `UmbStylesheetTreeRepository` instead. This will be removed in Umbraco 18.
  */
 export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 	/**

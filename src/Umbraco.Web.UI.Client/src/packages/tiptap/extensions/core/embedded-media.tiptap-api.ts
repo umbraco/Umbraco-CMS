@@ -9,27 +9,27 @@ export default class UmbTiptapEmbeddedMediaExtensionApi extends UmbTiptapExtensi
 		.umb-embed-holder {
 			display: inline-block;
 			position: relative;
-		}
 
-		.umb-embed-holder > * {
-			user-select: none;
-			pointer-events: none;
-		}
+			&::before {
+				z-index: 1000;
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				content: ' ';
+			}
 
-		.umb-embed-holder.ProseMirror-selectednode {
-			outline: 2px solid var(--uui-palette-spanish-pink-light);
-		}
+			&.ProseMirror-selectednode {
+				outline: 3px solid var(--uui-color-focus);
 
-		.umb-embed-holder::before {
-			z-index: 1000;
-			width: 100%;
-			height: 100%;
-			position: absolute;
-			content: ' ';
-		}
+				&::before {
+					background: rgba(0, 0, 0, 0.1);
+				}
 
-		.umb-embed-holder.ProseMirror-selectednode::before {
-			background: rgba(0, 0, 0, 0.025);
+				> * {
+					user-select: none;
+					pointer-events: none;
+				}
+			}
 		}
 	`;
 }

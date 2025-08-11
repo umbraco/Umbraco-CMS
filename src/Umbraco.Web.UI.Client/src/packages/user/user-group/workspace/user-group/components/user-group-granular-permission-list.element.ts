@@ -9,10 +9,10 @@ import { filterFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 @customElement('umb-user-group-granular-permission-list')
 export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 	@state()
-	_userGroupPermissions?: Array<any>;
+	private _userGroupPermissions?: Array<any>;
 
 	@state()
-	_userGroupFallbackPermissions?: Array<string>;
+	private _userGroupFallbackPermissions?: Array<string>;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 

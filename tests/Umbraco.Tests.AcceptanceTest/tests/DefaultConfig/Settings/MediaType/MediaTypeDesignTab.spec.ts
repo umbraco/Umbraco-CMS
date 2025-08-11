@@ -127,7 +127,7 @@ test('can set a property as mandatory in a media type', {tag: '@smoke'}, async (
   expect(mediaTypeData.properties[0].validation.mandatory).toBeTruthy();
 });
 
-test('can set up validation for a property in a media type', async ({umbracoApi, umbracoUi}) => {
+test('can set up validation for a property in a media type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const regex = '^[a-zA-Z0-9]*$';
@@ -226,7 +226,7 @@ test('can create a media type with multiple groups', {tag: '@smoke'}, async ({um
   expect(await umbracoApi.mediaType.doesGroupContainCorrectPropertyEditor(mediaTypeName, secondDataTypeName, secondDataType.id, secondGroupName)).toBeTruthy();
 });
 
-test('can create a media type with multiple tabs', async ({umbracoApi, umbracoUi}) => {
+test('can create a media type with multiple tabs', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondDataTypeName = 'Image Media Picker';
@@ -251,7 +251,7 @@ test('can create a media type with multiple tabs', async ({umbracoApi, umbracoUi
   expect(await umbracoApi.mediaType.doesTabContainCorrectPropertyEditorInGroup(mediaTypeName, secondDataTypeName, secondDataType.id, secondTabName, secondGroupName)).toBeTruthy();
 });
 
-test('can delete a tab from a media type', async ({umbracoApi, umbracoUi}) => {
+test('can delete a tab from a media type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.mediaType.createMediaTypeWithPropertyEditorInTab(mediaTypeName, dataTypeName, dataTypeData.id, tabName, groupName);

@@ -7,15 +7,15 @@ import { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/ex
 export abstract class UmbExtensionElementAndApiSlotElementBase<
 	ManifestType extends ManifestElementAndApi,
 > extends UmbLitElement {
-	_alias?: string;
 	@property({ type: String, reflect: true })
 	get alias() {
-		return this._alias;
+		return this.#alias;
 	}
 	set alias(newVal) {
-		this._alias = newVal;
+		this.#alias = newVal;
 		this.#observeManifest();
 	}
+	#alias?: string;
 
 	@property({ type: Object, attribute: false })
 	set props(newVal: Record<string, unknown> | undefined) {
@@ -34,26 +34,26 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 	#extensionController?: UmbExtensionElementAndApiInitializer<ManifestType>;
 
 	@state()
-	_api: ManifestType['API_TYPE'] | undefined;
+	protected _api: ManifestType['API_TYPE'] | undefined;
 
 	@state()
-	_element: ManifestType['ELEMENT_TYPE'] | undefined;
+	protected _element: ManifestType['ELEMENT_TYPE'] | undefined;
 
 	abstract getExtensionType(): string;
 	abstract getDefaultElementName(): string;
 
 	#observeManifest() {
-		if (!this._alias) return;
+		if (!this.alias) return;
 
 		this.#extensionController = new UmbExtensionElementAndApiInitializer<ManifestType>(
 			this,
 			umbExtensionsRegistry,
-			this._alias,
+			this.alias,
 			[this],
 			this.#extensionChanged,
 			this.getDefaultElementName(),
 		);
-		this.#extensionController.elementProps = this.#props;
+		this.#extensionController.elementProps = this.props;
 	}
 
 	#extensionChanged = (isPermitted: boolean, controller: UmbExtensionElementAndApiInitializer<ManifestType>) => {

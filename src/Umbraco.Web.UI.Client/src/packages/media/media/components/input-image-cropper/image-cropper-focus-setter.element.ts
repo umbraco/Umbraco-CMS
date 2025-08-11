@@ -33,7 +33,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	private _isDraggingGridHandle = false;
 
 	@state()
-	private coords = { x: 0, y: 0 };
+	private _coords = { x: 0, y: 0 };
 
 	@property({ attribute: false })
 	set focalPoint(value) {
@@ -133,8 +133,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		if (!this.imageElement) return;
 
 		// Init x and y coords from half of rendered image size, which is equavalient to focal point { left: 0.5, top: 0.5 }.
-		this.coords.x = this.imageElement?.clientWidth / 2;
-		this.coords.y = this.imageElement.clientHeight / 2;
+		this._coords.x = this.imageElement?.clientWidth / 2;
+		this._coords.y = this.imageElement.clientHeight / 2;
 	}
 
 	#handleGridDrag(event: PointerEvent) {
@@ -162,8 +162,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 				// check if coordinates are not NaN (can happen when dragging outside of the grid)
 				if (isNaN(x) || isNaN(y)) return;
 
-				this.coords.x = x;
-				this.coords.y = y;
+				this._coords.x = x;
+				this._coords.y = y;
 
 				this.#setFocalPoint(x, y, width, height);
 			},
@@ -209,26 +209,26 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 
 		if (event.key === 'ArrowLeft') {
 			event.preventDefault();
-			this.coords.x = clamp(this.coords.x - increment, 0, width);
-			this.#setFocalPoint(this.coords.x, this.coords.y, width, height);
+			this._coords.x = clamp(this._coords.x - increment, 0, width);
+			this.#setFocalPoint(this._coords.x, this._coords.y, width, height);
 		}
 
 		if (event.key === 'ArrowRight') {
 			event.preventDefault();
-			this.coords.x = clamp(this.coords.x + increment, 0, width);
-			this.#setFocalPoint(this.coords.x, this.coords.y, width, height);
+			this._coords.x = clamp(this._coords.x + increment, 0, width);
+			this.#setFocalPoint(this._coords.x, this._coords.y, width, height);
 		}
 
 		if (event.key === 'ArrowUp') {
 			event.preventDefault();
-			this.coords.y = clamp(this.coords.y - increment, 0, height);
-			this.#setFocalPoint(this.coords.x, this.coords.y, width, height);
+			this._coords.y = clamp(this._coords.y - increment, 0, height);
+			this.#setFocalPoint(this._coords.x, this._coords.y, width, height);
 		}
 
 		if (event.key === 'ArrowDown') {
 			event.preventDefault();
-			this.coords.y = clamp(this.coords.y + increment, 0, height);
-			this.#setFocalPoint(this.coords.x, this.coords.y, width, height);
+			this._coords.y = clamp(this._coords.y + increment, 0, height);
+			this.#setFocalPoint(this._coords.x, this._coords.y, width, height);
 		}
 	}
 

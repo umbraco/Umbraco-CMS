@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Signs;
@@ -59,7 +60,10 @@ public class SiblingsDocumentTreeController : DocumentTreeControllerBase
 
     [HttpGet("siblings")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<DocumentTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<IEnumerable<DocumentTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after)
-        => GetSiblings(target, before, after);
+    [ProducesResponseType(typeof(SubsetViewModel<DocumentTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<SubsetViewModel<DocumentTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after, Guid? dataTypeId = null)
+    {
+        IgnoreUserStartNodesForDataType(dataTypeId);
+        return await GetSiblings(target, before, after);
+    }
 }

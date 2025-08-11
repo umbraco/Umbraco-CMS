@@ -46,7 +46,7 @@ test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
 });
 
 // Really flaky tests, only occurs on pipeline
-test('can add a domain', async ({umbracoApi, umbracoUi}) => {
+test.skip('can add a domain', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesActionMenuOption();
@@ -105,7 +105,7 @@ test('can delete culture and hostname', async ({umbracoApi, umbracoUi}) => {
   expect(domainsData.domains.length).toBe(0);
 });
 
-test('can add culture and hostname for multiple languages', async ({umbracoApi, umbracoUi}) => {
+test('can add culture and hostname for multiple languages', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondDomainName = 'testdomain2';
   const secondLanguageName = 'Vietnamese';

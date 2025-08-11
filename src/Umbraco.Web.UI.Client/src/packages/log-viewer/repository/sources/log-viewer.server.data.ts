@@ -1,4 +1,4 @@
-import type { LogMessagesDataSource, LogSearchDataSource } from './index.js';
+import type { UmbLogMessagesDataSource, UmbLogSearchDataSource } from './index.js';
 import type {
 	DirectionModel,
 	LogLevelModel,
@@ -13,7 +13,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
  * @class UmbLogSearchesServerDataSource
  * @implements {TemplateDetailDataSource}
  */
-export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
+export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	#host: UmbControllerHost;
 
 	/**
@@ -66,9 +66,9 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 /**
  * A data source for the log messages and levels
  * @class UmbLogMessagesServerDataSource
- * @implements {LogMessagesDataSource}
+ * @implements {UmbLogMessagesDataSource}
  */
-export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
+export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource {
 	#host: UmbControllerHost;
 
 	/**

@@ -24,7 +24,7 @@ export class UmbDocumentTableColumnStateElement extends UmbLitElement implements
 	}
 
 	@state()
-	_state = '';
+	private _state = '';
 
 	#item = new UmbDocumentItemDataResolver(this);
 
