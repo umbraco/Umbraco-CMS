@@ -1,6 +1,6 @@
 import type { UmbDocumentTypeDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
-import { cache } from './document-type-detail.server.cache.js';
+import { cache } from './document-type-detail.server.runtime-cache.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
