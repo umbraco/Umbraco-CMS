@@ -7,27 +7,19 @@ import type {
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * A data source for the Document Type that fetches data from the server
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSource<UmbDocumentTypeDetailModel> {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbDocumentTypeServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbDocumentTypeServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
+export class UmbDocumentTypeDetailServerDataSource
+	extends UmbControllerBase
+	implements UmbDetailDataSource<UmbDocumentTypeDetailModel>
+{
 	/**
 	 * Creates a new Document Type scaffold
 	 * @param {(string | null)} parentUnique
@@ -74,10 +66,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(
-			this.#host,
-			DocumentTypeService.getDocumentTypeById({ path: { id: unique } }),
-		);
+		const { data, error } = await tryExecute(this, DocumentTypeService.getDocumentTypeById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -191,7 +180,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 		};
 
 		const { data, error } = await tryExecute(
-			this.#host,
+			this,
 			DocumentTypeService.postDocumentType({
 				body: body,
 			}),
@@ -267,7 +256,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 		};
 
 		const { error } = await tryExecute(
-			this.#host,
+			this,
 			DocumentTypeService.putDocumentTypeById({
 				path: { id: model.unique },
 				body: body,
@@ -291,7 +280,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(
-			this.#host,
+			this,
 			DocumentTypeService.deleteDocumentTypeById({
 				path: { id: unique },
 			}),
