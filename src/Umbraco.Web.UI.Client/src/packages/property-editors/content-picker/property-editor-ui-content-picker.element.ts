@@ -110,8 +110,8 @@ export class UmbPropertyEditorUIContentPickerElement
 		return !isNaN(num) && num > 0 ? num : fallback;
 	}
 
-	override firstUpdated(_changedProperties: Map<string | number | symbol, unknown>) {
-		super.firstUpdated(_changedProperties);
+	override firstUpdated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.firstUpdated(changedProperties);
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-content')!);
 		this.#setPickerRootUnique();
 
