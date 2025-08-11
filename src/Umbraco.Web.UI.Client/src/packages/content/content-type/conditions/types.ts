@@ -20,6 +20,7 @@ export type UmbWorkspaceContentTypeAliasConditionConfig = UmbConditionConfigBase
 /**
  * @deprecated Use `UmbWorkspaceContentTypeAliasConditionConfig` instead. This will be removed in Umbraco 17.
  */
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type WorkspaceContentTypeAliasConditionConfig = UmbWorkspaceContentTypeAliasConditionConfig;
 
 declare global {

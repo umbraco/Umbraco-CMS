@@ -1,3 +1,4 @@
+import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapStatusbarValue, UmbTiptapToolbarValue } from '../types.js';
 import {
@@ -33,6 +34,8 @@ const STYLESHEET_ROOT_PATH = '/css';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
+	#context = new UmbTiptapRteContext(this);
+
 	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
 
 	@property({ type: String })
@@ -181,6 +184,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				this.dispatchEvent(new UmbChangeEvent());
 			},
 		});
+
+		this.#context.setEditor(this._editor);
 	}
 
 	override render() {
@@ -188,7 +193,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return html`
 			${when(loading, () => html`<div id="loader"><uui-loader></uui-loader></div>`)}
 			${when(!loading, () => html`${this.#renderStyles()}${this.#renderToolbar()}`)}
-			<div id="editor" data-mark="input:tiptap-rte"></div>
+			<div id="editor" data-mark="input:tiptap-rte" ?data-loaded=${!loading}></div>
 			${when(!loading, () => this.#renderStatusbar())}
 		`;
 	}
@@ -272,7 +277,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				display: flex;
 				overflow: auto;
 				border-radius: var(--uui-border-radius);
-				border: 1px solid var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+				border: 1px solid transparent;
 				padding: 1rem;
 				box-sizing: border-box;
 
@@ -282,6 +287,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 				width: 100%;
 				max-width: 100%;
+
+				&[data-loaded] {
+					border-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
+				}
 
 				> .tiptap {
 					height: 100%;

@@ -30,13 +30,13 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 	#context = new UmbBlockGridAreaConfigEntryContext(this);
 
 	@state()
-	_columnSpan?: number;
+	private _columnSpan?: number;
 
 	@state()
-	_rowSpan?: number;
+	private _rowSpan?: number;
 
 	@state()
-	_alias = '';
+	private _alias = '';
 
 	constructor() {
 		super();

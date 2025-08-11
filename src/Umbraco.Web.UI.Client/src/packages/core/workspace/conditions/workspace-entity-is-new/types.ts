@@ -9,7 +9,7 @@ export interface UmbWorkspaceEntityIsNewConditionConfig
 /**
  * @deprecated Use `UmbWorkspaceEntityIsNewConditionConfig` instead. This will be removed in Umbraco 17.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/naming-convention
 export interface WorkspaceEntityIsNewConditionConfig extends UmbWorkspaceEntityIsNewConditionConfig {}
 
 declare global {

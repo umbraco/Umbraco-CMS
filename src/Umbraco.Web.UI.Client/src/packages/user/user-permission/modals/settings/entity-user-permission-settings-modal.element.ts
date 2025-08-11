@@ -20,13 +20,13 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	}
 
 	@state()
-	_headline: string = 'Set permissions';
+	private _headline: string = 'Set permissions';
 
 	@state()
-	_entityType?: string;
+	private _entityType?: string;
 
 	@state()
-	_preset?: UmbEntityUserPermissionSettingsModalValue;
+	private _preset?: UmbEntityUserPermissionSettingsModalValue;
 
 	override connectedCallback(): void {
 		super.connectedCallback();

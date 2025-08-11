@@ -15,6 +15,9 @@ public class SiblingsDataTypeTreeController : DataTypeTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<DataTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<SubsetViewModel<DataTypeTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after)
-        => GetSiblings(target, before, after);
+    public async Task<ActionResult<SubsetViewModel<DataTypeTreeItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after, bool foldersOnly = false)
+    {
+        RenderFoldersOnly(foldersOnly);
+        return await GetSiblings(target, before, after);
+    }
 }

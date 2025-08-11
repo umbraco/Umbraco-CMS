@@ -1,5 +1,6 @@
 import type { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type CodeEditorLanguage =
 	| 'csharp'
 	| 'razor'
@@ -10,6 +11,7 @@ export type CodeEditorLanguage =
 	| 'json'
 	| 'html';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export enum CodeEditorTheme {
 	Light = 'umb-light',
 	Dark = 'umb-dark',
@@ -59,6 +61,7 @@ export interface UmbCodeEditorCursorSelectionChangedEvent {
 	secondarySelections: UmbCodeEditorSelection[];
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface CodeEditorConstructorOptions {
 	/**
 	 * The initial value of the auto created model in the editor.
@@ -200,6 +203,7 @@ export interface CodeEditorConstructorOptions {
 	letterSpacing?: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface CodeEditorSearchOptions {
 	/**
 	 *   Limit the searching to only search inside the editable range of the model.

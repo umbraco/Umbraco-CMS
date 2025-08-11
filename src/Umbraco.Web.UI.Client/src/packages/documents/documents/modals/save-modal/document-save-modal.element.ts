@@ -15,7 +15,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
-	_options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbDocumentVariantOptionModel> = [];
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant) {

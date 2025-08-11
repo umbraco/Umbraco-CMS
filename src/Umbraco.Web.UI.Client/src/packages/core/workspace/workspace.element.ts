@@ -19,7 +19,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 	#entityType?: string;
 
 	@state()
-	_component?: HTMLElement;
+	private _component?: HTMLElement;
 
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType(): string | undefined {

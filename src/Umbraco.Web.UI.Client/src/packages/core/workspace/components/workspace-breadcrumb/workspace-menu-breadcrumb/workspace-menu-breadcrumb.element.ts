@@ -9,10 +9,10 @@ import type { UmbMenuStructureWorkspaceContext, UmbStructureItemModel } from '@u
 @customElement('umb-workspace-breadcrumb')
 export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	@state()
-	_name: string = '';
+	private _name: string = '';
 
 	@state()
-	_structure: UmbStructureItemModel[] = [];
+	private _structure: UmbStructureItemModel[] = [];
 
 	// TODO: figure out the correct context type
 	#workspaceContext?: any;

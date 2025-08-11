@@ -34,10 +34,10 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 	readonly = false;
 
 	@state()
-	_min = 0;
+	private _min = 0;
 
 	@state()
-	_max = Infinity;
+	private _max = Infinity;
 
 	#onChange(event: CustomEvent & { target: UmbInputMemberGroupElement }) {
 		this.value = event.target.value;

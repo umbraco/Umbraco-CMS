@@ -42,10 +42,10 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	hideSingleGroup = false;
 
 	@state()
-	_groups: Array<UmbPropertyTypeContainerModel> = [];
+	private _groups: Array<UmbPropertyTypeContainerModel> = [];
 
 	@state()
-	_hasProperties = false;
+	private _hasProperties = false;
 
 	constructor() {
 		super();
