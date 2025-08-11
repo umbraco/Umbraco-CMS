@@ -316,7 +316,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		if (this._timeZoneOptions.length === 1) {
 			return html`<span>${this._timeZoneOptions[0].name}</span> ${this._timeZoneOptions[0].value ===
 				this._clientTimeZone?.value
-					? ` (${this.localize.term('timeZonePicker_local')}})`
+					? ` (${this.localize.term('timeZonePicker_local')})`
 					: nothing}`;
 		}
 
