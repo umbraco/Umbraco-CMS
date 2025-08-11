@@ -31,6 +31,8 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 	#observeIsAuthorized() {
 		this.observe(this.#authContext?.isAuthorized, async (isAuthorized) => {
+			if (isAuthorized === undefined) return;
+
 			if (isAuthorized) {
 				const token = await this.#authContext?.getLatestToken();
 				if (token) {
@@ -68,10 +70,10 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 		this.#connection
 			.start()
 			.then(function () {
-				console.log('Connected!');
+				//console.log('Connected!');
 			})
 			.catch(function (err) {
-				console.log(err);
+				console.log('SignalR', err);
 			});
 
 		this.#connection.onclose((err?: Error) => {
