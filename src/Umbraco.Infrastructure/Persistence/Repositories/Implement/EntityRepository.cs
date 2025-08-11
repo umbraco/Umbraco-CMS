@@ -502,7 +502,8 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
     private TEntity BuildVariants<TEntity>(TEntity entity)
-        => BuildVariants(new[] { entity }).First();
+        where TEntity : PublishableContentEntitySlim
+        => BuildVariants([entity]).First();
 
     private IEnumerable<TEntity> BuildVariants<TEntity>(IEnumerable<TEntity> entities)
         where TEntity : PublishableContentEntitySlim
