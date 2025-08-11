@@ -1,14 +1,18 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../../types.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
+import { cache } from './data-type-detail.server.runtime-cache.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDataTypeRequestModel,
+	DataTypeResponseModel,
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbError } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '@umbraco-cms/backoffice/management-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Data Type that fetches data from the server
@@ -19,6 +23,29 @@ export class UmbDataTypeServerDataSource
 	extends UmbControllerBase
 	implements UmbDetailDataSource<UmbDataTypeDetailModel>
 {
+	#runtimeCache = cache;
+	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
+	#eventSource = 'Umbraco:CMS:DataType';
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+
+		this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
+			this.#serverEventContext = context;
+			this.#observeServerEvents();
+		});
+	}
+
+	#observeServerEvents() {
+		this.observe(
+			this.#serverEventContext?.byEventSourceAndTypes(this.#eventSource, ['Updated', 'Deleted']),
+			(event) => {
+				if (!event) return;
+				this.#runtimeCache.delete(event.key);
+			},
+		);
+	}
+
 	/**
 	 * Creates a new Data Type scaffold
 	 * @param {(string | null)} parentUnique
@@ -49,10 +76,26 @@ export class UmbDataTypeServerDataSource
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this, DataTypeService.getDataTypeById({ path: { id: unique } }));
+		let data: DataTypeResponseModel | undefined;
 
-		if (error || !data) {
-			return { error };
+		if (this.#runtimeCache.has(unique)) {
+			data = this.#runtimeCache.get(unique);
+		} else {
+			const { data: serverData, error: serverError } = await tryExecute(
+				this,
+				DataTypeService.getDataTypeById({ path: { id: unique } }),
+			);
+
+			if (serverError || !serverData) {
+				return { error: serverError };
+			}
+
+			this.#runtimeCache.set(unique, serverData);
+			data = serverData;
+		}
+
+		if (!data) {
+			return { error: new UmbError(`Data Type with unique "${unique}" not found.`) };
 		}
 
 		// TODO: make data mapper to prevent errors
@@ -149,11 +192,17 @@ export class UmbDataTypeServerDataSource
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecute(
+		const { error } = await tryExecute(
 			this,
 			DataTypeService.deleteDataTypeById({
 				path: { id: unique },
 			}),
 		);
+
+		if (!error) {
+			this.#runtimeCache.delete(unique);
+		}
+
+		return { error };
 	}
 }
