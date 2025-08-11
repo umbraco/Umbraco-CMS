@@ -4,7 +4,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { HubConnectionBuilder, type HubConnection } from '@umbraco-cms/backoffice/external/signalr';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { filter, Subject } from '@umbraco-cms/backoffice/external/rxjs';
 
 interface UmbManagementApiServerEventModel {
 	eventSource: string;
@@ -19,6 +20,29 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 	#events = new Subject<UmbManagementApiServerEventModel>();
 	public readonly events = this.#events.asObservable();
+
+	/**
+	 * Filters events by the given event source
+	 * @param {string} eventSource
+	 * @returns {Observable<UmbManagementApiServerEventModel>} - The filtered events
+	 * @memberof UmbManagementApiServerEventContext
+	 */
+	byEventSource(eventSource: string): Observable<UmbManagementApiServerEventModel> {
+		return this.#events.asObservable().pipe(filter((event) => event.eventSource === eventSource));
+	}
+
+	/**
+	 * Filters events by the given event source and event types
+	 * @param {string} eventSource
+	 * @param {Array<string>} eventTypes
+	 * @returns {Observable<UmbManagementApiServerEventModel>} - The filtered events
+	 * @memberof UmbManagementApiServerEventContext
+	 */
+	byEventSourceAndTypes(eventSource: string, eventTypes: Array<string>): Observable<UmbManagementApiServerEventModel> {
+		return this.#events
+			.asObservable()
+			.pipe(filter((event) => event.eventSource === eventSource && eventTypes.includes(event.eventType)));
+	}
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT);
