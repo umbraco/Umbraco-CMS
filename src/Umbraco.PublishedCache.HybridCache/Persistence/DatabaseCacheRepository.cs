@@ -146,6 +146,26 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return CreateContentNodeKit(dto, serializer, preview);
     }
 
+    public async Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
+    {
+        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+
+        dtos = dtos
+            .Where(x => x is not null)
+            .Where(x => preview || x.PubDataRaw is not null || x.PubData is not null)
+            .ToList();
+
+        IContentCacheDataSerializer serializer =
+            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+        return dtos
+            .Select(x => CreateContentNodeKit(x, serializer, preview));
+    }
+
     private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys, Guid objectType)
     {
         Guid[] keys = documentTypeKeys.ToArray();
@@ -218,6 +238,25 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
         return CreateMediaNodeKit(dto, serializer);
+    }
+
+    public async Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
+    {
+        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+
+        dtos = dtos
+            .Where(x => x is not null)
+            .ToList();
+
+        IContentCacheDataSerializer serializer =
+            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+        return dtos
+            .Select(x => CreateMediaNodeKit(x, serializer));
     }
 
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)

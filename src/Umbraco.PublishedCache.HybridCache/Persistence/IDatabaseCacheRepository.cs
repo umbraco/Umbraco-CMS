@@ -9,8 +9,37 @@ internal interface IDatabaseCacheRepository
 
     Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
 
+    async Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
+    {
+        var contentCacheNodes = new List<ContentCacheNode>();
+        foreach (Guid key in keys)
+        {
+            ContentCacheNode? contentSource = await GetContentSourceAsync(key, preview);
+            if (contentSource is not null)
+            {
+                contentCacheNodes.Add(contentSource);
+            }
+        }
+
+        return contentCacheNodes;
+    }
+
     Task<ContentCacheNode?> GetMediaSourceAsync(Guid key);
 
+    async Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
+    {
+        var contentCacheNodes = new List<ContentCacheNode>();
+        foreach (Guid key in keys)
+        {
+            ContentCacheNode? contentSource = await GetMediaSourceAsync(key);
+            if (contentSource is not null)
+            {
+                contentCacheNodes.Add(contentSource);
+            }
+        }
+
+        return contentCacheNodes;
+    }
 
     IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType);
 
