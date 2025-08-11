@@ -26,6 +26,7 @@ export class UmbDocumentTypeDetailServerDataSource
 {
 	#runtimeCache = cache;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
+	#eventSource = 'Umbraco:CMS:DocumentType';
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -37,14 +38,13 @@ export class UmbDocumentTypeDetailServerDataSource
 	}
 
 	#observeServerEvents() {
-		this.observe(this.#serverEventContext?.events, (event) => {
-			const eventSource = 'Umbraco:CMS:DocumentType';
-			if (event?.eventSource === eventSource) {
-				if (event.eventType === 'Updated' || event.eventType === 'Deleted') {
-					this.#runtimeCache.delete(event.key);
-				}
-			}
-		});
+		this.observe(
+			this.#serverEventContext?.byEventSourceAndTypes(this.#eventSource, ['Updated', 'Deleted']),
+			(event) => {
+				if (!event) return;
+				this.#runtimeCache.delete(event.key);
+			},
+		);
 	}
 
 	/**
