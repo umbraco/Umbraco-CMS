@@ -16,17 +16,20 @@ export function getTimeZoneList(
 	filter: Array<string> | undefined = undefined,
 	selectedDate: DateTime | undefined = undefined,
 ): Array<TimeZone> {
+	if (filter) {
+		return filter.map((tz) => ({
+			value: tz,
+			name: getTimeZoneName(tz),
+			offset: getTimeZoneOffset(tz, selectedDate ?? DateTime.now()),
+		}));
+	}
+
 	const timeZones = Intl.supportedValuesOf('timeZone')
 		// Exclude offset time zones, e.g. 'Etc/GMT+2', as they are not consistent between browsers
-		.filter(
-			(value) =>
-				value !== 'UTC' && !value.startsWith('Etc/') && (!filter || filter.some((f) => isEquivalentTimeZone(f, value))),
-		);
+		.filter((value) => value !== 'UTC' && !value.startsWith('Etc/'));
 
-	if (!filter || filter.includes('UTC')) {
-		// Add UTC to the top of the list
-		timeZones.unshift('UTC');
-	}
+	// Add UTC to the top of the list
+	timeZones.unshift('UTC');
 
 	const date = selectedDate ?? DateTime.now();
 	return timeZones.map((tz) => ({
