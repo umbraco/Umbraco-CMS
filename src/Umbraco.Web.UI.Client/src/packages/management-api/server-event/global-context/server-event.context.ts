@@ -4,6 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { HubConnectionBuilder, type HubConnection } from '@umbraco-cms/backoffice/external/signalr';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
 
 interface UmbManagementApiServerEventModel {
 	eventSource: string;
@@ -15,6 +16,9 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 	#connection?: HubConnection;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#serverContext?: typeof UMB_SERVER_CONTEXT.TYPE;
+
+	#events = new Subject<UmbManagementApiServerEventModel>();
+	public readonly events = this.#events.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT);
@@ -64,7 +68,7 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 			.build();
 
 		this.#connection.on('notify', (payload: UmbManagementApiServerEventModel) => {
-			console.log('payloadReceived', payload);
+			this.#events.next(payload);
 		});
 
 		this.#connection
