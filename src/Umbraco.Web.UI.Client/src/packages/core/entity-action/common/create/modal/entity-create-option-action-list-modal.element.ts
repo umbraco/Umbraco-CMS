@@ -28,7 +28,7 @@ export class UmbEntityCreateOptionActionListModalElement extends UmbModalBaseEle
 	private _apiControllers: Array<UmbExtensionApiInitializer<ManifestType>> = [];
 
 	@state()
-	_hrefList: Array<string | undefined> = [];
+	private _hrefList: Array<string | undefined> = [];
 
 	protected override updated(_changedProperties: PropertyValues): void {
 		super.updated(_changedProperties);

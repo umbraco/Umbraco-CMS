@@ -321,9 +321,12 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetSiblings(
         Guid key,
-        UmbracoObjectTypes objectType,
+        IEnumerable<UmbracoObjectTypes> objectTypes,
         int before,
         int after,
+        out long totalBefore,
+        out long totalAfter,
+        IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null)
     {
         if (before < 0)
@@ -340,12 +343,17 @@ public class EntityService : RepositoryService, IEntityService
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
+        var objectTypeGuids = objectTypes.Select(x => x.GetGuid()).ToHashSet();
+
         IEnumerable<IEntitySlim> siblings = _entityRepository.GetSiblings(
-            objectType.GetGuid(),
+            objectTypeGuids,
             key,
             before,
             after,
-            ordering);
+            filter,
+            ordering,
+            out totalBefore,
+            out totalAfter);
 
         scope.Complete();
         return siblings;

@@ -29,13 +29,13 @@ function ExtensionApiArgsMethod(
 @customElement('umb-workspace-footer')
 export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	@state()
-	_withinModal = false;
+	private _withinModal = false;
 
 	@state()
-	_modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalContext;
 
 	@state()
-	_isNew?: boolean;
+	private _isNew?: boolean;
 
 	constructor() {
 		super();

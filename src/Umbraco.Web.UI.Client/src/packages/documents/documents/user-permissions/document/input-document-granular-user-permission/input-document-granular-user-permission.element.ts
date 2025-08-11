@@ -17,12 +17,12 @@ import {
 
 @customElement('umb-input-document-granular-user-permission')
 export class UmbInputDocumentGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
-	_permissions: Array<UmbDocumentUserPermissionModel> = [];
+	#permissions: Array<UmbDocumentUserPermissionModel> = [];
 	public get permissions(): Array<UmbDocumentUserPermissionModel> {
-		return this._permissions;
+		return this.#permissions;
 	}
 	public set permissions(value: Array<UmbDocumentUserPermissionModel>) {
-		this._permissions = value;
+		this.#permissions = value;
 		const uniques = value.map((item) => item.document.id);
 		this.#observePickedDocuments(uniques);
 	}
@@ -60,7 +60,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		if (JSON.stringify(result) === JSON.stringify(currentPermissionVerbs)) return;
 
 		// update permission with new verbs
-		this.permissions = this._permissions.map((permission) => {
+		this.permissions = this.#permissions.map((permission) => {
 			if (permission.document.id === item.unique) {
 				return {
 					...permission,
@@ -101,7 +101,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 						verbs: result,
 					};
 
-					this.permissions = [...this._permissions, permissionItem];
+					this.permissions = [...this.#permissions, permissionItem];
 					this.dispatchEvent(new UmbChangeEvent());
 				},
 				() => {
@@ -153,7 +153,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		const permission = this.#getPermissionForDocument(item.unique);
 		if (!permission) return;
 
-		this.permissions = this._permissions.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
+		this.permissions = this.#permissions.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -223,7 +223,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 	}
 
 	#getPermissionForDocument(unique: string) {
-		return this._permissions?.find((permission) => permission.document.id === unique);
+		return this.#permissions?.find((permission) => permission.document.id === unique);
 	}
 
 	#getPermissionNamesForDocument(unique: string) {

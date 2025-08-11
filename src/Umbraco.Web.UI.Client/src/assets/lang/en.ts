@@ -176,6 +176,7 @@ export default {
 		confirmActionConfirm: 'Confirm',
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
+		viewSystemDetails:"View Umbraco CMS system information and version number"
 	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',

@@ -72,7 +72,7 @@ test('can remove an allowed child node from a document type', async ({umbracoApi
   await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
 });
 
-test('can configure a collection for a document type', async ({umbracoApi, umbracoUi}) => {
+test('can configure a collection for a document type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const collectionDataTypeName = 'TestCollection';
   await umbracoApi.dataType.ensureNameNotExists(collectionDataTypeName);

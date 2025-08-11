@@ -43,7 +43,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	private _sidebarApps?: Array<UmbExtensionElementInitializer<any>>;
 
 	@state()
-	_splitPanelPosition = '300px';
+	private _splitPanelPosition = '300px';
 
 	constructor() {
 		super();

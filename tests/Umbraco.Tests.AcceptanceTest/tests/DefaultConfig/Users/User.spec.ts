@@ -111,7 +111,7 @@ test('can remove a user group from a user', {tag: '@smoke'}, async ({umbracoApi,
   expect(userData.userGroupIds).toEqual([]);
 });
 
-test('can update culture for a user', async ({umbracoApi, umbracoUi}) => {
+test('can update culture for a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const danishIsoCode = 'da';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
