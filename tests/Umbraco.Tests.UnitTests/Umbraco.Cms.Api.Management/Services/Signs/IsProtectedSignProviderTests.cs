@@ -1,14 +1,12 @@
-﻿using Moq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Signs;
 
 [TestFixture]
-internal class IsProtectedSignProviderTest
+internal class IsProtectedSignProviderTests
 {
     [Test]
     public async Task IsProtectedSignProvider_Should_Populate_Signs()

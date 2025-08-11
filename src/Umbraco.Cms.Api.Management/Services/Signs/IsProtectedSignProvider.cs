@@ -1,11 +1,12 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Api.Management.Services.Signs;
 
 internal class IsProtectedSignProvider : ISignProvider
 {
-    private const string Alias = ISignProvider.Prefix + "IsProtected";
+    private const string Alias = Constants.Conventions.Signs.Prefix + "IsProtected";
 
     /// <inheritdoc/>>
     public bool CanProvideTreeSigns<TItem>() => typeof(TItem) == typeof(DocumentTreeItemResponseModel);

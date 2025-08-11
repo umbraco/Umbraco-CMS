@@ -1,7 +1,8 @@
+using Serilog.Core;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Api.Management.Services.Signs;
 
@@ -10,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.Services.Signs;
 /// </summary>
 internal class HasScheduleSignProvider : ISignProvider
 {
-    private const string Alias = ISignProvider.Prefix + "ScheduledForPublish";
+    private const string Alias = Constants.Conventions.Signs.Prefix + "ScheduledForPublish";
 
     private readonly IContentService _contentService;
 
