@@ -10,7 +10,7 @@ public class EntityTreeItemResponseModel : TreeItemPresentationModel
 
     public IEnumerable<SignModel> Signs => _signs.AsEnumerable();
 
-    public void AddSign(string provider, string alias) => _signs.Add(new SignModel { Provider = provider, Alias = alias });
+    public void AddSign(string alias) => _signs.Add(new SignModel { Alias = alias });
 
-    public void RemoveSign(string provider, string alias) => _signs.RemoveAll(x => x.Provider == provider && x.Alias == alias);
+    public void RemoveSign(string alias) => _signs.RemoveAll(x => x.Alias == alias);
 }

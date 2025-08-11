@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Api.Management.Services.Signs;
 /// </summary>
 internal class HasScheduleSignProvider : ISignProvider
 {
-    private const string Alias = "ScheduledForPublish";
+    private const string Alias = ISignProvider.Prefix + "ScheduledForPublish";
 
     private readonly IContentService _contentService;
 
@@ -29,7 +29,7 @@ internal class HasScheduleSignProvider : ISignProvider
         IEnumerable<Guid> contentKeysScheduledForPublishing = _contentService.GetScheduledContentKeys(treeItemViewModels.Select(x => x.Id));
         foreach (Guid key in contentKeysScheduledForPublishing)
         {
-            treeItemViewModels.First(x => x.Id == key).AddSign(Core.Constants.System.UmbracoSignProvider, Alias);
+            treeItemViewModels.First(x => x.Id == key).AddSign(Alias);
         }
 
         return Task.CompletedTask;

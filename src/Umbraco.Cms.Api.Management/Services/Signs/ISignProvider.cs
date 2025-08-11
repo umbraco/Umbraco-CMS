@@ -9,6 +9,11 @@ namespace Umbraco.Cms.Api.Management.Services.Signs;
 public interface ISignProvider
 {
     /// <summary>
+    /// Prefix of each sign alias.
+    /// </summary>
+    const string Prefix = "Umb.";
+
+    /// <summary>
     /// Gets a value indicating whether this provider can provide tree signs for the specified item type.
     /// </summary>
     /// <typeparam name="TItem">Type of tree item view model.</typeparam>
