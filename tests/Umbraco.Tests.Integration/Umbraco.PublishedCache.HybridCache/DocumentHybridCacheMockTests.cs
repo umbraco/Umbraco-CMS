@@ -168,8 +168,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     {
         var schedule = new CulturePublishScheduleModel
         {
-            Culture = "*",
-            Schedule = new ContentScheduleModel(),
+            Culture = Constants.System.InvariantCulture,
         };
 
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [schedule], Constants.Security.SuperUserKey);
@@ -192,8 +191,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     {
         var schedule = new CulturePublishScheduleModel
         {
-            Culture = "*",
-            Schedule = new ContentScheduleModel(),
+            Culture = Constants.System.InvariantCulture,
         };
 
         var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [schedule], Constants.Security.SuperUserKey);
