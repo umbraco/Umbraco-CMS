@@ -6,25 +6,25 @@
 public interface ILastSyncedManager
 {
     /// <summary>
-    /// Used to fetch the last synced internal ID from the database.
+    /// Fetches the last synced internal ID from the database.
     /// </summary>
     /// <returns>The Internal ID from the database.</returns>
     Task<int?> GetLastSyncedInternalAsync();
 
     /// <summary>
-    /// Used to fetch the last synced external ID from the database.
+    /// Fetches the last synced external ID from the database.
     /// </summary>
     /// <returns>The External ID from the database.</returns>
     Task<int?> GetLastSyncedExternalAsync();
 
     /// <summary>
-    /// Used to save the last synced Internal ID to the Database.
+    /// Saves the last synced Internal ID to the Database.
     /// </summary>
     /// <param name="id">The last synced internal ID.</param>
     Task SaveLastSyncedInternalAsync(int id);
 
     /// <summary>
-    /// Used to save the last synced External ID to the Database.
+    /// Saves the last synced External ID to the Database.
     /// </summary>
     /// <param name="id">The last synced external ID.</param>
     Task SaveLastSyncedExternalAsync(int id);

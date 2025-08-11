@@ -38,32 +38,27 @@ internal sealed class LastSyncedManager : ILastSyncedManager
     /// <inheritdoc/>
     public async Task SaveLastSyncedInternalAsync(int id)
     {
-        if (id >= 0)
+        if (id < 0)
         {
-            using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-            await _lastSyncedRepository.SaveInternalIdAsync(id);
-            scope.Complete();
+            throw new ArgumentException("Invalid last synced id. Must be non-negative.");
         }
-        else
-        {
-            throw new Exception("Invalid last synced id. Must be non-negative.");
-        }
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await _lastSyncedRepository.SaveInternalIdAsync(id);
+        scope.Complete();
     }
 
     /// <inheritdoc/>
     public async Task SaveLastSyncedExternalAsync(int id)
     {
-        if (id >= 0)
+        if (id < 0)
         {
-            using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-            await _lastSyncedRepository.SaveExternalIdAsync(id);
-            scope.Complete();
-        }
-        else
-        {
-            throw new Exception("Invalid last synced id. Must be non-negative.");
+            throw new ArgumentException("Invalid last synced id. Must be non-negative.");
         }
 
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await _lastSyncedRepository.SaveExternalIdAsync(id);
+        scope.Complete();
     }
 
     /// <inheritdoc/>
