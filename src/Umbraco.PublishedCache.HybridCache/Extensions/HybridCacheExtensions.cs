@@ -52,6 +52,11 @@ internal static class HybridCacheExtensions
             null,
             CancellationToken.None);
 
+        if (exists is false)
+        {
+            await cache.RemoveAsync(key);
+        }
+
         return (exists, result);
     }
 }
