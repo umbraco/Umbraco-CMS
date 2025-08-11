@@ -26,7 +26,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _cultureVariantOptions: Array<VariantOptionModelType> = [];
 
 	@state()
-	_activeVariants: Array<UmbVariantId> = [];
+	private _activeVariants: Array<UmbVariantId> = [];
 
 	#splitViewContext?: typeof UMB_WORKSPACE_SPLIT_VIEW_CONTEXT.TYPE;
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;

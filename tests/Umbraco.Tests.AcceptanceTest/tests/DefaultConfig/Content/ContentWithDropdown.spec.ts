@@ -83,7 +83,7 @@ for (const dataTypeName of dataTypeNames) {
   });
 }
 
-test('can not publish a mandatory dropdown with an empty value', async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory dropdown with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const optionValues = ['testOption1', 'testOption2', 'testOption3'];
   const customDataTypeId = await umbracoApi.dataType.createDropdownDataType(customDataTypeName, false, optionValues);

@@ -24,7 +24,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 	get props(): UmbAuthProviderDefaultProps {
 		return {
 			userLoginState: this.data?.userLoginState ?? 'loggingIn',
-			onSubmit: this.onSubmit.bind(this),
+			onSubmit: this.#onSubmit.bind(this),
 		};
 	}
 
@@ -137,7 +137,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		return provider.forProviderName.toLowerCase() !== 'umbraco';
 	};
 
-	private onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
+	#onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
 		try {
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 			if (!authContext) {

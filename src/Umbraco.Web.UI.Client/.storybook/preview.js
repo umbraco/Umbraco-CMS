@@ -128,6 +128,7 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'globalContext', [this]);
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'store', [this]);
+		// TODO: Remove this in Umbraco 18, use the repository instead
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'treeStore', [this]);
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'itemStore', [this]);
 
@@ -139,10 +140,10 @@ class UmbStoryBookElement extends UmbLitElement {
 		new UmbModalManagerContext(this);
 		new UmbNotificationContext(this);
 
-		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
+		umbLocalizationRegistry.loadLanguage('en'); // register default language
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
-			appLanguageContext.setLanguage('en-us'); // set default language
+			appLanguageContext?.setLanguage('en'); // set default language
 		});
 	}
 

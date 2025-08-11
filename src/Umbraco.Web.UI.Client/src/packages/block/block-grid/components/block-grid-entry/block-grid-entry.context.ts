@@ -153,11 +153,11 @@ export class UmbBlockGridEntryContext
 		return this._layout.getValue()?.rowSpan;
 	}
 
-	_gotManager() {
+	protected override _gotManager() {
 		this.#gotEntriesAndManager();
 	}
 
-	_gotEntries() {
+	protected override _gotEntries() {
 		this.scaleManager.setEntriesContext(this._entries);
 		if (!this._entries) return;
 
@@ -272,7 +272,7 @@ export class UmbBlockGridEntryContext
 		);
 	}
 
-	_gotContentType() {}
+	protected override _gotContentType() {}
 
 	#calcColumnSpan(columnSpan: number, relevantColumnSpanOptions: number[], layoutColumns: number) {
 		if (relevantColumnSpanOptions.length > 0) {

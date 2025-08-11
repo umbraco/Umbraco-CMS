@@ -18,7 +18,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	UmbDuplicateDocumentModalValue
 > {
 	@state()
-	_destinationUnique?: string | null;
+	private _destinationUnique?: string | null;
 
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;

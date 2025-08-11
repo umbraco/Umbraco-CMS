@@ -107,7 +107,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
                     return EntityContainerOperationStatus.ParentNotFound;
                 }
 
-                if (_entityContainerRepository.HasDuplicateName(container.ParentId, container.Name!))
+                if (_entityContainerRepository.HasDuplicateName(parentContainer?.Id ?? Constants.System.Root, container.Name!))
                 {
                     return EntityContainerOperationStatus.DuplicateName;
                 }
