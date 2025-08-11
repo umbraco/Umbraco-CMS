@@ -60,7 +60,7 @@ test('can publish content with the upload vector graphics data type', async ({um
   expect(contentData.values).toEqual([]);
 });
 
-test(`can upload a file with the svg extension in the content`, async ({umbracoApi, umbracoUi}) => {
+test(`can upload a file with the svg extension in the content`, {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const vectorGraphicsName = 'VectorGraphics.svg';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

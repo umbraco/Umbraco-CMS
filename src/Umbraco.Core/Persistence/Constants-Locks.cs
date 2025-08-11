@@ -87,8 +87,13 @@ public static partial class Constants
         public const int LongRunningOperations = -344;
 
         /// <summary>
+        ///     All document URLs.
+        /// </summary>
+        public const int DocumentUrls = -345;
+
+        /// <summary>
         ///     The entire element tree, i.e. all element items.
         /// </summary>
-        public const int ElementTree = -345;
+        public const int ElementTree = -346;
     }
 }

@@ -37,6 +37,8 @@ function serializeStyles(items: Record<string, string>): string {
 export const Span = Mark.create<SpanOptions>({
 	name: 'span',
 
+	priority: 50,
+
 	addOptions() {
 		return { HTMLAttributes: {} };
 	},

@@ -122,16 +122,16 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	}
 
 	@state()
-	_groups: Array<UmbPropertyTypeContainerModel> = [];
+	private _groups: Array<UmbPropertyTypeContainerModel> = [];
 
 	@state()
-	_hasProperties = false;
+	private _hasProperties = false;
 
 	@state()
-	_sortModeActive?: boolean;
+	private _sortModeActive?: boolean;
 
 	@state()
-	_editContentTypePath?: string;
+	private _editContentTypePath?: string;
 
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Core;
@@ -32,7 +32,7 @@ public partial class UserStartNodeEntitiesServiceTests : UmbracoIntegrationTest
 
     private IUserStartNodeEntitiesService UserStartNodeEntitiesService => GetRequiredService<IUserStartNodeEntitiesService>();
 
-    protected readonly Ordering BySortOrder = Ordering.By("sortOrder");
+    protected static readonly Ordering BySortOrder = Ordering.By("sortOrder");
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {

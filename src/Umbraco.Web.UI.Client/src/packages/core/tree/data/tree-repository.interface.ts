@@ -60,6 +60,7 @@ export interface UmbTreeRepository<
 	/**
 	 * Returns an observable of the root items of the tree.
 	 * @memberof UmbTreeRepository
+	 * @deprecated Use `requestTreeRootItems` instead. It will be removed in Umbraco 18.
 	 */
 	rootTreeItems: () => Promise<Observable<TreeItemType[]>>;
 
@@ -67,6 +68,7 @@ export interface UmbTreeRepository<
 	 * Returns an observable of the children of the given parent item.
 	 * @param {(string | null)} parentUnique
 	 * @memberof UmbTreeRepository
+	 * @deprecated Use `requestTreeItemsOf` instead. It will be removed in Umbraco 18.
 	 */
 	treeItemsOf: (parentUnique: string | null) => Promise<Observable<TreeItemType[]>>;
 }

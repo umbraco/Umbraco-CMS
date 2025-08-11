@@ -27,11 +27,7 @@ export const Figcaption = Node.create<FigcaptionOptions>({
 	draggable: false,
 
 	parseHTML() {
-		return [
-			{
-				tag: 'figcaption',
-			},
-		];
+		return [{ tag: this.name }];
 	},
 
 	renderHTML({ HTMLAttributes }) {

@@ -2,6 +2,9 @@ import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../enti
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
 
 export const UMB_DOCUMENT_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Document.Tree';
+/**
+ * @deprecated Use {@link UMB_DOCUMENT_TREE_REPOSITORY_ALIAS} instead. This will be removed in Umbraco 18.
+ */
 export const UMB_DOCUMENT_TREE_STORE_ALIAS = 'Umb.Store.Document.Tree';
 export const UMB_DOCUMENT_TREE_ALIAS = 'Umb.Tree.Document';
 

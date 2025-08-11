@@ -51,6 +51,24 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             take,
             out totalItems);
 
+    protected override IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter)
+    {
+        totalBefore = 0;
+        totalAfter = 0;
+
+        UmbracoObjectTypes[] siblingObjectTypes = GetObjectTypes();
+
+        return EntityService.GetSiblings(
+                target,
+                siblingObjectTypes,
+                before,
+                after,
+                out totalBefore,
+                out totalAfter,
+                ordering: ItemOrdering)
+            .ToArray();
+    }
+
     protected override TItem MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
         TItem viewModel = base.MapTreeItemViewModel(parentKey, entity);
@@ -93,19 +111,19 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     {
         totalItems = 0;
 
-        UmbracoObjectTypes[] childObjectTypes = _foldersOnly ? [FolderObjectType] : [FolderObjectType, ItemObjectType];
+        UmbracoObjectTypes[] childObjectTypes = GetObjectTypes();
 
-        IEntitySlim[] itemEntities = EntityService.GetPagedChildren(
-                    parentKey,
-                    [FolderObjectType, ItemObjectType],
-                    childObjectTypes,
-                    skip,
-                    take,
-                    false,
-                    out totalItems,
-                    ordering: ItemOrdering)
-                .ToArray();
-
-        return itemEntities;
+        return EntityService.GetPagedChildren(
+                parentKey,
+                [FolderObjectType, ItemObjectType],
+                childObjectTypes,
+                skip,
+                take,
+                false,
+                out totalItems,
+                ordering: ItemOrdering)
+            .ToArray();
     }
+
+    private UmbracoObjectTypes[] GetObjectTypes() => _foldersOnly ? [FolderObjectType] : [FolderObjectType, ItemObjectType];
 }

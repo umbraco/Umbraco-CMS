@@ -111,16 +111,16 @@ test('can remove a user group from a user', {tag: '@smoke'}, async ({umbracoApi,
   expect(userData.userGroupIds).toEqual([]);
 });
 
-test('can update culture for a user', async ({umbracoApi, umbracoUi}) => {
+test('can update culture for a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const danishIsoCode = 'da-dk';
+  const danishIsoCode = 'da';
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
   await umbracoUi.user.goToUsers();
 
   // Act
   await umbracoUi.user.clickUserWithName(nameOfTheUser);
-  await umbracoUi.user.selectUserLanguage('Dansk (Danmark)');
+  await umbracoUi.user.selectUserLanguage(danishIsoCode);
   await umbracoUi.user.clickSaveButton();
 
   // Assert

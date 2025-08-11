@@ -66,7 +66,7 @@ const uploadVideos = [
   {fileExtension: 'ogv', fileName: 'Ogv.ogv'}
 ];
 for (const uploadVideo of uploadVideos) {
-  test(`can upload a video with the ${uploadVideo.fileExtension} extension in the content`, async ({umbracoApi, umbracoUi}) => {
+  test(`can upload a video with the ${uploadVideo.fileExtension} extension in the content`, {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -77,6 +77,7 @@ for (const uploadVideo of uploadVideos) {
     // Act
     await umbracoUi.content.goToContentWithName(contentName);
     await umbracoUi.content.uploadFile(uploadVideoPath + uploadVideo.fileName);
+    await umbracoUi.waitForTimeout(500);
     await umbracoUi.content.clickSaveButton();
 
     // Assert
@@ -88,8 +89,7 @@ for (const uploadVideo of uploadVideos) {
   });
 }
 
-// TODO: Remove skip when the front-end is ready. Currently the uploaded video still displays after removing.
-test.skip('can remove a mp4 file in the content', async ({umbracoApi, umbracoUi}) => {
+test('can remove a mp4 file in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadFileName = 'Video.mp4';
   const mineType = 'video/mp4';

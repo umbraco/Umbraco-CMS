@@ -8,6 +8,9 @@ import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-
 
 export const UMB_STYLESHEET_TREE_ALIAS = 'Umb.Tree.Stylesheet';
 export const UMB_STYLESHEET_TREE_REPOSITORY_ALIAS = 'Umb.Repository.StylesheetTree';
+/**
+ * @deprecated Use {@link UMB_STYLESHEET_TREE_REPOSITORY_ALIAS} instead. This will be removed in Umbraco 18.
+ */
 export const UMB_STYLESHEET_TREE_STORE_ALIAS = 'Umb.Store.StylesheetTree';
 
 export const manifests: Array<UmbExtensionManifest> = [

@@ -9,10 +9,10 @@ import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-ty
 export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	//
 	@state()
-	_areaColumnsConfigurationObject?: UmbPropertyEditorConfig;
+	private _areaColumnsConfigurationObject?: UmbPropertyEditorConfig;
 
 	@state()
-	_areaConfigConfigurationObject?: UmbPropertyEditorConfig;
+	private _areaConfigConfigurationObject?: UmbPropertyEditorConfig;
 
 	constructor() {
 		super();

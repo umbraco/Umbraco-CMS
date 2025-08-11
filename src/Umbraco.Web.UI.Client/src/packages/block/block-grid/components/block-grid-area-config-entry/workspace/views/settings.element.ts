@@ -14,9 +14,10 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 	#dataset?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	@state()
-	_minValue?: number;
+	private _minValue?: number;
+
 	@state()
-	_maxValue?: number;
+	private _maxValue?: number;
 
 	constructor() {
 		super();
