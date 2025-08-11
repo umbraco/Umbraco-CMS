@@ -33,6 +33,9 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	@state()
 	private _isOpen = false;
 
+	@state()
+	private _disallowedLanguages: Array<UmbLanguageDetailModel> = [];
+
 	#collectionRepository = new UmbLanguageCollectionRepository(this);
 	#appLanguageContext?: UmbAppLanguageContext;
 	#languagesObserver?: any;
@@ -40,9 +43,6 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	// TODO: Here we have some read only state logic and then we have it again in the context. We should align this otherwise it will become a nightmare to maintain. [NL]
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
-
-	@state()
-	_disallowedLanguages: Array<UmbLanguageDetailModel> = [];
 
 	constructor() {
 		super();
@@ -103,6 +103,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this._isOpen = event.newState === 'open';
+
 		if (this._isOpen && !this.#languagesObserver) {
 			if (this._popoverElement) {
 				const host = this.getBoundingClientRect();
@@ -124,7 +125,11 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	#renderTrigger() {
-		return html`<button id="toggle" data-mark="action:open" popovertarget="dropdown-popover">
+		return html`<button
+			id="toggle"
+			data-mark="action:open"
+			popovertarget="dropdown-popover"
+			aria-label=${`Change app language (current: ${this._appLanguage?.name})`}>
 			<span
 				>${this._appLanguage?.name}
 				${this._appLanguageIsReadOnly ? this.#renderReadOnlyTag(this._appLanguage?.unique) : nothing}</span
@@ -138,24 +143,25 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			id="dropdown-popover"
 			data-mark="app-language-menu"
 			@beforetoggle=${this.#onPopoverToggle}>
-						<umb-popover-layout>
-			<uui-scroll-container style="max-height:calc(100vh - (var(--umb-header-layout-height) + 60px));">
-				${repeat(
-					this._languages,
-					(language) => language.unique,
-					(language) => html`
-						<uui-menu-item
-							label=${ifDefined(language.name)}
-							data-mark="${language.entityType}:${language.unique}"
-							?active=${language.unique === this._appLanguage?.unique}
-							@click-label=${() => this.#chooseLanguage(language.unique)}>
-							${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
-						</uui-menu-item>
-					`,
-				)}
+			<umb-popover-layout>
+				<uui-scroll-container style="max-height:calc(100vh - (var(--umb-header-layout-height) + 60px));">
+					<uui-combobox-list aria-label="App language" .for=${this}>
+						${repeat(
+							this._languages,
+							(language) => language.unique,
+							(language) => html`
+								<uui-combobox-list-option
+									role="option"
+									tabindex="0"
+									@click=${() => this.#chooseLanguage(language.unique)}>
+									${language.name}
+									${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
+								</uui-combobox-list-option>
+							`,
+						)}
+					</uui-combobox-list>
 				</uui-scroll-container>
-							</umb-popover-layout>
-
+			</umb-popover-layout>
 		</uui-popover-container>`;
 	}
 
@@ -196,12 +202,6 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			#toggle:hover {
 				background-color: var(--uui-color-surface-emphasis);
-			}
-
-			uui-menu-item {
-				color: var(--uui-color-text);
-				
-				width: auto;
 			}
 		`,
 	];
