@@ -41,6 +41,28 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     {
     }
 
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> SearchWithTrashed(
+        CancellationToken cancellationToken,
+        string query,
+        bool? trashed = null,
+        string? culture = null,
+        int skip = 0,
+        int take = 100,
+        Guid? parentId = null,
+        [FromQuery] IEnumerable<Guid>? allowedDocumentTypes = null)
+        => await SearchWithTrashed(
+            cancellationToken,
+            query,
+            trashed,
+            culture,
+            skip,
+            take,
+            parentId,
+            allowedDocumentTypes,
+            null);
+
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]

@@ -30,7 +30,7 @@ public class SearchMediaItemController : MediaItemControllerBase
         _dataTypeService = dataTypeService;
     }
 
-    [Obsolete("Use the non-obsolete constructor instead, will be removed in v18")]
+    [Obsolete("Use the non-obsolete constructor instead, will be removed in Umbraco 18.")]
     public SearchMediaItemController(
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory)
@@ -40,6 +40,28 @@ public class SearchMediaItemController : MediaItemControllerBase
             StaticServiceProvider.Instance.GetRequiredService<IDataTypeService>())
     {
     }
+
+    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> SearchFromParentWithAllowedTypes(
+        CancellationToken cancellationToken,
+        string query,
+        bool? trashed = null,
+        string? culture = null,
+        int skip = 0,
+        int take = 100,
+        Guid? parentId = null,
+        [FromQuery] IEnumerable<Guid>? allowedMediaTypes = null)
+        => await SearchFromParentWithAllowedTypes(
+            cancellationToken,
+            query,
+            trashed,
+            culture,
+            skip,
+            take,
+            parentId,
+            allowedMediaTypes,
+            null);
 
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
