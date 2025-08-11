@@ -29,11 +29,32 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	@state()
 	private _firstActionHref?: string;
 
-	@state()
-	_dropdownIsOpen = false;
-
 	// TODO: provide the entity context on a higher level, like the root element of this entity, tree-item/workspace/... [NL]
 	#entityContext = new UmbEntityContext(this);
+	#inViewport = false;
+	#observingEntityActions = false;
+
+	constructor() {
+		super();
+
+		// Only observe entity actions when the element is in the viewport
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						this.#inViewport = true;
+						this.#observeEntityActions();
+					}
+				});
+			},
+			{
+				root: null, // Use the viewport as the root
+				threshold: 0.1, // Trigger when at least 10% of the element is visible
+			},
+		);
+
+		observer.observe(this);
+	}
 
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('entityType') && _changedProperties.has('unique')) {
@@ -44,6 +65,11 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	}
 
 	#observeEntityActions() {
+		if (!this.entityType) return;
+		if (this.unique === undefined) return;
+		if (!this.#inViewport) return; // Only observe if the element is in the viewport
+		if (this.#observingEntityActions) return;
+
 		new UmbExtensionsManifestInitializer(
 			this,
 			umbExtensionsRegistry,
@@ -57,6 +83,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			},
 			'umbEntityActionsObserver',
 		);
+
+		this.#observingEntityActions = true;
 	}
 
 	async #createFirstActionApi() {
@@ -64,8 +92,10 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
 			{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta },
 		]);
-
-		this._firstActionHref = await this._firstActionApi?.getHref();
+		if (this._firstActionApi) {
+			(this._firstActionApi as any).manifest = this._firstActionManifest;
+			this._firstActionHref = await this._firstActionApi.getHref();
+		}
 	}
 
 	async #onFirstActionClick(event: PointerEvent) {
@@ -78,14 +108,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		await this._firstActionApi?.execute().catch(() => {});
 	}
 
-	#onActionExecuted() {
-		this._dropdownIsOpen = false;
-	}
-
-	#onDropdownClick(event: Event) {
-		event.stopPropagation();
-	}
-
 	override render() {
 		if (this._numberOfActions === 0) return nothing;
 		return html`<uui-action-bar slot="actions">${this.#renderMore()} ${this.#renderFirstAction()} </uui-action-bar>`;
@@ -95,25 +117,20 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		if (this._numberOfActions === 1) return nothing;
 
 		return html`
-			<umb-dropdown id="action-modal" .open=${this._dropdownIsOpen} @click=${this.#onDropdownClick} compact hide-expand>
-				<uui-symbol-more slot="label" label="Open actions menu"></uui-symbol-more>
-				<uui-scroll-container>
-					<umb-entity-action-list
-						@action-executed=${this.#onActionExecuted}
-						.entityType=${this.entityType}
-						.unique=${this.unique}></umb-entity-action-list>
-				</uui-scroll-container>
-			</umb-dropdown>
+			<umb-entity-actions-dropdown .label=${this.label} compact>
+				<uui-symbol-more slot="label"></uui-symbol-more>
+			</umb-entity-actions-dropdown>
 		`;
 	}
 
 	#renderFirstAction() {
-		if (!this._firstActionApi) return nothing;
+		if (!this._firstActionApi || !this._firstActionManifest) return nothing;
 		return html`<uui-button
-			label=${ifDefined(this._firstActionManifest?.meta.label)}
+			label=${this.localize.string(this._firstActionManifest.meta.label)}
+			data-mark=${'entity-action:' + this._firstActionManifest.alias}
 			@click=${this.#onFirstActionClick}
 			href="${ifDefined(this._firstActionHref)}">
-			<uui-icon name=${ifDefined(this._firstActionManifest?.meta.icon)}></uui-icon>
+			<uui-icon name=${ifDefined(this._firstActionManifest.meta.icon)}></uui-icon>
 		</uui-button>`;
 	}
 

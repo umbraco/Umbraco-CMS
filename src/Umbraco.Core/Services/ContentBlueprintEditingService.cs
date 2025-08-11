@@ -45,11 +45,13 @@ internal sealed class ContentBlueprintEditingService
             return Task.FromResult<IContent?>(null);
         }
 
+        IContent scaffold = blueprint.DeepCloneWithResetIdentities();
+
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        scope.Notifications.Publish(new ContentScaffoldedNotification(blueprint, blueprint, Constants.System.Root, new EventMessages()));
+        scope.Notifications.Publish(new ContentScaffoldedNotification(blueprint, scaffold, Constants.System.Root, new EventMessages()));
         scope.Complete();
 
-        return Task.FromResult<IContent?>(blueprint);
+        return Task.FromResult<IContent?>(scaffold);
     }
 
     public async Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeAsync(Guid contentTypeKey, int skip, int take)
@@ -112,7 +114,7 @@ internal sealed class ContentBlueprintEditingService
 
         // Create Blueprint
         var currentUserId = await GetUserIdAsync(userKey);
-        IContent blueprint = ContentService.CreateContentFromBlueprint(content, name, currentUserId);
+        IContent blueprint = ContentService.CreateBlueprintFromContent(content, name, currentUserId);
 
         if (key.HasValue)
         {
@@ -120,7 +122,7 @@ internal sealed class ContentBlueprintEditingService
         }
 
         // Save blueprint
-        await SaveAsync(blueprint, userKey);
+        await SaveAsync(blueprint, userKey, content);
 
         return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentCreateResult { Content = blueprint });
     }
@@ -238,10 +240,10 @@ internal sealed class ContentBlueprintEditingService
 
     protected override OperationResult? Delete(IContent content, int userId) => throw new NotImplementedException();
 
-    private async Task SaveAsync(IContent blueprint, Guid userKey)
+    private async Task SaveAsync(IContent blueprint, Guid userKey, IContent? createdFromContent = null)
     {
         var currentUserId = await GetUserIdAsync(userKey);
-        ContentService.SaveBlueprint(blueprint, currentUserId);
+        ContentService.SaveBlueprint(blueprint, createdFromContent, currentUserId);
     }
 
     private bool ValidateUniqueName(string name, IContent content)

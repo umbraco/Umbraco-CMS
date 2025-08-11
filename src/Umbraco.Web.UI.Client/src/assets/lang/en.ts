@@ -72,6 +72,8 @@ export default {
 		wasCopiedTo: 'was copied to',
 		wasDeleted: 'was deleted',
 		wasMovedTo: 'was moved to',
+		viewActionsFor: (name) => (name ? `View actions for '${name}'` : 'View actions'),
+		loadMore: 'Load more',
 	},
 	actionCategories: {
 		content: 'Content',
@@ -159,7 +161,7 @@ export default {
 		saveAndPublish: 'Save and publish',
 		saveToPublish: 'Save and send for approval',
 		saveListView: 'Save list view',
-		schedulePublish: 'Schedule',
+		schedulePublish: 'Schedule publish',
 		saveAndPreview: 'Save and preview',
 		showPageDisabled: "Preview is disabled because there's no template assigned",
 		styleChoose: 'Choose style',
@@ -174,6 +176,7 @@ export default {
 		confirmActionConfirm: 'Confirm',
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
+		viewSystemDetails:"View Umbraco CMS system information and version number"
 	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',
@@ -271,7 +274,7 @@ export default {
 		publishedPendingChanges: 'Published (pending changes)',
 		publishStatus: 'Publication Status',
 		publishDescendantsHelp:
-			'Publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.',
+			'Publish <strong>%0%</strong> and all items underneath and thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
 			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
 		noVariantsToProcess: 'There are no available variants',
@@ -319,7 +322,7 @@ export default {
 		addTextBox: 'Add another text box',
 		removeTextBox: 'Remove this text box',
 		contentRoot: 'Content root',
-		includeUnpublished: 'Include unpublished content items.',
+		includeUnpublished: 'Include unpublished items.',
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
@@ -348,6 +351,8 @@ export default {
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 		selectAllVariants: 'Select all variants',
 		saveModalTitle: 'Save',
+		saveAndPublishModalTitle: 'Save and publish',
+		publishModalTitle: 'Publish',
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
@@ -369,6 +374,14 @@ export default {
 		notFoundDescription: (entityType: string) => {
 			const entityName = entityType ?? 'item';
 			return `The requested ${entityName} could not be found. Please check the URL and try again.`;
+		},
+		forbiddenTitle: (entityType: string) => {
+			const entityName = entityType ?? 'item';
+			return `Access denied to this ${entityName}`;
+		},
+		forbiddenDescription: (entityType: string) => {
+			const entityName = entityType ?? 'item';
+			return `You do not have permission to access this ${entityName}. Please contact your administrator for assistance.`;
 		},
 	},
 	media: {
@@ -475,10 +488,11 @@ export default {
 		discardChanges: 'Discard changes',
 		unsavedChanges: 'Discard unsaved changes',
 		unsavedChangesWarning: 'Are you sure you want to navigate away from this page? You have unsaved changes',
-		confirmListViewPublish: 'Publishing will make the selected items visible on the site.',
-		confirmListViewUnpublish: 'Unpublishing will remove the selected items and all their descendants from the site.',
-		confirmPublish: 'Publishing will make this page and all its published descendants visible on the site.',
-		confirmUnpublish: 'Unpublishing will remove this page and all its descendants from the site.',
+		confirmListViewPublish: 'Publishing will make the selected items publicly available.',
+		confirmListViewUnpublish:
+			'Unpublishing will make the selected items and all their descendants publicly unavailable.',
+		confirmPublish: 'Publishing will make this content and all its published descendants publicly available.',
+		confirmUnpublish: 'Unpublishing will make this content publicly unavailable.',
 		doctypeChangeWarning: 'You have unsaved changes. Making changes to the Document Type will discard the changes.',
 	},
 	bulk: {
@@ -911,7 +925,7 @@ export default {
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
-		scheduledPublishing: 'Scheduled Publishing',
+		scheduledPublishing: 'Schedule publish',
 		umbracoInfo: 'Umbraco info',
 		search: 'Search',
 		searchNoResult: 'Sorry, we can not find what you are looking for.',
@@ -1119,6 +1133,12 @@ export default {
 	lockout: {
 		lockoutWillOccur: "You've been idle and logout will automatically occur in",
 		renewSession: 'Renew now to save your work',
+	},
+	timeout: {
+		warningHeadline: 'Session timeout',
+		warningText: 'Your session is about to expire and you will be logged out in <strong>{0} seconds</strong>.',
+		warningLogoutAction: 'Log out',
+		warningContinueAction: 'Stay logged in',
 	},
 	login: {
 		greeting0: 'Welcome',
@@ -2731,6 +2751,9 @@ export default {
 	routing: {
 		routeNotFoundTitle: 'Not found',
 		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
+		routeForbiddenTitle: 'Access denied',
+		routeForbiddenDescription:
+			'You do not have permission to access this resource. Please contact your administrator for assistance.',
 	},
 	codeEditor: {
 		label: 'Code editor',
@@ -2759,7 +2782,8 @@ export default {
 	tiptap: {
 		anchor: 'Anchor',
 		anchor_input: 'Enter an anchor ID',
-		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
+		config_dimensions_description:
+			'Sets the fixed width and height of the editor. This excludes the toolbar and statusbar heights.',
 		config_extensions: 'Capabilities',
 		config_statusbar: 'Statusbar',
 		config_toolbar: 'Toolbar',
@@ -2790,12 +2814,14 @@ export default {
 		charmap_extlatin: 'Extended Latin',
 		charmap_symbols: 'Symbols',
 		charmap_arrows: 'Arrows',
+		statusbar_characters: (count: number) => `${count.toLocaleString()} ${count === 1 ? 'character' : 'characters'}`,
+		statusbar_words: (count: number) => `${count.toLocaleString()} ${count === 1 ? 'word' : 'words'}`,
 	},
 	linkPicker: {
 		modalSource: 'Source',
 		modalManual: 'Manual',
 		modalAnchorValidationMessage:
-			'Please enter an anchor or querystring, or select a published document or media item, or manually configure the URL.',
+			'Please enter an anchor or querystring, select a document or media item, or manually configure the URL.',
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',

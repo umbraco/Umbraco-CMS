@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Security;
 /// <summary>
 ///     Changes the password for an identity user
 /// </summary>
-internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : UmbracoIdentityUser
+internal sealed class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : UmbracoIdentityUser
 {
     private readonly ILogger<PasswordChanger<TUser>> _logger;
 

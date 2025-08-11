@@ -11,16 +11,16 @@ type PickableFilterMethodType<T extends UmbEntityModel = UmbEntityModel> = (item
 @customElement('umb-picker-search-result')
 export class UmbPickerSearchResultElement extends UmbLitElement {
 	@state()
-	_query?: UmbSearchRequestArgs;
+	private _query?: UmbSearchRequestArgs;
 
 	@state()
-	_searching: boolean = false;
+	private _searching: boolean = false;
 
 	@state()
-	_items: UmbEntityModel[] = [];
+	private _items: UmbEntityModel[] = [];
 
 	@state()
-	_isSearchable: boolean = false;
+	private _isSearchable: boolean = false;
 
 	@property({ attribute: false })
 	pickableFilter: PickableFilterMethodType = () => true;
@@ -68,14 +68,13 @@ export class UmbPickerSearchResultElement extends UmbLitElement {
 	}
 
 	#renderResultItem(item: UmbEntityModel) {
-		console.log('pickableFilter', this.pickableFilter(item));
 		return html`
 			<umb-extension-with-api-slot
 				type="pickerSearchResultItem"
 				.filter=${(manifest: ManifestPickerSearchResultItem) => manifest.forEntityTypes.includes(item.entityType)}
 				.elementProps=${{
 					item,
-					disabled: !this.pickableFilter(item),
+					disabled: this.pickableFilter ? !this.pickableFilter(item) : undefined,
 				}}></umb-extension-with-api-slot>
 		`;
 	}

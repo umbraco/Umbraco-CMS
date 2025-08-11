@@ -29,6 +29,9 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
+// TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the `umb-input-block-type` element.
+import '@umbraco-cms/backoffice/block-type';
+
 interface MappedGroupWithBlockTypes extends UmbBlockGridTypeGroupType {
 	blocks: Array<UmbBlockTypeWithGroupKey>;
 }
@@ -76,7 +79,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	}
 
 	@state()
-	public _alias?: string;
+	private _alias?: string;
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;

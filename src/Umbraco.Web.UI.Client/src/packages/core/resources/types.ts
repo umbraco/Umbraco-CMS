@@ -1,5 +1,8 @@
-import type { UmbApiError, UmbCancelError, UmbError } from './umb-error.js';
+import type { UmbApiError, UmbCancelError } from './umb-error.js';
+export type * from './data-api/types.js';
 
+// TODO: Rename this to `UmbXhrRequestOptions` in a future version.
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface XhrRequestOptions extends UmbTryExecuteOptions {
 	baseUrl?: string;
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
@@ -37,7 +40,7 @@ export interface UmbTryExecuteOptions {
 }
 
 export type UmbApiWithErrorResponse = {
-	error?: UmbError | UmbApiError | UmbCancelError | Error;
+	error?: UmbApiError | UmbCancelError;
 };
 
 /**

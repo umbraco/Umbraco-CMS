@@ -1,18 +1,26 @@
 import type { UmbTiptapStatusbarValue } from '../types.js';
-import { css, customElement, html, map, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
+/**
+ * Provides a status bar for the {@link UmbInputTiptapElement}
+ * @element umb-tiptap-statusbar
+ * @cssprop --umb-tiptap-edge-border-color - Defines the edge border color
+ */
 @customElement('umb-tiptap-statusbar')
 export class UmbTiptapStatusbarElement extends UmbLitElement {
 	#attached = false;
+
+	#debouncer = debounce(() => this.requestUpdate(), 100);
+
 	#extensionsController?: UmbExtensionsElementInitializer;
 
-	@state()
-	private _lookup?: Map<string, unknown>;
+	#lookup: Map<string, unknown> = new Map();
 
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
@@ -61,12 +69,13 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 			'tiptapStatusbarExtension',
 			(manifest) => this.statusbar.flat().includes(manifest.alias),
 			(extensionControllers) => {
-				this._lookup = new Map(
-					extensionControllers.map((ext) => {
+				extensionControllers.forEach((ext) => {
+					if (!this.#lookup.has(ext.alias)) {
 						(ext.component as HTMLElement)?.setAttribute('data-mark', `action:tiptap-statusbar:${ext.alias}`);
-						return [ext.alias, ext.component];
-					}),
-				);
+						this.#lookup.set(ext.alias, ext.component);
+						this.#debouncer();
+					}
+				});
 			},
 		);
 
@@ -75,10 +84,15 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 
 	override render() {
 		if (!this.statusbar.flat().length) return nothing;
-		return map(
-			this.statusbar,
-			(area) => html`<div class="area">${map(area, (alias) => this._lookup?.get(alias) ?? nothing)}</div>`,
-		);
+		return this.#renderAreas(this.statusbar);
+	}
+
+	#renderAreas(statusbar: UmbTiptapStatusbarValue) {
+		return repeat(statusbar, (area) => html`<div class="area">${this.#renderActions(area)}</div>`);
+	}
+
+	#renderActions(aliases: Array<string>) {
+		return repeat(aliases, (alias) => this.#lookup?.get(alias) ?? nothing);
 	}
 
 	static override readonly styles = css`
@@ -95,10 +109,11 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 			justify-content: space-between;
 
 			border-radius: var(--uui-border-radius);
-			border: 1px solid var(--uui-color-border);
+			border: 1px solid var(--umb-tiptap-edge-border-color, var(--uui-color-border));
 			border-top-left-radius: 0;
 			border-top-right-radius: 0;
 			border-top: 0;
+			box-sizing: border-box;
 
 			min-height: var(--uui-size-layout-1);
 			max-height: var(--uui-size-layout-2);

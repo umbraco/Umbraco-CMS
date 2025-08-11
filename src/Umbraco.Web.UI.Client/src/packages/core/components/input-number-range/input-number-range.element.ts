@@ -28,7 +28,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	@property({ type: Number })
 	public set minValue(value: number | undefined) {
 		this._minValue = value;
-		this.updateValue();
+		this.#updateValue();
 	}
 	public get minValue() {
 		return this._minValue;
@@ -40,16 +40,30 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	@property({ type: Number })
 	public set maxValue(value: number | undefined) {
 		this._maxValue = value;
-		this.updateValue();
+		this.#updateValue();
 	}
 	public get maxValue() {
 		return this._maxValue;
 	}
 
 	@property({ type: Object })
-	validationRange?: UmbNumberRangeValueType;
+	public set validationRange(value: UmbNumberRangeValueType | undefined) {
+		this.#validationRange = value;
+		this._minPlaceholder = value?.min !== undefined ? String(value?.min) : '';
+		this._maxPlaceholder = value?.max !== undefined && value.max !== Infinity ? String(value.max) : '∞';
+	}
+	public get validationRange(): UmbNumberRangeValueType | undefined {
+		return this.#validationRange;
+	}
+	#validationRange?: UmbNumberRangeValueType | undefined;
 
-	private updateValue() {
+	@state()
+	private _minPlaceholder: string = '';
+
+	@state()
+	private _maxPlaceholder: string = '';
+
+	#updateValue() {
 		const newValue =
 			this._minValue || this._maxValue ? (this._minValue ?? '') + ',' + (this._maxValue ?? '') : undefined;
 		if (super.value !== newValue) {
@@ -114,7 +128,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.minLabel}
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
-				placeholder=${this.validationRange?.min ?? ''}
+				placeholder=${this._minPlaceholder}
 				.value=${this._minValue}
 				@input=${this.#onMinInput}></uui-input>
 			<b>–</b>
@@ -123,13 +137,20 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.maxLabel}
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
-				placeholder=${this.validationRange?.max ?? '∞'}
+				placeholder=${this._maxPlaceholder}
 				.value=${this._maxValue}
 				@input=${this.#onMaxInput}></uui-input>
 		`;
 	}
 
 	static override styles = css`
+		:host {
+			display: flex;
+			align-items: center;
+		}
+		b {
+			margin: 0 var(--uui-size-space-1);
+		}
 		:host(:invalid:not([pristine])) {
 			color: var(--uui-color-invalid);
 		}

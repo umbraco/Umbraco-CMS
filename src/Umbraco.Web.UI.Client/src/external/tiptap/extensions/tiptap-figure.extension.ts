@@ -35,7 +35,7 @@ export const Figure = Node.create<FigureOptions>({
 	parseHTML() {
 		return [
 			{
-				tag: 'figure',
+				tag: this.name,
 				getAttrs: (dom) => {
 					const figcaption = dom.querySelector('figcaption');
 					return {

@@ -7,7 +7,7 @@ test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.userGroup.clickUserGroupsButton();
 });
 
-test('the default configuration of Administrators is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration of Administrators is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Administrators';
   const sections = [
@@ -35,6 +35,8 @@ test('the default configuration of Administrators is correct', async ({umbracoAp
     "Umb.Document.Read",
     "Umb.Document.CreateBlueprint",
     "Umb.Document.Notifications",
+    "Umb.Document.PropertyValue.Read",
+    "Umb.Document.PropertyValue.Write"
   ];
   const granularPermissions = [];
   const hasAccessToAllLanguages = true;
@@ -65,7 +67,7 @@ test('the default configuration of Administrators is correct', async ({umbracoAp
   expect(userGroupData.permissions).toEqual(granularPermissions);
 });
 
-test('the default configuration of Editors is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration of Editors is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Editors';
   const sections = [
@@ -86,6 +88,8 @@ test('the default configuration of Editors is correct', async ({umbracoApi, umbr
     "Umb.Document.Read",
     "Umb.Document.CreateBlueprint",
     "Umb.Document.Notifications",
+    "Umb.Document.PropertyValue.Read",
+    "Umb.Document.PropertyValue.Write"
   ];
   const granularPermissions = [];
   const hasAccessToAllLanguages = true;
@@ -116,7 +120,7 @@ test('the default configuration of Editors is correct', async ({umbracoApi, umbr
   expect(userGroupData.permissions).toEqual(granularPermissions);
 });
 
-test('the default configuration of Sensitive data is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration of Sensitive data is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Sensitive data';
   const sections = [];
@@ -150,13 +154,15 @@ test('the default configuration of Sensitive data is correct', async ({umbracoAp
   expect(userGroupData.permissions).toEqual(granularPermissions);
 });
 
-test('the default configuration of Translators data is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration of Translators data is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Translators';
   const sections = ["Umb.Section.Translation"];
   const fallbackPermissions = [
     "Umb.Document.Update",
-    "Umb.Document.Read"
+    "Umb.Document.Read",
+    "Umb.Document.PropertyValue.Read",
+    "Umb.Document.PropertyValue.Write"
   ];
   const granularPermissions = [];
   const hasAccessToAllLanguages = true;
@@ -185,7 +191,7 @@ test('the default configuration of Translators data is correct', async ({umbraco
   expect(userGroupData.permissions).toEqual(granularPermissions);
 });
 
-test('the default configuration of Writers data is correct', async ({umbracoApi, umbracoUi}) => {
+test('the default configuration of Writers data is correct', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroupName = 'Writers';
   const sections = ["Umb.Section.Content"];
@@ -193,7 +199,9 @@ test('the default configuration of Writers data is correct', async ({umbracoApi,
     "Umb.Document.Create",
     "Umb.Document.Update",
     "Umb.Document.Read",
-    "Umb.Document.Notifications"
+    "Umb.Document.Notifications",
+    "Umb.Document.PropertyValue.Read",
+    "Umb.Document.PropertyValue.Write"
   ];
   const granularPermissions = [];
   const hasAccessToAllLanguages = true;

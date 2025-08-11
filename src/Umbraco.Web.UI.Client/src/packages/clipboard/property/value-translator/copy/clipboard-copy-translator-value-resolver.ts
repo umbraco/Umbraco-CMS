@@ -24,7 +24,14 @@ export class UmbClipboardCopyPropertyValueTranslatorValueResolver extends UmbCon
 		}
 
 		// Create translators
-		const apiPromises = manifests.map((manifest) => createExtensionApi(this, manifest));
+		const apiPromises = manifests.map((manifest) =>
+			createExtensionApi(this, manifest).then((api) => {
+				if (api) {
+					(api as any).manifest = manifest;
+				}
+				return api;
+			}),
+		);
 		const apis = await Promise.all(apiPromises);
 
 		// Translate values

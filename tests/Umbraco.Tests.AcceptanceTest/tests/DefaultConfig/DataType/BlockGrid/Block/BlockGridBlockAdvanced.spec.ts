@@ -42,7 +42,7 @@ test.skip('can remove a custom view from a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.goToBlockAdvancedTab();
 });
 
-// TODO: Remove skip and update test when the front-end is ready. Currently stylesheets are saved as arrays
+// TODO: Remove skip and update test when the front-end is ready. Currently it is not possible to add a custom stylesheet to a block
 test.skip('can remove a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css'
@@ -76,12 +76,11 @@ test('can update overlay size in a block', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainOverlaySize(blockGridEditorName, contentElementTypeId, overlaySize)).toBeTruthy();
 });
 
-test('can enable inline editing mode in a block', async ({umbracoApi, umbracoUi}) => {
+test('can enable inline editing mode in a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -96,8 +95,7 @@ test('can enable inline editing mode in a block', async ({umbracoApi, umbracoUi}
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainInlineEditing(blockGridEditorName, contentElementTypeId, true)).toBeTruthy();
 });
 
@@ -117,12 +115,11 @@ test('can disable inline editing mode in a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainInlineEditing(blockGridEditorName, contentElementTypeId, false)).toBeTruthy();
 });
 
-test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
+test('can enable hide content editor in a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -137,8 +134,7 @@ test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainHideContentEditor(blockGridEditorName, contentElementTypeId, true)).toBeTruthy();
 });
 
@@ -158,8 +154,7 @@ test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainHideContentEditor(blockGridEditorName, contentElementTypeId, false)).toBeTruthy();
 });
 
@@ -179,8 +174,7 @@ test('can add a background color to a block', {tag: '@smoke'}, async ({umbracoAp
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainBackgroundColor(blockGridEditorName, contentElementTypeId, backGroundColor)).toBeTruthy();
 });
 
@@ -201,8 +195,7 @@ test('can remove a background color to a block', async ({umbracoApi, umbracoUi})
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainBackgroundColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
 
@@ -222,8 +215,7 @@ test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umb
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, iconColor)).toBeTruthy();
 });
 
@@ -244,33 +236,31 @@ test('can remove a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainIconColor(blockGridEditorName, contentElementTypeId, '')).toBeTruthy();
 });
- 
-// TODO: Remove skip when the code is updated due to UI changes
-test.skip('can add a thumbnail to a block', async ({umbracoApi, umbracoUi}) => {
+
+test('can add a thumbnail to a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaName = 'TestMedia';
   await umbracoApi.media.ensureNameNotExists(mediaName);
-  await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlock(blockGridEditorName, contentElementTypeId);
-  const mediaUrl = await umbracoApi.media.getMediaPathByName(mediaName);
+  const mediaUrl = await umbracoApi.media.getMediaUrl(mediaId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
   await umbracoUi.dataType.goToBlockAdvancedTab();
-  await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl.fileName, mediaUrl.mediaPath);
+  await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.isSuccessNotificationVisible();
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
+  await umbracoUi.dataType.doesBlockHaveThumbnailImage(mediaUrl);
 });
 
 // TODO: Remove skip when the code is updated. Currently it is missing the assertion steps

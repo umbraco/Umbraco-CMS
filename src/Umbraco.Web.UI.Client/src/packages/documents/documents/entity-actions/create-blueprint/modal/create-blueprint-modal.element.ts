@@ -38,21 +38,21 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 		this.modalContext?.submit();
 	}
 
-	#renderBlueprintName() {
-		return html`<strong>Create a new Content Template from ${this._documentName}</strong>
-			A Content Template is predefined content that an editor can select to use as the basis for creating new content .
-			<uui-label for="name">Name</uui-label>
-			<uui-input
-				id="name"
-				label="name"
-				.value=${this._blueprintName}
-				@input=${(e: UUIInputEvent) => (this._blueprintName = e.target.value as string)}></uui-input>`;
-	}
-
 	override render() {
 		return html`
-			<umb-body-layout headline="Create Content Template">
-				${this.#renderBlueprintName()}
+			<umb-body-layout headline=${this.localize.term('actions_createblueprint')}>
+				<uui-box id="tree-box" headline=${this.localize.term('blueprints_createBlueprintFrom', this._documentName)}>
+					<umb-localize key="blueprints_blueprintDescription"></umb-localize>
+					<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical">
+						<div slot="editor">
+							<uui-input
+								id="name"
+								label="name"
+								.value=${this._blueprintName}
+								@input=${(e: UUIInputEvent) => (this._blueprintName = e.target.value as string)}></uui-input>
+						</div>
+					</umb-property-layout>
+				</uui-box>
 				<uui-button
 					slot="actions"
 					id="close"
@@ -79,7 +79,7 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 			strong,
 			uui-label,
 			uui-input {
-				display: block;
+				width: 100%;
 			}
 
 			uui-label {

@@ -12,7 +12,7 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	//
 	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well. [NL]
-	private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
+	private _splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
 
 	#appLanguage?: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
@@ -20,9 +20,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	#workspaceRoute?: string;
 	#appCulture?: string;
 	#variants?: Array<UmbDocumentVariantOptionModel>;
+	#isForbidden = false;
 
 	@state()
-	_routes?: Array<UmbRoute>;
+	private _routes?: Array<UmbRoute>;
 
 	constructor() {
 		super();
@@ -45,6 +46,15 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				},
 				'_observeVariants',
 			);
+
+			this.observe(
+				this.#workspaceContext?.forbidden.isOn,
+				(isForbidden) => {
+					this.#isForbidden = isForbidden ?? false;
+					this.#generateRoutes();
+				},
+				'_observeForbidden',
+			);
 		});
 	}
 
@@ -56,7 +66,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#generateRoutes() {
-		if (!this.#variants || !this.#appCulture) return;
+		if (!this.#variants || !this.#appCulture) {
+			this._routes = [];
+			return;
+		}
 
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
@@ -67,7 +80,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
-					component: this.splitViewElement,
+					component: this._splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
 						const variantSplit = info.match.fragments.consumed.split('_&_');
@@ -84,7 +97,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 				path: variant.unique,
-				component: this.splitViewElement,
+				component: this._splitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);
@@ -97,11 +110,16 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
-				resolve: () => {
+				pathMatch: 'full',
+				resolve: async () => {
+					if (!this.#workspaceContext) {
+						throw new Error('Workspace context is not available when resolving the default route.');
+					}
+
 					const route = routes.find((route) => route.path === this.#appCulture);
 
 					if (!route) {
-						const firstVariantPath = routes.find((route) => route.path === this.#variants?.[0].unique)?.path;
+						const firstVariantPath = routes.find((route) => route.path === this.#variants?.[0]?.unique)?.path;
 
 						if (firstVariantPath) {
 							history.replaceState({}, '', `${this.#workspaceRoute}/${firstVariantPath}`);
@@ -121,8 +139,11 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		}
 
 		routes.push({
-			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			path: '**',
+			component: async () => {
+				const router = await import('@umbraco-cms/backoffice/router');
+				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+			},
 		});
 
 		this._routes = routes;

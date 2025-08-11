@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Numeric';
@@ -27,8 +27,7 @@ test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'min', minimumValue)).toBeTruthy();
 });
 
@@ -43,8 +42,7 @@ test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'max', maximumValue)).toBeTruthy();
 });
 
@@ -59,8 +57,7 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
 });
 
@@ -75,12 +72,12 @@ test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  //await umbracoUi.dataType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.dataType.isErrorNotificationVisible(false);
+  await umbracoUi.dataType.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'allowDecimals', true)).toBeTruthy();
 });
 
 // TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17509
 test.skip('cannot update the minimum greater than the maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = 5;
@@ -94,6 +91,7 @@ test.skip('cannot update the minimum greater than the maximum', async ({umbracoA
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
+  await umbracoUi.dataType.isFailedStateButtonVisible();
   await umbracoUi.dataType.isErrorNotificationVisible();
 });
 

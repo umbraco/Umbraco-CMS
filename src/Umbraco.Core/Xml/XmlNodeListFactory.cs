@@ -13,7 +13,7 @@ public class XmlNodeListFactory
 
     #region XmlNodeListIterator
 
-    private class XmlNodeListIterator : XmlNodeList
+    private sealed class XmlNodeListIterator : XmlNodeList
     {
         private readonly XPathNodeIterator? _iterator;
         private readonly IList<XmlNode> _nodes = new List<XmlNode>();
@@ -108,7 +108,7 @@ public class XmlNodeListFactory
 
         #region XmlNodeListEnumerator
 
-        private class XmlNodeListEnumerator : IEnumerator
+        private sealed class XmlNodeListEnumerator : IEnumerator
         {
             private readonly XmlNodeListIterator _iterator;
             private int _position = -1;

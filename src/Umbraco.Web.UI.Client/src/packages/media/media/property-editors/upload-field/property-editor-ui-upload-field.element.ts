@@ -1,5 +1,5 @@
 import type { UmbInputUploadFieldElement } from '../../components/input-upload-field/input-upload-field.element.js';
-import type { MediaValueType } from './types.js';
+import type { UmbMediaValueType } from './types.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorUiElement,
@@ -14,7 +14,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 @customElement('umb-property-editor-ui-upload-field')
 export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
-	value: MediaValueType = {};
+	value: UmbMediaValueType = {};
 
 	@state()
 	private _fileExtensions?: Array<string>;
@@ -22,6 +22,11 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		this._fileExtensions = config.getValueByAlias<Array<string>>('fileExtensions');
+		if (this._fileExtensions?.length) {
+			this._fileExtensions = this._fileExtensions.map((ext) =>
+				ext.startsWith('.') ? ext : ext.includes('/') ? ext : `.${ext}`,
+			);
+		}
 	}
 
 	#onChange(event: CustomEvent) {

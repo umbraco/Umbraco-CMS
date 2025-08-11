@@ -188,10 +188,20 @@ export class UmbTemporaryFileManager<
 			return TemporaryFileStatus.CANCELLED;
 		}
 
-		if (error instanceof UmbApiError && error.status === 413) {
-			// Special handling for when the request body is too large
-			const maxFileSizeGuestimate = parseInt(/(\d+) bytes/.exec(error.problemDetails.title)?.[1] ?? '0', 10);
-			this.#notifyOnFileSizeLimitExceeded(maxFileSizeGuestimate, item);
+		if (UmbApiError.isUmbApiError(error)) {
+			// Handle the error based on the status code
+			if (error.status === 413) {
+				// Special handling for when the request body is too large
+				const maxFileSizeGuestimate = parseInt(/(\d+) bytes/.exec(error.problemDetails.title)?.[1] ?? '0', 10);
+				this.#notifyOnFileSizeLimitExceeded(maxFileSizeGuestimate, item);
+			} else {
+				this.#notificationContext?.peek('danger', {
+					data: {
+						headline: this.#localization.term('errors_receivedErrorFromServer'),
+						message: error.problemDetails.title,
+					},
+				});
+			}
 		} else {
 			this.#notificationContext?.peek('danger', {
 				data: {

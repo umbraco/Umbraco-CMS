@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Umbraco.Cms.Web.Common.Hosting;
 
-internal class UmbracoHostBuilderDecorator : IHostBuilder
+internal sealed class UmbracoHostBuilderDecorator : IHostBuilder
 {
     private readonly IHostBuilder _inner;
     private readonly Action<IHost>? _onBuild;

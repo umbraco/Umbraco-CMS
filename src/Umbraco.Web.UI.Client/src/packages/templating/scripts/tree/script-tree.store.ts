@@ -6,6 +6,7 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
  * @class UmbScriptTreeStore
  * @augments {UmbUniqueTreeStore}
  * @description - Tree Data Store for Scripts
+ * @deprecated - Use `UmbScriptTreeRepository` instead. This will be removed in Umbraco 18.
  */
 export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 	/**

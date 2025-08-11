@@ -23,7 +23,7 @@ export class UmbDocumentTableColumnNameElement extends UmbLitElement implements 
 	}
 
 	@state()
-	_name = '';
+	private _name = '';
 
 	#item = new UmbDocumentItemDataResolver(this);
 
@@ -34,7 +34,9 @@ export class UmbDocumentTableColumnNameElement extends UmbLitElement implements 
 
 	override render() {
 		if (!this.value) return nothing;
-		return html` <uui-button compact href=${this.value.editPath} label=${this._name}></uui-button> `;
+		if (!this.value.editPath) return nothing;
+		if (!this._name) return nothing;
+		return html`<uui-button compact href=${this.value.editPath} label=${this._name}></uui-button>`;
 	}
 
 	static override styles = [

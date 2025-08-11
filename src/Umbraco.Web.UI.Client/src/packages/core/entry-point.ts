@@ -15,6 +15,9 @@ import './entity-item/global-components.js';
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'store', [host]);
+	/**
+	 * TODO: Remove this in Umbraco 18, use the repository instead
+	 */
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'treeStore', [host]);
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'itemStore', [host]);
 

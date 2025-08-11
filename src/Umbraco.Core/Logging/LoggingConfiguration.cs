@@ -58,8 +58,7 @@ public class LoggingConfiguration : ILoggingConfiguration
     public string LogFileNameFormat { get; }
 
     /// <inheritdoc/>
-    public string[] GetLogFileNameFormatArguments() => _logFileNameFormatArguments.Split(',', StringSplitOptions.RemoveEmptyEntries)
-        .Select(x => x.Trim())
+    public string[] GetLogFileNameFormatArguments() => _logFileNameFormatArguments.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
         .Select(GetValue)
         .ToArray();
 

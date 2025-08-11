@@ -16,7 +16,7 @@ import type {
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
+import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 
@@ -61,48 +61,51 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#context = new UmbBlockListEntryContext(this);
 
 	@state()
-	_contentTypeAlias?: string;
+	private _contentTypeAlias?: string;
 
 	@state()
-	_contentTypeName?: string;
+	private _contentTypeName?: string;
 
 	@state()
-	_showContentEdit = false;
+	private _showContentEdit = false;
 
 	@state()
-	_hasSettings = false;
+	private _hasSettings = false;
 
 	@state()
-	_label = '';
+	private _label = '';
 
 	@state()
-	_icon?: string;
+	private _icon?: string;
 
 	@state()
-	_exposed?: boolean;
+	private _exposed?: boolean;
 
 	@state()
-	_unsupported?: boolean;
+	private _unsupported?: boolean;
 
 	@state()
-	_workspaceEditContentPath?: string;
+	private _showActions?: boolean;
 
 	@state()
-	_workspaceEditSettingsPath?: string;
+	private _workspaceEditContentPath?: string;
 
 	@state()
-	_inlineEditingMode?: boolean;
+	private _workspaceEditSettingsPath?: string;
+
+	@state()
+	private _inlineEditingMode?: boolean;
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
-	_contentInvalid?: boolean;
+	private _contentInvalid?: boolean;
 
 	// 'settings-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
-	_settingsInvalid?: boolean;
+	private _settingsInvalid?: boolean;
 
 	@state()
-	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel> = {
+	private _blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel> = {
 		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
@@ -175,6 +178,13 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				this.#updateBlockViewProps({ unsupported: unsupported });
 				this._unsupported = unsupported;
 				this.toggleAttribute('unsupported', unsupported);
+			},
+			null,
+		);
+		this.observe(
+			this.#context.actionsVisibility,
+			(showActions) => {
+				this._showActions = showActions;
 			},
 			null,
 		);
@@ -346,6 +356,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		ext.component?.setAttribute('part', 'component');
 		if (this._exposed) {
 			return ext.component;
 		} else {
@@ -411,15 +422,21 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							single
 							>${this.#renderBuiltinBlockView()}</umb-extension-slot
 						>
-						<uui-action-bar>
-							${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()}
-							${this.#renderCopyToClipboardAction()} ${this.#renderDeleteAction()}
-						</uui-action-bar>
+						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 							: nothing}
 					</div>
 				`
+			: nothing;
+	}
+
+	#renderActionBar() {
+		return this._showActions
+			? html`<uui-action-bar>
+					${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+					${this.#renderDeleteAction()}
+				</uui-action-bar>`
 			: nothing;
 	}
 
@@ -480,6 +497,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	static override styles = [
+		UUIBlinkKeyframes,
 		css`
 			:host {
 				position: relative;
@@ -509,6 +527,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
 				border-color: var(--uui-color-invalid);
+			}
+
+			umb-extension-slot::part(component) {
+				position: relative;
+				z-index: 0;
 			}
 
 			uui-action-bar {

@@ -10,24 +10,45 @@ import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/r
 export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 	//
 	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well. [NL]
-	private splitViewElement = new UmbDocumentBlueprintWorkspaceSplitViewElement();
+	private _splitViewElement = new UmbDocumentBlueprintWorkspaceSplitViewElement();
 
 	#workspaceContext?: typeof UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT.TYPE;
+	#variants?: Array<UmbDocumentBlueprintVariantOptionModel>;
+	#isForbidden = false;
 
 	@state()
-	_routes?: Array<UmbRoute>;
+	private _routes?: Array<UmbRoute>;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeVariants();
+			this.#observeForbidden();
 		});
 	}
 
 	#observeVariants() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.variantOptions, (options) => this._generateRoutes(options), '_observeVariants');
+		this.observe(
+			this.#workspaceContext.variantOptions,
+			(variants) => {
+				this.#variants = variants;
+				this._generateRoutes();
+			},
+			'_observeVariants',
+		);
+	}
+
+	#observeForbidden() {
+		this.observe(
+			this.#workspaceContext?.forbidden.isOn,
+			(isForbidden) => {
+				this.#isForbidden = isForbidden ?? false;
+				this._generateRoutes();
+			},
+			'_observeForbidden',
+		);
 	}
 
 	private _handleVariantFolderPart(index: number, folderPart: string) {
@@ -37,19 +58,17 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
 	}
 
-	private async _generateRoutes(variants: Array<UmbDocumentBlueprintVariantOptionModel>) {
-		if (!variants || variants.length === 0) return;
-
+	private async _generateRoutes() {
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
 		// Split view routes:
-		variants.forEach((variantA) => {
-			variants.forEach((variantB) => {
+		this.#variants?.forEach((variantA) => {
+			this.#variants?.forEach((variantB) => {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
-					component: this.splitViewElement,
+					component: this._splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
 						const variantSplit = info.match.fragments.consumed.split('_&_');
@@ -62,11 +81,11 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		// Single view:
-		variants.forEach((variant) => {
+		this.#variants?.forEach((variant) => {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 				path: variant.unique,
-				component: this.splitViewElement,
+				component: this._splitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);
@@ -75,17 +94,21 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 			});
 		});
 
-		if (routes.length !== 0) {
+		if (routes.length !== 0 && this.#variants?.length) {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
-				redirectTo: routes[variants.length * variants.length]?.path,
+				pathMatch: 'full',
+				redirectTo: routes[this.#variants.length * this.#variants.length]?.path,
 			});
 		}
 
 		routes.push({
 			path: `**`,
-			component: async () => (await import('@umbraco-cms/backoffice/router')).UmbRouteNotFoundElement,
+			component: async () => {
+				const router = await import('@umbraco-cms/backoffice/router');
+				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+			},
 		});
 
 		this._routes = routes;
@@ -108,6 +131,11 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 				display: block;
 				width: 100%;
 				height: 100%;
+
+				--uui-color-invalid: var(--uui-color-warning);
+				--uui-color-invalid-emphasis: var(--uui-color-warning-emphasis);
+				--uui-color-invalid-standalone: var(--uui-color-warning-standalone);
+				--uui-color-invalid-contrast: var(--uui-color-warning-contrast);
 			}
 		`,
 	];

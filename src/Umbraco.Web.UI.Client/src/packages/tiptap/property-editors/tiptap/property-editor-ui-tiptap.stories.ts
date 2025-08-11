@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUiTiptapElement } from './property-editor-ui-tiptap.element.js';
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 import './property-editor-ui-tiptap.element.js';
@@ -45,7 +45,7 @@ const config = new UmbPropertyEditorConfigCollection([
 ]);
 
 const meta: Meta<UmbPropertyEditorUiTiptapElement> = {
-	title: 'Property Editor UIs/Tiptap',
+	title: 'Extension Type/Property Editor UI/Tiptap',
 	component: 'umb-property-editor-ui-tiptap',
 	id: 'umb-property-editor-ui-tiptap',
 	args: {

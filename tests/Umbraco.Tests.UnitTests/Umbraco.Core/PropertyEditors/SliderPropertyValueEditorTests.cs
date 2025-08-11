@@ -270,7 +270,7 @@ public class SliderPropertyValueEditorTests
             .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => $"{key}_{alias}");
         return new SliderPropertyEditor.SliderPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
-            new SystemTextJsonSerializer(),
+            new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"),
             localizedTextServiceMock.Object)

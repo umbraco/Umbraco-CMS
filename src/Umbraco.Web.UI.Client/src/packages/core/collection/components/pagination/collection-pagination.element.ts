@@ -7,10 +7,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-collection-pagination')
 export class UmbCollectionPaginationElement extends UmbLitElement {
 	@state()
-	_totalPages = 1;
+	private _totalPages = 1;
 
 	@state()
-	_currentPage = 1;
+	private _currentPage = 1;
 
 	private _collectionContext?: UmbDefaultCollectionContext<any, any>;
 
@@ -56,9 +56,9 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 			.current=${this._currentPage}
 			.total=${this._totalPages}
 			firstlabel=${this.localize.term('general_first')}
-            previouslabel=${this.localize.term('general_previous')}
-            nextlabel=${this.localize.term('general_next')}
-            lastlabel=${this.localize.term('general_last')}
+			previouslabel=${this.localize.term('general_previous')}
+			nextlabel=${this.localize.term('general_next')}
+			lastlabel=${this.localize.term('general_last')}
 			@change=${this.#onChange}></uui-pagination>`;
 	}
 

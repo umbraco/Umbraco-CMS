@@ -25,6 +25,7 @@ export interface UmbCollectionConfiguration {
 	orderBy?: string;
 	orderDirection?: string;
 	pageSize?: number;
+	noItemsLabel?: string;
 	userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 }
 

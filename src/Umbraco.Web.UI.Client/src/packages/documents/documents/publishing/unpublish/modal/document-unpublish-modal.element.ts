@@ -37,22 +37,22 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	protected readonly _selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
-	_options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
-	_selection: Array<string> = [];
+	private _selection: Array<string> = [];
 
 	@state()
-	_canUnpublish = true;
+	private _canUnpublish = true;
 
 	@state()
-	_hasInvalidSelection = true;
+	private _hasInvalidSelection = true;
 
 	@state()
-	_isInvariant = false;
+	private _isInvariant = false;
 
 	@state()
-	_referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant) {
@@ -150,14 +150,12 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`<uui-dialog-layout headline=${this.localize.term('content_unpublish')}>
+			<p>
+				<umb-localize key="prompt_confirmUnpublish"></umb-localize>
+			</p>
 			${when(
 				!this._isInvariant,
 				() => html`
-					<p id="subtitle">
-						<umb-localize key="content_languagesToUnpublish">
-							Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.
-						</umb-localize>
-					</p>
 					<umb-document-variant-language-picker
 						.selectionManager=${this._selectionManager}
 						.variantLanguageOptions=${this._options}
@@ -165,13 +163,6 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 						.pickableFilter=${this.#pickableFilter}></umb-document-variant-language-picker>
 				`,
 			)}
-
-			<p>
-				<umb-localize key="prompt_confirmUnpublish">
-					Unpublishing will remove this page and all its descendants from the site.
-				</umb-localize>
-			</p>
-
 			${this._referencesConfig
 				? html`<umb-confirm-action-modal-entity-references
 						.config=${this._referencesConfig}

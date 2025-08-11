@@ -56,7 +56,10 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		if (asObservable) {
 			await this.observe(asObservable(), (currentUser) => {
 				this.#currentUser?.setValue(currentUser);
-			}).asPromise();
+			})
+				.asPromise()
+				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
+				.catch(() => undefined);
 		}
 	}
 
@@ -193,9 +196,9 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	/**
 	 * Get the permissions for the current user
-	 * @returns {Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel> | undefined} The permissions for the current user
+	 * @returns {unknown[] | undefined} The permissions for the current user
 	 */
-	getPermissions() {
+	getPermissions(): unknown[] | undefined {
 		return this.#currentUser.getValue()?.permissions;
 	}
 
