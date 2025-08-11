@@ -105,13 +105,11 @@ export class UmbInputTimeZonePickerElement extends UUIFormControlMixin(UmbLitEle
 				<uui-combobox
 					id="input"
 					pristine
-					label="Value"
+					label="${this.localize.term('general_value')} ${this.value}"
 					@search="${this.#onSearch}"
 					?disabled=${this.disabled}
 					?readonly=${this.readonly}>
-					<uui-combobox-list>
-						${until(repeat(this._filteredOptions, this.#renderTimeZoneOption), html`Searching...`)}
-					</uui-combobox-list>
+					<uui-combobox-list> ${until(repeat(this._filteredOptions, this.#renderTimeZoneOption))} </uui-combobox-list>
 				</uui-combobox>
 			</umb-form-validation-message>
 

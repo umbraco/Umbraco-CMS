@@ -125,11 +125,11 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		return super.value;
 	}
 
-	private #timeZoneList: Array<TimeZone> = [];
+	private _timeZoneList: Array<TimeZone> = [];
 
 	constructor() {
 		super();
-		this.#timeZoneList = getTimeZoneList(undefined, DateTime.now());
+		this._timeZoneList = getTimeZoneList(undefined, DateTime.now());
 
 		this.addValidator(
 			'valueMissing',
@@ -224,7 +224,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		return html`
 			<umb-input-time-zone-picker
 				name="picker"
-				.options=${this.#timeZoneList.filter((tz) => !this.value.includes(tz.value))}
+				.options=${this._timeZoneList.filter((tz) => !this.value.includes(tz.value))}
 				?disabled=${this.disabled}
 				?readonly=${this.readonly}
 				@added=${this.#onAdd}>

@@ -88,12 +88,24 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 				.readonly=${this.readonly}
 				@input=${this.#onModeInput}
 				.value=${this.value?.mode ?? 'none'}>
-				<uui-radio name="order" label="Disabled" value="none"></uui-radio>
-				<uui-radio name="order" label="All - Display all available time zones" value="all"></uui-radio>
-				<uui-radio name="order" label="Local - Display only the local time zone" value="local"></uui-radio>
-				<uui-radio name="order" label="Custom - Display a pre-defined list of time zones" value="custom"></uui-radio>
+				<uui-radio
+					name="order"
+					label=${this.localize.term('timeZonePicker_config_timeZones_disabled')}
+					value="none"></uui-radio>
+				<uui-radio
+					name="order"
+					label=${this.localize.term('timeZonePicker_config_timeZones_all')}
+					value="all"></uui-radio>
+				<uui-radio
+					name="order"
+					label=${this.localize.term('timeZonePicker_config_timeZones_local')}
+					value="local"></uui-radio>
+				<uui-radio
+					name="order"
+					label=${this.localize.term('timeZonePicker_config_timeZones_custom')}
+					value="custom"></uui-radio>
 			</uui-radio-group>
-			<div class="timezone-picker-container" ?hidden=${this.value?.mode !== 'custom'}>
+			<div class="timezone-picker" ?hidden=${this.value?.mode !== 'custom'}>
 				<umb-input-time-zone
 					.value=${this._selectedTimeZones}
 					.readonly=${this.readonly}
@@ -112,18 +124,14 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 				gap: var(--uui-size-space-3);
 			}
 
-			.timezone-picker-container {
+			.timezone-picker {
 				display: flex;
 				flex-direction: row;
 				gap: var(--uui-size-space-6);
 			}
 
-			.timezone-picker-container[hidden] {
+			.timezone-picker[hidden] {
 				display: none;
-			}
-
-			#timezone-select {
-				width: fit-content;
 			}
 		`,
 	];

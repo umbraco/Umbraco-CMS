@@ -217,8 +217,6 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 			this._value = undefined;
 			this._currentDate = undefined;
 			this.dispatchEvent(new UmbChangeEvent());
-
-			console.warn(`[UmbDateWithTimeZonePicker] Date picker value is empty.`);
 			return;
 		}
 
@@ -245,7 +243,6 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		}
 
 		this.#updateValue(this._currentDate.toISO({ includeOffset: false }) || '');
-		console.log(`[UmbDateWithTimeZonePicker] TimeZone changed: ${timeZoneValue}`);
 	}
 
 	#updateValue(date: string, updateOffsets = false) {
@@ -319,7 +316,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		if (this._timeZoneOptions.length === 1) {
 			return html`<span>${this._timeZoneOptions[0].name}</span> ${this._timeZoneOptions[0].value ===
 				this._clientTimeZone?.value
-					? ' (Local)'
+					? ` (${this.localize.term('timeZonePicker_local')}})`
 					: nothing}`;
 		}
 
@@ -331,7 +328,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				value=${this._selectedTimeZone || ''}
 				?readonly=${this.readonly || this._timeZoneOptions.length === 1}>
 				<uui-combobox-list>
-					${until(repeat(this._filteredTimeZoneOptions, this.#renderTimeZoneOption), html`Searching...`)}
+					${until(repeat(this._filteredTimeZoneOptions, this.#renderTimeZoneOption))}
 				</uui-combobox-list>
 			</uui-combobox>
 		`;
@@ -352,9 +349,12 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 			return nothing;
 		}
 
-		return html` <span class="info">
-			The selected time (UTC${this._currentDate.toFormat('Z')}) is equivalent to
-			${this._currentDate.toLocal().toFormat('ff')} in your local time.</span
+		return html` <span class="info"
+			>${this.localize.term(
+				'timeZonePicker_differentTimeZoneLabel',
+				`UTC${this._currentDate.toFormat('Z')}`,
+				this._currentDate.toLocal().toFormat('ff'),
+			)}</span
 		>`;
 	}
 
