@@ -155,8 +155,6 @@ export class UmbDocumentWorkspaceContext
 						documentTypeUnique,
 						blueprintUnique,
 					);
-					// TODO: make sure to capture promise rejection here [NL]
-					// Also check what the router does when setup is rejected...
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
