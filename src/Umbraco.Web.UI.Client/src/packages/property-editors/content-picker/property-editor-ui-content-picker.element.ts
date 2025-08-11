@@ -29,15 +29,6 @@ export class UmbPropertyEditorUIContentPickerElement
 	extends UmbFormControlMixin<UmbContentPickerValueType | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
-	@property({ type: Array })
-	public override set value(value: UmbContentPickerValueType | undefined) {
-		this.#value = value;
-	}
-	public override get value(): UmbContentPickerValueType | undefined {
-		return this.#value;
-	}
-	#value?: UmbContentPickerValueType = [];
-
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -94,7 +85,7 @@ export class UmbPropertyEditorUIContentPickerElement
 			this.#dynamicRoot = startNode.dynamicRoot;
 
 			// NOTE: Filter out any items that do not match the entity type. [LK]
-			this._invalidData = this.#value?.filter((x) => x.type !== this._rootEntityType);
+			this._invalidData = this.value?.filter((x) => x.type !== this._rootEntityType);
 			if (this._invalidData?.length) {
 				this.readonly = true;
 			}
@@ -119,7 +110,8 @@ export class UmbPropertyEditorUIContentPickerElement
 		return !isNaN(num) && num > 0 ? num : fallback;
 	}
 
-	override firstUpdated() {
+	override firstUpdated(_changedProperties: Map<string | number | symbol, unknown>) {
+		super.firstUpdated(_changedProperties);
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-content')!);
 		this.#setPickerRootUnique();
 
