@@ -11,7 +11,8 @@ namespace Umbraco.Extensions
         internal static void AddCollectionBuilders(this IUmbracoBuilder builder)
         {
             builder.SignProviders()
-                .Append<HasScheduleSignProvider>();
+                .Append<HasScheduleSignProvider>()
+                .Append<IsProtectedSignProvider>();
         }
 
         /// <summary>
