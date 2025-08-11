@@ -88,9 +88,8 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 			</uui-radio-group>
 			<div class="timezone-picker-container" ?hidden=${this.value?.mode !== 'custom'}>
 				<umb-input-time-zone
-					min=${1}
 					.value=${this._selectedTimeZones}
-					required
+					.required=${this.value?.mode === 'custom'}
 					@change=${this.#onChange}
 					${umbBindToValidation(this)}>
 				</umb-input-time-zone>

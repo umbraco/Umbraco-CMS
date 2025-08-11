@@ -135,7 +135,7 @@ export class UmbInputTimeZonePickerElement extends UUIFormControlMixin(UmbLitEle
 
 			#input {
 				width: 100%;
-				--uui-input-height: var(--uui-size-11);
+				--uui-input-height: var(--uui-size-12);
 			}
 
 			#validation-message {

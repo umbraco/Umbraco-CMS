@@ -130,7 +130,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
+			() => !this.readonly && !!this.required && (!this.value || this.value.length === 0),
 		);
 
 		this.addValidator(
@@ -138,6 +138,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 			() => this.minMessage,
 			() => !!this.min && this.value.length < this.min,
 		);
+
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
