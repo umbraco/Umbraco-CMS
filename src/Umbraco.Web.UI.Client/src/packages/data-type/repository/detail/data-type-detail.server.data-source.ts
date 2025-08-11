@@ -7,26 +7,18 @@ import type {
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * A data source for the Data Type that fetches data from the server
  * @class UmbDataTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataTypeDetailModel> {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbDataTypeServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbDataTypeServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
+export class UmbDataTypeServerDataSource
+	extends UmbControllerBase
+	implements UmbDetailDataSource<UmbDataTypeDetailModel>
+{
 	/**
 	 * Creates a new Data Type scaffold
 	 * @param {(string | null)} parentUnique
@@ -57,7 +49,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, DataTypeService.getDataTypeById({ path: { id: unique } }));
+		const { data, error } = await tryExecute(this, DataTypeService.getDataTypeById({ path: { id: unique } }));
 
 		if (error || !data) {
 			return { error };
@@ -100,7 +92,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		};
 
 		const { data, error } = await tryExecute(
-			this.#host,
+			this,
 			DataTypeService.postDataType({
 				body: body,
 			}),
@@ -134,7 +126,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		};
 
 		const { error } = await tryExecute(
-			this.#host,
+			this,
 			DataTypeService.putDataTypeById({
 				path: { id: model.unique },
 				body: body,
@@ -158,7 +150,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(
-			this.#host,
+			this,
 			DataTypeService.deleteDataTypeById({
 				path: { id: unique },
 			}),
