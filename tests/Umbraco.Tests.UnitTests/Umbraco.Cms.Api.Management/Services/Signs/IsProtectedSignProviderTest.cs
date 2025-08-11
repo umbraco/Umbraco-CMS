@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -8,29 +8,25 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Signs;
 
 [TestFixture]
-internal class HasScheduleSignProviderTests
+internal class IsProtectedSignProviderTest
 {
     [Test]
-    public async Task HasScheduleSignProvider_Should_Populate_Signs()
+    public async Task IsProtectedSignProvider_Should_Populate_Signs()
     {
         var entities = new List<EntitySlim>
         {
-            new() { Key = Guid.NewGuid(), Name = "Item 1" },
-            new() { Key = Guid.NewGuid(), Name = "Item 2" },
+            new() { Name = "Item 1" },
+            new() { Name = "Item 2" },
         };
 
-        var contentServiceMock = new Mock<IContentService>();
-        contentServiceMock
-            .Setup(x => x.GetScheduledContentKeys(It.IsAny<IEnumerable<Guid>>()))
-            .Returns([entities[1].Key]);
-        var sut = new HasScheduleSignProvider(contentServiceMock.Object);
+        var sut = new IsProtectedSignProvider();
 
         Assert.IsTrue(sut.CanProvideTreeSigns<DocumentTreeItemResponseModel>());
 
         var viewModels = new List<DocumentTreeItemResponseModel>
         {
-            new() { Id = entities[0].Key },
-            new() { Id = entities[1].Key },
+            new(),
+            new() { IsProtected = true },
         };
 
         await sut.PopulateTreeSignsAsync(viewModels.ToArray(), entities);
@@ -39,6 +35,6 @@ internal class HasScheduleSignProviderTests
         Assert.AreEqual(viewModels[1].Signs.Count(), 1);
 
         var signModel = viewModels[1].Signs.First();
-        Assert.AreEqual("Umb.ScheduledForPublish", signModel.Alias);
+        Assert.AreEqual("Umb.IsProtected", signModel.Alias);
     }
 }
