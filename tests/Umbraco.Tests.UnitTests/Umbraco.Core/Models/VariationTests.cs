@@ -637,14 +637,14 @@ public class VariationTests
                 attribute,
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IShortStringHelper>(),
-                new SystemTextJsonSerializer(),
+                new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
                 Mock.Of<IIOHelper>()));
 
         var textBoxEditor = new TextboxPropertyEditor(
             dataValueEditorFactory,
             ioHelper);
 
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var mockDataTypeService = new Mock<IDataTypeService>();
         Mock.Get(dataTypeService).Setup(x => x.GetDataType(It.Is<int>(y => y == Constants.DataTypes.Textbox)))

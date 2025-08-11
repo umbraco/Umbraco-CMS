@@ -4,11 +4,8 @@ import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewElement } from '@umbraco-cms/backoffice/block-custom-view';
 
-// eslint-disable-next-line local-rules/enforce-umb-prefix-on-element-name
 @customElement('example-block-custom-view')
-// eslint-disable-next-line local-rules/umb-class-prefix
 export class ExampleBlockCustomView extends UmbElementMixin(LitElement) implements UmbBlockEditorCustomViewElement {
-	//
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
@@ -29,13 +26,21 @@ export class ExampleBlockCustomView extends UmbElementMixin(LitElement) implemen
 		UmbTextStyles,
 		css`
 			:host {
+				position: relative;
 				display: block;
+				z-index: 10000;
 				height: 100%;
 				box-sizing: border-box;
 				background-color: red;
 				color: white;
 				border-radius: 9px;
 				padding: 12px;
+			}
+
+			:host > div {
+				position: relative;
+				display: block;
+				z-index: 10000;
 			}
 
 			.align-center {

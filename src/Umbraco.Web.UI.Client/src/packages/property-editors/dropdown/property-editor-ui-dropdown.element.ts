@@ -1,3 +1,4 @@
+import { ensureArray, updateItemsSelectedState } from '../utils/property-editor-ui-state-manager.js';
 import { css, customElement, html, map, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -30,7 +31,9 @@ export class UmbPropertyEditorUIDropdownElement
 
 	@property({ type: Array })
 	public override set value(value: Array<string> | string | undefined) {
-		this.#selection = this.#ensureValueIsArray(value);
+		this.#selection = ensureArray(value);
+		// Update the selected state of existing options when value changes
+		this.#updateSelectedState();
 	}
 	public override get value(): Array<string> | undefined {
 		return this.#selection;
@@ -97,10 +100,6 @@ export class UmbPropertyEditorUIDropdownElement
 		}
 	}
 
-	#ensureValueIsArray(value: Array<string> | string | null | undefined): Array<string> {
-		return Array.isArray(value) ? value : value ? [value] : [];
-	}
-
 	#onChange(event: CustomEvent & { target: UmbInputDropdownListElement }) {
 		const value = event.target.value as string;
 		this.#setValue(value ? [value] : []);
@@ -114,10 +113,25 @@ export class UmbPropertyEditorUIDropdownElement
 
 	#setValue(value: Array<string> | string | null | undefined) {
 		if (!value) return;
-		const selection = this.#ensureValueIsArray(value);
+		const selection = ensureArray(value);
 		this._options.forEach((item) => (item.selected = selection.includes(item.value)));
 		this.value = value;
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	/**
+	 * Updates the selected state of all options based on current selection.
+	 * This fixes the issue where UI doesn't update when values are set programmatically.
+	 */
+	#updateSelectedState() {
+		// Only update if we have options loaded
+		if (this._options.length > 0) {
+			// Update state only if changes are needed
+			const updatedOptions = updateItemsSelectedState(this._options, this.#selection, 'selected');
+			if (updatedOptions !== this._options) {
+				this._options = updatedOptions;
+			}
+		}
 	}
 
 	override render() {

@@ -199,7 +199,7 @@ public class MultiNodeTreePickerValidationTests
 
         var valueEditor = new MultiNodeTreePickerPropertyEditor.MultiNodeTreePickerPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
-            new SystemTextJsonSerializer(),
+            new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"),
             Mock.Of<ILocalizedTextService>(),

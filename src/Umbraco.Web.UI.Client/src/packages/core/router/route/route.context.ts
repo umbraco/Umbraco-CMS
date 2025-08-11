@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { IRouterSlot } from '../router-slot/index.js';
 import type { UmbModalRouteRegistration } from '../modal-registration/modal-route-registration.interface.js';
 import { umbGenerateRoutePathBuilder } from '../generate-route-path-builder.function.js';

@@ -27,7 +27,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	>;
 	#inUnprovidingState: boolean = false;
 
-	// @reprecated - Will be removed in v.17
+	// @deprecated - Will be removed in v.17
 	// Local version of the data send to the server, only use-case is for translation.
 	#translationData = new UmbObjectState<any>(undefined);
 	/**
@@ -81,7 +81,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	setVariantId(variantId: UmbVariantId): void {
 		this.#variantId = variantId;
 		// @.culture == null && @.segment == null
-		this.messages.filter((msg) => {
+		this.messages?.filter((msg) => {
 			// Figure out how many times '@.culture ==' is present in the path:
 			//const cultureMatches = (msg.path.match(/@\.culture ==/g) || []);
 			// I like a Regex that finds all the @.culture == and @.segment == in the path. they are adjacent. and I like to know the value following '== '
@@ -113,7 +113,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	 * @param translator
 	 */
 	async addTranslator(translator: UmbValidationMessageTranslator) {
-		this.messages.addTranslator(translator);
+		this.messages?.addTranslator(translator);
 	}
 
 	/**
@@ -454,6 +454,7 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 	}
 
 	override destroy(): void {
+		super.destroy();
 		this.#validationMode = false;
 		if (this.#inUnprovidingState === true) {
 			return;
@@ -468,6 +469,5 @@ export class UmbValidationController extends UmbControllerBase implements UmbVal
 		this.#localMessages = undefined;
 		this.#parentMessages = undefined;
 		this.#parent = undefined;
-		super.destroy();
 	}
 }

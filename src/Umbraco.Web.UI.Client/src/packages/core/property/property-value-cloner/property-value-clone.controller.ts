@@ -50,6 +50,8 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 			return incomingProperty;
 		}
 
+		(api as any).manifest = manifest;
+
 		let clonedProperty = incomingProperty;
 
 		if (api.cloneValue) {
@@ -85,6 +87,8 @@ export class UmbPropertyValueCloneController extends UmbControllerBase {
 		if (!api) {
 			return incomingProperty;
 		}
+
+		(api as any).manifest = manifest;
 
 		if (api.processValues) {
 			return (

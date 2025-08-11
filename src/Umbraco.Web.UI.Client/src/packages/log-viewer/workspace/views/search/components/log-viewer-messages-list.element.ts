@@ -59,7 +59,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		this.#logViewerContext?.getLogs();
 	}
 
-	_onPageChange(event: Event): void {
+	#onPageChange(event: Event): void {
 		const current = (event.target as UUIPaginationElement).current;
 		this.#logViewerContext?.setCurrentPage(current);
 		this.#logViewerContext?.getLogs();
@@ -74,7 +74,13 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		if (totalPages <= 1) return '';
 
 		return html`<div id="pagination">
-			<uui-pagination .total=${totalPages} @change="${this._onPageChange}"></uui-pagination>
+			<uui-pagination
+				.total=${totalPages}
+				firstlabel=${this.localize.term('general_first')}
+				previouslabel=${this.localize.term('general_previous')}
+				nextlabel=${this.localize.term('general_next')}
+				lastlabel=${this.localize.term('general_last')}
+				@change="${this.#onPageChange}"></uui-pagination>
 		</div>`;
 	}
 

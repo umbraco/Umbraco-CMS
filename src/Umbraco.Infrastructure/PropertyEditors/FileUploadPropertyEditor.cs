@@ -10,10 +10,16 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+// TODO (V17):
+// - Remove the implementation of INotificationHandler as these have all been refactored out into sepate notification handler classes.
+// - Remove the unused parameters from the constructor.
+
+/// <summary>
+/// Defines the file upload property editor.
+/// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.UploadField,
     ValueEditorIsReusable = true)]
@@ -22,12 +28,11 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
     INotificationHandler<MemberDeletedNotification>
 {
-    private readonly IContentService _contentService;
-    private readonly IOptionsMonitor<ContentSettings> _contentSettings;
     private readonly IIOHelper _ioHelper;
-    private readonly MediaFileManager _mediaFileManager;
-    private readonly UploadAutoFillProperties _uploadAutoFillProperties;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileUploadPropertyEditor"/> class.
+    /// </summary>
     public FileUploadPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         MediaFileManager mediaFileManager,
@@ -37,14 +42,11 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
-        _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
-        _contentSettings = contentSettings;
-        _uploadAutoFillProperties = uploadAutoFillProperties;
-        _contentService = contentService;
         _ioHelper = ioHelper;
         SupportsReadOnly = true;
     }
 
+    /// <inheritdoc/>
     public bool TryGetMediaPath(string? propertyEditorAlias, object? value, [MaybeNullWhen(false)] out string mediaPath)
     {
         if (propertyEditorAlias == Alias &&
@@ -59,53 +61,6 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         return false;
     }
 
-    public void Handle(ContentCopiedNotification notification)
-    {
-        // get the upload field properties with a value
-        IEnumerable<IProperty> properties = notification.Original.Properties.Where(IsUploadField);
-
-        // copy files
-        var isUpdated = false;
-        foreach (IProperty property in properties)
-        {
-            // copy each of the property values (variants, segments) to the destination
-            foreach (IPropertyValue propertyValue in property.Values)
-            {
-                var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
-                if (propVal == null || !(propVal is string str) || str.IsNullOrWhiteSpace())
-                {
-                    continue;
-                }
-
-                var sourcePath = _mediaFileManager.FileSystem.GetRelativePath(str);
-                var copyPath = _mediaFileManager.CopyFile(notification.Copy, property.PropertyType, sourcePath);
-                notification.Copy.SetValue(property.Alias, _mediaFileManager.FileSystem.GetUrl(copyPath),
-                    propertyValue.Culture, propertyValue.Segment);
-                isUpdated = true;
-            }
-        }
-
-        // if updated, re-save the copy with the updated value
-        if (isUpdated)
-        {
-            _contentService.Save(notification.Copy);
-        }
-    }
-
-    public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
-
-    public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
-
-    public void Handle(MediaSavingNotification notification)
-    {
-        foreach (IMedia entity in notification.SavedEntities)
-        {
-            AutoFillProperties(entity);
-        }
-    }
-
-    public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
-
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new FileUploadConfigurationEditor(_ioHelper);
@@ -117,86 +72,43 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     protected override IDataValueEditor CreateValueEditor()
         => DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute!);
 
-    /// <summary>
-    ///     Gets a value indicating whether a property is an upload field.
-    /// </summary>
-    /// <param name="property">The property.</param>
-    /// <returns>
-    ///     <c>true</c> if the specified property is an upload field; otherwise, <c>false</c>.
-    /// </returns>
-    private static bool IsUploadField(IProperty property) => property.PropertyType.PropertyEditorAlias ==
-                                                             Constants.PropertyEditors.Aliases.UploadField;
+    #region Obsolete notification handler notifications
 
-    /// <summary>
-    ///     The paths to all file upload property files contained within a collection of content entities
-    /// </summary>
-    /// <param name="entities"></param>
-    private IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
-        .SelectMany(x => x.Properties)
-        .Where(IsUploadField)
-        .SelectMany(GetFilePathsFromPropertyValues)
-        .Distinct();
-
-    /// <summary>
-    ///     Look through all property values stored against the property and resolve any file paths stored
-    /// </summary>
-    /// <param name="prop"></param>
-    /// <returns></returns>
-    private IEnumerable<string> GetFilePathsFromPropertyValues(IProperty prop)
+    /// <inheritdoc/>
+    [Obsolete("This handler is no longer registered. Logic has been migrated to FileUploadContentCopiedNotificationHandler. Scheduled for removal in Umbraco 17.")]
+    public void Handle(ContentCopiedNotification notification)
     {
-        IReadOnlyCollection<IPropertyValue> propVals = prop.Values;
-        foreach (IPropertyValue propertyValue in propVals)
-        {
-            // check if the published value contains data and return it
-            var propVal = propertyValue.PublishedValue;
-            if (propVal != null && propVal is string str1 && !str1.IsNullOrWhiteSpace())
-            {
-                yield return _mediaFileManager.FileSystem.GetRelativePath(str1);
-            }
-
-            // check if the edited value contains data and return it
-            propVal = propertyValue.EditedValue;
-            if (propVal != null && propVal is string str2 && !str2.IsNullOrWhiteSpace())
-            {
-                yield return _mediaFileManager.FileSystem.GetRelativePath(str2);
-            }
-        }
+        // This handler is no longer registered. Logic has been migrated to FileUploadContentCopiedNotificationHandler.
     }
 
-    private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
+    /// <inheritdoc/>
+    [Obsolete("This handler is no longer registered. Logic has been migrated to FileUploadMediaSavingNotificationHandler. Scheduled for removal in Umbraco 17.")]
+    public void Handle(MediaSavingNotification notification)
     {
-        IEnumerable<string> filePathsToDelete = ContainedFilePaths(deletedEntities);
-        _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
+        // This handler is no longer registered. Logic has been migrated to FileUploadMediaSavingNotificationHandler.
     }
 
-    /// <summary>
-    ///     Auto-fill properties (or clear).
-    /// </summary>
-    private void AutoFillProperties(IContentBase model)
+    /// <inheritdoc/>
+    [Obsolete("This handler is no longer registered. Logic has been migrated to FileUploadContentDeletedNotificationHandler. Scheduled for removal in Umbraco 17.")]
+    public void Handle(ContentDeletedNotification notification)
     {
-        IEnumerable<IProperty> properties = model.Properties.Where(IsUploadField);
-
-        foreach (IProperty property in properties)
-        {
-            ImagingAutoFillUploadField? autoFillConfig = _contentSettings.CurrentValue.GetConfig(property.Alias);
-            if (autoFillConfig == null)
-            {
-                continue;
-            }
-
-            foreach (IPropertyValue pvalue in property.Values)
-            {
-                var svalue = property.GetValue(pvalue.Culture, pvalue.Segment) as string;
-                if (string.IsNullOrWhiteSpace(svalue))
-                {
-                    _uploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
-                }
-                else
-                {
-                    _uploadAutoFillProperties.Populate(model, autoFillConfig,
-                        _mediaFileManager.FileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
-                }
-            }
-        }
+        // This handler is no longer registered. Logic has been migrated to FileUploadContentDeletedNotificationHandler.
     }
+
+
+    /// <inheritdoc/>
+    [Obsolete("This handler is no longer registered. Logic has been migrated to FileUploadMediaDeletedNotificationHandler. Scheduled for removal in Umbraco 17.")]
+    public void Handle(MediaDeletedNotification notification)
+    {
+        // This handler is no longer registered. Logic has been migrated to FileUploadMediaDeletedNotificationHandler.
+    }
+
+    /// <inheritdoc/>
+    [Obsolete("This handler is no longer registered. Logic has been migrated to FileUploadMemberDeletedNotificationHandler. Scheduled for removal in Umbraco 17.")]
+    public void Handle(MemberDeletedNotification notification)
+    {
+        // This handler is no longer registered. Logic has been migrated to FileUploadMemberDeletedNotificationHandler.
+    }
+
+    #endregion
 }

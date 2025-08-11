@@ -5,10 +5,11 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -384,9 +385,14 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         Assert.That(total, Is.EqualTo(10));
     }
 
-    [Test]
-    public async Task EntityService_Can_Get_Paged_Document_Type_Children()
+    [TestCase("")]
+    [TestCase("sortOrder")]
+    [TestCase("nodeId")]
+    public async Task EntityService_Can_Get_Paged_Document_Type_Children(string orderBy)
     {
+        Ordering? ordering = string.IsNullOrEmpty(orderBy)
+            ? null
+            : Ordering.By(orderBy, Direction.Ascending);
         IEnumerable<IEntitySlim> children = EntityService.GetPagedChildren(
             _documentTypeRootContainerKey,
             [UmbracoObjectTypes.DocumentTypeContainer],
@@ -394,13 +400,14 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             0,
             10,
             false,
-            out long totalRecords);
+            out long totalRecords,
+            ordering: ordering);
 
         Assert.AreEqual(3, totalRecords);
         Assert.AreEqual(3, children.Count());
         Assert.IsTrue(children.Single(x => x.Key == _documentTypeSubContainer1Key).HasChildren);     // Has a single folder as a child.
         Assert.IsTrue(children.Single(x => x.Key == _documentTypeSubContainer2Key).HasChildren);     // Has a single document type as a child.
-        Assert.IsFalse(children.Single(x => x.Key == _documentType1Key).HasChildren);         // Is a document type (has no children).
+        Assert.IsFalse(children.Single(x => x.Key == _documentType1Key).HasChildren);                // Is a document type (has no children).
     }
 
     [Test]
@@ -928,7 +935,176 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var result2 = EntityService.GetPathKeys(grandChild, omitSelf: true);
         Assert.AreEqual($"{root.Key},{child.Key}", string.Join(",", result2));
+    }
 
+    [Test]
+    public void EntityService_Siblings_ReturnsExpectedSiblings()
+    {
+        var children = CreateDocumentSiblingsTestData();
+
+        var target = children[1];
+
+        var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(7, totalAfter);
+        Assert.AreEqual(3, result.Length);
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[1].Key);
+        Assert.IsTrue(result[2].Key == children[2].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_SkipsTrashedEntities()
+    {
+        var children = CreateDocumentSiblingsTestData();
+
+        var trash = children[1];
+        ContentService.MoveToRecycleBin(trash);
+
+        var target = children[2];
+        var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(6, totalAfter);
+        Assert.AreEqual(3, result.Length);
+        Assert.IsFalse(result.Any(x => x.Key == trash.Key));
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[2].Key);
+        Assert.IsTrue(result[2].Key == children[3].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_SkipsFilteredEntities_UsingFilterWithSet()
+    {
+        var children = CreateDocumentSiblingsTestData();
+
+        // Apply a filter that excludes the child at index 1. We'd expect to not get this, but
+        // get still get one previous sibling, i.e. the entity at index 0.
+        Guid[] keysToExclude = [children[1].Key];
+        IQuery<IUmbracoEntity> filter = ScopeProvider.CreateQuery<IUmbracoEntity>().Where(x => !keysToExclude.Contains(x.Key));
+
+        var target = children[2];
+        var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter, filter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(6, totalAfter);
+        Assert.AreEqual(3, result.Length);
+        Assert.IsFalse(result.Any(x => x.Key == keysToExclude[0]));
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[2].Key);
+        Assert.IsTrue(result[2].Key == children[3].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_SkipsFilteredEntities_UsingFilterWithoutSet()
+    {
+        var children = CreateDocumentSiblingsTestData();
+
+        // Apply a filter that excludes the child at index 1. We'd expect to not get this, but
+        // get still get one previous sibling, i.e. the entity at index 0.
+        var keyToExclude = children[1].Key;
+        IQuery<IUmbracoEntity> filter = ScopeProvider.CreateQuery<IUmbracoEntity>().Where(x => x.Key != keyToExclude);
+
+        var target = children[2];
+        var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter, filter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(6, totalAfter);
+        Assert.AreEqual(3, result.Length);
+        Assert.IsFalse(result.Any(x => x.Key == keyToExclude));
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[2].Key);
+        Assert.IsTrue(result[2].Key == children[3].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_RespectsOrdering()
+    {
+        var children = CreateDocumentSiblingsTestData();
+
+        // Order the children by name to ensure the ordering works when differing from the default sort order, the name is a GUID.
+        children = children.OrderBy(x => x.Name).ToList();
+
+        var target = children[1];
+        var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter, ordering: Ordering.By(nameof(NodeDto.Text))).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(7, totalAfter);
+        Assert.AreEqual(3, result.Length);
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[1].Key);
+        Assert.IsTrue(result[2].Key == children[2].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_IgnoresOutOfBoundsLower()
+    {
+        var children = CreateDocumentSiblingsTestData();
+
+        var target = children[1];
+        var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 100, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(7, totalAfter);
+        Assert.AreEqual(3, result.Length);
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[1].Key);
+        Assert.IsTrue(result[2].Key == children[2].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_IgnoresOutOfBoundsUpper()
+    {
+        var children = CreateDocumentSiblingsTestData();
+
+        var target = children[^2];
+        var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 1, 100, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(7, totalBefore);
+        Assert.AreEqual(0, totalAfter);
+        Assert.AreEqual(3, result.Length);
+        Assert.IsTrue(result[^1].Key == children[^1].Key);
+        Assert.IsTrue(result[^2].Key == children[^2].Key);
+        Assert.IsTrue(result[^3].Key == children[^3].Key);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task EntityService_Siblings_FiltersByObjectTypes(bool foldersOnly)
+    {
+        // For testing these scenarios we can use the data setup in CreateStructureForPagedDocumentTypeChildrenTest.
+
+        var objectTypes = new List<UmbracoObjectTypes> { UmbracoObjectTypes.DocumentTypeContainer };
+        if (foldersOnly is false)
+        {
+            objectTypes.Add(UmbracoObjectTypes.DocumentType);
+        }
+
+        var result = EntityService.GetSiblings(_documentTypeSubContainer2Key, objectTypes, 1, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(0, totalAfter);
+
+        var expectedCount = foldersOnly ? 2 : 3;
+        Assert.AreEqual(expectedCount, result.Length);
+        Assert.IsTrue(result[0].Key == _documentTypeSubContainer1Key);
+        Assert.IsTrue(result[1].Key == _documentTypeSubContainer2Key);
+        if (foldersOnly is false)
+        {
+            Assert.IsTrue(result[2].Key == _documentType1Key);
+        }
+    }
+
+    private List<Content> CreateDocumentSiblingsTestData()
+    {
+        var contentType = ContentTypeService.Get("umbTextpage");
+
+        var root = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(root);
+
+        var children = new List<Content>();
+
+        for (int i = 0; i < 10; i++)
+        {
+            var child = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+            ContentService.Save(child);
+            children.Add(child);
+        }
+
+        return children;
     }
 
     private static bool _isSetup;

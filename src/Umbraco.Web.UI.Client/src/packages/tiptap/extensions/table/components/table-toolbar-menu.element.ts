@@ -3,7 +3,7 @@ import { customElement, html, ifDefined, when } from '@umbraco-cms/backoffice/ex
 
 import './table-insert.element.js';
 
-@customElement('umb-tiptap-table-toolbar-menu-element')
+@customElement('umb-tiptap-table-toolbar-menu')
 export class UmbTiptapTableToolbarMenuElement extends UmbTiptapToolbarMenuElement {
 	override render() {
 		const label = this.localize.string(this.manifest?.meta.label);
@@ -32,7 +32,7 @@ export class UmbTiptapTableToolbarMenuElement extends UmbTiptapToolbarMenuElemen
 				`,
 			)}
 			${this.renderMenu()}
-			<uui-popover-container id="popover-insert">
+			<uui-popover-container id="popover-insert" style="box-shadow: var(--uui-shadow-depth-3);">
 				<umb-tiptap-table-insert .editor=${this.editor}></umb-tiptap-table-insert>
 			</uui-popover-container>
 		`;
@@ -43,6 +43,6 @@ export { UmbTiptapTableToolbarMenuElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tiptap-table-toolbar-menu-element': UmbTiptapTableToolbarMenuElement;
+		'umb-tiptap-table-toolbar-menu': UmbTiptapTableToolbarMenuElement;
 	}
 }

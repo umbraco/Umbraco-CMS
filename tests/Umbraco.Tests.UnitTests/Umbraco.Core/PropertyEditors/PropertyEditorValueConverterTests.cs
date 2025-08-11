@@ -77,7 +77,7 @@ public class PropertyEditorValueConverterTests
     [TestCase(null, new string[] { })]
     public void CanConvertCheckboxListPropertyEditor(object value, IEnumerable<string> expected)
     {
-        var converter = new CheckboxListValueConverter(new SystemTextJsonSerializer());
+        var converter = new CheckboxListValueConverter(new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()));
         var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, value, false);
 
         Assert.AreEqual(expected, result);
@@ -102,7 +102,7 @@ public class PropertyEditorValueConverterTests
             Mock.Of<IPublishedModelFactory>(),
             mockPublishedContentTypeFactory.Object);
 
-        var converter = new FlexibleDropdownPropertyValueConverter(new SystemTextJsonSerializer());
+        var converter = new FlexibleDropdownPropertyValueConverter(new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()));
         var inter = converter.ConvertSourceToIntermediate(null, publishedPropType, value, false);
         var result =
             converter.ConvertIntermediateToObject(null, publishedPropType, PropertyCacheLevel.Unknown, inter, false);

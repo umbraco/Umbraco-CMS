@@ -34,6 +34,10 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), (_req, res, ctx) => {
 		const id = _req.params.id as string;
 		if (!id) return;
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 
 		const query = _req.url.searchParams;
 		const skip = query.get('skip') ? parseInt(query.get('skip') as string, 10) : 0;
@@ -56,6 +60,10 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:id/referenced-descendants`), (_req, res, ctx) => {
 		const id = _req.params.id as string;
 		if (!id) return;
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 
 		const ReferencedDescendantsResponse: GetDocumentByIdReferencedDescendantsResponse = {
 			total: 0,
@@ -68,6 +76,10 @@ export const detailHandlers = [
 	rest.put(umbracoPath(`${UMB_SLUG}/:id/validate`, 'v1.1'), (_req, res, ctx) => {
 		const id = _req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 
 		return res(ctx.status(200));
 	}),
@@ -75,6 +87,10 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const response = umbDocumentMockDb.detail.read(id);
 		return res(ctx.status(200), ctx.json(response));
 	}),
@@ -82,6 +98,10 @@ export const detailHandlers = [
 	rest.put(umbracoPath(`${UMB_SLUG}/:id`), async (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		const requestBody = (await req.json()) as UpdateDocumentRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		umbDocumentMockDb.detail.update(id, requestBody);
@@ -91,6 +111,10 @@ export const detailHandlers = [
 	rest.delete(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return res(ctx.status(403));
+		}
 		umbDocumentMockDb.detail.delete(id);
 		return res(ctx.status(200));
 	}),

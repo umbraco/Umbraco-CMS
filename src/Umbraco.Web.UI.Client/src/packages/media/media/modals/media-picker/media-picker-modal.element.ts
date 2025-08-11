@@ -21,10 +21,11 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
+import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 import '@umbraco-cms/backoffice/imaging';
 
@@ -70,19 +71,26 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	private _startNode: UmbMediaItemModel | undefined;
 
 	@state()
-	_searching: boolean = false;
+	private _searching: boolean = false;
 
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneMediaElement;
 
 	#pagingMap = new Map<string, UmbPaginationManager>();
+	#contextCulture?: string | null;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CONTENT_PROPERTY_CONTEXT, (context) => {
+		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
 			this.observe(context?.dataType, (dataType) => {
 				this.#dataType = dataType;
+			});
+		});
+
+		this.consumeContext(UMB_VARIANT_CONTEXT, (context) => {
+			this.observe(context?.culture, (culture) => {
+				this.#contextCulture = culture;
 			});
 		});
 	}
@@ -202,7 +210,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		const query = this._searchQuery;
 		const { data } = await this.#mediaSearchProvider.search({
 			query,
+			includeTrashed: false,
 			searchFrom: this._searchFrom,
+			culture: this.#contextCulture,
 			...this.data?.search?.queryParams,
 		});
 
@@ -337,6 +347,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 							? html`<uui-pagination
 									.current=${this._currentPage}
 									.total=${this._currentTotalPages}
+									firstlabel=${this.localize.term('general_first')}
+									previouslabel=${this.localize.term('general_previous')}
+									nextlabel=${this.localize.term('general_next')}
+									lastlabel=${this.localize.term('general_last')}
 									@change=${this.#onPageChange}></uui-pagination>`
 							: nothing}`}
 		`;
@@ -453,11 +467,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				grid-auto-rows: var(--umb-card-medium-min-width);
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
-			}
-
-			/** TODO: Remove this fix when UUI gets upgrade to 1.3 */
-			umb-imaging-thumbnail {
-				pointer-events: none;
 			}
 
 			umb-icon {

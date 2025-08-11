@@ -37,9 +37,9 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/language';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 
 type ContentModel = UmbDocumentDetailModel;
 type ContentTypeModel = UmbDocumentTypeDetailModel;
@@ -67,12 +67,12 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
 		(data) => !!data?.documentType.collection,
 	);
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
+
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
-	#userCanCreate = false;
-	#userCanUpdate = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -91,6 +91,7 @@ export class UmbDocumentWorkspaceContext
 		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
 			const config = await context?.getDocumentConfiguration();
 			const allowSegmentCreation = config?.allowNonExistingSegmentsCreation ?? false;
+			const allowEditInvariantFromNonDefault = config?.allowEditInvariantFromNonDefault ?? true;
 
 			this._variantOptionsFilter = (variantOption) => {
 				const isNotCreatedSegmentVariant = variantOption.segment && !variantOption.variant;
@@ -102,12 +103,8 @@ export class UmbDocumentWorkspaceContext
 
 				return true;
 			};
-		});
 
-		this.consumeContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT, async (context) => {
-			const documentConfiguration = (await context?.getDocumentConfiguration()) ?? undefined;
-
-			if (documentConfiguration?.allowEditInvariantFromNonDefault !== true) {
+			if (allowEditInvariantFromNonDefault === false) {
 				this.#preventEditInvariantFromNonDefault();
 			}
 		});
@@ -127,52 +124,19 @@ export class UmbDocumentWorkspaceContext
 			this.#publishingContext = context;
 		});
 
-		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
-			{
-				config: {
-					allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
-				},
-				onChange: (permitted: boolean) => {
-					if (permitted === this.#userCanCreate) return;
-					this.#userCanCreate = permitted;
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_CREATE,
-						this.#userCanCreate,
-						'You do not have permission to create documents.',
-					);
-				},
-			},
-		]);
-
-		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
-			{
-				config: {
-					allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
-				},
-				onChange: (permitted: boolean) => {
-					if (permitted === this.#userCanUpdate) return;
-					this.#userCanUpdate = permitted;
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-						this.#userCanUpdate,
-						'You do not have permission to update documents.',
-					);
-				},
-			},
-		]);
-
-		this.observe(this.variants, () => {
-			this.#setReadOnlyStateForUserPermission(
-				UMB_USER_PERMISSION_DOCUMENT_CREATE,
-				this.#userCanCreate,
-				'You do not have permission to create documents.',
-			);
-
-			this.#setReadOnlyStateForUserPermission(
-				UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-				this.#userCanUpdate,
-				'You do not have permission to update documents.',
-			);
+		this.observe(this.isNew, (isNew) => {
+			if (isNew === undefined) return;
+			if (isNew) {
+				this.#enforceUserPermission(
+					UMB_USER_PERMISSION_DOCUMENT_CREATE,
+					'You do not have permission to create documents.',
+				);
+			} else {
+				this.#enforceUserPermission(
+					UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+					'You do not have permission to update documents.',
+				);
+			}
 		});
 
 		this.routes.setRoutes([
@@ -226,44 +190,20 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
-	#preventEditInvariantFromNonDefault() {
-		this.observe(
-			observeMultiple([this.structure.contentTypeProperties, this.languages]),
-			([properties, languages]) => {
-				if (properties.length === 0) return;
-				if (languages.length === 0) return;
+	#enforceUserPermission(verb: string, message: string) {
+		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
+		this.#handleUserPermissionChange(verb, false, message);
 
-				const defaultLanguageUnique = languages.find((x) => x.isDefault)?.unique;
-				const ruleUnique = 'UMB_preventEditInvariantFromNonDefault';
-
-				const rule = {
-					unique: ruleUnique,
-					permitted: false,
-					message: 'Shared properties can only be edited in the default language',
-					variantId: UmbVariantId.CreateInvariant(),
-				};
-
-				/* The permission is false by default, and the onChange callback will not be triggered if the permission hasn't changed.
-			Therefore, we add the rule to the readOnlyGuard here. */
-				this.propertyWriteGuard.addRule(rule);
-
-				createExtensionApiByAlias(this, UMB_LANGUAGE_USER_PERMISSION_CONDITION_ALIAS, [
-					{
-						config: {
-							allOf: [defaultLanguageUnique],
-						},
-						onChange: (permitted: boolean) => {
-							if (permitted) {
-								this.propertyWriteGuard.removeRule(ruleUnique);
-							} else {
-								this.propertyWriteGuard.addRule(rule);
-							}
-						},
-					},
-				]);
+		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [verb],
+				},
+				onChange: (permitted: boolean) => {
+					this.#handleUserPermissionChange(verb, permitted, message);
+				},
 			},
-			'observePreventEditInvariantFromNonDefault',
-		);
+		]);
 	}
 
 	override resetState(): void {
@@ -303,7 +243,6 @@ export class UmbDocumentWorkspaceContext
 			preset: {
 				documentType: {
 					unique: documentTypeUnique,
-					collection: null,
 				},
 			},
 		});
@@ -341,21 +280,17 @@ export class UmbDocumentWorkspaceContext
 		this._data.updateCurrent({ template: { unique: templateUnique } });
 	}
 
-	/**
-	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
-	 */
-	public override requestSubmit() {
+	protected override async _handleSave() {
 		const elementStyle = (this.getHostElement() as HTMLElement).style;
 		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
 		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
 		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
 		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
-		return this._handleSubmit();
+		await super._handleSave();
 	}
 
 	public async saveAndPreview(): Promise<void> {
-		return this.#handleSaveAndPreview();
+		return await this.#handleSaveAndPreview();
 	}
 
 	async #handleSaveAndPreview() {
@@ -405,7 +340,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Publish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.publish();
+		await this.#publishingContext.publish();
 	}
 
 	/**
@@ -419,7 +354,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the SaveAndPublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.saveAndPublish();
+		await this.#publishingContext.saveAndPublish();
 	}
 
 	/**
@@ -433,7 +368,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.schedule();
+		await this.#publishingContext.schedule();
 	}
 
 	/**
@@ -447,7 +382,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the Unpublish method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.unpublish();
+		await this.#publishingContext.unpublish();
 	}
 
 	/**
@@ -461,7 +396,7 @@ export class UmbDocumentWorkspaceContext
 			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		this.#publishingContext.publishWithDescendants();
+		await this.#publishingContext.publishWithDescendants();
 	}
 
 	public createPropertyDatasetContext(
@@ -471,7 +406,7 @@ export class UmbDocumentWorkspaceContext
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
-	async #setReadOnlyStateForUserPermission(identifier: string, permitted: boolean, message: string) {
+	async #handleUserPermissionChange(identifier: string, permitted: boolean, message: string) {
 		if (permitted) {
 			this.readOnlyGuard?.removeRule(identifier);
 			return;
@@ -480,7 +415,39 @@ export class UmbDocumentWorkspaceContext
 		this.readOnlyGuard?.addRule({
 			unique: identifier,
 			message,
+			/* This guard is a bit backwards. The rule is permitted to be read-only. 
+			If the user does not have permission, we set it to true = permitted to be read-only. */
+			permitted: true,
 		});
+	}
+
+	#preventEditInvariantFromNonDefault() {
+		this.observe(
+			observeMultiple([this.structure.contentTypeProperties, this.variantOptions]),
+			([properties, variantOptions]) => {
+				if (properties.length === 0) return;
+				if (variantOptions.length === 0) return;
+
+				variantOptions.forEach((variantOption) => {
+					// Do not add a rule for the default language. It is always permitted to edit.
+					if (variantOption.language.isDefault) return;
+
+					const datasetVariantId = UmbVariantId.CreateFromPartial(variantOption);
+					const invariantVariantId = UmbVariantId.CreateInvariant();
+					const unique = `UMB_PREVENT_EDIT_INVARIANT_FROM_NON_DEFAULT_DATASET=${datasetVariantId.toString()}_PROPERTY_${invariantVariantId.toString()}`;
+
+					const rule: UmbVariantPropertyGuardRule = {
+						unique,
+						message: 'Shared properties can only be edited in the default language',
+						variantId: invariantVariantId,
+						datasetVariantId,
+						permitted: false,
+					};
+
+					this.propertyWriteGuard.addRule(rule);
+				});
+			},
+		);
 	}
 }
 

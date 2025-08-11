@@ -1,3 +1,4 @@
+export * from './array/index.js';
 export * from './bytes/bytes.function.js';
 export * from './debounce/debounce.function.js';
 export * from './deprecation/index.js';
@@ -29,4 +30,5 @@ export * from './sanitize/sanitize-html.function.js';
 export * from './selection-manager/selection.manager.js';
 export * from './state-manager/index.js';
 export * from './string/index.js';
+export * from './is-test-environment.function.js';
 export type * from './type/index.js';

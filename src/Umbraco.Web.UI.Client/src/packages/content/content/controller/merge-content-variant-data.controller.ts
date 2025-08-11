@@ -136,6 +136,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			// If api is not to be found, then we can continue using the draftValue as is.
 			return draftValue;
 		}
+		(api as any).manifest = manifest;
 
 		let newValue = draftValue;
 

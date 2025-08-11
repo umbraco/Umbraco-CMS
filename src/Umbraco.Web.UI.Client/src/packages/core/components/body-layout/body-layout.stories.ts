@@ -1,18 +1,18 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { UmbBodyLayoutElement } from './body-layout.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './body-layout.element.js';
-import type { UmbBodyLayoutElement } from './body-layout.element.js';
 
 const meta: Meta<UmbBodyLayoutElement> = {
-	title: 'Components/Workspace Layout',
+	title: 'Generic Components/Body Layout',
 	component: 'umb-body-layout',
 };
 
 export default meta;
 type Story = StoryObj<UmbBodyLayoutElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	render: () =>
 		html` <umb-body-layout>
 			<div slot="header"><uui-button color="" look="placeholder">Header slot</uui-button></div>

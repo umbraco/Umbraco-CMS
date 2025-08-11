@@ -21,7 +21,7 @@ public sealed class AppendEventMessagesAttribute : TypeFilterAttribute
     {
     }
 
-    private class AppendEventMessagesFilter : IActionFilter
+    private sealed class AppendEventMessagesFilter : IActionFilter
     {
         private readonly IEventMessagesFactory _eventMessagesFactory;
         private readonly IJsonSerializer _jsonSerializer;

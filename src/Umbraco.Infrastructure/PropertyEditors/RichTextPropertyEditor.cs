@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -33,8 +34,11 @@ public class RichTextPropertyEditor : DataEditor
     private readonly IRichTextPropertyIndexValueFactory _richTextPropertyIndexValueFactory;
 
     /// <summary>
-    ///     The constructor will setup the property editor based on the attribute if one is found.
+    /// Initializes a new instance of the <see cref="RichTextPropertyEditor"/> class.
     /// </summary>
+    /// <remarks>
+    /// The constructor will setup the property editor based on the attribute if one is found.
+    /// </remarks>
     public RichTextPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
@@ -43,6 +47,7 @@ public class RichTextPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _richTextPropertyIndexValueFactory = richTextPropertyIndexValueFactory;
+
         SupportsReadOnly = true;
     }
 
@@ -84,7 +89,7 @@ public class RichTextPropertyEditor : DataEditor
     ///     A custom value editor to ensure that images and blocks are parsed when being persisted and formatted correctly for
     ///     display in the editor
     /// </summary>
-    internal class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
+    internal sealed class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IHtmlSanitizer _htmlSanitizer;
@@ -93,7 +98,9 @@ public class RichTextPropertyEditor : DataEditor
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IRichTextRequiredValidator _richTextRequiredValidator;
+        private readonly IRichTextRegexValidator _richTextRegexValidator;
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
+        private readonly IBlockEditorElementTypeCache _elementTypeCache;
 
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
@@ -111,6 +118,7 @@ public class RichTextPropertyEditor : DataEditor
             IPropertyValidationService propertyValidationService,
             DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
             IRichTextRequiredValidator richTextRequiredValidator,
+            IRichTextRegexValidator richTextRegexValidator,
             BlockEditorVarianceHandler blockEditorVarianceHandler,
             ILanguageService languageService,
             IIOHelper ioHelper)
@@ -121,7 +129,9 @@ public class RichTextPropertyEditor : DataEditor
             _localLinkParser = localLinkParser;
             _pastedImages = pastedImages;
             _htmlSanitizer = htmlSanitizer;
+            _elementTypeCache = elementTypeCache;
             _richTextRequiredValidator = richTextRequiredValidator;
+            _richTextRegexValidator = richTextRegexValidator;
             _jsonSerializer = jsonSerializer;
             _logger = logger;
 
@@ -130,6 +140,8 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         public override IValueRequiredValidator RequiredValidator => _richTextRequiredValidator;
+
+        public override IValueFormatValidator FormatValidator => _richTextRegexValidator;
 
         protected override RichTextBlockValue CreateWithLayout(IEnumerable<RichTextBlockLayoutItem> layout) => new(layout);
 
@@ -237,7 +249,21 @@ public class RichTextPropertyEditor : DataEditor
         /// <returns></returns>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            if (TryParseEditorValue(editorValue.Value, out RichTextEditorValue? richTextEditorValue) is false)
+            // See note on BlockEditorPropertyValueEditor.FromEditor for why we can't return early with only a null or empty editorValue.
+            TryParseEditorValue(editorValue.Value, out RichTextEditorValue? richTextEditorValue);
+            TryParseEditorValue(currentValue, out RichTextEditorValue? currentRichTextEditorValue);
+
+            // We can early return if we have a null value and the current value doesn't have any blocks.
+            if (richTextEditorValue is null && currentRichTextEditorValue?.Blocks is null)
+            {
+                return null;
+            }
+
+            // Ensure the property type is populated on all blocks.
+            richTextEditorValue?.EnsurePropertyTypePopulatedOnBlocks(_elementTypeCache);
+            currentRichTextEditorValue?.EnsurePropertyTypePopulatedOnBlocks(_elementTypeCache);
+
+            if (string.IsNullOrWhiteSpace(richTextEditorValue?.Markup))
             {
                 return null;
             }
@@ -248,11 +274,6 @@ public class RichTextPropertyEditor : DataEditor
             var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
             Guid mediaParentId = config?.MediaParentId ?? Guid.Empty;
 
-            if (string.IsNullOrWhiteSpace(richTextEditorValue.Markup))
-            {
-                return null;
-            }
-
             var parseAndSavedTempImages = _pastedImages
                 .FindAndPersistPastedTempImagesAsync(richTextEditorValue.Markup, mediaParentId, userKey)
                 .GetAwaiter()
@@ -261,8 +282,7 @@ public class RichTextPropertyEditor : DataEditor
             var sanitized = _htmlSanitizer.Sanitize(editorValueWithMediaUrlsRemoved);
 
             richTextEditorValue.Markup = sanitized.NullOrWhiteSpaceAsNull() ?? string.Empty;
-
-            RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, MapBlockValueFromEditor);
+            RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueFromEditor(blockValue, currentRichTextEditorValue?.Blocks, editorValue.ContentKey));
 
             // return json
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(cleanedUpRichTextEditorValue, _jsonSerializer);
@@ -299,7 +319,7 @@ public class RichTextPropertyEditor : DataEditor
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(mergedEditorValue, _jsonSerializer);
         }
 
-        private string MergeMarkupValue(
+        private static string MergeMarkupValue(
             string source,
             string target,
             RichTextBlockValue? mergedBlockValue,
@@ -372,19 +392,26 @@ public class RichTextPropertyEditor : DataEditor
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)
             => RichTextPropertyEditorHelper.TryParseRichTextEditorValue(value, _jsonSerializer, _logger, out richTextEditorValue);
 
-        private RichTextEditorValue CleanAndMapBlocks(RichTextEditorValue richTextEditorValue, Action<RichTextBlockValue> handleMapping)
+        private RichTextEditorValue CleanAndMapBlocks(RichTextEditorValue? richTextEditorValue, Action<RichTextBlockValue> handleMapping)
         {
-            if (richTextEditorValue.Blocks is null)
+            // We handle mapping of blocks even if the edited value is empty, so property editors can clean up any resources
+            // relating to removed blocks, e.g. files uploaded to the media library from the file upload property editor.
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? blockEditorData = null;
+            if (richTextEditorValue?.Blocks is not null)
+            {
+                blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
+            }
+
+            handleMapping(blockEditorData?.BlockValue ?? new RichTextBlockValue());
+
+            if (richTextEditorValue?.Blocks is null)
             {
                 // no blocks defined, store empty block value
                 return MarkupWithEmptyBlocks();
             }
 
-            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
-
             if (blockEditorData is not null)
             {
-                handleMapping(blockEditorData.BlockValue);
                 return new RichTextEditorValue
                 {
                     Markup = richTextEditorValue.Markup,
@@ -397,7 +424,7 @@ public class RichTextPropertyEditor : DataEditor
 
             RichTextEditorValue MarkupWithEmptyBlocks() => new()
             {
-                Markup = richTextEditorValue.Markup,
+                Markup = richTextEditorValue?.Markup ?? string.Empty,
                 Blocks = new RichTextBlockValue(),
             };
         }

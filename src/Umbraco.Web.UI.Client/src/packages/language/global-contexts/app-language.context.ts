@@ -8,6 +8,7 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 
 // TODO: Make a store for the App Languages.
 // TODO: Implement default language end-point, in progress at backend team, so we can avoid getting all languages.
@@ -50,6 +51,8 @@ export class UmbAppLanguageContext extends UmbContextBase implements UmbApi {
 
 	#readOnlyStateIdentifier = 'UMB_LANGUAGE_PERMISSION_';
 	#localStorageKey = 'umb:appLanguage';
+
+	#variantContext = new UmbVariantContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_APP_LANGUAGE_CONTEXT);
@@ -96,6 +99,10 @@ export class UmbAppLanguageContext extends UmbContextBase implements UmbApi {
 		// set the new language
 		this.#appLanguage.update(language);
 
+		// Update the variant context with the new language
+		this.#variantContext.setCulture(language.unique);
+		this.#variantContext.setAppCulture(language.unique);
+
 		// store the new language in local storage
 		localStorage.setItem(this.#localStorageKey, language?.unique);
 
@@ -119,23 +126,20 @@ export class UmbAppLanguageContext extends UmbContextBase implements UmbApi {
 	}
 
 	#initAppLanguage() {
-		// get the selected language from local storage
-		const uniqueFromLocalStorage = localStorage.getItem(this.#localStorageKey);
-
-		if (uniqueFromLocalStorage) {
-			const language = this.#findLanguage(uniqueFromLocalStorage);
-			if (language) {
-				this.setLanguage(language.unique);
-				return;
-			}
-		}
-
-		const defaultLanguage = this.#languages.getValue().find((x) => x.isDefault);
+		const defaultLanguageUnique = this.#languages.getValue().find((x) => x.isDefault)?.unique;
 		// TODO: do we always have a default language?
 		// do we always get the default language on the first request, or could it be on page 2?
 		// in that case do we then need an endpoint to get the default language?
-		if (!defaultLanguage?.unique) return;
-		this.setLanguage(defaultLanguage.unique);
+		if (!defaultLanguageUnique) return;
+
+		this.#variantContext.setFallbackCulture(defaultLanguageUnique);
+
+		// get the selected language from local storage
+		const uniqueFromLocalStorage = localStorage.getItem(this.#localStorageKey);
+		const languageFromLocalStorage = this.#findLanguage(uniqueFromLocalStorage || '');
+		const languageUniqueToSet = languageFromLocalStorage ? languageFromLocalStorage.unique : defaultLanguageUnique;
+
+		this.setLanguage(languageUniqueToSet);
 	}
 
 	#findLanguage(unique: string) {

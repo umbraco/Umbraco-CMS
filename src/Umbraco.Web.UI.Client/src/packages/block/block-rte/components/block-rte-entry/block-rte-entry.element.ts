@@ -45,44 +45,49 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	#context = new UmbBlockRteEntryContext(this);
 
 	@state()
-	_showContentEdit = false;
+	private _showContentEdit = false;
 
 	@state()
-	_hasSettings = false;
+	private _hasSettings = false;
 
 	@state()
-	_label = '';
+	private _label = '';
 
 	@state()
-	_icon?: string;
+	private _icon?: string;
 
 	@state()
-	_exposed?: boolean;
+	private _exposed?: boolean;
 
 	@state()
-	_workspaceEditContentPath?: string;
+	private _showActions?: boolean;
 
 	@state()
-	_workspaceEditSettingsPath?: string;
+	private _workspaceEditContentPath?: string;
 
 	@state()
-	_contentTypeAlias?: string;
+	private _workspaceEditSettingsPath?: string;
 
 	@state()
-	_contentTypeName?: string;
+	private _contentTypeAlias?: string;
 
 	@state()
-	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
+	private _contentTypeName?: string;
+
+	@state()
+	private _blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
 		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_contentInvalid?: boolean;
 
 	// 'settings-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_settingsInvalid?: boolean;
 
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel>>) {
@@ -155,6 +160,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			(exposed) => {
 				this.#updateBlockViewProps({ unpublished: !exposed });
 				this._exposed = exposed;
+			},
+			null,
+		);
+
+		this.observe(
+			this.#context.actionsVisibility,
+			(showActions) => {
+				this._showActions = showActions;
 			},
 			null,
 		);
@@ -243,6 +256,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
+		ext.component?.setAttribute('part', 'component');
 		if (this._exposed) {
 			return ext.component;
 		} else {
@@ -268,12 +282,18 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 							single>
 							${this.#renderRefBlock()}
 						</umb-extension-slot>
-						<uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()} </uui-action-bar>
+						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 							: nothing}
 					</div>
 				`
+			: nothing;
+	}
+
+	#renderActionBar() {
+		return this._showActions
+			? html` <uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()}</uui-action-bar> `
 			: nothing;
 	}
 
@@ -283,7 +303,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-ref-rte-block>`;
+			.settings=${this._blockViewProps.settings}
+			.config=${this._blockViewProps.config}></umb-ref-rte-block>`;
 	}
 
 	#renderEditAction() {
@@ -335,16 +356,23 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			:host {
 				position: relative;
 				display: block;
-				user-select: none;
+				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
 			}
+
 			:host(.ProseMirror-selectednode) {
 				umb-ref-rte-block {
-					cursor: not-allowed;
+					--uui-color-default-contrast: initial;
 					outline: 3px solid var(--uui-color-focus);
 				}
 			}
+
+			umb-extension-slot::part(component) {
+				position: relative;
+				z-index: 0;
+			}
+
 			uui-action-bar {
 				position: absolute;
 				top: var(--uui-size-2);

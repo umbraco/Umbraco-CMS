@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -33,14 +33,13 @@ test('can create content with an empty block list', async ({umbracoApi, umbracoU
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -57,14 +56,13 @@ test('can publish content with an empty block list', async ({umbracoApi, umbraco
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);  
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe(expectedState);
@@ -89,8 +87,7 @@ test('can add a block element in the content', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(inputText);
@@ -112,8 +109,7 @@ test('can edit block element in the content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(updatedText);
 });
@@ -130,8 +126,7 @@ test('can delete block element in the content', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   const blockGridValue = contentData.values.find(item => item.value);
   expect(blockGridValue).toBeFalsy();
@@ -158,8 +153,7 @@ test('cannot add number of block element greater than the maximum amount', async
   await umbracoUi.content.clickCreateModalButton();
 
   // Assert
-  await umbracoUi.content.doesFormValidationMessageContainText('Maximum');
-  await umbracoUi.content.doesFormValidationMessageContainText('too many');
+  await umbracoUi.content.doesFormValidationMessageContainText('Maximum 1 entries, you have entered 1 too many.');
 });
 
 test('can set the label of block element in the content', async ({umbracoApi, umbracoUi}) => {
@@ -179,13 +173,11 @@ test('can set the label of block element in the content', async ({umbracoApi, um
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   await umbracoUi.content.doesBlockElementHaveName(blockLabel);
 });
 
-// TODO: Remove skip when front-end is ready. Currently, it is impossible to create content with blocklist that has a setting model
-test.skip('can add settings model for the block in the content', async ({umbracoApi, umbracoUi}) => {
+test('can add settings model for the block in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const contentBlockInputText = 'This is textstring';
   const settingBlockInputText = 'This is textarea';
@@ -209,8 +201,7 @@ test.skip('can add settings model for the block in the content', async ({umbraco
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(contentBlockInputText);
   expect(contentData.values[0].value.settingsData[0].values[0].value).toEqual(settingBlockInputText);
@@ -225,21 +216,20 @@ test.skip('can move blocks in the content', async ({umbracoApi, umbracoUi}) => {
 
 test('can create content with a block list with the inline editing mode enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithInlineEditingMode(customDataTypeName, elementTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithInlineEditingMode(customDataTypeName, true);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
   await umbracoUi.content.clickActionsMenuAtRoot();
-  await umbracoUi.content.clickCreateButton();
+  await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(documentTypeName);
   await umbracoUi.content.enterContentName(contentName);
   await umbracoUi.content.clickSaveButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.created);
-  await umbracoUi.content.isErrorNotificationVisible(false);
+  await umbracoUi.content.waitForContentToBeCreated();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
 });
 
@@ -261,12 +251,115 @@ test('can add a block element with inline editing mode enabled', async ({umbraco
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  //await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.saved);
-  await umbracoUi.content.isErrorNotificationVisible(false);
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value.contentData[0].values[0].value).toEqual(inputText);
   const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
   expect(blockListValue).toBeTruthy();
+});
+
+test('can add an invariant block element with invariant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const inputText = 'This is block test';
+  const customRTEDataTypeName = 'TestRTETiptap';
+  const customElementTypeName = 'BlockListWithRTEElement';
+  const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
+  const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.enterRTETipTapEditor(inputText);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
+  const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
+  expect(blockListValue).toBeTruthy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
+});
+
+test('can add a variant block element with variant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const inputText = 'This is block test';
+  const customRTEDataTypeName = 'TestRTETiptap';
+  const customElementTypeName = 'BlockListWithRTEElement';
+  await umbracoApi.language.createDanishLanguage();
+  const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
+  const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'testGroup', true);
+  await umbracoApi.document.createDefaultDocumentWithCulture(contentName, documentTypeId, 'en-US');
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.enterRTETipTapEditor(inputText);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
+  const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
+  expect(blockListValue).toBeTruthy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
+  await umbracoApi.language.ensureNameNotExists('Danish');
+});
+
+test('can add a variant block element with invariant RTE Tiptap in the content', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const inputText = 'This is block test';
+  const customRTEDataTypeName = 'TestRTETiptap';
+  const customElementTypeName = 'BlockListWithRTEElement';
+  await umbracoApi.language.createDanishLanguage();
+  const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
+  const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'testGroup', true);
+  await umbracoApi.document.createDefaultDocumentWithCulture(contentName, documentTypeId, 'en-US');
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(customElementTypeName);
+  await umbracoUi.content.enterRTETipTapEditor(inputText);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveButtonForContent();
+  await umbracoUi.content.clickSaveButton();
+
+  // Assert
+  await umbracoUi.content.isSuccessStateVisibleForSaveButton();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values[0].value.contentData[0].values[0].value.markup).toContain(inputText);
+  const blockListValue = contentData.values.find(item => item.editorAlias === "Umbraco.BlockList")?.value;
+  expect(blockListValue).toBeTruthy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customRTEDataTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(customElementTypeName);
+  await umbracoApi.language.ensureNameNotExists('Danish');
 });

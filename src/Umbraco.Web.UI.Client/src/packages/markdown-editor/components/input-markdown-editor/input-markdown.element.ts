@@ -87,6 +87,11 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 			this.observe(umbExtensionsRegistry.byType('monacoMarkdownEditorAction'), (manifests) => {
 				manifests.forEach(async (manifest) => {
 					const api = await createExtensionApi(this, manifest, [this]);
+
+					if (api) {
+						(api as any).manifest = manifest;
+					}
+
 					const action: UmbMarkdownEditorAction = {
 						id: manifest.alias ?? api.getUnique(),
 						label: this.localize.string(manifest.meta?.label ?? api.getLabel()),

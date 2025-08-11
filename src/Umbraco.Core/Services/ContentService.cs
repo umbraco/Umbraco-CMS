@@ -1108,14 +1108,8 @@ public class ContentService : RepositoryService, IContentService
 
             if (culturesChanging != null)
             {
-                IEnumerable<string>? languages = _languageRepository.GetMany()?
-                    .Where(x => culturesChanging.InvariantContains(x.IsoCode))
-                    .Select(x => x.CultureName);
-                if (languages is not null)
-                {
-                    var langs = string.Join(", ", languages);
-                    Audit(AuditType.SaveVariant, userId.Value, content.Id, $"Saved languages: {langs}", langs);
-                }
+                var langs = GetLanguageDetailsForAuditEntry(culturesChanging);
+                Audit(AuditType.SaveVariant, userId.Value, content.Id, $"Saved languages: {langs}", langs);
             }
             else
             {
@@ -1189,6 +1183,8 @@ public class ContentService : RepositoryService, IContentService
         {
             throw new ArgumentException("Cultures cannot be null or whitespace", nameof(cultures));
         }
+
+        cultures = cultures.Select(x => x.EnsureCultureCode()!).ToArray();
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -1269,7 +1265,7 @@ public class ContentService : RepositoryService, IContentService
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        culture = culture?.NullOrWhiteSpaceAsNull();
+        culture = culture?.NullOrWhiteSpaceAsNull().EnsureCultureCode();
 
         PublishedState publishedState = content.PublishedState;
         if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -1625,9 +1621,7 @@ public class ContentService : RepositoryService, IContentService
                 if (culturesUnpublishing != null)
                 {
                     // This will mean that that we unpublished a mandatory culture or we unpublished the last culture.
-                    var langs = string.Join(", ", allLangs
-                        .Where(x => culturesUnpublishing.InvariantContains(x.IsoCode))
-                        .Select(x => x.CultureName));
+                    var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
                     Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
 
                     if (publishResult == null)
@@ -1707,9 +1701,7 @@ public class ContentService : RepositoryService, IContentService
                     case PublishResultType.SuccessPublishCulture:
                         if (culturesPublishing != null)
                         {
-                            var langs = string.Join(", ", allLangs
-                                .Where(x => culturesPublishing.InvariantContains(x.IsoCode))
-                                .Select(x => x.CultureName));
+                            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesPublishing);
                             Audit(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
                         }
 
@@ -1717,9 +1709,7 @@ public class ContentService : RepositoryService, IContentService
                     case PublishResultType.SuccessUnpublishCulture:
                         if (culturesUnpublishing != null)
                         {
-                            var langs = string.Join(", ", allLangs
-                                .Where(x => culturesUnpublishing.InvariantContains(x.IsoCode))
-                                .Select(x => x.CultureName));
+                            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
                             Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
                         }
 
@@ -1741,9 +1731,7 @@ public class ContentService : RepositoryService, IContentService
         {
             if (culturesChanging != null)
             {
-                var langs = string.Join(", ", allLangs
-                    .Where(x => culturesChanging.InvariantContains(x.IsoCode))
-                    .Select(x => x.CultureName));
+                var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesChanging);
                 Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
             }
             else
@@ -2077,7 +2065,7 @@ public class ContentService : RepositoryService, IContentService
             cultures = ["*"];
         }
 
-        return cultures;
+        return cultures.Select(x => x.EnsureCultureCode()!).ToArray();
     }
 
     private static bool ProvidedCulturesIndicatePublishAll(string[] cultures) => cultures.Length == 0 || (cultures.Length == 1 && cultures[0] == "invariant");
@@ -3098,6 +3086,17 @@ public class ContentService : RepositoryService, IContentService
     private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
         _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message, parameters));
 
+    private string GetLanguageDetailsForAuditEntry(IEnumerable<string> affectedCultures)
+        => GetLanguageDetailsForAuditEntry(_languageRepository.GetMany(), affectedCultures);
+
+    private static string GetLanguageDetailsForAuditEntry(IEnumerable<ILanguage> languages, IEnumerable<string> affectedCultures)
+    {
+        IEnumerable<string> languageIsoCodes = languages
+            .Where(x => affectedCultures.InvariantContains(x.IsoCode))
+            .Select(x => x.IsoCode);
+        return string.Join(", ", languageIsoCodes);
+    }
+
     private static bool IsDefaultCulture(IReadOnlyCollection<ILanguage>? langs, string culture) =>
         langs?.Any(x => x.IsDefault && x.IsoCode.InvariantEquals(culture)) ?? false;
 
@@ -3612,6 +3611,9 @@ public class ContentService : RepositoryService, IContentService
     }
 
     public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+        => SaveBlueprint(content, null, userId);
+
+    public void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -3632,7 +3634,7 @@ public class ContentService : RepositoryService, IContentService
 
             Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
-            scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, evtMsgs));
+            scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, createdFromContent, evtMsgs));
             scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
             scope.Complete();
@@ -3655,12 +3657,12 @@ public class ContentService : RepositoryService, IContentService
 
     private static readonly string?[] ArrayOfOneNullString = { null };
 
-    public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
+    public IContent CreateBlueprintFromContent(
+        IContent blueprint,
+        string name,
+        int userId = Constants.Security.SuperUserId)
     {
-        if (blueprint == null)
-        {
-            throw new ArgumentNullException(nameof(blueprint));
-        }
+        ArgumentNullException.ThrowIfNull(blueprint);
 
         IContentType contentType = GetContentType(blueprint.ContentType.Alias);
         var content = new Content(name, -1, contentType);
@@ -3673,15 +3675,13 @@ public class ContentService : RepositoryService, IContentService
         if (blueprint.CultureInfos?.Count > 0)
         {
             cultures = blueprint.CultureInfos.Values.Select(x => x.Culture);
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            if (blueprint.CultureInfos.TryGetValue(_languageRepository.GetDefaultIsoCode(), out ContentCultureInfos defaultCulture))
             {
-                if (blueprint.CultureInfos.TryGetValue(_languageRepository.GetDefaultIsoCode(), out ContentCultureInfos defaultCulture))
-                {
-                    defaultCulture.Name = name;
-                }
-
-                scope.Complete();
+                defaultCulture.Name = name;
             }
+
+            scope.Complete();
         }
 
         DateTime now = DateTime.Now;
@@ -3701,6 +3701,11 @@ public class ContentService : RepositoryService, IContentService
 
         return content;
     }
+
+    /// <inheritdoc />
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
+    public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
+        => CreateBlueprintFromContent(blueprint, name, userId);
 
     public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
     {

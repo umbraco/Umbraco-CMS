@@ -18,6 +18,11 @@ public sealed class MediaTreeChangeDistributedCacheNotificationHandler : TreeCha
         => _distributedCache = distributedCache;
 
     /// <inheritdoc />
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     protected override void Handle(IEnumerable<TreeChange<IMedia>> entities)
+        => Handle(entities, new Dictionary<string, object?>());
+
+    /// <inheritdoc />
+    protected override void Handle(IEnumerable<TreeChange<IMedia>> entities, IDictionary<string, object?> state)
         => _distributedCache.RefreshMediaCache(entities);
 }

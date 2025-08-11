@@ -58,7 +58,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 		const { data, error } = await tryExecute(
 			this.#host,
 			PartialViewService.getPartialViewFolderByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 			}),
 		);
 
@@ -125,7 +125,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 		return tryExecute(
 			this.#host,
 			PartialViewService.deletePartialViewFolderByPath({
-				path: { path: encodeURIComponent(path) },
+				path: { path },
 			}),
 		);
 	}

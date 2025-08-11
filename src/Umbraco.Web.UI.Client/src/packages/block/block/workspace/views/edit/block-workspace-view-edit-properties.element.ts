@@ -36,13 +36,13 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	}
 
 	@state()
-	_dataOwner?: UmbBlockElementManager;
+	private _dataOwner?: UmbBlockElementManager;
 
 	@state()
-	_variantId?: UmbVariantId;
+	private _workspaceVariantId?: UmbVariantId;
 
 	@state()
-	_visibleProperties?: Array<UmbPropertyTypeModel>;
+	private _visibleProperties?: Array<UmbPropertyTypeModel>;
 
 	@state()
 	private _ownerEntityType?: string;
@@ -56,7 +56,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 			this.observe(
 				workspaceContext?.variantId,
 				(variantId) => {
-					this._variantId = variantId;
+					this._workspaceVariantId = variantId;
 					this.#processPropertyStructure();
 				},
 				'observeVariantId',
@@ -83,16 +83,19 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	}
 
 	#processPropertyStructure() {
-		if (!this._dataOwner || !this.#properties || !this.#propertyStructureHelper) {
+		if (!this._dataOwner || !this.#properties || !this.#propertyStructureHelper || !this._workspaceVariantId) {
 			return;
 		}
 
 		const propertyViewGuard = this._dataOwner.propertyViewGuard;
 
 		this.#properties.forEach((property) => {
-			const propertyVariantId = new UmbVariantId(this._variantId?.culture, this._variantId?.segment);
+			const propertyVariantId = new UmbVariantId(
+				property.variesByCulture ? this._workspaceVariantId!.culture : null,
+				property.variesBySegment ? this._workspaceVariantId!.segment : null,
+			);
 			this.observe(
-				propertyViewGuard.isPermittedForVariantAndProperty(propertyVariantId, property),
+				propertyViewGuard.isPermittedForVariantAndProperty(propertyVariantId, property, this._workspaceVariantId!),
 				(permitted) => {
 					if (permitted) {
 						this.#visiblePropertiesUniques.push(property.unique);
@@ -117,7 +120,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._variantId && this._visibleProperties
+		return this._workspaceVariantId && this._visibleProperties
 			? repeat(
 					this._visibleProperties,
 					(property) => property.alias,
@@ -126,7 +129,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 							class="property"
 							.ownerContext=${this._dataOwner}
 							.ownerEntityType=${this._ownerEntityType}
-							.variantId=${this._variantId}
+							.variantId=${this._workspaceVariantId}
 							.property=${property}></umb-block-workspace-view-edit-property>`,
 				)
 			: nothing;

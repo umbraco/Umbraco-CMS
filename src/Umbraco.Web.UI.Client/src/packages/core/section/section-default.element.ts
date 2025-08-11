@@ -43,7 +43,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	private _sidebarApps?: Array<UmbExtensionElementInitializer<any>>;
 
 	@state()
-	_splitPanelPosition = '300px';
+	private _splitPanelPosition = '300px';
 
 	constructor() {
 		super();
@@ -82,6 +82,10 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 				const routes: Array<IRoute> = await Promise.all(
 					extensionsWithElement.map(async (extensionController) => {
 						const api = await createExtensionApi(this, extensionController.manifest);
+
+						if (api) {
+							(api as any).manifest = extensionController.manifest;
+						}
 
 						return {
 							path:

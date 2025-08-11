@@ -106,7 +106,7 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 		if (!this._items?.length) return nothing;
 		return html`
 			<umb-workspace-info-app-layout headline="#references_labelUsedByItems">
-				${this.#renderItems()} ${this.#renderReferencePagination()}
+				<div id="content">${this.#renderItems()} ${this.#renderReferencePagination()}</div>
 			</umb-workspace-info-app-layout>
 		`;
 	}
@@ -132,7 +132,13 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 
 		return html`
 			<div class="pagination-container">
-				<uui-pagination .total=${totalPages} @change="${this.#onPageChange}"></uui-pagination>
+				<uui-pagination 
+				.total=${totalPages} 
+				firstlabel=${this.localize.term('general_first')}
+                previouslabel=${this.localize.term('general_previous')}
+                nextlabel=${this.localize.term('general_next')}
+                lastlabel=${this.localize.term('general_last')}
+				@change="${this.#onPageChange}"></uui-pagination>
 			</div>
 		`;
 	}
@@ -142,6 +148,11 @@ export class UmbEntityReferencesWorkspaceInfoAppElement extends UmbLitElement {
 		css`
 			:host {
 				display: contents;
+			}
+
+			#content {
+				display: block;
+				padding: var(--uui-size-space-3) var(--uui-size-space-4);
 			}
 
 			.pagination-container {

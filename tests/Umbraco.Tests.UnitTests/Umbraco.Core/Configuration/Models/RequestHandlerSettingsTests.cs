@@ -1,4 +1,3 @@
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
@@ -14,10 +13,10 @@ public class RequestHandlerSettingsTests
         var settings = new RequestHandlerSettings
         {
             UserDefinedCharCollection =
-            {
+            [
                 new() { Char = "test", Replacement = "replace" },
                 new() { Char = "test2", Replacement = "replace2" },
-            }
+            ]
         };
         var actual = settings.GetCharReplacements().ToList();
 
@@ -34,15 +33,15 @@ public class RequestHandlerSettingsTests
         var settings = new RequestHandlerSettings
         {
             UserDefinedCharCollection =
-            {
+            [
                 new() { Char = "test", Replacement = "replace" },
                 new() { Char = "test2", Replacement = "replace2" },
-            },
+            ],
             EnableDefaultCharReplacements = false,
         };
         var actual = settings.GetCharReplacements().ToList();
 
-        Assert.AreEqual(settings.UserDefinedCharCollection.Count, actual.Count);
+        Assert.AreEqual(settings.UserDefinedCharCollection.Count(), actual.Count);
         Assert.That(actual, Is.EquivalentTo(settings.UserDefinedCharCollection));
     }
 
@@ -52,10 +51,10 @@ public class RequestHandlerSettingsTests
         var settings = new RequestHandlerSettings
         {
             UserDefinedCharCollection =
-            {
+            [
                 new() { Char = "%", Replacement = "percent" },
                 new() { Char = ".", Replacement = "dot" },
-            }
+            ]
         };
         var actual = settings.GetCharReplacements().ToList();
 
@@ -73,11 +72,11 @@ public class RequestHandlerSettingsTests
         var settings = new RequestHandlerSettings
         {
             UserDefinedCharCollection =
-            {
+            [
                 new() { Char = "%", Replacement = "percent" },
                 new() { Char = ".", Replacement = "dot" },
                 new() { Char = "new", Replacement = "new" },
-            }
+            ]
         };
         var actual = settings.GetCharReplacements().ToList();
 

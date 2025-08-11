@@ -14,6 +14,7 @@ import {
 	UmbWorkspaceViewHintManager,
 	type UmbEntityDetailWorkspaceContextArgs,
 	type UmbEntityDetailWorkspaceContextCreateArgs,
+	type UmbSaveableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbContentTypeStructureManager,
@@ -98,7 +99,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
 	>
 	extends UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>
-	implements UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>
+	implements
+		UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>,
+		UmbSaveableWorkspaceContext
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
@@ -715,6 +718,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public async runMandatoryValidationForSaveData(saveData: DetailModelType, variantIds: Array<UmbVariantId> = []) {
 		// Check that the data is valid before we save it.
+		// If we vary by culture then we do not want to validate the invariant variant.
+		if (this.getVariesByCulture()) {
+			variantIds = variantIds.filter((variant) => !variant.isCultureInvariant());
+		}
 		const missingVariants = variantIds.filter((variant) => {
 			return !saveData.variants.some((y) => variant.compare(y));
 		});
@@ -755,7 +762,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 			// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
 			if (this.getIsNew()) {
-				const parent = this.getParent();
+				const parent = this._internal_getCreateUnderParent();
 				if (!parent) throw new Error('Parent is not set');
 				await this.#serverValidation.askServerForValidation(
 					saveData,
@@ -783,6 +790,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Request a save of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be saved.
+	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 */
+	public requestSave() {
+		return this._handleSave();
+	}
+
+	/**
 	 * Get the data to save
 	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
 	 * @returns {Promise<DetailModelType>}  {Promise<DetailModelType>}
@@ -793,6 +808,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	protected async _handleSubmit() {
+		await this._handleSave();
+		this._closeModal();
+	}
+	protected async _handleSave() {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');
@@ -833,18 +852,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this.runMandatoryValidationForSaveData(saveData, variantIds);
 		if (this.#validateOnSubmit) {
 			await this.askServerToValidate(saveData, variantIds);
-			return this.validateAndSubmit(
-				async () => {
-					return this.performCreateOrUpdate(variantIds, saveData);
-				},
-				async (reason?: any) => {
-					if (this.#ignoreValidationResultOnSubmit) {
-						return this.performCreateOrUpdate(variantIds, saveData);
-					} else {
-						return this.invalidSubmit(reason);
-					}
-				},
+			const valid = await this._validateAndLog().then(
+				() => true,
+				() => false,
 			);
+			if (valid || this.#ignoreValidationResultOnSubmit) {
+				return this.performCreateOrUpdate(variantIds, saveData);
+			}
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
 		}
@@ -879,7 +893,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	async #create(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
 
-		const parent = this.getParent();
+		const parent = this._internal_getCreateUnderParent();
 		if (!parent) throw new Error('Parent is not set');
 
 		const { data, error } = await this._detailRepository.create(saveData, parent.unique);
@@ -908,6 +922,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			variantIdsIncludingInvariant,
 		);
 		this._data.setCurrent(newCurrentData);
+		this.setIsNew(false);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!eventContext) {
@@ -918,9 +933,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			unique: parent.unique,
 		});
 		eventContext.dispatchEvent(event);
-		this.setIsNew(false);
-
-		this._closeModal();
 	}
 
 	async #update(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {
@@ -970,12 +982,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		});
 
 		eventContext.dispatchEvent(updatedEvent);
-
-		this._closeModal();
 	}
 
 	override resetState() {
 		super.resetState();
+		this.structure.clear();
 		this.readOnlyGuard.clearRules();
 		this.propertyViewGuard.clearRules();
 		this.propertyWriteGuard.clearRules();
