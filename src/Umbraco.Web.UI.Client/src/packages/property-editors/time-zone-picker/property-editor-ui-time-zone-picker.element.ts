@@ -29,6 +29,9 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 		return this._value;
 	}
 
+	@property({ type: Boolean, reflect: true })
+	readonly: boolean = false;
+
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
@@ -80,7 +83,11 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 
 	override render() {
 		return html`
-			<uui-radio-group required @input=${this.#onModeInput} .value=${this.value?.mode ?? 'none'}>
+			<uui-radio-group
+				required
+				.readonly=${this.readonly}
+				@input=${this.#onModeInput}
+				.value=${this.value?.mode ?? 'none'}>
 				<uui-radio name="order" label="Disabled" value="none"></uui-radio>
 				<uui-radio name="order" label="All - Display all available time zones" value="all"></uui-radio>
 				<uui-radio name="order" label="Local - Display only the local time zone" value="local"></uui-radio>
@@ -89,6 +96,7 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 			<div class="timezone-picker-container" ?hidden=${this.value?.mode !== 'custom'}>
 				<umb-input-time-zone
 					.value=${this._selectedTimeZones}
+					.readonly=${this.readonly}
 					.required=${this.value?.mode === 'custom'}
 					@change=${this.#onChange}
 					${umbBindToValidation(this)}>

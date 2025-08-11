@@ -12,15 +12,13 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { getTimeZoneList, type TimeZone } from '@umbraco-cms/backoffice/utils';
-import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
+import type { TimeZone } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-input-time-zone-picker
  */
 @customElement('umb-input-time-zone-picker')
 export class UmbInputTimeZonePickerElement extends UUIFormControlMixin(UmbLitElement, '') {
-	private _options: Array<TimeZone> = [];
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -31,13 +29,23 @@ export class UmbInputTimeZonePickerElement extends UUIFormControlMixin(UmbLitEle
 	disabled = false;
 
 	/**
-	 * Disables the input
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
 	 * @attr
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
+
+	@property({ type: Array, reflect: true })
+	public set options(value) {
+		this.#options = value;
+		this._filteredOptions = value;
+	}
+	public get options() {
+		return this.#options;
+	}
+	#options: Array<TimeZone> = [];
 
 	@state()
 	private _filteredOptions: Array<TimeZone> = [];
@@ -50,7 +58,7 @@ export class UmbInputTimeZonePickerElement extends UUIFormControlMixin(UmbLitEle
 	 */
 	constructor() {
 		super();
-		this._options = this._filteredOptions = getTimeZoneList(undefined, DateTime.now());
+		this._filteredOptions = this.options;
 	}
 
 	async #onAdd() {
@@ -62,7 +70,7 @@ export class UmbInputTimeZonePickerElement extends UUIFormControlMixin(UmbLitEle
 
 	#onSearch(event: UUIComboboxEvent) {
 		const searchTerm = (event.currentTarget as UUIComboboxElement)?.search;
-		this._filteredOptions = this._options.filter(
+		this._filteredOptions = this.options.filter(
 			(option) => new RegExp(searchTerm, 'i').test(option.name) || option.offset === searchTerm,
 		);
 	}

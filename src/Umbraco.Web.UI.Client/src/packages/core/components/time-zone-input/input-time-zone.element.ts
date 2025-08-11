@@ -6,6 +6,8 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { getTimeZoneList, type TimeZone } from '@umbraco-cms/backoffice/utils';
+import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
 
 /**
  * @element umb-input-time-zone
@@ -123,9 +125,11 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		return super.value;
 	}
 
+	private #timeZoneList: Array<TimeZone> = [];
+
 	constructor() {
 		super();
-		console.log(this.value);
+		this.#timeZoneList = getTimeZoneList(undefined, DateTime.now());
 
 		this.addValidator(
 			'valueMissing',
@@ -157,6 +161,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		const target = event.currentTarget as UmbInputTimeZoneItemElement;
 		const value = target.value as string;
 		this.value = this.value.map((item, index) => (index === currentIndex ? value : item));
+		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -186,12 +191,12 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 			id="validation-message"
 			@invalid=${this.#onInvalid}
 			@valid=${this.#onValid}>
-			<div id="sorter-wrapper">${this.#renderItems()}</div>
-			${this.#renderAddButton()}
+			<div id="sorter-wrapper">${this.#renderSelectedItems()}</div>
+			${this.#renderAddTimeZone()}
 		</umb-form-validation-message>`;
 	}
 
-	#renderItems() {
+	#renderSelectedItems() {
 		return html`
 			${repeat(
 				this.value,
@@ -214,11 +219,12 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		`;
 	}
 
-	#renderAddButton() {
+	#renderAddTimeZone() {
 		if (this.disabled || this.readonly) return nothing;
 		return html`
 			<umb-input-time-zone-picker
 				name="picker"
+				.options=${this.#timeZoneList.filter((tz) => !this.value.includes(tz.value))}
 				?disabled=${this.disabled}
 				?readonly=${this.readonly}
 				@added=${this.#onAdd}>

@@ -2,6 +2,7 @@ import { html, customElement, css, property, nothing, when } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
+import { getTimeZoneName } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-input-time-zone-item
@@ -31,11 +32,12 @@ export class UmbInputTimeZoneItemElement extends UUIFormControlMixin(UmbLitEleme
 	}
 
 	override render() {
+		const label = getTimeZoneName(this.value as string);
 		return html`
 			<div class="time-zone-item">
 				${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip" class="handle"></uui-icon>`}
 
-				<span>${this.value}</span>
+				<span>${label}</span>
 
 				${when(
 					!this.readonly,
@@ -43,7 +45,7 @@ export class UmbInputTimeZoneItemElement extends UUIFormControlMixin(UmbLitEleme
 						<uui-button
 							class="time-zone-remove-button"
 							compact
-							label="${this.localize.term('general_remove')} ${this.value}"
+							label="${this.localize.term('general_remove')} ${label}"
 							look="outline"
 							?disabled=${this.disabled}
 							@click=${() => this.dispatchEvent(new UmbDeleteEvent())}>
