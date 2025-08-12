@@ -1,5 +1,5 @@
-import type { UmbDocumentTypeDetailModel } from '../../types.js';
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
+import type { UmbDocumentTypeDetailModel } from '../../../types.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../../entity.js';
 import { cache } from './document-type-detail.server.runtime-cache.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
@@ -9,7 +9,6 @@ import type {
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbManagementApiDetailDataRequestManager } from '@umbraco-cms/backoffice/management-api';

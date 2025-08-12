@@ -1,5 +1,5 @@
 import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '../server-event/constants.js';
-import type { UmbManagementApiDetailDataCache } from '../runtime-cache/index.js';
+import type { UmbManagementApiDetailDataRuntimeCache } from './runtime-cache.js';
 import {
 	tryExecute,
 	type UmbApiError,
@@ -19,7 +19,7 @@ export interface UmbManagementApiDetailDataRequestManagerArgs<
 	read: (id: string) => Promise<UmbApiResponse<{ data: DetailResponseModelType }>>;
 	update: (id: string, data: UpdateRequestModelType) => Promise<UmbApiResponse<{ data: unknown }>>;
 	delete: (id: string) => Promise<UmbApiResponse<{ data: unknown }>>;
-	cache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
+	cache: UmbManagementApiDetailDataRuntimeCache<DetailResponseModelType>;
 	serverEventSource: string;
 }
 
@@ -28,7 +28,7 @@ export class UmbManagementApiDetailDataRequestManager<
 	CreateRequestModelType,
 	UpdateRequestModelType,
 > extends UmbControllerBase {
-	#cache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
+	#cache: UmbManagementApiDetailDataRuntimeCache<DetailResponseModelType>;
 	#serverEventSource: string;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 
