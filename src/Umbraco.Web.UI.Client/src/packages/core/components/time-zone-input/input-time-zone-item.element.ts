@@ -1,6 +1,5 @@
 import { html, customElement, css, property, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { getTimeZoneName } from '@umbraco-cms/backoffice/utils';
 
@@ -8,7 +7,10 @@ import { getTimeZoneName } from '@umbraco-cms/backoffice/utils';
  * @element umb-input-time-zone-item
  */
 @customElement('umb-input-time-zone-item')
-export class UmbInputTimeZoneItemElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputTimeZoneItemElement extends UmbLitElement {
+	@property({ reflect: false })
+	value = '';
+
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -27,12 +29,8 @@ export class UmbInputTimeZoneItemElement extends UUIFormControlMixin(UmbLitEleme
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
-	protected override getFormElement() {
-		return undefined;
-	}
-
 	override render() {
-		const label = getTimeZoneName(this.value as string);
+		const label = getTimeZoneName(this.value);
 		return html`
 			<div class="time-zone-item">
 				${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip" class="handle"></uui-icon>`}

@@ -1,9 +1,8 @@
 import type UmbInputTimeZoneItemElement from './input-time-zone-item.element.js';
 import type { UmbTimeZoneAddEvent } from './input-time-zone-picker.element.js';
 import { html, customElement, property, css, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { getTimeZoneList, type TimeZone } from '@umbraco-cms/backoffice/utils';
@@ -40,16 +39,16 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	 * @default undefined
 	 */
 	@property({ type: Number })
-	min?: number;
-
-	/**
-	 * Min validation message.
-	 * @type {boolean}
-	 * @attr
-	 * @default
-	 */
-	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	public set min(value) {
+		this.#min = value;
+	}
+	public get min() {
+		if (this.required && this.#min < 1) {
+			return 1;
+		}
+		return this.#min;
+	}
+	#min = 0;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -59,15 +58,6 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	 */
 	@property({ type: Number })
 	max?: number;
-
-	/**
-	 * Max validation message.
-	 * @type {boolean}
-	 * @attr
-	 * @default
-	 */
-	@property({ type: String, attribute: 'min-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
 
 	/**
 	 * Disables the input
@@ -112,9 +102,6 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	@property({ type: Boolean })
 	required?: boolean;
 
-	@property({ type: String })
-	requiredMessage?: string;
-
 	@property({ type: Array, reflect: false })
 	override set value(value: Array<string>) {
 		super.value = value;
@@ -132,22 +119,20 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		this._timeZoneList = getTimeZoneList(undefined, DateTime.now());
 
 		this.addValidator(
-			'valueMissing',
-			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-			() => !this.readonly && !!this.required && (!this.value || this.value.length === 0),
-		);
-
-		this.addValidator(
 			'rangeUnderflow',
-			() => this.minMessage,
-			() => !!this.min && this.value.length < this.min,
+			() => this.localize.term('validation_entriesShort', this.min, this.min - this.value.length),
+			() => this.value.length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
-			() => this.maxMessage,
+			() => this.localize.term('validation_entriesExceed', this.max, this.value.length - (this.max || 0)),
 			() => !!this.max && this.value.length > this.max,
 		);
+	}
+
+	protected override getFormElement() {
+		return undefined;
 	}
 
 	#onAdd(event: UmbTimeZoneAddEvent) {
@@ -157,7 +142,6 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	}
 
 	#onChange(event: UmbChangeEvent, currentIndex: number) {
-		event.stopPropagation();
 		const target = event.currentTarget as UmbInputTimeZoneItemElement;
 		const value = target.value as string;
 		this.value = this.value.map((item, index) => (index === currentIndex ? value : item));
@@ -165,35 +149,15 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#deleteItem(event: UmbDeleteEvent, itemIndex: number) {
-		event.stopPropagation();
+	#deleteItem(itemIndex: number) {
 		this.value = this.value.filter((_item, index) => index !== itemIndex);
 		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	// Prevent valid events from bubbling outside the message element
-	#onValid(event: Event) {
-		event.stopPropagation();
-	}
-
-	// Prevent invalid events from bubbling outside the message element
-	#onInvalid(event: Event) {
-		event.stopPropagation();
-	}
-
-	override getFormElement() {
-		return undefined;
-	}
-
 	override render() {
-		return html` <umb-form-validation-message
-			id="validation-message"
-			@invalid=${this.#onInvalid}
-			@valid=${this.#onValid}>
-			<div id="sorter-wrapper">${this.#renderSelectedItems()}</div>
-			${this.#renderAddTimeZone()}
-		</umb-form-validation-message>`;
+		return html`<div id="sorter-wrapper">${this.#renderSelectedItems()}</div>
+			${this.#renderAddTimeZone()}`;
 	}
 
 	#renderSelectedItems() {
@@ -205,13 +169,11 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 					<umb-input-time-zone-item
 						name="item-${index}"
 						data-sort-entry-id=${item}
-						required
-						required-message="Item ${index + 1} is missing a value"
 						value=${item}
 						?disabled=${this.disabled}
 						?readonly=${this.readonly}
 						@enter=${this.#onAdd}
-						@delete=${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}
+						@delete=${() => this.#deleteItem(index)}
 						@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}>
 					</umb-input-time-zone-item>
 				`,

@@ -106,13 +106,15 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 					value="custom"></uui-radio>
 			</uui-radio-group>
 			<div class="timezone-picker" ?hidden=${this.value?.mode !== 'custom'}>
-				<umb-input-time-zone
-					.value=${this._selectedTimeZones}
-					.readonly=${this.readonly}
-					.required=${this.value?.mode === 'custom'}
-					@change=${this.#onChange}
-					${umbBindToValidation(this)}>
-				</umb-input-time-zone>
+				<umb-form-validation-message>
+					<umb-input-time-zone
+						.value=${this._selectedTimeZones}
+						?readonly=${this.readonly}
+						?required=${this.value?.mode === 'custom'}
+						@change=${this.#onChange}
+						${umbBindToValidation(this)}>
+					</umb-input-time-zone>
+				</umb-form-validation-message>
 			</div>
 		`;
 	}

@@ -11,14 +11,13 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { TimeZone } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-input-time-zone-picker
  */
 @customElement('umb-input-time-zone-picker')
-export class UmbInputTimeZonePickerElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputTimeZonePickerElement extends UmbLitElement {
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -37,7 +36,7 @@ export class UmbInputTimeZonePickerElement extends UUIFormControlMixin(UmbLitEle
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
-	@property({ type: Array, reflect: true })
+	@property({ type: Array })
 	public set options(value) {
 		this.#options = value;
 		this._filteredOptions = value;
@@ -75,23 +74,9 @@ export class UmbInputTimeZonePickerElement extends UUIFormControlMixin(UmbLitEle
 		);
 	}
 
-	// Prevent valid events from bubbling outside the message element
-	#onValid(event: Event) {
-		event.stopPropagation();
-	}
-
-	// Prevent invalid events from bubbling outside the message element
-	#onInvalid(event: Event) {
-		event.stopPropagation();
-	}
-
 	public override async focus() {
 		await this.updateComplete;
 		this._input?.focus();
-	}
-
-	protected override getFormElement() {
-		return undefined;
 	}
 
 	#renderTimeZoneOption = (option: Option) =>
@@ -101,25 +86,22 @@ export class UmbInputTimeZonePickerElement extends UUIFormControlMixin(UmbLitEle
 
 	override render() {
 		return html`
-			<umb-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
-				<uui-combobox
-					id="input"
-					pristine
-					label="${this.localize.term('general_value')} ${this.value}"
-					@search="${this.#onSearch}"
-					?disabled=${this.disabled}
-					?readonly=${this.readonly}>
-					<uui-combobox-list> ${until(repeat(this._filteredOptions, this.#renderTimeZoneOption))} </uui-combobox-list>
-				</uui-combobox>
-			</umb-form-validation-message>
+			<uui-combobox
+				id="input"
+				pristine
+				label="${this.localize.term('general_value')} ${this._input?.value}"
+				@search="${this.#onSearch}"
+				?disabled=${this.disabled}
+				?readonly=${this.readonly}>
+				<uui-combobox-list> ${until(repeat(this._filteredOptions, this.#renderTimeZoneOption))} </uui-combobox-list>
+			</uui-combobox>
 
 			${when(
 				!this.readonly,
 				() => html`
 					<uui-button
-						id="add-button"
 						compact
-						label="${this.localize.term('general_add')} ${this.value}"
+						label="${this.localize.term('general_add')} ${this._input?.value}"
 						look="outline"
 						color="positive"
 						?disabled=${this.disabled || !this._input?.value}
