@@ -112,8 +112,8 @@ export class UmbPickerInputContext<
 
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove ${item.name}?`,
-			content: 'Are you sure you want to remove this item',
+			headline: `#actions_remove ${item.name}?`,
+			content: `#defaultdialogs_confirmremove ${item.name}?`,
 			confirmLabel: '#actions_remove',
 		});
 
