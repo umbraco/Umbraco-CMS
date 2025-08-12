@@ -15,7 +15,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache.Extensi
 public class HybridCacheExtensionsTests
 {
     private Mock<Microsoft.Extensions.Caching.Hybrid.HybridCache> _cacheMock;
-    private readonly HybridCacheEntryFlags _flags = HybridCacheEntryFlags.DisableLocalCacheWrite | HybridCacheEntryFlags.DisableDistributedCacheWrite;
 
     [SetUp]
     public void TestInitialize()
@@ -35,7 +34,7 @@ public class HybridCacheExtensionsTests
                 key,
                 null!,
                 It.IsAny<Func<object, CancellationToken, ValueTask<object>>>(),
-                It.Is<HybridCacheEntryOptions>(value => value.Flags == _flags),
+                It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .ReturnsAsync(expectedValue);
@@ -58,7 +57,7 @@ public class HybridCacheExtensionsTests
                 key,
                 null!,
                 It.IsAny<Func<object, CancellationToken, ValueTask<object>>>(),
-                It.Is<HybridCacheEntryOptions>(value => value.Flags == _flags),
+                It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .Returns((
@@ -91,7 +90,7 @@ public class HybridCacheExtensionsTests
                 key,
                 null!,
                 It.IsAny<Func<object, CancellationToken, ValueTask<string>>>(),
-                It.Is<HybridCacheEntryOptions>(value => value.Flags == _flags),
+                It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .ReturnsAsync(expectedValue);
@@ -116,7 +115,7 @@ public class HybridCacheExtensionsTests
                 key,
                 null!,
                 It.IsAny<Func<object, CancellationToken, ValueTask<int>>>(),
-                It.Is<HybridCacheEntryOptions>(value => value.Flags == _flags),
+                It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .ReturnsAsync(expectedValue);
@@ -140,7 +139,7 @@ public class HybridCacheExtensionsTests
                 key,
                 null!,
                 It.IsAny<Func<object, CancellationToken, ValueTask<object>>>(),
-                It.Is<HybridCacheEntryOptions>(value => value.Flags == _flags),
+                It.IsAny<HybridCacheEntryOptions>(),
                 null,
                 CancellationToken.None))
             .ReturnsAsync(null!);
@@ -163,7 +162,7 @@ public class HybridCacheExtensionsTests
             key,
             null,
             It.IsAny<Func<object?, CancellationToken, ValueTask<string>>>(),
-            It.Is<HybridCacheEntryOptions>(value => value.Flags == _flags),
+            It.IsAny<HybridCacheEntryOptions>(),
             null,
             CancellationToken.None))
             .Returns((

@@ -7,11 +7,6 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Extensions;
 /// </summary>
 internal static class HybridCacheExtensions
 {
-    private static readonly HybridCacheEntryOptions _options = new()
-    {
-        Flags = HybridCacheEntryFlags.DisableLocalCacheWrite | HybridCacheEntryFlags.DisableDistributedCacheWrite,
-    };
-
     /// <summary>
     /// Returns true if the cache contains an item with a matching key.
     /// </summary>
@@ -48,10 +43,12 @@ internal static class HybridCacheExtensions
                 exists = false;
                 return new ValueTask<T>(default(T)!);
             },
-            _options,
+            new HybridCacheEntryOptions(),
             null,
             CancellationToken.None);
 
+        // In checking for the existence of the item, if not found, we will have created a cache entry with a null value.
+        // So remove it again.
         if (exists is false)
         {
             await cache.RemoveAsync(key);
