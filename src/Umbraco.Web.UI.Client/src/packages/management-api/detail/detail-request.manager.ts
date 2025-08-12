@@ -10,25 +10,34 @@ import {
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbManagementApiDetailDataRequestManagerArgs<DetailResponseModelType> {
-	read: (id: string) => Promise<UmbApiResponse<{ data: DetailResponseModelType | undefined }>>;
+export interface UmbManagementApiDetailDataRequestManagerArgs<DetailResponseModelType, UpdateRequestModelType> {
+	read: (id: string) => Promise<UmbApiResponse<{ data: DetailResponseModelType }>>;
+	update: (id: string, data: UpdateRequestModelType) => Promise<UmbApiResponse<{ data: unknown }>>;
 	delete: (id: string) => Promise<UmbApiResponse<{ data: unknown }>>;
 	cache: UmbManagementApiRuntimeCache<DetailResponseModelType>;
 	serverEventSource: string;
 }
 
-export class UmbManagementApiDetailDataRequestManager<DetailResponseModelType> extends UmbControllerBase {
+export class UmbManagementApiDetailDataRequestManager<
+	DetailResponseModelType,
+	UpdateRequestModelType,
+> extends UmbControllerBase {
 	#cache: UmbManagementApiRuntimeCache<DetailResponseModelType>;
 	#serverEventSource: string;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 
 	#read;
+	#update;
 	#delete;
 
-	constructor(host: UmbControllerHost, args: UmbManagementApiDetailDataRequestManagerArgs<DetailResponseModelType>) {
+	constructor(
+		host: UmbControllerHost,
+		args: UmbManagementApiDetailDataRequestManagerArgs<DetailResponseModelType, UpdateRequestModelType>,
+	) {
 		super(host);
 
 		this.#read = args.read;
+		this.#update = args.update;
 		this.#delete = args.delete;
 
 		this.#cache = args.cache;
@@ -40,7 +49,7 @@ export class UmbManagementApiDetailDataRequestManager<DetailResponseModelType> e
 		});
 	}
 
-	async read(id: string): Promise<UmbApiResponse<{ data: DetailResponseModelType | undefined }>> {
+	async read(id: string): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {
 		let data: DetailResponseModelType | undefined;
 		let error: UmbApiError | UmbCancelError | undefined;
 
@@ -58,6 +67,16 @@ export class UmbManagementApiDetailDataRequestManager<DetailResponseModelType> e
 		}
 
 		return { data, error };
+	}
+
+	async update(id: string, data: UpdateRequestModelType): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {
+		const { error } = await tryExecute(this, this.#update(id, data));
+
+		if (!error) {
+			return this.read(id);
+		}
+
+		return { error };
 	}
 
 	async delete(id: string): Promise<UmbApiWithErrorResponse> {

@@ -22,9 +22,15 @@ export class UmbDataTypeServerDataSource
 	extends UmbControllerBase
 	implements UmbDetailDataSource<UmbDataTypeDetailModel>
 {
-	#detailRequestManager = new UmbManagementApiDetailDataRequestManager<DataTypeResponseModel>(this, {
+	#detailRequestManager = new UmbManagementApiDetailDataRequestManager<
+		DataTypeResponseModel,
+		UpdateDataTypeRequestModel
+	>(this, {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		read: (id: string) => DataTypeService.getDataTypeById({ path: { id } }),
+		update: (id: string, body: UpdateDataTypeRequestModel) =>
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			DataTypeService.putDataTypeById({ path: { id }, body }),
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		delete: (id: string) => DataTypeService.deleteDataTypeById({ path: { id } }),
 		cache: cache,
@@ -137,16 +143,20 @@ export class UmbDataTypeServerDataSource
 			values: model.values,
 		};
 
-		const { error } = await tryExecute(
-			this,
-			DataTypeService.putDataTypeById({
-				path: { id: model.unique },
-				body: body,
-			}),
-		);
+		const { data, error } = await this.#detailRequestManager.update(model.unique, body);
 
-		if (!error) {
-			return this.read(model.unique);
+		if (data) {
+			// TODO: make data mapper to prevent errors
+			const dataType: UmbDataTypeDetailModel = {
+				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+				unique: data.id,
+				name: data.name,
+				editorAlias: data.editorAlias,
+				editorUiAlias: data.editorUiAlias || null,
+				values: data.values as Array<UmbDataTypePropertyValueModel>,
+			};
+
+			return { data: dataType };
 		}
 
 		return { error };
