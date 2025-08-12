@@ -195,8 +195,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         sw.Start();
 #endif
 
-        const int GroupSize = 100;
-        foreach (IEnumerable<Guid> group in SeedKeys.InGroupsOf(GroupSize))
+        foreach (IEnumerable<Guid> group in SeedKeys.InGroupsOf(_cacheSettings.DocumentSeedBatchSize))
         {
             var uncachedKeys = new HashSet<Guid>();
             foreach (Guid key in group)
