@@ -1,6 +1,6 @@
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../../entity.js';
-import { cache } from './document-type-detail.server.runtime-cache.js';
+import { UmbManagementApiDocumentTypeDetailDataRequestManager } from './document-type-detail.server.request-manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
@@ -8,10 +8,8 @@ import type {
 	DocumentTypeResponseModel,
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbManagementApiDetailDataRequestManager } from '@umbraco-cms/backoffice/management-api';
 
 /**
  * A data source for the Document Type that fetches data from the server
@@ -22,23 +20,7 @@ export class UmbDocumentTypeDetailServerDataSource
 	extends UmbControllerBase
 	implements UmbDetailDataSource<UmbDocumentTypeDetailModel>
 {
-	#detailRequestManager = new UmbManagementApiDetailDataRequestManager<
-		DocumentTypeResponseModel,
-		CreateDocumentTypeRequestModel,
-		UpdateDocumentTypeRequestModel
-	>(this, {
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		create: (data: CreateDocumentTypeRequestModel) => DocumentTypeService.postDocumentType({ body: data }),
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		read: (id: string) => DocumentTypeService.getDocumentTypeById({ path: { id } }),
-		update: (id: string, body: UpdateDocumentTypeRequestModel) =>
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			DocumentTypeService.putDocumentTypeById({ path: { id }, body }),
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		delete: (id: string) => DocumentTypeService.deleteDocumentTypeById({ path: { id } }),
-		cache: cache,
-		serverEventSource: 'Umbraco:CMS:DocumentType',
-	});
+	#detailRequestManager = new UmbManagementApiDocumentTypeDetailDataRequestManager(this);
 
 	/**
 	 * Creates a new Document Type scaffold
