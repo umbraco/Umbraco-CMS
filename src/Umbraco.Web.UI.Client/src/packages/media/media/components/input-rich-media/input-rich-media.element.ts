@@ -355,9 +355,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		`;
 	}
 
+	// TODO: Consider removing the "progress element" from the dropzone and render that using a context instead. This would allow the media picker to show inline progress items instead [JOV]
 	#renderDropzone() {
 		if (this.readonly) return nothing;
 		return html`<umb-dropzone-media
+			id="dropzone"
 			?multiple=${this.multiple}
 			@change=${this.#onUploadCompleted}></umb-dropzone-media>`;
 	}
@@ -432,7 +434,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				position: relative;
@@ -442,6 +444,10 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				gap: var(--uui-size-space-5);
 				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				grid-auto-rows: var(--umb-card-medium-min-width);
+			}
+
+			#dropzone {
+				margin-bottom: var(--uui-size-space-5);
 			}
 
 			#btn-add {
