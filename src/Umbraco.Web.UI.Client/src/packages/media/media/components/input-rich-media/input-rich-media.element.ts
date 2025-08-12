@@ -1,10 +1,10 @@
-import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
+import { UMB_IMAGE_CROPPER_EDITOR_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
+import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { umbConfirmModal, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -15,6 +15,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 
 import '@umbraco-cms/backoffice/imaging';
 
@@ -101,6 +102,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	public override set value(value: Array<UmbMediaPickerPropertyValueEntry> | undefined) {
 		super.value = value;
 		this.#sorter.setModel(value);
+		this.#pickerContext.setSelection(value?.map((item) => item.mediaKey) ?? []);
 		this.#itemManager.setUniques(value?.map((x) => x.mediaKey));
 		// Maybe the new value is using an existing media, and there we need to update the cards despite no repository update.
 		this.#populateCards();
@@ -177,6 +179,8 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
+	readonly #pickerContext = new UmbMediaPickerInputContext(this);
+
 	constructor() {
 		super();
 
@@ -229,6 +233,10 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 			.observeRouteBuilder((routeBuilder) => {
 				this._routeBuilder = routeBuilder;
 			});
+
+		this.observe(this.#pickerContext.selection, (selection) => {
+			this.#addItems(selection);
+		});
 
 		this.addValidator(
 			'valueMissing',
@@ -303,35 +311,27 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	async #openPicker() {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalHandler = modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
-			data: {
+	#openPicker() {
+		this.#pickerContext.openPicker(
+			{
 				multiple: this.multiple,
 				startNode: this.startNode,
 				pickableFilter: this.#pickableFilter,
 			},
-			value: { selection: [] },
-		});
-
-		const data = await modalHandler?.onSubmit().catch(() => null);
-		if (!data) return;
-
-		const selection = data.selection.filter((x) => x !== null) as string[];
-		this.#addItems(selection);
+			{
+				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
+					unique: id,
+					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+				})),
+				includeTrashed: false,
+			},
+		);
 	}
 
 	async #onRemove(item: UmbRichMediaCardModel) {
 		try {
-			await umbConfirmModal(this, {
-				color: 'danger',
-				headline: `${this.localize.term('actions_remove')} ${item.name}?`,
-				content: `${this.localize.term('defaultdialogs_confirmremove')} ${item.name}?`,
-				confirmLabel: this.localize.term('actions_remove'),
-			});
-
+			await this.#pickerContext.requestRemoveItem(item.media);
 			this.value = this.value?.filter((x) => x.key !== item.unique);
-
 			this.dispatchEvent(new UmbChangeEvent());
 		} catch {
 			// User cancelled the action
