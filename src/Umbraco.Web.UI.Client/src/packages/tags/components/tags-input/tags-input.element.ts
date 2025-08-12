@@ -14,7 +14,6 @@ import type { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-cms
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { color } from 'storybook/internal/theming';
 
 @customElement('umb-tags-input')
 export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') {
