@@ -832,6 +832,15 @@ stages:
               dotnet nuget add source ./nupkg --name Local
               dotnet new install Umbraco.Templates::$cmsVersion
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
+            displayName: Install Template
+            workingDirectory: $(Agent.BuildDirectory)/app
+
+          # Install packages
+          - pwsh: |
+              dotnet add package Umbraco.Cms.Core --version $cmsVersion
+            condition:
+
+          - pwsh: |
               dotnet restore UmbracoProject
               cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
             displayName: Install Template
