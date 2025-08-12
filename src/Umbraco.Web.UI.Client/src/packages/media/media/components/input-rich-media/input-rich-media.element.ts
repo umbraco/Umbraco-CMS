@@ -3,7 +3,7 @@ import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry 
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -25,6 +25,7 @@ type UmbRichMediaCardModel = {
 	src?: string;
 	icon?: string;
 	isTrashed?: boolean;
+	isLoading?: boolean;
 };
 
 @customElement('umb-input-rich-media')
@@ -267,11 +268,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 			this._cards = [];
 			return;
 		}
-		// Check if all media items is loaded.
-		// But notice, it would be nicer UX if we could show a loading state on the cards that are missing(loading) their items.
-		const missingCards = mediaItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
-		const removedCards = this._cards.filter((card) => !mediaItems.find((item) => card.unique === item.unique));
-		if (missingCards.length === 0 && removedCards.length === 0) return;
 
 		this._cards =
 			this.value?.map((item) => {
@@ -282,6 +278,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					name: media?.name ?? '',
 					icon: media?.mediaType?.icon,
 					isTrashed: media?.isTrashed ?? false,
+					isLoading: !media,
 				};
 			}) ?? [];
 	}
@@ -371,7 +368,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 
 	#renderItems() {
-		if (!this._cards.length) return;
+		if (!this._cards.length) return nothing;
 		return html`
 			${repeat(
 				this._cards,
@@ -405,10 +402,16 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
 		return html`
 			<uui-card-media id=${item.unique} name=${item.name} .href=${href} ?readonly=${this.readonly}>
-				<umb-imaging-thumbnail
-					unique=${item.media}
-					alt=${item.name}
-					icon=${item.icon ?? 'icon-picture'}></umb-imaging-thumbnail>
+				${when(
+					item.isLoading,
+					() => html`<uui-loader-circle></uui-loader-circle>`,
+					() => html`
+						<umb-imaging-thumbnail
+							unique=${item.media}
+							alt=${item.name}
+							icon=${item.icon ?? 'icon-picture'}></umb-imaging-thumbnail>
+					`,
+				)}
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
 			</uui-card-media>
 		`;
