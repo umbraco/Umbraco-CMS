@@ -264,11 +264,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	async #populateCards() {
 		const mediaItems = this.#itemManager.getItems();
 
-		if (!mediaItems.length) {
-			this._cards = [];
-			return;
-		}
-
 		this._cards =
 			this.value?.map((item) => {
 				const media = mediaItems.find((x) => x.unique === item.mediaKey);
