@@ -9,11 +9,10 @@ import type {
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute, UmbError } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '@umbraco-cms/backoffice/management-api';
+import { UmbManagementApiDetailDataRequestManager } from '@umbraco-cms/backoffice/management-api';
 
 /**
  * A data source for the Document Type that fetches data from the server
@@ -24,28 +23,14 @@ export class UmbDocumentTypeDetailServerDataSource
 	extends UmbControllerBase
 	implements UmbDetailDataSource<UmbDocumentTypeDetailModel>
 {
-	#runtimeCache = cache;
-	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
-	#eventSource = 'Umbraco:CMS:DocumentType';
-
-	constructor(host: UmbControllerHost) {
-		super(host);
-
-		this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
-			this.#serverEventContext = context;
-			this.#observeServerEvents();
-		});
-	}
-
-	#observeServerEvents() {
-		this.observe(
-			this.#serverEventContext?.byEventSourceAndTypes(this.#eventSource, ['Updated', 'Deleted']),
-			(event) => {
-				if (!event) return;
-				this.#runtimeCache.delete(event.key);
-			},
-		);
-	}
+	#detailRequestManager = new UmbManagementApiDetailDataRequestManager<DocumentTypeResponseModel>(this, {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		read: (id: string) => DocumentTypeService.getDocumentTypeById({ path: { id } }),
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		delete: (id: string) => DocumentTypeService.deleteDocumentTypeById({ path: { id } }),
+		cache: cache,
+		serverEventSource: 'Umbraco:CMS:DocumentType',
+	});
 
 	/**
 	 * Creates a new Document Type scaffold
@@ -93,26 +78,10 @@ export class UmbDocumentTypeDetailServerDataSource
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		let data: DocumentTypeResponseModel | undefined;
-
-		if (this.#runtimeCache.has(unique)) {
-			data = this.#runtimeCache.get(unique);
-		} else {
-			const { data: serverData, error: serverError } = await tryExecute(
-				this,
-				DocumentTypeService.getDocumentTypeById({ path: { id: unique } }),
-			);
-
-			if (serverError || !serverData) {
-				return { error: serverError };
-			}
-
-			this.#runtimeCache.set(unique, serverData);
-			data = serverData;
-		}
+		const { data, error } = await this.#detailRequestManager.read(unique);
 
 		if (!data) {
-			return { error: new UmbError(`Document Type with unique "${unique}" not found.`) };
+			return { error };
 		}
 
 		// TODO: make data mapper to prevent errors
@@ -321,18 +290,6 @@ export class UmbDocumentTypeDetailServerDataSource
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-
-		const { error } = await tryExecute(
-			this,
-			DocumentTypeService.deleteDocumentTypeById({
-				path: { id: unique },
-			}),
-		);
-
-		if (!error) {
-			this.#runtimeCache.delete(unique);
-		}
-
-		return { error };
+		return this.#detailRequestManager.delete(unique);
 	}
 }
