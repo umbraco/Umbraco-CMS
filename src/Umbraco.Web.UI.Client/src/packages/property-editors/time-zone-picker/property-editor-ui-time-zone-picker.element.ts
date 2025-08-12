@@ -85,7 +85,7 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 		return html`
 			<uui-radio-group
 				required
-				.readonly=${this.readonly}
+				?readonly=${this.readonly}
 				@input=${this.#onModeInput}
 				.value=${this.value?.mode ?? 'none'}>
 				<uui-radio

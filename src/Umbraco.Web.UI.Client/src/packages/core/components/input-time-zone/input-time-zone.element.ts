@@ -1,6 +1,16 @@
 import type UmbInputTimeZoneItemElement from './input-time-zone-item.element.js';
-import type { UmbTimeZoneAddEvent } from './input-time-zone-picker.element.js';
-import { html, customElement, property, css, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbInputTimeZonePickerElement } from './input-time-zone-picker.element.js';
+import {
+	html,
+	customElement,
+	property,
+	css,
+	repeat,
+	nothing,
+	query,
+	when,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -36,7 +46,6 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default undefined
 	 */
 	@property({ type: Number })
 	public set min(value) {
@@ -54,7 +63,6 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default undefined
 	 */
 	@property({ type: Number })
 	max?: number;
@@ -112,6 +120,12 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		return super.value;
 	}
 
+	@state()
+	private _disableAddButton = true;
+
+	@query('umb-input-time-zone-picker')
+	protected _timeZonePicker?: UmbInputTimeZonePickerElement;
+
 	private _timeZoneList: Array<TimeZone> = [];
 
 	constructor() {
@@ -135,8 +149,12 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		return undefined;
 	}
 
-	#onAdd(event: UmbTimeZoneAddEvent) {
-		this.value = [...this.value, event.getValue()];
+	#onAdd() {
+		if (this._timeZonePicker) {
+			this.value = [...this.value, this._timeZonePicker.value];
+			this._timeZonePicker.value = '';
+			this._disableAddButton = true;
+		}
 		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -172,7 +190,6 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 						value=${item}
 						?disabled=${this.disabled}
 						?readonly=${this.readonly}
-						@enter=${this.#onAdd}
 						@delete=${() => this.#deleteItem(index)}
 						@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}>
 					</umb-input-time-zone-item>
@@ -184,20 +201,47 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	#renderAddTimeZone() {
 		if (this.disabled || this.readonly) return nothing;
 		return html`
-			<umb-input-time-zone-picker
-				name="picker"
-				.options=${this._timeZoneList.filter((tz) => !this.value.includes(tz.value))}
-				?disabled=${this.disabled}
-				?readonly=${this.readonly}
-				@added=${this.#onAdd}>
-			</umb-input-time-zone-picker>
+			<div id="add-time-zone">
+				<umb-input-time-zone-picker
+					id="time-zone-picker"
+					name="picker"
+					.options=${this._timeZoneList.filter((tz) => !this.value.includes(tz.value))}
+					@change=${(event: UmbChangeEvent) => {
+						this._disableAddButton = !(event.target as UmbInputTimeZonePickerElement)?.value;
+					}}
+					?disabled=${this.disabled}
+					?readonly=${this.readonly}>
+				</umb-input-time-zone-picker>
+				${when(
+					!this.readonly,
+					() => html`
+						<uui-button
+							compact
+							label="${this.localize.term('general_add')} ${this._timeZonePicker?.value}"
+							look="outline"
+							color="positive"
+							?disabled=${this.disabled || this._disableAddButton}
+							@click=${this.#onAdd}>
+							<uui-icon name="icon-add"></uui-icon>
+						</uui-button>
+					`,
+				)}
+			</div>
 		`;
 	}
 
 	static override styles = [
 		css`
-			#action {
-				display: block;
+			#add-time-zone {
+				display: flex;
+				margin-bottom: var(--uui-size-space-3);
+				gap: var(--uui-size-space-1);
+			}
+
+			#time-zone-picker {
+				width: 100%;
+				display: inline-flex;
+				--uui-input-height: var(--uui-size-12);
 			}
 
 			.--umb-sorter-placeholder {

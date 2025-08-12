@@ -1,17 +1,8 @@
-import {
-	html,
-	customElement,
-	css,
-	property,
-	query,
-	when,
-	until,
-	repeat,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, property, query, until, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { TimeZone } from '@umbraco-cms/backoffice/utils';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-input-time-zone-picker
@@ -46,6 +37,15 @@ export class UmbInputTimeZonePickerElement extends UmbLitElement {
 	}
 	#options: Array<TimeZone> = [];
 
+	@property({ type: String, reflect: true })
+	public set value(value) {
+		this.#value = value;
+	}
+	public get value() {
+		return this.#value;
+	}
+	#value: string = '';
+
 	@state()
 	private _filteredOptions: Array<TimeZone> = [];
 
@@ -60,11 +60,9 @@ export class UmbInputTimeZonePickerElement extends UmbLitElement {
 		this._filteredOptions = this.options;
 	}
 
-	async #onAdd() {
-		const input = this._input;
-		if (typeof input?.value !== 'string') return;
-		this.dispatchEvent(new UmbTimeZoneAddEvent({ value: input.value }));
-		input.value = '';
+	public override async focus() {
+		await this.updateComplete;
+		this._input?.focus();
 	}
 
 	#onSearch(event: UUIComboboxEvent) {
@@ -74,9 +72,9 @@ export class UmbInputTimeZonePickerElement extends UmbLitElement {
 		);
 	}
 
-	public override async focus() {
-		await this.updateComplete;
-		this._input?.focus();
+	#onChange(event: UUIComboboxEvent) {
+		this.value = ((event.currentTarget as UUIComboboxElement)?.value as string) ?? '';
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#renderTimeZoneOption = (option: Option) =>
@@ -90,68 +88,23 @@ export class UmbInputTimeZonePickerElement extends UmbLitElement {
 				id="input"
 				pristine
 				label="${this.localize.term('general_value')} ${this._input?.value}"
+				.value=${this.value}
 				@search="${this.#onSearch}"
+				@change="${this.#onChange}"
 				?disabled=${this.disabled}
 				?readonly=${this.readonly}>
 				<uui-combobox-list> ${until(repeat(this._filteredOptions, this.#renderTimeZoneOption))} </uui-combobox-list>
 			</uui-combobox>
-
-			${when(
-				!this.readonly,
-				() => html`
-					<uui-button
-						compact
-						label="${this.localize.term('general_add')} ${this._input?.value}"
-						look="outline"
-						color="positive"
-						?disabled=${this.disabled || !this._input?.value}
-						@click=${this.#onAdd}>
-						<uui-icon name="icon-add"></uui-icon>
-					</uui-button>
-				`,
-			)}
 		`;
 	}
 
 	static override styles = [
 		css`
-			:host {
-				display: flex;
-				margin-bottom: var(--uui-size-space-3);
-				gap: var(--uui-size-space-1);
-			}
-
 			#input {
 				width: 100%;
-				--uui-input-height: var(--uui-size-12);
-			}
-
-			#validation-message {
-				flex: 1;
-			}
-
-			.handle {
-				cursor: grab;
-			}
-
-			.handle:active {
-				cursor: grabbing;
 			}
 		`,
 	];
-}
-
-export class UmbTimeZoneAddEvent extends Event {
-	#value: string;
-
-	public constructor({ value }: { value: string }) {
-		super('added', { bubbles: true, composed: true });
-		this.#value = value;
-	}
-
-	public getValue() {
-		return this.#value;
-	}
 }
 
 export default UmbInputTimeZonePickerElement;
