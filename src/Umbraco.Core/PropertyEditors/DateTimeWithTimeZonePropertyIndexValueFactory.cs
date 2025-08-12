@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -8,9 +9,15 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class DateTimeWithTimeZonePropertyIndexValueFactory : IDateTimeWithTimeZonePropertyIndexValueFactory
 {
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
+    private readonly IJsonSerializer _jsonSerializer;
 
-    public DateTimeWithTimeZonePropertyIndexValueFactory(IDataTypeConfigurationCache dataTypeConfigurationCache)
-        => _dataTypeConfigurationCache = dataTypeConfigurationCache;
+    public DateTimeWithTimeZonePropertyIndexValueFactory(
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
+        IJsonSerializer jsonSerializer)
+    {
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
+        _jsonSerializer = jsonSerializer;
+    }
 
     /// <inheritdoc />
     public IEnumerable<IndexValue> GetIndexValues(
@@ -36,7 +43,7 @@ public class DateTimeWithTimeZonePropertyIndexValueFactory : IDateTimeWithTimeZo
         }
 
         DateWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
-        var value = DateTimeWithTimeZoneValueConverter.GetValue(sourceStr, configuration);
+        var value = DateTimeWithTimeZoneValueConverter.GetValue(sourceStr, configuration, _jsonSerializer);
         if (value is DateTimeOffset dateTimeOffset)
         {
             // Index the DateTimeOffset as UTC, so it's easier to query.

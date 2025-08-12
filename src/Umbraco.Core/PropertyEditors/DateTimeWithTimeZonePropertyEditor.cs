@@ -49,6 +49,7 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
 
     private class DateTimeWithTimeZoneDataValueEditor : DataValueEditor
     {
+        private readonly IJsonSerializer _jsonSerializer;
         private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
         public DateTimeWithTimeZoneDataValueEditor(
@@ -60,6 +61,7 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
             IDataTypeConfigurationCache dataTypeConfigurationCache)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
+            _jsonSerializer = jsonSerializer;
             _dataTypeConfigurationCache = dataTypeConfigurationCache;
             Validators.AddRange(new DateTimeWithTimeZoneValidator(localizedTextService));
         }
@@ -90,34 +92,52 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
                 dateTimeOffset = new DateTimeOffset(DateOnly.MinValue, TimeOnly.FromTimeSpan(dateTimeOffset.TimeOfDay), dateTimeOffset.Offset);
             }
 
-            valueAsJsonObject["date"] = dateTimeOffset;
-            return editorValue.Value;
+            var value = new DateTimeWithTimeZoneValueConverter.DateWithTimeZone
+            {
+                Date = dateTimeOffset,
+                TimeZone = valueAsJsonObject["timeZone"]?.GetValue<string>(),
+            };
+
+            var jsonStr = _jsonSerializer.Serialize(value);
+            return jsonStr;
         }
 
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment);
-            if (value is not string valueString || JsonNode.Parse(valueString) is not JsonObject valueAsJsonObject)
+            if (value is not string valueString)
+            {
+                return null;
+            }
+
+            var interValue = DateTimeWithTimeZoneValueConverter.GetIntermediateValue(valueString, _jsonSerializer);
+            if (interValue is not DateTimeWithTimeZoneValueConverter.DateWithTimeZone dateWithTimeZone)
             {
                 return null;
             }
 
             DateWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
-            var valueObject = DateTimeWithTimeZoneValueConverter.GetValue(valueAsJsonObject, configuration);
-            if (valueObject is DateTimeOffset && valueAsJsonObject["timeZone"] is null)
+            var objectValue = DateTimeWithTimeZoneValueConverter.GetObjectValue(dateWithTimeZone, configuration);
+
+            JsonNode node = new JsonObject();
+            if (objectValue is DateTimeOffset && dateWithTimeZone.TimeZone is null)
             {
                 // If the time zone is not set, we assume the date is in UTC.
-                valueAsJsonObject["timeZone"] = "UTC";
+                node["timeZone"] = "UTC";
             }
-            else if (valueObject is not null && valueObject is not DateTimeOffset)
+            else if (objectValue is not null && objectValue is not DateTimeOffset)
             {
                 // If the value is not a DateTimeOffset, clean the time zone.
-                valueAsJsonObject["timeZone"] = null;
+                node["timeZone"] = null;
+            }
+            else
+            {
+                node["timeZone"] = dateWithTimeZone.TimeZone;
             }
 
-            valueAsJsonObject["date"] = DateTimeWithTimeZoneValueConverter.GetDateValueAsString(valueObject, configuration);
+            node["date"] = DateTimeWithTimeZoneValueConverter.GetDateValueAsString(objectValue);
 
-            return valueAsJsonObject;
+            return node;
         }
 
         /// <summary>
@@ -130,7 +150,11 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
             public DateTimeWithTimeZoneValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
             /// <inheritdoc/>
-            public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
+            public IEnumerable<ValidationResult> Validate(
+                object? value,
+                string? valueType,
+                object? dataTypeConfiguration,
+                PropertyValidationContext validationContext)
             {
                 if (value is not JsonObject valueAsJsonObject)
                 {
@@ -142,6 +166,21 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
                 {
                     yield return new ValidationResult(
                         _localizedTextService.Localize("validation", "invalidDate", [selectedDate]),
+                        ["value"]);
+                }
+
+                var selectedTimeZone = valueAsJsonObject["timeZone"]?.GetValue<string>();
+                var dataTypeConfig = dataTypeConfiguration as DateWithTimeZoneConfiguration;
+                if (dataTypeConfig?.TimeZones?.Mode is not { } mode || mode == DateWithTimeZoneMode.None)
+                {
+                    yield break;
+                }
+
+                if (mode == DateWithTimeZoneMode.Custom
+                    && dataTypeConfig.TimeZones.TimeZones.Any(t => t.Equals(selectedTimeZone, StringComparison.InvariantCultureIgnoreCase)) != true)
+                {
+                    yield return new ValidationResult(
+                        _localizedTextService.Localize("validation", "invalidTimeZone", [selectedTimeZone]),
                         ["value"]);
                 }
             }
