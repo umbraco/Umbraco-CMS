@@ -2,6 +2,6 @@ import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/external/bac
 import { UmbManagementApiDetailDataRuntimeCache } from '@umbraco-cms/backoffice/management-api';
 
 // We use a singleton so we can share the cache across the application
-const cache = new UmbManagementApiDetailDataRuntimeCache<DataTypeResponseModel>();
+const dataTypeDetailCache = new UmbManagementApiDetailDataRuntimeCache<DataTypeResponseModel>();
 
-export { cache };
+export { dataTypeDetailCache };

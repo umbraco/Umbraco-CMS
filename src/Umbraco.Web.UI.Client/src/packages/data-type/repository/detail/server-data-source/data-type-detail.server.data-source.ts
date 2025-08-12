@@ -1,6 +1,6 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../../../types.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../../entity.js';
-import { cache } from './data-type-detail.server.runtime-cache.js';
+import { UmbManagementApiDataTypeDetailDataRequestManager } from './data-type-detail.server.request-manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
@@ -8,9 +8,7 @@ import type {
 	DataTypeResponseModel,
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbManagementApiDetailDataRequestManager } from '@umbraco-cms/backoffice/management-api';
 
 /**
  * A data source for the Data Type that fetches data from the server
@@ -21,23 +19,7 @@ export class UmbDataTypeServerDataSource
 	extends UmbControllerBase
 	implements UmbDetailDataSource<UmbDataTypeDetailModel>
 {
-	#detailRequestManager = new UmbManagementApiDetailDataRequestManager<
-		DataTypeResponseModel,
-		UpdateDataTypeRequestModel,
-		CreateDataTypeRequestModel
-	>(this, {
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		create: (body: CreateDataTypeRequestModel) => DataTypeService.postDataType({ body }),
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		read: (id: string) => DataTypeService.getDataTypeById({ path: { id } }),
-		update: (id: string, body: UpdateDataTypeRequestModel) =>
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			DataTypeService.putDataTypeById({ path: { id }, body }),
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		delete: (id: string) => DataTypeService.deleteDataTypeById({ path: { id } }),
-		cache: cache,
-		serverEventSource: 'Umbraco:CMS:DataType',
-	});
+	#detailRequestManager = new UmbManagementApiDataTypeDetailDataRequestManager(this);
 
 	/**
 	 * Creates a new Data Type scaffold
