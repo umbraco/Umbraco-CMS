@@ -1,5 +1,5 @@
-import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../../types.js';
-import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
+import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../../../types.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../../entity.js';
 import { cache } from './data-type-detail.server.runtime-cache.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
