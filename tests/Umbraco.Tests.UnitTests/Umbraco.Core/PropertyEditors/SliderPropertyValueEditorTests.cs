@@ -17,6 +17,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class SliderPropertyValueEditorTests
 {
+    public static Guid NewGuid => Guid.NewGuid();
+    public static GuidUdi NewGuidUdi => new GuidUdi(Constants.UdiEntityType.Document, NewGuid);
+
 #pragma warning disable IDE1006 // Naming Styles
     public static object[] InvalidCaseData = new object[]
 #pragma warning restore IDE1006 // Naming Styles
@@ -28,14 +31,28 @@ public class SliderPropertyValueEditorTests
         true,
         new object(),
         new List<string> { "some", "values" },
-        Guid.NewGuid(),
-        new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid())
+        // NewGuid, // This is a valid Guid, but not a valid value for Can_Handle_Invalid_Values_From_Editor test.
+        // NewGuidUdi // This is a valid UDI, but not a valid value for Can_Handle_Invalid_Values_From_Editor test.
     };
 
-    [TestCaseSource(nameof(InvalidCaseData))]
+    [TestCaseSource("InvalidCaseData")] // nameof(InvalidCaseData) would not work here due to the static nature of the array
     public void Can_Handle_Invalid_Values_From_Editor(object value)
     {
         var fromEditor = FromEditor(value);
+        Assert.IsNull(fromEditor);
+    }
+
+    [Test]
+    public void Can_Handle_Invalid_Values_From_Editor_Guid()
+    {
+        var fromEditor = FromEditor(NewGuid);
+        Assert.IsNull(fromEditor);
+    }
+
+    [Test]
+    public void Can_Handle_Invalid_Values_From_Editor_Udi()
+    {
+        var fromEditor = FromEditor(NewGuidUdi);
         Assert.IsNull(fromEditor);
     }
 
