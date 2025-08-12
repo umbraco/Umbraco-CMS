@@ -281,16 +281,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             return false;
         }
 
-        ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
-            GetCacheKey(keyAttempt.Result, preview), // Unique key to the cache entry
-            cancel => ValueTask.FromResult<ContentCacheNode?>(null));
-
-        if (contentCacheNode is null)
-        {
-            await _hybridCache.RemoveAsync(GetCacheKey(keyAttempt.Result, preview));
-        }
-
-        return contentCacheNode is not null;
+        return await _hybridCache.ExistsAsync(GetCacheKey(keyAttempt.Result, preview));
     }
 
     public async Task RefreshContentAsync(IContent content)

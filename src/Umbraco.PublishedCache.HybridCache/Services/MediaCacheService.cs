@@ -133,18 +133,8 @@ internal sealed class MediaCacheService : IMediaCacheService
             return false;
         }
 
-        ContentCacheNode? contentCacheNode = await _hybridCache.GetOrCreateAsync<ContentCacheNode?>(
-            $"{keyAttempt.Result}", // Unique key to the cache entry
-            cancel => ValueTask.FromResult<ContentCacheNode?>(null));
-
-        if (contentCacheNode is null)
-        {
-            await _hybridCache.RemoveAsync($"{keyAttempt.Result}");
-        }
-
-        return contentCacheNode is not null;
+        return await _hybridCache.ExistsAsync($"{keyAttempt.Result}");
     }
-
 
     public async Task RefreshMediaAsync(IMedia media)
     {

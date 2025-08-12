@@ -254,7 +254,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .ToList();
 
         IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
         return dtos
             .Select(x => CreateMediaNodeKit(x, serializer));
     }
