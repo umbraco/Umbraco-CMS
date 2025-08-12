@@ -180,7 +180,7 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
                     && dataTypeConfig.TimeZones.TimeZones.Any(t => t.Equals(selectedTimeZone, StringComparison.InvariantCultureIgnoreCase)) != true)
                 {
                     yield return new ValidationResult(
-                        _localizedTextService.Localize("validation", "invalidTimeZone", [selectedTimeZone]),
+                        _localizedTextService.Localize("validation", "notOneOfOptions", [selectedTimeZone]),
                         ["value"]);
                 }
             }

@@ -123,10 +123,7 @@ public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
     internal static string? GetDateValueAsString(object? value) =>
         value switch
         {
-            DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("o"),
-            DateOnly dateOnly => dateOnly.ToString("o"),
-            TimeOnly timeOnly => timeOnly.ToString("o"),
-            DateTime dateTime => dateTime.ToString("o"),
+            DateTimeOffset or DateOnly or TimeOnly or DateTime => $"{value:O}",
             null => null,
             _ => throw new ArgumentOutOfRangeException(nameof(value), $"Unsupported type: {value.GetType().FullName}"),
         };
