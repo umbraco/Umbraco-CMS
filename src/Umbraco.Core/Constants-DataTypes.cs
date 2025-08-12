@@ -116,6 +116,11 @@ public static partial class Constants
             public const string DatePickerWithTime = "e4d66c0f-b935-4200-81f0-025f7256b89a";
 
             /// <summary>
+            ///     Guid for Date Time With Timezone as string
+            /// </summary>
+            public const string DateTimeWithTimeZone = "88E8A052-30EE-4D44-A507-59F2CDFC769C";
+
+            /// <summary>
             ///     Guid for Approved Color as string
             /// </summary>
             public const string ApprovedColor = "0225af17-b302-49cb-9176-b9f35cab9c17";
@@ -226,11 +231,6 @@ public static partial class Constants
             public const string LabelDecimal = "8f1ef1e1-9de4-40d3-a072-6673f631ca64";
 
             /// <summary>
-            ///     Guid for Date Picker with timezone
-            /// </summary>
-            public const string DatePickerWithTimezone = "e7ccd055-60e2-4c63-88e7-212249eaf581";
-
-            /// <summary>
             ///     Guid for Content Picker
             /// </summary>
             public static readonly Guid ContentPickerGuid = new(ContentPicker);
@@ -294,6 +294,11 @@ public static partial class Constants
             ///     Guid for Date Picker with time
             /// </summary>
             public static readonly Guid DatePickerWithTimeGuid = new(DatePickerWithTime);
+
+            /// <summary>
+            ///     Guid for for Date Time With Timezone
+            /// </summary>
+            public static readonly Guid DateTimeWithTimeZoneGuid = new(DateTimeWithTimeZone);
 
             /// <summary>
             ///     Guid for Approved Color
@@ -404,11 +409,6 @@ public static partial class Constants
             ///     Guid for Label decimal
             /// </summary>
             public static readonly Guid LabelDecimalGuid = new(LabelDecimal);
-
-            /// <summary>
-            ///     Guid for Date Picker with timezone
-            /// </summary>
-            public static readonly Guid DatePickerWithTimezoneGuid = new(DatePickerWithTimezone);
         }
     }
 }
