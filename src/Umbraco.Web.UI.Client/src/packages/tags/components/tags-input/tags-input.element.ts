@@ -14,6 +14,7 @@ import type { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-cms
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { color } from 'storybook/internal/theming';
 
 @customElement('umb-tags-input')
 export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -78,13 +79,23 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		this._matches = data.items;
 	}
 
-	#onKeydown(e: KeyboardEvent) {
+	#onKeydown(e: KeyboardEvent, idx: number) {
 		//Prevent tab away if there is a input.
 		if (e.key === 'Tab' && (this._tagInput.value as string).trim().length && !this._matches.length) {
 			e.preventDefault();
 			this.#createTag();
 			return;
 		}
+
+		//To be able to get out of the input
+		if (e.key === 'Tab' && !(this._tagInput.value as string).trim().length) return;
+
+		if (e.key === 'Backspace') {
+			e.preventDefault();
+			console.log('DELETE TAG:', this.#items[idx]);
+			this.#delete(this.#items[idx]);
+		}
+
 		if (e.key === 'Enter') {
 			this.#createTag();
 			return;
@@ -208,9 +219,9 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#enteredTags() {
-		return html` ${this.items.map((tag) => {
+		return html` ${this.items.map((tag, index) => {
 			return html`
-				<uui-tag class="tag">
+				<uui-tag class="tag" tabindex="0" @keydown="${(e: KeyboardEvent) => this.#onKeydown(e, index)}">
 					<span>${tag}</span>
 					${this.#renderRemoveButton(tag)}
 				</uui-tag>
