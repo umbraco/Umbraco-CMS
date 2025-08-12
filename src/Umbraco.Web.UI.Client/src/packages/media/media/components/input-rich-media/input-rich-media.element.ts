@@ -292,7 +292,10 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return true;
 	};
 
-	#addItems(uniques: string[]) {
+	#addItems(additionalMediaKeys: string[]) {
+		// Check that the unique is not already added
+		const uniques = additionalMediaKeys.filter((key) => !this.value?.some((item) => item.mediaKey === key));
+
 		if (!uniques.length) return;
 
 		const additions: Array<UmbMediaPickerPropertyValueEntry> = uniques.map((unique) => ({
