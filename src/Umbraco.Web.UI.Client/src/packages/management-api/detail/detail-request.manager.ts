@@ -116,12 +116,12 @@ export class UmbManagementApiDetailDataRequestManager<
 			this.#serverEventContext?.byEventSourceAndTypes(this.#serverEventSource, ['Updated', 'Deleted']),
 			(event) => {
 				if (!event) return;
-				this.#invalidateCache(event.key);
+				this.#invalidateCacheEntry(event.key);
 			},
 		);
 	}
 
-	#invalidateCache(id: string) {
+	#invalidateCacheEntry(id: string) {
 		this.#cache.delete(id);
 	}
 }
