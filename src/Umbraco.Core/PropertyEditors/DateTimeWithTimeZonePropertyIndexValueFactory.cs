@@ -50,7 +50,7 @@ public class DateTimeWithTimeZonePropertyIndexValueFactory : IDateTimeWithTimeZo
             value = dateTimeOffset.UtcDateTime;
         }
 
-        indexValue.Values = [value];
+        indexValue.Values = [$"{value:O}"];
 
         return [indexValue];
     }
