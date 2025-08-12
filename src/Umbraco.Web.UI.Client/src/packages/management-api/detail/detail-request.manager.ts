@@ -10,7 +10,12 @@ import {
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbManagementApiDetailDataRequestManagerArgs<DetailResponseModelType, UpdateRequestModelType> {
+export interface UmbManagementApiDetailDataRequestManagerArgs<
+	DetailResponseModelType,
+	CreateRequestModelType,
+	UpdateRequestModelType,
+> {
+	create: (data: CreateRequestModelType) => Promise<UmbApiResponse<{ data: unknown }>>;
 	read: (id: string) => Promise<UmbApiResponse<{ data: DetailResponseModelType }>>;
 	update: (id: string, data: UpdateRequestModelType) => Promise<UmbApiResponse<{ data: unknown }>>;
 	delete: (id: string) => Promise<UmbApiResponse<{ data: unknown }>>;
@@ -20,22 +25,29 @@ export interface UmbManagementApiDetailDataRequestManagerArgs<DetailResponseMode
 
 export class UmbManagementApiDetailDataRequestManager<
 	DetailResponseModelType,
+	CreateRequestModelType,
 	UpdateRequestModelType,
 > extends UmbControllerBase {
 	#cache: UmbManagementApiRuntimeCache<DetailResponseModelType>;
 	#serverEventSource: string;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 
+	#create;
 	#read;
 	#update;
 	#delete;
 
 	constructor(
 		host: UmbControllerHost,
-		args: UmbManagementApiDetailDataRequestManagerArgs<DetailResponseModelType, UpdateRequestModelType>,
+		args: UmbManagementApiDetailDataRequestManagerArgs<
+			DetailResponseModelType,
+			CreateRequestModelType,
+			UpdateRequestModelType
+		>,
 	) {
 		super(host);
 
+		this.#create = args.create;
 		this.#read = args.read;
 		this.#update = args.update;
 		this.#delete = args.delete;
@@ -47,6 +59,16 @@ export class UmbManagementApiDetailDataRequestManager<
 			this.#serverEventContext = context;
 			this.#observeServerEvents();
 		});
+	}
+
+	async create(data: CreateRequestModelType): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {
+		const { data: createdId, error } = await tryExecute(this, this.#create(data));
+
+		if (!error) {
+			return this.read(createdId as string);
+		}
+
+		return { error };
 	}
 
 	async read(id: string): Promise<UmbApiResponse<{ data?: DetailResponseModelType }>> {
