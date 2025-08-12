@@ -10,7 +10,8 @@
     "all": "npx playwright test",
     "createTest": "node createTest.js",
     "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
-    "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\""
+    "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\"",
+    "releaseTest": "npx playwright test DefaultConfig --grep \"@release\""
   },
   "devDependencies": {
     "@playwright/test": "^1.50",
@@ -21,7 +22,7 @@
   },
   "dependencies": {
     "@umbraco/json-models-builders": "^2.0.37",
-    "@umbraco/playwright-testhelpers": "^16.0.29",
+    "@umbraco/playwright-testhelpers": "^16.0.34",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.6.7"

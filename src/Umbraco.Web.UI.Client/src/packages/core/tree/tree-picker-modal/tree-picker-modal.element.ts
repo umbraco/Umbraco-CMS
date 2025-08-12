@@ -14,23 +14,23 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	UmbTreePickerModalValue
 > {
 	@state()
-	_selectionConfiguration: UmbTreeSelectionConfiguration = {
+	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
 		multiple: false,
 		selectable: true,
 		selection: [],
 	};
 
 	@state()
-	_hasSelection: boolean = false;
+	private _hasSelection: boolean = false;
 
 	@state()
-	_createPath?: string;
+	private _createPath?: string;
 
 	@state()
-	_createLabel?: string;
+	private _createLabel?: string;
 
 	@state()
-	_searchQuery?: string;
+	private _searchQuery?: string;
 
 	#pickerContext = new UmbTreeItemPickerContext(this);
 
@@ -57,6 +57,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				this.#pickerContext.search.updateConfig({
 					...this.data.search,
 					searchFrom: this.data.startNode,
+					dataTypeUnique: this.#pickerContext.dataType?.unique,
 				});
 			}
 

@@ -71,7 +71,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	private _startNode: UmbMediaItemModel | undefined;
 
 	@state()
-	_searching: boolean = false;
+	private _searching: boolean = false;
 
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneMediaElement;
@@ -213,6 +213,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			includeTrashed: false,
 			searchFrom: this._searchFrom,
 			culture: this.#contextCulture,
+			dataTypeUnique: this.#dataType?.unique,
 			...this.data?.search?.queryParams,
 		});
 
@@ -348,9 +349,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 									.current=${this._currentPage}
 									.total=${this._currentTotalPages}
 									firstlabel=${this.localize.term('general_first')}
-                                    previouslabel=${this.localize.term('general_previous')}
-                                    nextlabel=${this.localize.term('general_next')}
-                                    lastlabel=${this.localize.term('general_last')}
+									previouslabel=${this.localize.term('general_previous')}
+									nextlabel=${this.localize.term('general_next')}
+									lastlabel=${this.localize.term('general_last')}
 									@change=${this.#onPageChange}></uui-pagination>`
 							: nothing}`}
 		`;

@@ -261,7 +261,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         {
             var templateRepository = CreateRepository(provider);
             var globalSettings = new GlobalSettings();
-            var serializer = new SystemTextJsonSerializer();
+            var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
             var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
             var commonRepository =
                 new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);

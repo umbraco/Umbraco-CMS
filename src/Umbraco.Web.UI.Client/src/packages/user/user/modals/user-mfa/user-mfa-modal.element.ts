@@ -19,7 +19,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 	modalContext?: UmbModalContext<UmbUserMfaModalConfiguration, never>;
 
 	@state()
-	_items: Array<UmbMfaLoginProviderOption> = [];
+	private _items: Array<UmbMfaLoginProviderOption> = [];
 
 	#unique = '';
 	#userRepository = new UmbUserRepository(this);
