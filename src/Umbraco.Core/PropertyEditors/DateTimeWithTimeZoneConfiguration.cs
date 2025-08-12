@@ -5,27 +5,27 @@ using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-public class DateWithTimeZoneConfiguration
+public class DateTimeWithTimeZoneConfiguration
 {
     /// <summary>
     /// The format of the date and time value.
     /// </summary>
     [ConfigurationField("format")]
-    public DateWithTimeZoneFormat Format { get; set; } = DateWithTimeZoneFormat.DateTime;
+    public DateTimeWithTimeZoneFormat Format { get; set; } = DateTimeWithTimeZoneFormat.DateTime;
 
     /// <summary>
     /// The time zones configuration.
     /// </summary>
     [ConfigurationField("timeZones")]
-    public DateWithTimeZoneTimeZones? TimeZones { get; set; }
+    public DateTimeWithTimeZoneTimeZones? TimeZones { get; set; }
 }
 
-public class DateWithTimeZoneTimeZones
+public class DateTimeWithTimeZoneTimeZones
 {
     /// <summary>
     /// The mode for time zones.
     /// </summary>
-    public DateWithTimeZoneMode? Mode { get; set; } = DateWithTimeZoneMode.None;
+    public DateTimeWithTimeZoneMode? Mode { get; set; } = DateTimeWithTimeZoneMode.None;
 
     /// <summary>
     /// A list of time zones to use when the mode is set to Custom.
@@ -33,7 +33,7 @@ public class DateWithTimeZoneTimeZones
     public List<string> TimeZones { get; set; } = [];
 }
 
-public enum DateWithTimeZoneMode
+public enum DateTimeWithTimeZoneMode
 {
     /// <summary>
     /// Do not display any time zones.
@@ -60,7 +60,7 @@ public enum DateWithTimeZoneMode
     Custom,
 }
 
-public enum DateWithTimeZoneFormat
+public enum DateTimeWithTimeZoneFormat
 {
     /// <summary>
     /// Display the date only, without time.

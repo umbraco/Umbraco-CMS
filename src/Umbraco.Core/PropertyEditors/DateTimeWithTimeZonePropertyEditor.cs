@@ -38,7 +38,7 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new DateWithTimeZoneConfigurationEditor(_ioHelper);
+        new DateTimeWithTimeZoneConfigurationEditor(_ioHelper);
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
@@ -84,15 +84,15 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
                 return null;
             }
 
-            var configuration = editorValue.DataTypeConfiguration as DateWithTimeZoneConfiguration;
-            if (configuration?.Format == DateWithTimeZoneFormat.TimeOnly)
+            var configuration = editorValue.DataTypeConfiguration as DateTimeWithTimeZoneConfiguration;
+            if (configuration?.Format == DateTimeWithTimeZoneFormat.TimeOnly)
             {
                 // Clear the date part if the format is TimeOnly.
                 // This is needed because `DateTimeOffset.TryParse` does not support `DateTimeStyles.NoCurrentDateDefault`.
                 dateTimeOffset = new DateTimeOffset(DateOnly.MinValue, TimeOnly.FromTimeSpan(dateTimeOffset.TimeOfDay), dateTimeOffset.Offset);
             }
 
-            var value = new DateTimeWithTimeZoneValueConverter.DateWithTimeZone
+            var value = new DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone
             {
                 Date = dateTimeOffset,
                 TimeZone = valueAsJsonObject["timeZone"]?.GetValue<string>(),
@@ -111,12 +111,12 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
             }
 
             var interValue = DateTimeWithTimeZoneValueConverter.GetIntermediateValue(valueString, _jsonSerializer);
-            if (interValue is not DateTimeWithTimeZoneValueConverter.DateWithTimeZone dateWithTimeZone)
+            if (interValue is not DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone dateWithTimeZone)
             {
                 return null;
             }
 
-            DateWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
+            DateTimeWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateTimeWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
             var objectValue = DateTimeWithTimeZoneValueConverter.GetObjectValue(dateWithTimeZone, configuration);
 
             JsonNode node = new JsonObject();
@@ -170,13 +170,13 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
                 }
 
                 var selectedTimeZone = valueAsJsonObject["timeZone"]?.GetValue<string>();
-                var dataTypeConfig = dataTypeConfiguration as DateWithTimeZoneConfiguration;
-                if (dataTypeConfig?.TimeZones?.Mode is not { } mode || mode == DateWithTimeZoneMode.None)
+                var dataTypeConfig = dataTypeConfiguration as DateTimeWithTimeZoneConfiguration;
+                if (dataTypeConfig?.TimeZones?.Mode is not { } mode || mode == DateTimeWithTimeZoneMode.None)
                 {
                     yield break;
                 }
 
-                if (mode == DateWithTimeZoneMode.Custom
+                if (mode == DateTimeWithTimeZoneMode.Custom
                     && dataTypeConfig.TimeZones.TimeZones.Any(t => t.Equals(selectedTimeZone, StringComparison.InvariantCultureIgnoreCase)) != true)
                 {
                     yield return new ValidationResult(

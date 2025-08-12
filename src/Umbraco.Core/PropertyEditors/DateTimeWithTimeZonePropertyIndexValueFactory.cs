@@ -42,7 +42,7 @@ public class DateTimeWithTimeZonePropertyIndexValueFactory : IDateTimeWithTimeZo
             return [indexValue];
         }
 
-        DateWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
+        DateTimeWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateTimeWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
         var value = DateTimeWithTimeZoneValueConverter.GetValue(sourceStr, configuration, _jsonSerializer);
         if (value is DateTimeOffset dateTimeOffset)
         {
