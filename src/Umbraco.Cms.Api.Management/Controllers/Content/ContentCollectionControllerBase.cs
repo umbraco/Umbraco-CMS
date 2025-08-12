@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -11,15 +15,27 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
-public abstract class ContentCollectionControllerBase<TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel> : ManagementApiControllerBase
+public abstract class ContentCollectionControllerBase<TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel, TItem> : ManagementApiControllerBase
     where TContent : class, IContentBase
     where TCollectionResponseModel : ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>
     where TValueResponseModelBase : ValueResponseModelBase
     where TVariantResponseModel : VariantResponseModelBase
+    where TItem : DocumentCollectionResponseModel, new()
 {
     private readonly IUmbracoMapper _mapper;
+    private readonly SignProviderCollection _signProviders;
 
-    protected ContentCollectionControllerBase(IUmbracoMapper mapper) => _mapper = mapper;
+    protected ContentCollectionControllerBase(IUmbracoMapper mapper, SignProviderCollection signProvider)
+    {
+        _mapper = mapper;
+        _signProviders = signProvider;
+    }
+
+    [Obsolete("Use the constructer with all parameters. To be removed in Umbraco 18")]
+    protected ContentCollectionControllerBase(IUmbracoMapper mapper)
+        : this(mapper, StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+    {
+    }
 
     [Obsolete("This method is no longer used and will be removed in Umbraco 17.")]
     protected IActionResult CollectionResult(ListViewPagedModel<TContent> result)
@@ -50,6 +66,10 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
 
     protected IActionResult CollectionResult(List<TCollectionResponseModel> collectionResponseModels, long totalNumberOfItems)
     {
+
+        TItem[] signTargets = collectionResponseModels.OfType<TItem>().ToArray();
+        PopulateSigns(signTargets).GetAwaiter().GetResult();
+
         var pageViewModel = new PagedViewModel<TCollectionResponseModel>
         {
             Items = collectionResponseModels,
@@ -104,4 +124,12 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
                 StatusCode = StatusCodes.Status500InternalServerError,
             },
         });
+
+    protected async Task PopulateSigns(TItem[] collectionViewModel)
+    {
+        foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<TItem>()))
+        {
+            await signProvider.PopulateCollectionSignsAsync(collectionViewModel);
+        }
+    }
 }

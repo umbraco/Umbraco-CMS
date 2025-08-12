@@ -1,3 +1,4 @@
+using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Models.Entities;
 
@@ -12,8 +13,7 @@ public interface ISignProvider
     /// Gets a value indicating whether this provider can provide tree signs for the specified item type.
     /// </summary>
     /// <typeparam name="TItem">Type of tree item view model.</typeparam>
-    /// <returns></returns>
-    bool CanProvideTreeSigns<TItem>();
+    bool CanProvideSigns<TItem>();
 
     /// <summary>
     /// Populates the provided tree item view models with signs.
@@ -23,4 +23,12 @@ public interface ISignProvider
     /// <param name="entities">The entities from which the collection of tree item view models was populated.</param>
     Task PopulateTreeSignsAsync<TItem>(TItem[] treeItemViewModels, IEnumerable<IEntitySlim> entities)
         where TItem : EntityTreeItemResponseModel, new();
+
+    /// <summary>
+    /// Populates the provided collection item view models with signs.
+    /// </summary>
+    /// <typeparam name="TItem">Type of collection item view model.</typeparam>
+    /// <param name="collectionItemViewModel">The collection of collection item view models populated with signs.</param>
+    Task PopulateCollectionSignsAsync<TItem>(TItem[] collectionItemViewModel)
+        where TItem : DocumentCollectionResponseModel, new();
 }

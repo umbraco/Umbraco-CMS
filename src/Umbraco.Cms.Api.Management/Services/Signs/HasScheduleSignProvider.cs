@@ -1,4 +1,5 @@
 using Serilog.Core;
+using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -21,7 +22,10 @@ internal class HasScheduleSignProvider : ISignProvider
     public HasScheduleSignProvider(IContentService contentService) => _contentService = contentService;
 
     /// <inheritdoc/>
-    public bool CanProvideTreeSigns<TItem>() => typeof(TItem) == typeof(DocumentTreeItemResponseModel);
+    public bool CanProvideSigns<TItem>() =>
+        typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
+        typeof(TItem) == typeof(DocumentCollectionResponseModel);
+
 
     /// <inheritdoc/>
     public Task PopulateTreeSignsAsync<TItem>(TItem[] treeItemViewModels, IEnumerable<IEntitySlim> entities)
@@ -31,6 +35,19 @@ internal class HasScheduleSignProvider : ISignProvider
         foreach (Guid key in contentKeysScheduledForPublishing)
         {
             treeItemViewModels.First(x => x.Id == key).AddSign(Alias);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc/>
+    public Task PopulateCollectionSignsAsync<TItem>(TItem[] collectionItemViewModel)
+        where TItem : DocumentCollectionResponseModel, new()
+    {
+        IEnumerable<Guid> contentKeysScheduledForPublishing = _contentService.GetScheduledContentKeys(collectionItemViewModel.Select(x => x.Id));
+        foreach (Guid key in contentKeysScheduledForPublishing)
+        {
+            collectionItemViewModel.First(x => x.Id == key).AddSign(Alias);
         }
 
         return Task.CompletedTask;
