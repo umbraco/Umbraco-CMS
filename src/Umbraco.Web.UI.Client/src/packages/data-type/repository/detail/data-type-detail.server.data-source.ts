@@ -9,7 +9,6 @@ import type {
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbManagementApiDetailDataRequestManager } from '@umbraco-cms/backoffice/management-api';
 
@@ -24,8 +23,11 @@ export class UmbDataTypeServerDataSource
 {
 	#detailRequestManager = new UmbManagementApiDetailDataRequestManager<
 		DataTypeResponseModel,
-		UpdateDataTypeRequestModel
+		UpdateDataTypeRequestModel,
+		CreateDataTypeRequestModel
 	>(this, {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		create: (body: CreateDataTypeRequestModel) => DataTypeService.postDataType({ body }),
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		read: (id: string) => DataTypeService.getDataTypeById({ path: { id } }),
 		update: (id: string, body: UpdateDataTypeRequestModel) =>
@@ -69,21 +71,7 @@ export class UmbDataTypeServerDataSource
 
 		const { data, error } = await this.#detailRequestManager.read(unique);
 
-		if (!data) {
-			return { error };
-		}
-
-		// TODO: make data mapper to prevent errors
-		const dataType: UmbDataTypeDetailModel = {
-			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
-			unique: data.id,
-			name: data.name,
-			editorAlias: data.editorAlias,
-			editorUiAlias: data.editorUiAlias || null,
-			values: data.values as Array<UmbDataTypePropertyValueModel>,
-		};
-
-		return { data: dataType };
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
 	}
 
 	/**
@@ -109,18 +97,9 @@ export class UmbDataTypeServerDataSource
 			values: model.values,
 		};
 
-		const { data, error } = await tryExecute(
-			this,
-			DataTypeService.postDataType({
-				body: body,
-			}),
-		);
+		const { data, error } = await this.#detailRequestManager.create(body);
 
-		if (data) {
-			return this.read(data as any);
-		}
-
-		return { error };
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
 	}
 
 	/**
@@ -145,21 +124,7 @@ export class UmbDataTypeServerDataSource
 
 		const { data, error } = await this.#detailRequestManager.update(model.unique, body);
 
-		if (data) {
-			// TODO: make data mapper to prevent errors
-			const dataType: UmbDataTypeDetailModel = {
-				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
-				unique: data.id,
-				name: data.name,
-				editorAlias: data.editorAlias,
-				editorUiAlias: data.editorUiAlias || null,
-				values: data.values as Array<UmbDataTypePropertyValueModel>,
-			};
-
-			return { data: dataType };
-		}
-
-		return { error };
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
 	}
 
 	/**
@@ -171,5 +136,17 @@ export class UmbDataTypeServerDataSource
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 		return this.#detailRequestManager.delete(unique);
+	}
+
+	// TODO: change this to a mapper extension when the endpoints returns a $type for DataTypeResponseModel
+	#mapServerResponseModelToEntityDetailModel(data: DataTypeResponseModel): UmbDataTypeDetailModel {
+		return {
+			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+			unique: data.id,
+			name: data.name,
+			editorAlias: data.editorAlias,
+			editorUiAlias: data.editorUiAlias || null,
+			values: data.values as Array<UmbDataTypePropertyValueModel>,
+		};
 	}
 }
