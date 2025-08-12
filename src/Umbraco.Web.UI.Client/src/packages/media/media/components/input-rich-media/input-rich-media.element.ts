@@ -345,9 +345,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		}
 	}
 
-	async #onUploadCompleted(e: CustomEvent) {
-		const completed = e.detail as Array<UmbUploadableItem>;
-		const uploaded = completed.map((file) => file.unique);
+	async #onUploadCompleted(e: UmbDropzoneChangeEvent) {
+		if (this.readonly) return;
+
+		// If there are any finished uploadable items, we need to add them to the value
+		const uploaded = e.items
+			.filter((file) => file.status === UmbFileDropzoneItemStatus.COMPLETE)
+			.map((file) => file.unique);
 		this.#addItems(uploaded);
 	}
 
@@ -360,10 +364,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	#renderDropzone() {
 		if (this.readonly) return nothing;
-		if (this._cards && this._cards.length >= this.max) return;
 		return html`<umb-dropzone-media
-			?multiple=${this.max > 1}
-			@complete=${this.#onUploadCompleted}></umb-dropzone-media>`;
+			?multiple=${this.multiple}
+			@change=${this.#onUploadCompleted}></umb-dropzone-media>`;
 	}
 
 	#renderItems() {
