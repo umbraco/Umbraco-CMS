@@ -2,10 +2,9 @@
 interface UmbCacheEntryModel<DataModelType> {
 	id: string;
 	data: DataModelType;
-	insertDate: number;
 }
 
-export class UmbManagementApiRuntimeCache<DataModelType> {
+export class UmbManagementApiDetailDataRuntimeCache<DataModelType> {
 	#entries: Map<string, UmbCacheEntryModel<DataModelType>> = new Map();
 
 	has(id: string): boolean {
@@ -16,7 +15,6 @@ export class UmbManagementApiRuntimeCache<DataModelType> {
 		const cacheEntry: UmbCacheEntryModel<DataModelType> = {
 			id: id,
 			data,
-			insertDate: Date.now(),
 		};
 
 		this.#entries.set(id, cacheEntry);
