@@ -241,23 +241,23 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Language}.id = @id";
+    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Language)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
+        var lIdWhere = $"WHERE {SqlSyntax.GetQuotedColumnName("languageId")} = @id";
         var list = new List<string>
         {
             // NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
             // but we still need to remove them
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DictionaryValue + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE tagId IN (SELECT id FROM " +
-            Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentUrl + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Language + " WHERE id = @id",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DictionaryValue)} {lIdWhere}",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.PropertyData)} {lIdWhere}",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation)} {lIdWhere}",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DocumentCultureVariation)} {lIdWhere}",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {SqlSyntax.GetQuotedColumnName("tagId")} IN (SELECT id FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere})",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere}",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DocumentUrl)} {lIdWhere}",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @id",
         };
         return list;
     }
@@ -292,7 +292,8 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
 
         // insert
         LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
-        var id = Convert.ToInt32(Database.Insert(dto));
+        _ = Database.Insert(dto);
+        var id = Convert.ToInt32(dto.Id);
         entity.Id = id;
         entity.ResetDirtyProperties();
 

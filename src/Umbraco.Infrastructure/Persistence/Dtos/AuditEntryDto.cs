@@ -10,6 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal sealed class AuditEntryDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.AuditEntry;
+
     [Column("id")]
     [PrimaryKeyColumn]
     public int Id { get; set; }

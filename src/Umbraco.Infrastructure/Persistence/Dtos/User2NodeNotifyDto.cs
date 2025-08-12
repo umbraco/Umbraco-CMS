@@ -9,6 +9,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal sealed class User2NodeNotifyDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.User2NodeNotify;
+
     [Column("userId")]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2NodeNotify", OnColumns = "userId, nodeId, action")]
     [ForeignKey(typeof(UserDto))]

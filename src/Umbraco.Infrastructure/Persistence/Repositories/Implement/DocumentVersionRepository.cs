@@ -1,9 +1,11 @@
 using System.Data;
+using System.Text;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -24,17 +26,15 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
     /// </remarks>
     public IReadOnlyCollection<ContentVersionMeta>? GetDocumentVersionsEligibleForCleanup()
     {
-        Sql<ISqlContext>? query = _scopeAccessor.AmbientScope?.SqlContext.Sql();
+        IScope? ambientScope = _scopeAccessor.AmbientScope;
+        if (ambientScope is null)
+        {
+            return null;
+        }
 
-        query?.Select(@"umbracoDocument.nodeId as contentId,
-                           umbracoContent.contentTypeId as contentTypeId,
-                           umbracoContentVersion.id as versionId,
-                           umbracoContentVersion.userId as userId,
-                           umbracoContentVersion.versionDate as versionDate,
-                           umbracoDocumentVersion.published as currentPublishedVersion,
-                           umbracoContentVersion.[current] as currentDraftVersion,
-                           umbracoContentVersion.preventCleanup as preventCleanup,
-                           umbracoUser.userName as username")
+        ISqlSyntaxProvider syntax = ambientScope.SqlContext.SqlSyntax;
+        Sql<ISqlContext> query = ambientScope.SqlContext.Sql()
+            .Select(GetQuotedSelectCoumns(syntax))
             .From<DocumentDto>()
             .InnerJoin<ContentDto>()
             .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
@@ -51,6 +51,37 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
         return _scopeAccessor.AmbientScope?.Database.Fetch<ContentVersionMeta>(query);
     }
 
+    private string GetQuotedSelectCoumns(ISqlSyntaxProvider syntax) =>
+        $@"
+{syntax.ColumnWithAlias(ContentVersionDto.TableName,"id", "versionId")},
+{syntax.ColumnWithAlias(DocumentDto.TableName, "nodeId", "contentId")},
+{syntax.ColumnWithAlias(ContentDto.TableName, "contentTypeId", "contentTypeId")},
+{syntax.ColumnWithAlias(ContentVersionDto.TableName,"userId", "userId")},
+{syntax.ColumnWithAlias(ContentVersionDto.TableName,"versionDate", "versionDate")},
+{syntax.ColumnWithAlias(DocumentVersionDto.TableName,"published", "currentPublishedVersion")},
+{syntax.ColumnWithAlias(ContentVersionDto.TableName,"current", "currentDraftVersion")},
+{syntax.ColumnWithAlias(ContentVersionDto.TableName,"preventCleanup", "preventCleanup")},
+{syntax.ColumnWithAlias(UserDto.TableName,"userName", "username")}
+";
+
+    private static string GetQuotedSelectCoumn(ISqlSyntaxProvider syntax, string columnName, string? alias = null, string? tableName = null)
+    {
+        var sb = new StringBuilder();
+        if (tableName is not null)
+        {
+            _ = sb.Append($"{syntax.GetQuotedTableName(tableName)}.");
+        }
+
+        _ = sb.Append(syntax.GetQuotedColumnName(columnName));
+
+        if (alias is not null)
+        {
+            _ = sb.Append($" AS {syntax.GetQuotedName(alias)}");
+        }
+
+        return sb.ToString();
+    }
+
     /// <inheritdoc />
     public IReadOnlyCollection<ContentVersionCleanupPolicySettings>? GetCleanupPolicies()
     {
@@ -65,17 +96,16 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
     /// <inheritdoc />
     public IEnumerable<ContentVersionMeta>? GetPagedItemsByContentId(int contentId, long pageIndex, int pageSize, out long totalRecords, int? languageId = null)
     {
-        Sql<ISqlContext>? query = _scopeAccessor.AmbientScope?.SqlContext.Sql();
+        IScope? ambientScope = _scopeAccessor.AmbientScope;
+        if (ambientScope is null)
+        {
+            totalRecords = 0;
+            return null;
+        }
 
-        query?.Select(@"umbracoDocument.nodeId as contentId,
-                           umbracoContent.contentTypeId as contentTypeId,
-                           umbracoContentVersion.id as versionId,
-                           umbracoContentVersion.userId as userId,
-                           umbracoContentVersion.versionDate as versionDate,
-                           umbracoDocumentVersion.published as currentPublishedVersion,
-                           umbracoContentVersion.[current] as currentDraftVersion,
-                           umbracoContentVersion.preventCleanup as preventCleanup,
-                           umbracoUser.userName as username")
+        ISqlSyntaxProvider syntax = ambientScope.SqlContext.SqlSyntax;
+        Sql<ISqlContext> query = ambientScope.SqlContext.Sql()
+            .Select(GetQuotedSelectCoumns(syntax))
             .From<DocumentDto>()
             .InnerJoin<ContentDto>()
             .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
@@ -91,10 +121,10 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
 
         // TODO: If there's not a better way to write this then we need a better way to write this.
         query = languageId.HasValue
-            ? query?.Where<ContentVersionCultureVariationDto>(x => x.LanguageId == languageId.Value)
-            : query?.Where("umbracoContentVersionCultureVariation.languageId is null");
+            ? query.Where<ContentVersionCultureVariationDto>(x => x.LanguageId == languageId.Value)
+            : query.WhereNull<ContentVersionCultureVariationDto>(x => x.LanguageId);
 
-        query = query?.OrderByDescending<ContentVersionDto>(x => x.Id);
+        query = query.OrderByDescending<ContentVersionDto>(x => x.Id);
 
         Page<ContentVersionMeta>? page =
             _scopeAccessor.AmbientScope?.Database.Page<ContentVersionMeta>(pageIndex + 1, pageSize, query);
@@ -164,17 +194,15 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
     /// <inheritdoc />
     public ContentVersionMeta? Get(int versionId)
     {
-        Sql<ISqlContext>? query = _scopeAccessor.AmbientScope?.SqlContext.Sql();
+        IScope? ambientScope = _scopeAccessor.AmbientScope;
+        if (ambientScope is null)
+        {
+            return null;
+        }
 
-        query?.Select(@"umbracoDocument.nodeId as contentId,
-                           umbracoContent.contentTypeId as contentTypeId,
-                           umbracoContentVersion.id as versionId,
-                           umbracoContentVersion.userId as userId,
-                           umbracoContentVersion.versionDate as versionDate,
-                           umbracoDocumentVersion.published as currentPublishedVersion,
-                           umbracoContentVersion.[current] as currentDraftVersion,
-                           umbracoContentVersion.preventCleanup as preventCleanup,
-                           umbracoUser.userName as username")
+        ISqlSyntaxProvider syntax = ambientScope.SqlContext.SqlSyntax;
+        Sql<ISqlContext> query = ambientScope.SqlContext.Sql()
+            .Select(GetQuotedSelectCoumns(syntax))
             .From<DocumentDto>()
             .InnerJoin<ContentDto>()
             .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)

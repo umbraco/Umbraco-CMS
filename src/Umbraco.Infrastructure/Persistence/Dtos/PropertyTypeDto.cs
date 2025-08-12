@@ -10,6 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class PropertyTypeDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.PropertyType;
+
     private string? _alias;
 
     [Column("id")]

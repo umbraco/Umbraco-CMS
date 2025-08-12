@@ -596,10 +596,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     protected override IContent? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
-            .Where<NodeDto>(x => x.NodeId == id)
-            .SelectTop(1);
+            .Where<NodeDto>(x => x.NodeId == id);
 
-        DocumentDto? dto = Database.Fetch<DocumentDto>(sql).FirstOrDefault();
+        DocumentDto? dto = Database.Fetch<DocumentDto>(sql.SelectTop(1)).FirstOrDefault();
         return dto == null
             ? null
             : MapDtoToContent(dto);
@@ -725,46 +724,48 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
 
     // ah maybe not, that what's used for eg Exists in base repo
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTab(NodeDto.TableName)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
+        var nodeId = QuoteCol("nodeId");
+        var uniqueId = QuoteCol("uniqueId");
+        var umbracoNode = QuoteTab(NodeDto.TableName);
         var list = new List<string>
-        {
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.RedirectUrl +
-            " WHERE contentKey IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node +
-            " WHERE id = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
-            "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup +
-            " SET startContentId = NULL WHERE startContentId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Domain + " WHERE domainRootStructureID = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentVersion + " WHERE id IN (SELECT id FROM " +
-            Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " +
-            Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation +
-            " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion +
-            " WHERE nodeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.AccessRule + " WHERE accessId IN (SELECT id FROM " +
-            Constants.DatabaseSchema.Tables.Access +
-            " WHERE nodeId = @id OR loginNodeId = @id OR noAccessNodeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE loginNodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE noAccessNodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentUrl + " WHERE uniqueId IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node +
-            " WHERE id = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id",
-
+    {
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.ContentSchedule)} WHERE {nodeId} = @id",
+      $@"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.RedirectUrl)} WHERE {QuoteCol("contentKey")} IN
+        (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.User2NodeNotify )} WHERE {nodeId} = @id",
+      $@"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.UserGroup2GranularPermission)} WHERE {uniqueId} IN
+        (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.UserStartNode)} WHERE {QuoteCol("startNode")} = @id",
+      $@"UPDATE {QuoteTab(Constants.DatabaseSchema.Tables.UserGroup)}
+        SET {QuoteCol("startContentId")} = NULL
+        WHERE {QuoteCol("startContentId")} = @id",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteCol("parentId")} = @id",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteCol("childId")} = @id",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {nodeId} = @id",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Domain)} WHERE {QuoteCol("domainRootStructureID")} = @id",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Document)} WHERE {nodeId} = @id",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.DocumentCultureVariation)} WHERE {nodeId} = @id",
+      $@"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.DocumentVersion)} WHERE id IN
+        (SELECT id FROM {QuoteTab(Constants.DatabaseSchema.Tables.ContentVersion )} WHERE {nodeId} = @id)",
+      $@"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.PropertyData)} WHERE {QuoteCol("versionId")} IN
+        (SELECT id FROM {QuoteTab(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
+      $@"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation)} WHERE {QuoteCol("versionId")} IN
+        (SELECT id FROM {QuoteTab(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Content)} WHERE {nodeId} = @id",
+      $@"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.AccessRule)} WHERE {QuoteCol("accessId")} IN
+        (SELECT id FROM {QuoteTab(Constants.DatabaseSchema.Tables.Access)}
+          WHERE {nodeId} = @id OR {QuoteCol("loginNodeId")} = @id OR {QuoteCol("noAccessNodeId")} = @id)",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Access)} WHERE {nodeId} = @id",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Access)} WHERE {QuoteCol("loginNodeId")} = @id",
+      $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Access)} WHERE {QuoteCol("noAccessNodeId")} = @id",
+      $@"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.DocumentUrl)} WHERE {uniqueId} IN
+        (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
+      $"DELETE FROM {umbracoNode} WHERE id = @id",
         };
         return list;
     }
@@ -1829,4 +1830,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     #endregion
+
+    private string QuoteTab(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
+
+    private string QuoteCol(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
 }
