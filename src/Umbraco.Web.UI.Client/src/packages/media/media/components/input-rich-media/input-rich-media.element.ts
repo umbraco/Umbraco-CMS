@@ -382,26 +382,22 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 
 	#renderAddButton() {
-		if (this._cards && this._cards.length && !this.multiple) return;
-		if (this.readonly && this._cards.length > 0) {
-			return nothing;
-		} else {
-			return html`
-				<uui-button
-					id="btn-add"
-					look="placeholder"
-					@blur=${() => {
-						this.pristine = false;
-						this.checkValidity();
-					}}
-					@click=${this.#openPicker}
-					label=${this.localize.term('general_choose')}
-					?disabled=${this.readonly}>
-					<uui-icon name="icon-add"></uui-icon>
-					${this.localize.term('general_choose')}
-				</uui-button>
-			`;
-		}
+		if (this.readonly) return nothing;
+		return html`
+			<uui-button
+				id="btn-add"
+				look="placeholder"
+				@blur=${() => {
+					this.pristine = false;
+					this.checkValidity();
+				}}
+				@click=${this.#openPicker}
+				label=${this.localize.term('general_choose')}
+				?disabled=${this.readonly}>
+				<uui-icon name="icon-add"></uui-icon>
+				${this.localize.term('general_choose')}
+			</uui-button>
+		`;
 	}
 
 	#renderItem(item: UmbRichMediaCardModel) {
