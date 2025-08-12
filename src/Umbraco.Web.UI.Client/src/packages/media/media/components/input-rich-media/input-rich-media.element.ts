@@ -329,16 +329,20 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	}
 
 	async #onRemove(item: UmbRichMediaCardModel) {
-		await umbConfirmModal(this, {
-			color: 'danger',
-			headline: `${this.localize.term('actions_remove')} ${item.name}?`,
-			content: `${this.localize.term('defaultdialogs_confirmremove')} ${item.name}?`,
-			confirmLabel: this.localize.term('actions_remove'),
-		});
+		try {
+			await umbConfirmModal(this, {
+				color: 'danger',
+				headline: `${this.localize.term('actions_remove')} ${item.name}?`,
+				content: `${this.localize.term('defaultdialogs_confirmremove')} ${item.name}?`,
+				confirmLabel: this.localize.term('actions_remove'),
+			});
 
-		this.value = this.value?.filter((x) => x.key !== item.unique);
+			this.value = this.value?.filter((x) => x.key !== item.unique);
 
-		this.dispatchEvent(new UmbChangeEvent());
+			this.dispatchEvent(new UmbChangeEvent());
+		} catch {
+			// User cancelled the action
+		}
 	}
 
 	async #onUploadCompleted(e: CustomEvent) {
