@@ -21,7 +21,7 @@ public class ContentFinderByUrlNew : IContentFinder
     private readonly ILogger<ContentFinderByUrlNew> _logger;
     private readonly IPublishedContentCache _publishedContentCache;
     private readonly IDocumentUrlService _documentUrlService;
-    private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
+    private WebRoutingSettings _webRoutingSettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
@@ -55,7 +55,9 @@ public class ContentFinderByUrlNew : IContentFinder
         _publishedContentCache = publishedContentCache;
         _documentUrlService = documentUrlService;
         UmbracoContextAccessor = umbracoContextAccessor;
-        _webRoutingSettings = webRoutingSettings;
+
+        _webRoutingSettings = webRoutingSettings.CurrentValue;
+        webRoutingSettings.OnChange(x => _webRoutingSettings = x);
     }
 
     /// <summary>
@@ -85,7 +87,7 @@ public class ContentFinderByUrlNew : IContentFinder
         {
             // If we have configured strict domain matching, and a domain has not been found for the request configured on an ancestor node,
             // do not route the content by URL.
-            if (_webRoutingSettings.CurrentValue.UseStrictDomainMatching)
+            if (_webRoutingSettings.UseStrictDomainMatching)
             {
                 return Task.FromResult(false);
             }
