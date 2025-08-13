@@ -104,10 +104,6 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     protected override UmbracoObjectTypes ContentObjectType
         => UmbracoObjectTypes.Element;
 
-    // TODO ELEMENTS: implement publishing
-    protected override PublishResult CommitDocumentChanges(ICoreScope scope, IElement content, EventMessages eventMessages, IReadOnlyCollection<ILanguage> allLangs, IDictionary<string, object?>? notificationState, int userId)
-        => throw new NotImplementedException();
-
     protected override void DeleteLocked(ICoreScope scope, IElement content, EventMessages evtMsgs)
     {
         _elementRepository.Delete(content);
@@ -135,11 +131,26 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     protected override TreeChangeNotification<IElement> TreeChangeNotification(IElement content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ElementTreeChangeNotification(content, changeTypes, eventMessages);
 
+    protected override TreeChangeNotification<IElement> TreeChangeNotification(IElement content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages)
+        => new ElementTreeChangeNotification(content, changeTypes, publishedCultures, unpublishedCultures, eventMessages);
+
     protected override TreeChangeNotification<IElement> TreeChangeNotification(IEnumerable<IElement> content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ElementTreeChangeNotification(content, changeTypes, eventMessages);
 
     protected override DeletingNotification<IElement> DeletingNotification(IElement content, EventMessages eventMessages)
         => new ElementDeletingNotification(content, eventMessages);
+
+    protected override CancelableEnumerableObjectNotification<IElement> PublishingNotification(IElement content, EventMessages eventMessages)
+        => new ElementPublishingNotification(content, eventMessages);
+
+    protected override IStatefulNotification PublishedNotification(IElement content, EventMessages eventMessages)
+        => new ElementPublishedNotification(content, eventMessages);
+
+    protected override IStatefulNotification PublishedNotification(IEnumerable<IElement> content, EventMessages eventMessages)
+        => new ElementPublishedNotification(content, eventMessages);
+
+    protected override CancelableEnumerableObjectNotification<IElement> UnpublishingNotification(IElement content, EventMessages eventMessages)
+        => new ElementUnpublishingNotification(content, eventMessages);
 
     protected override IStatefulNotification UnpublishedNotification(IElement content, EventMessages eventMessages)
         => new ElementUnpublishedNotification(content, eventMessages);
@@ -149,9 +160,6 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
 
     protected override DeletedVersionsNotification<IElement> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
         => new ElementDeletedVersionsNotification(id, messages, specificVersion, deletePriorVersions, dateToRetain);
-
-    protected override CancelableEnumerableObjectNotification<IElement> PublishingNotification(IElement content, EventMessages eventMessages)
-        => new ElementPublishingNotification(content, eventMessages);
 
     #endregion
 }

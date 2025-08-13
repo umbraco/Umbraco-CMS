@@ -2,6 +2,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
+// TODO ELEMENTS: fully define this interface
 public interface IPublishableContentRepository<TContent> : IContentRepository<int, TContent>,
     IReadRepository<Guid, TContent>
     where TContent : IPublishableContentBase
@@ -20,7 +21,7 @@ public interface IPublishableContentRepository<TContent> : IContentRepository<in
     /// </summary>
     /// <param name="content"></param>
     /// <param name="schedule"></param>
-    void PersistContentSchedule(TContent content, ContentScheduleCollection schedule);
+    void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection schedule);
 
     /// <summary>
     ///     Clears the publishing schedule for all entries having an a date before (lower than, or equal to) a specified date.
@@ -59,5 +60,7 @@ public interface IPublishableContentRepository<TContent> : IContentRepository<in
     ///     We require this on the repo because the IQuery{TContent} cannot supply the 'newest' parameter
     /// </remarks>
     int CountPublished(string? contentTypeAlias = null);
+
+    bool IsPathPublished(TContent? content);
 }
 

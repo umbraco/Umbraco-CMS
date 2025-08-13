@@ -49,6 +49,14 @@ internal sealed class ElementEditingService
         return Task.FromResult(element);
     }
 
+    // TODO ELEMENTS: implement validation here
+    public Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ElementCreateModel createModel, Guid userKey)
+        => Task.FromResult(Attempt<ContentValidationResult, ContentEditingOperationStatus>.Succeed(ContentEditingOperationStatus.Success, new ()));
+
+    // TODO ELEMENTS: implement validation here
+    public Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateElementUpdateModel updateModel, Guid userKey)
+        => Task.FromResult(Attempt<ContentValidationResult, ContentEditingOperationStatus>.Succeed(ContentEditingOperationStatus.Success, new ()));
+
     public async Task<Attempt<ElementCreateResult, ContentEditingOperationStatus>> CreateAsync(ElementCreateModel createModel, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)

@@ -2,8 +2,8 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
-// TODO ELEMENTS: make IContentService inherit this interface
-public interface IPublishableContentService<TContent>
+// TODO ELEMENTS: fully define this interface
+public interface IPublishableContentService<TContent> : IContentServiceBase<TContent>
     where TContent : class, IPublishableContentBase
 {
     /// <summary>
@@ -21,4 +21,40 @@ public interface IPublishableContentService<TContent>
     OperationResult Delete(TContent content, int userId = Constants.Security.SuperUserId);
 
     ContentScheduleCollection GetContentScheduleByContentId(Guid contentId);
+
+    /// <summary>
+    ///     Persists publish/unpublish schedule for content.
+    /// </summary>
+    /// <param name="content"></param>
+    /// <param name="contentSchedule"></param>
+    void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule);
+
+    /// <summary>
+    ///     Publishes content
+    /// </summary>
+    /// <remarks>
+    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
+    ///     <para>Wildcards (*) can be used as culture identifier to publish all cultures.</para>
+    ///     <para>An empty array (or a wildcard) can be passed for culture invariant content.</para>
+    /// </remarks>
+    /// <param name="content">The content to publish.</param>
+    /// <param name="cultures">The cultures to publish.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    PublishResult Publish(TContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Unpublishes content.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         By default, unpublishes the content as a whole, but it is possible to specify a culture to be
+    ///         unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
+    ///         the content as a whole may or may not remain published.
+    ///     </para>
+    ///     <para>
+    ///         If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
+    ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
+    ///     </para>
+    /// </remarks>
+    PublishResult Unpublish(TContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
 }

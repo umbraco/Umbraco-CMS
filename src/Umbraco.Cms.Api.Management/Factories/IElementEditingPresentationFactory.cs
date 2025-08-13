@@ -8,4 +8,6 @@ public interface IElementEditingPresentationFactory
     ElementCreateModel MapCreateModel(CreateElementRequestModel requestModel);
 
     ElementUpdateModel MapUpdateModel(UpdateElementRequestModel requestModel);
+
+    ValidateElementUpdateModel MapValidateUpdateModel(ValidateUpdateElementRequestModel requestModel);
 }

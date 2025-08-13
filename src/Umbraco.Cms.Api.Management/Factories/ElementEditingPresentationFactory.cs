@@ -17,4 +17,12 @@ internal sealed class ElementEditingPresentationFactory : ContentEditingPresenta
 
     public ElementUpdateModel MapUpdateModel(UpdateElementRequestModel requestModel)
         => MapContentEditingModel<ElementUpdateModel>(requestModel);
+
+    public ValidateElementUpdateModel MapValidateUpdateModel(ValidateUpdateElementRequestModel requestModel)
+    {
+        ValidateElementUpdateModel model = MapContentEditingModel<ValidateElementUpdateModel>(requestModel);
+        model.Cultures = requestModel.Cultures;
+
+        return model;
+    }
 }

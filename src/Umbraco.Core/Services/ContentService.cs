@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
@@ -652,22 +651,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     }
 
     /// <summary>
-    ///     Gets the parent of the current content as an <see cref="IContent" /> item.
-    /// </summary>
-    /// <param name="content"><see cref="IContent" /> to retrieve the parent from</param>
-    /// <returns>Parent <see cref="IContent" /> object</returns>
-    public IContent? GetParent(IContent? content)
-    {
-        if (content?.ParentId == Constants.System.Root || content?.ParentId == Constants.System.RecycleBinContent ||
-            content is null)
-        {
-            return null;
-        }
-
-        return GetById(content.ParentId);
-    }
-
-    /// <summary>
     ///     Gets a collection of <see cref="IContent" /> objects, which reside at the first level / root
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
@@ -712,13 +695,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     }
 
     /// <summary>
-    ///     Checks whether an <see cref="IContent" /> item has any children
-    /// </summary>
-    /// <param name="id">Id of the <see cref="IContent" /></param>
-    /// <returns>True if the content has any children otherwise False</returns>
-    public bool HasChildren(int id) => CountChildren(id) > 0;
-
-    /// <summary>
     ///     Checks if the passed in <see cref="IContent" /> can be published based on the ancestors publish state.
     /// </summary>
     /// <param name="content"><see cref="IContent" /> to check if ancestors are published</param>
@@ -739,15 +715,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         // not trashed and has a parent: publishable if the parent is path-published
         IContent? parent = GetById(content.ParentId);
         return parent == null || IsPathPublished(parent);
-    }
-
-    public bool IsPathPublished(IContent? content)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.IsPathPublished(content);
-        }
     }
 
     #endregion
@@ -800,354 +767,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.Complete();
             return result;
         }
-    }
-
-    /// <summary>
-    ///     Handles a lot of business logic cases for how the document should be persisted
-    /// </summary>
-    /// <param name="scope"></param>
-    /// <param name="content"></param>
-    /// <param name="allLangs"></param>
-    /// <param name="notificationState"></param>
-    /// <param name="userId"></param>
-    /// <param name="branchOne"></param>
-    /// <param name="branchRoot"></param>
-    /// <param name="eventMessages"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     <para>
-    ///         Business logic cases such: as unpublishing a mandatory culture, or unpublishing the last culture, checking for
-    ///         pending scheduled publishing, etc... is dealt with in this method.
-    ///         There is quite a lot of cases to take into account along with logic that needs to deal with scheduled
-    ///         saving/publishing, branch saving/publishing, etc...
-    ///     </para>
-    /// </remarks>
-    private PublishResult CommitDocumentChangesInternal(
-        ICoreScope scope,
-        IContent content,
-        EventMessages eventMessages,
-        IReadOnlyCollection<ILanguage> allLangs,
-        IDictionary<string, object?>? notificationState,
-        int userId,
-        bool branchOne = false,
-        bool branchRoot = false)
-    {
-        if (scope == null)
-        {
-            throw new ArgumentNullException(nameof(scope));
-        }
-
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
-
-        if (eventMessages == null)
-        {
-            throw new ArgumentNullException(nameof(eventMessages));
-        }
-
-        PublishResult? publishResult = null;
-        PublishResult? unpublishResult = null;
-
-        // nothing set = republish it all
-        if (content.PublishedState != PublishedState.Publishing &&
-            content.PublishedState != PublishedState.Unpublishing)
-        {
-            content.PublishedState = PublishedState.Publishing;
-        }
-
-        // State here is either Publishing or Unpublishing
-        // Publishing to unpublish a culture may end up unpublishing everything so these flags can be flipped later
-        var publishing = content.PublishedState == PublishedState.Publishing;
-        var unpublishing = content.PublishedState == PublishedState.Unpublishing;
-
-        var variesByCulture = content.ContentType.VariesByCulture();
-
-        // Track cultures that are being published, changed, unpublished
-        IReadOnlyList<string>? culturesPublishing = null;
-        IReadOnlyList<string>? culturesUnpublishing = null;
-        IReadOnlyList<string>? culturesChanging = variesByCulture
-            ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-            : null;
-
-        var isNew = !content.HasIdentity;
-        TreeChangeTypes changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
-        var previouslyPublished = content.HasIdentity && content.Published;
-
-        // Inline method to persist the document with the documentRepository since this logic could be called a couple times below
-        void SaveDocument(IContent c)
-        {
-            // save, always
-            if (c.HasIdentity == false)
-            {
-                c.CreatorId = userId;
-            }
-
-            c.WriterId = userId;
-
-            // saving does NOT change the published version, unless PublishedState is Publishing or Unpublishing
-            _documentRepository.Save(c);
-        }
-
-        if (publishing)
-        {
-            // Determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
-            culturesUnpublishing = content.GetCulturesUnpublishing();
-            culturesPublishing = variesByCulture
-                ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                : null;
-
-            // ensure that the document can be published, and publish handling events, business rules, etc
-            publishResult = StrategyCanPublish(
-                scope,
-                content, /*checkPath:*/
-                !branchOne || branchRoot,
-                culturesPublishing,
-                culturesUnpublishing,
-                eventMessages,
-                allLangs,
-                notificationState);
-
-            if (publishResult.Success)
-            {
-                // raise Publishing notification
-                if (scope.Notifications.PublishCancelable(
-                        new ContentPublishingNotification(content, eventMessages).WithState(notificationState)))
-                {
-                    _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
-                    return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, eventMessages, content);
-                }
-
-                // note: StrategyPublish flips the PublishedState to Publishing!
-                publishResult = StrategyPublish(content, culturesPublishing, culturesUnpublishing, eventMessages);
-
-                // Check if a culture has been unpublished and if there are no cultures left, and then unpublish document as a whole
-                if (publishResult.Result == PublishResultType.SuccessUnpublishCulture &&
-                    content.PublishCultureInfos?.Count == 0)
-                {
-                    // This is a special case! We are unpublishing the last culture and to persist that we need to re-publish without any cultures
-                    // so the state needs to remain Publishing to do that. However, we then also need to unpublish the document and to do that
-                    // the state needs to be Unpublishing and it cannot be both. This state is used within the documentRepository to know how to
-                    // persist certain things. So before proceeding below, we need to save the Publishing state to publish no cultures, then we can
-                    // mark the document for Unpublishing.
-                    SaveDocument(content);
-
-                    // Set the flag to unpublish and continue
-                    unpublishing = content.Published; // if not published yet, nothing to do
-                }
-            }
-            else
-            {
-                // in a branch, just give up
-                if (branchOne && !branchRoot)
-                {
-                    return publishResult;
-                }
-
-                // Check for mandatory culture missing, and then unpublish document as a whole
-                if (publishResult.Result == PublishResultType.FailedPublishMandatoryCultureMissing)
-                {
-                    publishing = false;
-                    unpublishing = content.Published; // if not published yet, nothing to do
-
-                    // we may end up in a state where we won't publish nor unpublish
-                    // keep going, though, as we want to save anyways
-                }
-
-                // reset published state from temp values (publishing, unpublishing) to original value
-                // (published, unpublished) in order to save the document, unchanged - yes, this is odd,
-                // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
-                // PublishState to anything other than Publishing or Unpublishing - which is precisely
-                // what we want to do here - throws
-                content.Published = content.Published;
-            }
-        }
-
-        // won't happen in a branch
-        if (unpublishing)
-        {
-            IContent? newest = GetById(content.Id); // ensure we have the newest version - in scope
-            if (content.VersionId != newest?.VersionId)
-            {
-                return new PublishResult(PublishResultType.FailedPublishConcurrencyViolation, eventMessages, content);
-            }
-
-            if (content.Published)
-            {
-                // ensure that the document can be unpublished, and unpublish
-                // handling events, business rules, etc
-                // note: StrategyUnpublish flips the PublishedState to Unpublishing!
-                // note: This unpublishes the entire document (not different variants)
-                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, notificationState);
-                if (unpublishResult.Success)
-                {
-                    unpublishResult = StrategyUnpublish(content, eventMessages);
-                }
-                else
-                {
-                    // reset published state from temp values (publishing, unpublishing) to original value
-                    // (published, unpublished) in order to save the document, unchanged - yes, this is odd,
-                    // but: (a) it means we don't reproduce the PublishState logic here and (b) setting the
-                    // PublishState to anything other than Publishing or Unpublishing - which is precisely
-                    // what we want to do here - throws
-                    content.Published = content.Published;
-                    return unpublishResult;
-                }
-            }
-            else
-            {
-                // already unpublished - optimistic concurrency collision, really,
-                // and I am not sure at all what we should do, better die fast, else
-                // we may end up corrupting the db
-                throw new InvalidOperationException("Concurrency collision.");
-            }
-        }
-
-        // Persist the document
-        SaveDocument(content);
-
-        // we have tried to unpublish - won't happen in a branch
-        if (unpublishing)
-        {
-            // and succeeded, trigger events
-            if (unpublishResult?.Success ?? false)
-            {
-                // events and audit
-                scope.Notifications.Publish(
-                    new ContentUnpublishedNotification(content, eventMessages).WithState(notificationState));
-                scope.Notifications.Publish(new ContentTreeChangeNotification(
-                    content,
-                    TreeChangeTypes.RefreshBranch,
-                    variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : null,
-                    variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : ["*"],
-                    eventMessages));
-
-                if (culturesUnpublishing != null)
-                {
-                    // This will mean that that we unpublished a mandatory culture or we unpublished the last culture.
-                    var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
-                    Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
-
-                    if (publishResult == null)
-                    {
-                        throw new PanicException("publishResult == null - should not happen");
-                    }
-
-                    switch (publishResult.Result)
-                    {
-                        case PublishResultType.FailedPublishMandatoryCultureMissing:
-                            // Occurs when a mandatory culture was unpublished (which means we tried publishing the document without a mandatory culture)
-
-                            // Log that the whole content item has been unpublished due to mandatory culture unpublished
-                            Audit(AuditType.Unpublish, userId, content.Id, "Unpublished (mandatory language unpublished)");
-                            return new PublishResult(PublishResultType.SuccessUnpublishMandatoryCulture, eventMessages, content);
-                        case PublishResultType.SuccessUnpublishCulture:
-                            // Occurs when the last culture is unpublished
-                            Audit(AuditType.Unpublish, userId, content.Id, "Unpublished (last language unpublished)");
-                            return new PublishResult(PublishResultType.SuccessUnpublishLastCulture, eventMessages, content);
-                    }
-                }
-
-                Audit(AuditType.Unpublish, userId, content.Id);
-                return new PublishResult(PublishResultType.SuccessUnpublish, eventMessages, content);
-            }
-
-            // or, failed
-            scope.Notifications.Publish(new ContentTreeChangeNotification(content, changeType, eventMessages));
-            return new PublishResult(PublishResultType.FailedUnpublish, eventMessages, content); // bah
-        }
-
-        // we have tried to publish
-        if (publishing)
-        {
-            // and succeeded, trigger events
-            if (publishResult?.Success ?? false)
-            {
-                if (isNew == false && previouslyPublished == false)
-                {
-                    changeType = TreeChangeTypes.RefreshBranch; // whole branch
-                }
-                else if (isNew == false && previouslyPublished)
-                {
-                    changeType = TreeChangeTypes.RefreshNode; // single node
-                }
-
-                // invalidate the node/branch
-                // for branches, handled by SaveAndPublishBranch
-                if (!branchOne)
-                {
-                    scope.Notifications.Publish(
-                        new ContentTreeChangeNotification(
-                            content,
-                            changeType,
-                            variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : ["*"],
-                            variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : null,
-                            eventMessages));
-                    scope.Notifications.Publish(
-                        new ContentPublishedNotification(content, eventMessages).WithState(notificationState));
-                }
-
-                // it was not published and now is... descendants that were 'published' (but
-                // had an unpublished ancestor) are 're-published' ie not explicitly published
-                // but back as 'published' nevertheless
-                if (!branchOne && isNew == false && previouslyPublished == false && HasChildren(content.Id))
-                {
-                    IContent[] descendants = GetPublishedDescendantsLocked(content).ToArray();
-                    scope.Notifications.Publish(
-                        new ContentPublishedNotification(descendants, eventMessages).WithState(notificationState));
-                }
-
-                switch (publishResult.Result)
-                {
-                    case PublishResultType.SuccessPublish:
-                        Audit(AuditType.Publish, userId, content.Id);
-                        break;
-                    case PublishResultType.SuccessPublishCulture:
-                        if (culturesPublishing != null)
-                        {
-                            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesPublishing);
-                            Audit(AuditType.PublishVariant, userId, content.Id, $"Published languages: {langs}", langs);
-                        }
-
-                        break;
-                    case PublishResultType.SuccessUnpublishCulture:
-                        if (culturesUnpublishing != null)
-                        {
-                            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
-                            Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
-                        }
-
-                        break;
-                }
-
-                return publishResult;
-            }
-        }
-
-        // should not happen
-        if (branchOne && !branchRoot)
-        {
-            throw new PanicException("branchOne && !branchRoot - should not happen");
-        }
-
-        // if publishing didn't happen or if it has failed, we still need to log which cultures were saved
-        if (!branchOne && (publishResult == null || !publishResult.Success))
-        {
-            if (culturesChanging != null)
-            {
-                var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesChanging);
-                Audit(AuditType.SaveVariant, userId, content.Id, $"Saved languages: {langs}", langs);
-            }
-            else
-            {
-                Audit(AuditType.Save, userId, content.Id);
-            }
-        }
-
-        // or, failed
-        scope.Notifications.Publish(new ContentTreeChangeNotification(content, changeType, eventMessages));
-        return publishResult!;
     }
 
     // utility 'PublishCultures' func used by SaveAndPublishBranch
@@ -2106,30 +1725,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         }
     }
 
-    internal IEnumerable<IContent> GetPublishedDescendantsLocked(IContent content)
-    {
-        var pathMatch = content.Path + ",";
-        IQuery<IContent> query = Query<IContent>()
-            .Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& culture.Trashed == false*/);
-        IEnumerable<IContent> contents = _documentRepository.Get(query);
-
-        // beware! contents contains all published version below content
-        // including those that are not directly published because below an unpublished content
-        // these must be filtered out here
-        var parents = new List<int> { content.Id };
-        if (contents is not null)
-        {
-            foreach (IContent c in contents)
-            {
-                if (parents.Contains(c.ParentId))
-                {
-                    yield return c;
-                    parents.Add(c.Id);
-                }
-            }
-        }
-    }
-
     #endregion
 
     #region Private Methods
@@ -2137,333 +1732,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     // TODO ELEMENTS: not used? clean up!
     private bool IsMandatoryCulture(IReadOnlyCollection<ILanguage> langs, string culture) =>
         langs.Any(x => x.IsMandatory && x.IsoCode.InvariantEquals(culture));
-
-    #endregion
-
-    #region Publishing Strategies
-
-    /// <summary>
-    ///     Ensures that a document can be published
-    /// </summary>
-    /// <param name="scope"></param>
-    /// <param name="content"></param>
-    /// <param name="checkPath"></param>
-    /// <param name="culturesUnpublishing"></param>
-    /// <param name="evtMsgs"></param>
-    /// <param name="culturesPublishing"></param>
-    /// <param name="allLangs"></param>
-    /// <param name="notificationState"></param>
-    /// <returns></returns>
-    private PublishResult StrategyCanPublish(
-        ICoreScope scope,
-        IContent content,
-        bool checkPath,
-        IReadOnlyList<string>? culturesPublishing,
-        IReadOnlyCollection<string>? culturesUnpublishing,
-        EventMessages evtMsgs,
-        IReadOnlyCollection<ILanguage> allLangs,
-        IDictionary<string, object?>? notificationState)
-    {
-        var variesByCulture = content.ContentType.VariesByCulture();
-
-        // If it's null it's invariant
-        CultureImpact[] impactsToPublish = culturesPublishing == null
-                ? new[] { _cultureImpactFactory.ImpactInvariant() }
-            : culturesPublishing.Select(x =>
-                _cultureImpactFactory.ImpactExplicit(
-                        x,
-                        allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory)))
-                    .ToArray();
-
-        // publish the culture(s)
-        var publishTime = DateTime.Now;
-        if (!impactsToPublish.All(impact => content.PublishCulture(impact, publishTime, _propertyEditorCollection)))
-        {
-            return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content);
-        }
-
-        // Validate the property values
-        IProperty[]? invalidProperties = null;
-        if (!impactsToPublish.All(x =>
-                _propertyValidationService.Value.IsPropertyDataValid(content, out invalidProperties, x)))
-        {
-            return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, content)
-            {
-                InvalidProperties = invalidProperties,
-            };
-        }
-
-        // Check if mandatory languages fails, if this fails it will mean anything that the published flag on the document will
-        // be changed to Unpublished and any culture currently published will not be visible.
-        if (variesByCulture)
-        {
-            if (culturesPublishing == null)
-            {
-                throw new InvalidOperationException(
-                    "Internal error, variesByCulture but culturesPublishing is null.");
-            }
-
-            if (content.Published && culturesPublishing.Count == 0 && culturesUnpublishing?.Count == 0)
-            {
-                // no published cultures = cannot be published
-                // This will occur if for example, a culture that is already unpublished is sent to be unpublished again, or vice versa, in that case
-                // there will be nothing to publish/unpublish.
-                return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
-            }
-
-            // missing mandatory culture = cannot be published
-            IEnumerable<string> mandatoryCultures = allLangs.Where(x => x.IsMandatory).Select(x => x.IsoCode);
-            var mandatoryMissing = mandatoryCultures.Any(x =>
-                !content.PublishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase));
-            if (mandatoryMissing)
-            {
-                return new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, evtMsgs, content);
-            }
-
-            if (culturesPublishing.Count == 0 && culturesUnpublishing?.Count > 0)
-            {
-                return new PublishResult(PublishResultType.SuccessUnpublishCulture, evtMsgs, content);
-            }
-        }
-
-        // ensure that the document has published values
-        // either because it is 'publishing' or because it already has a published version
-        if (content.PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
-        {
-            _logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
-                content.Name,
-                content.Id,
-                "document does not have published values");
-            return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
-        }
-
-        ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
-
-        // loop over each culture publishing - or InvariantCulture for invariant
-        foreach (var culture in culturesPublishing ?? new[] { Constants.System.InvariantCulture })
-        {
-            // ensure that the document status is correct
-            // note: culture will be string.Empty for invariant
-            switch (content.GetStatus(contentSchedule, culture))
-            {
-                case ContentStatus.Expired:
-                    if (!variesByCulture)
-                    {
-                        _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "document has expired");
-                    }
-                    else
-                    {
-                        _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}", content.Name, content.Id, culture, "document culture has expired");
-                    }
-
-                    return new PublishResult(
-                        !variesByCulture
-                            ? PublishResultType.FailedPublishHasExpired : PublishResultType.FailedPublishCultureHasExpired,
-                        evtMsgs,
-                        content);
-
-                case ContentStatus.AwaitingRelease:
-                    if (!variesByCulture)
-                    {
-                        _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
-                            content.Name,
-                            content.Id,
-                            "document is awaiting release");
-                    }
-                    else
-                    {
-                        _logger.LogInformation(
-                            "Document {ContentName} (id={ContentId}) culture {Culture} cannot be published: {Reason}",
-                            content.Name,
-                            content.Id,
-                            culture,
-                            "document has culture awaiting release");
-                    }
-
-                    return new PublishResult(
-                        !variesByCulture
-                            ? PublishResultType.FailedPublishAwaitingRelease
-                            : PublishResultType.FailedPublishCultureAwaitingRelease,
-                        evtMsgs,
-                        content);
-
-                case ContentStatus.Trashed:
-                    _logger.LogInformation(
-                        "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
-                        content.Name,
-                        content.Id,
-                        "document is trashed");
-                    return new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, content);
-            }
-        }
-
-        if (checkPath)
-        {
-            // check if the content can be path-published
-            // root content can be published
-            // else check ancestors - we know we are not trashed
-            var pathIsOk = content.ParentId == Constants.System.Root || IsPathPublished(GetParent(content));
-            if (!pathIsOk)
-            {
-                _logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cannot be published: {Reason}",
-                    content.Name,
-                    content.Id,
-                    "parent is not published");
-                return new PublishResult(PublishResultType.FailedPublishPathNotPublished, evtMsgs, content);
-            }
-        }
-
-        // If we are both publishing and unpublishing cultures, then return a mixed status
-        if (variesByCulture && culturesPublishing?.Count > 0 && culturesUnpublishing?.Count > 0)
-        {
-            return new PublishResult(PublishResultType.SuccessMixedCulture, evtMsgs, content);
-        }
-
-        return new PublishResult(evtMsgs, content);
-    }
-
-    /// <summary>
-    ///     Publishes a document
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="culturesUnpublishing"></param>
-    /// <param name="evtMsgs"></param>
-    /// <param name="culturesPublishing"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     It is assumed that all publishing checks have passed before calling this method like
-    ///     <see cref="StrategyCanPublish" />
-    /// </remarks>
-    private PublishResult StrategyPublish(
-        IContent content,
-        IReadOnlyCollection<string>? culturesPublishing,
-        IReadOnlyCollection<string>? culturesUnpublishing,
-        EventMessages evtMsgs)
-    {
-        // change state to publishing
-        content.PublishedState = PublishedState.Publishing;
-
-        // if this is a variant then we need to log which cultures have been published/unpublished and return an appropriate result
-        if (content.ContentType.VariesByCulture())
-        {
-            if (content.Published && culturesUnpublishing?.Count == 0 && culturesPublishing?.Count == 0)
-            {
-                return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
-            }
-
-            if (culturesUnpublishing?.Count > 0)
-            {
-                _logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cultures: {Cultures} have been unpublished.",
-                    content.Name,
-                    content.Id,
-                    string.Join(",", culturesUnpublishing));
-            }
-
-            if (culturesPublishing?.Count > 0)
-            {
-                _logger.LogInformation(
-                    "Document {ContentName} (id={ContentId}) cultures: {Cultures} have been published.",
-                    content.Name,
-                    content.Id,
-                    string.Join(",", culturesPublishing));
-            }
-
-            if (culturesUnpublishing?.Count > 0 && culturesPublishing?.Count > 0)
-            {
-                return new PublishResult(PublishResultType.SuccessMixedCulture, evtMsgs, content);
-            }
-
-            if (culturesUnpublishing?.Count > 0 && culturesPublishing?.Count == 0)
-            {
-                return new PublishResult(PublishResultType.SuccessUnpublishCulture, evtMsgs, content);
-            }
-
-            return new PublishResult(PublishResultType.SuccessPublishCulture, evtMsgs, content);
-        }
-
-        _logger.LogInformation("Document {ContentName} (id={ContentId}) has been published.", content.Name, content.Id);
-        return new PublishResult(evtMsgs, content);
-    }
-
-    /// <summary>
-    ///     Ensures that a document can be unpublished
-    /// </summary>
-    /// <param name="scope"></param>
-    /// <param name="content"></param>
-    /// <param name="evtMsgs"></param>
-    /// <param name="notificationState"></param>
-    /// <returns></returns>
-    private PublishResult StrategyCanUnpublish(
-        ICoreScope scope,
-        IContent content,
-        EventMessages evtMsgs,
-        IDictionary<string, object?>? notificationState)
-    {
-        // raise Unpublishing notification
-        ContentUnpublishingNotification notification = new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState);
-        var notificationResult = scope.Notifications.PublishCancelable(notification);
-
-        if (notificationResult)
-        {
-            _logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
-            return new PublishResult(PublishResultType.FailedUnpublishCancelledByEvent, evtMsgs, content);
-        }
-
-        return new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
-    }
-
-    /// <summary>
-    ///     Unpublishes a document
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="evtMsgs"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     It is assumed that all unpublishing checks have passed before calling this method like
-    ///     <see cref="StrategyCanUnpublish" />
-    /// </remarks>
-    private PublishResult StrategyUnpublish(IContent content, EventMessages evtMsgs)
-    {
-        var attempt = new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
-
-        // TODO: What is this check?? we just created this attempt and of course it is Success?!
-        if (attempt.Success == false)
-        {
-            return attempt;
-        }
-
-        // if the document has any release dates set to before now,
-        // they should be removed so they don't interrupt an unpublish
-        // otherwise it would remain released == published
-        ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
-        IReadOnlyList<ContentSchedule> pastReleases =
-            contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.Now);
-        foreach (ContentSchedule p in pastReleases)
-        {
-            contentSchedule.Remove(p);
-        }
-
-        if (pastReleases.Count > 0)
-        {
-            _logger.LogInformation(
-                "Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
-        }
-
-        _documentRepository.PersistContentSchedule(content, contentSchedule);
-
-        // change state to unpublishing
-        content.PublishedState = PublishedState.Unpublishing;
-
-        _logger.LogInformation("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
-        return attempt;
-    }
 
     #endregion
 
@@ -2774,9 +2042,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override IContent CreateContentInstance(string name, IContent parent, IContentType contentType, int userId)
         => new Content(name, parent, contentType, userId);
 
-    protected override PublishResult CommitDocumentChanges(ICoreScope scope, IContent content, EventMessages eventMessages, IReadOnlyCollection<ILanguage> allLangs, IDictionary<string, object?>? notificationState, int userId)
-        => CommitDocumentChangesInternal(scope, content, eventMessages, allLangs, notificationState, userId);
-
     protected override void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
     {
         void DoDelete(IContent c)
@@ -2817,11 +2082,26 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override TreeChangeNotification<IContent> TreeChangeNotification(IContent content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ContentTreeChangeNotification(content, changeTypes, eventMessages);
 
+    protected override TreeChangeNotification<IContent> TreeChangeNotification(IContent content, TreeChangeTypes changeTypes, IEnumerable<string>? publishedCultures, IEnumerable<string>? unpublishedCultures, EventMessages eventMessages)
+        => new ContentTreeChangeNotification(content, changeTypes, publishedCultures, unpublishedCultures, eventMessages);
+
     protected override TreeChangeNotification<IContent> TreeChangeNotification(IEnumerable<IContent> content, TreeChangeTypes changeTypes, EventMessages eventMessages)
         => new ContentTreeChangeNotification(content, changeTypes, eventMessages);
 
     protected override DeletingNotification<IContent> DeletingNotification(IContent content, EventMessages eventMessages)
         => new ContentDeletingNotification(content, eventMessages);
+
+    protected override CancelableEnumerableObjectNotification<IContent> PublishingNotification(IContent content, EventMessages eventMessages)
+        => new ContentPublishingNotification(content, eventMessages);
+
+    protected override IStatefulNotification PublishedNotification(IContent content, EventMessages eventMessages)
+        => new ContentPublishedNotification(content, eventMessages);
+
+    protected override IStatefulNotification PublishedNotification(IEnumerable<IContent> content, EventMessages eventMessages)
+        => new ContentPublishedNotification(content, eventMessages);
+
+    protected override CancelableEnumerableObjectNotification<IContent> UnpublishingNotification(IContent content, EventMessages eventMessages)
+        => new ContentUnpublishingNotification(content, eventMessages);
 
     protected override IStatefulNotification UnpublishedNotification(IContent content, EventMessages eventMessages)
         => new ContentUnpublishedNotification(content, eventMessages);
@@ -2831,9 +2111,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     protected override DeletedVersionsNotification<IContent> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
         => new ContentDeletedVersionsNotification(id, messages, specificVersion, deletePriorVersions, dateToRetain);
-
-    protected override CancelableEnumerableObjectNotification<IContent> PublishingNotification(IContent content, EventMessages eventMessages)
-        => new ContentPublishingNotification(content, eventMessages);
 
     #endregion
 }

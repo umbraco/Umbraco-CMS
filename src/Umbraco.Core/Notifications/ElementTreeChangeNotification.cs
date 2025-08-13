@@ -32,4 +32,14 @@ public sealed class ElementTreeChangeNotification : TreeChangeNotification<IElem
         : base(new TreeChange<IElement>(target, changeTypes), messages)
     {
     }
+
+    public ElementTreeChangeNotification(
+        IElement target,
+        TreeChangeTypes changeTypes,
+        IEnumerable<string>? publishedCultures,
+        IEnumerable<string>? unpublishedCultures,
+        EventMessages messages)
+        : base(new TreeChange<IElement>(target, changeTypes, publishedCultures, unpublishedCultures), messages)
+    {
+    }
 }
