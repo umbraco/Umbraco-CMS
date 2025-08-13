@@ -27,14 +27,7 @@ internal class HasScheduleSignProvider : ISignProvider
         typeof(TItem) == typeof(DocumentCollectionResponseModel);
 
     /// <inheritdoc/>
-    public Task PopulateTreeSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
-         where TItem : EntityTreeItemResponseModel, IHasSigns => PopulateSigns(itemViewModels);
-
-    /// <inheritdoc/>
-    public Task PopulateCollectionSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
-        where TItem : IHasSigns => PopulateSigns(itemViewModels);
-
-    private Task PopulateSigns<TItem>(IEnumerable<TItem> itemViewModels)
+    public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
         where TItem : IHasSigns
     {
         IEnumerable<Guid> contentKeysScheduledForPublishing = _contentService.GetScheduledContentKeys(itemViewModels.Select(x => x.Id));

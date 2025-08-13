@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -17,8 +20,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Collection;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class DocumentCollectionControllerBase : ContentCollectionControllerBase<IContent, DocumentCollectionResponseModel, DocumentValueResponseModel, DocumentVariantResponseModel, DocumentCollectionResponseModel>
 {
+    protected DocumentCollectionControllerBase(IUmbracoMapper mapper, SignProviderCollection signProviders)
+        : base(mapper, signProviders)
+    {
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in V18")]
     protected DocumentCollectionControllerBase(IUmbracoMapper mapper)
-        : base(mapper)
+        : this(mapper, StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
     {
     }
 

@@ -18,22 +18,13 @@ internal class IsProtectedSignProvider : ISignProvider
         typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
         typeof(TItem) == typeof(DocumentCollectionResponseModel);
 
-    /// <inheritdoc/>
-    public Task PopulateTreeSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
-        where TItem : EntityTreeItemResponseModel, IHasSigns
-        => PopulateSigns(itemViewModels, x => x is DocumentTreeItemResponseModel { IsProtected: true });
-
-    /// <inheritdoc/>
-    public Task PopulateCollectionSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
-        where TItem : IHasSigns
-        => PopulateSigns(itemViewModels, x => x is DocumentCollectionResponseModel { IsProtected: true });
-
-    private static Task PopulateSigns<TItem>(IEnumerable<TItem> itemViewModels, Func<TItem, bool> discrimator)
+    /// <inheritdoc/>>
+    public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
         where TItem : IHasSigns
     {
         foreach (TItem item in itemViewModels)
         {
-            if (discrimator(item))
+            if (item is IIsProtected { IsProtected: true })
             {
                 item.AddSign(Alias);
             }

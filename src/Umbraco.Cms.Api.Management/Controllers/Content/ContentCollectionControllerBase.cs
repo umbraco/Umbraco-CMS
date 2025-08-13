@@ -131,7 +131,7 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
     {
         foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<TCollectionResponseModel>()))
         {
-            await signProvider.PopulateCollectionSignsAsync(itemViewModels);
+            await signProvider.PopulateSignsAsync(itemViewModels);
         }
     }
 }

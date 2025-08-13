@@ -166,7 +166,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     {
         foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<TItem>()))
         {
-            await signProvider.PopulateTreeSignsAsync(treeItemViewModels);
+            await signProvider.PopulateSignsAsync(treeItemViewModels);
         }
     }
 
@@ -179,9 +179,9 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             Parent = parentKey.HasValue
                 ? new ReferenceByIdModel
                 {
-                    Id = parentKey.Value
+                    Id = parentKey.Value,
                 }
-                : null
+                : null,
         };
 
         return viewModel;

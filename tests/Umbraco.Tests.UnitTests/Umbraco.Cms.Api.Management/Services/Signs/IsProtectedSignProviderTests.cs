@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -12,12 +12,6 @@ internal class IsProtectedSignProviderTests
     [Test]
     public async Task IsProtectedSignProvider_Should_Populate_Tree_Signs()
     {
-        var entities = new List<EntitySlim>
-        {
-            new() { Name = "Item 1" },
-            new() { Name = "Item 2" },
-        };
-
         var sut = new IsProtectedSignProvider();
 
         Assert.IsTrue(sut.CanProvideSigns<DocumentTreeItemResponseModel>());
@@ -28,7 +22,7 @@ internal class IsProtectedSignProviderTests
             new() { IsProtected = true },
         };
 
-        await sut.PopulateTreeSignsAsync(viewModels);
+        await sut.PopulateSignsAsync(viewModels);
 
         Assert.AreEqual(viewModels[0].Signs.Count(), 0);
         Assert.AreEqual(viewModels[1].Signs.Count(), 1);
@@ -40,12 +34,6 @@ internal class IsProtectedSignProviderTests
     [Test]
     public async Task IsProtectedSignProvider_Should_Populate_Collection_Signs()
     {
-        var entities = new List<EntitySlim>
-        {
-            new() { Name = "Item 1" },
-            new() { Name = "Item 2" },
-        };
-
         var sut = new IsProtectedSignProvider();
 
         Assert.IsTrue(sut.CanProvideSigns<DocumentCollectionResponseModel>());
@@ -56,7 +44,7 @@ internal class IsProtectedSignProviderTests
             new() { IsProtected = true },
         };
 
-        await sut.PopulateCollectionSignsAsync(viewModels);
+        await sut.PopulateSignsAsync(viewModels);
 
         Assert.AreEqual(viewModels[0].Signs.Count(), 0);
         Assert.AreEqual(viewModels[1].Signs.Count(), 1);
