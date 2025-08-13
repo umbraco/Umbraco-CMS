@@ -190,7 +190,7 @@ public enum UmbracoObjectTypes
     Element,
 
     /// <summary>
-    ///     Document blueprint container.
+    ///     Element container.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.ElementContainer)]
     [FriendlyName("Element Container")]
