@@ -63,7 +63,9 @@ export class UmbWorkspaceSplitViewManager {
 				const newVariants = [...activeVariants];
 				newVariants[index] = { index, culture: variantId.culture, segment: variantId.segment };
 
-				const variantPart: string = newVariants.map((v) => UmbVariantId.Create(v).toString()).join(this.VARIANT_DELIMITER);
+				const variantPart: string = newVariants
+					.map((v) => UmbVariantId.Create(v).toString())
+					.join(this.VARIANT_DELIMITER);
 
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}`);
 				return true;
@@ -80,7 +82,11 @@ export class UmbWorkspaceSplitViewManager {
 		const currentVariant = this.getActiveVariants()[0];
 		const workspaceRoute = this.getWorkspaceRoute();
 		if (currentVariant && workspaceRoute) {
-			history.pushState(null, '', `${workspaceRoute}/${UmbVariantId.Create(currentVariant)}${this.VARIANT_DELIMITER}${newVariant}`);
+			history.pushState(
+				null,
+				'',
+				`${workspaceRoute}/${UmbVariantId.Create(currentVariant)}${this.VARIANT_DELIMITER}${newVariant}`,
+			);
 			return true;
 		}
 		return false;

@@ -47,7 +47,6 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-
 	private async _generateRoutes(variants: Array<UmbMemberVariantOptionModel>) {
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
