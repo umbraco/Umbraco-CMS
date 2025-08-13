@@ -106,6 +106,25 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase {
 		return true;
 	}
 
+	public updateToolbarItem(aliases: string[], to: [number, number]) {
+		const toolbar = [...this.#toolbar.getValue()];
+		const [rowIndex, groupIndex] = to;
+		const newToolbar = toolbar.map((row, rIdx) => {
+			if (rIdx !== rowIndex) return row;
+			return {
+				...row,
+				data: row.data.map((group, gIdx) => {
+					if (gIdx !== groupIndex) return group;
+					return {
+						...group,
+						data: [...aliases],
+					};
+				}),
+			};
+		});
+		this.#toolbar.setValue(newToolbar);
+	}
+
 	public insertToolbarItem(alias: string, to: [number, number, number]) {
 		const toolbar = [...this.#toolbar.getValue()];
 
