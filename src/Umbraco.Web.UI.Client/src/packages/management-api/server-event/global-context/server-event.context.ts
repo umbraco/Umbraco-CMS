@@ -1,4 +1,5 @@
 import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from './server-event.context-token.js';
+import type { UmbManagementApiServerEventModel } from './types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
@@ -6,12 +7,7 @@ import { HubConnectionBuilder, type HubConnection } from '@umbraco-cms/backoffic
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { filter, Subject } from '@umbraco-cms/backoffice/external/rxjs';
-
-interface UmbManagementApiServerEventModel {
-	eventSource: string;
-	eventType: string;
-	key: string;
-}
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbManagementApiServerEventContext extends UmbContextBase {
 	#connection?: HubConnection;
@@ -20,6 +16,9 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 	#events = new Subject<UmbManagementApiServerEventModel>();
 	public readonly events = this.#events.asObservable();
+
+	#isConnected = new UmbBooleanState(undefined);
+	public readonly isConnected = this.#isConnected.asObservable();
 
 	/**
 	 * Filters events by the given event source
@@ -69,6 +68,7 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 					throw new Error('No auth token found');
 				}
 			} else {
+				this.#isConnected.setValue(false);
 				this.#connection?.stop();
 				this.#connection = undefined;
 			}
@@ -97,18 +97,10 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 		this.#connection
 			.start()
-			.then(function () {
-				//console.log('Connected!');
-			})
-			.catch(function (err) {
-				console.log('SignalR', err);
-			});
+			.then(() => this.#isConnected.setValue(true))
+			.catch(() => this.#isConnected.setValue(false));
 
-		this.#connection.onclose((err?: Error) => {
-			if (err) {
-				console.error('Connection closed with error: ', err);
-			}
-		});
+		this.#connection.onclose(() => this.#isConnected.setValue(false));
 	}
 }
 
