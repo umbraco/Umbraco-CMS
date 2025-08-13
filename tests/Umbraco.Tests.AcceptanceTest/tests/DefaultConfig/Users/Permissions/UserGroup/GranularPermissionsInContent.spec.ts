@@ -223,7 +223,7 @@ test('can move a specific content with move to permission enabled', async ({umbr
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
   // Act
-  await umbracoUi.content.clickCaretButtonForContentName(firstDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(firstDocumentName);
   await umbracoUi.content.clickActionsMenuForContent(childDocumentName);
   await umbracoUi.content.clickMoveToActionMenuOption();
   await umbracoUi.content.moveToContentWithName([], moveToDocumentName);

@@ -1,8 +1,9 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-section-main')
-export class UmbSectionMainElement extends LitElement {
+export class UmbSectionMainElement extends UmbLitElement {
 	override render() {
 		return html`
 			<main>

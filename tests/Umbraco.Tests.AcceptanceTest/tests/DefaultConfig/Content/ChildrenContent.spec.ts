@@ -41,10 +41,10 @@ test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   expect(await umbracoApi.document.doesNameExist(childContentName)).toBeTruthy();
   const childData = await umbracoApi.document.getChildren(contentId);
   expect(childData[0].variants[0].name).toBe(childContentName);
-  // verify that the child content displays in the tree after reloading children
+  // Verify that the child content displays in the tree after reloading children
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadChildrenActionMenuOption();
-  await umbracoUi.content.clickCaretButtonForContentName(contentName);
+  await umbracoUi.content.openContentCaretButtonForName(contentName);
   await umbracoUi.content.doesContentTreeHaveName(childContentName);
 
   // Clean
@@ -67,7 +67,7 @@ test('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickCaretButtonForContentName(contentName);
+  await umbracoUi.content.openContentCaretButtonForName(contentName);
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
   await umbracoUi.content.clickCreateActionMenuOption();
   await umbracoUi.content.chooseDocumentType(childOfChildDocumentTypeName);
@@ -80,7 +80,7 @@ test('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
   const childOfChildData = await umbracoApi.document.getChildren(childContentId);
   expect(childOfChildData[0].variants[0].name).toBe(childOfChildContentName);
   // verify that the child content displays in the tree
-  await umbracoUi.content.clickCaretButtonForContentName(childContentName);
+  await umbracoUi.content.openContentCaretButtonForName(childContentName);
   await umbracoUi.content.doesContentTreeHaveName(childOfChildContentName);
 
   // Clean
@@ -98,7 +98,7 @@ test('cannot publish child if the parent is not published', async ({umbracoApi, 
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  await umbracoUi.content.clickCaretButtonForContentName(contentName);
+  await umbracoUi.content.openContentCaretButtonForName(contentName);
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
   await umbracoUi.content.clickPublishActionMenuOption();
   await umbracoUi.content.clickConfirmToPublishButton();
