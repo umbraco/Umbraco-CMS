@@ -16,10 +16,14 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<ElementTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<ActionResult<SubsetViewModel<ElementTreeItemResponseModel>>> Siblings(
+    public async Task<ActionResult<SubsetViewModel<ElementTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,
         int before,
-        int after) =>
-        GetSiblings(target, before, after);
+        int after,
+        bool foldersOnly = false)
+    {
+        RenderFoldersOnly(foldersOnly);
+        return await GetSiblings(target, before, after);
+    }
 }
