@@ -8,7 +8,7 @@ const autoScrollSpeed = 16;
 /**
  *
  * @param {Element} el - The element to check for ability to scroll
- * @param {Boolean} includeSelf - If true, the element itself will be included in the check
+ * @param {boolean} includeSelf - If true, the element itself will be included in the check
  * @returns {Element | null}
  */
 function getParentScrollElement(el: Element, includeSelf: boolean) {
@@ -247,7 +247,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector' | 'identifier'>>;
 
 /**
-
+ 
  * @class UmbSorterController
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
