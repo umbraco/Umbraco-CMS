@@ -201,7 +201,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	#renderButtonRemove() {
 		return html`
 			<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
-				<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
+				<uui-icon name="icon-trash"></uui-icon>
+				<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
 			</uui-button>
 		`;
 	}
