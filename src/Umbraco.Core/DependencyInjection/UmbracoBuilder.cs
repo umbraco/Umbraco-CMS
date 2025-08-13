@@ -437,6 +437,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
             Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();
             Services.AddSingleton<IUserPermissionAuthorizer, UserPermissionAuthorizer>();
+            Services.AddSingleton<IContextualPermissionAuthorizer, ContextualPermissionAuthorizer>();
 
             // Segments
             Services.AddUnique<ISegmentService, NoopSegmentService>();
