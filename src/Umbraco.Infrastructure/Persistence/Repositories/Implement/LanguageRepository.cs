@@ -292,8 +292,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
 
         // insert
         LanguageDto dto = LanguageFactory.BuildDto(entity, GetFallbackLanguageId(entity));
-        _ = Database.Insert(dto);
-        var id = Convert.ToInt32(dto.Id);
+        var id = Convert.ToInt32(Database.Insert(dto));
         entity.Id = id;
         entity.ResetDirtyProperties();
 

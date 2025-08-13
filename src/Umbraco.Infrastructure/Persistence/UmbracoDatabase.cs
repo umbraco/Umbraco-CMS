@@ -410,36 +410,15 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
     {
         if (SqlContext.SqlSyntax.ScalarMappers == null)
         {
-            try
-            {
-                return base.ExecuteScalar<T>(sql, commandType, args);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return base.ExecuteScalar<T>(sql, commandType, args);
         }
 
         if (!SqlContext.SqlSyntax.ScalarMappers.TryGetValue(typeof(T), out IScalarMapper? mapper))
         {
-            try
-            {
-                return base.ExecuteScalar<T>(sql, commandType, args);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return base.ExecuteScalar<T>(sql, commandType, args);
         }
 
-        try
-        {
-            var result = base.ExecuteScalar<object>(sql, commandType, args);
-            return (T)mapper.Map(result);
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        var result = base.ExecuteScalar<object>(sql, commandType, args);
+        return (T)mapper.Map(result);
     }
 }

@@ -335,16 +335,15 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             : MapDtoToContent(dto);
     }
 
+    /// <summary>
+    /// Nothing to do here, media has only one version which must not be deleted.
+    /// Base calls is abstarct so this must be implemented.
+    /// </summary>
+    /// <param name="id">ont used</param>
+    /// <param name="versionId">not used</param>
     protected override void PerformDeleteVersion(int id, int versionId)
     {
-        Sql<ISqlContext> sql = Sql().Delete<PropertyDataDto>(x => x.VersionId == versionId);
-        _ = Database.Execute(sql);
-
-        sql = Sql().Delete<ContentVersionDto>(x => x.Id == versionId);
-        _ = Database.Execute(sql);
-
-        // there is versionId column in ContentVersionDto! Is it not tested?
-        _ = Database.Delete<ContentVersionDto>("WHERE versionId = @versionId", new { versionId });
+        // Nothing to do here, media has only one version which must not be deleted.
     }
 
     #endregion

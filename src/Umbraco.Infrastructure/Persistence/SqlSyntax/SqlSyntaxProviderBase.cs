@@ -420,29 +420,24 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string ColumnWithAlias(string tableNameOrAlias, string columnName, string columnAlias = "")
     {
         var quotedColumnName = GetQuotedColumnName(columnName);
-        var tablePrefix = GetTableNameOrAlias(tableNameOrAlias);
+        var coulumnPrefix = GetColumnPrefix(tableNameOrAlias);
         var asAppendix = string.IsNullOrEmpty(columnAlias)
             ? string.Empty
             : $" AS {GetQuotedName(columnAlias)}";
 
-        return $"{tablePrefix}{quotedColumnName}{asAppendix}";
+        return $"{coulumnPrefix}{quotedColumnName}{asAppendix}";
     }
 
-    private string GetTableNameOrAlias(string? tableNameOrAlias)
+    private string GetColumnPrefix(string? tableNameOrAlias)
     {
         if (string.IsNullOrEmpty(tableNameOrAlias))
         {
             return string.Empty;
         }
 
-        var rVal = tableNameOrAlias.Trim();
-        if (rVal != rVal.ToLowerInvariant() || rVal.Contains(" "))
-        {
-            // if the table name is all lower case, then we assume it is an alias
-            rVal = GetQuotedTableName(tableNameOrAlias);
-        }
-
-        return $"{rVal}.";
+        // Always quote the identifier to avoid ambiguity between table names and aliases.
+        var quoted = GetQuotedTableName(tableNameOrAlias.Trim());
+        return $"{quoted}.";
     }
 
     public abstract Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);

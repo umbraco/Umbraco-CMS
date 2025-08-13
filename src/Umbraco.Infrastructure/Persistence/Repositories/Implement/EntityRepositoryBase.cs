@@ -215,19 +215,9 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
 
     protected virtual bool PerformExists(TId id)
     {
-        Sql<ISqlContext> sql;
-        try
-        {
-            sql = GetBaseQuery(true);
-            sql.Where(GetBaseWhereClause(), new { id });
-            var count = Database.ExecuteScalar<int>(sql);
-            return count == 1;
-        }
-        catch (Exception)
-        {
-
-            throw;
-        }
+        Sql<ISqlContext> sql = GetBaseQuery(true).Where(GetBaseWhereClause(), new { id });
+        var count = Database.ExecuteScalar<int>(sql);
+        return count == 1;
     }
 
     protected virtual int PerformCount(IQuery<TEntity>? query)

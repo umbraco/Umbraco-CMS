@@ -883,10 +883,17 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     protected override void PerformDeleteVersion(int id, int versionId)
     {
-        Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
-        Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new { versionId });
-        Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
-        Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
+        Sql<ISqlContext> sql = Sql().Delete<PropertyDataDto>(x => x.VersionId == versionId);
+        _ = Database.Execute(sql);
+
+        sql = Sql().Delete<ContentVersionCultureVariationDto>(x => x.VersionId == versionId);
+        _ = Database.Execute(sql);
+
+        sql = Sql().Delete<DocumentVersionDto>(x => x.Id == versionId);
+        _ = Database.Execute(sql);
+
+        sql = Sql().Delete<ContentVersionDto>(x => x.Id == versionId);
+        _ = Database.Execute(sql);
     }
 
     #endregion
