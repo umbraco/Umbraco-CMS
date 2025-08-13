@@ -11,6 +11,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -132,6 +133,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual string GetQuotedColumnName(string? columnName) => $"\"{columnName}\"";
 
+    public virtual string OrderByGuid(string tableName, string columnName) => $"UPPER({this.GetQuotedColumn(tableName, columnName)})";
+
     public virtual string GetQuotedName(string? name) => $"\"{name}\"";
 
     public virtual string GetQuotedValue(string value) => $"'{value}'";
@@ -177,7 +180,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         return "NVARCHAR";
     }
 
-    public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false)
+    public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false)
     {
         tableName = GetQuotedTableName(tableName);
         columnName = GetQuotedColumnName(columnName);
@@ -413,6 +416,29 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual string FormatTableRename(string? oldName, string? newName) =>
         string.Format(RenameTable, GetQuotedTableName(oldName), GetQuotedTableName(newName));
+
+    public virtual string ColumnWithAlias(string tableNameOrAlias, string columnName, string columnAlias = "")
+    {
+        var quotedColumnName = GetQuotedColumnName(columnName);
+        var coulumnPrefix = GetColumnPrefix(tableNameOrAlias);
+        var asAppendix = string.IsNullOrEmpty(columnAlias)
+            ? string.Empty
+            : $" AS {GetQuotedName(columnAlias)}";
+
+        return $"{coulumnPrefix}{quotedColumnName}{asAppendix}";
+    }
+
+    private string GetColumnPrefix(string? tableNameOrAlias)
+    {
+        if (string.IsNullOrEmpty(tableNameOrAlias))
+        {
+            return string.Empty;
+        }
+
+        // Always quote the identifier to avoid ambiguity between table names and aliases.
+        var quoted = GetQuotedTableName(tableNameOrAlias.Trim());
+        return $"{quoted}.";
+    }
 
     public abstract Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
 

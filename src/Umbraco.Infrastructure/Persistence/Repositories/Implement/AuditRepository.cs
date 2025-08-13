@@ -36,9 +36,15 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
     {
         DateTime oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
 
-        Database.Execute(
-            "delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
-            new { oldestPermittedLogEntry });
+        // var sqlString = $"Delete from {SqlSyntax.GetQuotedTableName(LogDto.TableName)} where datestamp < @oldestPermittedLogEntry and {SqlSyntax.GetQuotedColumnName("logHeader")} in ('open','system')"; // "delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')"
+        // Database.Execute(sqlString, new { oldestPermittedLogEntry });
+
+        var headers = new[] { "open", "system" };
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Delete<LogDto>()
+            .Where<LogDto>(c => c.Datestamp < oldestPermittedLogEntry)
+            .WhereIn<LogDto>(c => c.Header, headers);
+        _ = Database.Execute(sql);
     }
 
     /// <summary>
@@ -69,10 +75,7 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
         AuditType[]? auditTypeFilter,
         IQuery<IAuditItem>? customFilter)
     {
-        if (auditTypeFilter == null)
-        {
-            auditTypeFilter = Array.Empty<AuditType>();
-        }
+        auditTypeFilter ??= [];
 
         Sql<ISqlContext> sql = GetBaseQuery(false);
 
@@ -83,7 +86,7 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
         {
             foreach (Tuple<string, object[]> filterClause in customFilter.GetWhereClauses())
             {
-                sql.Where(filterClause.Item1, filterClause.Item2);
+                sql = sql.Where(filterClause.Item1, filterClause.Item2);
             }
         }
 
@@ -91,13 +94,14 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
         {
             foreach (AuditType type in auditTypeFilter)
             {
-                sql.Where("(logHeader=@0)", type.ToString());
+                var typeString = type.ToString();
+                sql = sql.Where<LogDto>(c => c.Header == typeString);
             }
         }
 
         sql = orderDirection == Direction.Ascending
-            ? sql.OrderBy("Datestamp")
-            : sql.OrderByDescending("Datestamp");
+            ? sql.OrderBy<LogDto>(c => c.Datestamp)
+            : sql.OrderByDescending<LogDto>(c => c.Datestamp);
 
         // get page
         Page<LogDto>? page = Database.Page<LogDto>(pageIndex + 1, pageSize, sql);
@@ -144,7 +148,7 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
     protected override IAuditItem? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new { id = id });
+        sql.Where(GetBaseWhereClause(), new { id });
 
         LogDto? dto = Database.First<LogDto>(sql);
         return dto == null
@@ -162,7 +166,7 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
 
         List<LogDto>? dtos = Database.Fetch<LogDto>(sql);
 
-        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType,  x.Comment, x.Parameters, DateTime.SpecifyKind(x.Datestamp, DateTimeKind.Local))).ToList();
+        return dtos.Select(x => new AuditItem(x.NodeId, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId, x.EntityType, x.Comment, x.Parameters, DateTime.SpecifyKind(x.Datestamp, DateTimeKind.Local))).ToList();
     }
 
     protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -184,7 +188,8 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => "umbracoLog.id = @id";
+    protected override string GetBaseWhereClause() =>
+        $"{SqlSyntax.GetQuotedTableName(LogDto.TableName)}.{SqlSyntax.GetQuotedColumnName("id")} = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 }
