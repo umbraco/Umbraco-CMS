@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -27,8 +28,9 @@ internal sealed class ContentBlueprintEditingService
         IContentValidationService validationService,
         IContentBlueprintContainerService containerService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService)
+        IRelationService relationService,
+        ContentTypeFilterCollection contentTypeFilters)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService, contentTypeFilters)
         => _containerService = containerService;
 
     public Task<IContent?> GetAsync(Guid key)
