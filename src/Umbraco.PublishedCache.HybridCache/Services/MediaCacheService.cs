@@ -158,8 +158,7 @@ internal sealed class MediaCacheService : IMediaCacheService
         sw.Start();
 #endif
 
-        const int GroupSize = 100;
-        foreach (IEnumerable<Guid> group in SeedKeys.InGroupsOf(GroupSize))
+        foreach (IEnumerable<Guid> group in SeedKeys.InGroupsOf(_cacheSettings.MediaSeedBatchSize))
         {
             var uncachedKeys = new HashSet<Guid>();
             foreach (Guid key in group)

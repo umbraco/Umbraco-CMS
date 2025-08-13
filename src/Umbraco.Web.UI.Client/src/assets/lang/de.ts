@@ -277,7 +277,7 @@ export default {
 		notCreated: 'Nicht angelegt',
 		updateDate: 'Zuletzt bearbeitet am',
 		updateDateDesc: 'Letzter Änderungszeitpunkt des Dokuments',
-		uploadClear: 'Datei entfernen',
+		uploadClear: 'Datei(en) entfernen',
 		uploadClearImageContext: 'Klicke hier um das das Bild vom Medienelement zu entfernen.',
 		uploadClearFileContext: 'Klicke hier um das das Bild vom Medienelement zu entfernen.',
 		urls: 'Link zum Dokument',
