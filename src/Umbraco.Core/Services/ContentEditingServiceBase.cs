@@ -388,14 +388,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return (null, ContentEditingOperationStatus.ParentNotFound);
         }
 
-        if (parent == null && contentType.AllowedAsRoot == false)
-        {
-            return (null, ContentEditingOperationStatus.NotAllowed);
-        }
+        if (parent == null &&
+            (contentType.AllowedAsRoot == false ||
 
-        // We could have a content type filter registered that prevents the content from being created at the root level,
-        // even if it's allowed in the content type definition.
-        if (await IsAllowedAtRootByContentTypeFilters(contentType) is false)
+            // We could have a content type filter registered that prevents the content from being created at the root level,
+            // even if it's allowed in the content type definition.
+            await IsAllowedAtRootByContentTypeFilters(contentType) == false))
         {
             return (null, ContentEditingOperationStatus.NotAllowed);
         }
@@ -411,7 +409,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             Guid[] allowedContentTypeKeys = parentContentType?.AllowedContentTypes?.Select(c => c.Key).ToArray()
                                             ?? Array.Empty<Guid>();
 
-            if (allowedContentTypeKeys.Contains(contentType.Key) == false)
+            if (allowedContentTypeKeys.Contains(contentType.Key) == false ||
+
+                // We could have a content type filter registered that prevents the content from being created as a child,
+                // even if it's allowed in the content type definition.
+                await IsAllowedAsChildByContentTypeFilters(contentType, parentContentType!.Key, parent.Key) == false)
             {
                 return (null, ContentEditingOperationStatus.NotAllowed);
             }
@@ -426,6 +428,17 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         foreach (IContentTypeFilter filter in _contentTypeFilters)
         {
             filteredContentTypes = await filter.FilterAllowedAtRootAsync(filteredContentTypes);
+        }
+
+        return filteredContentTypes.Any();
+    }
+
+    private async Task<bool> IsAllowedAsChildByContentTypeFilters(TContentType contentType, Guid parentContentTypeKey, Guid parentKey)
+    {
+        IEnumerable<ContentTypeSort> filteredContentTypes = [new ContentTypeSort(contentType.Key, contentType.SortOrder, contentType.Alias)];
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            filteredContentTypes = await filter.FilterAllowedChildrenAsync(filteredContentTypes, parentContentTypeKey, parentKey);
         }
 
         return filteredContentTypes.Any();
