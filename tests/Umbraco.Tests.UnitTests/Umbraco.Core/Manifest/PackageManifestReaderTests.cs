@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.FileProviders;
@@ -32,7 +32,7 @@ public class PackageManifestReaderTests
         fileProviderFactoryMock.Setup(m => m.Create()).Returns(_fileProviderMock.Object);
 
         _loggerMock = new Mock<ILogger<AppPluginsPackageManifestReader>>();
-        _reader = new AppPluginsPackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
+        _reader = new AppPluginsPackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()), _loggerMock.Object);
     }
 
     [Test]

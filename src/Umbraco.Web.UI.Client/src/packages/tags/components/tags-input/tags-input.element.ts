@@ -23,16 +23,16 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	@property({ type: String })
 	culture?: string | null;
 
-	_items: string[] = [];
 	@property({ type: Array })
 	public set items(newTags: string[]) {
 		const newItems = newTags.filter((x) => x !== '');
-		this._items = newItems;
-		super.value = this._items.join(',');
+		this.#items = newItems;
+		super.value = this.#items.join(',');
 	}
 	public get items(): string[] {
-		return this._items;
+		return this.#items;
 	}
+	#items: string[] = [];
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -220,7 +220,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	#renderTagOptions() {
 		if (!this._currentInput.length || !this._matches.length) return nothing;
-		const matchfilter = this._matches.filter((tag) => tag.text !== this._items.find((x) => x === tag.text));
+		const matchfilter = this._matches.filter((tag) => tag.text !== this.#items.find((x) => x === tag.text));
 		if (!matchfilter.length) return;
 		return html`
 			<div id="matchlist">

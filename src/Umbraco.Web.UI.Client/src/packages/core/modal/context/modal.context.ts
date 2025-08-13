@@ -109,10 +109,12 @@ export class UmbModalContext<
 
 	#activeModalPath?: string;
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_internal_setCurrentModalPath(path: string) {
 		this.#activeModalPath = path;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	async _internal_removeCurrentModal() {
 		const routeContext = await this.getContext(UMB_ROUTE_CONTEXT);
 		routeContext?._internal_removeModalPath(this.#activeModalPath);

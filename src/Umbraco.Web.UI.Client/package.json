@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "16.1.0-rc",
+	"version": "16.3.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -191,6 +191,10 @@
 		"test:dev-watch": "npm run generate:check-const-test && web-test-runner --watch --config ./web-test-runner.dev.config.mjs",
 		"test:watch": "npm run generate:check-const-test && web-test-runner --watch",
 		"test": "npm run generate:check-const-test && npm run check:module-dependencies && web-test-runner",
+		"test:examples": "npm run generate:check-const-test && web-test-runner --files \"./examples/**/*.test.ts\"",
+		"test:examples:dev": "npm run generate:check-const-test && web-test-runner --config ./web-test-runner.dev.config.mjs --files \"./examples/**/*.test.ts\"",
+		"test:examples:watch": "npm run generate:check-const-test && web-test-runner --watch --config ./web-test-runner.dev.config.mjs --files \"./examples/**/*.test.ts\"",
+		"test:examples:browser": "npm run generate:check-const-test && web-test-runner --config ./web-test-runner.dev.config.mjs --files \"./examples/**/*.test.ts\" --manual",
 		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist-cms/vscode-html-custom-data.json",
 		"wc-analyze": "wca **/*.element.ts --outFile dist-cms/custom-elements.json",
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",

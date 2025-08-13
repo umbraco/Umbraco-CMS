@@ -61,51 +61,51 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#context = new UmbBlockListEntryContext(this);
 
 	@state()
-	_contentTypeAlias?: string;
+	private _contentTypeAlias?: string;
 
 	@state()
-	_contentTypeName?: string;
+	private _contentTypeName?: string;
 
 	@state()
-	_showContentEdit = false;
+	private _showContentEdit = false;
 
 	@state()
-	_hasSettings = false;
+	private _hasSettings = false;
 
 	@state()
-	_label = '';
+	private _label = '';
 
 	@state()
-	_icon?: string;
+	private _icon?: string;
 
 	@state()
-	_exposed?: boolean;
+	private _exposed?: boolean;
 
 	@state()
-	_unsupported?: boolean;
+	private _unsupported?: boolean;
 
 	@state()
-	_showActions?: boolean;
+	private _showActions?: boolean;
 
 	@state()
-	_workspaceEditContentPath?: string;
+	private _workspaceEditContentPath?: string;
 
 	@state()
-	_workspaceEditSettingsPath?: string;
+	private _workspaceEditSettingsPath?: string;
 
 	@state()
-	_inlineEditingMode?: boolean;
+	private _inlineEditingMode?: boolean;
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
-	_contentInvalid?: boolean;
+	private _contentInvalid?: boolean;
 
 	// 'settings-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
-	_settingsInvalid?: boolean;
+	private _settingsInvalid?: boolean;
 
 	@state()
-	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel> = {
+	private _blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockListLayoutModel> = {
 		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.

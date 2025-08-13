@@ -520,6 +520,10 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                 //       the containers and their parent relationships in the model, so it's ok
                 container => model.Containers.First(c => c.Key == container.ParentKey).Name);
 
+        // Store the existing property types in a list to reference when processing properties.
+        // This ensures we correctly handle property types that may have been filtered out from groups.
+        var existingPropertyTypes = contentType.PropertyTypes.ToList();
+
         // handle properties in groups
         PropertyGroup[] propertyGroups = model.Containers.Select(container =>
             {
@@ -540,7 +544,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
                 IPropertyType[] properties = model
                     .Properties
                     .Where(property => property.ContainerKey == container.Key)
-                    .Select(property => MapProperty(contentType, property, propertyGroup, dataTypesByKey))
+                    .Select(property => MapProperty(contentType, property, propertyGroup, existingPropertyTypes, dataTypesByKey))
                     .ToArray();
 
                 if (properties.Any() is false && parentContainerNamesById.ContainsKey(container.Key) is false)
@@ -565,8 +569,8 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         // handle orphaned properties
-        IEnumerable<TPropertyTypeModel> orphanedPropertyTypeModels = model.Properties.Where (x => x.ContainerKey is null).ToArray();
-        IPropertyType[] orphanedPropertyTypes = orphanedPropertyTypeModels.Select(property => MapProperty(contentType, property, null, dataTypesByKey)).ToArray();
+        IEnumerable<TPropertyTypeModel> orphanedPropertyTypeModels = model.Properties.Where(x => x.ContainerKey is null).ToArray();
+        IPropertyType[] orphanedPropertyTypes = orphanedPropertyTypeModels.Select(property => MapProperty(contentType, property, null, existingPropertyTypes, dataTypesByKey)).ToArray();
         if (contentType.NoGroupPropertyTypes.SequenceEqual(orphanedPropertyTypes) is false)
         {
             contentType.NoGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, orphanedPropertyTypes);
@@ -588,6 +592,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         TContentType contentType,
         TPropertyTypeModel property,
         PropertyGroup? propertyGroup,
+        IEnumerable<IPropertyType> existingPropertyTypes,
         IDictionary<Guid, IDataType> dataTypesByKey)
     {
         // get the selected data type
@@ -598,7 +603,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         }
 
         // get the current property type (if it exists)
-        IPropertyType propertyType = contentType.PropertyTypes.FirstOrDefault(pt => pt.Key == property.Key)
+        IPropertyType propertyType = existingPropertyTypes.FirstOrDefault(pt => pt.Key == property.Key)
                                      ?? new PropertyType(_shortStringHelper, dataType);
 
         // We are demanding a property type key in the model, so we should probably ensure that it's the on that's actually used.
@@ -617,10 +622,9 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         propertyType.SortOrder = property.SortOrder;
         propertyType.LabelOnTop = property.Appearance.LabelOnTop;
 
-        if (propertyGroup is not null)
-        {
-            propertyType.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id, false);
-        }
+        propertyType.PropertyGroupId = propertyGroup is null
+            ? null
+            : new Lazy<int>(() => propertyGroup.Id, false);
 
         return propertyType;
     }

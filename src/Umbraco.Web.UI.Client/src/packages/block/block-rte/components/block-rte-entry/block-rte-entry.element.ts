@@ -45,47 +45,49 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	#context = new UmbBlockRteEntryContext(this);
 
 	@state()
-	_showContentEdit = false;
+	private _showContentEdit = false;
 
 	@state()
-	_hasSettings = false;
+	private _hasSettings = false;
 
 	@state()
-	_label = '';
+	private _label = '';
 
 	@state()
-	_icon?: string;
+	private _icon?: string;
 
 	@state()
-	_exposed?: boolean;
+	private _exposed?: boolean;
 
 	@state()
-	_showActions?: boolean;
+	private _showActions?: boolean;
 
 	@state()
-	_workspaceEditContentPath?: string;
+	private _workspaceEditContentPath?: string;
 
 	@state()
-	_workspaceEditSettingsPath?: string;
+	private _workspaceEditSettingsPath?: string;
 
 	@state()
-	_contentTypeAlias?: string;
+	private _contentTypeAlias?: string;
 
 	@state()
-	_contentTypeName?: string;
+	private _contentTypeName?: string;
 
 	@state()
-	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
+	private _blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
 		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_contentInvalid?: boolean;
 
 	// 'settings-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_settingsInvalid?: boolean;
 
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel>>) {
@@ -354,13 +356,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			:host {
 				position: relative;
 				display: block;
-				user-select: none;
+				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
 			}
+
 			:host(.ProseMirror-selectednode) {
 				umb-ref-rte-block {
-					cursor: not-allowed;
+					--uui-color-default-contrast: initial;
 					outline: 3px solid var(--uui-color-focus);
 				}
 			}

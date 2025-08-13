@@ -10,13 +10,13 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_WEBHOOK_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_url: string = '';
+	private _url: string = '';
 
 	@state()
-	_name = '';
+	private _name = '';
 
 	@state()
-	_description = '';
+	private _description = '';
 
 	constructor() {
 		super();

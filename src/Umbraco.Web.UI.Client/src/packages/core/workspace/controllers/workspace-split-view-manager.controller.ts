@@ -1,18 +1,24 @@
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-export type ActiveVariant = {
+export type UmbActiveVariant = {
 	index: number;
 	culture: string | null;
 	segment: string | null;
 };
 
 /**
+ * @deprecated Use {@link UmbActiveVariant} instead. This will be removed in Umbraco 18.
+ */
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export type ActiveVariant = UmbActiveVariant;
+
+/**
  * @class UmbWorkspaceSplitViewManager
  * @description - Class managing the split view state for a workspace context.
  */
 export class UmbWorkspaceSplitViewManager {
-	#activeVariantsInfo = new UmbArrayState<ActiveVariant>([], (x) => x.index).sortBy(
+	#activeVariantsInfo = new UmbArrayState<UmbActiveVariant>([], (x) => x.index).sortBy(
 		(a, b) => (a.index || 0) - (b.index || 0),
 	);
 	public readonly activeVariantsInfo = this.#activeVariantsInfo.asObservable();

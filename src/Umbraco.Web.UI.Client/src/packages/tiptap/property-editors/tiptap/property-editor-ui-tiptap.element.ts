@@ -1,6 +1,7 @@
 import type { UmbInputTiptapElement } from '../../components/input-tiptap/input-tiptap.element.js';
+import { css, customElement, html, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorUiRteElementBase } from '@umbraco-cms/backoffice/rte';
-import { css, customElement, html, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../components/input-tiptap/input-tiptap.element.js';
 
@@ -66,6 +67,7 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 	override render() {
 		return html`
 			<umb-input-tiptap
+				style=${styleMap(this._css)}
 				.configuration=${this._config}
 				.requiredMessage=${this.mandatoryMessage}
 				.value=${this._markup}

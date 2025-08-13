@@ -16,16 +16,16 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
-	_options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
-	_hasNotSelectedMandatory?: boolean;
+	private _hasNotSelectedMandatory?: boolean;
 
 	@state()
-	_hasInvalidSelection = true;
+	private _hasInvalidSelection = true;
 
 	@state()
-	_isInvariant = false;
+	private _isInvariant = false;
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant || option.variant.state === UmbDocumentVariantState.NOT_CREATED) {
