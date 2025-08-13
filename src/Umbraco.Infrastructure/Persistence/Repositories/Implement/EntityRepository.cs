@@ -942,6 +942,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         public ContentVariation Variations { get; set; }
 
         public bool Published { get; set; }
+
         public bool Edited { get; set; }
     }
 

@@ -203,7 +203,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
         if (result?.Success != false && cultureAndSchedule.Schedules.FullSchedule.Any())
         {
-            // TODO TODO ELEMENTS: create strongly typed PublishResult - do not rely on IPublishableContentBase
+            // TODO ELEMENTS: create strongly typed PublishResult - do not rely on IPublishableContentBase
             _contentService.PersistContentSchedule(result?.Content as IContent ?? content, cultureAndSchedule.Schedules);
             result = new PublishResult(
                 PublishResultType.SuccessPublish,

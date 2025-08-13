@@ -91,6 +91,27 @@ public class RefresherTests
         });
     }
 
+    [TestCase(TreeChangeTypes.None)]
+    [TestCase(TreeChangeTypes.RefreshAll)]
+    [TestCase(TreeChangeTypes.RefreshBranch)]
+    [TestCase(TreeChangeTypes.Remove)]
+    [TestCase(TreeChangeTypes.RefreshNode)]
+    public void ElementCacheRefresherCanDeserializeJsonPayload(TreeChangeTypes changeTypes)
+    {
+        var key = Guid.NewGuid();
+        ElementCacheRefresher.JsonPayload[] source =
+        {
+            new(1234, key, changeTypes)
+        };
+
+        var json = JsonSerializer.Serialize(source);
+        var payload = JsonSerializer.Deserialize<ElementCacheRefresher.JsonPayload[]>(json);
+
+        Assert.AreEqual(1234, payload[0].Id);
+        Assert.AreEqual(key, payload[0].Key);
+        Assert.AreEqual(changeTypes, payload[0].ChangeTypes);
+    }
+
     [Test]
     public void ContentTypeCacheRefresherCanDeserializeJsonPayload()
     {
