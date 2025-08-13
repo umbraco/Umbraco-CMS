@@ -13,6 +13,8 @@ export type UmbActiveVariant = {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export type ActiveVariant = UmbActiveVariant;
 
+const UBM_VARIANT_DELIMITER = '_&_';
+
 /**
  * @class UmbWorkspaceSplitViewManager
  * @description - Class managing the split view state for a workspace context.
@@ -23,8 +25,6 @@ export class UmbWorkspaceSplitViewManager {
 	);
 	public readonly activeVariantsInfo = this.#activeVariantsInfo.asObservable();
 	public readonly splitViewActive = this.#activeVariantsInfo.asObservablePart((x) => x.length > 1);
-
-	private readonly VARIANT_DELIMITER = '_&_';
 
 	private _routeBase?: string;
 	public getWorkspaceRoute(): string | undefined {
@@ -65,7 +65,7 @@ export class UmbWorkspaceSplitViewManager {
 
 				const variantPart: string = newVariants
 					.map((v) => UmbVariantId.Create(v).toString())
-					.join(this.VARIANT_DELIMITER);
+					.join(UBM_VARIANT_DELIMITER);
 
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}`);
 				return true;
@@ -85,7 +85,7 @@ export class UmbWorkspaceSplitViewManager {
 			history.pushState(
 				null,
 				'',
-				`${workspaceRoute}/${UmbVariantId.Create(currentVariant)}${this.VARIANT_DELIMITER}${newVariant}`,
+				`${workspaceRoute}/${UmbVariantId.Create(currentVariant)}${UBM_VARIANT_DELIMITER}${newVariant}`,
 			);
 			return true;
 		}
@@ -99,7 +99,7 @@ export class UmbWorkspaceSplitViewManager {
 			if (activeVariants && index < activeVariants.length) {
 				const newVariants = activeVariants.filter((x) => x.index !== index);
 
-				const variantPart: string = newVariants.map((v) => UmbVariantId.Create(v)).join(this.VARIANT_DELIMITER);
+				const variantPart: string = newVariants.map((v) => UmbVariantId.Create(v)).join(UBM_VARIANT_DELIMITER);
 
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}`);
 				return true;
@@ -109,7 +109,7 @@ export class UmbWorkspaceSplitViewManager {
 	}
 
 	public setVariantParts(routeFragment: string) {
-		const variantSplit = routeFragment.split(this.VARIANT_DELIMITER);
+		const variantSplit = routeFragment.split(UBM_VARIANT_DELIMITER);
 		variantSplit.forEach((part, index) => {
 			this.handleVariantFolderPart(index, part);
 		});
