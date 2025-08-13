@@ -126,7 +126,7 @@ public partial class ContentEditingServiceTests
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Create_As_Child(bool allowedAsChild)
-        => await Test_Can_Create_At_Root(allowedAsChild, allowedAsChild);
+        => await Test_Can_Create_As_Child(allowedAsChild, allowedAsChild);
 
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToAllowTextPageAsChild))]
