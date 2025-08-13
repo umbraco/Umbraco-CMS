@@ -62,6 +62,15 @@ export default defineConfig({
         // Use prepared auth state.
         ignoreHTTPSErrors: true,
         storageState: STORAGE_STATE
+      },
+    },
+    {
+      name: 'externalLoginAzureADB2C',
+      testMatch: 'ExternalLogin/AzureADB2C/**',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
       }
     },
     // This project is used to test the install steps, for that we do not need to authenticate.

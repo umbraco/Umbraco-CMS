@@ -783,6 +783,21 @@ stages:
               testCommand: "npx playwright test --project=deliveryApi"
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+            # ExternalLogin AzureADB2C
+            WindowsExternalLoginAzureADB2C:
+              vmImage: "windows-latest"
+              testFolder: "ExternalLoginAzureADB2C"
+              testCommand: "npx playwright test --project=externalLoginAzureADB2C"
+              packages:
+                - name: "Microsoft.AspNetCore.Authentication.OpenIdConnect"
+                  version: "9.0.8"
+              AZUREB2C__DOMAIN: $(AZUREB2CDOMAINID)
+              AZUREB2C__TENANT: $(AZUREB2CTENANTID)
+              AZUREB2C__POLICY: $(AZUREB2CPOLICYNAME)
+              AZUREB2C__CLIENTID: $(AZUREB2CCLIENTID)
+              AZUREB2C__CLIENTSECRET: $(AZUREB2CCLIENTSECRET)
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
         pool:
           vmImage: $(vmImage)
         steps:
@@ -835,10 +850,13 @@ stages:
             displayName: Install Template
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          # Install packages
-          - pwsh: |
-              dotnet add package Umbraco.Cms.Core --version $cmsVersion
-            condition:
+          # Install NuGet packages if defined
+          - ${{ if $packages }}:
+              - ${{ each package in $packages }}:
+                  - pwsh: |
+                      Write-Host "Installing package ${{ package.name }} version ${{ package.version }}"
+                      dotnet add package ${{ package.name }} --version ${{ package.version }}
+                    displayName: "Install NuGet package: ${{ package.name }}"
 
           - pwsh: |
               dotnet restore UmbracoProject
@@ -861,6 +879,22 @@ stages:
               }
             displayName: Update application to use necessary app settings
             workingDirectory: $(Agent.BuildDirectory)/app
+
+          # Update application to use necessary App_Plugins
+          - pwsh: |
+              $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)"
+              $destinationPath = "UmbracoProject"
+              $appPluginsFolders = Get-ChildItem -Path $sourcePath -Directory -Filter "App_Plugins"
+              if ($appPluginsFolders) {
+                foreach ($folder in $appPluginsFolders) {
+                  Write-Host "Copying folder: $($folder.FullName)"
+                  Copy-Item -Path $folder.FullName -Destination $destinationPath -Recurse -Force
+                  }
+              } else {
+                Write-Host "No App_Plugins found."
+              }
+            displayName: "Update application to use necessary App_Plugins"
+            workingDirectory: "$(Agent.BuildDirectory)/app"
 
           # Update application to use necessary classes
           - pwsh: |
