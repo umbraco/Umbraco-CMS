@@ -1,41 +1,39 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Api.Management.Services.Signs;
 
+/// <summary>
+/// Implements a <see cref="ISignProvider"/> that provides signs for documents that are protected.
+/// </summary>
 internal class IsProtectedSignProvider : ISignProvider
 {
     private const string Alias = Constants.Conventions.Signs.Prefix + "IsProtected";
 
     /// <inheritdoc/>>
-    public bool CanProvideSigns<TItem>() =>
+    public bool CanProvideSigns<TItem>()
+        where TItem : IHasSigns =>
         typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
         typeof(TItem) == typeof(DocumentCollectionResponseModel);
 
-    /// <inheritdoc/>>
-    public Task PopulateTreeSignsAsync<TItem>(TItem[] treeItemViewModels, IEnumerable<IEntitySlim> entities)
-        where TItem : EntityTreeItemResponseModel, new()
-    {
-        foreach (TItem item in treeItemViewModels)
-        {
-            if (item is DocumentTreeItemResponseModel { IsProtected: true })
-            {
-                item.AddSign(Alias);
-            }
-        }
-
-        return Task.CompletedTask;
-    }
+    /// <inheritdoc/>
+    public Task PopulateTreeSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
+        where TItem : EntityTreeItemResponseModel, IHasSigns
+        => PopulateSigns(itemViewModels, x => x is DocumentTreeItemResponseModel { IsProtected: true });
 
     /// <inheritdoc/>
-    public Task PopulateCollectionSignsAsync<TItem>(TItem[] collectionItemViewModel)
-        where TItem : DocumentCollectionResponseModel, new()
+    public Task PopulateCollectionSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
+        where TItem : IHasSigns
+        => PopulateSigns(itemViewModels, x => x is DocumentCollectionResponseModel { IsProtected: true });
+
+    private static Task PopulateSigns<TItem>(IEnumerable<TItem> itemViewModels, Func<TItem, bool> discrimator)
+        where TItem : IHasSigns
     {
-        foreach (TItem item in collectionItemViewModel)
+        foreach (TItem item in itemViewModels)
         {
-            if (item is DocumentCollectionResponseModel { IsProtected: true })
+            if (discrimator(item))
             {
                 item.AddSign(Alias);
             }

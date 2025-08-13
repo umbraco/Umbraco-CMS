@@ -1,7 +1,6 @@
-using Serilog.Core;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -22,32 +21,26 @@ internal class HasScheduleSignProvider : ISignProvider
     public HasScheduleSignProvider(IContentService contentService) => _contentService = contentService;
 
     /// <inheritdoc/>
-    public bool CanProvideSigns<TItem>() =>
+    public bool CanProvideSigns<TItem>()
+        where TItem : IHasSigns =>
         typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
         typeof(TItem) == typeof(DocumentCollectionResponseModel);
 
+    /// <inheritdoc/>
+    public Task PopulateTreeSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
+         where TItem : EntityTreeItemResponseModel, IHasSigns => PopulateSigns(itemViewModels);
 
     /// <inheritdoc/>
-    public Task PopulateTreeSignsAsync<TItem>(TItem[] treeItemViewModels, IEnumerable<IEntitySlim> entities)
-        where TItem : EntityTreeItemResponseModel, new()
+    public Task PopulateCollectionSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
+        where TItem : IHasSigns => PopulateSigns(itemViewModels);
+
+    private Task PopulateSigns<TItem>(IEnumerable<TItem> itemViewModels)
+        where TItem : IHasSigns
     {
-        IEnumerable<Guid> contentKeysScheduledForPublishing = _contentService.GetScheduledContentKeys(treeItemViewModels.Select(x => x.Id));
+        IEnumerable<Guid> contentKeysScheduledForPublishing = _contentService.GetScheduledContentKeys(itemViewModels.Select(x => x.Id));
         foreach (Guid key in contentKeysScheduledForPublishing)
         {
-            treeItemViewModels.First(x => x.Id == key).AddSign(Alias);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc/>
-    public Task PopulateCollectionSignsAsync<TItem>(TItem[] collectionItemViewModel)
-        where TItem : DocumentCollectionResponseModel, new()
-    {
-        IEnumerable<Guid> contentKeysScheduledForPublishing = _contentService.GetScheduledContentKeys(collectionItemViewModel.Select(x => x.Id));
-        foreach (Guid key in contentKeysScheduledForPublishing)
-        {
-            collectionItemViewModel.First(x => x.Id == key).AddSign(Alias);
+            itemViewModels.First(x => x.Id == key).AddSign(Alias);
         }
 
         return Task.CompletedTask;

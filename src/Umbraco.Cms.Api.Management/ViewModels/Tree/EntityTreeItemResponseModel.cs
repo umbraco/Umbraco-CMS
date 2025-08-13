@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
-public class EntityTreeItemResponseModel : TreeItemPresentationModel
+public class EntityTreeItemResponseModel : TreeItemPresentationModel, IHasSigns
 {
     private readonly List<SignModel> _signs = [];
 

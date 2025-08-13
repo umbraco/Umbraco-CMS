@@ -44,7 +44,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(null, rootEntities);
 
-        await PopulateSigns(treeItemViewModels, rootEntities);
+        await PopulateSigns(treeItemViewModels);
 
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
@@ -57,7 +57,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(parentId, children);
 
-        await PopulateSigns(treeItemViewModels, children);
+        await PopulateSigns(treeItemViewModels);
 
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
@@ -79,7 +79,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(parentKey, siblings);
 
-        await PopulateSigns(treeItemViewModels, siblings);
+        await PopulateSigns(treeItemViewModels);
 
         SubsetViewModel<TItem> result = SubsetViewModel(treeItemViewModels, totalBefore, totalAfter);
 
@@ -101,7 +101,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             })
             .ToArray();
 
-        await PopulateSigns(treeItemViewModels, ancestorEntities);
+        await PopulateSigns(treeItemViewModels);
 
         return Ok(treeItemViewModels);
     }
@@ -162,11 +162,11 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
 
-    protected virtual async Task PopulateSigns(TItem[] treeItemViewModels, IEnumerable<IEntitySlim> entities)
+    protected virtual async Task PopulateSigns(TItem[] treeItemViewModels)
     {
         foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<TItem>()))
         {
-            await signProvider.PopulateTreeSignsAsync(treeItemViewModels, entities);
+            await signProvider.PopulateTreeSignsAsync(treeItemViewModels);
         }
     }
 

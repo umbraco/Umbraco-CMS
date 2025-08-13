@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -28,7 +28,7 @@ internal class IsProtectedSignProviderTests
             new() { IsProtected = true },
         };
 
-        await sut.PopulateTreeSignsAsync(viewModels.ToArray(), entities);
+        await sut.PopulateTreeSignsAsync(viewModels);
 
         Assert.AreEqual(viewModels[0].Signs.Count(), 0);
         Assert.AreEqual(viewModels[1].Signs.Count(), 1);
@@ -56,7 +56,7 @@ internal class IsProtectedSignProviderTests
             new() { IsProtected = true },
         };
 
-        await sut.PopulateCollectionSignsAsync(viewModels.ToArray());
+        await sut.PopulateCollectionSignsAsync(viewModels);
 
         Assert.AreEqual(viewModels[0].Signs.Count(), 0);
         Assert.AreEqual(viewModels[1].Signs.Count(), 1);

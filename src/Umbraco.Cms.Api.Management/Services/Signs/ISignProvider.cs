@@ -1,6 +1,5 @@
-using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Api.Management.Services.Signs;
 
@@ -10,25 +9,25 @@ namespace Umbraco.Cms.Api.Management.Services.Signs;
 public interface ISignProvider
 {
     /// <summary>
-    /// Gets a value indicating whether this provider can provide tree signs for the specified item type.
+    /// Gets a value indicating whether this provider can provide signs for the specified item type.
     /// </summary>
-    /// <typeparam name="TItem">Type of tree item view model.</typeparam>
-    bool CanProvideSigns<TItem>();
+    /// <typeparam name="TItem">Type of view model supporting signs.</typeparam>
+    bool CanProvideSigns<TItem>()
+        where TItem : IHasSigns;
 
     /// <summary>
     /// Populates the provided tree item view models with signs.
     /// </summary>
-    /// <typeparam name="TItem">Type of tree item view model.</typeparam>
-    /// <param name="treeItemViewModels">The collection of tree item view models populated with signs.</param>
-    /// <param name="entities">The entities from which the collection of tree item view models was populated.</param>
-    Task PopulateTreeSignsAsync<TItem>(TItem[] treeItemViewModels, IEnumerable<IEntitySlim> entities)
-        where TItem : EntityTreeItemResponseModel, new();
+    /// <typeparam name="TItem">Type of tree item view model supporting signs.</typeparam>
+    /// <param name="itemViewModels">The collection of tree item view models to be populated with signs.</param>
+    Task PopulateTreeSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
+        where TItem : EntityTreeItemResponseModel, IHasSigns;
 
     /// <summary>
-    /// Populates the provided collection item view models with signs.
+    /// Populates the provided collection view models with signs.
     /// </summary>
-    /// <typeparam name="TItem">Type of collection item view model.</typeparam>
-    /// <param name="collectionItemViewModel">The collection of collection item view models populated with signs.</param>
-    Task PopulateCollectionSignsAsync<TItem>(TItem[] collectionItemViewModel)
-        where TItem : DocumentCollectionResponseModel, new();
+    /// <typeparam name="TItem">Type of collection view model supporting signs.</typeparam>
+    /// <param name="itemViewModels">The collection of view models to be populated with signs.</param>
+    Task PopulateCollectionSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
+        where TItem : IHasSigns;
 }

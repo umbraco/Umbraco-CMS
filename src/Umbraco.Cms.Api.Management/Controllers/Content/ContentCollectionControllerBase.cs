@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -20,7 +19,6 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
     where TCollectionResponseModel : ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>
     where TValueResponseModelBase : ValueResponseModelBase
     where TVariantResponseModel : VariantResponseModelBase
-    where TItem : DocumentCollectionResponseModel, new()
 {
     private readonly IUmbracoMapper _mapper;
     private readonly SignProviderCollection _signProviders;
@@ -64,11 +62,12 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
         return Ok(pageViewModel);
     }
 
+    /// <summary>
+    /// Creates a collection result from the provided collection response models and total number of items.
+    /// </summary>
     protected IActionResult CollectionResult(List<TCollectionResponseModel> collectionResponseModels, long totalNumberOfItems)
     {
-
         TItem[] signTargets = collectionResponseModels.OfType<TItem>().ToArray();
-        PopulateSigns(signTargets).GetAwaiter().GetResult();
 
         var pageViewModel = new PagedViewModel<TCollectionResponseModel>
         {
@@ -125,11 +124,14 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
             },
         });
 
-    protected async Task PopulateSigns(TItem[] collectionViewModel)
+    /// <summary>
+    /// Populates the signs for the collection response models.
+    /// </summary>
+    protected async Task PopulateSigns(IEnumerable<TCollectionResponseModel> itemViewModels)
     {
-        foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<TItem>()))
+        foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<TCollectionResponseModel>()))
         {
-            await signProvider.PopulateCollectionSignsAsync(collectionViewModel);
+            await signProvider.PopulateCollectionSignsAsync(itemViewModels);
         }
     }
 }
