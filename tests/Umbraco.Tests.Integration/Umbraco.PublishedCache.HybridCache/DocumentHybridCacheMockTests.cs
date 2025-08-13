@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -26,8 +27,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithContent
 {
     private IPublishedContentCache _mockedCache;
-    private Mock<IDatabaseCacheRepository> _mockedNucacheRepository;
-    private IDocumentCacheService _mockDocumentCacheService;
+    private Mock<IDatabaseCacheRepository> _mockDatabaseCacheRepository;
+    private IDocumentCacheService _documentCacheService;
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddUmbracoHybridCache();
 
@@ -38,7 +39,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     [SetUp]
     public void SetUp()
     {
-        _mockedNucacheRepository = new Mock<IDatabaseCacheRepository>();
+        _mockDatabaseCacheRepository = new Mock<IDatabaseCacheRepository>();
 
         var contentData = new ContentData(
             Textpage.Name,
@@ -76,25 +77,29 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             IsDraft = false,
         };
 
-        _mockedNucacheRepository.Setup(r => r.GetContentSourceAsync(It.IsAny<Guid>(), true))
+        _mockDatabaseCacheRepository.Setup(r => r.GetContentSourceAsync(It.IsAny<Guid>(), true))
             .ReturnsAsync(draftTestCacheNode);
+        _mockDatabaseCacheRepository.Setup(r => r.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), true))
+            .ReturnsAsync([draftTestCacheNode]);
 
-        _mockedNucacheRepository.Setup(r => r.GetContentSourceAsync(It.IsAny<Guid>(), false))
+        _mockDatabaseCacheRepository.Setup(r => r.GetContentSourceAsync(It.IsAny<Guid>(), false))
             .ReturnsAsync(publishedTestCacheNode);
+        _mockDatabaseCacheRepository.Setup(r => r.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false))
+            .ReturnsAsync([publishedTestCacheNode]);
 
-        _mockedNucacheRepository.Setup(r => r.GetContentByContentTypeKey(It.IsAny<IReadOnlyCollection<Guid>>(), ContentCacheDataSerializerEntityType.Document)).Returns(
+        _mockDatabaseCacheRepository.Setup(r => r.GetContentByContentTypeKey(It.IsAny<IReadOnlyCollection<Guid>>(), ContentCacheDataSerializerEntityType.Document)).Returns(
             new List<ContentCacheNode>()
             {
                 draftTestCacheNode,
             });
 
-        _mockedNucacheRepository.Setup(r => r.DeleteContentItemAsync(It.IsAny<int>()));
+        _mockDatabaseCacheRepository.Setup(r => r.DeleteContentItemAsync(It.IsAny<int>()));
 
         var mockedPublishedStatusService = new Mock<IPublishStatusQueryService>();
         mockedPublishedStatusService.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
 
-        _mockDocumentCacheService = new DocumentCacheService(
-            _mockedNucacheRepository.Object,
+        _documentCacheService = new DocumentCacheService(
+            _mockDatabaseCacheRepository.Object,
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ICoreScopeProvider>(),
             GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>(),
@@ -105,9 +110,10 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             GetRequiredService<IPublishedModelFactory>(),
             GetRequiredService<IPreviewService>(),
             mockedPublishedStatusService.Object,
-            GetRequiredService<IDocumentNavigationQueryService>());
+            new NullLogger<DocumentCacheService>());
 
-        _mockedCache = new DocumentCache(_mockDocumentCacheService,
+        _mockedCache = new DocumentCache(
+            _documentCacheService,
             GetRequiredService<IPublishedContentTypeCache>(),
             GetRequiredService<IDocumentNavigationQueryService>(),
             GetRequiredService<IDocumentUrlService>(),
@@ -118,8 +124,10 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     // So we'll manually create them with a magic options mock.
     private IEnumerable<IDocumentSeedKeyProvider> GetSeedProviders(IPublishStatusQueryService publishStatusQueryService)
     {
-        _cacheSettings = new CacheSettings();
-        _cacheSettings.DocumentBreadthFirstSeedCount = 0;
+        _cacheSettings = new CacheSettings
+        {
+            DocumentBreadthFirstSeedCount = 0
+        };
 
         var mock = new Mock<IOptions<CacheSettings>>();
         mock.Setup(m => m.Value).Returns(() => _cacheSettings);
@@ -140,7 +148,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         var textPage2 = await _mockedCache.GetByIdAsync(Textpage.Key, true);
         AssertTextPage(textPage);
         AssertTextPage(textPage2);
-        _mockedNucacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
     [Test]
@@ -152,79 +160,79 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         var textPage2 = await _mockedCache.GetByIdAsync(Textpage.Id, true);
         AssertTextPage(textPage);
         AssertTextPage(textPage2);
-        _mockedNucacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
     [Test]
     public async Task Content_Is_Seeded_By_Id()
     {
-        var schedule = new CultureAndScheduleModel
+        var schedule = new CulturePublishScheduleModel
         {
-            CulturesToPublishImmediately = new HashSet<string> { "*" }, Schedules = new ContentScheduleCollection(),
+            Culture = Constants.System.InvariantCulture,
         };
 
-        var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, schedule, Constants.Security.SuperUserKey);
+        var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [schedule], Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
         Textpage.Published = true;
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
+        await _documentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
-        await _mockDocumentCacheService.SeedAsync(CancellationToken.None);
-        _mockedNucacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
+        await _documentCacheService.SeedAsync(CancellationToken.None);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Exactly(1));
 
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Id);
         AssertTextPage(textPage);
 
-        _mockedNucacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
     [Test]
     public async Task Content_Is_Seeded_By_Key()
     {
-        var schedule = new CultureAndScheduleModel
+        var schedule = new CulturePublishScheduleModel
         {
-            CulturesToPublishImmediately = new HashSet<string> { "*" }, Schedules = new ContentScheduleCollection(),
+            Culture = Constants.System.InvariantCulture,
         };
 
-        var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, schedule, Constants.Security.SuperUserKey);
+        var publishResult = await ContentPublishingService.PublishAsync(Textpage.Key, [schedule], Constants.Security.SuperUserKey);
         Assert.IsTrue(publishResult.Success);
         Textpage.Published = true;
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
+        await _documentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
-        await _mockDocumentCacheService.SeedAsync(CancellationToken.None);
-        _mockedNucacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
+        await _documentCacheService.SeedAsync(CancellationToken.None);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Exactly(1));
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Key);
         AssertTextPage(textPage);
 
-        _mockedNucacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
     [Test]
     public async Task Content_Is_Not_Seeded_If_Unpblished_By_Id()
     {
 
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
+        await _documentCacheService.DeleteItemAsync(Textpage);
 
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
-        await _mockDocumentCacheService.SeedAsync(CancellationToken.None);
+        await _documentCacheService.SeedAsync(CancellationToken.None);
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Id, true);
         AssertTextPage(textPage);
 
-        _mockedNucacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
     [Test]
     public async Task Content_Is_Not_Seeded_If_Unpublished_By_Key()
     {
         _cacheSettings.ContentTypeKeys = [ Textpage.ContentType.Key ];
-        await _mockDocumentCacheService.DeleteItemAsync(Textpage);
+        await _documentCacheService.DeleteItemAsync(Textpage);
 
-        await _mockDocumentCacheService.SeedAsync(CancellationToken.None);
+        await _documentCacheService.SeedAsync(CancellationToken.None);
         var textPage = await _mockedCache.GetByIdAsync(Textpage.Key, true);
         AssertTextPage(textPage);
 
-        _mockedNucacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Exactly(1));
     }
 
     private void AssertTextPage(IPublishedContent textPage)
