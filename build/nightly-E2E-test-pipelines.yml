@@ -809,6 +809,10 @@ stages:
             AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
 
         steps:
+          - pwsh: |
+              $value = $env:AZUREB2CCLIENTID
+              Write-Host "Length: $($value.Length)"
+            displayName: Checks the length of the client id
           # Setup test environment
           - task: DownloadPipelineArtifact@2
             displayName: Download NuGet artifacts
