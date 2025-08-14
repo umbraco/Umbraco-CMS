@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+﻿using NPoco;
+using Org.BouncyCastle.Asn1.X509.Qualified;
+using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
@@ -13,13 +15,6 @@ public class HasPendingChangesSignProvider : ISignProvider
 {
     private const string Alias = Constants.Conventions.Signs.Prefix + "PendingChanges";
 
-    private readonly IContentService _contentService;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="HasPendingChangesSignProvider"/> class.
-    /// </summary>
-    public HasPendingChangesSignProvider(IContentService contentService) => _contentService = contentService;
-
     public bool CanProvideSigns<TItem>()
         where TItem : IHasSigns =>
         typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
@@ -30,17 +25,31 @@ public class HasPendingChangesSignProvider : ISignProvider
     {
         foreach (TItem item in itemViewModels)
         {
-            IContent? content = _contentService.GetById(item.Id);
-            if (content == null)
+            switch (item)
             {
-                continue;
-            }
+                case DocumentTreeItemResponseModel treeItem:
+                    foreach (DocumentVariantItemResponseModel variant in treeItem.Variants)
+                    {
+                        DocumentVariantState state = variant.State;
+                        if (state == DocumentVariantState.PublishedPendingChanges)
+                        {
+                            item.AddSign(Alias);
+                        }
+                    }
 
-            DocumentVariantState state = DocumentVariantStateHelper.GetState(content, null);
+                    break;
 
-            if (state == DocumentVariantState.PublishedPendingChanges)
-            {
-                item.AddSign(Alias);
+                case DocumentCollectionResponseModel collectionItem:
+                    foreach (DocumentVariantItemResponseModel variant in collectionItem.Variants.OfType<DocumentVariantItemResponseModel>())
+                    {
+                        DocumentVariantState state = variant.State;
+                        if (state == DocumentVariantState.PublishedPendingChanges)
+                        {
+                            item.AddSign(Alias);
+                        }
+                    }
+
+                    break;
             }
         }
 
