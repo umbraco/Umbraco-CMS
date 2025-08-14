@@ -3,6 +3,8 @@ import { UmbImagingRepository } from '../imaging.repository.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
 
 @customElement('umb-imaging-thumbnail')
 export class UmbImagingThumbnailElement extends UmbLitElement {
@@ -66,7 +68,11 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	#intersectionObserver?: IntersectionObserver;
 
 	override render() {
-		return html` ${this.#renderThumbnail()} ${when(this._isLoading, () => this.#renderLoading())} `;
+		return when(
+			this._isLoading,
+			() => this.#renderLoading(),
+			() => this.#renderThumbnail(),
+		);
 	}
 
 	override connectedCallback() {
@@ -77,17 +83,34 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 				if (entries[0].isIntersecting) {
 					this.#generateThumbnailUrl();
 					this.#intersectionObserver?.disconnect();
+					this.#observeActionEvent();
 				}
 			});
 			this.#intersectionObserver.observe(this);
 		} else {
 			this.#generateThumbnailUrl();
+			this.#observeActionEvent();
 		}
 	}
 
 	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#intersectionObserver?.disconnect();
+	}
+
+	/**
+	 * Observes the action events for the current media item.
+	 * Reloads the thumbnail when the media item is updated.
+	 * Note: Call this only when the media item is in view or otherwise is supposed to be loaded already.
+	 */
+	#observeActionEvent() {
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
+			actionEventContext?.addEventListener(UmbEntityUpdatedEvent.TYPE, (event) => {
+				if (event instanceof UmbEntityUpdatedEvent && event.getUnique() === this.unique) {
+					this.#generateThumbnailUrl();
+				}
+			});
+		});
 	}
 
 	#renderLoading() {
@@ -105,6 +128,9 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	}
 
 	async #generateThumbnailUrl() {
+		if (!this.unique) return;
+		this._isLoading = true;
+
 		const { data } = await this.#imagingRepository.requestResizedItems([this.unique], {
 			height: this.height,
 			width: this.width,
