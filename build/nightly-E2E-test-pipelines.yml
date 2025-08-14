@@ -854,12 +854,12 @@ stages:
             displayName: Install Template
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          - ${{ if packageName }}:
-              - pwsh: |
-                  Write-Host "Installing package $(packageName) version $(packageVersion)"
-                  dotnet add package $(packageName) --version $(packageVersion)
-                displayName: "Install NuGet package: $(packageName)"
-                workingDirectory: $(Agent.BuildDirectory)/app
+          - pwsh: |
+              Write-Host "Installing package $(packageName) version $(packageVersion)"
+              dotnet add package $(packageName) --version $(packageVersion)
+            displayName: "Install NuGet package: $(packageName)"
+            workingDirectory: $(Agent.BuildDirectory)/app
+            condition: and(succeeded(), ne(variables['packageName'], ''))
 
           - pwsh: |
               dotnet restore UmbracoProject
