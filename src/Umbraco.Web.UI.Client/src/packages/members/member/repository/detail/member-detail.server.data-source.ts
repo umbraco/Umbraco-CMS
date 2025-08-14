@@ -6,7 +6,7 @@ import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import {umbDeepMerge, type UmbDeepPartialObject} from '@umbraco-cms/backoffice/utils';
+import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import { UmbMemberTypeDetailServerDataSource } from '@umbraco-cms/backoffice/member-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
