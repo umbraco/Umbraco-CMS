@@ -33,3 +33,13 @@ export interface UmbUniqueItemModel {
 	name: string;
 	icon?: string;
 }
+
+export interface UmbDateTimeWithTimeZone {
+	date: string | undefined;
+	timeZone: string | undefined;
+}
+
+export interface UmbTimeZonePickerValue {
+	mode: 'all' | 'local' | 'custom';
+	timeZones: Array<string>;
+}

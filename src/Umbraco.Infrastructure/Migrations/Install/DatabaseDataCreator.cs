@@ -857,6 +857,25 @@ internal sealed class DatabaseDataCreator
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
+        ConditionalInsert(
+            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
+            Constants.DataTypes.Guids.DateTimeWithTimeZone,
+            new NodeDto
+            {
+                NodeId = 1055,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 1,
+                Path = "-1,1055",
+                SortOrder = 2,
+                UniqueId = Constants.DataTypes.Guids.DateTimeWithTimeZoneGuid,
+                Text = "Date Picker with Time Zone",
+                NodeObjectType = Constants.ObjectTypes.DataType,
+                CreateDate = DateTime.Now,
+            },
+            Constants.DatabaseSchema.Tables.Node,
+            "id");
     }
 
     private void CreateNodeDataForMediaTypes()
@@ -2290,6 +2309,22 @@ internal sealed class DatabaseDataCreator
                     DbType = "Ntext",
                     Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
                                     "\", \"multiple\": true}",
+                });
+        }
+
+        if (_database.Exists<NodeDto>(1055))
+        {
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
+                new DataTypeDto
+                {
+                    NodeId = 1055,
+                    EditorAlias = Constants.PropertyEditors.Aliases.DateTimeWithTimeZone,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DateWithTimeZonePicker",
+                    DbType = "Ntext",
+                    Configuration = "{\"format\": \"date-time\", \"timeFormat\": \"HH:mm\", \"timeZones\": {\"mode\": \"all\"}}",
                 });
         }
     }
