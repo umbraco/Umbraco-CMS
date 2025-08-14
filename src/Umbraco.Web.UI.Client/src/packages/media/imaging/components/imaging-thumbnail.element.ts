@@ -105,12 +105,11 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	}
 
 	async #generateThumbnailUrl() {
-		const { data } = await this.#imagingRepository.requestThumbnailUrls(
-			[this.unique],
-			this.height,
-			this.width,
-			this.mode,
-		);
+		const { data } = await this.#imagingRepository.requestResizedItems([this.unique], {
+			height: this.height,
+			width: this.width,
+			mode: this.mode,
+		});
 
 		this._thumbnailUrl = data?.[0]?.url ?? '';
 		this._isLoading = false;
