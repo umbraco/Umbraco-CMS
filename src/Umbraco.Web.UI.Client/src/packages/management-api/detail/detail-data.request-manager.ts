@@ -1,5 +1,5 @@
 import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '../server-event/constants.js';
-import type { UmbManagementApiDetailDataRuntimeCache } from './runtime-cache.js';
+import type { UmbManagementApiDetailDataCache } from './cache.js';
 import {
 	tryExecute,
 	type UmbApiError,
@@ -19,7 +19,7 @@ export interface UmbManagementApiDetailDataRequestManagerArgs<
 	read: (id: string) => Promise<UmbApiResponse<{ data: DetailResponseModelType }>>;
 	update: (id: string, data: UpdateRequestModelType) => Promise<UmbApiResponse<{ data: unknown }>>;
 	delete: (id: string) => Promise<UmbApiResponse<{ data: unknown }>>;
-	runtimeCache: UmbManagementApiDetailDataRuntimeCache<DetailResponseModelType>;
+	dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
 	serverEventSource: string;
 	inflightRequestCache: Map<string, Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>>;
 }
@@ -29,7 +29,7 @@ export class UmbManagementApiDetailDataRequestManager<
 	CreateRequestModelType,
 	UpdateRequestModelType,
 > extends UmbControllerBase {
-	#runtimeCache: UmbManagementApiDetailDataRuntimeCache<DetailResponseModelType>;
+	#dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
 	#serverEventSource: string;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 	#inflightRequestCache: Map<string, Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>>;
@@ -55,7 +55,7 @@ export class UmbManagementApiDetailDataRequestManager<
 		this.#update = args.update;
 		this.#delete = args.delete;
 
-		this.#runtimeCache = args.runtimeCache;
+		this.#dataCache = args.dataCache;
 		this.#serverEventSource = args.serverEventSource;
 		this.#inflightRequestCache = args.inflightRequestCache;
 
@@ -82,8 +82,8 @@ export class UmbManagementApiDetailDataRequestManager<
 		const inflightCacheKey = `read:${id}`;
 
 		// Only read from the cache when we are connected to the server events
-		if (this.#isConnectedToServerEvents && this.#runtimeCache.has(id)) {
-			data = this.#runtimeCache.get(id);
+		if (this.#isConnectedToServerEvents && this.#dataCache.has(id)) {
+			data = this.#dataCache.get(id);
 		} else {
 			const hasInflightRequest = this.#inflightRequestCache.has(inflightCacheKey);
 
@@ -101,7 +101,7 @@ export class UmbManagementApiDetailDataRequestManager<
 				const { data: serverData, error: serverError } = await request;
 
 				if (this.#isConnectedToServerEvents && serverData) {
-					this.#runtimeCache.set(id, serverData);
+					this.#dataCache.set(id, serverData);
 				}
 
 				data = serverData;
@@ -129,7 +129,7 @@ export class UmbManagementApiDetailDataRequestManager<
 
 		// Only update the cache when we are connected to the server events
 		if (this.#isConnectedToServerEvents && !error) {
-			this.#runtimeCache.delete(id);
+			this.#dataCache.delete(id);
 		}
 
 		return { error };
@@ -146,7 +146,7 @@ export class UmbManagementApiDetailDataRequestManager<
 
 				// Clear the cache if we lose connection to the server events
 				if (this.#isConnectedToServerEvents === false) {
-					this.#runtimeCache.clear();
+					this.#dataCache.clear();
 				}
 			},
 			'umbObserveServerEventsConnection',
@@ -157,7 +157,7 @@ export class UmbManagementApiDetailDataRequestManager<
 			this.#serverEventContext?.byEventSourceAndTypes(this.#serverEventSource, ['Updated', 'Deleted']),
 			(event) => {
 				if (!event) return;
-				this.#runtimeCache.delete(event.key);
+				this.#dataCache.delete(event.key);
 			},
 			'umbObserveServerEvents',
 		);
