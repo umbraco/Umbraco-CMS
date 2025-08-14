@@ -6,17 +6,17 @@ interface UmbCacheEntryModel<DataModelType> {
 
 /**
  * A runtime cache for storing entity detail data from the Management Api
- * @class UmbManagementApiDetailDataRuntimeCache
+ * @class UmbManagementApiDetailDataCache
  * @template DataModelType
  */
-export class UmbManagementApiDetailDataRuntimeCache<DataModelType> {
+export class UmbManagementApiDetailDataCache<DataModelType> {
 	#entries: Map<string, UmbCacheEntryModel<DataModelType>> = new Map();
 
 	/**
 	 * Checks if an entry exists in the cache
 	 * @param {string} id - The ID of the entry to check
 	 * @returns {boolean} - True if the entry exists, false otherwise
-	 * @memberof UmbManagementApiDetailDataRuntimeCache
+	 * @memberof UmbManagementApiDetailDataCache
 	 */
 	has(id: string): boolean {
 		return this.#entries.has(id);
@@ -26,7 +26,7 @@ export class UmbManagementApiDetailDataRuntimeCache<DataModelType> {
 	 * Adds an entry to the cache
 	 * @param {string} id - The ID of the entry to add
 	 * @param {DataModelType} data - The data to cache
-	 * @memberof UmbManagementApiDetailDataRuntimeCache
+	 * @memberof UmbManagementApiDetailDataCache
 	 */
 	set(id: string, data: DataModelType): void {
 		const cacheEntry: UmbCacheEntryModel<DataModelType> = {
@@ -41,7 +41,7 @@ export class UmbManagementApiDetailDataRuntimeCache<DataModelType> {
 	 * Retrieves an entry from the cache
 	 * @param {string} id - The ID of the entry to retrieve
 	 * @returns {DataModelType | undefined} - The cached entry or undefined if not found
-	 * @memberof UmbManagementApiDetailDataRuntimeCache
+	 * @memberof UmbManagementApiDetailDataCache
 	 */
 	get(id: string): DataModelType | undefined {
 		const entry = this.#entries.get(id);
@@ -51,7 +51,7 @@ export class UmbManagementApiDetailDataRuntimeCache<DataModelType> {
 	/**
 	 * Deletes an entry from the cache
 	 * @param {string} id - The ID of the entry to delete
-	 * @memberof UmbManagementApiDetailDataRuntimeCache
+	 * @memberof UmbManagementApiDetailDataCache
 	 */
 	delete(id: string): void {
 		this.#entries.delete(id);
@@ -59,7 +59,7 @@ export class UmbManagementApiDetailDataRuntimeCache<DataModelType> {
 
 	/**
 	 * Clears all entries from the cache
-	 * @memberof UmbManagementApiDetailDataRuntimeCache
+	 * @memberof UmbManagementApiDetailDataCache
 	 */
 	clear(): void {
 		this.#entries.clear();
