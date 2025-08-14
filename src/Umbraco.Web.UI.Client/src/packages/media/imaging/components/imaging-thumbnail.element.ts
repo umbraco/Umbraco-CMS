@@ -118,8 +118,6 @@ export class UmbImagingThumbnailElement extends UmbLitElement {
 	}
 
 	#renderThumbnail() {
-		if (this._isLoading) return nothing;
-
 		return when(
 			this._thumbnailUrl,
 			(url) => html`<img id="figure" src=${url} alt=${this.alt} loading=${this.loading} draggable="false" />`,
