@@ -13,8 +13,7 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
     internal abstract IAppPolicyCache AppPolicyCache { get; }
 
     [Test]
-    // ToDo: Check wether the Explicit attribute is still needed e.g. in pipelines
-    // [Explicit("Testing for timeouts cannot work on VSTS.")]
+    [Explicit("The necessary wait time [Thread.Sleep(300)] makes this test slow. We'll omit it to save the runtime of the entire unit test.")]
     public void Can_Add_And_Expire_Struct_Strongly_Typed_With_Null()
     {
         var now = DateTime.Now;

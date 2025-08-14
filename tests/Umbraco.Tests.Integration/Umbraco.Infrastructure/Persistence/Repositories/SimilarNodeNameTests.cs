@@ -184,8 +184,6 @@ internal sealed class SimilarNodeNameTests
     }
 
     [Test]
-    // ToDo: Check wether the Explicit attribute is still needed e.g. in pipelines
-    // [Explicit("This test fails! We need to fix up the logic")]
     public void TestMany()
     {
         SimilarNodeName[] names =
@@ -197,7 +195,6 @@ internal sealed class SimilarNodeNameTests
             new SimilarNodeName {Id = 22, Name = "Test (1) (1)"}
         };
 
-        // TODO: this will yield "Test (2)" which is already in use
         var uniqueName = SimilarNodeName.GetUniqueName(names, 0, "Test");
         Assert.AreEqual("Test (3)", uniqueName);
     }
