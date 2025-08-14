@@ -150,7 +150,6 @@ export class UmbHintController<
 		hints.forEach((hint) => {
 			console.log(hint);
 			const newPath = parentViewAlias ? [parentViewAlias, ...hint.path] : hint.path;
-			// Notice addOne appends the parent viewAlias to the path:
 			this.#parent!.addOne({ ...hint, path: newPath });
 		});
 
@@ -174,17 +173,7 @@ export class UmbHintController<
 		newHint.unique ??= Symbol();
 		newHint.weight ??= 0;
 		newHint.text ??= '!';
-		if (newHint.path) {
-			if (this.#viewAlias && newHint.path[0] !== this.#viewAlias) {
-				newHint.path = [this.#viewAlias, ...newHint.path];
-			}
-		} else {
-			if (this.#viewAlias) {
-				newHint.path = [this.#viewAlias];
-			} else {
-				newHint.path = [];
-			}
-		}
+		newHint.path ??= [];
 		this.#hints.appendOne(newHint);
 		return hint.unique!;
 	}
