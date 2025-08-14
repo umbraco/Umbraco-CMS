@@ -788,9 +788,11 @@ stages:
               vmImage: "windows-latest"
               testFolder: "ExternalLoginAzureADB2C"
               testCommand: "npx playwright test --project=externalLoginAzureADB2C"
-              packages:
-                - name: "Microsoft.AspNetCore.Authentication.OpenIdConnect"
-                  version: "9.0.8"
+#              packages:
+#                - name: "Microsoft.AspNetCore.Authentication.OpenIdConnect"
+#                  version: "9.0.8"
+              packageName: "Microsoft.AspNetCore.Authentication.OpenIdConnect"
+              packageVersion: "9.0.8"
               AZUREB2C__DOMAIN: $(AZUREB2CDOMAIN)
               AZUREB2C__TENANT: $(AZUREB2CTENANT)
               AZUREB2C__POLICY: $(AZUREB2CPOLICY)
@@ -852,13 +854,12 @@ stages:
             displayName: Install Template
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          # Install NuGet packages if defined
-          - ${{ if $packages }}:
-              - ${{ each package in $packages }}:
-                  - pwsh: |
-                      Write-Host "Installing package ${{ package.name }} version ${{ package.version }}"
-                      dotnet add package ${{ package.name }} --version ${{ package.version }}
-                    displayName: "Install NuGet package: ${{ package.name }}"
+          - ${{ if packageName }}:
+              - pwsh: |
+                  Write-Host "Installing package $(packageName) version $(packageVersion)"
+                  dotnet add package $(packageName) --version $(packageVersion)
+                displayName: "Install NuGet package: $(packageName)"
+                workingDirectory: $(Agent.BuildDirectory)/app
 
           - pwsh: |
               dotnet restore UmbracoProject
