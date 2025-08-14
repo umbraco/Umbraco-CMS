@@ -75,7 +75,8 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	/**
 	 * Clears the cache for all images.
 	 */
-	clearCache() {
+	async clearCache() {
+		await this.#init;
 		this.#dataStore?.clear();
 	}
 
@@ -83,7 +84,8 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	 * Clears the cache for a specific image.
 	 * @param {string} unique The unique identifier for the media item
 	 */
-	clearCacheByUnique(unique: string) {
+	async clearCacheByUnique(unique: string) {
+		await this.#init;
 		this.#dataStore?.clearCropByUnique(unique);
 	}
 
