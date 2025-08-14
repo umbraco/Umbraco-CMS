@@ -73,6 +73,21 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	}
 
 	/**
+	 * Clears the cache for all images.
+	 */
+	clearCache() {
+		this.#dataStore?.clear();
+	}
+
+	/**
+	 * Clears the cache for a specific image.
+	 * @param {string} unique The unique identifier for the media item
+	 */
+	clearCacheByUnique(unique: string) {
+		this.#dataStore?.clearCropByUnique(unique);
+	}
+
+	/**
 	 * Requests the thumbnail URLs for the given uniques
 	 * @param {Array<string>} uniques - The unique identifiers for the media items
 	 * @param {number} height - The desired height in pixels of the thumbnail
