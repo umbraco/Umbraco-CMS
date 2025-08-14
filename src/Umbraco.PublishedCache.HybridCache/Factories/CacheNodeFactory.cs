@@ -38,7 +38,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
         };
     }
 
-    private static bool GetPublishedValue(IContent content, bool preview)
+    private static bool GetPublishedValue(IPublishableContentBase content, bool preview)
     {
         switch (content.PublishedState)
         {
@@ -80,6 +80,26 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             CreateDate = media.CreateDate,
             CreatorId = media.CreatorId,
             ContentTypeId = media.ContentTypeId,
+            Data = contentData,
+            IsDraft = false,
+        };
+    }
+
+    public ContentCacheNode ToContentCacheNode(IElement element, bool preview)
+    {
+        ContentData contentData = GetContentData(
+            element,
+            GetPublishedValue(element, preview),
+            null,
+            element.PublishCultureInfos?.Values.Select(x => x.Culture).ToHashSet() ?? []);
+        return new ContentCacheNode
+        {
+            Id = element.Id,
+            Key = element.Key,
+            SortOrder = element.SortOrder,
+            CreateDate = element.CreateDate,
+            CreatorId = element.CreatorId,
+            ContentTypeId = element.ContentTypeId,
             Data = contentData,
             IsDraft = false,
         };

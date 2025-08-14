@@ -9,4 +9,6 @@ internal interface IPublishedContentFactory
     IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode);
 
     IPublishedMember ToPublishedMember(IMember member);
+
+    IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview);
 }

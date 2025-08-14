@@ -44,6 +44,13 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         return model;
     }
 
+    public IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview)
+        // TODO ELEMENTS: while this almost and carries no performance penalty, it's:
+        //                - a little hacky to convert to IPublishedContent, and
+        //                - certain things won't work properly within PublishedContent (like Level and GetParent())
+        //                -> see if it can be changed without hacking the planet
+        => ToIPublishedContent(contentCacheNode, preview);
+
     public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
     {
         IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
