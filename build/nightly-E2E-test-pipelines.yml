@@ -793,17 +793,21 @@ stages:
               packageVersion: "9.0.8"
               CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
-              # Since these values are set as secrets, we need to see them as an environment variable to be able to use them
-              env:
-                AZUREB2C__DOMAIN: $(AZUREB2CDOMAIN)
-                AZUREB2C__TENANT: $(AZUREB2CTENANT)
-                AZUREB2C__POLICY: $(AZUREB2CPOLICY)
-                AZUREB2C__CLIENTID: $(AZUREB2CCLIENTID)
-                AZUREB2C__CLIENTSECRET: $(AZUREB2CCLIENTSECRET)
-                AZUREB2C__TESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
-                AZUREB2C__TESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
+
         pool:
           vmImage: $(vmImage)
+
+          # Since these values are set as secrets, we need to see them as an environment variable to be able to use them
+          # This is not the best solution, we should split the cases in our matrix into pipeline templates. especially the different app settings, as they have different logic
+          env:
+            AZUREB2C__DOMAIN: $(AZUREB2C__DOMAIN)
+            AZUREB2C__TENANT: $(AZUREB2C__TENANT)
+            AZUREB2C__POLICY: $(AZUREB2C__POLICY)
+            AZUREB2C__CLIENTID: $(AZUREB2C__CLIENTID)
+            AZUREB2C__CLIENTSECRET: $(AZUREB2C__CLIENTSECRET)
+            AZUREB2C__TESTUSEREMAIL: $(AZUREB2C__TESTUSEREMAIL)
+            AZUREB2C__TESTUSERPASSWORD: $(AZUREB2C__TESTUSERPASSWORD)
+
         steps:
           # Setup test environment
           - task: DownloadPipelineArtifact@2
