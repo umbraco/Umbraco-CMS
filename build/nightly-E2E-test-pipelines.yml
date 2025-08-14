@@ -789,20 +789,19 @@ stages:
               testFolder: "ExternalLogin\\AzureADB2C"
               testCommand: "npx playwright test --project=externalLoginAzureADB2C"
               port: 44331
-#              packages:
-#                - name: "Microsoft.AspNetCore.Authentication.OpenIdConnect"
-#                  version: "9.0.8"
               packageName: "Microsoft.AspNetCore.Authentication.OpenIdConnect"
               packageVersion: "9.0.8"
-              AZUREB2C__DOMAIN: $(AZUREB2CDOMAIN)
-              AZUREB2C__TENANT: $(AZUREB2CTENANT)
-              AZUREB2C__POLICY: $(AZUREB2CPOLICY)
-              AZUREB2C__CLIENTID: $(AZUREB2CCLIENTID)
-              AZUREB2C__CLIENTSECRET: $(AZUREB2CCLIENTSECRET)
-              AZUREB2C__TESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
-              AZUREB2C__TESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              # Since these values are set as secrets, we need to see them as an environment variable to be able to use them
+              env:
+                AZUREB2C__DOMAIN: $(AZUREB2CDOMAIN)
+                AZUREB2C__TENANT: $(AZUREB2CTENANT)
+                AZUREB2C__POLICY: $(AZUREB2CPOLICY)
+                AZUREB2C__CLIENTID: $(AZUREB2CCLIENTID)
+                AZUREB2C__CLIENTSECRET: $(AZUREB2CCLIENTSECRET)
+                AZUREB2C__TESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
+                AZUREB2C__TESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
         pool:
           vmImage: $(vmImage)
         steps:
