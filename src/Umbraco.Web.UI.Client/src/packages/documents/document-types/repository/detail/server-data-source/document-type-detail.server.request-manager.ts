@@ -14,6 +14,8 @@ export class UmbManagementApiDocumentTypeDetailDataRequestManager extends UmbMan
 	UpdateDocumentTypeRequestModel,
 	CreateDocumentTypeRequestModel
 > {
+	static #inflightRequestCache: Map<string, Promise<any>> = new Map();
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			create: (body: CreateDocumentTypeRequestModel) => DocumentTypeService.postDocumentType({ body }),
@@ -23,6 +25,7 @@ export class UmbManagementApiDocumentTypeDetailDataRequestManager extends UmbMan
 			delete: (id: string) => DocumentTypeService.deleteDocumentTypeById({ path: { id } }),
 			runtimeCache: documentTypeDetailCache,
 			serverEventSource: 'Umbraco:CMS:DocumentType',
+			inflightRequestCache: UmbManagementApiDocumentTypeDetailDataRequestManager.#inflightRequestCache,
 		});
 	}
 }

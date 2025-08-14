@@ -14,6 +14,8 @@ export class UmbManagementApiDataTypeDetailDataRequestManager extends UmbManagem
 	UpdateDataTypeRequestModel,
 	CreateDataTypeRequestModel
 > {
+	static #inflightRequestCache: Map<string, Promise<any>> = new Map();
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			create: (body: CreateDataTypeRequestModel) => DataTypeService.postDataType({ body }),
@@ -22,6 +24,7 @@ export class UmbManagementApiDataTypeDetailDataRequestManager extends UmbManagem
 			delete: (id: string) => DataTypeService.deleteDataTypeById({ path: { id } }),
 			runtimeCache: dataTypeDetailCache,
 			serverEventSource: 'Umbraco:CMS:DataType',
+			inflightRequestCache: UmbManagementApiDataTypeDetailDataRequestManager.#inflightRequestCache,
 		});
 	}
 }

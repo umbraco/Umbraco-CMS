@@ -21,6 +21,7 @@ export interface UmbManagementApiDetailDataRequestManagerArgs<
 	delete: (id: string) => Promise<UmbApiResponse<{ data: unknown }>>;
 	runtimeCache: UmbManagementApiDetailDataRuntimeCache<DetailResponseModelType>;
 	serverEventSource: string;
+	inflightRequestCache: Map<string, Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>>;
 }
 
 export class UmbManagementApiDetailDataRequestManager<
@@ -31,6 +32,7 @@ export class UmbManagementApiDetailDataRequestManager<
 	#runtimeCache: UmbManagementApiDetailDataRuntimeCache<DetailResponseModelType>;
 	#serverEventSource: string;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
+	#inflightRequestCache: Map<string, Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>>;
 
 	#create;
 	#read;
@@ -55,6 +57,7 @@ export class UmbManagementApiDetailDataRequestManager<
 
 		this.#runtimeCache = args.runtimeCache;
 		this.#serverEventSource = args.serverEventSource;
+		this.#inflightRequestCache = args.inflightRequestCache;
 
 		this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
 			this.#serverEventContext = context;
@@ -76,18 +79,36 @@ export class UmbManagementApiDetailDataRequestManager<
 		let data: DetailResponseModelType | undefined;
 		let error: UmbApiError | UmbCancelError | undefined;
 
+		const inflightCacheKey = `read:${id}`;
+
 		// Only read from the cache when we are connected to the server events
 		if (this.#isConnectedToServerEvents && this.#runtimeCache.has(id)) {
 			data = this.#runtimeCache.get(id);
 		} else {
-			const { data: serverData, error: serverError } = await tryExecute(this, this.#read(id));
+			const hasInflightRequest = this.#inflightRequestCache.has(inflightCacheKey);
+			console.log(`hasInflightRequest for:${hasInflightRequest} ${inflightCacheKey}`);
+			const myTryExecute = hasInflightRequest
+				? this.#inflightRequestCache.get(inflightCacheKey)
+				: tryExecute(this, this.#read(id));
 
-			if (this.#isConnectedToServerEvents && serverData) {
-				this.#runtimeCache.set(id, serverData);
+			if (!myTryExecute) {
+				throw new Error('No Request. Aborting read.');
 			}
 
-			data = serverData;
-			error = serverError;
+			this.#inflightRequestCache.set(inflightCacheKey, myTryExecute);
+
+			try {
+				const { data: serverData, error: serverError } = await myTryExecute;
+
+				if (this.#isConnectedToServerEvents && serverData) {
+					this.#runtimeCache.set(id, serverData);
+				}
+
+				data = serverData;
+				error = serverError;
+			} finally {
+				this.#inflightRequestCache.delete(inflightCacheKey);
+			}
 		}
 
 		return { data, error };
