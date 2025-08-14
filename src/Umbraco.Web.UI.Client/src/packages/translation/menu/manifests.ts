@@ -1,6 +1,6 @@
-import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_TRANSLATION_SECTION_ALIAS } from '../section/index.js';
 import { UMB_TRANSLATION_MENU_ALIAS } from './constants.js';
+import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{

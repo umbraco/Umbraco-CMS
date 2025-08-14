@@ -57,6 +57,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				this.#pickerContext.search.updateConfig({
 					...this.data.search,
 					searchFrom: this.data.startNode,
+					dataTypeUnique: this.#pickerContext.dataType?.unique,
 				});
 			}
 
