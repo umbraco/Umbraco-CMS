@@ -1,7 +1,7 @@
 import { html, customElement, css, property, query, until, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { TimeZone } from '@umbraco-cms/backoffice/utils';
+import type { UmbTimeZone } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
@@ -35,7 +35,7 @@ export class UmbInputTimeZonePickerElement extends UmbLitElement {
 	public get options() {
 		return this.#options;
 	}
-	#options: Array<TimeZone> = [];
+	#options: Array<UmbTimeZone> = [];
 
 	@property({ type: String, reflect: true })
 	public set value(value) {
@@ -47,7 +47,7 @@ export class UmbInputTimeZonePickerElement extends UmbLitElement {
 	#value: string = '';
 
 	@state()
-	private _filteredOptions: Array<TimeZone> = [];
+	private _filteredOptions: Array<UmbTimeZone> = [];
 
 	@query('#input')
 	protected _input?: UUIComboboxElement;

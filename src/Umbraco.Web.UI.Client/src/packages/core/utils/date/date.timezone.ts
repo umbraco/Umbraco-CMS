@@ -1,6 +1,6 @@
 import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
 
-export interface TimeZone {
+export interface UmbTimeZone {
 	value: string;
 	name: string;
 	offset: string;
@@ -10,12 +10,12 @@ export interface TimeZone {
  * Retrieves a list of supported time zones in the browser.
  * @param {Array<string>} [filter] - An optional array of time zone identifiers to filter the result on.
  * @param {DateTime} [selectedDate] - An optional Luxon DateTime object to format the offset for each time zone.
- * @returns {Array<TimeZone>} An array of objects containing time zone values and names.
+ * @returns {Array<UmbTimeZone>} An array of objects containing time zone values and names.
  */
 export function getTimeZoneList(
 	filter: Array<string> | undefined = undefined,
 	selectedDate: DateTime | undefined = undefined,
-): Array<TimeZone> {
+): Array<UmbTimeZone> {
 	if (filter) {
 		return filter.map((tz) => ({
 			value: tz,
@@ -42,9 +42,9 @@ export function getTimeZoneList(
 /**
  * Retrieves the client's time zone information.
  * @param {DateTime} [selectedDate] - An optional Luxon DateTime object to format the offset of the time zone.
- * @returns {TimeZone} An object containing the client's time zone name and value.
+ * @returns {UmbTimeZone} An object containing the client's time zone name and value.
  */
-export function getClientTimeZone(selectedDate: DateTime | undefined = undefined): TimeZone {
+export function getClientTimeZone(selectedDate: DateTime | undefined = undefined): UmbTimeZone {
 	const clientTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 	return {
 		value: clientTimeZone,

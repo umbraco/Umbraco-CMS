@@ -1,4 +1,4 @@
-import { getClientTimeZone, getTimeZoneList, isEquivalentTimeZone, type TimeZone } from '@umbraco-cms/backoffice/utils';
+import { getClientTimeZone, getTimeZoneList, isEquivalentTimeZone, type UmbTimeZone } from '@umbraco-cms/backoffice/utils';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -28,8 +28,8 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	private _timeZoneOptions: Array<TimeZone> = [];
-	private _clientTimeZone: TimeZone | undefined;
+	private _timeZoneOptions: Array<UmbTimeZone> = [];
+	private _clientTimeZone: UmbTimeZone | undefined;
 
 	@state()
 	private _value: UmbDateTimeWithTimeZone | undefined;
@@ -62,7 +62,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	private _datePickerValue: string = '';
 
 	@state()
-	private _filteredTimeZoneOptions: Array<TimeZone> = [];
+	private _filteredTimeZoneOptions: Array<UmbTimeZone> = [];
 
 	@state()
 	private _selectedTimeZone: string | undefined;

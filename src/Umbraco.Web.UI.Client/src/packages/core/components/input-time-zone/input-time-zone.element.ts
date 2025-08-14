@@ -15,7 +15,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { getTimeZoneList, type TimeZone } from '@umbraco-cms/backoffice/utils';
+import { getTimeZoneList, type UmbTimeZone } from '@umbraco-cms/backoffice/utils';
 import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
 
 /**
@@ -126,7 +126,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	@query('umb-input-time-zone-picker')
 	protected _timeZonePicker?: UmbInputTimeZonePickerElement;
 
-	private _timeZoneList: Array<TimeZone> = [];
+	private _timeZoneList: Array<UmbTimeZone> = [];
 
 	constructor() {
 		super();
