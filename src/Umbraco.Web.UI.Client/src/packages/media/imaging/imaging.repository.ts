@@ -11,18 +11,18 @@ import type { UmbMediaUrlModel } from '@umbraco-cms/backoffice/media';
  * You can use it to request (cached) thumbnail URLs or new resized images.
  */
 export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
+	#init;
+	#itemSource = new UmbImagingServerDataSource(this);
 	#dataStore?: typeof UMB_IMAGING_STORE_CONTEXT.TYPE;
-	#itemSource;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#itemSource = new UmbImagingServerDataSource(host);
 
-		this.consumeContext(UMB_IMAGING_STORE_CONTEXT, (instance) => {
+		this.#init = this.consumeContext(UMB_IMAGING_STORE_CONTEXT, (instance) => {
 			if (instance) {
 				this.#dataStore = instance;
 			}
-		});
+		}).asPromise({ preventTimeout: true });
 	}
 
 	/**
@@ -37,6 +37,9 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 		imagingModel?: UmbImagingResizeModel,
 	): Promise<{ data: UmbMediaUrlModel[] }> {
 		if (!uniques.length) throw new Error('Uniques are missing');
+
+		await this.#init;
+
 		if (!this.#dataStore) {
 			console.warn('[UmbImagingRepository] No data store available. All thumbnails are uncached.');
 		}
