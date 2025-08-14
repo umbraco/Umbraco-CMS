@@ -61,6 +61,10 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	@queryAll('.options')
 	private _optionCollection?: HTMLCollectionOf<HTMLInputElement>;
 
+	@query('#enteredTagsWrapper') private _enteredTagsWrapper!: HTMLElement;
+
+	@queryAll('.tag') private _tagEls?: NodeListOf<HTMLElement>;
+
 	#repository = new UmbTagRepository(this);
 
 	public override focus() {
@@ -78,34 +82,85 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		this._matches = data.items;
 	}
 
-	#onKeydown(e: KeyboardEvent, idx: number) {
-		//Prevent tab away if there is a input.
-		if (e.key === 'Tab' && (this._tagInput.value as string).trim().length && !this._matches.length) {
+	#onInputKeydown(e: KeyboardEvent) {
+		const inputLength = (this._tagInput.value as string).trim().length;
+
+		//Prevent tab away if there is a text in the input.
+		if (e.key === 'Tab' && inputLength && !this._matches.length) {
 			e.preventDefault();
 			this.#createTag();
 			return;
 		}
 
-		//To be able to get out of the input
-		if (e.key === 'Tab' && !(this._tagInput.value as string).trim().length) return;
-
-		if (e.key === 'Backspace') {
-			e.preventDefault();
-			console.log('DELETE TAG:', this.#items[idx]);
-			this.#delete(this.#items[idx]);
+		//If the input is empty we can navigate out of it using tab
+		if (e.key === 'Tab' && !inputLength) {
+			return;
 		}
 
+		//Create a new tag when enter to the input
 		if (e.key === 'Enter') {
 			this.#createTag();
 			return;
 		}
-		if (e.key === 'ArrowDown' || e.key === 'Tab') {
+
+		//This one to show option collection if there is any
+		if (e.key === 'ArrowDown') {
 			e.preventDefault();
 			this._currentInput = this._optionCollection?.item(0)?.value ?? this._currentInput;
 			this._optionCollection?.item(0)?.focus();
 			return;
 		}
 		this.#inputError(false);
+	}
+
+	#focusTag(index: number) {
+		const tag = this._tagEls?.[index];
+		if (!tag) return;
+
+		//Find the current element with the class .tab and tabindex=0(will be the previous tag)
+		const active = this.renderRoot.querySelector<HTMLElement>('.tag[tabindex="0"]');
+		//Return it is tabindex to -1
+		active?.setAttribute('tabindex', '-1');
+
+		// Set the tabindex to 0 in the current target
+		tag.setAttribute('tabindex', '0');
+		tag.focus();
+	}
+
+	#onTagsWrapperKeydown(e: KeyboardEvent) {
+		if ((e.key === 'Enter' || e.key === 'ArrowDown') && this.items.length) {
+			e.preventDefault();
+			this.#focusTag(0);
+		}
+	}
+
+	#onTagKeydown(e: KeyboardEvent, idx: number) {
+		const current = e.currentTarget as HTMLElement;
+		if (e.key === 'ArrowRight') {
+			e.preventDefault();
+			if (idx < this.items.length - 1) {
+				this.#focusTag(idx + 1);
+			}
+		}
+		if (e.key === 'ArrowLeft') {
+			e.preventDefault();
+			if (idx > 0) {
+				this.#focusTag(idx - 1);
+			}
+		}
+		if (e.key === 'Backspace') {
+			e.preventDefault();
+			if (this.#items.length - 1 === idx) {
+				this.#focusTag(idx - 1);
+			}
+			this.#delete(this.#items[idx]);
+			this.#focusTag(idx + 1);
+		}
+		if (e.key === 'Tab') {
+			e.preventDefault();
+			current.tabIndex = -1;
+			this._enteredTagsWrapper.focus();
+		}
 	}
 
 	#onInput(e: UUIInputEvent) {
@@ -206,7 +261,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	override render() {
 		return html`
 			<div id="wrapper">
-				${this.#enteredTags()}
+				<div id="enteredTagsWrapper" tabindex="0" @keydown="${this.#onTagsWrapperKeydown}">${this.#enteredTags()}</div>
 				<span id="main-tag-wrapper">
 					<uui-tag id="input-width-tracker" aria-hidden="true" style="visibility:hidden;opacity:0;position:absolute;">
 						${this._currentInput}
@@ -218,18 +273,22 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#enteredTags() {
-		return html` ${this.items.map((tag, index) => {
-			return html`
-				<uui-tag class="tag" tabindex="0" @keydown="${(e: KeyboardEvent) => this.#onKeydown(e, index)}">
-					<span>${tag}</span>
-					${this.#renderRemoveButton(tag)}
-				</uui-tag>
-			`;
-		})}`;
+		return html`
+			${repeat(
+				this.items,
+				(tag) => tag,
+				(tag, index) => html`
+					<uui-tag class="tag" tabindex="-1" @keydown="${(e: KeyboardEvent) => this.#onTagKeydown(e, index)}">
+						<span>${tag}</span>
+						${this.#renderRemoveButton(tag)}
+					</uui-tag>
+				`,
+			)}
+		`;
 	}
 
 	#renderTagOptions() {
-		if (!this._currentInput.length || !this._matches.length) return nothing;
+		if (!this._matches.length) return nothing;
 		const matchfilter = this._matches.filter((tag) => tag.text !== this.#items.find((x) => x === tag.text));
 		if (!matchfilter.length) return;
 		return html`
@@ -264,7 +323,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 					aria-label="tag input"
 					placeholder="Enter tag"
 					.value="${this._currentInput ?? undefined}"
-					@keydown="${this.#onKeydown}"
+					@keydown="${this.#onInputKeydown}"
 					@input="${this.#onInput}"
 					@blur="${this.#onBlur}" />
 				<uui-icon id="icon-add" name="icon-add"></uui-icon>
@@ -299,6 +358,11 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			}
 
 			/** Tags */
+			#enteredTagsWrapper {
+				display: flex;
+				gap: var(--uui-size-space-2);
+				flex-wrap: wrap;
+			}
 
 			uui-tag {
 				position: relative;
