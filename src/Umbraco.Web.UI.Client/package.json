@@ -235,7 +235,7 @@
 		"eslint-plugin-lit": "^2.1.1",
 		"eslint-plugin-local-rules": "^3.0.2",
 		"eslint-plugin-prettier": "^5.5.4",
-		"eslint-plugin-storybook": "9.1.2",
+		"eslint-plugin-storybook": "9.0.14",
 		"eslint-plugin-wc": "^2.2.1",
 		"globals": "^16.3.0",
 		"lucide-static": "^0.539.0",
