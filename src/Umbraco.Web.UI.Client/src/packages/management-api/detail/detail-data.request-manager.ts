@@ -86,19 +86,19 @@ export class UmbManagementApiDetailDataRequestManager<
 			data = this.#runtimeCache.get(id);
 		} else {
 			const hasInflightRequest = this.#inflightRequestCache.has(inflightCacheKey);
-			console.log(`hasInflightRequest for:${hasInflightRequest} ${inflightCacheKey}`);
-			const myTryExecute = hasInflightRequest
+
+			const request = hasInflightRequest
 				? this.#inflightRequestCache.get(inflightCacheKey)
 				: tryExecute(this, this.#read(id));
 
-			if (!myTryExecute) {
+			if (!request) {
 				throw new Error('No Request. Aborting read.');
 			}
 
-			this.#inflightRequestCache.set(inflightCacheKey, myTryExecute);
+			this.#inflightRequestCache.set(inflightCacheKey, request);
 
 			try {
-				const { data: serverData, error: serverError } = await myTryExecute;
+				const { data: serverData, error: serverError } = await request;
 
 				if (this.#isConnectedToServerEvents && serverData) {
 					this.#runtimeCache.set(id, serverData);
