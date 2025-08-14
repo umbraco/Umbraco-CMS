@@ -1,5 +1,5 @@
 /* eslint-disable local-rules/no-direct-api-import */
-import { dataTypeDetailCache } from './data-type-detail.server.runtime-cache.js';
+import { dataTypeDetailCache } from './data-type-detail.server.cache.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	DataTypeService,
