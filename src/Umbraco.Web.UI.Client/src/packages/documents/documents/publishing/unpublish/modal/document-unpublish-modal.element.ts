@@ -37,22 +37,22 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	protected readonly _selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
-	_options: Array<UmbDocumentVariantOptionModel> = [];
+	private _options: Array<UmbDocumentVariantOptionModel> = [];
 
 	@state()
-	_selection: Array<string> = [];
+	private _selection: Array<string> = [];
 
 	@state()
-	_canUnpublish = true;
+	private _canUnpublish = true;
 
 	@state()
-	_hasInvalidSelection = true;
+	private _hasInvalidSelection = true;
 
 	@state()
-	_isInvariant = false;
+	private _isInvariant = false;
 
 	@state()
-	_referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
 	#pickableFilter = (option: UmbDocumentVariantOptionModel) => {
 		if (!option.variant) {

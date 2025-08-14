@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 let memberId = '';
@@ -39,6 +39,7 @@ test('can create a member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
 
   // Assert
   await umbracoUi.member.waitForMemberToBeCreated();
+  await umbracoUi.member.isSuccessStateIconVisible()
   await umbracoUi.member.clickMembersSidebarButton();
   await umbracoUi.member.isMemberWithNameVisible(memberName, true);
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
@@ -222,7 +223,7 @@ test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
-test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) => {
+test('cannot create member with invalid email', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const invalidEmail = 'invalidemail';
   await umbracoUi.member.goToMembers();
@@ -244,8 +245,7 @@ test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) 
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently it is possible to update member with invalid email.
-test.skip('cannot update email to an invalid email', async ({umbracoApi, umbracoUi}) => {
+test('cannot update email to an invalid email', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const invalidEmail = 'invalidemail';
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);

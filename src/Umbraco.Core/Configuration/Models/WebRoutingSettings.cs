@@ -21,6 +21,7 @@ public class WebRoutingSettings
     internal const bool StaticDisableFindContentByIdentifierPath = false;
     internal const bool StaticDisableRedirectUrlTracking = false;
     internal const string StaticUrlProviderMode = "Auto";
+    internal const bool StaticUseStrictDomainMatching = false;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to check if any routed endpoints match a front-end request before
@@ -60,8 +61,12 @@ public class WebRoutingSettings
     [DefaultValue(StaticValidateAlternativeTemplates)]
     public bool ValidateAlternativeTemplates { get; set; } = StaticValidateAlternativeTemplates;
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether the content finder by a path of the content key (<see cref="Routing.ContentFinderByKeyPath" />) is disabled.
+    /// </summary>
     [DefaultValue(StaticDisableFindContentByIdentifierPath)]
     public bool DisableFindContentByIdentifierPath { get; set; } = StaticDisableFindContentByIdentifierPath;
+
     /// <summary>
     ///     Gets or sets a value indicating whether redirect URL tracking is disabled.
     /// </summary>
@@ -78,4 +83,15 @@ public class WebRoutingSettings
     ///     Gets or sets a value for the Umbraco application URL.
     /// </summary>
     public string UmbracoApplicationUrl { get; set; } = null!;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether strict domain matching is used when finding content to match the request.
+    /// </summary>
+    /// <remarks>
+    ///     <para>This setting is used within Umbraco's routing process based on content finders, specifically <see cref="Routing.ContentFinderByUrlNew" />.</para>
+    ///     <para>If set to the default value of <see langword="false"/>, requests that don't match a configured domain will be routed to the first root node.</para>
+    ///     <para>If set to <see langword="true"/>, requests that don't match a configured domain will not be routed.</para>
+    /// </remarks>
+    [DefaultValue(StaticUseStrictDomainMatching)]
+    public bool UseStrictDomainMatching { get; set; } = StaticUseStrictDomainMatching;
 }

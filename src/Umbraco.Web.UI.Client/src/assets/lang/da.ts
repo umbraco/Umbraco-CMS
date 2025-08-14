@@ -293,7 +293,7 @@ export default {
 		notCreated: 'Ikke oprettet',
 		updateDate: 'Sidst redigeret',
 		updateDateDesc: 'Tidspunkt for seneste redigering',
-		uploadClear: 'Fjern fil',
+		uploadClear: 'Fjern fil(er)',
 		uploadClearImageContext: 'Klik her for at fjerne billedet fra medie filen',
 		uploadClearFileContext: 'Klik her for at fjerne filen fra medie filen',
 		urls: 'Link til dokument',
@@ -2705,7 +2705,7 @@ export default {
 		trainingDescription:
 			'\n        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>\n    ',
 		learningBaseDescription:
-  			'  <p>Vil du mestre Umbraco? Brug et par minutter på at lære nogle best practices ved at besøge <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">Umbraco Learning Base YouTube-kanalen</a>. Her finder du en masse videoer, der dækker mange aspekter af Umbraco.</p> ',
+			'  <p>Vil du mestre Umbraco? Brug et par minutter på at lære nogle best practices ved at besøge <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">Umbraco Learning Base YouTube-kanalen</a>. Her finder du en masse videoer, der dækker mange aspekter af Umbraco.</p> ',
 		getStarted: 'To get you started',
 	},
 	settingsDashboard: {
@@ -2790,9 +2790,8 @@ export default {
 	tiptap: {
 		anchor: 'Anker',
 		anchor_input: 'Indtast anker-ID',
-		config_dimensions_description: 'Sæt den maksimale bredde og højde på editoren. Dette ekskluderer værktøjslinjens højde.',
-		maxDimensions: 'Maksimale dimensioner',
-		minDimensions: 'Minimale dimensioner',
+		config_dimensions_description:
+			'Angiver en fast bredde og højde for editoren. Dette ekskluderer værktøjslinjens og statuslinjens højder.',
 		config_extensions: 'Funktioner',
 		config_statusbar: 'Statuslinje',
 		config_toolbar: 'Værktøjslinje',

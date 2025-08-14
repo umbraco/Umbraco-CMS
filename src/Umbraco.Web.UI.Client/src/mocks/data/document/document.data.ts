@@ -77,9 +77,9 @@ export const data: Array<UmbMockDocumentModel> = [
 						<p>
 							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
 						</p>
-						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
+						<div class="umb-macro-holder TestMacro umb-macro-mce_1"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
 						<p>The following tests the embed plugin:</p>
-						<div class="mceNonEditable umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Sleep Token - The Summoning"></iframe></div>
+						<div class="umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Sleep Token - The Summoning"></iframe></div>
 						<p>End of test content</p>
 					`,
 				},
@@ -939,7 +939,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-US',
 				segment: null,
-				name: 'All RTEs',
+				name: 'Rich Text Editor',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
 			},
@@ -947,7 +947,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		values: [
 			{
 				alias: 'tiptap',
-				editorAlias: 'Umb.PropertyEditorUi.Tiptap',
+				editorAlias: 'Umbraco.RichText',
 				culture: null,
 				segment: null,
 				value: {
@@ -957,7 +957,25 @@ export const data: Array<UmbMockDocumentModel> = [
 						settingsData: [],
 						expose: [],
 					},
-					markup: `<p><a id="anchor"></a> Here is a link for <a target="_blank" data-router-slot="disabled" href="https://gist.github.com/leekelleher/9490718" type="external">all HTML tags</a>.</p><p><span id="foo">Some</span> value for the RTE with an <a target="" data-router-slot="disabled" href="https://google.com" type="external">external link</a> and an <a target="" data-router-slot="disabled" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}" type="document">internal link</a>.</p><div data-foo-bar="123"><span>This is a plain old span tag.</span> <span style="color: red;">Hello </span><span style="color: blue;">world</span><span style="color: red;">.</span></div><table style="min-width: 50px"><colgroup><col style="min-width: 25px"><col style="min-width: 25px"></colgroup><tbody><tr><th colspan="1" rowspan="1"><p> Version</p></th><th colspan="1" rowspan="1"><p>Date</p></th></tr><tr><td colspan="1" rowspan="1"><p>15.3</p></td><td colspan="1" rowspan="1"><p>2025-03-20</p></td></tr><tr><td colspan="1" rowspan="1"><p>16.0</p></td><td colspan="1" rowspan="1"><p>2025-06-12</p></td></tr><tr><td colspan="1" rowspan="1"><p>17.0</p></td><td colspan="1" rowspan="1"><p>2025-11-27</p></td></tr></tbody></table><p><img src="/umbraco/backoffice/assets/installer-illustration.svg" alt="Installer illustration" width="384" height="228" loading="lazy"></p><p>End of test content</p>`,
+					markup: `
+<p><a id="anchor"></a> Here is a link for <a target="_blank" data-router-slot="disabled" href="https://gist.github.com/leekelleher/9490718" type="external">all HTML tags</a>.</p>
+
+<p>Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo</p>
+
+<p>The following tests the embed plugin:</p>
+<p><div class="umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false" data-embed-url="https://www.youtube.com/watch?v=QRIWz9SotY4"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Deep dive into Rich Text Editor"></iframe></div></p>
+
+<p><span id="foo">Some</span> value for the RTE with an <a target="" data-router-slot="disabled" href="https://google.com" type="external">external link</a> and an <a target="" data-router-slot="disabled" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}" type="document">internal link</a>.</p>
+
+<div data-foo-bar="123"><span>This is a plain old span tag.</span> <span style="color: red;">Hello </span><span style="color: blue;">world</span><span style="color: red;">.</span></div>
+
+<table style="min-width: 50px"><colgroup><col style="min-width: 25px"><col style="min-width: 25px"></colgroup><tbody><tr><th colspan="1" rowspan="1"><p> Version</p></th><th colspan="1" rowspan="1"><p>Date</p></th></tr><tr><td colspan="1" rowspan="1"><p>15.3</p></td><td colspan="1" rowspan="1"><p>2025-03-20</p></td></tr><tr><td colspan="1" rowspan="1"><p>16.0</p></td><td colspan="1" rowspan="1"><p>2025-06-12</p></td></tr><tr><td colspan="1" rowspan="1"><p>17.0</p></td><td colspan="1" rowspan="1"><p>2025-11-27</p></td></tr></tbody></table>
+
+<p><img src="/umbraco/backoffice/assets/installer-illustration.svg" alt="Installer illustration" width="384" height="228" loading="lazy"></p>
+
+<div class="umb-macro-holder"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
+
+<p>End of test content</p>`,
 				},
 			},
 		],

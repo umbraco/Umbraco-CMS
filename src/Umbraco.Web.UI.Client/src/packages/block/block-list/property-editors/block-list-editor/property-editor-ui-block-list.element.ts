@@ -162,7 +162,7 @@ export class UmbPropertyEditorUIBlockListElement
 	readonly #entriesContext = new UmbBlockListEntriesContext(this);
 
 	@state()
-	_notSupportedVariantSetting?: boolean;
+	private _notSupportedVariantSetting?: boolean;
 
 	constructor() {
 		super();

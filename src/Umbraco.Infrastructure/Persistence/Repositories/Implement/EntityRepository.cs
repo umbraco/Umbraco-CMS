@@ -95,10 +95,6 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             ApplyOrdering(ref sql, ordering);
         }
 
-        // TODO: we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
-        // no matter what we always must have node id ordered at the end
-        sql = ordering.Direction == Direction.Ascending ? sql.OrderBy("NodeId") : sql.OrderByDescending("NodeId");
-
         // for content we must query for ContentEntityDto entities to produce the correct culture variant entity names
         var pageIndexToFetch = pageIndex + 1;
         IEnumerable<BaseDto> dtos;
@@ -146,7 +142,15 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
     /// <inheritdoc/>
-    public IEnumerable<IEntitySlim> GetSiblings(Guid objectType, Guid targetKey, int before, int after, Ordering ordering)
+    public IEnumerable<IEntitySlim> GetSiblings(
+        ISet<Guid> objectTypes,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
     {
         // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
         // without us also having to do a nested query for the parent ID too.
@@ -159,13 +163,28 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         Sql<ISqlContext> orderingSql = Sql();
         ApplyOrdering(ref orderingSql, ordering);
 
-        // Get all children of the parent node which is not trashed, ordered by SortOrder, and assign each a row number.
+        // Get all children of the parent node which are not trashed and match the provided object types.
+        // Order by SortOrder, and assign each a row number.
         // These row numbers are important, we need them to select the "before" and "after" siblings of the target node.
         Sql<ISqlContext> rowNumberSql = Sql()
             .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS rn")
             .AndSelect<NodeDto>(n => n.UniqueId)
             .From<NodeDto>()
-            .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == false);
+            .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == false)
+            .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
+
+        // Apply the filter if provided.
+        if (filter != null)
+        {
+            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+            {
+                rowNumberSql.Where(filterClause.Item1, filterClause.Item2);
+            }
+        }
+
+        // By applying additional where clauses with parameters containing an unknown number of elements, the position of the parameters in
+        // the final query for before and after positions will increase. So we need to calculate the offset based on the provided values.
+        int beforeAfterParameterIndexOffset = GetBeforeAfterParameterOffset(objectTypes, filter);
 
         // Find the specific row number of the target node.
         // We need this to determine the bounds of the row numbers to select.
@@ -180,21 +199,66 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         IEnumerable<object> afterArguments = targetRowSql.Arguments.Concat([after]);
 
         // Select the UniqueId of nodes which row number is within the specified range of the target node's row number.
+        const int BeforeAfterParameterIndex = 3;
+        var beforeAfterParameterIndex = BeforeAfterParameterIndex + beforeAfterParameterIndexOffset;
+        var beforeArgumentsArray = beforeArguments.ToArray();
+        var afterArgumentsArray = afterArguments.ToArray();
         Sql<ISqlContext>? mainSql = Sql()
             .Select("UniqueId")
             .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
-            .Where($"rn >= ({targetRowSql.SQL}) - @3", beforeArguments.ToArray())
-            .Where($"rn <= ({targetRowSql.SQL}) + @3", afterArguments.ToArray())
+            .Where($"rn >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
+            .Where($"rn <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
             .OrderBy("rn");
 
         List<Guid>? keys = Database.Fetch<Guid>(mainSql);
+
+        totalBefore = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, beforeArgumentsArray, true);
+        totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
 
         if (keys is null || keys.Count == 0)
         {
             return [];
         }
 
-        return PerformGetAll(objectType, ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
+        // To re-use this method we need to provide a single object type. By convention for folder based trees, we provide the primary object type last.
+        return PerformGetAll(objectTypes.ToArray(), ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
+    }
+
+    private static int GetBeforeAfterParameterOffset(ISet<Guid> objectTypes, IQuery<IUmbracoEntity>? filter)
+    {
+        int beforeAfterParameterIndexOffset = 0;
+
+        // Increment for each object type.
+        beforeAfterParameterIndexOffset += objectTypes.Count;
+
+        // Increment for the provided filter.
+        if (filter != null)
+        {
+            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+            {
+                // We need to offset by one for each non-array parameter in the filter clause.
+                // If a query is created using Contains or some other set based operation, we'll get both the array and the
+                // items in the array provided in the where clauses. It's only the latter that count for applying parameters
+                // to the SQL statement, and hence we should only offset by them.
+                beforeAfterParameterIndexOffset += filterClause.Item2.Count(x => !x.GetType().IsArray);
+            }
+        }
+
+        return beforeAfterParameterIndexOffset;
+    }
+
+    private long GetNumberOfSiblingsOutsideSiblingRange(
+        Sql<ISqlContext> rowNumberSql,
+        Sql<ISqlContext> targetRowSql,
+        int parameterIndex,
+        object[] arguments,
+        bool getBefore)
+    {
+        Sql<ISqlContext>? sql = Sql()
+            .SelectCount()
+            .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
+            .Where($"rn {(getBefore ? "<" : ">")} ({targetRowSql.SQL}) {(getBefore ? "-" : "+")} @{parameterIndex}", arguments);
+        return Database.ExecuteScalar<long>(sql);
     }
 
 
@@ -270,16 +334,16 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     }
 
     private IEnumerable<IEntitySlim> PerformGetAll(
-        Guid objectType,
+        Guid[] objectTypes,
         Ordering ordering,
         Action<Sql<ISqlContext>>? filter = null)
     {
-        var isContent = objectType == Constants.ObjectTypes.Document ||
-                        objectType == Constants.ObjectTypes.DocumentBlueprint;
-        var isMedia = objectType == Constants.ObjectTypes.Media;
-        var isMember = objectType == Constants.ObjectTypes.Member;
+        var isContent = objectTypes.Contains(Constants.ObjectTypes.Document) ||
+                        objectTypes.Contains(Constants.ObjectTypes.DocumentBlueprint);
+        var isMedia = objectTypes.Contains(Constants.ObjectTypes.Media);
+        var isMember = objectTypes.Contains(Constants.ObjectTypes.Member);
 
-        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectType, ordering, filter);
+        Sql<ISqlContext> sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypes, ordering, filter);
         return GetEntities(sql, isContent, isMedia, isMember);
     }
 
@@ -526,8 +590,17 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         Guid objectType,
         Ordering ordering,
         Action<Sql<ISqlContext>>? filter)
+        => GetFullSqlForEntityType(isContent, isMedia, isMember, [objectType], ordering, filter);
+
+    protected Sql<ISqlContext> GetFullSqlForEntityType(
+        bool isContent,
+        bool isMedia,
+        bool isMember,
+        Guid[] objectTypes,
+        Ordering ordering,
+        Action<Sql<ISqlContext>>? filter)
     {
-        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, new[] { objectType });
+        Sql<ISqlContext> sql = GetBaseWhere(isContent, isMedia, isMember, false, filter, objectTypes);
         AddGroupBy(isContent, isMedia, isMember, sql, false);
         ApplyOrdering(ref sql, ordering);
 
@@ -742,6 +815,8 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
         Ordering? runner = ordering;
 
+        Direction lastDirection = Direction.Ascending;
+        bool orderingIncludesNodeId = false;
         do
         {
 
@@ -753,7 +828,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 case "PATH":
                     orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
                     break;
-
+                case "NODEID":
+                    orderBy = runner.OrderBy;
+                    orderingIncludesNodeId = true;
+                    break;
                 default:
                     orderBy = runner.OrderBy ?? string.Empty;
                     break;
@@ -768,11 +846,25 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 sql.OrderByDescending(orderBy);
             }
 
+            lastDirection = runner.Direction;
+
             runner = runner.Next;
         }
         while (runner is not null);
 
-
+        // If we haven't already included the node Id in the order by clause, order by node Id as well to ensure consistent results
+        // when the provided sort yields entities with the same value.
+        if (orderingIncludesNodeId is false)
+        {
+            if (lastDirection == Direction.Ascending)
+            {
+                sql.OrderBy<NodeDto>(x => x.NodeId);
+            }
+            else
+            {
+                sql.OrderByDescending<NodeDto>(x => x.NodeId);
+            }
+        }
     }
 
     #endregion

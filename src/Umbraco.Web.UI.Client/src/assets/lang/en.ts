@@ -176,6 +176,7 @@ export default {
 		confirmActionConfirm: 'Confirm',
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
+		viewSystemDetails: 'View Umbraco CMS system information and version number',
 	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',
@@ -294,7 +295,7 @@ export default {
 		notCreated: 'Not created',
 		updateDate: 'Last edited',
 		updateDateDesc: 'Date/time this document was edited',
-		uploadClear: 'Remove file(s)',
+		uploadClear: 'Clear file(s)',
 		uploadClearImageContext: 'Click here to remove the image from the media item',
 		uploadClearFileContext: 'Click here to remove the file from the media item',
 		urls: 'Link to document',
@@ -2781,7 +2782,8 @@ export default {
 	tiptap: {
 		anchor: 'Anchor',
 		anchor_input: 'Enter an anchor ID',
-		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
+		config_dimensions_description:
+			'Sets the fixed width and height of the editor. This excludes the toolbar and statusbar heights.',
 		config_extensions: 'Capabilities',
 		config_statusbar: 'Statusbar',
 		config_toolbar: 'Toolbar',

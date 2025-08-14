@@ -1839,14 +1839,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetDataTypeTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -4453,14 +4450,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetDocumentBlueprintTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -6770,14 +6764,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetDocumentTypeTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -10394,6 +10385,14 @@
                 "format": "uuid"
               }
             }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -11208,6 +11207,14 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -11216,14 +11223,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetDocumentTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -16028,14 +16032,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetMediaTypeTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -16287,6 +16288,14 @@
                 "type": "string",
                 "format": "uuid"
               }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -18550,6 +18559,14 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -18558,14 +18575,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/MediaTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetMediaTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -28769,14 +28783,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetNamedEntityTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -36736,6 +36747,9 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                },
+                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -37020,6 +37034,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -38356,6 +38373,36 @@
           }
         },
         "additionalProperties": false
+      },
+      "DocumentTypePermissionPresentationModel": {
+        "required": [
+          "$type",
+          "documentTypeAlias",
+          "verbs"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "verbs": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "documentTypeAlias": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentTypePermissionPresentationModel": "#/components/schemas/DocumentTypePermissionPresentationModel"
+          }
+        }
       },
       "DocumentTypePropertyTypeContainerResponseModel": {
         "required": [
@@ -44776,6 +44823,209 @@
         },
         "additionalProperties": false
       },
+      "SubsetDataTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetDocumentBlueprintTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetDocumentTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetDocumentTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetMediaTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetMediaTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetNamedEntityTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "TagResponseModel": {
         "required": [
           "id",
@@ -46515,6 +46765,9 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                },
+                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -46939,6 +47192,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"

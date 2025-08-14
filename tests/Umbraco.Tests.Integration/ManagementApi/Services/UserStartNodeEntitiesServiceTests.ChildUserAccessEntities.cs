@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Services;

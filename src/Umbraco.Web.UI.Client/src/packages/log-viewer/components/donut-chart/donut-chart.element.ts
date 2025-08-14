@@ -13,7 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { clamp } from '@umbraco-cms/backoffice/utils';
 
-export interface Circle {
+interface Circle {
 	color: string;
 	name: string;
 	percent: number;
@@ -82,10 +82,10 @@ export class UmbDonutChartElement extends LitElement {
 	private _detailsBox!: HTMLDivElement;
 
 	@state()
-	private circles: CircleWithCommands[] = [];
+	private _circles: CircleWithCommands[] = [];
 
 	@state()
-	private viewBox = 100;
+	private _viewBox = 100;
 
 	@state()
 	private _posY = 0;
@@ -133,7 +133,7 @@ export class UmbDonutChartElement extends LitElement {
 	#printCircles(event: Event | null = null) {
 		this._totalAmount = this._slices.reduce((acc, slice) => acc + slice.amount, 0);
 		event?.stopPropagation();
-		this.circles = this.#addCommands(
+		this._circles = this.#addCommands(
 			this._slices.map((slice) => {
 				return {
 					percent: this.#calculatePercentage(slice.amount),
@@ -190,7 +190,7 @@ export class UmbDonutChartElement extends LitElement {
 	#setDetailsBoxData(event: MouseEvent) {
 		const target = event.target as SVGPathElement;
 		const index = target.dataset.index as unknown as number;
-		const circle = this.circles[index];
+		const circle = this._circles[index];
 		this._detailName = circle.name;
 		this._detailAmount = circle.number;
 		this._detailColor = circle.color;
@@ -231,7 +231,7 @@ export class UmbDonutChartElement extends LitElement {
 					<feDropShadow stdDeviation="1 1" in="merge1" dx="0" dy="0" flood-color="#000" flood-opacity="0.8" x="0%" y="0%" width="100%" height="100%" result="dropShadow1"/>
 				</filter>
 				<desc>${this.description}</desc>
-					${this.circles.map(
+					${this._circles.map(
 						(circle, i) => svg`
 								<path
 								class="circle"
@@ -240,7 +240,7 @@ export class UmbDonutChartElement extends LitElement {
 									fill="${circle.color}"
 									role="listitem"
 									d="${circle.commands}"
-									transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
+									transform="rotate(${circle.offset} ${this._viewBox / 2} ${this._viewBox / 2})">
 								</path>
 								<path
 								data-index="${i}"
@@ -250,7 +250,7 @@ export class UmbDonutChartElement extends LitElement {
 									fill="${circle.color}"
 									role="listitem"
 									d="${circle.commands}"
-									transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
+									transform="rotate(${circle.offset} ${this._viewBox / 2} ${this._viewBox / 2})">
 								</path>`,
 					)}
 
@@ -259,7 +259,7 @@ export class UmbDonutChartElement extends LitElement {
 
 	override render() {
 		return html` <div id="container" @mousemove=${this.#calculateDetailsBoxPosition}>
-				<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list">${this.#renderCircles()}</svg>
+				<svg viewBox="0 0 ${this._viewBox} ${this._viewBox}" role="list">${this.#renderCircles()}</svg>
 				<div
 					id="details-box"
 					style="--pos-y: ${this._posY}px; --pos-x: ${this._posX}px; --umb-donut-detail-color: ${this._detailColor}">
