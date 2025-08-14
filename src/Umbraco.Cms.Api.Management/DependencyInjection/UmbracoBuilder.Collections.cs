@@ -13,7 +13,8 @@ namespace Umbraco.Extensions
             builder.SignProviders()
                 .Append<HasScheduleSignProvider>()
                 .Append<IsProtectedSignProvider>()
-                .Append<HasPendingChangesSignProvider>();
+                .Append<HasPendingChangesSignProvider>()
+                .Append<HasCollectionSignProvider>();
         }
 
         /// <summary>
