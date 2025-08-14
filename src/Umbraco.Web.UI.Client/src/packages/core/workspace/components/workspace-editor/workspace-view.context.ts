@@ -1,29 +1,51 @@
 import type { ManifestWorkspaceView } from '../../types.js';
-import type { UmbWorkspaceHint } from '../../controllers/workspace-view-hint-manager.controller.js';
 import { UMB_WORKSPACE_VIEW_CONTEXT } from './workspace-view.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbHintManager } from '@umbraco-cms/backoffice/utils';
+import { UmbHintController, type UmbHint } from '@umbraco-cms/backoffice/hint';
 
-export interface UmbWorkspaceViewHint extends UmbWorkspaceHint {
-	viewAlias: string;
+export interface UmbVariantHint extends UmbHint {
+	variantId?: UmbVariantId;
 }
 
+/**
+ *
+ * NOTES
+ * TODO:
+ * The Workspace View Context is also a View Context...
+ *
+ * But shortcut should properly be it's own Context.
+ * Consider leaving out Browser Title for now?
+ * Could Hints be its own context? And can the navgiational element know about hints that the specific manager isnt available for — no need to spin up workspace view contexts virtually...
+ *
+ *
+ * TODO: Enable changing Icon and Weight at runtime..
+ *
+ */
 export class UmbWorkspaceViewContext extends UmbControllerBase {
 	//
 	#providerCtrl: any;
 	#currentProvideHost?: UmbClassInterface;
 
+	#variantId?: UmbVariantId;
+
 	public manifest: ManifestWorkspaceView;
 
 	public hints;
 
-	constructor(host: UmbControllerHost, manifest: ManifestWorkspaceView) {
+	constructor(host: UmbControllerHost, manifest: ManifestWorkspaceView, variantId?: UmbVariantId) {
 		super(host);
 		this.manifest = manifest;
-		this.hints = new UmbHintManager<UmbWorkspaceViewHint>(this, { scaffold: { viewAlias: manifest.alias } });
+		this.#variantId = variantId;
+		this.hints = new UmbHintController<UmbVariantHint>(this, {
+			viewAlias: manifest.alias,
+			scaffold: {
+				variantId: variantId,
+			},
+		});
+		this.hints.inherit();
 	}
 
 	provideAt(controllerHost: UmbClassInterface): void {
@@ -42,18 +64,13 @@ export class UmbWorkspaceViewContext extends UmbControllerBase {
 		}
 	}
 
-	/**
-	 * observe hint of an optional variant, the variant is optional, in that case all variantIds are accepted.
-	 * @param {UmbVariantId} variantId - the variantId to match against the hint.
-	 * @returns {Observable<UmbWorkspaceHint | undefined>} the first hint that matches the variantId or undefined if no hint is found.
-	 */
-	hintOfVariant(variantId?: UmbVariantId): Observable<UmbWorkspaceHint | undefined> {
-		const viewAlias = this.manifest.alias;
-		if (variantId) {
+	firstHintOfVariant(): Observable<UmbVariantHint | undefined> {
+		if (this.#variantId) {
 			return this.hints.asObservablePart((x) =>
-				x.find((hint) => hint.viewAlias === viewAlias && (hint.variantId ? hint.variantId.compare(variantId) : true)),
+				x.find((hint) => (hint.variantId ? hint.variantId.equal(this.#variantId!) : true)),
 			);
+		} else {
+			return this.hints.firstHint;
 		}
-		return this.hints.asObservablePart((x) => x.find((hint) => hint.viewAlias === viewAlias));
 	}
 }

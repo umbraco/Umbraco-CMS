@@ -1,13 +1,14 @@
-import { UmbWorkspaceViewContext } from './workspace-view.context.js';
-import { UMB_WORKSPACE_VIEW_NAVIGATION_CONTEXT } from './workspace-view-navigation.context-token.js';
+import { type UmbVariantHint, UmbWorkspaceViewContext } from './workspace-view.context.js';
+import { UMB_WORKSPACE_EDITOR_NAVIGATION_CONTEXT } from './workspace-editor-navigation.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbHintManager } from '@umbraco-cms/backoffice/utils';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbHintController } from '@umbraco-cms/backoffice/hint';
 
-export class UmbWorkspaceViewNavigationContext extends UmbContextBase {
+export class UmbWorkspaceEditorNavigationContext extends UmbContextBase {
 	//
 	#init: Promise<void>;
 	/**
@@ -16,13 +17,12 @@ export class UmbWorkspaceViewNavigationContext extends UmbContextBase {
 	#views = new UmbBasicState(<Array<UmbWorkspaceViewContext>>[]);
 	public readonly views = this.#views.asObservable();
 
-	/** HERE THIS IS THE PLACE TO CONTINUE!!!!!!! */
-
-	// TODO: We still need to sync these up to the workspace context...
-	#hints = new UmbHintManager(this);
+	#hints = new UmbHintController<UmbVariantHint>(this, {});
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_WORKSPACE_VIEW_NAVIGATION_CONTEXT);
+		super(host, UMB_WORKSPACE_EDITOR_NAVIGATION_CONTEXT);
+
+		this.#hints.inherit();
 
 		this.#init = new UmbExtensionsManifestInitializer(
 			this,
@@ -47,7 +47,6 @@ export class UmbWorkspaceViewNavigationContext extends UmbContextBase {
 						.filter((view) => !viewsToKeep.some((x) => x.manifest.alias === view.manifest.alias))
 						.forEach((view) => {
 							const context = new UmbWorkspaceViewContext(this, view.manifest);
-							context.hints.bindWith(this.#hints);
 							newViews.push(context);
 						});
 
@@ -57,6 +56,10 @@ export class UmbWorkspaceViewNavigationContext extends UmbContextBase {
 			'initViewApis',
 			{},
 		).asPromise();
+	}
+
+	setVariantId(variantId: UmbVariantId | undefined): void {
+		this.#hints.updateScaffold({ variantId });
 	}
 
 	async getViewContext(alias: string): Promise<UmbWorkspaceViewContext | undefined> {
