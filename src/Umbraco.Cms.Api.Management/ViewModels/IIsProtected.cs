@@ -1,12 +1,12 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels;
 
 /// <summary>
-///     Specifies if the implementation of this interface is protected or not.
+/// Marker interface that indicates the type can represent the state of protected content.
 /// </summary>
 public interface IIsProtected
 {
     /// <summary>
-    ///     Specifies if the implementation of this interface is protected or not.
+    /// Gets or sets a value indicating whether the model represents content that is protected.
     /// </summary>
     bool IsProtected { get; set; }
 }

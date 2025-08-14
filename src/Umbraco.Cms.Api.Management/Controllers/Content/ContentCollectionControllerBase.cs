@@ -14,7 +14,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
-public abstract class ContentCollectionControllerBase<TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel, TItem> : ManagementApiControllerBase
+public abstract class ContentCollectionControllerBase<TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel> : ManagementApiControllerBase
     where TContent : class, IContentBase
     where TCollectionResponseModel : ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>
     where TValueResponseModelBase : ValueResponseModelBase
@@ -67,8 +67,6 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
     /// </summary>
     protected IActionResult CollectionResult(List<TCollectionResponseModel> collectionResponseModels, long totalNumberOfItems)
     {
-        TItem[] signTargets = collectionResponseModels.OfType<TItem>().ToArray();
-
         var pageViewModel = new PagedViewModel<TCollectionResponseModel>
         {
             Items = collectionResponseModels,

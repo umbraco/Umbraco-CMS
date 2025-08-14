@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels;
 public interface IHasSigns
 {
     /// <summary>
-    /// Gets or sets the unique identifier for the entity.
+    /// Gets the unique identifier for the entity.
     /// </summary>
     Guid Id { get; }
 

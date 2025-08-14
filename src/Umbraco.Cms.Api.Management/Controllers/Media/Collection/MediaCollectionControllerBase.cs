@@ -19,11 +19,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Collection;
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Collection}/{Constants.UdiEntityType.Media}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
-public abstract class MediaCollectionControllerBase : ContentCollectionControllerBase<IMedia, MediaCollectionResponseModel, MediaValueResponseModel, MediaVariantResponseModel, DocumentCollectionResponseModel>
+public abstract class MediaCollectionControllerBase : ContentCollectionControllerBase<IMedia, MediaCollectionResponseModel, MediaValueResponseModel, MediaVariantResponseModel>
 {
     private readonly SignProviderCollection _signProviders;
 
-    [ActivatorUtilitiesConstructor]
     protected MediaCollectionControllerBase(IUmbracoMapper mapper, SignProviderCollection signProviders)
         : base(mapper, signProviders)
     {
