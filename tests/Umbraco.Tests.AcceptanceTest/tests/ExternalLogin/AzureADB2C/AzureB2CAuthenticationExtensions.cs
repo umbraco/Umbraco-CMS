@@ -10,9 +10,7 @@ namespace Umbraco.Cms.Tests.AcceptanceTest.ExternalLogin.AzureADB2C
         public static IUmbracoBuilder ConfigureAuthentication(this IUmbracoBuilder builder,
             IConfiguration configuration)
         {
-            var b2CSettings = configuration
-                .GetSection("AzureB2C")
-                .Get<AzureB2CSettings>() ?? new AzureB2CSettings();
+            var b2cSettings = new AzureB2CSettings();
 
             builder.AddBackOfficeExternalLogins(logins =>
             {
