@@ -45,7 +45,6 @@ export class UmbWorkspaceViewContext extends UmbControllerBase {
 				variantId: variantId,
 			},
 		});
-		this.hints.inherit();
 	}
 
 	provideAt(controllerHost: UmbClassInterface): void {

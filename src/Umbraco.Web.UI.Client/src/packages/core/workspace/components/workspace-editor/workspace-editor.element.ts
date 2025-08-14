@@ -1,7 +1,6 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
-import type { UmbWorkspaceHint } from '../../controllers/workspace-view-hint-manager.controller.js';
 import { UmbWorkspaceEditorNavigationContext } from './workspace-editor-navigation.context.js';
-import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
+import type { UmbVariantHint, UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -59,6 +58,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		return this._variantId;
 	}
 	public set variantId(value: UmbVariantId | undefined) {
+		if (value && this._variantId?.equal(value)) {
+			return;
+		}
 		this._variantId = value;
 		this.#navigationContext.setVariantId(value);
 		this.#observeWorkspaceViewHints();
@@ -69,7 +71,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
 
 	@state()
-	private _hintMap: Map<string, UmbWorkspaceHint> = new Map();
+	private _hintMap: Map<string, UmbVariantHint> = new Map();
 
 	@state()
 	private _routes?: UmbRoute[];
@@ -98,13 +100,15 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		this._hintMap = new Map();
 		this.#workspaceViewHintObservers = this._workspaceViews.map((view, index) =>
 			this.observe(
-				view.hintOfVariant(this._variantId),
+				view.firstHintOfVariant(),
 				(hint) => {
+					console.log('hint found', view.manifest.alias, hint);
 					if (hint) {
 						this._hintMap.set(view.manifest.alias, hint);
 					} else {
 						this._hintMap.delete(view.manifest.alias);
 					}
+					console.log('hint map', this._hintMap);
 					this.requestUpdate('_hintMap');
 				},
 				'umbObserveState_' + index,

@@ -26,6 +26,9 @@ export class UmbHintController<
 > extends UmbControllerBase {
 	//
 	#viewAlias?: string;
+	getViewAlias(): string | undefined {
+		return this.#viewAlias;
+	}
 	#scaffold: Partial<HintType>;
 	#inUnprovidingState?: boolean;
 
@@ -111,8 +114,8 @@ export class UmbHintController<
 				this.initiateChange();
 				if (this.#parentHints) {
 					// Remove the local messages that does not exist in the parent anymore:
-					const toRemove = this.#parentHints.filter((msg) => !hints.find((m) => m.unique === msg.unique));
-					this.remove(toRemove.map((msg) => msg.unique));
+					const toRemove = this.#parentHints.filter((hint) => !hints.find((m) => m.unique === hint.unique));
+					this.remove(toRemove.map((hint) => hint.unique));
 				}
 				this.#parentHints = hints;
 
@@ -140,14 +143,15 @@ export class UmbHintController<
 
 		this.#parent!.initiateChange();
 
+		console.log('transferHints');
+
+		const parentViewAlias = this.#parent.getViewAlias();
+
 		hints.forEach((hint) => {
-			// replace this.#baseDataPath (if it starts with it) with $ in the path, so it becomes relative to the parent context
-			const path = hint.path;
-			if (path === undefined) {
-				throw new Error('Path was not transformed correctly and can therefor not be synced with parent messages.');
-			}
+			console.log(hint);
+			const newPath = parentViewAlias ? [parentViewAlias, ...hint.path] : hint.path;
 			// Notice addOne appends the parent viewAlias to the path:
-			this.#parent!.addOne(hint);
+			this.#parent!.addOne({ ...hint, path: newPath });
 		});
 
 		this.#parent!.finishChange();
@@ -175,7 +179,11 @@ export class UmbHintController<
 				newHint.path = [this.#viewAlias, ...newHint.path];
 			}
 		} else {
-			newHint.path = [];
+			if (this.#viewAlias) {
+				newHint.path = [this.#viewAlias];
+			} else {
+				newHint.path = [];
+			}
 		}
 		this.#hints.appendOne(newHint);
 		return hint.unique!;

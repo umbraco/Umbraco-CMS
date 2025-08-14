@@ -47,6 +47,7 @@ export class UmbWorkspaceEditorNavigationContext extends UmbContextBase {
 						.filter((view) => !viewsToKeep.some((x) => x.manifest.alias === view.manifest.alias))
 						.forEach((view) => {
 							const context = new UmbWorkspaceViewContext(this, view.manifest);
+							context.hints.inheritFrom(this.#hints);
 							newViews.push(context);
 						});
 
