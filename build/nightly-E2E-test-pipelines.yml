@@ -786,7 +786,7 @@ stages:
             # ExternalLogin AzureADB2C
             WindowsExternalLoginAzureADB2C:
               vmImage: "windows-latest"
-              testFolder: "ExternalLogin\AzureADB2C"
+              testFolder: "ExternalLogin\\AzureADB2C"
               testCommand: "npx playwright test --project=externalLoginAzureADB2C"
 #              packages:
 #                - name: "Microsoft.AspNetCore.Authentication.OpenIdConnect"
