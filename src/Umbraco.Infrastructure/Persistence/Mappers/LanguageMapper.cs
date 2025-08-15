@@ -21,5 +21,6 @@ public sealed class LanguageMapper : BaseMapper
         DefineMap<Language, LanguageDto>(nameof(Language.Id), nameof(LanguageDto.Id));
         DefineMap<Language, LanguageDto>(nameof(Language.IsoCode), nameof(LanguageDto.IsoCode));
         DefineMap<Language, LanguageDto>(nameof(Language.CultureName), nameof(LanguageDto.CultureName));
+        DefineMap<Language, LanguageDto>(nameof(Language.SortOrder), nameof(LanguageDto.SortOrder));
     }
 }

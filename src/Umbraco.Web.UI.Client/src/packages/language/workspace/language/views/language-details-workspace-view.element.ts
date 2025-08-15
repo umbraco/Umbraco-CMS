@@ -123,6 +123,10 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 					<div slot="editor">${this._language?.unique}</div>
 				</umb-property-layout>
 
+				<umb-property-layout label="Sort Order">
+					<div slot="editor">${this._language?.sortOrder}</div>
+				</umb-property-layout>
+
 				<umb-property-layout label="Settings">
 					<div slot="editor">
 						<uui-toggle
