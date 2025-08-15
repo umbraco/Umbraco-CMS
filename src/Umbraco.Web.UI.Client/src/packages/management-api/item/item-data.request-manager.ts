@@ -1,8 +1,9 @@
 import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '../server-event/constants.js';
 import type { UmbManagementApiItemDataCache } from './cache.js';
-import { tryExecute, UmbApiError, UmbCancelError, type UmbApiResponse } from '@umbraco-cms/backoffice/resources';
+import type { UmbApiError, UmbCancelError, UmbApiResponse } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 export interface UmbManagementApiItemDataRequestManagerArgs<ItemResponseModelType> {
 	getItems: (unique: Array<string>) => Promise<UmbApiResponse<{ data: Array<ItemResponseModelType> }>>;
@@ -49,7 +50,12 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 		}
 
 		if (idsToRequest.length > 0) {
-			const { data: serverData, error: serverError } = await tryExecute(this, this.#getItems(idsToRequest));
+			const getItemsController = new UmbItemDataApiGetRequestController(this, {
+				api: (args) => this.#getItems(args.uniques),
+				uniques: idsToRequest,
+			});
+
+			const { data: serverData, error: serverError } = await getItemsController.request();
 
 			serverItems = serverData ?? [];
 			error = serverError;
