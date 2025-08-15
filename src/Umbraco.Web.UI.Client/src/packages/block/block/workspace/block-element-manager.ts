@@ -205,7 +205,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		}
 
 		const dataTypeItem = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
-		const editorAlias = dataTypeItem?.propertyEditorUiAlias;
+		const editorAlias = dataTypeItem?.propertyEditorSchemaAlias;
 
 		if (!editorAlias) {
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
