@@ -16,7 +16,6 @@ export interface UmbSelectableItem {
  * Updates the selected state of items based on current selection.
  * This function is for internal use only within the property-editors package and should not be exposed
  * to external consumers to avoid unwanted external dependencies.
- * 
  * @internal
  * @template T
  * @param {T[]} items - Array of items to update
@@ -31,7 +30,7 @@ export function updateItemsSelectedState<T extends UmbSelectableItem>(
 ): T[] {
 	// Convert to Set for O(1) lookups instead of O(n) includes
 	const selectionSet = new Set(selection);
-	
+
 	// Check if any state changes are needed to avoid unnecessary array allocations
 	let hasChanges = false;
 	for (const item of items) {
@@ -54,8 +53,6 @@ export function updateItemsSelectedState<T extends UmbSelectableItem>(
 		[stateProperty]: selectionSet.has(item.value),
 	}));
 }
-
-
 
 /**
  * Helper function to ensure a value is an array

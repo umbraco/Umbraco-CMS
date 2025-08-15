@@ -138,7 +138,7 @@ export default {
 		saveAndGenerateModels: 'Guardar y generar modelos',
 		undo: 'Deshacer',
 		redo: 'Rehacer',
-		viewSystemDetails:"Ver infomacion del sistema y numero de version"
+		viewSystemDetails: 'Ver infomacion del sistema y numero de version',
 	},
 	content: {
 		isPublished: 'Está publicado',

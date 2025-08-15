@@ -1,4 +1,9 @@
 import { UmbDocumentItemRepository } from '../../item/index.js';
+import {
+	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+} from '../../paths.js';
+import type { UmbDocumentEntityTypeUnion } from '../../entity.js';
 import type {
 	UmbDocumentCreateOptionsModalData,
 	UmbDocumentCreateOptionsModalValue,
@@ -15,11 +20,6 @@ import {
 	type UmbDocumentBlueprintItemBaseModel,
 } from '@umbraco-cms/backoffice/document-blueprint';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import {
-	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
-	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
-} from '../../paths.js';
-import type { UmbDocumentEntityTypeUnion } from '../../entity.js';
 
 @customElement('umb-document-create-options-modal')
 export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<

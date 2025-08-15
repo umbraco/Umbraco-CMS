@@ -69,9 +69,9 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 						.current=${this.#currentPage}
 						.total=${Math.ceil(this._total / this.#itemsPerPage)}
 						firstlabel=${this.localize.term('general_first')}
-                        previouslabel=${this.localize.term('general_previous')}
-                        nextlabel=${this.localize.term('general_next')}
-                        lastlabel=${this.localize.term('general_last')}
+						previouslabel=${this.localize.term('general_previous')}
+						nextlabel=${this.localize.term('general_next')}
+						lastlabel=${this.localize.term('general_last')}
 						@change=${this.#onChangePage}></uui-pagination>`
 				: nothing}
 		</uui-box>`;
