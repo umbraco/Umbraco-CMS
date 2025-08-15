@@ -112,7 +112,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				const tabName = tab.name ?? '';
 				const path = `tab/${encodeFolderName(tabName)}`;
 				routes.push({
-					path: `tab/${encodeFolderName(tabName)}`,
+					path,
 					component: () => import('./content-editor-tab.element.js'),
 					setup: (component) => {
 						(component as UmbContentWorkspaceViewEditTabElement).containerId = tab.id;
