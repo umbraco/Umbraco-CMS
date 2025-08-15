@@ -105,7 +105,7 @@ export class UmbHintController<
 			parent?.descendingHints(this.#viewAlias),
 			(hints) => {
 				if (!hints) {
-					console.warn('TODO: Does this case happen, maybe its only in destruction?');
+					// Parent properly lost, so lets assume the parent hints are empty: [NL]
 					hints = [];
 				}
 				this.initiateChange();
