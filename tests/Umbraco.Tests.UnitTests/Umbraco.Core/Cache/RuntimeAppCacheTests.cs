@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Extensions;
@@ -13,17 +12,16 @@ public abstract class RuntimeAppCacheTests : AppCacheTests
     internal abstract IAppPolicyCache AppPolicyCache { get; }
 
     [Test]
-    [Explicit("The necessary wait time [Thread.Sleep(300)] makes this test slow. We'll omit it to save the runtime of the entire unit test.")]
     public void Can_Add_And_Expire_Struct_Strongly_Typed_With_Null()
     {
         var now = DateTime.Now;
-        AppPolicyCache.Insert("DateTimeTest", () => now, new TimeSpan(0, 0, 0, 0, 200));
+        AppPolicyCache.Insert("DateTimeTest", () => now, new TimeSpan(0, 0, 0, 0, 20));
         var cachedDateTime = AppCache.GetCacheItem<DateTime>("DateTimeTest");
         var cachedDateTimeNullable = AppCache.GetCacheItem<DateTime?>("DateTimeTest");
         Assert.AreEqual(now, cachedDateTime);
         Assert.AreEqual(now, cachedDateTimeNullable);
 
-        Thread.Sleep(300); // sleep longer than the cache expiration
+        Thread.Sleep(30); // sleep longer than the cache expiration
 
         cachedDateTime = AppCache.GetCacheItem<DateTime>("DateTimeTest");
         cachedDateTimeNullable = AppCache.GetCacheItem<DateTime?>("DateTimeTest");
