@@ -1,5 +1,6 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDictionaryItemModel } from './types.js';
+import { UmbManagementApiDictionaryItemDataRequestManager } from './dictionary-item.server.request-manager.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { DictionaryItemItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -15,6 +16,8 @@ export class UmbDictionaryItemServerDataSource extends UmbItemServerDataSourceBa
 	DictionaryItemItemResponseModel,
 	UmbDictionaryItemModel
 > {
+	#itemRequestManager = new UmbManagementApiDictionaryItemDataRequestManager(this);
+
 	/**
 	 * Creates an instance of UmbDictionaryItemServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
@@ -29,13 +32,7 @@ export class UmbDictionaryItemServerDataSource extends UmbItemServerDataSourceBa
 	override async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			api: (args) => DictionaryService.getItemDictionary({ query: { id: args.uniques } }),
-			uniques,
-		});
-
-		const { data, error } = await itemRequestManager.request();
+		const { data, error } = await this.#itemRequestManager.getItems(uniques);
 
 		return { data: this._getMappedItems(data), error };
 	}
