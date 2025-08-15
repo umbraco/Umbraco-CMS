@@ -101,10 +101,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             | ContentCacheDataSerializerEntityType.Media
             | ContentCacheDataSerializerEntityType.Member);
 
-        // If contentTypeIds, mediaTypeIds and memberTypeIds are null, truncate table as all records will be deleted (as these 3 are the only types in the table).
-        if (contentTypeIds != null && !contentTypeIds.Any()
-                                   && mediaTypeIds != null && !mediaTypeIds.Any()
-                                   && memberTypeIds != null && !memberTypeIds.Any())
+        // If contentTypeIds, mediaTypeIds and memberTypeIds are all non-null but empty,
+        // truncate the table as all records will be deleted (as these 3 are the only types in the table).
+        if (contentTypeIds is not null && contentTypeIds.Count == 0 &&
+            mediaTypeIds is not null && mediaTypeIds.Count == 0 &&
+            memberTypeIds is not null && memberTypeIds.Count == 0)
         {
             if (Database.DatabaseType == DatabaseType.SqlServer2012)
             {
@@ -144,6 +145,26 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
         return CreateContentNodeKit(dto, serializer, preview);
+    }
+
+    public async Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
+    {
+        Sql<ISqlContext>? sql = SqlContentSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+
+        dtos = dtos
+            .Where(x => x is not null)
+            .Where(x => preview || x.PubDataRaw is not null || x.PubData is not null)
+            .ToList();
+
+        IContentCacheDataSerializer serializer =
+            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+        return dtos
+            .Select(x => CreateContentNodeKit(x, serializer, preview));
     }
 
     private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys, Guid objectType)
@@ -220,6 +241,25 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return CreateMediaNodeKit(dto, serializer);
     }
 
+    public async Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
+    {
+        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+
+        dtos = dtos
+            .Where(x => x is not null)
+            .ToList();
+
+        IContentCacheDataSerializer serializer =
+            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+        return dtos
+            .Select(x => CreateMediaNodeKit(x, serializer));
+    }
+
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
         // use a custom SQL to update row version on each update
@@ -241,10 +281,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     // assumes content tree lock
     private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
+        if (contentTypeIds is null)
+        {
+            return;
+        }
+
         Guid contentObjectType = Constants.ObjectTypes.Document;
 
         // remove all - if anything fails the transaction will rollback
-        if (contentTypeIds == null || contentTypeIds.Count == 0)
+        if (contentTypeIds.Count == 0)
         {
             // must support SQL-CE
             Database.Execute(
@@ -271,7 +316,7 @@ WHERE cmsContentNu.nodeId IN (
 
         // insert back - if anything fails the transaction will rollback
         IQuery<IContent> query = SqlContext.Query<IContent>();
-        if (contentTypeIds != null && contentTypeIds.Count > 0)
+        if (contentTypeIds.Count > 0)
         {
             query = query.WhereIn(x => x.ContentTypeId, contentTypeIds); // assume number of ctypes won't blow IN(...)
         }
@@ -306,13 +351,17 @@ WHERE cmsContentNu.nodeId IN (
     }
 
     // assumes media tree lock
-    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize,
-        IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
+        if (contentTypeIds is null)
+        {
+            return;
+        }
+
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
         // remove all - if anything fails the transaction will rollback
-        if (contentTypeIds is null || contentTypeIds.Count == 0)
+        if (contentTypeIds.Count == 0)
         {
             // must support SQL-CE
             Database.Execute(
@@ -339,7 +388,7 @@ WHERE cmsContentNu.nodeId IN (
 
         // insert back - if anything fails the transaction will rollback
         IQuery<IMedia> query = SqlContext.Query<IMedia>();
-        if (contentTypeIds is not null && contentTypeIds.Count > 0)
+        if (contentTypeIds.Count > 0)
         {
             query = query.WhereIn(x => x.ContentTypeId, contentTypeIds); // assume number of ctypes won't blow IN(...)
         }
@@ -359,13 +408,17 @@ WHERE cmsContentNu.nodeId IN (
     }
 
     // assumes member tree lock
-    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize,
-        IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
+        if (contentTypeIds is null)
+        {
+            return;
+        }
+
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
         // remove all - if anything fails the transaction will rollback
-        if (contentTypeIds == null || contentTypeIds.Count == 0)
+        if (contentTypeIds.Count == 0)
         {
             // must support SQL-CE
             Database.Execute(
@@ -392,7 +445,7 @@ WHERE cmsContentNu.nodeId IN (
 
         // insert back - if anything fails the transaction will rollback
         IQuery<IMember> query = SqlContext.Query<IMember>();
-        if (contentTypeIds != null && contentTypeIds.Count > 0)
+        if (contentTypeIds.Count > 0)
         {
             query = query.WhereIn(x => x.ContentTypeId, contentTypeIds); // assume number of ctypes won't blow IN(...)
         }

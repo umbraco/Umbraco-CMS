@@ -68,10 +68,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
-		const { data, error } = await tryExecute(
-			this.#host,
-			StylesheetService.getStylesheetByPath({ path: { path } }),
-		);
+		const { data, error } = await tryExecute(this.#host, StylesheetService.getStylesheetByPath({ path: { path } }));
 
 		if (error || !data) {
 			return { error };
