@@ -4,11 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbHintController, type UmbHint } from '@umbraco-cms/backoffice/hint';
-
-export interface UmbVariantHint extends UmbHint {
-	variantId?: UmbVariantId;
-}
+import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 /**
  *

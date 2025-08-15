@@ -1,23 +1,10 @@
 import type { UmbPartialSome } from '../../utils/type/index.js';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 import { UmbArrayState, UmbObjectState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_HINT_CONTEXT } from './hint.context-token.js';
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-
-export interface UmbIncomingHintBase {
-	unique?: string | symbol;
-	text: string;
-	weight?: number;
-	color?: UUIInterfaceColor;
-}
-
-export interface UmbHint extends UmbIncomingHintBase {
-	unique: string | symbol;
-	path: Array<string>;
-	weight: number;
-}
+import type { UmbHint, UmbIncomingHintBase } from '../types.js';
 
 export class UmbHintController<
 	HintType extends UmbHint = UmbHint,

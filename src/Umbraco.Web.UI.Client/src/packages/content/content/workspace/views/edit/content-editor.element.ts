@@ -15,6 +15,7 @@ import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import './content-editor-tab.element.js';
+import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 @customElement('umb-content-workspace-view-edit')
 export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -38,6 +39,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 
 	@state()
 	private _activePath = '';
+
+	@state()
+	private _hintMap: Map<string, UmbVariantHint> = new Map();
 
 	#structureManager?: UmbContentTypeStructureManager<UmbContentTypeModel>;
 
