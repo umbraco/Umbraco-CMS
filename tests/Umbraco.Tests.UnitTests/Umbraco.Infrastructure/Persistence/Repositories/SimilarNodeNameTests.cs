@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Repositories;
 
 [TestFixture]
 internal sealed class SimilarNodeNameTests
@@ -156,45 +156,19 @@ internal sealed class SimilarNodeNameTests
         Assert.AreEqual(expected, res);
     }
 
-    /* Original Tests - Can be deleted, as new tests cover all cases */
-
-    [TestCase(0, "Charlie", "Charlie")]
-    [TestCase(0, "Zulu", "Zulu (1)")]
-    [TestCase(0, "Golf", "Golf (1)")]
-    [TestCase(0, "Kilo", "Kilo (2)")]
-    [TestCase(0, "Alpha", "Alpha (3)")]
-    //// [TestCase(0, "Kilo (1)", "Kilo (1) (1)")] // though... we might consider "Kilo (2)"
-    [TestCase(0, "Kilo (1)", "Kilo (2)")] // names[] contains "Kilo" AND "Kilo (1)", which implies that result should be "Kilo (2)"
-    [TestCase(6, "Kilo (1)", "Kilo (1)")] // because of the id
-    [TestCase(0, "alpha", "alpha (3)")]
-    [TestCase(0, "", " (1)")]
-    [TestCase(0, null, " (1)")]
-    public void Test(int nodeId, string nodeName, string expected)
-    {
-        SimilarNodeName[] names =
-        {
-            new SimilarNodeName {Id = 1, Name = "Alpha (2)"}, new SimilarNodeName {Id = 2, Name = "Alpha"},
-            new SimilarNodeName {Id = 3, Name = "Golf"}, new SimilarNodeName {Id = 4, Name = "Zulu"},
-            new SimilarNodeName {Id = 5, Name = "Mike"}, new SimilarNodeName {Id = 6, Name = "Kilo (1)"},
-            new SimilarNodeName {Id = 7, Name = "Yankee"}, new SimilarNodeName {Id = 8, Name = "Kilo"},
-            new SimilarNodeName {Id = 9, Name = "Golf (2)"}, new SimilarNodeName {Id = 10, Name = "Alpha (1)"}
-        };
-
-        Assert.AreEqual(expected, SimilarNodeName.GetUniqueName(names, nodeId, nodeName));
-    }
-
     [Test]
-    [Explicit("This test fails! We need to fix up the logic")]
-    public void TestMany()
+    public void Handles_Many_Similar_Names()
     {
         SimilarNodeName[] names =
         {
-            new SimilarNodeName {Id = 1, Name = "Alpha (2)"}, new SimilarNodeName {Id = 2, Name = "Test"},
-            new SimilarNodeName {Id = 3, Name = "Test (1)"}, new SimilarNodeName {Id = 4, Name = "Test (2)"},
+            new SimilarNodeName {Id = 1, Name = "Alpha (2)"},
+            new SimilarNodeName {Id = 2, Name = "Test"},
+            new SimilarNodeName {Id = 3, Name = "Test (1)"},
+            new SimilarNodeName {Id = 4, Name = "Test (2)"},
             new SimilarNodeName {Id = 22, Name = "Test (1) (1)"}
         };
 
-        // TODO: this will yield "Test (2)" which is already in use
-        Assert.AreEqual("Test (3)", SimilarNodeName.GetUniqueName(names, 0, "Test"));
+        var uniqueName = SimilarNodeName.GetUniqueName(names, 0, "Test");
+        Assert.AreEqual("Test (3)", uniqueName);
     }
 }

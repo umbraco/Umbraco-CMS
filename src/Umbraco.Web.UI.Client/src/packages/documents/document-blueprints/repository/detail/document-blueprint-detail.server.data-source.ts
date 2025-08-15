@@ -210,7 +210,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
 					scheduledPublishDate: variant.scheduledPublishDate || null,
-					scheduledUnpublishDate: variant.scheduledUnpublishDate || null
+					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
 				};
 			}),
 			documentType: {
