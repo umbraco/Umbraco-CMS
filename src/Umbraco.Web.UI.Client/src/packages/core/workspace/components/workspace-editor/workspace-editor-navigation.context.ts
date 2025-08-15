@@ -1,4 +1,4 @@
-import { type UmbVariantHint, UmbWorkspaceViewContext } from './workspace-view.context.js';
+import { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { UMB_WORKSPACE_EDITOR_NAVIGATION_CONTEXT } from './workspace-editor-navigation.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -6,7 +6,7 @@ import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extens
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbHintController } from '@umbraco-cms/backoffice/hint';
+import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 export class UmbWorkspaceEditorNavigationContext extends UmbContextBase {
 	//

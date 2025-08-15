@@ -1,4 +1,9 @@
+import type { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export const UMB_WORKSPACE_VIEW_CONTEXT = new UmbContextToken<UmbWorkspaceViewContext>('UmbWorkspaceViewContext');
+export const UMB_WORKSPACE_VIEW_CONTEXT = new UmbContextToken<UmbViewContext, UmbWorkspaceViewContext>(
+	'UmbViewContext',
+	undefined,
+	(context): context is UmbWorkspaceViewContext => (context as UmbWorkspaceViewContext).IS_WORKSPACE_VIEW_CONTEXT,
+);

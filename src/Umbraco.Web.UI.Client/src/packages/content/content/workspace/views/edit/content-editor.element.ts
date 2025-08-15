@@ -16,6 +16,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import './content-editor-tab.element.js';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import { UMB_HINT_CONTEXT } from 'src/packages/core/hint/context/hint.context-token.js';
+import type { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 @customElement('umb-content-workspace-view-edit')
 export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -43,6 +45,8 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	@state()
 	private _hintMap: Map<string, UmbVariantHint> = new Map();
 
+	#viewContexts: Array<UmbViewContext> = [];
+
 	#structureManager?: UmbContentTypeStructureManager<UmbContentTypeModel>;
 
 	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
@@ -50,13 +54,17 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_HINT_CONTEXT, (context) => {
+			// Parse on as inhiretFrom for all the view contexts.
+		});
+
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(
 			this._tabsStructureHelper.mergedContainers,
 			(tabs) => {
 				this._tabs = tabs;
-				this._createRoutes();
+				this.#createRoutes();
 			},
 			null,
 		);
@@ -77,13 +85,13 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			await this.#structureManager.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
-				this._createRoutes();
+				this.#createRoutes();
 			},
 			'_observeGroups',
 		);
 	}
 
-	private _createRoutes() {
+	#createRoutes() {
 		if (!this._tabs || !this.#structureManager) return;
 		const routes: UmbRoute[] = [];
 

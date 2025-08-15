@@ -117,6 +117,7 @@
 		"./utils": "./dist-cms/packages/core/utils/index.js",
 		"./validation": "./dist-cms/packages/core/validation/index.js",
 		"./variant": "./dist-cms/packages/core/variant/index.js",
+		"./view": "./dist-cms/packages/core/view/index.js",
 		"./webhook": "./dist-cms/packages/webhook/index.js",
 		"./workspace": "./dist-cms/packages/core/workspace/index.js",
 		"./external/backend-api": "./dist-cms/packages/core/backend-api/index.js",

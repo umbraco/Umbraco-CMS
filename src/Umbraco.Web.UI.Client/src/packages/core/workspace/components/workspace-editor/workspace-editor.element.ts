@@ -1,6 +1,6 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
 import { UmbWorkspaceEditorNavigationContext } from './workspace-editor-navigation.context.js';
-import type { UmbVariantHint, UmbWorkspaceViewContext } from './workspace-view.context.js';
+import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -8,6 +8,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 /**
  * @element umb-workspace-editor
