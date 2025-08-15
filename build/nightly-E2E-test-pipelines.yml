@@ -795,24 +795,28 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               # Since these values are set as secrets, we need to see them as an environment variable to be able to use them
               # This is not the best solution, we should split the cases in our matrix into pipeline templates. especially the different app settings, as they have different logic
-              AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
-              AZUREADB2CTENANT: $(AZUREB2CTENANT)
-              AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
-              AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
-              AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
-              AZUREADB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
-              AZUREADB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
+              AZUREB2CDOMAIN: $(AZUREB2CDOMAIN)
+              AZUREB2CTENANT: $(AZUREB2CTENANT)
+              AZUREB2CPOLICY: $(AZUREB2CPOLICY)
+              PIPELINEAZUREB2CCLIENTID: $(AZUREB2CCLIENTID)
+              AZUREB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
+              AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
+              AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
 
         pool:
           vmImage: $(vmImage)
 
         steps:
           - pwsh: |
-              $value = $env:AZUREADB2CCLIENTID
+              $value = $env:AZUREB2CCLIENTID
               Write-Host "Client ID Length: $($value.Length)"
-              $values = $env:AZUREADB2CDOMAIN
-              Write-Host "Domain ID Length: $($values.Length)"
+              Write-Host "Client Pipeline ID Length: $(PIPELINEAZUREB2CCLIENTID)"
             displayName: Checks the length of the client id
+          - pwsh: |
+              Write-Host "Client ID Length: $($env:AZUREB2CCLIENTIDTEST.Length)"
+            displayName: Checks Client ID Length
+            env:
+              AZUREB2CCLIENTIDTEST: $(AZUREB2CCLIENTID)
           # Setup test environment
           - task: DownloadPipelineArtifact@2
             displayName: Download NuGet artifacts
