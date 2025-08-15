@@ -1,6 +1,7 @@
 import type {
 	UmbContentTypeModel,
 	UmbPropertyContainerTypes,
+	UmbPropertyTypeContainerMergedModel,
 	UmbPropertyTypeContainerModel,
 	UmbPropertyTypeModel,
 } from '../types.js';
@@ -28,6 +29,7 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbError } from '@umbraco-cms/backoffice/resources';
+import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 
 type UmbPropertyTypeUnique = UmbPropertyTypeModel['unique'];
 
@@ -866,4 +868,66 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypes.destroy();
 		super.destroy();
 	}
+
+	// TODO: Make use of this for the structure helpers.
+	readonly contentTypeMergedContainers = createObservablePart(
+		this.#contentTypeContainers,
+		(containers: UmbPropertyTypeContainerModel[]): UmbPropertyTypeContainerMergedModel[] => {
+			// Lookup map for containers
+			const containerByIdCache = new Map<string, UmbPropertyTypeContainerModel>();
+			for (const c of containers) {
+				containerByIdCache.set(c.id, c);
+			}
+
+			// Cache to avoid recomputing parent chains
+			const chainCache = new Map<string, Array<string>>();
+
+			// Map to merge duplicates
+			const mergedMap = new Map<string, UmbPropertyTypeContainerMergedModel>();
+
+			for (const container of containers) {
+				const path = getContainerChainKey(container, containerByIdCache, chainCache);
+				const key = path?.join('|') ?? '';
+				if (!mergedMap.has(key)) {
+					// Store the first occurrence
+					mergedMap.set(key, {
+						ids: [container.id],
+						path: path,
+						type: container.type,
+						name: container.name,
+						sortOrder: container.sortOrder, // Heavily assuming the first is the owner content type container, this could maybe turn out not always to be the case?
+					});
+				} else {
+					// existing already then just add the id:
+					mergedMap.get(key)?.ids.push(container.id);
+				}
+			}
+
+			return Array.from(mergedMap.values());
+		},
+	);
+}
+
+// Get a unique key for a container including all parent type/name pairs
+function getContainerChainKey(
+	container: UmbPropertyTypeContainerModel,
+	containerById: Map<string, UmbPropertyTypeContainerModel>,
+	chainCache: Map<string, Array<string>>,
+): Array<string> {
+	if (chainCache.has(container.id)) {
+		return chainCache.get(container.id)!;
+	}
+
+	// Notice this is made compatible with the path for the URL of the tab, making the match simpler in the other end. [NL]
+	let path = [`${container.type.toLowerCase()}/${encodeFolderName(container.name)}`];
+	if (container.parent && containerById.has(container.parent.id)) {
+		const parent = containerById.get(container.parent.id)!;
+		path = [...getContainerChainKey(parent, containerById, chainCache), ...path];
+	} else if (!container.parent && container.type === 'Group') {
+		// Append root to the containers with no parent.
+		path.unshift(`root`);
+	}
+
+	chainCache.set(container.id, [...path]);
+	return path;
 }
