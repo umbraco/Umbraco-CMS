@@ -1,10 +1,9 @@
 import type { UmbPartialSome } from '../../utils/type/index.js';
-import { UmbContextBase, UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
-import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_HINT_CONTEXT } from './hint.context-token.js';
-import { ReplaceStartOfPath } from '../../validation/utils/replace-start-of-path.function.js';
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
 export interface UmbIncomingHintBase {
@@ -29,7 +28,8 @@ export class UmbHintController<
 	getViewAlias(): string | undefined {
 		return this.#viewAlias;
 	}
-	#scaffold: Partial<HintType>;
+	#scaffold = new UmbObjectState<Partial<HintType>>({});
+	readonly scaffold = this.#scaffold.asObservable();
 	#inUnprovidingState?: boolean;
 
 	#parent?: UmbHintController;
@@ -42,14 +42,19 @@ export class UmbHintController<
 	//public readonly hasHints = this._hints.asObservablePart((x) => x.length > 0);
 
 	updateScaffold(updates: Partial<HintType>) {
-		this.#scaffold = { ...this.#scaffold, ...updates };
+		this.#scaffold.update(updates);
+	}
+	getScaffold(): Partial<HintType> {
+		return this.#scaffold.getValue();
 	}
 
 	constructor(host: UmbControllerHost, args?: { viewAlias?: string; scaffold?: Partial<HintType> }) {
 		super(host);
 
 		this.#viewAlias = args?.viewAlias;
-		this.#scaffold = args?.scaffold ?? {};
+		if (args?.scaffold) {
+			this.#scaffold.setValue(args?.scaffold);
+		}
 
 		this.#hints.sortBy((a, b) => (b.weight || 0) - (a.weight || 0));
 	}
@@ -104,6 +109,11 @@ export class UmbHintController<
 
 	inheritFrom(parent: UmbHintController | undefined): void {
 		this.#parent = parent;
+		this.observe(this.#parent?.scaffold, (scaffold) => {
+			if (scaffold) {
+				this.#scaffold.update(scaffold as any);
+			}
+		});
 		this.observe(
 			parent?.descendingHints(this.#viewAlias),
 			(hints) => {
@@ -143,13 +153,14 @@ export class UmbHintController<
 
 		this.#parent!.initiateChange();
 
-		console.log('transferHints');
-
 		const parentViewAlias = this.#parent.getViewAlias();
 
 		hints.forEach((hint) => {
-			console.log(hint);
-			const newPath = parentViewAlias ? [parentViewAlias, ...hint.path] : hint.path;
+			let newPath = hint.path;
+			// If the hint path does not already contain the parent view alias as the first entry, we add it. (This will usually happen, but some Hint Contexts does not have a view alias as they)
+			if (parentViewAlias && newPath[0] !== parentViewAlias) {
+				newPath = [parentViewAlias, ...hint.path];
+			}
 			this.#parent!.addOne({ ...hint, path: newPath });
 		});
 
@@ -169,7 +180,11 @@ export class UmbHintController<
 	 * @returns {HintType['unique']} Unique value of the hint
 	 */
 	addOne(hint: IncomingHintType): string | symbol {
-		const newHint = { ...this.#scaffold, ...hint } as unknown as HintType;
+		/**
+		 * TODO:
+		 * Works, but the Hint does not stay when navigating away from a variant and back...
+		 */
+		const newHint = { ...this.#scaffold.getValue(), ...hint } as unknown as HintType;
 		newHint.unique ??= Symbol();
 		newHint.weight ??= 0;
 		newHint.text ??= '!';
