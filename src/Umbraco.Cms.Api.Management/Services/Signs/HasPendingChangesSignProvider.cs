@@ -4,18 +4,22 @@ using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 
-
 namespace Umbraco.Cms.Api.Management.Services.Signs;
 
+/// <summary>
+/// Implements a <see cref="ISignProvider"/> that provides signs for documents that have pending changes.
+/// </summary>
 public class HasPendingChangesSignProvider : ISignProvider
 {
     private const string Alias = Constants.Conventions.Signs.Prefix + "PendingChanges";
 
+    /// <inheritdoc/>
     public bool CanProvideSigns<TItem>()
         where TItem : IHasSigns =>
         typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
         typeof(TItem) == typeof(DocumentCollectionResponseModel);
 
+    /// <inheritdoc/>
     public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
         where TItem : IHasSigns
     {
@@ -24,27 +28,17 @@ public class HasPendingChangesSignProvider : ISignProvider
             switch (item)
             {
                 case DocumentTreeItemResponseModel treeItem:
-                    foreach (DocumentVariantItemResponseModel variant in treeItem.Variants)
+                    if (treeItem.Variants.Any(variant => variant.State == DocumentVariantState.PublishedPendingChanges))
                     {
-                        DocumentVariantState state = variant.State;
-                        if (state == DocumentVariantState.PublishedPendingChanges)
-                        {
-                            item.AddSign(Alias);
-                            break;
-                        }
+                        item.AddSign(Alias);
                     }
 
                     break;
 
                 case DocumentCollectionResponseModel collectionItem:
-                    foreach (DocumentVariantResponseModel variant in collectionItem.Variants)
+                    if (collectionItem.Variants.Any(variant => variant.State == DocumentVariantState.PublishedPendingChanges))
                     {
-                        var state = variant.State;
-                        if (state == DocumentVariantState.PublishedPendingChanges)
-                        {
-                            item.AddSign(Alias);
-                            break;
-                        }
+                        item.AddSign(Alias);
                     }
 
                     break;
