@@ -16,9 +16,7 @@ internal class IsProtectedSignProvider : ISignProvider
     /// <inheritdoc/>>
     public bool CanProvideSigns<TItem>()
         where TItem : IHasSigns =>
-        typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
-        typeof(TItem) == typeof(DocumentCollectionResponseModel) ||
-        typeof(TItem) == typeof(DocumentItemResponseModel);
+        typeof(IIsProtected).IsAssignableFrom(typeof(TItem));
 
     /// <inheritdoc/>>
     public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
