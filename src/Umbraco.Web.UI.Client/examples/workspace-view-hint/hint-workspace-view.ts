@@ -3,6 +3,7 @@ import { css, html, customElement, LitElement } from '@umbraco-cms/backoffice/ex
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UMB_WORKSPACE_VIEW_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
 
 @customElement('example-hint-workspace-view')
 export class ExampleHintWorkspaceView extends UmbElementMixin(LitElement) {
@@ -16,6 +17,8 @@ export class ExampleHintWorkspaceView extends UmbElementMixin(LitElement) {
 		}
 		const view = await context.getViewContext('example.workspaceView.hint');
 		*/
+
+		/*
 		const view = await this.getContext(UMB_WORKSPACE_VIEW_CONTEXT);
 		if (!view) {
 			throw new Error('Could not find the view');
@@ -26,6 +29,24 @@ export class ExampleHintWorkspaceView extends UmbElementMixin(LitElement) {
 		} else {
 			view.hints.addOne({
 				unique: 'exampleHintFromToggleAction',
+				text: 'Hi',
+				color: 'invalid',
+				weight: 100,
+			});
+		}
+			*/
+
+		const workspace = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
+		if (!workspace) {
+			throw new Error('Could not find the workspace');
+		}
+
+		if (workspace.hints.has('exampleHintFromToggleAction')) {
+			workspace.hints.removeOne('exampleHintFromToggleAction');
+		} else {
+			workspace.hints.addOne({
+				unique: 'exampleHintFromToggleAction',
+				path: ['Umb.WorkspaceView.Document.Edit', 'root'],
 				text: 'Hi',
 				color: 'invalid',
 				weight: 100,

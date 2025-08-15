@@ -1,6 +1,6 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
-import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import { UmbClassState, mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { UMB_VIEW_CONTEXT } from './view.context-token';
@@ -18,18 +18,30 @@ export class UmbViewContext extends UmbControllerBase {
 	#providerCtrl: any;
 	#currentProvideHost?: UmbClassInterface;
 
-	#variantId?: UmbVariantId;
+	public readonly viewAlias: string;
+	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
+	protected readonly _variantId = this.#variantId.asObservable();
 
 	public hints;
 
+	readonly firstHintOfVariant;
+
 	constructor(host: UmbControllerHost, viewAlias: string, variantId?: UmbVariantId) {
 		super(host);
-		this.#variantId = variantId;
+		this.viewAlias = viewAlias;
+		this.#variantId.setValue(variantId);
 		this.hints = new UmbHintController<UmbVariantHint>(this, {
 			viewAlias: viewAlias,
 			scaffold: {
 				variantId: variantId,
 			},
+		});
+		this.firstHintOfVariant = mergeObservables([this._variantId, this.hints.hints], ([variantId, hints]) => {
+			if (variantId) {
+				return hints.find((hint) => (hint.variantId ? hint.variantId.equal(variantId!) : true));
+			} else {
+				return hints[0];
+			}
 		});
 	}
 
@@ -51,18 +63,8 @@ export class UmbViewContext extends UmbControllerBase {
 		this.hints.unprovide();
 	}
 
-	inheritFrom(context: UmbViewContext): void {
+	inheritFrom(context?: UmbViewContext): void {
 		// TODO: Do you want to inherit the variantId as well? Then I think VariantId needs to become a state.
-		this.hints.inheritFrom(context.hints);
-	}
-
-	firstHintOfVariant(): Observable<UmbVariantHint | undefined> {
-		if (this.#variantId) {
-			return this.hints.asObservablePart((x) =>
-				x.find((hint) => (hint.variantId ? hint.variantId.equal(this.#variantId!) : true)),
-			);
-		} else {
-			return this.hints.firstHint;
-		}
+		this.hints.inheritFrom(context?.hints);
 	}
 }

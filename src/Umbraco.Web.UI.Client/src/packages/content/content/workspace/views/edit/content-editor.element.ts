@@ -1,5 +1,5 @@
 import type { UmbContentWorkspaceViewEditTabElement } from './content-editor-tab.element.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbContentTypeModel,
@@ -16,8 +16,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import './content-editor-tab.element.js';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import { UMB_HINT_CONTEXT } from 'src/packages/core/hint/context/hint.context-token.js';
-import type { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import { UMB_VIEW_CONTEXT, UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 @customElement('umb-content-workspace-view-edit')
 export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -26,6 +25,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	@state()
 	private _hasRootProperties = false;
   */
+	#viewContext?: UmbViewContext;
 
 	@state()
 	private _hasRootGroups = false;
@@ -54,8 +54,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_HINT_CONTEXT, (context) => {
-			// Parse on as inhiretFrom for all the view contexts.
+		this.consumeContext(UMB_VIEW_CONTEXT, (context) => {
+			// TODO: Parse on as inhiretFrom for all the view contexts.
+			this.#viewContext = context;
 		});
 
 		this._tabsStructureHelper.setIsRoot(true);
@@ -103,11 +104,13 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 					(component as UmbContentWorkspaceViewEditTabElement).containerId = null;
 				},
 			});
+			this.#createViewContext('root');
 		}
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
+				const path = `tab/${encodeFolderName(tabName)}`;
 				routes.push({
 					path: `tab/${encodeFolderName(tabName)}`,
 					component: () => import('./content-editor-tab.element.js'),
@@ -115,6 +118,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 						(component as UmbContentWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
+				this.#createViewContext(path);
 			});
 		}
 
@@ -134,35 +138,45 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		this._routes = routes;
 	}
 
+	#createViewContext(viewAlias: string) {
+		if (!this.#viewContexts.find((context) => context.viewAlias === viewAlias)) {
+			const view = new UmbViewContext(this, viewAlias);
+			this.#viewContexts.push(view);
+
+			view.inheritFrom(this.#viewContext);
+
+			this.observe(
+				view.firstHintOfVariant,
+				(hint) => {
+					if (hint) {
+						this._hintMap.set(view.viewAlias, hint);
+					} else {
+						this._hintMap.delete(view.viewAlias);
+					}
+					this.requestUpdate('_hintMap');
+				},
+				'umbObserveState_' + viewAlias,
+			);
+		}
+	}
+
 	override render() {
 		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
 				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups))
 					? html` <uui-tab-group slot="header">
-							${this._hasRootGroups && this._tabs.length > 0
-								? html`
-										<uui-tab
-											label=${this.localize.term('general_generic')}
-											.active=${this._routerPath + '/root' === this._activePath ||
-											this._routerPath + '/' === this._activePath}
-											href=${this._routerPath + '/root'}></uui-tab>
-									`
-								: ''}
+							${this._hasRootGroups && this._tabs.length > 0 ? this.#renderTab('root', '#general_generic') : nothing}
 							${repeat(
 								this._tabs,
 								(tab) => tab.name,
 								(tab, index) => {
-									const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
-									return html`<uui-tab
-										label=${this.localize.string(tab.name ?? '#general_unnamed')}
-										.active=${path === this._activePath ||
-										(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath)}
-										href=${path}></uui-tab>`;
+									const path = 'tab/' + encodeFolderName(tab.name || '');
+									return this.#renderTab(path, tab.name, index);
 								},
 							)}
 						</uui-tab-group>`
-					: ''}
+					: nothing}
 
 				<umb-router-slot
 					inherit-addendum
@@ -176,6 +190,25 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				</umb-router-slot>
 			</umb-body-layout>
 		`;
+	}
+
+	#renderTab(path: string, name: string, index = 0) {
+		const hint = this._hintMap.get(path);
+		const fullPath = this._routerPath + '/' + path;
+		const active =
+			fullPath === this._activePath ||
+			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath);
+		return html`<uui-tab
+			.label=${this.localize.string(name ?? '#general_unnamed')}
+			.active=${active}
+			href=${fullPath}
+			data-mark="content-tab:${path}"
+			>${hint && !active
+				? html`<uui-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+						>${hint.text}</uui-badge
+					>`
+				: nothing}</uui-tab
+		>`;
 	}
 
 	static override styles = [

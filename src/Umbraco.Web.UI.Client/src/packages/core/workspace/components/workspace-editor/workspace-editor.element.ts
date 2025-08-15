@@ -89,7 +89,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		this._hintMap = new Map();
 		this.#workspaceViewHintObservers = this._workspaceViews.map((view, index) =>
 			this.observe(
-				view.firstHintOfVariant(),
+				view.firstHintOfVariant,
 				(hint) => {
 					if (hint) {
 						this._hintMap.set(view.manifest.alias, hint);
@@ -170,16 +170,17 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 									const manifest = view.manifest;
 									const displayName = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
 									const hint = this._hintMap.get(manifest.alias);
+									const active =
+										'view/' + manifest.meta.pathname === this._activePath || (index === 0 && this._activePath === '');
 									// Notice how we use index 0 to determine which workspace that is active with empty path. [NL]
 									return html`
 										<uui-tab
 											href="${this._routerPath}/view/${manifest.meta.pathname}"
 											.label=${displayName}
-											?active=${'view/' + manifest.meta.pathname === this._activePath ||
-											(index === 0 && this._activePath === '')}
+											?active=${active}
 											data-mark="workspace:view-link:${manifest.alias}">
 											<div slot="icon">
-												<umb-icon name=${manifest.meta.icon}></umb-icon> ${hint
+												<umb-icon name=${manifest.meta.icon}></umb-icon> ${hint && !active
 													? html`<uui-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
 															>${hint.text}</uui-badge
 														>`
