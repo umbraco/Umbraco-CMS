@@ -252,7 +252,7 @@
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.16",
 		"typedoc": "^0.28.10",
-		"typescript": "5.8.3",
+		"typescript": "5.9.2",
 		"typescript-eslint": "^8.39.1",
 		"typescript-json-schema": "^0.65.1",
 		"vite": "^7.1.2",
