@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
-// TODO ELEMENTS: implement IPublishedElement cache with an actual cache behind
+// TODO ELEMENTS: implement IPublishedElement cache with an actual cache behind (see DocumentCacheService)
 internal class ElementCacheService : IElementCacheService
 {
     private readonly IElementService _elementService;
@@ -46,4 +46,13 @@ internal class ElementCacheService : IElementCacheService
         result = _publishedContentFactory.ToIPublishedElement(cacheNode, preview.Value);
         return Task.FromResult(result.CreateModel(_publishedModelFactory));
     }
+
+    // TODO ELEMENTS: implement memory cache
+    public Task ClearMemoryCacheAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    // TODO ELEMENTS: implement memory cache
+    public Task RefreshMemoryCacheAsync(Guid key) => Task.CompletedTask;
+
+    // TODO ELEMENTS: implement memory cache
+    public Task RemoveFromMemoryCacheAsync(Guid key) => Task.CompletedTask;
 }

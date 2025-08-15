@@ -64,16 +64,6 @@ public interface IPublishedElement
     int SortOrder { get; }
 
     /// <summary>
-    ///     Gets the tree level of the content item.
-    /// </summary>
-    int Level { get; }
-
-    /// <summary>
-    ///     Gets the tree path of the content item.
-    /// </summary>
-    string Path { get; }
-
-    /// <summary>
     ///     Gets the identifier of the user who created the content item.
     /// </summary>
     int CreatorId { get; }

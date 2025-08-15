@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Cache;
 public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCacheRefresherNotification, ElementCacheRefresher.JsonPayload>
 {
     private readonly IIdKeyMap _idKeyMap;
-    private readonly IElementService _elementService;
+    private readonly IElementCacheService _elementCacheService;
     private readonly ICacheManager _cacheManager;
 
     public ElementCacheRefresher(
@@ -22,12 +22,12 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
         IIdKeyMap idKeyMap,
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory,
-        IElementService elementService,
+        IElementCacheService elementCacheService,
         ICacheManager cacheManager)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
-        _elementService = elementService;
+        _elementCacheService = elementCacheService;
 
         // TODO: Use IElementsCache instead of ICacheManager, see ContentCacheRefresher for more information.
         _cacheManager = cacheManager;
@@ -37,7 +37,7 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
 
     public class JsonPayload
     {
-        public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
+        public JsonPayload(int id, Guid key, TreeChangeTypes changeTypes)
         {
             Id = id;
             Key = key;
@@ -46,7 +46,7 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
 
         public int Id { get; }
 
-        public Guid? Key { get; }
+        public Guid Key { get; }
 
         public TreeChangeTypes ChangeTypes { get; }
 
@@ -89,15 +89,10 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
             // By GUID Key
             isolatedCache.Clear(RepositoryCacheKeys.GetKey<IElement, Guid?>(payload.Key));
 
-            // remove those that are in the branch
-            if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
-            {
-                var pathid = "," + payload.Id + ",";
-                isolatedCache.ClearOfType<IElement>((k, v) => v.Path?.Contains(pathid) ?? false);
-            }
-
             HandleMemoryCache(payload);
-            HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
+
+            // TODO ELEMENTS: if we need published status caching for elements (e.g. for seeding purposes), make sure
+            //                it is kept in sync here (see ContentCacheRefresher)
 
             if (payload.ChangeTypes == TreeChangeTypes.Remove)
             {
@@ -110,15 +105,22 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
         base.Refresh(payloads);
     }
 
-    private async Task HandlePublishedAsync(JsonPayload payload, CancellationToken cancellationToken)
-    {
-        // TODO ELEMENTS: clear published status memory cache (see ContentCacheRefresher)
-        await Task.CompletedTask;
-    }
-
     private void HandleMemoryCache(JsonPayload payload)
     {
-        // TODO ELEMENTS: clear published elements memory cache (see ContentCacheRefresher)
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            _elementCacheService.ClearMemoryCacheAsync(CancellationToken.None).GetAwaiter().GetResult();
+        }
+        else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) || payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
+        {
+            // NOTE: RefreshBranch might be triggered even though elements do not support branch publishing
+            _elementCacheService.RefreshMemoryCacheAsync(payload.Key).GetAwaiter().GetResult();
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            _elementCacheService.RemoveFromMemoryCacheAsync(payload.Key).GetAwaiter().GetResult();
+        }
     }
 
     // these events should never trigger

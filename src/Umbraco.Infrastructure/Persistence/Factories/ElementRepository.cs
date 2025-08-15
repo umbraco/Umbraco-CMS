@@ -1343,32 +1343,9 @@ public class ElementRepository : ContentRepositoryBase<int, IElement, ElementRep
             ordering);
     }
 
+    // NOTE: Elements cannot have unpublished parents
     public bool IsPathPublished(IElement? content)
-    {
-        // fail fast
-        if (content?.Path.StartsWith("-1,-20,") ?? false)
-        {
-            return false;
-        }
-
-        // succeed fast
-        if (content?.ParentId == -1)
-        {
-            return content.Published;
-        }
-
-        IEnumerable<int>? ids = content?.Path.Split(Constants.CharArrays.Comma).Skip(1)
-            .Select(s => int.Parse(s, CultureInfo.InvariantCulture));
-
-        Sql<ISqlContext> sql = SqlContext.Sql()
-            .SelectCount<NodeDto>(x => x.NodeId)
-            .From<NodeDto>()
-            .InnerJoin<ElementDto>().On<NodeDto, ElementDto>((n, d) => n.NodeId == d.NodeId && d.Published)
-            .WhereIn<NodeDto>(x => x.NodeId, ids);
-
-        var count = Database.ExecuteScalar<int>(sql);
-        return count == content?.Level;
-    }
+        => content is { Trashed: false, Published: true };
 
     #endregion
 

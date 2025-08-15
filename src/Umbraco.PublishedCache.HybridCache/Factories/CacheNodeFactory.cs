@@ -149,10 +149,11 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
         // sanitize - names should be ok but ... never knows
         if (content.ContentType.VariesByCulture())
         {
-            ContentCultureInfosCollection? infos = content is IContent document
+            var publishableContent = content as IPublishableContentBase;
+            ContentCultureInfosCollection? infos = publishableContent is not null
                 ? published
-                    ? document.PublishCultureInfos
-                    : document.CultureInfos
+                    ? publishableContent.PublishCultureInfos
+                    : publishableContent.CultureInfos
                 : content.CultureInfos;
 
             // ReSharper disable once UseDeconstruction
@@ -160,7 +161,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             {
                 foreach (ContentCultureInfos cultureInfo in infos)
                 {
-                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
+                    var cultureIsDraft = !published && publishableContent is not null && publishableContent.IsCultureEdited(cultureInfo.Culture);
                     cultureData[cultureInfo.Culture] = new CultureVariation
                     {
                         Name = cultureInfo.Name,

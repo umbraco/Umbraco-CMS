@@ -39,10 +39,6 @@ public abstract class PublishedElementWrapped : IPublishedElement
 
     public int SortOrder => _content.SortOrder;
 
-    public int Level => _content.Level;
-
-    public string Path => _content.Path;
-
     public int CreatorId => _content.CreatorId;
 
     public DateTime CreateDate => _content.CreateDate;

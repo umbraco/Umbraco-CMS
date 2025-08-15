@@ -94,6 +94,16 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
 
     #region Abstract implementations
 
+    protected override UmbracoObjectTypes ContentObjectType => UmbracoObjectTypes.Element;
+
+    protected override int[] ReadLockIds => WriteLockIds;
+
+    protected override int[] WriteLockIds => new[] { Constants.Locks.ElementTree };
+
+    protected override bool SupportsBranchPublishing => false;
+
+    protected override ILogger<ElementService> Logger => _logger;
+
     protected override IElement CreateContentInstance(string name, int parentId, IContentType contentType, int userId)
         => new Element(name, contentType, userId);
 
@@ -101,20 +111,11 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     protected override IElement CreateContentInstance(string name, IElement parent, IContentType contentType, int userId)
         => throw new InvalidOperationException("Elements cannot be nested underneath one another");
 
-    protected override UmbracoObjectTypes ContentObjectType
-        => UmbracoObjectTypes.Element;
-
     protected override void DeleteLocked(ICoreScope scope, IElement content, EventMessages evtMsgs)
     {
         _elementRepository.Delete(content);
         scope.Notifications.Publish(new ElementDeletedNotification(content, evtMsgs));
     }
-
-    protected override ILogger<ElementService> Logger => _logger;
-
-    protected override int[] ReadLockIds => WriteLockIds;
-
-    protected override int[] WriteLockIds => new[] { Constants.Locks.ElementTree };
 
     protected override SavingNotification<IElement> SavingNotification(IElement content, EventMessages eventMessages)
         => new ElementSavingNotification(content, eventMessages);

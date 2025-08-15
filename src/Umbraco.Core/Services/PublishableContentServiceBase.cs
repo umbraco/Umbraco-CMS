@@ -55,11 +55,19 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         _idKeyMap = idKeyMap;
     }
 
+    protected abstract UmbracoObjectTypes ContentObjectType { get; }
+
+    protected abstract int[] ReadLockIds { get; }
+
+    protected abstract int[] WriteLockIds { get; }
+
+    protected abstract bool SupportsBranchPublishing { get; }
+
+    protected abstract ILogger<PublishableContentServiceBase<TContent>> Logger { get; }
+
     protected abstract TContent CreateContentInstance(string name, int parentId, IContentType contentType, int userId);
 
     protected abstract TContent CreateContentInstance(string name, TContent parent, IContentType contentType, int userId);
-
-    protected abstract UmbracoObjectTypes ContentObjectType { get; }
 
     protected virtual PublishResult CommitDocumentChanges(
         ICoreScope scope,
@@ -71,12 +79,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         => CommitDocumentChangesInternal(scope, content, eventMessages, allLangs, notificationState, userId);
 
     protected abstract void DeleteLocked(ICoreScope scope, TContent content, EventMessages evtMsgs);
-
-    protected abstract int[] ReadLockIds { get; }
-
-    protected abstract int[] WriteLockIds { get; }
-
-    protected abstract ILogger<PublishableContentServiceBase<TContent>> Logger { get; }
 
     protected abstract SavingNotification<TContent> SavingNotification(TContent content, EventMessages eventMessages);
 
@@ -1020,7 +1022,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             : null;
 
         var isNew = !content.HasIdentity;
-        TreeChangeTypes changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
+        TreeChangeTypes changeType = isNew || SupportsBranchPublishing is false ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
         var previouslyPublished = content.HasIdentity && content.Published;
 
         // Inline method to persist the document with the documentRepository since this logic could be called a couple times below
@@ -1165,7 +1167,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                 scope.Notifications.Publish(UnpublishedNotification(content, eventMessages).WithState(notificationState));
                 scope.Notifications.Publish(TreeChangeNotification(
                     content,
-                    TreeChangeTypes.RefreshBranch,
+                    SupportsBranchPublishing ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode,
                     variesByCulture ? culturesPublishing.IsCollectionEmpty() ? null : culturesPublishing : null,
                     variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : ["*"],
                     eventMessages));
@@ -1211,7 +1213,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             // and succeeded, trigger events
             if (publishResult?.Success ?? false)
             {
-                if (isNew == false && previouslyPublished == false)
+                if (isNew == false && previouslyPublished == false && SupportsBranchPublishing)
                 {
                     changeType = TreeChangeTypes.RefreshBranch; // whole branch
                 }
@@ -1684,7 +1686,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             }
         }
 
-        if (checkPath)
+        if (checkPath && SupportsBranchPublishing)
         {
             // check if the content can be path-published
             // root content can be published

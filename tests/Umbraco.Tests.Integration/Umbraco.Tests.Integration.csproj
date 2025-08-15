@@ -319,7 +319,7 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Delete.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.Pubiish.cs">
+    <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.Publish.cs">
       <DependentUpon>ElementPublishingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.Unpublish.cs">

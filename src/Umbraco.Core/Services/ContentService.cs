@@ -2028,13 +2028,15 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     #region Abstract implementations
 
-    protected override ILogger<ContentService> Logger => _logger;
+    protected override UmbracoObjectTypes ContentObjectType => UmbracoObjectTypes.Document;
 
     protected override int[] ReadLockIds => WriteLockIds;
 
     protected override int[] WriteLockIds => new[] { Constants.Locks.ContentTree };
 
-    protected override UmbracoObjectTypes ContentObjectType => UmbracoObjectTypes.Document;
+    protected override bool SupportsBranchPublishing => true;
+
+    protected override ILogger<ContentService> Logger => _logger;
 
     protected override IContent CreateContentInstance(string name, int parentId, IContentType contentType, int userId)
         => new Content(name, parentId, contentType, userId);

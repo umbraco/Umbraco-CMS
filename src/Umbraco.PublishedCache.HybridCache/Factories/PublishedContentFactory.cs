@@ -23,16 +23,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
 
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
-        IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
-        var contentNode = new ContentNode(
-            contentCacheNode.Id,
-            contentCacheNode.Key,
-            contentCacheNode.SortOrder,
-            contentCacheNode.CreateDate,
-            contentCacheNode.CreatorId,
-            contentType,
-            preview ? contentCacheNode.Data : null,
-            preview ? null : contentCacheNode.Data);
+        ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
 
         IPublishedContent? model = GetModel(contentNode, preview);
 
@@ -45,11 +36,19 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     }
 
     public IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview)
-        // TODO ELEMENTS: while this almost and carries no performance penalty, it's:
-        //                - a little hacky to convert to IPublishedContent, and
-        //                - certain things won't work properly within PublishedContent (like Level and GetParent())
-        //                -> see if it can be changed without hacking the planet
-        => ToIPublishedContent(contentCacheNode, preview);
+    {
+        ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
+
+        IPublishedElement? model = GetPublishedElement(contentNode, preview);
+
+        if (preview)
+        {
+            // TODO ELEMENTS: what is the element equivalent of this?
+            // return model ?? GetPublishedContentAsDraft(model);
+        }
+
+        return model;
+    }
 
     public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
     {
@@ -95,6 +94,20 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor);
     }
 
+    private ContentNode CreateContentNode(ContentCacheNode contentCacheNode, bool preview)
+    {
+        IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
+        return new ContentNode(
+            contentCacheNode.Id,
+            contentCacheNode.Key,
+            contentCacheNode.SortOrder,
+            contentCacheNode.CreateDate,
+            contentCacheNode.CreatorId,
+            contentType,
+            preview ? contentCacheNode.Data : null,
+            preview ? null : contentCacheNode.Data);
+    }
+
     private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
     {
         var properties = member
@@ -129,12 +142,25 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         properties[alias] = new[] { new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty } };
     }
 
+    // TODO ELEMENTS: rename this to GetPublishedContent
     private IPublishedContent? GetModel(ContentNode node, bool preview)
     {
         ContentData? contentData = preview ? node.DraftModel : node.PublishedModel;
         return contentData == null
             ? null
             : new PublishedContent(
+                node,
+                preview,
+                _elementsCache,
+                _variationContextAccessor);
+    }
+
+    private IPublishedElement? GetPublishedElement(ContentNode node, bool preview)
+    {
+        ContentData? contentData = preview ? node.DraftModel : node.PublishedModel;
+        return contentData == null
+            ? null
+            : new PublishedElement(
                 node,
                 preview,
                 _elementsCache,

@@ -6,4 +6,10 @@ namespace Umbraco.Cms.Core.PublishedCache;
 public interface IElementCacheService
 {
     Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null);
+
+    Task ClearMemoryCacheAsync(CancellationToken cancellationToken);
+
+    Task RefreshMemoryCacheAsync(Guid key);
+
+    Task RemoveFromMemoryCacheAsync(Guid key);
 }

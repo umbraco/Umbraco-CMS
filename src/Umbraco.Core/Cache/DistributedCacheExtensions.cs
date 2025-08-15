@@ -231,7 +231,7 @@ public static class DistributedCacheExtensions
 
     public static void RefreshAllElementCache(this DistributedCache dc)
         // note: refresh all element cache does refresh content types too
-        => dc.RefreshByPayload(ElementCacheRefresher.UniqueId, new ElementCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll).Yield());
+        => dc.RefreshByPayload(ElementCacheRefresher.UniqueId, new ElementCacheRefresher.JsonPayload(0, Guid.Empty, TreeChangeTypes.RefreshAll).Yield());
 
 
     public static void RefreshElementCache(this DistributedCache dc, IEnumerable<TreeChange<IElement>> changes)

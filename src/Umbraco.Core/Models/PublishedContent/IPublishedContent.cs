@@ -31,4 +31,14 @@ public interface IPublishedContent : IPublishedElement
     /// </summary>
     [Obsolete("Please use either the IPublishedContent.Children() extension method in the Umbraco.Extensions namespace, or IDocumentNavigationQueryService if you only need keys. Scheduled for removal in V16.")]
     IEnumerable<IPublishedContent> Children { get; }
+
+    /// <summary>
+    ///     Gets the tree level of the content item.
+    /// </summary>
+    int Level { get; }
+
+    /// <summary>
+    ///     Gets the tree path of the content item.
+    /// </summary>
+    string Path { get; }
 }

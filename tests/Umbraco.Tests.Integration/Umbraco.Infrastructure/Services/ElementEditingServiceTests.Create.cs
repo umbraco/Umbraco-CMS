@@ -441,6 +441,7 @@ public partial class ElementEditingServiceTests
     }
 
     [Test]
+    // TODO ELEMENTS: make ContentEditingServiceBase element aware so it can guard against this test case
     // TODO ELEMENTS: create a similar test for content creation based on element types
     public async Task Cannot_Create_Element_Based_On_NonElement_ContentType()
     {
