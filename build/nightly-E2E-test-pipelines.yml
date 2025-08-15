@@ -755,16 +755,6 @@ stages:
         timeoutInMinutes: 180
         variables:
           SA_PASSWORD: UmbracoAcceptance123!
-        # Since these values are set as secrets, we need to see them as an environment variable to be able to use them
-        # This is not the best solution, we should split the cases in our matrix into pipeline templates. especially the different app settings, as they have different logic
-        env:
-          AZUREB2CDOMAIN: $(AZUREB2CDOMAIN)
-          AZUREB2CTENANT: $(AZUREB2CTENANT)
-          AZUREB2CPOLICY: $(AZUREB2CPOLICY)
-          AZUREB2CCLIENTID: $(AZUREB2CCLIENTID)
-          AZUREB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
-          AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
-          AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
         strategy:
           matrix:
             # UnattendedInstallConfig
@@ -803,6 +793,18 @@ stages:
               packageVersion: "9.0.8"
               CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              # Since these values are set as secrets, we need to see them as an environment variable to be able to use them
+              # This is not the best solution, we should split the cases in our matrix into pipeline templates. especially the different app settings, as they have different logic
+              AZUREB2CCLIENTID2: $(AZUREB2CCLIENTID)
+
+              env:
+                AZUREB2CDOMAIN: $(AZUREB2CDOMAIN)
+                AZUREB2CTENANT: $(AZUREB2CTENANT)
+                AZUREB2CPOLICY: $(AZUREB2CPOLICY)
+                AZUREB2CCLIENTID: $(AZUREB2CCLIENTID)
+                AZUREB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
+                AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
+                AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
 
         pool:
           vmImage: $(vmImage)
@@ -810,7 +812,9 @@ stages:
         steps:
           - pwsh: |
               $value = $env:AZUREB2CCLIENTID
+              $value2 = $env:AZUREB2CCLIENTID2
               Write-Host "Length: $($value.Length)"
+              Write-Host "Length: $($value2.Length)"
             displayName: Checks the length of the client id
           # Setup test environment
           - task: DownloadPipelineArtifact@2
