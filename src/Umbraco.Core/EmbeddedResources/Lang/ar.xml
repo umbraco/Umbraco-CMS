@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <language
   alias="ar"
-  intName="Arabic (Morocco)"
+  intName="Arabic"
   localName="Arabic"
-  lcid=""
-  culture="ar-MA"
+  lcid="6145"
+  culture="ar"
 >
   <creator>
     <name>مجتمع أومبراكو</name>
