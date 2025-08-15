@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -9,7 +7,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the ContentService, which is an easy access to operations involving <see cref="IContent" />
 /// </summary>
-public interface IContentService : IContentServiceBase<IContent>
+public interface IContentService : IPublishableContentService<IContent>
 {
     #region Rollback
 
@@ -110,13 +108,6 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     <see cref="ContentScheduleCollection" />
     /// </returns>
     ContentScheduleCollection GetContentScheduleByContentId(int contentId);
-
-    /// <summary>
-    ///     Persists publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="contentSchedule"></param>
-    void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule);
 
     /// <summary>
     ///     Gets documents.
@@ -280,26 +271,6 @@ public interface IContentService : IContentServiceBase<IContent>
     #region Save, Delete Document
 
     /// <summary>
-    ///     Saves a document.
-    /// </summary>
-    OperationResult Save(IContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null);
-
-    /// <summary>
-    ///     Saves documents.
-    /// </summary>
-    // TODO: why only 1 result not 1 per content?!
-    OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Deletes a document.
-    /// </summary>
-    /// <remarks>
-    ///     <para>This method will also delete associated media files, child content and possibly associated domains.</para>
-    ///     <para>This method entirely clears the content from the database.</para>
-    /// </remarks>
-    OperationResult Delete(IContent content, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Deletes all documents of a given document type.
     /// </summary>
     /// <remarks>
@@ -383,19 +354,6 @@ public interface IContentService : IContentServiceBase<IContent>
     #region Publish Document
 
     /// <summary>
-    ///     Publishes a document.
-    /// </summary>
-    /// <remarks>
-    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
-    ///     <para>Wildcards (*) can be used as culture identifier to publish all cultures.</para>
-    ///     <para>An empty array (or a wildcard) can be passed for culture invariant content.</para>
-    /// </remarks>
-    /// <param name="content">The document to publish.</param>
-    /// <param name="cultures">The cultures to publish.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Publishes a document branch.
     /// </summary>
     /// <param name="content">The root document.</param>
@@ -425,22 +383,6 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     </para>
     /// </remarks>
     IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Unpublishes a document.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         By default, unpublishes the document as a whole, but it is possible to specify a culture to be
-    ///         unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
-    ///         the document as a whole may or may not remain published.
-    ///     </para>
-    ///     <para>
-    ///         If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
-    ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
-    ///     </para>
-    /// </remarks>
-    PublishResult Unpublish(IContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets a value indicating whether a document is path-publishable.
@@ -522,7 +464,4 @@ public interface IContentService : IContentServiceBase<IContent>
     #endregion
 
     Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
-
-ContentScheduleCollection GetContentScheduleByContentId(Guid contentId) => StaticServiceProvider.Instance
-    .GetRequiredService<ContentService>().GetContentScheduleByContentId(contentId);
 }
