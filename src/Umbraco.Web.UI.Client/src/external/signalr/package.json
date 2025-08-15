@@ -1,0 +1,11 @@
+{
+	"name": "@umbraco-backoffice/signalr",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	},
+	"dependencies": {
+		"@microsoft/signalr": "9.0.6"
+	}
+}
