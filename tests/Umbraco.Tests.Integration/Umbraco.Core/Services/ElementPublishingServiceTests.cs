@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -31,6 +32,8 @@ public partial class ElementPublishingServiceTests : UmbracoIntegrationTest
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
+
+    private IElementCacheService ElementCacheService => GetRequiredService<IElementCacheService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 

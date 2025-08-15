@@ -20,6 +20,10 @@ public partial class ElementPublishingServiceTests
 
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.NotNull(element!.PublishDate);
+
+        var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
+        Assert.NotNull(publishedElement);
+        Assert.IsTrue(publishedElement.IsPublished());
     }
 
     [Test]
@@ -36,6 +40,12 @@ public partial class ElementPublishingServiceTests
         Assert.IsTrue(publishAttempt.Success);
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.AreEqual(1, element!.PublishedCultures.Count());
+
+        var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
+        Assert.NotNull(publishedElement);
+        Assert.IsTrue(publishedElement.IsPublished(langEn.IsoCode));
+        Assert.IsFalse(publishedElement.IsPublished(langDa.IsoCode));
+        Assert.IsFalse(publishedElement.IsPublished(langBe.IsoCode));
     }
 
     [Test]
@@ -55,6 +65,12 @@ public partial class ElementPublishingServiceTests
         Assert.IsTrue(publishAttempt.Success);
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.AreEqual(2, element!.PublishedCultures.Count());
+
+        var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
+        Assert.NotNull(publishedElement);
+        Assert.IsTrue(publishedElement.IsPublished(langEn.IsoCode));
+        Assert.IsTrue(publishedElement.IsPublished(langDa.IsoCode));
+        Assert.IsFalse(publishedElement.IsPublished(langBe.IsoCode));
     }
 
     [Test]
@@ -75,5 +91,11 @@ public partial class ElementPublishingServiceTests
         Assert.IsTrue(publishAttempt.Success);
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.AreEqual(3, element!.PublishedCultures.Count());
+
+        var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
+        Assert.NotNull(publishedElement);
+        Assert.IsTrue(publishedElement.IsPublished(langEn.IsoCode));
+        Assert.IsTrue(publishedElement.IsPublished(langDa.IsoCode));
+        Assert.IsTrue(publishedElement.IsPublished(langBe.IsoCode));
     }
 }

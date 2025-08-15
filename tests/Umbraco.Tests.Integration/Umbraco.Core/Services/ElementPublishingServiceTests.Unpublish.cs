@@ -24,6 +24,9 @@ public partial class ElementPublishingServiceTests
         Assert.IsTrue(unpublishAttempt.Success);
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.IsNull(element!.PublishDate);
+
+        var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
+        Assert.IsNull(publishedElement);
     }
 
     [Test]
@@ -45,6 +48,9 @@ public partial class ElementPublishingServiceTests
         Assert.IsTrue(unpublishAttempt.Success);
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.AreEqual(0, element!.PublishedCultures.Count());
+
+        var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
+        Assert.IsNull(publishedElement);
     }
 
     [Test]
@@ -70,6 +76,12 @@ public partial class ElementPublishingServiceTests
         Assert.IsTrue(unpublishAttempt.Success);
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.AreEqual(1, element!.PublishedCultures.Count());
+
+        var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
+        Assert.NotNull(publishedElement);
+        Assert.IsFalse(publishedElement.IsPublished(langEn.IsoCode));
+        Assert.IsFalse(publishedElement.IsPublished(langDa.IsoCode));
+        Assert.IsTrue(publishedElement.IsPublished(langBe.IsoCode));
     }
 
     [Test]
@@ -95,5 +107,8 @@ public partial class ElementPublishingServiceTests
         Assert.IsTrue(unpublishAttempt.Success);
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.AreEqual(0, element!.PublishedCultures.Count());
+
+        var publishedElement = await ElementCacheService.GetByKeyAsync(element.Key, false);
+        Assert.IsNull(publishedElement);
     }
 }
