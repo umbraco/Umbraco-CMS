@@ -51,7 +51,6 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 	}
 
 	readonly #dataTypeItemManager = new UmbDataTypeItemRepositoryManager(this);
-	#dataTypeSchemaAliasMap = new Map<string, string>();
 
 	readonly structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(
 		this,
@@ -88,18 +87,6 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 			this.structure.contentTypeDataTypeUniques,
 			(dataTypeUniques: Array<string>) => {
 				this.#dataTypeItemManager.setUniques(dataTypeUniques);
-			},
-			null,
-		);
-		this.observe(
-			this.#dataTypeItemManager.items,
-			(dataTypes) => {
-				// Make a map of the data type unique and editorAlias:
-				this.#dataTypeSchemaAliasMap = new Map(
-					dataTypes.map((dataType) => {
-						return [dataType.unique, dataType.propertyEditorSchemaAlias];
-					}),
-				);
 			},
 			null,
 		);
@@ -217,8 +204,9 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 			throw new Error(`Property alias "${alias}" not found.`);
 		}
 
-		// TODO: I think we should await this in the same way as we do for Content Detail Workspace Context. [NL]
-		const editorAlias = this.#dataTypeSchemaAliasMap.get(property.dataType.unique);
+		const dataTypeItem = await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique);
+		const editorAlias = dataTypeItem?.propertyEditorUiAlias;
+
 		if (!editorAlias) {
 			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
 		}
