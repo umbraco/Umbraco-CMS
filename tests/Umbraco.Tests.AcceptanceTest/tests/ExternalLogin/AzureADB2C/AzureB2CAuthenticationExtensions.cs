@@ -23,11 +23,11 @@ namespace Umbraco.Cms.Tests.AcceptanceTest.ExternalLogin.AzureADB2C
                     {
                         options.RequireHttpsMetadata = true;
                         options.SaveTokens = true;
-                        options.ClientId = b2CSettings.ClientId;
-                        options.ClientSecret = b2CSettings.ClientSecret;
+                        options.ClientId = b2cSettings.ClientId;
+                        options.ClientSecret = b2cSettings.ClientSecret;
                         options.CallbackPath = "/umbraco-b2c-users-signin";
                         options.MetadataAddress =
-                            $"https://{b2CSettings.Domain}/{b2CSettings.Tenant}/{b2CSettings.Policy}/v2.0/.well-known/openid-configuration";
+                            $"https://{b2cSettings.Domain}/{b2cSettings.Tenant}/{b2cSettings.Policy}/v2.0/.well-known/openid-configuration";
 
                         options.ResponseType = OpenIdConnectResponseType.Code;
                         options.TokenValidationParameters.SaveSigninToken = true;
