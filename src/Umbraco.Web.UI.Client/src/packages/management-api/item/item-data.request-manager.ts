@@ -41,7 +41,6 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 
 		// Only read from the cache when we are connected to the server events
 		if (this.#isConnectedToServerEvents) {
-			console.log(this.#dataCache);
 			const cachedIds = ids.filter((id) => this.#dataCache.has(id));
 			cacheItems = cachedIds
 				.map((id) => this.#dataCache.get(id))
