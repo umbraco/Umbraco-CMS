@@ -17,6 +17,7 @@ export class UmbWorkspaceEditorNavigationContext extends UmbContextBase {
 	#views = new UmbBasicState(<Array<UmbWorkspaceViewContext>>[]);
 	public readonly views = this.#views.asObservable();
 
+	#variantId?: UmbVariantId;
 	#hints = new UmbHintController<UmbVariantHint>(this, {});
 
 	constructor(host: UmbControllerHost) {
@@ -46,7 +47,7 @@ export class UmbWorkspaceEditorNavigationContext extends UmbContextBase {
 					workspaceViews
 						.filter((view) => !viewsToKeep.some((x) => x.manifest.alias === view.manifest.alias))
 						.forEach((view) => {
-							const context = new UmbWorkspaceViewContext(this, view.manifest);
+							const context = new UmbWorkspaceViewContext(this, view.manifest, this.#variantId);
 							context.hints.inheritFrom(this.#hints);
 							newViews.push(context);
 						});
@@ -60,7 +61,11 @@ export class UmbWorkspaceEditorNavigationContext extends UmbContextBase {
 	}
 
 	setVariantId(variantId: UmbVariantId | undefined): void {
+		this.#variantId = variantId;
 		this.#hints.updateScaffold({ variantId });
+		this.#views.getValue().forEach((view) => {
+			view.hints.updateScaffold({ variantId });
+		});
 	}
 
 	async getViewContext(alias: string): Promise<UmbWorkspaceViewContext | undefined> {

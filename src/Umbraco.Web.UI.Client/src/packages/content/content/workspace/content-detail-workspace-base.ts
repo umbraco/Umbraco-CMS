@@ -54,7 +54,7 @@ import {
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
 import { UmbSegmentCollectionRepository, type UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
-import { UmbHintController } from '@umbraco-cms/backoffice/hint';
+import { UmbHintContext } from '@umbraco-cms/backoffice/hint';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -140,7 +140,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	/* Hints */
-	readonly hints = new UmbHintController(this);
+	readonly hints = new UmbHintContext(this);
 
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]

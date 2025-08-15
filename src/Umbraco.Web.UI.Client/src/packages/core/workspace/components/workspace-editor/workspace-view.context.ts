@@ -54,6 +54,7 @@ export class UmbWorkspaceViewContext extends UmbControllerBase {
 
 		this.#currentProvideHost = controllerHost;
 		this.#providerCtrl = controllerHost.provideContext(UMB_WORKSPACE_VIEW_CONTEXT, this);
+		this.hints.provideAt(controllerHost);
 	}
 
 	unprovide(): void {
@@ -61,6 +62,7 @@ export class UmbWorkspaceViewContext extends UmbControllerBase {
 			this.#providerCtrl.destroy();
 			this.#providerCtrl = undefined;
 		}
+		this.hints.unprovide();
 	}
 
 	firstHintOfVariant(): Observable<UmbVariantHint | undefined> {

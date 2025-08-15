@@ -102,13 +102,11 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			this.observe(
 				view.firstHintOfVariant(),
 				(hint) => {
-					console.log('hint found', view.manifest.alias, hint);
 					if (hint) {
 						this._hintMap.set(view.manifest.alias, hint);
 					} else {
 						this._hintMap.delete(view.manifest.alias);
 					}
-					console.log('hint map', this._hintMap);
 					this.requestUpdate('_hintMap');
 				},
 				'umbObserveState_' + index,
@@ -127,8 +125,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 					component: () => createExtensionElement(manifest),
 					setup: (component: any) => {
 						if (component) {
-							component.manifest = manifest;
 							context.provideAt(component);
+							component.manifest = manifest;
 						}
 					},
 				};

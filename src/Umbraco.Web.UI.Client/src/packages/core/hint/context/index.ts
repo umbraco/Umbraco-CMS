@@ -1,1 +1,2 @@
-export * from './hint.controller.js';
+export * from './hints.controller.js';
+export * from './hints.context.js';

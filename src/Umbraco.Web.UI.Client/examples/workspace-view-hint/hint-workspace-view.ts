@@ -21,10 +21,6 @@ export class ExampleHintWorkspaceView extends UmbElementMixin(LitElement) {
 			throw new Error('Could not find the view');
 		}
 
-		this.observe(view.hints.hints, (hints) => {
-			console.log('Local Hints:', hints, this);
-		});
-
 		if (view.hints.has('exampleHintFromToggleAction')) {
 			view.hints.removeOne('exampleHintFromToggleAction');
 		} else {

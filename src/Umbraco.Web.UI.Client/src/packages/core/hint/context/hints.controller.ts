@@ -118,8 +118,8 @@ export class UmbHintController<
 			parent?.descendingHints(this.#viewAlias),
 			(hints) => {
 				if (!hints) {
-					this.#hints.clear();
-					return;
+					console.warn('TODO: Does this case happen, maybe its only in destruction?');
+					hints = [];
 				}
 				this.initiateChange();
 				if (this.#parentHints) {
@@ -130,14 +130,11 @@ export class UmbHintController<
 				this.#parentHints = hints;
 
 				hints.forEach((hint) => {
-					// Remove first entry of hint.path:
-					const path = hint.path.slice(1);
-					if (path === undefined) {
-						throw new Error(
-							'Path was not transformed correctly and can therefor not be transfered to the local validation context messages.',
-						);
+					// Remove first entry of hint.path, if it matches viewAlias.
+					if (this.#viewAlias && hint.path[0] === this.#viewAlias) {
+						hint = { ...hint, path: hint.path.slice(1) };
 					}
-					this.#hints.appendOne({ ...hint, path } as HintType);
+					this.#hints.appendOne(hint as HintType);
 				});
 
 				this.finishChange();
@@ -153,13 +150,13 @@ export class UmbHintController<
 
 		this.#parent!.initiateChange();
 
-		const parentViewAlias = this.#parent.getViewAlias();
+		const viewAlias = this.getViewAlias();
 
 		hints.forEach((hint) => {
 			let newPath = hint.path;
 			// If the hint path does not already contain the parent view alias as the first entry, we add it. (This will usually happen, but some Hint Contexts does not have a view alias as they)
-			if (parentViewAlias && newPath[0] !== parentViewAlias) {
-				newPath = [parentViewAlias, ...hint.path];
+			if (viewAlias && newPath[0] !== viewAlias) {
+				newPath = [viewAlias, ...hint.path];
 			}
 			this.#parent!.addOne({ ...hint, path: newPath });
 		});
