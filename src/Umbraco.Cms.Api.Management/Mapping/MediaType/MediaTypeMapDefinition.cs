@@ -99,5 +99,6 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.Id = source.Key;
         target.Alias = source.Alias;
         target.Icon = source.Icon ?? string.Empty;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 }

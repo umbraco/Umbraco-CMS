@@ -115,6 +115,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.Id = source.Key;
         target.Alias = source.Alias;
         target.Icon = source.Icon ?? string.Empty;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
     // Umbraco.Code.MapAll

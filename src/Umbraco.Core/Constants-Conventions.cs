@@ -303,5 +303,16 @@ public static partial class Constants
         {
             public const string Prefix = "umb://";
         }
+
+        /// <summary>
+        ///     Constants for all Sign aliases.
+        /// </summary>
+        public static class Signs
+        {
+            /// <summary>
+            ///     Prefix for all signs aliases.
+            /// </summary>
+            public const string Prefix = "Umb.";
+        }
     }
 }
