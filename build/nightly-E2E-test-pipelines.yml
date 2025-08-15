@@ -795,20 +795,20 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               # Since these values are set as secrets, we need to see them as an environment variable to be able to use them
               # This is not the best solution, we should split the cases in our matrix into pipeline templates. especially the different app settings, as they have different logic
-              AZUREB2CDOMAIN: $(AZUREB2CDOMAIN)
-              AZUREB2CTENANT: $(AZUREB2CTENANT)
-              AZUREB2CPOLICY: $(AZUREB2CPOLICY)
-              AZUREB2CCLIENTID: $(AZUREB2CCLIENTID)
-              AZUREB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
-              AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
-              AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
+              AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
+              AZUREADB2CTENANT: $(AZUREB2CTENANT)
+              AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
+              AZURESDB2CCLIENTID: $(AZUREB2CCLIENTID)
+              AZURESDB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
+              AZUREADB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
+              AZUREADB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
 
         pool:
           vmImage: $(vmImage)
 
         steps:
           - pwsh: |
-              $value = $env:AZUREB2CCLIENTID
+              $value = $env:AZURESDB2CCLIENTID
               Write-Host "Length: $($value.Length)"
             displayName: Checks the length of the client id
           # Setup test environment
