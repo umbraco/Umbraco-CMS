@@ -12,6 +12,8 @@ import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/b
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
+	UmbEntityCreatedEvent,
+	UmbEntityUpdatedEvent,
 	UmbHasChildrenEntityContext,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -323,6 +325,11 @@ export abstract class UmbTreeItemContextBase<
 				UmbRequestReloadStructureForEntityEvent.TYPE,
 				this.#onReloadStructureRequest as unknown as EventListener,
 			);
+
+			this.#actionEventContext?.addEventListener(
+				UmbEntityUpdatedEvent.TYPE,
+				this.#onReloadStructureRequest as unknown as EventListener,
+			);
 		});
 	}
 
@@ -478,6 +485,11 @@ export abstract class UmbTreeItemContextBase<
 
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureRequest as unknown as EventListener,
+		);
+
+		this.#actionEventContext?.removeEventListener(
+			UmbEntityUpdatedEvent.TYPE,
 			this.#onReloadStructureRequest as unknown as EventListener,
 		);
 	};
