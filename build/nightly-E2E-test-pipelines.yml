@@ -797,16 +797,16 @@ stages:
         pool:
           vmImage: $(vmImage)
 
-          # Since these values are set as secrets, we need to see them as an environment variable to be able to use them
-          # This is not the best solution, we should split the cases in our matrix into pipeline templates. especially the different app settings, as they have different logic
-          env:
-            AZUREB2CDOMAIN: $(AZUREB2CDOMAIN)
-            AZUREB2CTENANT: $(AZUREB2CTENANT)
-            AZUREB2CPOLICY: $(AZUREB2CPOLICY)
-            AZUREB2CCLIENTID: $(AZUREB2CCLIENTID)
-            AZUREB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
-            AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
-            AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
+        # Since these values are set as secrets, we need to see them as an environment variable to be able to use them
+        # This is not the best solution, we should split the cases in our matrix into pipeline templates. especially the different app settings, as they have different logic
+        env:
+          AZUREB2CDOMAIN: $(AZUREB2CDOMAIN)
+          AZUREB2CTENANT: $(AZUREB2CTENANT)
+          AZUREB2CPOLICY: $(AZUREB2CPOLICY)
+          AZUREB2CCLIENTID: $(AZUREB2CCLIENTID)
+          AZUREB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
+          AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
+          AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
 
         steps:
           - pwsh: |
