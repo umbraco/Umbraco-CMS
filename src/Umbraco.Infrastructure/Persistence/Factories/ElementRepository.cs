@@ -637,18 +637,15 @@ public class ElementRepository : ContentRepositoryBase<int, IElement, ElementRep
         var list = new List<string>
         {
             "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.RedirectUrl +
-            " WHERE contentKey IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node +
-            " WHERE id = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
-            "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup +
-            " SET startContentId = NULL WHERE startContentId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
+            // TODO ELEMENTS: include these if applicable, or clean up if not
+            // "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
+            // "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
+            // "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup +
+            // " SET startContentId = NULL WHERE startContentId = @id",
+            // "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
+            // "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Domain + " WHERE domainRootStructureID = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Element + " WHERE nodeId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.ElementCultureVariation + " WHERE nodeId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.ElementVersion + " WHERE id IN (SELECT id FROM " +
@@ -659,7 +656,8 @@ public class ElementRepository : ContentRepositoryBase<int, IElement, ElementRep
             " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion +
             " WHERE nodeId = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id"
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id",
         };
         return list;
     }
