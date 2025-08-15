@@ -1,4 +1,3 @@
-using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 

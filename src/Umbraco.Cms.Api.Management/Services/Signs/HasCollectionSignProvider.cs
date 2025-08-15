@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
@@ -19,7 +20,8 @@ public class HasCollectionSignProvider : ISignProvider
         typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
         typeof(TItem) == typeof(DocumentCollectionResponseModel) ||
         typeof(TItem) == typeof(MediaTreeItemResponseModel) ||
-        typeof(TItem) == typeof(MediaCollectionResponseModel);
+        typeof(TItem) == typeof(MediaCollectionResponseModel) ||
+        typeof(TItem) == typeof(DocumentItemResponseModel);
 
 /// <inheritdoc/>
     public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
@@ -55,6 +57,14 @@ public class HasCollectionSignProvider : ISignProvider
 
                 case MediaCollectionResponseModel response:
                     if (response.MediaType.Collection != null)
+                    {
+                        item.AddSign(Alias);
+                    }
+
+                    break;
+
+                case DocumentItemResponseModel response:
+                    if (response.DocumentType.Collection != null)
                     {
                         item.AddSign(Alias);
                     }

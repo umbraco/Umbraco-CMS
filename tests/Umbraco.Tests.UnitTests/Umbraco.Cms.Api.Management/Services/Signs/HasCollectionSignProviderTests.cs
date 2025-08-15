@@ -2,6 +2,7 @@
 using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
@@ -24,6 +25,13 @@ internal class HasCollectionSignProviderTests
     {
         var sut = new HasCollectionSignProvider();
         Assert.IsTrue(sut.CanProvideSigns<DocumentCollectionResponseModel>());
+    }
+
+    [Test]
+    public async Task HasCollectionSignProvider_Can_Provide_Plain_Signs()
+    {
+        var sut = new HasCollectionSignProvider();
+        Assert.IsTrue(sut.CanProvideSigns<DocumentItemResponseModel>());
     }
 
     [Test]
@@ -73,6 +81,29 @@ internal class HasCollectionSignProviderTests
             new()
             {
                 Id = Guid.NewGuid(), DocumentType = new DocumentTypeCollectionReferenceResponseModel() { Collection = new ReferenceByIdModel(Guid.NewGuid()) },
+            },
+            new() { Id = Guid.NewGuid() },
+        };
+
+        await sut.PopulateSignsAsync(viewModels);
+
+        Assert.AreEqual(viewModels[0].Signs.Count(), 1);
+        Assert.AreEqual(viewModels[1].Signs.Count(), 0);
+
+        var signModel = viewModels[0].Signs.First();
+        Assert.AreEqual("Umb.HasCollection", signModel.Alias);
+    }
+
+    [Test]
+    public async Task HasCollectionSignProvider_Should_Populate_Plain_Signs()
+    {
+        var sut = new HasCollectionSignProvider();
+
+        var viewModels = new List<DocumentItemResponseModel>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(), DocumentType = new DocumentTypeReferenceResponseModel() { Collection = new ReferenceByIdModel(Guid.NewGuid()) },
             },
             new() { Id = Guid.NewGuid() },
         };

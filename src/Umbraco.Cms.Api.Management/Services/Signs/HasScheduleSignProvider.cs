@@ -1,5 +1,6 @@
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -24,7 +25,8 @@ internal class HasScheduleSignProvider : ISignProvider
     public bool CanProvideSigns<TItem>()
         where TItem : IHasSigns =>
         typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
-        typeof(TItem) == typeof(DocumentCollectionResponseModel);
+        typeof(TItem) == typeof(DocumentCollectionResponseModel) ||
+        typeof(TItem) == typeof(DocumentItemResponseModel);
 
     /// <inheritdoc/>
     public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
