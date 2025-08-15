@@ -1,5 +1,5 @@
 import { UmbWorkspaceViewContext } from './workspace-view.context.js';
-import { UMB_WORKSPACE_EDITOR_NAVIGATION_CONTEXT } from './workspace-editor-navigation.context-token.js';
+import { UMB_WORKSPACE_EDITOR_CONTEXT } from './workspace-editor.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -8,7 +8,7 @@ import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
-export class UmbWorkspaceEditorNavigationContext extends UmbContextBase {
+export class UmbWorkspaceEditorContext extends UmbContextBase {
 	//
 	#init: Promise<void>;
 	/**
@@ -21,7 +21,7 @@ export class UmbWorkspaceEditorNavigationContext extends UmbContextBase {
 	#hints = new UmbHintController<UmbVariantHint>(this, {});
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_WORKSPACE_EDITOR_NAVIGATION_CONTEXT);
+		super(host, UMB_WORKSPACE_EDITOR_CONTEXT);
 
 		this.#hints.inherit();
 

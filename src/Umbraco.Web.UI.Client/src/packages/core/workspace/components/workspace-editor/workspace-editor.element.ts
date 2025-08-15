@@ -1,5 +1,5 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
-import { UmbWorkspaceEditorNavigationContext } from './workspace-editor-navigation.context.js';
+import { UmbWorkspaceEditorContext } from './workspace-editor.context.js';
 import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
@@ -36,7 +36,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	So the question goes how can we sync this upward and downward for just specific variant ids. Or sync all, but only show by a filter..
 	I think all hints should support the concept of variant id, but it should be optional if we like to filter by it.
 	*/
-	#navigationContext = new UmbWorkspaceEditorNavigationContext(this);
+	#navigationContext = new UmbWorkspaceEditorContext(this);
 	#workspaceViewHintObservers: Array<UmbObserverController> = [];
 
 	@property()
