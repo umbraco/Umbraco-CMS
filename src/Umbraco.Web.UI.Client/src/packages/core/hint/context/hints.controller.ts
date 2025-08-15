@@ -95,6 +95,7 @@ export class UmbHintController<
 	}
 
 	inheritFrom(parent: UmbHintController | undefined): void {
+		if (this.#parent === parent) return;
 		this.#parent = parent;
 		this.observe(this.#parent?.scaffold, (scaffold) => {
 			if (scaffold) {

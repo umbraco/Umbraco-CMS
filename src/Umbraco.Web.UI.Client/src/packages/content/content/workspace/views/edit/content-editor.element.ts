@@ -45,7 +45,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	@state()
 	private _hintMap: Map<string, UmbVariantHint> = new Map();
 
-	#viewContexts: Array<UmbViewContext> = [];
+	#tabViewContexts: Array<UmbViewContext> = [];
 
 	#structureManager?: UmbContentTypeStructureManager<UmbContentTypeModel>;
 
@@ -55,8 +55,10 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		super();
 
 		this.consumeContext(UMB_VIEW_CONTEXT, (context) => {
-			// TODO: Parse on as inhiretFrom for all the view contexts.
 			this.#viewContext = context;
+			this.#tabViewContexts.forEach((view) => {
+				view.inheritFrom(this.#viewContext);
+			});
 		});
 
 		this._tabsStructureHelper.setIsRoot(true);
@@ -139,9 +141,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	}
 
 	#createViewContext(viewAlias: string) {
-		if (!this.#viewContexts.find((context) => context.viewAlias === viewAlias)) {
+		if (!this.#tabViewContexts.find((context) => context.viewAlias === viewAlias)) {
 			const view = new UmbViewContext(this, viewAlias);
-			this.#viewContexts.push(view);
+			this.#tabViewContexts.push(view);
 
 			view.inheritFrom(this.#viewContext);
 

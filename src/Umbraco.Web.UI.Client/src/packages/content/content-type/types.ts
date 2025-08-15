@@ -13,6 +13,14 @@ export interface UmbPropertyTypeContainerModel {
 	type: UmbPropertyContainerTypes;
 	sortOrder: number;
 }
+
+export interface UmbPropertyTypeContainerMergedModel {
+	ids: Array<string>;
+	path: Array<string>;
+	name: string;
+	type: UmbPropertyContainerTypes;
+	sortOrder: number;
+}
 /**
  *
  * @deprecated

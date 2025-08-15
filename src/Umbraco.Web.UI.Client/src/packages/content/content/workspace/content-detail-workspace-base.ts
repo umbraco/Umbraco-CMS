@@ -54,7 +54,8 @@ import {
 	type UmbPropertyTypePresetModelTypeModel,
 } from '@umbraco-cms/backoffice/property';
 import { UmbSegmentCollectionRepository, type UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
-import { UmbHintContext } from '@umbraco-cms/backoffice/hint';
+import { UmbHintContext, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -140,7 +141,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	/* Hints */
-	readonly hints = new UmbHintContext(this);
+	readonly hints = new UmbHintContext<UmbVariantHint>(this);
 
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]
@@ -207,6 +208,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
 		this.varies = this.structure.ownerContentTypeObservablePart((x) =>
 			x ? x.variesByCulture || x.variesBySegment : undefined,
+		);
+
+		new UmbContentValidationToHintsManager<ContentTypeDetailModelType>(
+			this,
+			this.structure,
+			this.validationContext,
+			this.hints,
 		);
 
 		this.variantOptions = mergeObservables(
