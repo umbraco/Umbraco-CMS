@@ -1,0 +1,3880 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<language
+  alias="ar"
+  intName="Arabic"
+  localName="Arabic"
+  lcid="6145"
+  culture="ar"
+>
+  <creator>
+    <name>مجتمع أومبراكو</name>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
+  </creator>
+  <area alias="actions">
+    <key alias="assigndomain">الثقافة وأسماء المضيفين</key>
+    <key alias="auditTrail">سجل المراجعة</key>
+    <key alias="browse">تصفح العقدة</key>
+    <key alias="changeDocType">تغيير نوع المستند</key>
+    <key alias="copy">نسخ</key>
+    <key alias="create">إنشاء</key>
+    <key alias="export">تصدير</key>
+    <key alias="createPackage">إنشاء حزمة</key>
+    <key alias="createGroup">إنشاء مجموعة</key>
+    <key alias="delete">حذف</key>
+    <key alias="disable">تعطيل</key>
+    <key alias="editSettings">تحرير الإعدادات</key>
+    <key alias="emptyrecyclebin">إفراغ سلة المحذوفات</key>
+    <key alias="enable">تمكين</key>
+    <key alias="exportDocumentType">تصدير نوع المستند</key>
+    <key alias="importdocumenttype">استيراد نوع المستند</key>
+    <key alias="importPackage">استيراد حزمة</key>
+    <key alias="liveEdit">تحرير في اللوحة</key>
+    <key alias="logout">خروج</key>
+    <key alias="move">نقل</key>
+    <key alias="notify">الإشعارات</key>
+    <key alias="protect">تقييد الوصول العام</key>
+    <key alias="publish">نشر</key>
+    <key alias="unpublish">إلغاء النشر</key>
+    <key alias="refreshNode">إعادة تحميل</key>
+    <key alias="republish">إعادة نشر الموقع بالكامل</key>
+    <key alias="remove">إزالة</key>
+    <key alias="rename" version="7.3.0">إعادة تسمية</key>
+    <key alias="restore" version="7.3.0">استعادة</key>
+    <key alias="chooseWhereToCopy">اختر مكان النسخ</key>
+    <key alias="chooseWhereToMove">اختر مكان النقل</key>
+    <key alias="chooseWhereToImport">اختر مكان الاستيراد</key>
+    <key alias="toInTheTreeStructureBelow">إلى في هيكل الشجرة أدناه</key>
+    <key
+      alias="infiniteEditorChooseWhereToCopy"
+    >اختر مكان نسخ العنصر/العناصر المحددة</key>
+    <key
+      alias="infiniteEditorChooseWhereToMove"
+    >اختر مكان نقل العنصر/العناصر المحددة</key>
+    <key alias="wasMovedTo">تم نقله إلى</key>
+    <key alias="wasCopiedTo">تم نسخه إلى</key>
+    <key alias="wasDeleted">تم حذفه</key>
+    <key alias="rights">الصلاحيات</key>
+    <key alias="rollback">التراجع</key>
+    <key alias="sendtopublish">إرسال للنشر</key>
+    <key alias="sendToTranslate">إرسال للترجمة</key>
+    <key alias="setGroup">تعيين مجموعة</key>
+    <key alias="sort">ترتيب</key>
+    <key alias="translate">ترجمة</key>
+    <key alias="update">تحديث</key>
+    <key alias="setPermissions">تعيين الصلاحيات</key>
+    <key alias="unlock">إلغاء القفل</key>
+    <key alias="createblueprint">إنشاء قالب المحتوى</key>
+    <key alias="resendInvite">إعادة إرسال الدعوة</key>
+    <key alias="toggleHideUnavailable">إخفاء الخيارات غير المتاحة</key>
+    <key alias="changeDataType">تغيير نوع البيانات</key>
+    <key alias="editContent">تحرير المحتوى</key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">عنوان الرابط</key>
+    <key alias="urlLinkPicker">الرابط</key>
+    <key alias="anchorLinkPicker">مرساة / سلسلة الاستعلام</key>
+    <key alias="anchorInsert">الاسم</key>
+    <key alias="closeThisWindow">إغلاق هذه النافذة</key>
+    <key alias="confirmdelete">هل أنت متأكد من أنك تريد الحذف</key>
+    <key
+      alias="confirmdeleteNumberOfItems"
+    ><![CDATA[هل أنت متأكد من أنك تريد حذف <strong>%0%</strong> من <strong>%1%</strong> عنصر]]></key>
+    <key alias="confirmdisable">هل أنت متأكد من أنك تريد التعطيل</key>
+    <key alias="confirmremove">هل أنت متأكد من أنك تريد الإزالة</key>
+    <key
+      alias="confirmremoveusageof"
+    ><![CDATA[هل أنت متأكد من أنك تريد إزالة استخدام <strong>%0%</strong>]]></key>
+    <key alias="confirmlogout">هل أنت متأكد؟</key>
+    <key alias="confirmSure">هل أنت متأكد؟</key>
+    <key alias="cut">قص</key>
+    <key alias="editDictionary">تحرير عنصر القاموس</key>
+    <key alias="editLanguage">تحرير اللغة</key>
+    <key alias="editSelectedMedia">تحرير الوسائط المحددة</key>
+    <key alias="editWebhook">تحرير الويب هوك</key>
+    <key alias="insertAnchor">إدراج رابط محلي</key>
+    <key alias="insertCharacter">إدراج حرف</key>
+    <key alias="insertgraphicheadline">إدراج عنوان رسومي</key>
+    <key alias="insertimage">إدراج صورة</key>
+    <key alias="insertlink">إدراج رابط</key>
+    <key alias="insertMacro">انقر لإضافة ماكرو</key>
+    <key alias="inserttable">إدراج جدول</key>
+    <key
+      alias="languagedeletewarning"
+    >هذا سيحذف اللغة وجميع المحتوى المتعلق باللغة</key>
+    <key
+      alias="languageChangeWarning"
+    >تغيير الثقافة للغة قد يكون عملية مكلفة وسيؤدي إلى إعادة بناء تخزين المحتوى المؤقت والفهارس
+    </key>
+    <key alias="lastEdited">آخر تحرير</key>
+    <key alias="link">رابط</key>
+    <key alias="linkinternal">رابط داخلي:</key>
+    <key
+      alias="linklocaltip"
+    >عند استخدام الروابط المحلية، أدرج "#" أمام الرابط</key>
+    <key alias="linknewwindow">فتح في نافذة جديدة؟</key>
+    <key
+      alias="macroDoesNotHaveProperties"
+    >هذا الماكرو لا يحتوي على أي خصائص يمكنك تحريرها</key>
+    <key alias="paste">لصق</key>
+    <key alias="permissionsEdit">تحرير الصلاحيات لـ</key>
+    <key alias="permissionsSet">تعيين الصلاحيات لـ</key>
+    <key
+      alias="permissionsSetForGroup"
+    >تعيين الصلاحيات لـ %0% لمجموعة المستخدم %1%</key>
+    <key
+      alias="permissionsHelp"
+    >حدد مجموعات المستخدمين التي تريد تعيين صلاحيات لها</key>
+    <key
+      alias="recycleBinDeleting"
+    >العناصر في سلة المحذوفات يتم حذفها الآن. يرجى عدم إغلاق هذه النافذة بينما تحدث هذه العملية
+    </key>
+    <key alias="recycleBinIsEmpty">سلة المحذوفات فارغة الآن</key>
+    <key
+      alias="recycleBinWarning"
+    >عندما يتم حذف العناصر من سلة المحذوفات، ستختفي للأبد</key>
+    <key alias="regexSearchError">
+      <![CDATA[خدمة ويب <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> تواجه حالياً بعض المشاكل، والتي لا نملك السيطرة عليها. نعتذر بشدة عن هذا الإزعاج.]]></key>
+    <key
+      alias="regexSearchHelp"
+    >ابحث عن تعبير نمطي لإضافة التحقق لحقل نموذج. مثال: 'email'، 'zip-code'، 'URL'.
+    </key>
+    <key alias="removeMacro">إزالة الماكرو</key>
+    <key alias="requiredField">حقل مطلوب</key>
+    <key alias="sitereindexed">تم إعادة فهرسة الموقع</key>
+    <key
+      alias="siterepublished"
+    >تم تحديث تخزين الموقع المؤقت. جميع المحتوى المنشور محدث الآن. بينما جميع المحتوى غير المنشور لا يزال غير منشور
+    </key>
+    <key
+      alias="siterepublishHelp"
+    >سيتم تحديث تخزين الموقع المؤقت. سيتم تحديث جميع المحتوى المنشور، بينما سيبقى المحتوى غير المنشور غير منشور.
+    </key>
+    <key alias="tableColumns">عدد الأعمدة</key>
+    <key alias="tableRows">عدد الصفوف</key>
+    <key
+      alias="thumbnailimageclickfororiginal"
+    >انقر على الصورة لرؤية الحجم الكامل</key>
+    <key alias="treepicker">اختيار العنصر</key>
+    <key alias="viewCacheItem">عرض عنصر التخزين المؤقت</key>
+    <key alias="relateToOriginalLabel">ربط بالأصل</key>
+    <key alias="includeDescendants">تضمين التوابع</key>
+    <key alias="theFriendliestCommunity">أودّ المجتمع</key>
+    <key alias="linkToPage">رابط للصفحة</key>
+    <key
+      alias="openInNewWindow"
+    >يفتح المستند المرتبط في نافذة أو علامة تبويب جديدة</key>
+    <key alias="linkToMedia">رابط للوسائط</key>
+    <key alias="selectContentStartNode">تحديد عقدة بداية المحتوى</key>
+    <key alias="selectEvent">تحديد حدث</key>
+    <key alias="selectMedia">تحديد وسائط</key>
+    <key alias="selectMediaType">تحديد نوع الوسائط</key>
+    <key alias="selectIcon">تحديد أيقونة</key>
+    <key alias="selectItem">تحديد عنصر</key>
+    <key alias="selectLink">تحديد رابط</key>
+    <key alias="selectMacro">تحديد ماكرو</key>
+    <key alias="selectContent">تحديد محتوى</key>
+    <key alias="selectContentType">تحديد نوع المحتوى</key>
+    <key alias="selectMediaStartNode">تحديد عقدة بداية الوسائط</key>
+    <key alias="selectMember">تحديد عضو</key>
+    <key alias="selectMemberGroup">تحديد مجموعة الأعضاء</key>
+    <key alias="selectMemberType">تحديد نوع العضو</key>
+    <key alias="selectNode">تحديد عقدة</key>
+    <key alias="selectLanguages">تحديد اللغات</key>
+    <key alias="selectSections">تحديد الأقسام</key>
+    <key alias="selectUser">تحديد مستخدم</key>
+    <key alias="selectUsers">تحديد مستخدمين</key>
+    <key alias="noIconsFound">لم يتم العثور على أيقونات</key>
+    <key alias="noMacroParams">لا توجد معاملات لهذا الماكرو</key>
+    <key alias="noMacros">لا توجد ماكروهات متاحة للإدراج</key>
+    <key alias="externalLoginProviders">موفروا تسجيل الدخول الخارجي</key>
+    <key alias="exceptionDetail">تفاصيل الاستثناء</key>
+    <key alias="stacktrace">تتبع المكدس</key>
+    <key alias="innerException">الاستثناء الداخلي</key>
+    <key alias="linkYour">ربط الـ</key>
+    <key alias="unLinkYour">إلغاء ربط الـ</key>
+    <key alias="account">حساب</key>
+    <key alias="selectEditor">تحديد محرر</key>
+    <key alias="selectSnippet">تحديد مقطع</key>
+    <key
+      alias="variantdeletewarning"
+    >هذا سيحذف العقدة وجميع لغاتها. إذا كنت تريد حذف لغة واحدة فقط، يجب إلغاء نشر العقدة بتلك اللغة بدلاً من ذلك.
+    </key>
+    <key
+      alias="propertyuserpickerremovewarning"
+    ><![CDATA[هذا سيزيل المستخدم <strong>%0%</strong>.]]></key>
+    <key
+      alias="userremovewarning"
+    ><![CDATA[هذا سيزيل المستخدم <strong>%0%</strong> من مجموعة <strong>%1%</strong>]]></key>
+    <key alias="yesRemove">نعم، إزالة</key>
+    <key alias="deleteLayout">أنت تحذف التخطيط</key>
+    <key
+      alias="deletingALayout"
+    >تعديل التخطيط سيؤدي إلى فقدان البيانات لأي محتوى موجود يعتمد على هذا التكوين.</key>
+    <key alias="selectEditorConfiguration">تحديد التكوين</key>
+  </area>
+  <area alias="dictionary">
+    <key alias="importDictionaryItemHelp">
+      لاستيراد عنصر قاموس، ابحث عن ملف ".udt" على جهاز الكمبيوت
+  </key></area>
+      <area alias="actionCategories">
+    <key alias="content">المحتوى</key>
+    <key alias="administration">الإدارة</key>
+    <key alias="structure">الهيكل</key>
+    <key alias="other">أخرى</key>
+  </area>
+  <area alias="actionDescriptions">
+    <key
+      alias="assignDomain"
+    >السماح بالوصول لتعيين الثقافة وأسماء المضيفين</key>
+    <key alias="auditTrail">السماح بالوصول لعرض سجل تاريخ العقدة</key>
+    <key alias="browse">السماح بالوصول لعرض العقدة</key>
+    <key alias="changeDocType">السماح بالوصول لتغيير نوع المستند للعقدة</key>
+    <key alias="copy">السماح بالوصول لنسخ العقدة</key>
+    <key alias="create">السماح بالوصول لإنشاء العقد</key>
+    <key alias="delete">السماح بالوصول لحذف العقد</key>
+    <key alias="move">السماح بالوصول لنقل العقدة</key>
+    <key alias="protect">السماح بالوصول لتعيين وتغيير قيود الوصول للعقدة</key>
+    <key alias="publish">السماح بالوصول لنشر العقدة</key>
+    <key alias="unpublish">السماح بالوصول لإلغاء نشر العقدة</key>
+    <key alias="rights">السماح بالوصول لتغيير صلاحيات العقدة</key>
+    <key alias="rollback">السماح بالوصول للتراجع بالعقدة إلى حالة سابقة</key>
+    <key
+      alias="sendtopublish"
+    >السماح بالوصول لإرسال العقدة للموافقة قبل النشر</key>
+    <key alias="sendToTranslate">السماح بالوصول لإرسال العقدة للترجمة</key>
+    <key alias="sort">السماح بالوصول لتغيير ترتيب العقد</key>
+    <key alias="translate">السماح بالوصول لترجمة العقدة</key>
+    <key alias="update">السماح بالوصول لحفظ العقدة</key>
+    <key alias="createblueprint">السماح بالوصول لإنشاء قالب المحتوى</key>
+    <key alias="notify">السماح بالوصول لإعداد الإشعارات لعقد المحتوى</key>
+  </area>
+  <area alias="apps">
+    <key alias="umbContent">المحتوى</key>
+    <key alias="umbInfo">معلومات</key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="permissionDenied">تم رفض الإذن.</key>
+    <key alias="addNew">إضافة نطاق جديد</key>
+    <key alias="addCurrent">إضافة النطاق الحالي</key>
+    <key alias="remove">إزالة</key>
+    <key alias="invalidNode">عقدة غير صالحة.</key>
+    <key alias="invalidDomain">نطاق واحد أو أكثر له تنسيق غير صالح.</key>
+    <key alias="duplicateDomain">تم تعيين النطاق بالفعل.</key>
+    <key alias="language">اللغة</key>
+    <key alias="domain">النطاق</key>
+    <key alias="domainCreated">تم إنشاء النطاق الجديد '%0%'</key>
+    <key alias="domainDeleted">تم حذف النطاق '%0%'</key>
+    <key alias="domainExists">تم تعيين النطاق '%0%' بالفعل</key>
+    <key alias="domainUpdated">تم تحديث النطاق '%0%'</key>
+    <key alias="orEdit">تحرير النطاقات الحالية</key>
+    <key alias="domainHelpWithVariants">
+      <![CDATA[أسماء النطاقات الصالحة هي: "example.com"، "www.example.com"، "example.com:8080"، أو "https://www.example.com/".
+     كما يتم دعم مسارات المستوى الواحد في النطاقات، مثل "example.com/en" أو "/en".]]></key>
+    <key alias="inherit">وراثة</key>
+    <key alias="setLanguage">الثقافة</key>
+    <key alias="setLanguageHelp">
+      <![CDATA[تعيين الثقافة للعقد تحت العقدة الحالية،<br /> أو وراثة الثقافة من العقد الأصل. سيتم التطبيق أيضاً<br />
+      على العقدة الحالية، ما لم ينطبق نطاق أدناه أيضاً.]]>
+    </key>
+    <key alias="setDomains">النطاقات</key>
+  </area>
+  <area alias="buttons">
+    <key alias="clearSelection">مسح التحديد</key>
+    <key alias="select">تحديد</key>
+    <key alias="somethingElse">افعل شيئاً آخر</key>
+    <key alias="bold">عريض</key>
+    <key alias="deindent">إلغاء مسافة الفقرة البادئة</key>
+    <key alias="formFieldInsert">إدراج حقل النموذج</key>
+    <key alias="graphicHeadline">إدراج عنوان رسومي</key>
+    <key alias="htmlEdit">تحرير Html</key>
+    <key alias="indent">مسافة بادئة للفقرة</key>
+    <key alias="italic">مائل</key>
+    <key alias="justifyCenter">توسيط</key>
+    <key alias="justifyLeft">محاذاة لليسار</key>
+    <key alias="justifyRight">محاذاة لليمين</key>
+    <key alias="linkInsert">إدراج رابط</key>
+    <key alias="linkLocal">إدراج رابط محلي (مرساة)</key>
+    <key alias="listBullet">قائمة نقطية</key>
+    <key alias="listNumeric">قائمة رقمية</key>
+    <key alias="macroInsert">إدراج ماكرو</key>
+    <key alias="pictureInsert">إدراج صورة</key>
+    <key alias="publishAndClose">نشر وإغلاق</key>
+    <key alias="publishDescendants">نشر مع التوابع</key>
+    <key alias="relations">تحرير العلاقات</key>
+    <key alias="returnToList">العودة للقائمة</key>
+    <key alias="save">حفظ</key>
+    <key alias="saveAndClose">حفظ وإغلاق</key>
+    <key alias="saveAndPublish">حفظ ونشر</key>
+    <key alias="saveToPublish">حفظ وإرسال للموافقة</key>
+    <key alias="saveListView">حفظ عرض القائمة</key>
+    <key alias="schedulePublish">جدولة</key>
+    <key alias="saveAndPreview">حفظ ومعاينة</key>
+    <key alias="showPageDisabled">المعاينة معطلة لأنه لا يوجد قالب معين</key>
+    <key alias="styleChoose">اختيار النمط</key>
+    <key alias="styleShow">إظهار الأنماط</key>
+    <key alias="tableInsert">إدراج جدول</key>
+    <key alias="saveAndGenerateModels">حفظ وإنشاء النماذج</key>
+    <key alias="undo">تراجع</key>
+    <key alias="redo">إعادة</key>
+    <key alias="deleteTag">حذف العلامة</key>
+    <key alias="confirmActionCancel">إلغاء</key>
+    <key alias="confirmActionConfirm">تأكيد</key>
+    <key alias="morePublishingOptions">المزيد من خيارات النشر</key>
+    <key alias="submitChanges">إرسال</key>
+    <key alias="generateModelsAndClose">إنشاء النماذج وإغلاق</key>
+  </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">تم حذف الوسائط</key>
+    <key alias="move">تم نقل الوسائط</key>
+    <key alias="copy">تم نسخ الوسائط</key>
+    <key alias="save">تم حفظ الوسائط</key>
+    <key alias="new">تم إنشاء الوسائط</key>
+  </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">عرض لـ</key>
+    <key alias="delete">تم حذف المحتوى</key>
+    <key alias="unpublish">تم إلغاء نشر المحتوى</key>
+    <key alias="publish">تم حفظ المحتوى ونشره</key>
+    <key alias="publishvariant">تم حفظ المحتوى ونشره للغات: %0%</key>
+    <key alias="save">تم حفظ المحتوى</key>
+    <key alias="savevariant">تم حفظ المحتوى للغات: %0%</key>
+    <key alias="move">تم نقل المحتوى</key>
+    <key alias="copy">تم نسخ المحتوى</key>
+    <key alias="rollback">تم التراجع بالمحتوى</key>
+    <key alias="sendtopublish">تم إرسال المحتوى للنشر</key>
+    <key alias="sendtopublishvariant">تم إرسال المحتوى للنشر للغات: %0%</key>
+    <key alias="sort">تم تنفيذ ترتيب العناصر الفرعية بواسطة المستخدم</key>
+    <key alias="custom">%0%</key>
+    <key
+      alias="contentversionpreventcleanup"
+    >تم تعطيل التنظيف للإصدار: %0%</key>
+    <key alias="contentversionenablecleanup">تم تمكين التنظيف للإصدار: %0%</key>
+    <key alias="smallCopy">نسخ</key>
+    <key alias="smallPublish">نشر</key>
+    <key alias="smallPublishVariant">نشر</key>
+    <key alias="smallMove">نقل</key>
+    <key alias="smallSave">حفظ</key>
+    <key alias="smallNew">جديد</key>
+    <key alias="smallSaveVariant">حفظ</key>
+    <key alias="smallDelete">حذف</key>
+    <key alias="smallUnpublish">إلغاء نشر</key>
+    <key alias="smallRollBack">تراجع</key>
+    <key alias="smallSendToPublish">إرسال للنشر</key>
+    <key alias="smallSendToPublishVariant">إرسال للنشر</key>
+    <key alias="smallSort">ترتيب</key>
+    <key alias="smallCustom">مخصص</key>
+    <key alias="smallContentVersionPreventCleanup">حفظ</key>
+    <key alias="smallContentVersionEnableCleanup">حفظ</key>
+    <key alias="historyIncludingVariants">التاريخ (جميع المتغيرات)</key>
+    <key alias="unpublishvariant">تم إلغاء نشر المحتوى للغات: %0%</key>
+    <key alias="smallUnpublishVariant">إلغاء نشر</key>
+  </area>
+  <area alias="codefile">
+    <key
+      alias="createFolderIllegalChars"
+    >لا يمكن أن يحتوي اسم المجلد على أحرف غير قانونية.</key>
+    <key alias="deleteItemFailed">فشل في حذف العنصر: %0%</key>
+  </area>
+  <area alias="content">
+    <key alias="isPublished" version="7.2">منشور</key>
+    <key alias="about">حول هذه الصفحة</key>
+    <key alias="alias">الاسم المستعار</key>
+    <key alias="alternativeTextHelp">(كيف تصف الصورة عبر الهاتف)</key>
+    <key alias="alternativeUrls">الروابط البديلة</key>
+    <key alias="clickToEdit">انقر لتحرير هذا العنصر</key>
+    <key alias="createBy">أنشئ بواسطة</key>
+    <key alias="createByDesc" version="7.0">المؤلف الأصلي</key>
+    <key alias="updatedBy" version="7.0">حُدث بواسطة</key>
+    <key alias="createDate">تاريخ الإنشاء</key>
+    <key alias="createDateDesc" version="7.0">تاريخ/وقت إنشاء هذا المستند</key>
+    <key alias="documentType">نوع المستند</key>
+    <key alias="editing">تحرير</key>
+    <key alias="expireDate">إزالة في</key>
+    <key alias="itemChanged">تم تغيير هذا العنصر بعد النشر</key>
+    <key alias="itemNotPublished">هذا العنصر غير منشور</key>
+    <key alias="lastPublished">آخر نشر</key>
+    <key alias="noItemsToShow">لا توجد عناصر للعرض</key>
+    <key
+      alias="listViewNoItems"
+      version="7.1.5"
+    >لا توجد عناصر للعرض في القائمة.</key>
+    <key alias="listViewNoContent">لم تتم إضافة محتوى</key>
+    <key alias="listViewNoMembers">لم تتم إضافة أعضاء</key>
+    <key alias="mediatype">نوع الوسائط</key>
+    <key alias="mediaLinks">رابط إلى عنصر/عناصر الوسائط</key>
+    <key alias="membergroup">مجموعة الأعضاء</key>
+    <key alias="memberrole">الدور</key>
+    <key alias="membertype">نوع العضو</key>
+    <key alias="noChanges">لم يتم إجراء تغييرات</key>
+    <key alias="noDate">لم يتم اختيار تاريخ</key>
+    <key alias="nodeName">عنوان الصفحة</key>
+    <key alias="noMediaLink">عنصر الوسائط هذا ليس له رابط</key>
+    <key alias="otherElements">الخصائص</key>
+    <key
+      alias="parentNotPublished"
+    >هذا المستند منشور ولكنه غير مرئي لأن الأصل '%0%' غير منشور
+    </key>
+    <key
+      alias="parentCultureNotPublished"
+    >هذه الثقافة منشورة ولكنها غير مرئية لأنها غير منشورة على الأصل '%0%'
+    </key>
+    <key
+      alias="parentNotPublishedAnomaly"
+    >هذا المستند منشور ولكنه ليس في التخزين المؤقت</key>
+    <key alias="getUrlException">لا يمكن الحصول على الرابط</key>
+    <key
+      alias="routeError"
+    >هذا المستند منشور ولكن رابطه سيتصادم مع المحتوى %0%</key>
+    <key
+      alias="routeErrorCannotRoute"
+    >هذا المستند منشور ولكن لا يمكن توجيه رابطه</key>
+    <key alias="publish">نشر</key>
+    <key alias="published">منشور</key>
+    <key alias="publishedPendingChanges">منشور (تغييرات معلقة)</key>
+    <key alias="publishStatus">حالة النشر</key>
+    <key alias="publishDescendantsHelp">
+      <![CDATA[نشر <strong>%0%</strong> وجميع عناصر المحتوى أدناه وبالتالي جعل محتواها متاحاً للجمهور.]]></key>
+    <key alias="publishDescendantsWithVariantsHelp">
+      <![CDATA[نشر المتغيرات ومتغيرات من نفس النوع أدناه وبالتالي جعل محتواها متاحاً للجمهور.]]></key>
+    <key alias="releaseDate">نشر في</key>
+    <key alias="unpublishDate">إلغاء النشر في</key>
+    <key alias="removeDate">مسح التاريخ</key>
+    <key alias="setDate">تعيين التاريخ</key>
+    <key alias="sortDone">تم تحديث ترتيب الفرز</key>
+    <key
+      alias="sortHelp"
+    >لترتيب العقد، ما عليك سوى سحب العقد أو النقر على أحد عناوين الأعمدة. يمكنك تحديد عقد متعددة عن طريق الضغط على مفتاح "shift" أو "control" أثناء التحديد
+    </key>
+    <key alias="statistics">إحصائيات</key>
+    <key alias="titleOptional">العنوان (اختياري)</key>
+    <key alias="altTextOptional">النص البديل (اختياري)</key>
+    <key alias="captionTextOptional">التسمية التوضيحية (اختياري)</key>
+    <key alias="type">النوع</key>
+    <key alias="unpublish">إلغاء النشر</key>
+    <key alias="unpublished">غير منشور</key>
+    <key alias="notCreated">غير مُنشأ</key>
+    <key alias="updateDate">آخر تحرير</key>
+    <key alias="updateDateDesc" version="7.0">تاريخ/وقت تحرير هذا المستند</key>
+    <key alias="uploadClear">إزالة الملف/الملفات</key>
+    <key
+      alias="uploadClearImageContext"
+    >انقر هنا لإزالة الصورة من عنصر الوسائط</key>
+    <key
+      alias="uploadClearFileContext"
+    >انقر هنا لإزالة الملف من عنصر الوسائط</key>
+    <key alias="urls">رابط إلى المستند</key>
+    <key alias="memberof">عضو في مجموعة/مجموعات</key>
+    <key alias="notmemberof">ليس عضواً في مجموعة/مجموعات</key>
+    <key alias="childItems" version="7.0">العناصر الفرعية</key>
+    <key alias="target" version="7.0">الهدف</key>
+    <key
+      alias="scheduledPublishServerTime"
+    >هذا يترجم إلى الوقت التالي على الخادم:</key>
+    <key alias="scheduledPublishDocumentation">
+      <![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">ماذا يعني هذا؟</a>]]></key>
+    <key
+      alias="nestedContentDeleteItem"
+    >هل أنت متأكد من أنك تريد حذف هذا العنصر؟</key>
+    <key
+      alias="nestedContentEditorNotSupported"
+    >الخاصية %0% تستخدم المحرر %1% غير المدعوم بواسطة المحتوى المتداخل.
+    </key>
+    <key
+      alias="nestedContentDeleteAllItems"
+    >هل أنت متأكد من أنك تريد حذف جميع العناصر؟</key>
+    <key
+      alias="nestedContentDeleteItem"
+    >هل أنت متأكد من أنك تريد حذف هذا العنصر؟</key>
+    <key
+      alias="nestedContentNoContentTypes"
+    >لا يوجد أنواع محتوى مكونة لهذه الخاصية.</key>
+    <key alias="nestedContentAddElementType">إضافة نوع عنصر</key>
+    <key alias="nestedContentSelectElementTypeModalTitle">تحديد نوع العنصر</key>
+    <key
+      alias="nestedContentGroupHelpText"
+    >حدد المجموعة التي يجب عرض خصائصها. إذا تُركت فارغة، سيتم استخدام المجموعة الأولى على نوع العنصر.
+    </key>
+    <key
+      alias="nestedContentTemplateHelpTextPart1"
+    >أدخل تعبير angular لتقييمه مقابل كل عنصر لاسمه. استخدم
+    </key>
+    <key alias="nestedContentTemplateHelpTextPart2">لعرض فهرس العنصر</key>
+    <key
+      alias="nestedContentNoGroups"
+    >نوع العنصر المحدد لا يحتوي على أي مجموعات مدعومة (علامات التبويب غير مدعومة بواسطة هذا المحرر، إما قم بتغييرها إلى مجموعات أو استخدم محرر قائمة الكتل).</key>
+    <key alias="addTextBox">إضافة مربع نص آخر</key>
+    <key alias="removeTextBox">إزالة مربع النص هذا</key>
+    <key alias="contentRoot">جذر المحتوى</key>
+    <key alias="includeUnpublished">تضمين عناصر المحتوى غير المنشورة.</key>
+    <key
+      alias="isSensitiveValue"
+    >هذه القيمة مخفية. إذا كنت بحاجة للوصول لعرض هذه القيمة، يرجى الاتصال بمدير الموقع.
+    </key>
+    <key alias="isSensitiveValue_short">هذه القيمة مخفية.</key>
+    <key alias="languagesToPublish">ما اللغات التي تريد نشرها؟</key>
+    <key
+      alias="languagesToSendForApproval"
+    >ما اللغات التي تريد إرسالها للموافقة؟</key>
+    <key alias="languagesToSchedule">ما اللغات التي تريد جدولتها؟</key>
+    <key
+      alias="languagesToUnpublish"
+    >حدد اللغات لإلغاء نشرها. إلغاء نشر لغة إلزامية سيلغي نشر جميع اللغات.
+    </key>
+    <key alias="variantsWillBeSaved">سيتم حفظ جميع المتغيرات الجديدة.</key>
+    <key alias="variantsToPublish">أي متغيرات تريد نشرها؟</key>
+    <key alias="variantsToSave">اختر أي متغيرات سيتم حفظها.</key>
+    <key
+      alias="publishRequiresVariants"
+    >المتغيرات التالية مطلوبة لحدوث النشر:</key>
+    <key alias="notReadyToPublish">لسنا مستعدين للنشر</key>
+    <key alias="readyToPublish">مستعد للنشر؟</key>
+    <key alias="readyToSave">مستعد للحفظ؟</key>
+    <key alias="resetFocalPoint">إعادة تعيين نقطة التركيز</key>
+    <key alias="sendForApproval">إرسال للموافقة</key>
+    <key
+      alias="schedulePublishHelp"
+    >حدد التاريخ والوقت لنشر و/أو إلغاء نشر عنصر المحتوى.</key>
+    <key alias="createEmpty">إنشاء جديد</key>
+    <key alias="createFromClipboard">لصق من الحافظة</key>
+    <key alias="removeItem">إزالة العنصر</key>
+    <key alias="nodeIsInTrash">هذا العنصر في سلة المحذوفات</key>
+    <key alias="noProperties">لا يمكن إضافة محتوى لهذا العنصر</key>
+    <key alias="variantSaveNotAllowed">الحفظ غير مسموح</key>
+    <key alias="variantPublishNotAllowed">النشر غير مسموح</key>
+    <key
+      alias="variantSendForApprovalNotAllowed"
+    >الإرسال للموافقة غير مسموح</key>
+    <key alias="variantScheduleNotAllowed">الجدولة غير مسموحة</key>
+    <key alias="variantUnpublishNotAllowed">إلغاء النشر غير مسموح</key>
+    <key alias="selectAllVariants">تحديد جميع المتغيرات</key>
+  </area>
+  <area alias="blueprints">
+    <key
+      alias="createBlueprintFrom"
+    ><![CDATA[إنشاء قالب محتوى جديد من <em>%0%</em>]]></key>
+    <key alias="blankBlueprint">فارغ</key>
+    <key alias="selectBlueprint">اختيار قالب محتوى</key>
+    <key alias="createdBlueprintHeading">تم إنشاء قالب المحتوى</key>
+    <key alias="createdBlueprintMessage">تم إنشاء قالب محتوى من '%0%'</key>
+    <key
+      alias="duplicateBlueprintMessage"
+    >يوجد بالفعل قالب محتوى آخر بنفس الاسم</key>
+    <key
+      alias="blueprintDescription"
+    >قالب المحتوى هو محتوى محدد مسبقاً يمكن للمحرر تحديده لاستخدامه كأساس لإنشاء محتوى جديد
+    </key>
+  </area>
+  <area alias="media">
+    <key alias="clickToUpload">انقر للرفع</key>
+    <key alias="orClickHereToUpload">أو انقر هنا لاختيار الملفات</key>
+    <key
+      alias="disallowedFileType"
+    >لا يمكن رفع هذا الملف، ليس له نوع ملف معتمد</key>
+    <key
+      alias="disallowedMediaType"
+    >لا يمكن رفع هذا الملف، نوع الوسائط بالاسم المستعار '%0%' غير مسموح هنا</key>
+    <key
+      alias="invalidFileName"
+    >لا يمكن رفع هذا الملف، ليس له اسم ملف صالح</key>
+    <key alias="maxFileSize">الحد الأقصى لحجم الملف هو</key>
+    <key alias="mediaRoot">جذر الوسائط</key>
+    <key alias="createFolderFailed">فشل في إنشاء مجلد تحت المعرف الأصل %0%</key>
+    <key alias="renameFolderFailed">فشل في إعادة تسمية المجلد بالمعرف %0%</key>
+    <key
+      alias="dragAndDropYourFilesIntoTheArea"
+    >اسحب وأفلت ملفك/ملفاتك في المنطقة</key>
+    <key
+      alias="fileSecurityValidationFailure"
+    >فشل في واحد أو أكثر من تحققات أمان الملفات</key>
+    <key
+      alias="moveToSameFolderFailed"
+    >لا يمكن أن تكون مجلدات الأصل والوجهة هي نفسها</key>
+    <key alias="uploadNotAllowed">الرفع غير مسموح في هذا الموقع.</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">إنشاء عضو جديد</key>
+    <key alias="allMembers">جميع الأعضاء</key>
+    <key
+      alias="memberGroupNoProperties"
+    >مجموعات الأعضاء ليس لها خصائص إضافية للتحرير.</key>
+    <key alias="2fa">المصادقة الثنائية</key>
+    <key
+      alias="duplicateMemberLogin"
+    >يوجد بالفعل عضو بهذا اسم تسجيل الدخول</key>
+    <key alias="memberHasGroup">العضو موجود بالفعل في المجموعة '%0%'</key>
+    <key alias="memberHasPassword">العضو لديه كلمة مرور محددة بالفعل</key>
+    <key alias="memberLockoutNotEnabled">القفل غير مُمكن لهذا العضو</key>
+    <key alias="memberNotInGroup">العضو ليس في المجموعة '%0%'</key>
+  </area>
+  <area alias="contentType">
+    <key alias="copyFailed">فشل في نسخ نوع المحتوى</key>
+    <key alias="moveFailed">فشل في نقل نوع المحتوى</key>
+  </area>
+  <area alias="mediaType">
+    <key alias="copyFailed">فشل في نسخ نوع الوسائط</key>
+    <key alias="moveFailed">فشل في نقل نوع الوسائط</key>
+    <key alias="autoPickMediaType">اختيار تلقائي</key>
+  </area>
+  <area alias="memberType">
+    <key alias="copyFailed">فشل في نسخ نوع العضو</key>
+  </area>
+  <area alias="create">
+    <key alias="chooseNode">أين تريد إنشاء %0% الجديد</key>
+    <key alias="createUnder">إنشاء عنصر تحت</key>
+    <key
+      alias="createContentBlueprint"
+    >حدد نوع المستند الذي تريد إنشاء قالب محتوى له</key>
+    <key alias="enterFolderName">أدخل اسم المجلد</key>
+    <key alias="updateData">اختر نوعاً وعنواناً</key>
+    <key alias="noDocumentTypes" version="7.0">
+      <![CDATA[لا توجد أنواع مستندات مسموحة متاحة لإنشاء المحتوى هنا. يجب تمكين هذه في <strong>أنواع المستندات</strong> داخل قسم <strong>الإعدادات</strong>، بتحرير <strong>أنواع العقد الفرعية المسموحة</strong> تحت <strong>الصلاحيات</strong>.]]></key>
+    <key alias="noDocumentTypesAtRoot">
+      <![CDATA[لا توجد أنواع مستندات متاحة لإنشاء المحتوى هنا. يجب إنشاء هذه في <strong>أنواع المستندات</strong> داخل قسم <strong>الإعدادات</strong>.]]></key>
+    <key
+      alias="noDocumentTypesWithNoSettingsAccess"
+    >الصفحة المحددة في شجرة المحتوى لا تسمح بإنشاء أي صفحات تحتها.
+    </key>
+    <key
+      alias="noDocumentTypesEditPermissions"
+    >تحرير الصلاحيات لنوع المستند هذا</key>
+    <key alias="noDocumentTypesCreateNew">إنشاء نوع مستند جديد</key>
+    <key alias="noDocumentTypesAllowedAtRoot">
+      <![CDATA[لا توجد أنواع مستندات مسموحة متاحة لإنشاء المحتوى هنا. يجب تمكين هذه في <strong>أنواع المستندات</strong> داخل قسم <strong>الإعدادات</strong>، بتغيير خيار <strong>السماح كجذر</strong> تحت <strong>الصلاحيات</strong>.]]></key>
+    <key alias="noMediaTypes" version="7.0">
+      <![CDATA[لا توجد أنواع وسائط مسموحة متاحة لإنشاء الوسائط هنا. يجب تمكين هذه في <strong>أنواع الوسائط</strong> داخل قسم <strong>الإعدادات</strong>، بتحرير <strong>أنواع العقد الفرعية المسموحة</strong> تحت <strong>الصلاحيات</strong>.]]></key>
+    <key
+      alias="noMediaTypesWithNoSettingsAccess"
+    >الوسائط المحددة في الشجرة لا تسمح بإنشاء أي وسائط أخرى تحتها.
+    </key>
+    <key
+      alias="noMediaTypesEditPermissions"
+    >تحرير الصلاحيات لأنواع الوسائط هذه</key>
+    <key alias="documentTypeWithoutTemplate">نوع مستند بدون قالب</key>
+    <key alias="documentTypeWithTemplate">نوع مستند بقالب</key>
+    <key
+      alias="documentTypeWithTemplateDescription"
+    >تعريف البيانات لصفحة محتوى يمكن إنشاؤها بواسطة المحررين في شجرة المحتوى ويمكن الوصول إليها مباشرة عبر رابط.
+    </key>
+    <key alias="documentType">نوع المستند</key>
+    <key
+      alias="documentTypeDescription"
+    >تعريف البيانات لمكون محتوى يمكن إنشاؤه بواسطة المحررين في شجرة المحتوى واختياره على صفحات أخرى ولكن ليس له رابط مباشر.
+    </key>
+    <key alias="elementType">نوع العنصر</key>
+    <key
+      alias="elementTypeDescription"
+    >يحدد المخطط لمجموعة متكررة من الخصائص، على سبيل المثال، في محرر خاصية 'قائمة الكتل' أو 'شبكة الكتل'.
+    </key>
+    <key alias="composition">التركيب</key>
+    <key
+      alias="compositionDescription"
+    >يحدد مجموعة قابلة لإعادة الاستخدام من الخصائص التي يمكن تضمينها في تعريف أنواع مستندات أخرى متعددة. على سبيل المثال، مجموعة من 'إعدادات الصفحة المشتركة'.
+    </key>
+    <key alias="folder">مجلد</key>
+    <key
+      alias="folderDescription"
+    >يُستخدم لتنظيم أنواع المستندات والتراكيب وأنواع العناصر المُنشأة في شجرة نوع المستند هذه.
+    </key>
+    <key alias="newFolder">مجلد جديد</key>
+    <key alias="newDataType">نوع بيانات جديد</key>
+    <key alias="newJavascriptFile">ملف JavaScript جديد</key>
+    <key alias="newEmptyPartialView">عرض جزئي فارغ جديد</key>
+    <key alias="newPartialViewMacro">ماكرو عرض جزئي جديد</key>
+    <key alias="newPartialViewFromSnippet">عرض جزئي جديد من مقطع</key>
+    <key
+      alias="newPartialViewMacroFromSnippet"
+    >ماكرو عرض جزئي جديد من مقطع</key>
+    <key
+      alias="newPartialViewMacroNoMacro"
+    >ماكرو عرض جزئي جديد (بدون ماكرو)</key>
+    <key alias="newStyleSheetFile">ملف ورقة أنماط جديد</key>
+    <key
+      alias="newRteStyleSheetFile"
+    >ملف ورقة أنماط محرر النص المنسق الجديد</key>
+  </area>
+  <area alias="dashboard">
+    <key alias="browser">تصفح موقعك</key>
+    <key alias="dontShowAgain">- إخفاء</key>
+    <key
+      alias="nothinghappens"
+    >إذا لم يفتح أومبراكو، قد تحتاج للسماح بالنوافذ المنبثقة من هذا الموقع</key>
+    <key alias="openinnew">تم فتحه في نافذة جديدة</key>
+    <key alias="restart">إعادة التشغيل</key>
+    <key alias="visit">زيارة</key>
+    <key alias="welcome">أهلاً وسهلاً</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">البقاء</key>
+    <key alias="discardChanges">تجاهل التغييرات</key>
+    <key alias="unsavedChanges">لديك تغييرات غير محفوظة</key>
+    <key
+      alias="unsavedChangesWarning"
+    >هل أنت متأكد من أنك تريد الانتقال بعيداً عن هذه الصفحة؟ - لديك تغييرات غير محفوظة
+    </key>
+    <key
+      alias="confirmListViewPublish"
+    >النشر سيجعل العناصر المحددة مرئية على الموقع.</key>
+    <key
+      alias="confirmListViewUnpublish"
+    >إلغاء النشر سيزيل العناصر المحددة وجميع توابعها من الموقع.
+    </key>
+    <key
+      alias="confirmUnpublish"
+    >إلغاء النشر سيزيل هذه الصفحة وجميع توابعها من الموقع.</key>
+    <key
+      alias="doctypeChangeWarning"
+    >لديك تغييرات غير محفوظة. إجراء تغييرات على نوع المستند سيتجاهل التغييرات.
+    </key>
+  </area>
+  <area alias="bulk">
+    <key alias="done">تم</key>
+    <key alias="deletedItem">تم حذف %0% عنصر</key>
+    <key alias="deletedItems">تم حذف %0% عنصر</key>
+    <key alias="deletedItemOfItem">تم حذف %0% من %1% عنصر</key>
+    <key alias="deletedItemOfItems">تم حذف %0% من %1% عنصر</key>
+    <key alias="publishedItem">تم نشر %0% عنصر</key>
+    <key alias="publishedItems">تم نشر %0% عنصر</key>
+    <key alias="publishedItemOfItem">تم نشر %0% من %1% عنصر</key>
+    <key alias="publishedItemOfItems">تم نشر %0% من %1% عنصر</key>
+    <key alias="unpublishedItem">تم إلغاء نشر %0% عنصر</key>
+    <key alias="unpublishedItems">تم إلغاء نشر %0% عنصر</key>
+    <key alias="unpublishedItemOfItem">تم إلغاء نشر %0% من %1% عنصر</key>
+    <key alias="unpublishedItemOfItems">تم إلغاء نشر %0% من %1% عنصر</key>
+    <key alias="movedItem">تم نقل %0% عنصر</key>
+    <key alias="movedItems">تم نقل %0% عنصر</key>
+    <key alias="movedItemOfItem">تم نقل %0% من %1% عنصر</key>
+    <key alias="movedItemOfItems">تم نقل %0% من %1% عنصر</key>
+    <key alias="copiedItem">تم نسخ %0% عنصر</key>
+    <key alias="copiedItems">تم نسخ %0% عنصر</key>
+    <key alias="copiedItemOfItem">تم نسخ %0% من %1% عنصر</key>
+    <key alias="copiedItemOfItems">تم نسخ %0% من %1% عنصر</key>
+  </area>
+<area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">عنوان الرابط</key>
+    <key alias="urlLinkPicker">رابط</key>
+    <key alias="anchorLinkPicker">مرساة / استعلام</key>
+    <key alias="anchorInsert">اسم</key>
+    <key alias="closeThisWindow">إغلاق هذه النافذة</key>
+    <key alias="confirmdelete">هل أنت متأكد أنك تريد حذف</key>
+    <key
+      alias="confirmdeleteNumberOfItems"
+    ><![CDATA[هل أنت متأكد أنك تريد حذف <strong>%0%</strong> من <strong>%1%</strong> عناصر]]></key>
+    <key alias="confirmdisable">هل أنت متأكد أنك تريد تعطيل</key>
+    <key alias="confirmremove">هل أنت متأكد أنك تريد إزالة</key>
+    <key
+      alias="confirmremoveusageof"
+    ><![CDATA[هل أنت متأكد أنك تريد إزالة استخدام <strong>%0%</strong>]]></key>
+    <key alias="confirmlogout">هل أنت متأكد؟</key>
+    <key alias="confirmSure">هل أنت متأكد؟</key>
+    <key alias="cut">قص</key>
+    <key alias="editDictionary">تحرير عنصر القاموس</key>
+    <key alias="editLanguage">تحرير اللغة</key>
+    <key alias="editSelectedMedia">تحرير الوسائط المحددة</key>
+    <key alias="editWebhook">تحرير ويب هوك</key>
+    <key alias="insertAnchor">إدراج رابط محلي</key>
+    <key alias="insertCharacter">إدراج حرف</key>
+    <key alias="insertgraphicheadline">إدراج عنوان رسومي</key>
+    <key alias="insertimage">إدراج صورة</key>
+    <key alias="insertlink">إدراج رابط</key>
+    <key alias="insertMacro">انقر لإضافة ماكرو</key>
+    <key alias="inserttable">إدراج جدول</key>
+    <key
+      alias="languagedeletewarning"
+    >سيؤدي هذا إلى حذف اللغة وجميع المحتوى المرتبط بها</key>
+    <key
+      alias="languageChangeWarning"
+    >تغيير الثقافة للغة قد تكون عملية مكلفة وسيؤدي إلى إعادة بناء ذاكرة التخزين المؤقت للمحتوى والفهارس</key>
+    <key alias="lastEdited">آخر تحرير</key>
+    <key alias="link">رابط</key>
+    <key alias="linkinternal">رابط داخلي:</key>
+    <key
+      alias="linklocaltip"
+    >عند استخدام الروابط المحلية، أدخل "#" قبل الرابط</key>
+    <key alias="linknewwindow">فتح في نافذة جديدة؟</key>
+    <key
+      alias="macroDoesNotHaveProperties"
+    >هذا الماكرو لا يحتوي على أي خصائص يمكنك تحريرها</key>
+    <key alias="paste">لصق</key>
+    <key alias="permissionsEdit">تحرير الأذونات لـ</key>
+    <key alias="permissionsSet">تعيين الأذونات لـ</key>
+    <key
+      alias="permissionsSetForGroup"
+    >تعيين الأذونات لـ %0% لمجموعة المستخدمين %1%</key>
+    <key
+      alias="permissionsHelp"
+    >حدد مجموعات المستخدمين التي تريد تعيين الأذونات لها</key>
+    <key
+      alias="recycleBinDeleting"
+    >يتم الآن حذف العناصر في سلة المحذوفات. يرجى عدم إغلاق هذه النافذة أثناء هذه العملية</key>
+    <key alias="recycleBinIsEmpty">سلة المحذوفات فارغة الآن</key>
+    <key
+      alias="recycleBinWarning"
+    >عند حذف العناصر من سلة المحذوفات، سيتم إزالتها إلى الأبد</key>
+    <key alias="regexSearchError">
+      <![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> تواجه خدمة الويب بعض المشاكل، والتي ليس لدينا أي سيطرة عليها. نأسف لهذا الإزعاج.]]></key>
+    <key
+      alias="regexSearchHelp"
+    >ابحث عن تعبير عادي لإضافة التحقق إلى حقل النموذج. مثال: 'بريد إلكتروني', 'رمز بريدي', 'رابط'.</key>
+    <key alias="removeMacro">إزالة الماكرو</key>
+    <key alias="requiredField">حقل مطلوب</key>
+    <key alias="sitereindexed">تمت إعادة فهرسة الموقع</key>
+    <key
+      alias="siterepublished"
+    >تم تحديث ذاكرة التخزين المؤقت للموقع. جميع محتويات النشر محدثة الآن. بينما تبقى جميع المحتويات غير المنشورة غير منشورة</key>
+    <key
+      alias="siterepublishHelp"
+    >سيتم تحديث ذاكرة التخزين المؤقت للموقع. سيتم تحديث جميع المحتويات المنشورة، بينما تبقى المحتويات غير المنشورة غير منشورة.</key>
+    <key alias="tableColumns">عدد الأعمدة</key>
+    <key alias="tableRows">عدد الصفوف</key>
+    <key
+      alias="thumbnailimageclickfororiginal"
+    >انقر على الصورة لرؤية الحجم الكامل</key>
+    <key alias="treepicker">اختر عنصرًا</key>
+    <key alias="viewCacheItem">عرض عنصر الذاكرة المؤقتة</key>
+    <key alias="relateToOriginalLabel">ربط بالأصل</key>
+    <key alias="includeDescendants">تضمين العناصر الفرعية</key>
+    <key alias="theFriendliestCommunity">أكثر المجتمعات ودية</key>
+    <key alias="linkToPage">رابط إلى الصفحة</key>
+    <key
+      alias="openInNewWindow"
+    >يفتح المستند المرتبط في نافذة أو علامة تبويب جديدة</key>
+    <key alias="linkToMedia">رابط إلى الوسائط</key>
+    <key alias="selectContentStartNode">حدد عقدة بداية المحتوى</key>
+    <key alias="selectEvent">حدد حدثًا</key>
+    <key alias="selectMedia">حدد وسائط</key>
+    <key alias="selectMediaType">حدد نوع الوسائط</key>
+    <key alias="selectIcon">حدد أيقونة</key>
+    <key alias="selectItem">حدد عنصرًا</key>
+    <key alias="selectLink">حدد رابطًا</key>
+    <key alias="selectMacro">حدد ماكرو</key>
+    <key alias="selectContent">حدد محتوى</key>
+    <key alias="selectContentType">حدد نوع المحتوى</key>
+    <key alias="selectMediaStartNode">حدد عقدة بداية الوسائط</key>
+    <key alias="selectMember">حدد عضوًا</key>
+    <key alias="selectMemberGroup">حدد مجموعة أعضاء</key>
+    <key alias="selectMemberType">حدد نوع العضو</key>
+    <key alias="selectNode">حدد عقدة</key>
+    <key alias="selectLanguages">حدد اللغات</key>
+    <key alias="selectSections">حدد الأقسام</key>
+    <key alias="selectUser">حدد مستخدمًا</key>
+    <key alias="selectUsers">حدد المستخدمين</key>
+    <key alias="noIconsFound">لم يتم العثور على أي أيقونات</key>
+    <key alias="noMacroParams">لا توجد معلمات لهذا الماكرو</key>
+    <key alias="noMacros">لا توجد وحدات ماكرو متاحة للإدراج</key>
+    <key alias="externalLoginProviders">موفرو تسجيل الدخول الخارجيين</key>
+    <key alias="exceptionDetail">تفاصيل الاستثناء</key>
+    <key alias="stacktrace">تتبع المكدس</key>
+    <key alias="innerException">استثناء داخلي</key>
+    <key alias="linkYour">ربط</key>
+    <key alias="unLinkYour">إلغاء ربط</key>
+    <key alias="account">الحساب</key>
+    <key alias="selectEditor">حدد المحرر</key>
+    <key alias="selectSnippet">حدد مقتطف</key>
+    <key
+      alias="variantdeletewarning"
+    >سيؤدي هذا إلى حذف العقدة وجميع لغاتها. إذا كنت تريد حذف لغة واحدة فقط، فيجب عليك إلغاء نشر العقدة بتلك اللغة بدلاً من ذلك.</key>
+    <key
+      alias="propertyuserpickerremovewarning"
+    ><![CDATA[سيؤدي هذا إلى إزالة المستخدم <strong>%0%</strong>.]]></key>
+    <key
+      alias="userremovewarning"
+    ><![CDATA[سيؤدي هذا إلى إزالة المستخدم <strong>%0%</strong> من مجموعة <strong>%1%</strong>]]></key>
+    <key alias="yesRemove">نعم، إزالة</key>
+    <key alias="deleteLayout">أنت تحذف التخطيط</key>
+    <key
+      alias="deletingALayout"
+    >سيؤدي تعديل التخطيط إلى فقدان البيانات لأي محتوى موجود يعتمد على هذا التكوين.</key>
+    <key alias="selectEditorConfiguration">حدد التكوين</key>
+  </area>
+  <area alias="dictionary">
+    <key alias="importDictionaryItemHelp">
+      لاستيراد عنصر قاموس، ابحث عن ملف ".udt" على جهازك عن طريق النقر على زر "استيراد" (سيتم طلب التأكيد في الشاشة التالية)
+    </key>
+    <key alias="itemDoesNotExists">عنصر القاموس غير موجود.</key>
+    <key alias="parentDoesNotExists">العنصر الأب غير موجود.</key>
+    <key alias="noItems">لا توجد عناصر قاموس.</key>
+    <key alias="noItemsInFile">لا توجد عناصر قاموس في هذا الملف.</key>
+    <key alias="noItemsFound">لم يتم العثور على أي عناصر قاموس.</key>
+    <key alias="createNew">إنشاء عنصر قاموس</key>
+  </area>
+  <area alias="dictionaryItem">
+    <key
+      alias="description"
+    ><![CDATA[
+      تحرير إصدارات اللغة المختلفة لعنصر القاموس '<em>%0%</em>' أدناه
+   ]]></key>
+    <key alias="displayName">اسم الثقافة</key>
+    <key
+      alias="changeKeyError"
+    ><![CDATA[
+      المفتاح '%0%' موجود بالفعل.
+   ]]></key>
+    <key alias="overviewTitle">نظرة عامة على القاموس</key>
+  </area>
+  <area alias="examineManagement">
+    <key alias="configuredSearchers">باحثون مكونون</key>
+    <key
+      alias="configuredSearchersDescription"
+    >يعرض خصائص وأدوات لأي باحث مكون (مثل باحث متعدد الفهارس)</key>
+    <key alias="fieldValues">قيم الحقل</key>
+    <key alias="healthStatus">حالة الصحة</key>
+    <key
+      alias="healthStatusDescription"
+    >حالة صحة الفهرس وما إذا كان يمكن قراءته</key>
+    <key alias="indexers">الفهارس</key>
+    <key alias="indexInfo">معلومات الفهرس</key>
+    <key alias="contentInIndex">المحتوى في الفهرس</key>
+    <key alias="indexInfoDescription">يسرد خصائص الفهرس</key>
+    <key alias="manageIndexes">إدارة فهارس Examine</key>
+    <key
+      alias="manageIndexesDescription"
+    >يسمح لك بمشاهدة تفاصيل كل فهرس ويوفر بعض الأدوات لإدارة الفهارس</key>
+    <key alias="rebuildIndex">إعادة بناء الفهرس</key>
+    <key
+      alias="rebuildIndexWarning"
+    ><![CDATA[
+      سيؤدي هذا إلى إعادة بناء الفهرس.<br />
+      اعتمادًا على كمية المحتوى في موقعك، قد يستغرق هذا بعض الوقت.<br />
+      لا يوصى بإعادة بناء الفهرس خلال أوقات حركة مرور عالية على الموقع أو عندما يقوم المحررون بتحرير المحتوى.
+     ]]>
+    </key>
+    <key alias="searchers">الباحثون</key>
+    <key alias="searchDescription">ابحث في الفهرس وعرض النتائج</key>
+    <key alias="tools">أدوات</key>
+    <key alias="toolsDescription">أدوات لإدارة الفهرس</key>
+    <key alias="fields">الحقول</key>
+    <key
+      alias="indexCannotRead"
+    >لا يمكن قراءة الفهرس وسيحتاج إلى إعادة بناء</key>
+    <key
+      alias="processIsTakingLonger"
+    >تستغرق العملية وقتًا أطول من المتوقع، تحقق من سجل Umbraco لمعرفة ما إذا كانت هناك أي أخطاء خلال هذه العملية</key>
+    <key
+      alias="indexCannotRebuild"
+    >لا يمكن إعادة بناء هذا الفهرس لأنه لا يحتوي على</key>
+    <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">لم يتم العثور على نتائج</key>
+    <key
+      alias="searchResultsFound"
+    >عرض %0% - %1% من %2% نتيجة - الصفحة %3% من %4%</key>
+  </area>
+  <area alias="placeholders">
+    <key alias="username">أدخل اسم المستخدم</key>
+    <key alias="password">أدخل كلمة المرور</key>
+    <key alias="confirmPassword">تأكيد كلمة المرور</key>
+    <key alias="nameentity">سمّ %0%...</key>
+    <key alias="entername">أدخل اسمًا...</key>
+    <key alias="enteremail">أدخل بريدًا إلكترونيًا...</key>
+    <key alias="enterusername">أدخل اسم مستخدم...</key>
+    <key alias="label">تسمية...</key>
+    <key alias="enterDescription">أدخل وصفًا...</key>
+    <key alias="search">اكتب للبحث...</key>
+    <key alias="filter">اكتب للتصفية...</key>
+    <key alias="enterTags">اكتب لإضافة علامات (اضغط إدخال بعد كل علامة)...</key>
+    <key alias="email">أدخل بريدك الإلكتروني</key>
+    <key alias="enterMessage">أدخل رسالة...</key>
+    <key
+      alias="usernameHint"
+    >اسم المستخدم الخاص بك هو عادةً بريدك الإلكتروني</key>
+    <key alias="anchor">#قيمة أو ?مفتاح=قيمة</key>
+    <key alias="enterAlias">أدخل اسمًا مستعارًا...</key>
+    <key alias="generatingAlias">جارٍ إنشاء اسم مستعار...</key>
+    <key alias="a11yCreateItem">إنشاء عنصر</key>
+    <key alias="a11yEdit">تحرير</key>
+    <key alias="a11yName">الاسم</key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="createListView" version="7.2">إنشاء عرض قائمة مخصص</key>
+    <key alias="removeListView" version="7.2">إزالة عرض قائمة مخصص</key>
+    <key
+      alias="aliasAlreadyExists"
+    >نوع محتوى أو نوع وسائط أو نوع عضو بهذا الاسم المستعار موجود بالفعل</key>
+  </area>
+  <area alias="renamecontainer">
+    <key alias="renamed">تمت إعادة التسمية</key>
+    <key alias="enterNewFolderName">أدخل اسم مجلد جديد هنا</key>
+    <key alias="folderWasRenamed">تمت إعادة تسمية %0% إلى %1%</key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="addPrevalue">إضافة قيمة مسبقة</key>
+    <key alias="dataBaseDatatype">نوع بيانات قاعدة البيانات</key>
+    <key alias="guid">معرف محرر الخصائص</key>
+    <key alias="renderControl">محرر الخصائص</key>
+    <key alias="rteButtons">أزرار</key>
+    <key alias="rteEnableAdvancedSettings">تمكين الإعدادات المتقدمة لـ</key>
+    <key alias="rteEnableContextMenu">تمكين قائمة السياق</key>
+    <key
+      alias="rteMaximumDefaultImgSize"
+    >الحد الأقصى للحجم الافتراضي للصور المدرجة</key>
+    <key alias="rteRelatedStylesheets">أوراق الأنماط ذات الصلة</key>
+    <key alias="rteShowLabel">إظهار التسمية</key>
+    <key alias="rteWidthAndHeight">العرض والارتفاع</key>
+    <key alias="selectFolder">حدد المجلد لنقله</key>
+    <key alias="inTheTree">إلى في بنية الشجرة أدناه</key>
+    <key alias="wasMoved">تم نقله تحت</key>
+    <key
+      alias="canChangePropertyEditorHelp"
+    >تعطيل تغيير محرر الخصائص على نوع بيانات بقيم مخزنة. للسماح بذلك يمكنك تغيير إعداد Umbraco:CMS:DataTypes:CanBeChanged في appsettings.json.</key>
+    <key
+      alias="hasReferencesDeleteConsequence"
+    ><![CDATA[حذف <strong>%0%</strong> سيحذف الخصائص وبياناتها من العناصر التالية]]></key>
+    <key
+      alias="acceptDeleteConsequence"
+    >أنا أفهم أن هذا الإجراء سيحذف الخصائص والبيانات المستندة إلى نوع البيانات هذا</key>
+  </area>
+  <area alias="errorHandling">
+    <key
+      alias="errorButDataWasSaved"
+    >تم حفظ بياناتك، ولكن قبل أن تتمكن من نشر هذه الصفحة، هناك بعض الأخطاء التي تحتاج إلى إصلاحها أولاً:</key>
+    <key
+      alias="errorChangingProviderPassword"
+    >موفر العضوية الحالي لا يدعم تغيير كلمة المرور (يجب أن يكون EnablePasswordRetrieval صحيحًا)</key>
+    <key alias="errorExistsWithoutTab">%0% موجود بالفعل</key>
+    <key alias="errorHeader">كانت هناك أخطاء:</key>
+    <key alias="errorHeaderWithoutTab">كانت هناك أخطاء:</key>
+    <key
+      alias="errorInPasswordFormat"
+    >يجب أن تكون كلمة المرور بطول %0% أحرف على الأقل وتحتوي على %1% حرف غير أبجدي رقمي على الأقل</key>
+    <key alias="errorIntegerWithoutTab">%0% يجب أن يكون عددًا صحيحًا</key>
+    <key alias="errorMandatory">حقل %0% في علامة التبويب %1% إلزامي</key>
+    <key alias="errorMandatoryWithoutTab">%0% حقل إلزامي</key>
+    <key alias="errorRegExp">%0% في %1% ليس بتنسيق صحيح</key>
+    <key alias="errorRegExpWithoutTab">%0% ليس بتنسيق صحيح</key>
+  </area>
+  <area alias="errors">
+    <key alias="receivedErrorFromServer">تم استلام خطأ من الخادم</key>
+    <key
+      alias="dissallowedMediaType"
+    >تم منع نوع الملف المحدد من قبل المسؤول</key>
+    <key
+      alias="codemirroriewarning"
+    >ملاحظة! على الرغم من تمكين CodeMirror عن طريق التكوين، إلا أنه معطل في Internet Explorer لأنه غير مستقر بما فيه الكفاية.</key>
+    <key
+      alias="contentTypeAliasAndNameNotNull"
+    >يرجى ملء كل من الاسم المستعار والاسم على نوع الخاصية الجديد!</key>
+    <key
+      alias="filePermissionsError"
+    >هناك مشكلة في حق الوصول للقراءة/الكتابة لملف أو مجلد معين</key>
+    <key
+      alias="macroErrorLoadingPartialView"
+    >خطأ في تحميل نص Partial View (ملف: %0%)</key>
+    <key alias="missingTitle">الرجاء إدخال عنوان</key>
+    <key alias="missingType">الرجاء اختيار نوع</key>
+    <key
+      alias="pictureResizeBiggerThanOrg"
+    >أنت على وشك جعل الصورة أكبر من الحجم الأصلي. هل أنت متأكد أنك تريد المتابعة؟</key>
+    <key
+      alias="startNodeDoesNotExists"
+    >تم حذف عقدة البداية، يرجى الاتصال بمسؤولك</key>
+    <key
+      alias="stylesMustMarkBeforeSelect"
+    >يرجى تحديد المحتوى قبل تغيير النمط</key>
+    <key alias="stylesNoStylesOnPage">لا توجد أنماط نشطة متاحة</key>
+    <key
+      alias="tableColMergeLeft"
+    >يرجى وضع المؤشر على يسار الخليتين اللتين ترغب في دمجهما</key>
+    <key alias="tableSplitNotSplittable">لا يمكنك تقسيم خلية لم يتم دمجها.</key>
+    <key alias="propertyHasErrors">هذه الخاصية غير صالحة</key>
+    <key alias="defaultError">حدث فشل غير معروف</key>
+    <key alias="concurrencyError">فشل التزامن التفاؤلي، تم تعديل الكائن</key>
+  </area>
+  <area alias="general">
+    <key alias="about">حول</key>
+    <key alias="action">إجراء</key>
+    <key alias="actions">إجراءات</key>
+    <key alias="add">إضافة</key>
+    <key alias="alias">اسم مستعار</key>
+    <key alias="all">الكل</key>
+    <key alias="areyousure">هل أنت متأكد؟</key>
+    <key alias="back">رجوع</key>
+    <key alias="backToOverview">العودة إلى النظرة العامة</key>
+    <key alias="border">حدود</key>
+    <key alias="by">بواسطة</key>
+    <key alias="cancel">إلغاء</key>
+    <key alias="cellMargin">هوامش الخلية</key>
+    <key alias="choose">اختر</key>
+    <key alias="clear">مسح</key>
+    <key alias="close">إغلاق</key>
+    <key alias="closewindow">إغلاق النافذة</key>
+    <key alias="closepane">إغلاق اللوحة</key>
+    <key alias="comment">تعليق</key>
+    <key alias="confirm">تأكيد</key>
+    <key alias="constrain">تقيد</key>
+    <key alias="constrainProportions">تقيد النسب</key>
+    <key alias="content">محتوى</key>
+    <key alias="continue">متابعة</key>
+    <key alias="copy">نسخ</key>
+    <key alias="create">إنشاء</key>
+    <key alias="database">قاعدة البيانات</key>
+    <key alias="date">تاريخ</key>
+    <key alias="default">افتراضي</key>
+    <key alias="delete">حذف</key>
+    <key alias="deleted">تم الحذف</key>
+    <key alias="deleting">جارٍ الحذف...</key>
+    <key alias="design">تصميم</key>
+    <key alias="dictionary">قاموس</key>
+    <key alias="dimensions">أبعاد</key>
+    <key alias="discard">تجاهل</key>
+    <key alias="down">أسفل</key>
+    <key alias="download">تنزيل</key>
+    <key alias="edit">تحرير</key>
+    <key alias="edited">تم التحرير</key>
+    <key alias="elements">عناصر</key>
+    <key alias="email">بريد إلكتروني</key>
+    <key alias="error">خطأ</key>
+    <key alias="field">حقل</key>
+    <key alias="findDocument">بحث</key>
+    <key alias="first">أولاً</key>
+    <key alias="focalPoint">نقطة محورية</key>
+    <key alias="general">عام</key>
+    <key alias="groups">مجموعات</key>
+    <key alias="group">مجموعة</key>
+    <key alias="height">ارتفاع</key>
+    <key alias="help">مساعدة</key>
+    <key alias="hide">إخفاء</key>
+    <key alias="history">تاريخ</key>
+    <key alias="icon">أيقونة</key>
+    <key alias="id">معرف</key>
+    <key alias="import">استيراد</key>
+    <key alias="excludeFromSubFolders">البحث في هذا المجلد فقط</key>
+    <key alias="info">معلومات</key>
+    <key alias="innerMargin">هوامش داخلية</key>
+    <key alias="insert">إدراج</key>
+    <key alias="install">تثبيت</key>
+    <key alias="invalid">غير صالح</key>
+    <key alias="justify">محاذاة</key>
+    <key alias="label">تسمية</key>
+    <key alias="language">لغة</key>
+    <key alias="last">آخر</key>
+    <key alias="layout">تخطيط</key>
+    <key alias="links">روابط</key>
+    <key alias="loading">جارٍ التحميل...</key>
+    <key alias="locked">مقفل</key>
+    <key alias="login">تسجيل الدخول</key>
+    <key alias="logoff">تسجيل الخروج</key>
+    <key alias="logout">تسجيل الخروج</key>
+    <key alias="macro">ماكرو</key>
+    <key alias="mandatory">إلزامي</key>
+    <key alias="message">رسالة</key>
+    <key alias="move">نقل</key>
+    <key alias="name">اسم</key>
+    <key alias="new">جديد</key>
+    <key alias="next">التالي</key>
+    <key alias="no">لا</key>
+    <key alias="nodeName">اسم العقدة</key>
+    <key alias="of">من</key>
+    <key alias="off">إيقاف</key>
+    <key alias="ok">موافق</key>
+    <key alias="open">فتح</key>
+    <key alias="options">خيارات</key>
+    <key alias="on">تشغيل</key>
+    <key alias="or">أو</key>
+    <key alias="orderBy">ترتيب حسب</key>
+    <key alias="password">كلمة المرور</key>
+    <key alias="path">مسار</key>
+    <key alias="pleasewait">لحظة من فضلك...</key>
+    <key alias="previous">السابق</key>
+    <key alias="properties">خصائص</key>
+    <key alias="readMore">قراءة المزيد</key>
+    <key alias="rebuild">إعادة بناء</key>
+    <key alias="reciept">البريد الإلكتروني لاستلام بيانات النموذج</key>
+    <key alias="recycleBin">سلة المحذوفات</key>
+    <key alias="recycleBinEmpty">سلة المحذوفات فارغة</key>
+    <key alias="reload">إعادة تحميل</key>
+    <key alias="remaining">متبقي</key>
+    <key alias="remove">إزالة</key>
+    <key alias="rename">إعادة تسمية</key>
+    <key alias="renew">تجديد</key>
+    <key alias="required" version="7.0">مطلوب</key>
+    <key alias="retrieve">استرجاع</key>
+    <key alias="retry">إعادة المحاولة</key>
+    <key alias="rights">أذونات</key>
+    <key alias="scheduledPublishing">النشر المجدول</key>
+    <key alias="umbracoInfo">معلومات Umbraco</key>
+    <key alias="search">بحث</key>
+    <key alias="searchNoResult">عذرًا، لا يمكننا العثور على ما تبحث عنه.</key>
+    <key alias="noItemsInList">لم تتم إضافة أي عناصر</key>
+    <key alias="server">خادم</key>
+    <key alias="settings">إعدادات</key>
+    <key alias="shared">مشترك</key>
+    <key alias="show">إظهار</key>
+    <key alias="showPageOnSend">إظهار الصفحة عند الإرسال</key>
+    <key alias="size">حجم</key>
+    <key alias="sort">فرز</key>
+    <key alias="status">حالة</key>
+    <key alias="submit">إرسال</key>
+    <key alias="success">نجاح</key>
+    <key alias="type">نوع</key>
+    <key alias="typeName">اسم النوع</key>
+    <key alias="typeToSearch">اكتب للبحث...</key>
+    <key alias="under">تحت</key>
+    <key alias="up">أعلى</key>
+    <key alias="update">تحديث</key>
+    <key alias="upgrade">ترقية</key>
+    <key alias="upload">رفع</key>
+    <key alias="url">رابط</key>
+    <key alias="user">مستخدم</key>
+    <key alias="username">اسم المستخدم</key>
+    <key alias="value">قيمة</key>
+    <key alias="view">عرض</key>
+    <key alias="welcome">مرحبًا...</key>
+    <key alias="width">عرض</key>
+    <key alias="yes">نعم</key>
+    <key alias="folder">مجلد</key>
+    <key alias="searchResults">نتائج البحث</key>
+    <key alias="reorder">إعادة ترتيب</key>
+    <key alias="reorderDone">لقد انتهيت من إعادة الترتيب</key>
+    <key alias="preview">معاينة</key>
+    <key alias="changePassword">تغيير كلمة المرور</key>
+    <key alias="to">إلى</key>
+    <key alias="listView">عرض القائمة</key>
+    <key alias="saving">جارٍ الحفظ...</key>
+    <key alias="current">حالي</key>
+    <key alias="embed">تضمين</key>
+    <key alias="selected">محدد</key>
+    <key alias="other">آخر</key>
+    <key alias="articles">مقالات</key>
+    <key alias="videos">فيديوهات</key>
+    <key alias="avatar">صورة رمزية لـ</key>
+    <key alias="header">رأس</key>
+    <key alias="systemField">حقل نظام</key>
+    <key alias="lastUpdated">آخر تحديث</key>
+    <key alias="skipToMenu">انتقل إلى القائمة</key>
+    <key alias="skipToContent">انتقل إلى المحتوى</key>
+    <key alias="primary">أساسي</key>
+    <key alias="change">تغيير</key>
+    <key alias="cropSection">قسم القص</key>
+    <key alias="generic">عام</key>
+    <key alias="media">وسائط</key>
+    <key alias="revert">تراجع</key>
+    <key alias="validate">تحقق</key>
+  </area>
+  <area alias="colors">
+    <key alias="blue">أزرق</key>
+  </area>
+  <area alias="shortcuts">
+    <key alias="addGroup">إضافة مجموعة</key>
+    <key alias="addProperty">إضافة خاصية</key>
+    <key alias="addEditor">إضافة محرر</key>
+    <key alias="addTemplate">إضافة قالب</key>
+    <key alias="addChildNode">إضافة عقدة فرعية</key>
+    <key alias="addChild">إضافة فرعي</key>
+    <key alias="editDataType">تحرير نوع البيانات</key>
+    <key alias="navigateSections">التنقل بين الأقسام</key>
+    <key alias="shortcut">اختصارات</key>
+    <key alias="showShortcuts">إظهار الاختصارات</key>
+    <key alias="toggleListView">تبديل عرض القائمة</key>
+    <key alias="toggleAllowAsRoot">تبديل السماح كجذر</key>
+    <key alias="commentLine">تعليق/إلغاء تعليق الأسطر</key>
+    <key alias="removeLine">إزالة سطر</key>
+    <key alias="copyLineUp">نسخ الأسطر لأعلى</key>
+    <key alias="copyLineDown">نسخ الأسطر لأسفل</key>
+    <key alias="moveLineUp">نقل الأسطر لأعلى</key>
+    <key alias="moveLineDown">نقل الأسطر لأسفل</key>
+    <key alias="generalHeader">عام</key>
+    <key alias="editorHeader">محرر</key>
+    <key alias="toggleAllowCultureVariants">تبديل السماح بمتغيرات الثقافة</key>
+    <key alias="addTab">إضافة علامة تبويب</key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="backgroundcolor">لون الخلفية</key>
+    <key alias="bold">عريض</key>
+    <key alias="color">لون النص</key>
+    <key alias="font">خط</key>
+    <key alias="text">نص</key>
+  </area>
+  <area alias="headers">
+    <key alias="page">صفحة</key>
+  </area>
+  <area alias="installer">
+    <key
+      alias="databaseErrorCannotConnect"
+    >لا يمكن للمثبت الاتصال بقاعدة البيانات.</key>
+    <key
+      alias="databaseErrorWebConfig"
+    >تعذر حفظ ملف web.config. يرجى تعديل سلسلة الاتصال يدويًا.</key>
+    <key
+      alias="databaseFound"
+    >تم العثور على قاعدة البيانات الخاصة بك وهي معرفة كـ</key>
+    <key alias="databaseHeader">تكوين قاعدة البيانات</key>
+    <key alias="databaseInstall">
+      <![CDATA[
+      اضغط على زر <strong>تثبيت</strong> لتثبيت قاعدة بيانات Umbraco %0%
+    ]]>
+    </key>
+    <key alias="databaseInstallDone">
+      <![CDATA[تم الآن نسخ Umbraco %0% إلى قاعدة البيانات الخاصة بك. اضغط <strong>التالي</strong> للمتابعة.]]></key>
+    <key
+      alias="databaseNotFound"
+    ><![CDATA[<p>لم يتم العثور على قاعدة البيانات! يرجى التحقق من أن المعلومات في "سلسلة الاتصال" لملف "web.config" صحيحة.</p>
+              <p>للمتابعة، يرجى تحرير ملف "web.config" (باستخدام Visual Studio أو محرر النصوص المفضل لديك)، انتقل إلى الأسفل، أضف سلسلة الاتصال لقاعدة البيانات الخاصة بك في المفتاح المسمى "UmbracoDbDSN" واحفظ الملف. </p>
+              <p>
+              انقر على زر <strong>إعادة المحاولة</strong> عند
+              الانتهاء.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              المزيد من المعلومات حول تحرير web.config هنا</a>.</p>]]></key>
+    <key
+      alias="databaseText"
+    ><![CDATA[لإكمال هذه الخطوة، يجب أن تعرف بعض المعلومات المتعلقة بخادم قاعدة البيانات ("سلسلة الاتصال").<br />
+        يرجى الاتصال بمزود خدمة الإنترنت الخاص بك إذا لزم الأمر.
+        إذا كنت تقوم بالتثبيت على جهاز محلي أو خادم، فقد تحتاج إلى معلومات من مسؤول النظام الخاص بك.]]></key>
+    <key
+      alias="databaseUpgrade"
+    ><![CDATA[
+      <p>
+      اضغط على زر <strong>ترقية</strong> لترقية قاعدة البيانات الخاصة بك إلى Umbraco %0%</p>
+      <p>
+      لا تقلق - لن يتم حذف أي محتوى وسيستمر كل شيء في العمل بعد ذلك!
+      </p>
+      ]]></key>
+    <key
+      alias="databaseUpgradeDone"
+    ><![CDATA[تمت ترقية قاعدة البيانات الخاصة بك إلى الإصدار النهائي %0%.<br />اضغط <strong>التالي</strong> للمتابعة. ]]></key>
+    <key alias="databaseUpToDate">
+      <![CDATA[قاعدة البيانات الحالية الخاصة بك محدثة! انقر <strong>التالي</strong> لمتابعة معالج التكوين]]></key>
+    <key alias="defaultUserChangePass">
+      <![CDATA[<strong>يجب تغيير كلمة مرور المستخدم الافتراضي!</strong>]]></key>
+    <key alias="defaultUserDisabled">
+      <![CDATA[<strong>تم تعطيل المستخدم الافتراضي أو ليس لديه حق الوصول إلى Umbraco!</strong></p><p>لا يلزم اتخاذ أي إجراءات أخرى. انقر <strong>التالي</strong> للمتابعة.]]></key>
+    <key alias="defaultUserPassChanged">
+      <![CDATA[<strong>تم تغيير كلمة مرور المستخدم الافتراضي بنجاح منذ التثبيت!</strong></p><p>لا يلزم اتخاذ أي إجراءات أخرى. انقر <strong>التالي</strong> للمتابعة.]]></key>
+    <key alias="defaultUserPasswordChanged">تم تغيير كلمة المرور!</key>
+    <key
+      alias="greatStart"
+    >احصل على بداية رائعة، شاهد مقاطع الفيديو التقديمية الخاصة بنا</key>
+    <key
+      alias="licenseText"
+    >بالنقر على الزر التالي (أو تعديل umbracoConfigurationStatus في web.config)، فإنك تقبل ترخيص هذا البرنامج كما هو محدد في المربع أدناه. لاحظ أن توزيعة Umbraco هذه تتكون من ترخيصين مختلفين، ترخيص MIT مفتوح المصدر للإطار وترخيص Umbraco المجاني الذي يغطي واجهة المستخدم.</key>
+  <key alias="None">غير مثبت بعد.</key>
+<key alias="permissionsAffectedFolders">الملفات والمجلدات المتأثرة</key>
+<key
+      alias="permissionsAffectedFoldersMoreInfo"
+    >مزيد من المعلومات حول إعداد أذونات Umbraco هنا</key>
+<key
+      alias="permissionsAffectedFoldersText"
+    >تحتاج إلى منح ASP.NET أذونات التعديل للملفات/المجلدات التالية</key>
+<key
+      alias="permissionsAlmostPerfect"
+    ><![CDATA[<strong>إعدادات الأذونات الخاصة بك مثالية تقريبًا!</strong><br /><br />
+يمكنك تشغيل Umbraco دون مشاكل، ولكن لن تتمكن من تثبيت الحزم الموصى بها للاستفادة الكاملة من Umbraco.]]></key>
+<key alias="permissionsHowtoResolve">كيفية الحل</key>
+<key alias="permissionsHowtoResolveLink">انقر هنا لقراءة النسخة النصية</key>
+<key
+      alias="permissionsHowtoResolveText"
+    ><![CDATA[شاهد <strong>الفيديو التعليمي</strong> الخاص بنا حول إعداد أذونات المجلدات لـ Umbraco أو اقرأ النسخة النصية.]]></key>
+<key
+      alias="permissionsMaybeAnIssue"
+    ><![CDATA[<strong>إعدادات الأذونات الخاصة بك قد تكون مشكلة!</strong>
+<br/><br />
+يمكنك تشغيل Umbraco دون مشاكل، ولكن لن تتمكن من إنشاء مجلدات أو تثبيت الحزم الموصى بها للاستفادة الكاملة من Umbraco.]]></key>
+<key
+      alias="permissionsNotReady"
+    ><![CDATA[<strong>إعدادات الأذونات الخاصة بك غير جاهزة لـ Umbraco!</strong>
+<br /><br />
+من أجل تشغيل Umbraco، ستحتاج إلى تحديث إعدادات الأذونات الخاصة بك.]]></key>
+<key
+      alias="permissionsPerfect"
+    ><![CDATA[<strong>إعدادات الأذونات الخاصة بك مثالية!</strong><br /><br />
+أنت جاهز لتشغيل Umbraco وتثبيت الحزم!]]></key>
+<key alias="permissionsResolveFolderIssues">حل مشكلة المجلد</key>
+<key
+      alias="permissionsResolveFolderIssuesLink"
+    >اتبع هذا الرابط لمزيد من المعلومات حول مشاكل ASP.NET وإنشاء المجلدات</key>
+<key alias="permissionsSettingUpPermissions">إعداد أذونات المجلدات</key>
+<key
+      alias="permissionsText"
+    ><![CDATA[
+تحتاج Umbraco إلى صلاحيات الكتابة/التعديل على بعض المجلدات لتخزين ملفات مثل الصور وملفات PDF.
+كما تقوم بتخزين بيانات مؤقتة (ذاكرة التخزين المؤقت) لتحسين أداء موقعك.
+]]></key>
+<key alias="runwayFromScratch">أريد البدء من الصفر</key>
+<key
+      alias="runwayFromScratchText"
+    ><![CDATA[
+موقعك فارغ تمامًا في الوقت الحالي، لذا فهو مثالي إذا كنت تريد البدء من الصفر وإنشاء أنواع المستندات والقوالب الخاصة بك.
+(<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">تعلم كيف</a>)
+لا يزال بإمكانك اختيار تثبيت Runway لاحقًا. يرجى الذهاب إلى قسم المطور واختيار الحزم.
+]]></key>
+<key
+      alias="runwayHeader"
+    >لقد قمت للتو بإعداد منصة Umbraco نظيفة. ماذا تريد أن تفعل بعد ذلك؟</key>
+<key alias="runwayInstalled">تم تثبيت Runway</key>
+<key
+      alias="runwayInstalledText"
+    ><![CDATA[
+لديك الأساس في مكانه. حدد الوحدات التي ترغب في تثبيتها فوقه.<br />
+هذه قائمتنا الموصى بها من الوحدات، حدد تلك التي ترغب في تثبيتها، أو عرض <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">القائمة الكاملة للوحدات</a>
+]]></key>
+<key alias="runwayOnlyProUsers">موصى به فقط للمستخدمين ذوي الخبرة</key>
+<key alias="runwaySimpleSite">أريد البدء بموقع ويب بسيط</key>
+<key
+      alias="runwaySimpleSiteText"
+    ><![CDATA[
+<p>
+"Runway" هو موقع ويب بسيط يوفر بعض أنواع المستندات الأساسية والقوالب. يمكن للمثبت إعداد Runway لك تلقائيًا،
+ولكن يمكنك بسهولة تحريره أو توسيعه أو إزالته. ليس ضروريًا ويمكنك استخدام Umbraco بدونه بشكل مثالي. ومع ذلك،
+يقدم Runway أساسًا سهلاً مبنيًا على أفضل الممارسات لبدء أسرع من أي وقت مضى.
+إذا اخترت تثبيت Runway، يمكنك اختياريًا تحديد لبنات البناء الأساسية المسماة وحدات Runway لتعزيز صفحات Runway الخاصة بك.
+</p>
+<small>
+<em>المضمن مع Runway:</em> الصفحة الرئيسية، صفحة البدء، صفحة تثبيت الوحدات.<br />
+<em>الوحدات الاختيارية:</em> التنقل العلوي، خريطة الموقع، الاتصال، المعرض.
+</small>
+]]></key>
+<key alias="runwayWhatIsRunway">ما هو Runway</key>
+<key alias="step1">الخطوة 1/5 قبول الترخيص</key>
+<key alias="step2">الخطوة 2/5: تكوين قاعدة البيانات</key>
+<key alias="step3">الخطوة 3/5: التحقق من أذونات الملفات</key>
+<key alias="step4">الخطوة 4/5: التحقق من أمان Umbraco</key>
+<key alias="step5">الخطوة 5/5: Umbraco جاهز لبدء العمل</key>
+<key alias="thankYou">شكرًا لك على اختيار Umbraco</key>
+<key
+      alias="theEndBrowseSite"
+    ><![CDATA[<h3>تصفح موقعك الجديد</h3>
+لقد قمت بتثبيت Runway، فلماذا لا ترى كيف يبدو موقعك الجديد.]]></key>
+<key
+      alias="theEndFurtherHelp"
+    ><![CDATA[<h3>مزيد من المساعدة والمعلومات</h3>
+احصل على المساعدة من مجتمعنا الحائز على جوائز، أو تصفح الوثائق أو شاهد بعض مقاطع الفيديو المجانية حول كيفية إنشاء موقع بسيط، وكيفية استخدام الحزم ودليل سريع لمصطلحات Umbraco]]></key>
+<key alias="theEndHeader">تم تثبيت Umbraco %0% وهو جاهز للاستخدام</key>
+<key
+      alias="theEndInstallFailed"
+    ><![CDATA[لإكمال التثبيت، ستحتاج إلى
+تعديل ملف <strong>/web.config</strong> يدويًا وتحديث مفتاح AppSetting <strong>UmbracoConfigurationStatus</strong> في الأسفل إلى قيمة <strong>'%0%'</strong>.]]></key>
+<key
+      alias="theEndInstallSuccess"
+    ><![CDATA[يمكنك <strong>البدء فورًا</strong> بالنقر على زر "تشغيل Umbraco" أدناه. <br />إذا كنت <strong>جديدًا على Umbraco</strong>،
+يمكنك العثور على الكثير من الموارد في صفحات البداية الخاصة بنا.]]></key>
+<key
+      alias="theEndOpenUmbraco"
+    ><![CDATA[<h3>تشغيل Umbraco</h3>
+لإدارة موقعك، ما عليك سوى فتح واجهة Umbraco الخلفية والبدء في إضافة المحتوى أو تحديث القوالب أو أوراق الأنماط أو إضافة وظائف جديدة]]></key>
+<key alias="Unavailable">فشل الاتصال بقاعدة البيانات.</key>
+<key alias="Version3">Umbraco الإصدار 3</key>
+<key alias="Version4">Umbraco الإصدار 4</key>
+<key alias="watch">شاهد</key>
+<key
+      alias="welcomeIntro"
+    ><![CDATA[سيرشدك هذا المعالج خلال عملية تكوين <strong>Umbraco %0%</strong> لتثبيت جديد أو الترقية من الإصدار 3.0.
+<br /><br />
+اضغط <strong>"التالي"</strong> لبدء المعالج.]]></key>
+</area>
+<area alias="language">
+<key alias="cultureCode">رمز الثقافة</key>
+<key alias="displayName">اسم الثقافة</key>
+</area>
+<area alias="lockout">
+<key
+      alias="lockoutWillOccur"
+    >لقد كنت خاملاً وسيتم تسجيل الخروج تلقائيًا خلال</key>
+<key alias="renewSession">جدد الآن لحفظ عملك</key>
+</area>
+<area alias="login">
+<key alias="greeting0">مرحبًا</key>
+<key alias="greeting1">مرحبًا</key>
+<key alias="greeting2">مرحبًا</key>
+<key alias="greeting3">مرحبًا</key>
+<key alias="greeting4">مرحبًا</key>
+<key alias="greeting5">مرحبًا</key>
+<key alias="greeting6">مرحبًا</key>
+<key alias="instruction">تسجيل الدخول أدناه</key>
+<key alias="signInWith">تسجيل الدخول باستخدام</key>
+<key alias="timeout">انتهت الجلسة</key>
+<key
+      alias="userFailedLogin"
+    >عذرًا! لم نتمكن من تسجيل دخولك. يرجى التحقق من بيانات الاعتماد الخاصة بك والمحاولة مرة أخرى.</key>
+<key
+      alias="bottomText"
+    ><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
+<key alias="forgottenPassword">نسيت كلمة المرور؟</key>
+<key
+      alias="forgottenPasswordInstruction"
+    >سيتم إرسال بريد إلكتروني إلى العنوان المحدد يحتوي على رابط لإعادة تعيين كلمة المرور الخاصة بك</key>
+<key
+      alias="requestPasswordResetConfirmation"
+    >سيتم إرسال بريد إلكتروني مع تعليمات إعادة تعيين كلمة المرور إلى العنوان المحدد إذا كان مطابقًا لسجلاتنا</key>
+<key alias="showPassword">إظهار كلمة المرور</key>
+<key alias="hidePassword">إخفاء كلمة المرور</key>
+<key alias="returnToLogin">العودة إلى نموذج تسجيل الدخول</key>
+<key alias="setPasswordInstruction">يرجى تقديم كلمة مرور جديدة</key>
+<key alias="setPasswordConfirmation">تم تحديث كلمة المرور الخاصة بك</key>
+<key
+      alias="resetCodeExpired"
+    >الرابط الذي نقرت عليه غير صالح أو انتهت صلاحيته</key>
+<key
+      alias="resetPasswordEmailCopySubject"
+    >Umbraco: إعادة تعيين كلمة المرور</key>
+<key
+      alias="resetPasswordEmailCopyFormat"
+    ><![CDATA[
+<html>
+<head>
+<meta name='viewport' content='width=device-width'>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+</head>
+<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+<tr>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+<tr>
+<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+<div></div>
+<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+</td>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+<br>
+<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+<tr>
+<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+<tr>
+<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+طلب إعادة تعيين كلمة المرور
+</h1>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+اسم المستخدم الخاص بك لتسجيل الدخول إلى واجهة Umbraco الخلفية هو: <strong>%0%</strong>
+</p>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+<tbody>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+انقر على هذا الرابط لإعادة تعيين كلمة المرور الخاصة بك
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</p>
+<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>إذا لم تتمكن من النقر على الرابط، فانسخ هذا الرابط والصقه في نافذة المتصفح الخاصة بك:</p>
+<table border='0' cellpadding='0' cellspacing='0'>
+<tr>
+<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>
+</font>
+</td>
+</tr>
+</table>
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<br><br><br>
+</div>
+</td>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+</tr>
+</table>
+</body>
+</html>
+]]></key>
+<key alias="mfaSecurityCodeSubject">Umbraco: رمز الأمان</key>
+<key alias="mfaSecurityCodeMessage">رمز الأمان الخاص بك هو: %0%</key>
+<key alias="2faTitle">خطوة أخيرة</key>
+<key
+      alias="2faText"
+    >لقد قمت بتمكين المصادقة الثنائية ويجب عليك التحقق من هويتك.</key>
+<key alias="2faMultipleText">الرجاء اختيار مزود المصادقة الثنائية</key>
+<key alias="2faCodeInput">رمز التحقق</key>
+<key alias="2faCodeInputHelp">الرجاء إدخال رمز التحقق</key>
+<key alias="2faInvalidCode">تم إدخال رمز غير صالح</key>
+</area>
+<area alias="main">
+<key alias="dashboard">لوحة التحكم</key>
+<key alias="sections">الأقسام</key>
+<key alias="tree">المحتوى</key>
+</area>
+<area alias="moveOrCopy">
+<key alias="choose">اختر الصفحة أعلاه...</key>
+<key alias="copyDone">تم نسخ %0% إلى %1%</key>
+<key alias="copyTo">حدد أدناه المكان الذي يجب نسخ المستند %0% إليه</key>
+<key alias="moveDone">تم نقل %0% إلى %1%</key>
+<key alias="moveTo">حدد أدناه المكان الذي يجب نقل المستند %0% إليه</key>
+<key
+      alias="nodeSelected"
+    >تم تحديده كجذر لمحتواك الجديد، انقر على 'موافق' أدناه.</key>
+<key
+      alias="noNodeSelected"
+    >لم يتم تحديد أي عقدة بعد، يرجى تحديد عقدة في القائمة أعلاه قبل النقر على 'موافق'</key>
+<key
+      alias="notAllowedByContentType"
+    >العقدة الحالية غير مسموح بها تحت العقدة المختارة بسبب نوعها</key>
+<key
+      alias="notAllowedByPath"
+    >لا يمكن نقل العقدة الحالية إلى إحدى صفحاتها الفرعية ولا يمكن أن يكون الأصل والوجهة متماثلين</key>
+<key alias="notAllowedAtRoot">لا يمكن أن توجد العقدة الحالية في الجذر</key>
+<key
+      alias="notValid"
+    >الإجراء غير مسموح به لأن لديك أذونات غير كافية على مستند أو أكثر من المستندات الفرعية.</key>
+<key alias="relateToOriginal">ربط العناصر المنسوخة بالأصل</key>
+</area>
+<area alias="notifications">
+<key
+      alias="editNotifications"
+    ><![CDATA[حدد إشعارك لـ <strong>%0%</strong>]]></key>
+<key alias="notificationsSavedFor">تم حفظ إعدادات الإشعارات لـ</key>
+<key
+      alias="mailBody"
+    ><![CDATA[
+مرحبًا %0%
+
+هذا بريد آلي لإعلامك بأن المهمة '%1%'
+تم تنفيذها على الصفحة '%2%'
+بواسطة المستخدم '%3%'
+
+انتقل إلى http://%4%/#/content/content/edit/%5% للتحرير.
+
+%6%
+
+أتمنى لك يومًا سعيدًا!
+تحياتي من روبوت Umbraco
+]]></key>
+<key alias="mailBodyVariantSummary">تم تعديل اللغات التالية %0%</key>
+<key
+      alias="mailBodyHtml"
+    ><![CDATA[
+<html>
+<head>
+<meta name='viewport' content='width=device-width'>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+</head>
+<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+<tr>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+<tr>
+<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+<div></div>
+<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+</td>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+<br>
+<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+<tr>
+<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+<tr>
+<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+مرحبًا %0%،
+</h1>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+هذا بريد آلي لإعلامك بأن المهمة <strong>'%1%'</strong> تم تنفيذها على الصفحة <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> بواسطة المستخدم <strong>'%3%'</strong>
+</p>
+<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+<tbody>
+<tr>
+<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>تحرير</a></td></tr></tbody></table>
+</td>
+</tr>
+</tbody>
+</table>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+<h3>ملخص التحديث:</h3>
+%6%
+</p>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+أتمنى لك يومًا سعيدًا!<br /><br />
+تحياتي من روبوت Umbraco
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<br><br><br>
+</div>
+</td>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+</tr>
+</table>
+</body>
+</html>
+]]></key>
+<key
+      alias="mailBodyVariantHtmlSummary"
+    ><![CDATA[<p>تم تعديل اللغات التالية:</p>
+%0%
+]]></key>
+<key alias="mailSubject">[%0%] إشعار حول %1% تم تنفيذه على %2%</key>
+<key alias="notifications">الإشعارات</key>
+</area>
+<area alias="packager">
+<key alias="actions">الإجراءات</key>
+<key alias="created">تم الإنشاء</key>
+<key alias="createPackage">إنشاء حزمة</key>
+<key
+      alias="chooseLocalPackageText"
+    ><![CDATA[
+اختر الحزمة من جهازك، بالنقر على زر استعراض<br />
+وتحديد موقع الحزمة. عادةً ما تحتوي حزم Umbraco على امتداد ".umb" أو ".zip".
+]]></key>
+<key alias="deletewarning">سيؤدي هذا إلى حذف الحزمة</key>
+<key alias="includeAllChildNodes">تضمين جميع العقد الفرعية</key>
+<key alias="installed">تم التثبيت</key>
+<key alias="installedPackages">الحزم المثبتة</key>
+<key alias="installInstructions">تعليمات التثبيت</key>
+<key alias="noConfigurationView">هذه الحزمة لا تحتوي على عرض تكوين</key>
+<key alias="noPackagesCreated">لم يتم إنشاء أي حزم بعد</key>
+<key alias="noPackages">لم يتم تثبيت أي حزم</key>
+<key
+      alias="noPackagesDescription"
+    ><![CDATA[تصفح الحزم المتاحة باستخدام أيقونة <strong>'الحزم'</strong> في أعلى يمين شاشتك]]></key>
+<key alias="packageContent">محتوى الحزمة</key>
+<key alias="packageLicense">الترخيص</key>
+<key alias="packageSearch">البحث عن الحزم</key>
+<key alias="packageSearchResults">نتائج البحث عن</key>
+<key alias="packageNoResults">لم نتمكن من العثور على أي شيء لـ</key>
+<key
+      alias="packageNoResultsDescription"
+    >يرجى محاولة البحث عن حزمة أخرى أو التصفح عبر الفئات</key>
+<key alias="packagesPopular">شائعة</key>
+<key alias="packagesPromoted">مميزة</key>
+<key alias="packagesNew">إصدارات جديدة</key>
+<key alias="packageHas">لديه</key>
+<key alias="packageKarmaPoints">نقاط كارما</key>
+<key alias="packageInfo">معلومات</key>
+<key alias="packageOwner">المالك</key>
+<key alias="packageContrib">المساهمون</key>
+<key alias="packageCreated">تم الإنشاء</key>
+<key alias="packageCurrentVersion">الإصدار الحالي</key>
+<key alias="packageNetVersion">إصدار .NET</key>
+<key alias="packageDownloads">التحميلات</key>
+<key alias="packageLikes">الإعجابات</key>
+<key alias="packageCompatibility">التوافق</key>
+<key
+      alias="packageCompatibilityDescription"
+    >هذه الحزمة متوافقة مع إصدارات Umbraco التالية، كما أبلغ أعضاء المجتمع. لا يمكن ضمان التوافق الكامل للإصدارات المبلغ عنها أقل من 100%</key>
+<key alias="packageExternalSources">مصادر خارجية</key>
+<key alias="packageAuthor">المؤلف</key>
+<key alias="packageDocumentation">الوثائق</key>
+<key alias="packageMetaData">بيانات وصفية للحزمة</key>
+<key alias="packageName">اسم الحزمة</key>
+<key alias="packageNoItemsHeader">لا تحتوي الحزمة على أي عناصر</key>
+<key
+      alias="packageNoItemsText"
+    ><![CDATA[ملف الحزمة هذا لا يحتوي على أي عناصر لإلغاء التثبيت.<br/><br/>
+يمكنك إزالته بأمان من النظام بالنقر على "إلغاء تثبيت الحزمة" أدناه.]]></key>
+<key alias="packageOptions">خيارات الحزمة</key>
+<key alias="packageMigrationsRun">تشغيل عمليات ترحيل الحزم المعلقة</key>
+<key alias="packageReadme">ملف README للحزمة</key>
+<key alias="packageRepository">مستودع الحزمة</key>
+<key alias="packageUninstallConfirm">تأكيد إلغاء تثبيت الحزمة</key>
+<key alias="packageUninstalledHeader">تم إلغاء تثبيت الحزمة</key>
+<key alias="packageUninstalledText">تم إلغاء تثبيت الحزمة بنجاح</key>
+<key alias="packageUninstallHeader">إلغاء تثبيت الحزمة</key>
+<key
+      alias="packageUninstallText"
+    ><![CDATA[يمكنك إلغاء تحديد العناصر التي لا ترغب في إزالتها في هذا الوقت أدناه. عند النقر على "تأكيد إلغاء التثبيت"، سيتم إزالة جميع العناصر المحددة.<br />
+<span style="color: Red; font-weight: bold;">ملاحظة:</span> أي مستندات أو وسائط وما إلى ذلك تعتمد على العناصر التي تقوم بإزالتها، ستتوقف عن العمل، وقد تؤدي إلى عدم استقرار النظام،
+لذا قم بإلغاء التثبيت بحذر. في حالة الشك، اتصل بمؤلف الحزمة.]]></key>
+<key alias="packageVersion">إصدار الحزمة</key>
+<key
+      alias="verifiedToWorkOnUmbracoCloud"
+    >تم التحقق من العمل على Umbraco Cloud</key>
+<key
+      alias="packageMigrationsComplete"
+    >تم الانتهاء من عمليات ترحيل الحزمة بنجاح.</key>
+<key
+      alias="packageMigrationsNonePending"
+    >تم الانتهاء من جميع عمليات ترحيل الحزمة بنجاح.</key>
+</area>
+<area alias="paste">
+<key alias="doNothing">لصق مع التنسيق الكامل (غير موصى به)</key>
+<key
+      alias="errorMessage"
+    >النص الذي تحاول لصقه يحتوي على أحرف خاصة أو تنسيق. قد يكون هذا بسبب نسخ نص من Microsoft Word. يمكن لـ Umbraco إزالة الأحرف الخاصة أو التنسيق تلقائيًا، بحيث يكون المحتوى الملصق أكثر ملاءمة للويب.</key>
+<key alias="removeAll">لصق كنص خام بدون أي تنسيق على الإطلاق</key>
+<key alias="removeSpecialFormattering">لصق، ولكن إزالة التنسيق (موصى به)</key>
+</area>
+<area alias="publicAccess">
+<key alias="paGroups">الحماية القائمة على المجموعات</key>
+<key
+      alias="paGroupsHelp"
+    >إذا كنت تريد منح الوصول لجميع أعضاء مجموعات أعضاء محددة</key>
+<key
+      alias="paGroupsNoGroups"
+    >تحتاج إلى إنشاء مجموعة أعضاء قبل أن تتمكن من استخدام المصادقة القائمة على المجموعات</key>
+<key alias="paErrorPage">صفحة الخطأ</key>
+<key
+      alias="paErrorPageHelp"
+    >تستخدم عندما يكون الأشخاص مسجلين دخولاً، ولكن ليس لديهم حق الوصول</key>
+<key
+      alias="paHowWould"
+    ><![CDATA[اختر كيفية تقييد الوصول إلى الصفحة <strong>%0%</strong>]]></key>
+<key alias="paIsProtected"><![CDATA[<strong>%0%</strong> محمي الآن]]></key>
+<key
+      alias="paIsRemoved"
+    ><![CDATA[تمت إزالة الحماية من <strong>%0%</strong>]]></key>
+<key alias="paLoginPage">صفحة تسجيل الدخول</key>
+<key alias="paLoginPageHelp">اختر الصفحة التي تحتوي على نموذج تسجيل الدخول</key>
+<key alias="paRemoveProtection">إزالة الحماية...</key>
+<key
+      alias="paRemoveProtectionConfirm"
+    ><![CDATA[هل أنت متأكد أنك تريد إزالة الحماية من الصفحة <strong>%0%</strong>?]]></key>
+<key
+      alias="paSelectPages"
+    >حدد الصفحات التي تحتوي على نموذج تسجيل الدخول ورسائل الخطأ</key>
+<key
+      alias="paSelectGroups"
+    ><![CDATA[حدد المجموعات التي لديها حق الوصول إلى الصفحة <strong>%0%</strong>]]></key>
+<key
+      alias="paSelectMembers"
+    ><![CDATA[حدد الأعضاء الذين لديهم حق الوصول إلى الصفحة <strong>%0%</strong>]]></key>
+<key alias="paMembers">حماية أعضاء محددين</key>
+<key alias="paMembersHelp">إذا كنت ترغب في منح الوصول لأعضاء محددين</key>
+</area>
+<area alias="publish">
+<key
+      alias="contentPublishedFailedAwaitingRelease"
+    ><![CDATA[
+لا يمكن نشر %0% لأن العنصر مجدول للإصدار.
+]]></key>
+<key
+      alias="contentPublishedFailedExpired"
+    ><![CDATA[
+لا يمكن نشر %0% لأن العنصر قد انتهت صلاحيته.
+]]></key>
+<key
+      alias="contentPublishedFailedInvalid"
+    ><![CDATA[
+لا يمكن نشر %0% لأن هذه الخصائص: %1% لم تمر بقواعد التحقق.
+]]></key>
+<key
+      alias="contentPublishedFailedByEvent"
+    ><![CDATA[
+لا يمكن نشر %0%، ألغي إضافة طرف ثالث الإجراء.
+]]></key>
+<key
+      alias="contentPublishedFailedByParent"
+    ><![CDATA[
+لا يمكن نشر %0%، لأن الصفحة الأصلية غير منشورة.
+]]></key>
+<key
+      alias="contentPublishedFailedByMissingName"
+    ><![CDATA[
+لا يمكن نشر %0%، لأنه يفتقد إلى اسم.
+]]></key>
+<key alias="includeUnpublished">تضمين الصفحات الفرعية غير المنشورة</key>
+<key alias="inProgress">جاري النشر - يرجى الانتظار...</key>
+<key alias="inProgressCounter">تم نشر %0% من أصل %1% صفحات...</key>
+<key alias="nodePublish">تم نشر %0%</key>
+<key alias="nodePublishAll">تم نشر %0% والصفحات الفرعية</key>
+<key alias="publishAll">نشر %0% وجميع صفحاته الفرعية</key>
+<key
+      alias="publishHelp"
+    ><![CDATA[
+انقر <em>نشر</em> لنشر <strong>%0%</strong> وبالتالي جعل محتواه متاحًا للجمهور.<br/><br />
+يمكنك نشر هذه الصفحة وجميع صفحاتها الفرعية عن طريق تحديد <em>تضمين الصفحات الفرعية غير المنشورة</em> أدناه.
+]]></key>
+<key
+      alias="invalidPublishBranchPermissions"
+    >أذونات مستخدم غير كافية لنشر جميع المستندات الفرعية</key>
+<key
+      alias="contentPublishedFailedIsTrashed"
+    >لا يمكن نشر %0% لأن العنصر في سلة المحذوفات.</key>
+<key
+      alias="contentPublishedFailedReqCultureValidationError"
+    >فشل التحقق للغة المطلوبة '%0%'. تم حفظ هذه اللغة ولكن لم يتم نشرها.</key>
+</area>
+<area alias="colorpicker">
+<key alias="noColors">لم تقم بتكوين أي ألوان معتمدة</key>
+</area>
+<area alias="contentPicker">
+<key alias="allowedItemTypes">يمكنك فقط تحديد عناصر من نوع: %0%</key>
+<key
+      alias="pickedTrashedItem"
+    >لقد حددت عنصر محتوى محذوف حاليًا أو في سلة المحذوفات</key>
+<key
+      alias="pickedTrashedItems"
+    >لقد حددت عناصر محتوى محذوفة حاليًا أو في سلة المحذوفات</key>
+<key alias="specifyPickerRootTitle">تحديد الجذر</key>
+<key alias="defineRootNode">اختر عقدة الجذر</key>
+<key alias="defineXPathOrigin">تحديد عبر XPath</key>
+<key alias="defineDynamicRoot">تحديد جذر ديناميكي</key>
+</area>
+<area alias="dynamicRoot">
+<key alias="configurationTitle">استعلام الجذر الديناميكي</key>
+<key alias="pickDynamicRootOriginTitle">اختر الأصل</key>
+<key
+      alias="pickDynamicRootOriginDesc"
+    >حدد الأصل لاستعلام الجذر الديناميكي الخاص بك</key>
+<key alias="originRootTitle">الجذر</key>
+<key alias="originRootDesc">عقدة الجذر لجلسة التحرير هذه</key>
+<key alias="originParentTitle">الأصل</key>
+<key alias="originParentDesc">العقدة الأصلية للمصدر في جلسة التحرير هذه</key>
+<key alias="originCurrentTitle">الحالي</key>
+<key alias="originCurrentDesc">عقدة المحتوى التي هي مصدر جلسة التحرير هذه</key>
+<key alias="originSiteTitle">الموقع</key>
+<key alias="originSiteDesc">ابحث عن أقرب عقدة باسم مضيف</key>
+<key alias="originByKeyTitle">عقدة محددة</key>
+<key alias="originByKeyDesc">اختر عقدة محددة كأصل لهذا الاستعلام</key>
+<key alias="pickDynamicRootQueryStepTitle">إضافة خطوة إلى الاستعلام</key>
+<key
+      alias="pickDynamicRootQueryStepDesc"
+    >حدد الخطوة التالية لاستعلام الجذر الديناميكي الخاص بك</key>
+<key alias="queryStepNearestAncestorOrSelfTitle">أقرب سلف أو نفس العقدة</key>
+<key
+      alias="queryStepNearestAncestorOrSelfDesc"
+    >استعلام أقرب سلف أو نفس العقدة التي تناسب أحد الأنواع المكونة</key>
+<key alias="queryStepFurthestAncestorOrSelfTitle">أبعد سلف أو نفس العقدة</key>
+<key
+      alias="queryStepFurthestAncestorOrSelfDesc"
+    >استعلام أبعد سلف أو نفس العقدة التي تناسب أحد الأنواع المكونة</key>
+<key alias="queryStepNearestDescendantOrSelfTitle">أقرب فرع أو نفس العقدة</key>
+<key
+      alias="queryStepNearestDescendantOrSelfDesc"
+    >استعلام أقرب فرع أو نفس العقدة التي تناسب أحد الأنواع المكونة</key>
+<key alias="queryStepFurthestDescendantOrSelfTitle">أبعد فرع أو نفس العقدة</key>
+<key
+      alias="queryStepFurthestDescendantOrSelfDesc"
+    >استعلام أبعد فرع أو نفس العقدة التي تناسب أحد الأنواع المكونة</key>
+<key alias="queryStepCustomTitle">مخصص</key>
+<key alias="queryStepCustomDesc">استعلام باستخدام خطوة استعلام مخصصة</key>
+<key alias="addQueryStep">إضافة خطوة استعلام</key>
+<key alias="queryStepTypes">التي تطابق أنواع: </key>
+<key alias="noValidStartNodeTitle">لا يوجد محتوى مطابق</key>
+<key
+      alias="noValidStartNodeDesc"
+    >تكوين هذه الخاصية لا يتطابق مع أي محتوى. قم بإنشاء المحتوى المفقود أو اتصل بمسؤولك لضبط إعدادات الجذر الديناميكي لهذه الخاصية.</key>
+<key alias="cancelAndClearQuery">إلغاء ومسح الاستعلام</key>
+</area>
+<area alias="mediaPicker">
+    <key alias="deletedItem">عنصر محذوف</key>
+    <key
+      alias="pickedTrashedItem"
+    >لقد حددت عنصر وسائط محذوف حاليًا أو في سلة المحذوفات</key>
+    <key
+      alias="pickedTrashedItems"
+    >لقد حددت عناصر وسائط محذوفة حاليًا أو في سلة المحذوفات</key>
+    <key alias="trashed">في سلة المحذوفات</key>
+    <key alias="openMedia">فتح في مكتبة الوسائط</key>
+    <key alias="changeMedia">تغيير عنصر الوسائط</key>
+    <key alias="editMediaEntryLabel">تحرير %0% على %1%</key>
+    <key alias="confirmCancelMediaEntryCreationHeadline">إلغاء الإنشاء؟</key>
+    <key
+      alias="confirmCancelMediaEntryCreationMessage"
+    ><![CDATA[هل أنت متأكد أنك تريد إلغاء الإنشاء؟]]></key>
+    <key
+      alias="confirmCancelMediaEntryHasChanges"
+    >لقد أجريت تغييرات على هذا المحتوى. هل أنت متأكد أنك تريد تجاهلها؟</key>
+    <key alias="confirmRemoveAllMediaEntryMessage">إزالة جميع الوسائط؟</key>
+    <key alias="tabClipboard">الحافظة</key>
+    <key alias="notAllowed">غير مسموح</key>
+    <key alias="openMediaPicker">فتح منتقي الوسائط</key>
+</area>
+
+<area alias="relatedlinks">
+    <key alias="enterExternal">إدخال رابط خارجي</key>
+    <key alias="chooseInternal">اختيار صفحة داخلية</key>
+    <key alias="caption">عنوان</key>
+    <key alias="link">رابط</key>
+    <key alias="newWindow">فتح في نافذة جديدة</key>
+    <key alias="captionPlaceholder">أدخل عنوان العرض</key>
+    <key alias="externalLinkPlaceholder">أدخل الرابط</key>
+</area>
+
+<area alias="imagecropper">
+    <key alias="reset">إعادة تعيين القص</key>
+    <key alias="updateEditCrop">تم</key>
+    <key alias="undoEditCrop">تراجع عن التعديلات</key>
+    <key alias="customCrop">مخصص من قبل المستخدم</key>
+</area>
+
+<area alias="rollback">
+    <key alias="changes">التغييرات</key>
+    <key alias="created">تم الإنشاء</key>
+    <key alias="currentVersion">الإصدار الحالي</key>
+    <key
+      alias="diffHelp"
+    ><![CDATA[يعرض هذا الاختلافات بين الإصدار الحالي (المسودة) والإصدار المحدد<br /><del>النص الأحمر</del> سيتم إزالته في الإصدار المحدد، <ins>النص الأخضر</ins> سيتم إضافته]]></key>
+    <key
+      alias="noDiff"
+    >لا توجد اختلافات بين الإصدار الحالي (المسودة) والإصدار المحدد</key>
+    <key alias="documentRolledBack">تم استعادة المستند</key>
+    <key alias="headline">حدد إصدارًا للمقارنة مع الإصدار الحالي</key>
+    <key
+      alias="htmlHelp"
+    >يعرض الإصدار المحدد كـ HTML، إذا كنت ترغب في رؤية الفرق بين إصدارين في نفس الوقت، استخدم عرض المقارنة</key>
+    <key alias="rollbackTo">الرجوع إلى</key>
+    <key alias="selectVersion">اختر الإصدار</key>
+    <key alias="view">عرض</key>
+    <key
+      alias="pagination"
+    ><![CDATA[عرض الإصدار %0% إلى %1% من %2% إصدارات]]></key>
+    <key alias="versions">الإصدارات</key>
+    <key alias="currentDraftVersion">إصدار المسودة الحالي</key>
+    <key alias="currentPublishedVersion">الإصدار المنشور الحالي</key>
+</area>
+
+<area alias="scripts">
+    <key alias="editscript">تحرير ملف السكريبت</key>
+</area>
+
+<area alias="sections">
+    <key alias="content">المحتوى</key>
+    <key alias="forms">النماذج</key>
+    <key alias="media">الوسائط</key>
+    <key alias="member">الأعضاء</key>
+    <key alias="packages">الحزم</key>
+    <key alias="marketplace">السوق</key>
+    <key alias="settings">الإعدادات</key>
+    <key alias="translation">الترجمة</key>
+    <key alias="users">المستخدمون</key>
+</area>
+
+<area alias="help">
+    <key alias="tours">الجولات</key>
+    <key alias="theBestUmbracoVideoTutorials">أفضل دروس الفيديو لـ Umbraco</key>
+    <key alias="umbracoForum">زيارة our.umbraco.com</key>
+    <key alias="umbracoTv">زيارة umbraco.tv</key>
+    <key alias="umbracoLearningBase">شاهد دروس الفيديو المجانية</key>
+    <key alias="umbracoLearningBaseDescription">على قاعدة تعلم Umbraco</key>
+</area>
+
+<area alias="settings">
+    <key alias="defaulttemplate">القالب الافتراضي</key>
+    <key
+      alias="importDocumentTypeHelp"
+    >لاستيراد نوع مستند، ابحث عن ملف ".udt" على جهازك بالنقر على زر "استيراد" (سيتم طلب التأكيد في الشاشة التالية)</key>
+    <key alias="newtabname">عنوان علامة تبويب جديدة</key>
+    <key alias="nodetype">نوع العقدة</key>
+    <key alias="objecttype">النوع</key>
+    <key alias="stylesheet">ورقة الأنماط</key>
+    <key alias="script">سكريبت</key>
+    <key alias="tab">علامة تبويب</key>
+    <key alias="tabname">عنوان علامة التبويب</key>
+    <key alias="tabs">علامات التبويب</key>
+    <key alias="contentTypeEnabled">تم تمكين نوع المحتوى الرئيسي</key>
+    <key alias="contentTypeUses">يستخدم نوع المحتوى هذا</key>
+    <key
+      alias="noPropertiesDefinedOnTab"
+    >لا توجد خصائص محددة في هذه علامة التبويب. انقر على رابط "إضافة خاصية جديدة" في الأعلى لإنشاء خاصية جديدة.</key>
+    <key alias="createMatchingTemplate">إنشاء قالب مطابق</key>
+    <key alias="addIcon">إضافة أيقونة</key>
+</area>
+
+<area alias="sort">
+    <key alias="sortOrder">ترتيب الفرز</key>
+    <key alias="sortCreationDate">تاريخ الإنشاء</key>
+    <key alias="sortDone">تم الفرز.</key>
+    <key
+      alias="sortHelp"
+    >اسحب العناصر المختلفة لأعلى أو لأسفل أدناه لتعيين كيفية ترتيبها. أو انقر على عناوين الأعمدة لفرز مجموعة العناصر بأكملها</key>
+    <key
+      alias="sortPleaseWait"
+    ><![CDATA[يرجى الانتظار. يتم فرز العناصر، قد يستغرق هذا بعض الوقت.]]></key>
+    <key alias="sortEmptyState">لا توجد عقد فرعية لفرزها في هذه العقدة</key>
+</area>
+
+<area alias="speechBubbles">
+    <key alias="validationFailedHeader">التحقق</key>
+    <key
+      alias="validationFailedMessage"
+    >يجب إصلاح أخطاء التحقق قبل حفظ العنصر</key>
+    <key alias="operationFailedHeader">فشل</key>
+    <key alias="operationSavedHeader">تم الحفظ</key>
+    <key
+      alias="invalidUserPermissionsText"
+    >أذونات مستخدم غير كافية، تعذر إكمال العملية</key>
+    <key alias="operationCancelledHeader">تم الإلغاء</key>
+    <key
+      alias="operationCancelledText"
+    >تم إلغاء العملية بواسطة إضافة طرف ثالث</key>
+    <key
+      alias="folderUploadNotAllowed"
+    >يتم تحميل هذا الملف كجزء من مجلد، ولكن إنشاء مجلد جديد غير مسموح به هنا</key>
+    <key alias="folderCreationNotAllowed">إنشاء مجلد جديد غير مسموح به هنا</key>
+    <key alias="contentTypeDublicatePropertyType">نوع الخاصية موجود بالفعل</key>
+    <key alias="contentTypePropertyTypeCreated">تم إنشاء نوع الخاصية</key>
+    <key
+      alias="contentTypePropertyTypeCreatedText"
+    ><![CDATA[الاسم: %0% <br /> نوع البيانات: %1%]]></key>
+    <key alias="contentTypePropertyTypeDeleted">تم حذف نوع الخاصية</key>
+    <key alias="contentTypeSavedHeader">تم حفظ نوع المستند</key>
+    <key alias="contentTypeTabCreated">تم إنشاء علامة تبويب</key>
+    <key alias="contentTypeTabDeleted">تم حذف علامة التبويب</key>
+    <key
+      alias="contentTypeTabDeletedText"
+    >تم حذف علامة التبويب بالمعرف: %0%</key>
+    <key alias="cssErrorHeader">لم يتم حفظ ورقة الأنماط</key>
+    <key alias="cssSavedHeader">تم حفظ ورقة الأنماط</key>
+    <key alias="cssSavedText">تم حفظ ورقة الأنماط بدون أخطاء</key>
+    <key alias="dataTypeSaved">تم حفظ نوع البيانات</key>
+    <key alias="dictionaryItemSaved">تم حفظ عنصر القاموس</key>
+    <key alias="editContentPublishedHeader">تم نشر المحتوى</key>
+    <key alias="editContentPublishedText">ومرئي على الموقع</key>
+    <key alias="editBlueprintSavedHeader">تم حفظ قالب المحتوى</key>
+    <key alias="editBlueprintSavedText">تم حفظ التغييرات بنجاح</key>
+    <key alias="editContentSavedHeader">تم حفظ المحتوى</key>
+    <key alias="editContentSavedText">تذكر النشر لجعل التغييرات مرئية</key>
+    <key alias="editContentSendToPublish">تم الإرسال للموافقة</key>
+    <key alias="editContentSendToPublishText">تم إرسال التغييرات للموافقة</key>
+    <key alias="editMediaSaved">تم حفظ الوسائط</key>
+    <key alias="editMediaSavedText">تم حفظ الوسائط بدون أخطاء</key>
+    <key alias="editMemberSaved">تم حفظ العضو</key>
+    <key alias="editStylesheetPropertySaved">تم حفظ خاصية ورقة الأنماط</key>
+    <key alias="editStylesheetSaved">تم حفظ ورقة الأنماط</key>
+    <key alias="editTemplateSaved">تم حفظ القالب</key>
+    <key alias="editUserError">خطأ في حفظ المستخدم (تحقق من السجل)</key>
+    <key alias="editUserSaved">تم حفظ المستخدم</key>
+    <key alias="editUserTypeSaved">تم حفظ نوع المستخدم</key>
+    <key alias="editUserGroupSaved">تم حفظ مجموعة المستخدمين</key>
+    <key
+      alias="editCulturesAndHostnamesSaved"
+    >تم حفظ الثقافات وأسماء المضيفين</key>
+    <key
+      alias="editCulturesAndHostnamesError"
+    >خطأ في حفظ الثقافات وأسماء المضيفين</key>
+    <key alias="fileErrorHeader">لم يتم حفظ الملف</key>
+    <key alias="fileErrorText">تعذر حفظ الملف. يرجى التحقق من أذونات الملف</key>
+    <key alias="fileSavedHeader">تم حفظ الملف</key>
+    <key alias="fileSavedText">تم حفظ الملف بدون أخطاء</key>
+    <key alias="languageSaved">تم حفظ اللغة</key>
+    <key alias="mediaTypeSavedHeader">تم حفظ نوع الوسائط</key>
+    <key alias="memberTypeSavedHeader">تم حفظ نوع العضو</key>
+    <key alias="memberGroupSavedHeader">تم حفظ مجموعة الأعضاء</key>
+    <key
+      alias="memberGroupNameDuplicate"
+    >يوجد بالفعل مجموعة أعضاء أخرى بنفس الاسم</key>
+    <key alias="templateErrorHeader">لم يتم حفظ القالب</key>
+    <key
+      alias="templateErrorText"
+    >يرجى التأكد من عدم وجود قالبين بنفس الاسم المستعار</key>
+    <key alias="templateSavedHeader">تم حفظ القالب</key>
+    <key alias="templateSavedText">تم حفظ القالب بدون أخطاء!</key>
+    <key alias="contentUnpublished">تم إلغاء نشر المحتوى</key>
+    <key alias="partialViewSavedHeader">تم حفظ العرض الجزئي</key>
+    <key alias="partialViewSavedText">تم حفظ العرض الجزئي بدون أخطاء!</key>
+    <key alias="partialViewErrorHeader">لم يتم حفظ العرض الجزئي</key>
+    <key alias="partialViewErrorText">حدث خطأ أثناء حفظ الملف.</key>
+    <key alias="permissionsSavedFor">تم حفظ الأذونات لـ</key>
+    <key alias="deleteUserGroupsSuccess">تم حذف %0% مجموعات مستخدمين</key>
+    <key alias="deleteUserGroupSuccess">تم حذف %0%</key>
+    <key alias="enableUsersSuccess">تم تمكين %0% مستخدمين</key>
+    <key alias="disableUsersSuccess">تم تعطيل %0% مستخدمين</key>
+    <key alias="enableUserSuccess">تم تمكين %0%</key>
+    <key alias="disableUserSuccess">تم تعطيل %0%</key>
+    <key alias="setUserGroupOnUsersSuccess">تم تعيين مجموعات المستخدمين</key>
+    <key alias="unlockUsersSuccess">تم فتح %0% مستخدمين</key>
+    <key alias="unlockUserSuccess">تم فتح %0%</key>
+    <key alias="memberExportedSuccess">تم تصدير العضو إلى ملف</key>
+    <key alias="memberExportedError">حدث خطأ أثناء تصدير العضو</key>
+    <key alias="deleteUserSuccess">تم حذف المستخدم %0%</key>
+    <key alias="resendInviteHeader">دعوة مستخدم</key>
+    <key alias="resendInviteSuccess">تم إعادة إرسال الدعوة إلى %0%</key>
+    <key alias="documentTypeExportedSuccess">تم تصدير نوع المستند إلى ملف</key>
+    <key alias="documentTypeExportedError">حدث خطأ أثناء تصدير نوع المستند</key>
+    <key
+      alias="dictionaryItemExportedSuccess"
+    >تم تصدير عنصر/عناصر القاموس إلى ملف</key>
+    <key
+      alias="dictionaryItemExportedError"
+    >حدث خطأ أثناء تصدير عنصر/عناصر القاموس</key>
+    <key
+      alias="dictionaryItemImported"
+    >تم استيراد عنصر/عناصر القاموس التالية!</key>
+    <key
+      alias="publishWithNoDomains"
+    >لم يتم تكوين نطاقات لموقع متعدد اللغات، يرجى الاتصال بالمسؤول، راجع السجل لمزيد من المعلومات</key>
+    <key
+      alias="publishWithMissingDomain"
+    >لا يوجد نطاق مكون لـ %0%، يرجى الاتصال بالمسؤول، راجع السجل لمزيد من المعلومات</key>
+    <key
+      alias="publishWithNoUrl"
+    >لا يحتوي المستند على عنوان URL، ربما بسبب تعارض في التسمية مع مستند آخر. يمكن العثور على مزيد من التفاصيل تحت قسم المعلومات.</key>
+    <key
+      alias="copySuccessMessage"
+    >تم نسخ معلومات النظام بنجاح إلى الحافظة</key>
+    <key alias="cannotCopyInformation">تعذر نسخ معلومات النظام إلى الحافظة</key>
+    <key alias="webhookSaved">تم حفظ Webhook</key>
+    <key
+      alias="operationSavedHeaderReloadUser"
+    >تم الحفظ. لعرض التغييرات يرجى إعادة تحميل المتصفح</key>
+    <key
+      alias="editMultiContentPublishedText"
+    >تم نشر %0% مستندات وظهرت على الموقع</key>
+    <key alias="editVariantPublishedText">تم نشر %0% وظهر على الموقع</key>
+    <key
+      alias="editMultiVariantPublishedText"
+    >تم نشر %0% مستندات للغات %1% وظهرت على الموقع</key>
+    <key alias="editContentScheduledSavedText">تم تحديث جدول النشر</key>
+    <key alias="editVariantSavedText">تم حفظ %0%</key>
+    <key
+      alias="editVariantSendToPublishText"
+    >تم إرسال تغييرات %0% للموافقة</key>
+    <key alias="contentCultureUnpublished">تم إلغاء نشر متغير المحتوى %0%</key>
+    <key
+      alias="contentMandatoryCultureUnpublished"
+    >تم إلغاء نشر اللغة الإلزامية '%0%'. جميع لغات عنصر المحتوى هذا غير منشورة الآن.</key>
+    <key
+      alias="contentReqCulturePublishError"
+    >لا يمكن نشر المستند لأن اللغة المطلوبة '%0%' غير منشورة</key>
+    <key alias="contentCultureValidationError">فشل التحقق للغة '%0%'</key>
+    <key
+      alias="scheduleErrReleaseDate1"
+    >لا يمكن أن يكون تاريخ الإصدار في الماضي</key>
+    <key
+      alias="scheduleErrReleaseDate2"
+    >لا يمكن جدولة المستند للنشر لأن اللغة المطلوبة '%0%' غير منشورة</key>
+    <key
+      alias="scheduleErrReleaseDate3"
+    >لا يمكن جدولة المستند للنشر لأن اللغة المطلوبة '%0%' لها تاريخ نشر لاحق للغة غير إلزامية</key>
+    <key
+      alias="scheduleErrExpireDate1"
+    >لا يمكن أن يكون تاريخ الانتهاء في الماضي</key>
+    <key
+      alias="scheduleErrExpireDate2"
+    >لا يمكن أن يكون تاريخ الانتهاء قبل تاريخ الإصدار</key>
+    <key
+      alias="preventCleanupEnableError"
+    >حدث خطأ أثناء تمكين تنظيف الإصدارات لـ %0%</key>
+    <key
+      alias="preventCleanupDisableError"
+    >حدث خطأ أثناء تعطيل تنظيف الإصدارات لـ %0%</key>
+</area>
+
+<area alias="stylesheet">
+    <key alias="addRule">إضافة نمط</key>
+    <key alias="editRule">تحرير النمط</key>
+    <key alias="editorRules">أنماط محرر النصوص المنسق</key>
+    <key
+      alias="editorRulesHelp"
+    >حدد الأنماط التي يجب أن تكون متاحة في محرر النصوص المنسق لورقة الأنماط هذه</key>
+    <key alias="editstylesheet">تحرير ورقة الأنماط</key>
+    <key alias="editstylesheetproperty">تحرير خاصية ورقة الأنماط</key>
+    <key alias="nameHelp">الاسم المعروض في محدد نمط المحرر</key>
+    <key alias="preview">معاينة</key>
+    <key alias="previewHelp">كيف سيبدو النص في محرر النصوص المنسق.</key>
+    <key alias="selector">محدد</key>
+    <key alias="selectorHelp">يستخدم صيغة CSS، مثل "h1" أو ".redHeader"</key>
+    <key alias="styles">الأنماط</key>
+    <key
+      alias="stylesHelp"
+    >CSS الذي يجب تطبيقه في محرر النصوص المنسق، مثل "color:red;"</key>
+    <key alias="tabCode">الكود</key>
+    <key alias="tabRules">المحرر</key>
+</area>
+
+<area alias="template">
+    <key
+      alias="runtimeModeProduction"
+    ><![CDATA[المحتوى غير قابل للتحرير عند استخدام وضع التشغيل <code>Production</code>.]]></key>
+    <key alias="deleteByIdFailed">فشل حذف القالب بالمعرف %0%</key>
+    <key alias="edittemplate">تحرير القالب</key>
+    <key alias="insertSections">أقسام</key>
+    <key alias="insertContentArea">إدراج منطقة محتوى</key>
+    <key
+      alias="insertContentAreaPlaceHolder"
+    >إدراج عنصر نائب لمنطقة المحتوى</key>
+    <key alias="insert">إدراج</key>
+    <key alias="insertDesc">اختر ما تريد إدراجه في قالبك</key>
+    <key alias="insertDictionaryItem">عنصر قاموس</key>
+    <key
+      alias="insertDictionaryItemDesc"
+    >عنصر القاموس هو عنصر نائب لنص قابل للترجمة، مما يسهل إنشاء تصاميم لمواقع متعددة اللغات.</key>
+    <key alias="insertMacro">ماكرو</key>
+    <key
+      alias="insertMacroDesc"
+    >الماكرو هو مكون قابل للتكوين رائع للأجزاء القابلة لإعادة الاستخدام من تصميمك، حيث تحتاج إلى خيار لتوفير معلمات، مثل المعارض والنماذج والقوائم.</key>
+    <key alias="insertPageField">قيمة</key>
+    <key
+      alias="insertPageFieldDesc"
+    >يعرض قيمة حقل مسمى من الصفحة الحالية، مع خيارات لتعديل القيمة أو الرجوع إلى قيم بديلة.</key>
+    <key alias="insertPartialView">عرض جزئي</key>
+    <key
+      alias="insertPartialViewDesc"
+    >العرض الجزئي هو ملف قالب منفصل يمكن تقديمه داخل قالب آخر، وهو رائع لإعادة استخدام ترميز HTML أو لفصل القوالب المعقدة إلى ملفات منفصلة.</key>
+    <key alias="mastertemplate">القالب الرئيسي</key>
+    <key alias="noMaster">بدون رئيسي</key>
+    <key alias="renderBody">تقديم القالب الفرعي</key>
+    <key
+      alias="renderBodyDesc"
+    ><![CDATA[يعرض محتويات قالب فرعي، عن طريق إدراج عنصر نائب <code>@RenderBody()</code>.]]></key>
+    <key alias="defineSection">تحديد قسم مسمى</key>
+    <key
+      alias="defineSectionDesc"
+    ><![CDATA[يحدد جزءًا من القالب كقسم مسمى عن طريق لفه في <code>@section { ... }</code>. يمكن تقديم هذا في منطقة محددة من القالب الأصلي لهذا القالب، باستخدام <code>@RenderSection</code>.]]></key>
+    <key alias="renderSection">تقديم قسم مسمى</key>
+    <key
+      alias="renderSectionDesc"
+    ><![CDATA[يعرض منطقة مسمى من قالب فرعي، عن طريق إدراج عنصر نائب <code>@RenderSection(name)</code>. يعرض هذا منطقة من القالب الفرعي ملفوفة في تعريف <code>@section [name]{ ... }</code> المقابل.]]></key>
+    <key alias="sectionName">اسم القسم</key>
+    <key alias="sectionMandatory">القسم إلزامي</key>
+    <key
+      alias="sectionMandatoryDesc"
+    ><![CDATA[إذا كان إلزاميًا، يجب أن يحتوي القالب الفرعي على تعريف <code>@section</code>، وإلا سيظهر خطأ.]]></key>
+    <key alias="queryBuilder">منشئ الاستعلام</key>
+    <key alias="itemsReturned">عناصر تم إرجاعها، في</key>
+    <key alias="iWant">أريد</key>
+    <key alias="allContent">كل المحتوى</key>
+    <key alias="contentOfType">محتوى من نوع "%0%"</key>
+    <key alias="from">من</key>
+    <key alias="websiteRoot">موقعي</key>
+    <key alias="where">حيث</key>
+    <key alias="and">و</key>
+    <key alias="is">هو</key>
+    <key alias="isNot">ليس</key>
+    <key alias="before">قبل</key>
+    <key alias="beforeIncDate">قبل (بما في ذلك التاريخ المحدد)</key>
+    <key alias="after">بعد</key>
+    <key alias="afterIncDate">بعد (بما في ذلك التاريخ المحدد)</key>
+    <key alias="equals">يساوي</key>
+    <key alias="doesNotEqual">لا يساوي</key>
+    <key alias="contains">يحتوي على</key>
+    <key alias="doesNotContain">لا يحتوي على</key>
+    <key alias="greaterThan">أكبر من</key>
+    <key alias="greaterThanEqual">أكبر من أو يساوي</key>
+    <key alias="lessThan">أقل من</key>
+    <key alias="lessThanEqual">أقل من أو يساوي</key>
+    <key alias="id">المعرف</key>
+    <key alias="name">الاسم</key>
+    <key alias="createdDate">تاريخ الإنشاء</key>
+    <key alias="lastUpdatedDate">تاريخ آخر تحديث</key>
+    <key alias="orderBy">ترتيب حسب</key>
+    <key alias="ascending">تصاعدي</key>
+    <key alias="descending">تنازلي</key>
+    <key alias="template">قالب</key>
+</area>
+
+<area alias="grid">
+    <key alias="media">صورة</key>
+    <key alias="macro">ماكرو</key>
+    <key alias="insertControl">اختر نوع المحتوى</key>
+    <key alias="chooseLayout">اختر تخطيطًا</key>
+    <key alias="addRows">إضافة صف</key>
+    <key alias="addElement">إضافة محتوى</key>
+    <key alias="dropElement">إسقاط المحتوى</key>
+    <key alias="settingsApplied">تم تطبيق الإعدادات</key>
+    <key alias="contentNotAllowed">هذا المحتوى غير مسموح به هنا</key>
+    <key alias="contentAllowed">هذا المحتوى مسموح به هنا</key>
+    <key alias="clickToEmbed">انقر للتضمين</key>
+    <key alias="clickToInsertImage">انقر لإدراج صورة</key>
+    <key alias="clickToInsertMacro">انقر لإدراج ماكرو</key>
+    <key alias="placeholderWriteHere">اكتب هنا...</key>
+    <key alias="gridLayouts">تخطيطات الشبكة</key>
+    <key
+      alias="gridLayoutsDetail"
+    >التخطيطات هي مساحة العمل العامة لمحرر الشبكة، عادة ما تحتاج إلى واحد أو اثنين فقط من التخطيطات المختلفة</key>
+    <key alias="addGridLayout">إضافة تخطيط شبكة</key>
+    <key alias="editGridLayout">تحرير تخطيط الشبكة</key>
+    <key
+      alias="addGridLayoutDetail"
+    >اضبط التخطيط عن طريق تعيين عرض الأعمدة وإضافة أقسام إضافية</key>
+    <key alias="rowConfigurations">تكوينات الصفوف</key>
+    <key
+      alias="rowConfigurationsDetail"
+    >الصفوف هي خلايا محددة مسبقًا مرتبة أفقيًا</key>
+    <key alias="addRowConfiguration">إضافة تكوين صف</key>
+    <key alias="editRowConfiguration">تحرير تكوين الصف</key>
+    <key
+      alias="addRowConfigurationDetail"
+    >اضبط الصف عن طريق تعيين عرض الخلايا وإضافة خلايا إضافية</key>
+    <key alias="noConfiguration">لا يوجد تكوين إضافي متاح</key>
+    <key alias="columns">أعمدة</key>
+    <key alias="columnsDetails">إجمالي عدد الأعمدة المدمجة في تخطيط الشبكة</key>
+    <key alias="settings">الإعدادات</key>
+    <key
+      alias="settingsDetails"
+    >تكوين الإعدادات التي يمكن للمحررين تغييرها</key>
+    <key alias="styles">الأنماط</key>
+    <key alias="stylesDetails">تكوين الأنماط التي يمكن للمحررين تغييرها</key>
+    <key alias="allowAllEditors">السماح لجميع المحررين</key>
+    <key alias="allowAllRowConfigurations">السماح لجميع تكوينات الصفوف</key>
+    <key alias="maxItems">الحد الأقصى للعناصر</key>
+    <key
+      alias="maxItemsDescription"
+    >اتركه فارغًا أو اضبطه على 0 لغير محدود</key>
+    <key alias="setAsDefault">تعيين كافتراضي</key>
+    <key alias="chooseExtra">اختر إضافي</key>
+    <key alias="chooseDefault">اختر افتراضي</key>
+    <key alias="areAdded">تمت إضافتها</key>
+    <key alias="warning">تحذير</key>
+    <key
+      alias="warningText"
+    ><![CDATA[<p>سيؤدي تعديل اسم تكوين الصف إلى فقدان البيانات لأي محتوى موجود يعتمد على هذا التكوين.</p> <p><strong>تعديل التسمية فقط لن يؤدي إلى فقدان البيانات.</strong></p>]]></key>
+    <key alias="youAreDeleting">أنت تحذف تكوين الصف</key>
+    <key
+      alias="deletingARow"
+    >سيؤدي حذف اسم تكوين صف إلى فقدان البيانات لأي محتوى موجود يعتمد على هذا التكوين.</key>
+    <key alias="deleteLayout">أنت تحذف التخطيط</key>
+    <key
+      alias="deletingALayout"
+    >سيؤدي تعديل التخطيط إلى فقدان البيانات لأي محتوى موجود يعتمد على هذا التكوين.</key>
+</area>
+
+<area alias="contentTypeEditor">
+    <key alias="compositions">التكوينات</key>
+    <key alias="group">مجموعة</key>
+    <key alias="noGroups">لم تقم بإضافة أي مجموعات</key>
+    <key alias="addGroup">إضافة مجموعة</key>
+    <key alias="inheritedFrom">موروث من</key>
+    <key alias="addProperty">إضافة خاصية</key>
+    <key alias="requiredLabel">تسمية مطلوبة</key>
+    <key alias="enableListViewHeading">تمكين عرض القائمة</key>
+    <key
+      alias="enableListViewDescription"
+    >يضبط عنصر المحتوى لعرض قائمة قابلة للفرز والبحث من العناصر الفرعية، لن تظهر العناصر الفرعية في الشجرة</key>
+    <key alias="allowedTemplatesHeading">القوالب المسموح بها</key>
+    <key
+      alias="allowedTemplatesDescription"
+    >اختر القوالب المسموح للمحررين باستخدامها على المحتوى من هذا النوع</key>
+    <key alias="allowAsRootHeading">السماح كجذر</key>
+    <key
+      alias="allowAsRootDescription"
+    >السماح للمحررين بإنشاء محتوى من هذا النوع في جذر شجرة المحتوى.</key>
+    <key alias="childNodesHeading">أنواع العقد الفرعية المسموح بها</key>
+    <key
+      alias="childNodesDescription"
+    >السماح بإنشاء محتوى من الأنواع المحددة أسفل المحتوى من هذا النوع.</key>
+    <key alias="chooseChildNode">اختر عقدة فرعية</key>
+    <key
+      alias="compositionsDescription"
+    >وراثة علامات التبويب والخصائص من نوع محتوى موجود. ستتم إضافة علامات تبويب جديدة إلى نوع المحتوى الحالي أو دمجها إذا كانت هناك علامة تبويب بنفس الاسم موجودة.</key>
+    <key
+      alias="compositionInUse"
+    >يستخدم نوع المحتوى هذا في تكوين، وبالتالي لا يمكن تكوينه بنفسه.</key>
+    <key
+      alias="noAvailableCompositions"
+    >لا توجد أنواع محتوى متاحة لاستخدامها كتكوين.</key>
+    <key
+      alias="compositionRemoveWarning"
+    >سيؤدي إزالة التكوين إلى حذف جميع بيانات الخصائص المرتبطة. بمجرد حفظ نوع المحتوى، لا يوجد طريق للعودة.</key>
+    <key alias="availableEditors">إنشاء جديد</key>
+    <key alias="reuse">استخدام موجود</key>
+    <key alias="editorSettings">إعدادات المحرر</key>
+    <key alias="configuration">التكوين</key>
+    <key alias="yesDelete">نعم، احذف</key>
+    <key alias="movedUnderneath">تم نقله تحت</key>
+    <key alias="copiedUnderneath">تم نسخه تحت</key>
+    <key alias="folderToMove">حدد المجلد للنقل</key>
+    <key alias="folderToCopy">حدد المجلد للنسخ</key>
+    <key alias="structureBelow">إلى في بنية الشجرة أدناه</key>
+    <key alias="allDocumentTypes">كل أنواع المستندات</key>
+    <key alias="allDocuments">كل المستندات</key>
+    <key alias="allMediaItems">كل عناصر الوسائط</key>
+    <key
+      alias="usingThisDocument"
+    >باستخدام نوع المستند هذا سيتم حذفها نهائيًا، يرجى تأكيد رغبتك في حذفها أيضًا.</key>
+    <key
+      alias="usingThisMedia"
+    >باستخدام نوع الوسائط هذا سيتم حذفها نهائيًا، يرجى تأكيد رغبتك في حذفها أيضًا.</key>
+    <key
+      alias="usingThisMember"
+    >باستخدام نوع العضو هذا سيتم حذفها نهائيًا، يرجى تأكيد رغبتك في حذفها أيضًا</key>
+    <key alias="andAllDocuments">وكل المستندات التي تستخدم هذا النوع</key>
+    <key alias="andAllMediaItems">وكل عناصر الوسائط التي تستخدم هذا النوع</key>
+    <key alias="andAllMembers">وكل الأعضاء الذين يستخدمون هذا النوع</key>
+    <key alias="memberCanEdit">يمكن للعضو التحرير</key>
+    <key
+      alias="memberCanEditDescription"
+    >السماح لقيمة هذه الخاصية بالتحرير من قبل العضو في صفحة ملفه الشخصي</key>
+    <key alias="isSensitiveData">بيانات حساسة</key>
+    <key
+      alias="isSensitiveDataDescription"
+    >إخفاء قيمة هذه الخاصية عن محرري المحتوى الذين ليس لديهم إذن لعرض المعلومات الحساسة</key>
+    <key alias="showOnMemberProfile">عرض على ملف العضو</key>
+    <key
+      alias="showOnMemberProfileDescription"
+    >السماح بعرض قيمة هذه الخاصية في صفحة ملف العضو الشخصي</key>
+    <key alias="tabHasNoSortOrder">علامة التبويب ليس لها ترتيب فرز</key>
+    <key alias="compositionUsageHeading">أين يتم استخدام هذا التكوين؟</key>
+    <key
+      alias="compositionUsageSpecification"
+    >يستخدم هذا التكوين حاليًا في تكوين أنواع المحتوى التالية:</key>
+    <key alias="variantsHeading">السماح بالمتغيرات</key>
+    <key alias="cultureVariantHeading">السماح بالاختلاف حسب الثقافة</key>
+    <key alias="segmentVariantHeading">السماح بالتجزئة</key>
+    <key alias="cultureVariantLabel">الاختلاف حسب الثقافة</key>
+    <key alias="segmentVariantLabel">الاختلاف حسب القطاعات</key>
+    <key
+      alias="variantsDescription"
+    >السماح للمحررين بإنشاء محتوى من هذا النوع بلغات مختلفة.</key>
+    <key
+      alias="cultureVariantDescription"
+    >السماح للمحررين بإنشاء محتوى بلغات مختلفة.</key>
+    <key
+      alias="segmentVariantDescription"
+    >السماح للمحررين بإنشاء قطاعات من هذا المحتوى.</key>
+    <key alias="allowVaryByCulture">السماح بالاختلاف حسب الثقافة</key>
+    <key alias="allowVaryBySegment">السماح بالتجزئة</key>
+    <key alias="elementType">نوع العنصر</key>
+    <key alias="elementHeading">نوع عنصر</key>
+    <key
+      alias="elementDescription"
+    >نوع العنصر مخصص للاستخدام داخل أنواع المستندات الأخرى، وليس في شجرة المحتوى.</key>
+    <key
+      alias="elementCannotToggle"
+    >لا يمكن تغيير نوع المستند إلى نوع عنصر بمجرد استخدامه لإنشاء عنصر محتوى واحد أو أكثر.</key>
+    <key alias="elementDoesNotSupport">هذا غير قابل للتطبيق لنوع العنصر</key>
+    <key
+      alias="propertyHasChanges"
+    >لقد أجريت تغييرات على هذه الخاصية. هل أنت متأكد أنك تريد تجاهلها؟</key>
+    <key alias="displaySettingsHeadline">المظهر</key>
+    <key alias="displaySettingsLabelOnTop">التسمية في الأعلى (عرض كامل)</key>
+    <key alias="removeChildNode">أنت تقوم بإزالة العقدة الفرعية</key>
+    <key
+      alias="removeChildNodeWarning"
+    >ستحد إزالة العقدة الفرعية من خيارات المحررين لإنشاء أنواع محتوى مختلفة أسفل العقدة.</key>
+    <key
+      alias="usingEditor"
+    >باستخدام هذا المحرر سيتم تحديثه بالإعدادات الجديدة.</key>
+    <key alias="historyCleanupHeading">تنظيف السجل</key>
+    <key
+      alias="historyCleanupDescription"
+    >السماح بتجاوز إعدادات تنظيف السجل العامة.</key>
+    <key
+      alias="historyCleanupKeepAllVersionsNewerThanDays"
+    >احتفظ بكل الإصدارات الأحدث من أيام</key>
+    <key
+      alias="historyCleanupKeepLatestVersionPerDayForDays"
+    >احتفظ بأحدث إصدار لكل يوم لمدة أيام</key>
+    <key alias="historyCleanupPreventCleanup">منع التنظيف</key>
+    <key alias="historyCleanupEnableCleanup">تمكين التنظيف</key>
+    <key
+      alias="historyCleanupGloballyDisabled"
+    ><![CDATA[<strong>ملاحظة!</strong> تنظيف إصدارات المحتوى التاريخية معطل عالميًا. لن يحدث تأثير هذه الإعدادات حتى يتم تمكينه.]]></key>
+    <key
+      alias="groupReorderSameAliasError"
+    >لا يمكن نقل المجموعة %0% إلى هذه علامة التبويب لأن المجموعة ستحصل على نفس الاسم المستعار كعلامة تبويب: "%1%". أعد تسمية المجموعة للمتابعة.</key>
+    <key alias="searchResultSettings">التكوينات المتاحة</key>
+    <key alias="searchResultEditors">إنشاء تكوين جديد</key>
+    <key
+      alias="confirmDeleteTabMessage"
+    ><![CDATA[هل أنت متأكد أنك تريد حذف علامة التبويب <strong>%0%</strong>?]]></key>
+    <key
+      alias="confirmDeleteGroupMessage"
+    ><![CDATA[هل أنت متأكد أنك تريد حذف المجموعة <strong>%0%</strong>?]]></key>
+    <key
+      alias="confirmDeletePropertyMessage"
+    ><![CDATA[هل أنت متأكد أنك تريد حذف الخاصية <strong>%0%</strong>?]]></key>
+    <key
+      alias="confirmDeleteTabNotice"
+    >سيؤدي هذا أيضًا إلى حذف جميع العناصر أسفل هذه علامة التبويب.</key>
+    <key
+      alias="confirmDeleteGroupNotice"
+    >سيؤدي هذا أيضًا إلى حذف جميع العناصر أسفل هذه المجموعة.</key>
+    <key alias="addTab">إضافة علامة تبويب</key>
+    <key alias="convertToTab">تحويل إلى علامة تبويب</key>
+    <key
+      alias="tabDirectPropertiesDropZone"
+    >اسحب الخصائص هنا لوضعها مباشرة على علامة التبويب</key>
+    <key
+      alias="changeDataTypeHelpText"
+    >تعطيل تغيير نوع البيانات بقيم مخزنة. للسماح بذلك يمكنك تغيير إعداد Umbraco:CMS:DataTypes:CanBeChanged في appsettings.json.</key>
+</area>
+<area alias="webhooks">
+    <key alias="addWebhook">إنشاء ويب هوك</key>
+    <key alias="addWebhookHeader">إضافة رأس ويب هوك</key>
+    <key alias="addDocumentType">إضافة نوع مستند</key>
+    <key alias="addMediaType">إضافة نوع وسائط</key>
+    <key alias="createHeader">إنشاء رأس</key>
+    <key alias="deliveries">التسليمات</key>
+    <key alias="noHeaders">لم يتم إضافة رؤوس ويب هوك</key>
+    <key alias="noEventsFound">لم يتم العثور على أحداث.</key>
+    <key alias="enabled">مفعل</key>
+    <key alias="events">الأحداث</key>
+    <key alias="event">الحدث</key>
+    <key alias="url">الرابط</key>
+    <key alias="types">الأنواع</key>
+    <key alias="webhookKey">مفتاح ويب هوك</key>
+    <key alias="retryCount">عدد المحاولات</key>
+    <key
+      alias="urlDescription"
+    >الرابط الذي سيتم استدعاؤه عند تنشيط ويب هوك.</key>
+    <key alias="eventDescription">الأحداث التي يجب أن ينشط عندها ويب هوك.</key>
+    <key alias="contentTypeDescription">تنشيط ويب هوك لنوع محتوى معين فقط.</key>
+    <key alias="enabledDescription">هل ويب هوك مفعل؟</key>
+    <key alias="headersDescription">رؤوس مخصصة لتضمينها في طلب ويب هوك.</key>
+    <key alias="contentType">نوع المحتوى</key>
+    <key alias="headers">الرؤوس</key>
+    <key alias="selectEventFirst">الرجاء تحديد حدث أولاً.</key>
+</area>
+<area alias="languages">
+    <key alias="addLanguage">إضافة لغة</key>
+    <key alias="culture">رمز ISO</key>
+    <key alias="mandatoryLanguage">لغة إجبارية</key>
+    <key
+      alias="mandatoryLanguageHelp"
+    >يجب ملء خصائص هذه اللغة قبل إمكانية نشر العقدة.</key>
+    <key alias="defaultLanguage">اللغة الافتراضية</key>
+    <key
+      alias="defaultLanguageHelp"
+    >يمكن أن يكون لموقع أمبراكو لغة افتراضية واحدة فقط.</key>
+    <key
+      alias="changingDefaultLanguageWarning"
+    >تغيير اللغة الافتراضية قد يؤدي إلى فقدان المحتوى الافتراضي.</key>
+    <key alias="fallsbackToLabel">يعود إلى</key>
+    <key alias="noFallbackLanguageOption">لا يوجد لغة للعودة إليها</key>
+    <key
+      alias="fallbackLanguageDescription"
+    >للسماح للمحتوى متعدد اللغات بالعودة إلى لغة أخرى إذا لم يكن موجودًا في اللغة المطلوبة، حددها هنا.</key>
+    <key alias="fallbackLanguage">لغة العودة</key>
+    <key alias="none">لا شيء</key>
+    <key
+      alias="invariantPropertyUnlockHelp"
+    ><![CDATA[<strong>%0%</strong> مشترك بين جميع اللغات والقطاعات.]]></key>
+    <key
+      alias="invariantCulturePropertyUnlockHelp"
+    ><![CDATA[<strong>%0%</strong> مشترك بين جميع اللغات.]]></key>
+    <key
+      alias="invariantSegmentPropertyUnlockHelp"
+    ><![CDATA[<strong>%0%</strong> مشترك بين جميع القطاعات.]]></key>
+    <key alias="invariantLanguageProperty">مشترك: اللغات</key>
+    <key alias="invariantSegmentProperty">مشترك: القطاعات</key>
+</area>
+<area alias="macro">
+    <key alias="addParameter">إضافة معامل</key>
+    <key alias="editParameter">تعديل معامل</key>
+    <key alias="enterMacroName">أدخل اسم الماكرو</key>
+    <key alias="parameters">المعاملات</key>
+    <key
+      alias="parametersDescription"
+    >حدد المعاملات التي يجب أن تكون متاحة عند استخدام هذا الماكرو.</key>
+    <key alias="selectViewFile">حدد ملف عرض جزئي للماكرو</key>
+</area>
+<area alias="modelsBuilder">
+    <key alias="buildingModels">جاري بناء النماذج</key>
+    <key alias="waitingMessage">هذا قد يستغرق بعض الوقت، لا تقلق</key>
+    <key alias="modelsGenerated">تم إنشاء النماذج</key>
+    <key alias="modelsGeneratedError">تعذر إنشاء النماذج</key>
+    <key
+      alias="modelsExceptionInUlog"
+    >فشل إنشاء النماذج، راجع الاستثناء في سجل U</key>
+</area>
+<area alias="templateEditor">
+    <key alias="addDefaultValue">إضافة قيمة افتراضية</key>
+    <key alias="defaultValue">القيمة الافتراضية</key>
+    <key alias="alternativeField">حقل احتياطي</key>
+    <key alias="alternativeText">القيمة الافتراضية</key>
+    <key alias="casing">حالة الأحرف</key>
+    <key alias="encoding">التشفير</key>
+    <key alias="chooseField">اختر حقل</key>
+    <key alias="convertLineBreaks">تحويل فواصل الأسطر</key>
+    <key alias="convertLineBreaksHelp">يستبدل فواصل الأسطر بوسم 'br' HTML</key>
+    <key alias="customFields">الحقول المخصصة</key>
+    <key alias="dateOnly">التاريخ فقط</key>
+    <key alias="formatAsDate">تنسيق كتاريخ</key>
+    <key alias="htmlEncode">تشفير HTML</key>
+    <key alias="htmlEncodeHelp">سيستبدل الأحرف الخاصة بما يعادلها في HTML.</key>
+    <key alias="insertedAfter">سيتم إدراجه بعد قيمة الحقل</key>
+    <key alias="insertedBefore">سيتم إدراجه قبل قيمة الحقل</key>
+    <key alias="lowercase">أحرف صغيرة</key>
+    <key alias="none">لا شيء</key>
+    <key alias="outputSample">عينة الإخراج</key>
+    <key alias="postContent">إدراج بعد الحقل</key>
+    <key alias="preContent">إدراج قبل الحقل</key>
+    <key alias="recursive">متكرر</key>
+    <key alias="recursiveDescr">نعم، اجعله متكررًا</key>
+    <key alias="standardFields">الحقول القياسية</key>
+    <key alias="uppercase">أحرف كبيرة</key>
+    <key alias="urlEncode">تشفير URL</key>
+    <key alias="urlEncodeHelp">سيقوم بتنسيق الأحرف الخاصة في عناوين URL</key>
+    <key
+      alias="usedIfAllEmpty"
+    >سيتم استخدامه فقط عندما تكون قيم الحقول أعلاه فارغة</key>
+    <key
+      alias="usedIfEmpty"
+    >سيتم استخدام هذا الحقل فقط إذا كان الحقل الأساسي فارغًا</key>
+    <key alias="withTime">التاريخ والوقت</key>
+</area>
+<area alias="translation">
+    <key alias="details">تفاصيل الترجمة</key>
+    <key alias="DownloadXmlDTD">تنزيل XML DTD</key>
+    <key alias="fields">الحقول</key>
+    <key alias="includeSubpages">تضمين الصفحات الفرعية</key>
+    <key
+      alias="mailBody"
+    ><![CDATA[
+      مرحبًا %0%
+
+      هذه رسالة آلية لإعلامك بأن المستند '%1%'
+      قد تم طلب ترجمته إلى '%5%' بواسطة %2%.
+
+      انتقل إلى http://%3%/translation/details.aspx?id=%4% للتحرير.
+
+      أو سجل الدخول إلى أمبراكو للحصول على نظرة عامة على مهام الترجمة الخاصة بك
+      http://%3%
+
+      أتمنى لك يومًا سعيدًا!
+      تحياتي من روبوت أمبراكو
+    ]]></key>
+    <key
+      alias="noTranslators"
+    >لم يتم العثور على مستخدمين مترجمين. الرجاء إنشاء مستخدم مترجم قبل البدء في إرسال المحتوى للترجمة</key>
+    <key
+      alias="pageHasBeenSendToTranslation"
+    >تم إرسال الصفحة '%0%' للترجمة</key>
+    <key alias="sendToTranslate">إرسال الصفحة '%0%' للترجمة</key>
+    <key alias="totalWords">إجمالي الكلمات</key>
+    <key alias="translateTo">ترجمة إلى</key>
+    <key alias="translationDone">تم الانتهاء من الترجمة.</key>
+    <key
+      alias="translationDoneHelp"
+    >يمكنك معاينة الصفحات التي ترجمتها للتو بالنقر أدناه. إذا تم العثور على الصفحة الأصلية، ستحصل على مقارنة بين الصفحتين.</key>
+    <key alias="translationFailed">فشلت الترجمة، قد يكون ملف XML تالفًا</key>
+    <key alias="translationOptions">خيارات الترجمة</key>
+    <key alias="translator">المترجم</key>
+    <key alias="uploadTranslationXml">رفع ملف ترجمة XML</key>
+</area>
+<area alias="treeHeaders">
+    <key alias="content">المحتوى</key>
+    <key alias="contentBlueprints">قوالب المحتوى</key>
+    <key alias="media">الوسائط</key>
+    <key alias="cacheBrowser">متصفح الذاكرة المؤقتة</key>
+    <key alias="contentRecycleBin">سلة المحذوفات</key>
+    <key alias="createdPackages">الحزم المنشأة</key>
+    <key alias="dataTypes">أنواع البيانات</key>
+    <key alias="dictionary">القاموس</key>
+    <key alias="installedPackages">الحزم المثبتة</key>
+    <key alias="installSkin">تثبيت سكين</key>
+    <key alias="installStarterKit">تثبيت مجموعة البداية</key>
+    <key alias="languages">اللغات</key>
+    <key alias="localPackage">تثبيت حزمة محلية</key>
+    <key alias="macros">ماكروات</key>
+    <key alias="mediaTypes">أنواع الوسائط</key>
+    <key alias="member">الأعضاء</key>
+    <key alias="memberGroups">مجموعات الأعضاء</key>
+    <key alias="memberRoles">أدوار الأعضاء</key>
+    <key alias="memberTypes">أنواع الأعضاء</key>
+    <key alias="documentTypes">أنواع المستندات</key>
+    <key alias="relationTypes">أنواع العلاقات</key>
+    <key alias="packager">الحزم</key>
+    <key alias="packages">الحزم</key>
+    <key alias="partialViews">العروض الجزئية</key>
+    <key alias="partialViewMacros">ملفات ماكرو العروض الجزئية</key>
+    <key alias="repositories">التثبيت من مستودع</key>
+    <key alias="runway">تثبيت رانوي</key>
+    <key alias="runwayModules">وحدات رانوي</key>
+    <key alias="scripting">ملفات البرمجة</key>
+    <key alias="scripts">النصوص البرمجية</key>
+    <key alias="stylesheets">صفحات الأنماط</key>
+    <key alias="templates">القوالب</key>
+    <key alias="logViewer">عارض السجلات</key>
+    <key alias="users">المستخدمون</key>
+    <key alias="settingsGroup">الإعدادات</key>
+    <key alias="templatingGroup">القالب</key>
+    <key alias="thirdPartyGroup">طرف ثالث</key>
+    <key alias="webhooks">ويب هوكس</key>
+</area>
+<area alias="update">
+    <key alias="updateAvailable">تحديث جديد متاح</key>
+    <key alias="updateDownloadText">%0% جاهز، انقر هنا للتنزيل</key>
+    <key alias="updateNoServer">لا يوجد اتصال بالخادم</key>
+    <key
+      alias="updateNoServerError"
+    >خطأ في التحقق من التحديث. الرجاء مراجعة سجل التتبع لمزيد من المعلومات</key>
+</area>
+<area alias="user">
+    <key alias="access">الوصول</key>
+    <key
+      alias="accessHelp"
+    >بناءً على المجموعات المخصصة والعقد البدائية، لدى المستخدم حق الوصول إلى العقد التالية</key>
+    <key alias="assignAccess">تعيين وصول</key>
+    <key alias="administrators">مسؤول</key>
+    <key alias="categoryField">حقل الفئة</key>
+    <key alias="createDate">تم إنشاء المستخدم</key>
+    <key alias="changePassword">تغيير كلمة المرور</key>
+    <key alias="changePhoto">تغيير الصورة</key>
+    <key alias="newPassword">كلمة مرور جديدة</key>
+    <key alias="newPasswordFormatLengthTip">%0% حرفًا على الأقل مطلوب!</key>
+    <key
+      alias="newPasswordFormatNonAlphaTip"
+    >يجب أن يحتوي على %0% حرفًا خاصًا على الأقل.</key>
+    <key alias="noLockouts">لم يتم حظر الحساب</key>
+    <key alias="noPasswordChange">لم يتم تغيير كلمة المرور</key>
+    <key alias="confirmNewPassword">تأكيد كلمة المرور الجديدة</key>
+    <key
+      alias="changePasswordDescription"
+    >يمكنك تغيير كلمة المرور الخاصة بك للوصول إلى واجهة أمبراكو الخلفية عن طريق ملء النموذج أدناه والنقر على زر 'تغيير كلمة المرور'</key>
+    <key alias="contentChannel">قناة المحتوى</key>
+    <key alias="createAnotherUser">إنشاء مستخدم آخر</key>
+    <key
+      alias="createUserHelp"
+    >إنشاء مستخدمين جدد لمنحهم حق الوصول إلى أمبراكو. عند إنشاء مستخدم جديد، سيتم إنشاء كلمة مرور يمكنك مشاركتها مع المستخدم.</key>
+    <key alias="descriptionField">حقل الوصف</key>
+    <key alias="disabled">تعطيل المستخدم</key>
+    <key alias="documentType">نوع المستند</key>
+    <key alias="editors">محرر</key>
+    <key
+      alias="emailRequired"
+    >مطلوب - أدخل عنوان بريد إلكتروني لهذا المستخدم</key>
+    <key alias="excerptField">حقل مقتطف</key>
+    <key alias="failedPasswordAttempts">محاولات تسجيل دخول فاشلة</key>
+    <key alias="goToProfile">انتقل إلى ملف المستخدم</key>
+    <key alias="groupsHelp">إضافة مجموعات لتعيين الوصول والأذونات</key>
+    <key alias="inviteAnotherUser">دعوة مستخدم آخر</key>
+    <key
+      alias="inviteUserHelp"
+    >دعوة مستخدمين جدد لمنحهم حق الوصول إلى أمبراكو. سيتم إرسال بريد دعوة إلى المستخدم بمعلومات حول كيفية تسجيل الدخول إلى أمبراكو. تستمر الدعوات لمدة 72 ساعة.</key>
+    <key alias="language">اللغة</key>
+    <key alias="languageHelp">تعيين اللغة التي ستظهر في القوائم والنوافذ</key>
+    <key alias="lastLockoutDate">تاريخ آخر حظر</key>
+    <key alias="lastLogin">آخر تسجيل دخول</key>
+    <key alias="lastPasswordChangeDate">تم تغيير كلمة المرور آخر مرة</key>
+    <key alias="loginname">اسم المستخدم</key>
+    <key alias="mediastartnode">عقدة بدء الوسائط</key>
+    <key alias="mediastartnodehelp">تقييم مكتبة الوسائط إلى عقدة بدء محددة</key>
+    <key alias="mediastartnodes">عقد بدء الوسائط</key>
+    <key alias="mediastartnodeshelp">تقييم مكتبة الوسائط إلى عقد بدء محددة</key>
+    <key alias="modules">الأقسام</key>
+    <key alias="nameRequired">مطلوب - أدخل اسمًا لهذا المستخدم</key>
+    <key alias="noConsole">تعطيل الوصول إلى أمبراكو</key>
+    <key alias="noLogin">لم يسجل الدخول بعد</key>
+    <key alias="oldPassword">كلمة المرور القديمة</key>
+    <key alias="password">كلمة المرور</key>
+    <key alias="resetPassword">إعادة تعيين كلمة المرور</key>
+    <key alias="passwordChanged">تم تغيير كلمة المرور الخاصة بك!</key>
+    <key alias="passwordChangedGeneric">تم تغيير كلمة المرور</key>
+    <key alias="passwordConfirm">الرجاء تأكيد كلمة المرور الجديدة</key>
+    <key alias="passwordEnterNew">أدخل كلمة المرور الجديدة</key>
+    <key
+      alias="passwordIsBlank"
+    >كلمة المرور الجديدة لا يمكن أن تكون فارغة!</key>
+    <key alias="passwordCurrent">كلمة المرور الحالية</key>
+    <key alias="passwordInvalid">كلمة المرور الحالية غير صالحة</key>
+    <key
+      alias="passwordIsDifferent"
+    >كان هناك اختلاف بين كلمة المرور الجديدة وكلمة المرور المؤكدة. الرجاء المحاولة مرة أخرى!</key>
+    <key
+      alias="passwordMismatch"
+    >كلمة المرور المؤكدة لا تطابق كلمة المرور الجديدة!</key>
+    <key alias="permissionReplaceChildren">استبدال أذونات العقد الفرعية</key>
+    <key
+      alias="permissionSelectedPages"
+    >أنت تقوم حاليًا بتعديل الأذونات للصفحات:</key>
+    <key alias="permissionSelectPages">حدد الصفحات لتعديل أذوناتها</key>
+    <key alias="removePhoto">إزالة الصورة</key>
+    <key alias="permissionsDefault">الأذونات الافتراضية</key>
+    <key alias="permissionsGranular">أذونات مفصلة</key>
+    <key alias="permissionsGranularHelp">تعيين أذونات لعقد محددة</key>
+    <key alias="profile">الملف الشخصي</key>
+    <key alias="searchAllChildren">بحث في جميع العناصر الفرعية</key>
+    <key
+      alias="languagesHelp"
+    >تقييد اللغات التي يمكن للمستخدمين الوصول إليها للتحرير</key>
+    <key alias="sectionsHelp">إضافة أقسام لمنح المستخدمين حق الوصول</key>
+    <key alias="selectUserGroups">اختر مجموعات المستخدمين</key>
+    <key alias="noStartNode">لم يتم تحديد عقدة بدء</key>
+    <key alias="noStartNodes">لم يتم تحديد عقد بدء</key>
+    <key alias="startnode">عقدة بدء المحتوى</key>
+    <key alias="startnodehelp">تقييم شجرة المحتوى إلى عقدة بدء محددة</key>
+    <key alias="startnodes">عقد بدء المحتوى</key>
+    <key alias="startnodeshelp">تقييم شجرة المحتوى إلى عقد بدء محددة</key>
+    <key alias="updateDate">تم تحديث المستخدم آخر مرة</key>
+    <key alias="userCreated">تم إنشاؤه</key>
+    <key
+      alias="userCreatedSuccessHelp"
+    >تم إنشاء المستخدم الجديد بنجاح. لتسجيل الدخول إلى أمبراكو استخدم كلمة المرور أدناه.</key>
+    <key alias="userManagement">إدارة المستخدمين</key>
+    <key alias="username">الاسم</key>
+    <key alias="userPermissions">أذونات المستخدم</key>
+    <key alias="usergroup">مجموعة المستخدمين</key>
+    <key alias="userInvited">تمت دعوته</key>
+    <key
+      alias="userInvitedSuccessHelp"
+    >تم إرسال دعوة إلى المستخدم الجديد بتفاصيل حول كيفية تسجيل الدخول إلى أمبراكو.</key>
+    <key
+      alias="userinviteWelcomeMessage"
+    >مرحبًا بك في أمبراكو! خلال دقيقة واحدة ستكون جاهزًا، نحتاج فقط منك إعداد كلمة مرور.</key>
+    <key
+      alias="userinviteExpiredMessage"
+    >مرحبًا بك في أمبراكو! لسوء الحظ، انتهت صلاحية دعوتك. الرجاء الاتصال بمسؤولك واطلب إعادة إرسالها.</key>
+    <key alias="writer">كاتب</key>
+    <key alias="change">تغيير</key>
+    <key alias="yourProfile" version="7.0">ملفك الشخصي</key>
+    <key alias="yourHistory" version="7.0">سجلّك الحديث</key>
+    <key alias="sessionExpires" version="7.0">تنتهي الجلسة خلال</key>
+    <key alias="inviteUser">دعوة مستخدم</key>
+    <key alias="createUser">إنشاء مستخدم</key>
+    <key alias="sendInvite">إرسال دعوة</key>
+    <key alias="backToUsers">العودة إلى المستخدمين</key>
+    <key alias="inviteEmailCopySubject">أمبراكو: دعوة</key>
+    <key
+      alias="inviteEmailCopyFormat"
+    ><![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+<div></div>
+<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+</td>
+<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+<br>
+<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+<tr>
+<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+<tr>
+<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															مرحبًا %0%،
+														</h1>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															لقد تمت دعوتك بواسطة <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> إلى واجهة أمبراكو الخلفية.
+														</p>
+<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															رسالة من <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:
+															<br/>
+<em>%2%</em>
+</p>
+<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+<tbody>
+<tr>
+<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+<tbody>
+<tr>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																							انقر على هذا الرابط لقبول الدعوة
+																						</a>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>إذا لم تتمكن من النقر على الرابط، انسخ والصق هذا الرابط في نافذة متصفحك:</p>
+<table border='0' cellpadding='0' cellspacing='0'>
+<tr>
+<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
+</font>
+</td>
+</tr>
+</table>
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<br><br><br>
+</div>
+</td>
+<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>
+</tr>
+</table>
+</body>
+</html>]]></key>
+    <key alias="defaultInvitationMessage">جاري إعادة إرسال الدعوة...</key>
+    <key alias="deleteUser">حذف المستخدم</key>
+    <key
+      alias="deleteUserConfirmation"
+    >هل أنت متأكد أنك تريد حذف حساب هذا المستخدم؟</key>
+    <key alias="stateAll">الكل</key>
+    <key alias="stateActive">نشط</key>
+    <key alias="stateDisabled">معطل</key>
+    <key alias="stateLockedOut">محظور</key>
+    <key alias="stateApproved">موافق عليه</key>
+    <key alias="stateInvited">مدعو</key>
+    <key alias="stateInactive">غير نشط</key>
+    <key alias="sortNameAscending">الاسم (أ-ي)</key>
+    <key alias="sortNameDescending">الاسم (ي-أ)</key>
+    <key alias="sortCreateDateAscending">الأقدم</key>
+    <key alias="sortCreateDateDescending">الأحدث</key>
+    <key alias="sortLastLoginDateDescending">آخر تسجيل دخول</key>
+    <key alias="noUserGroupsAdded">لم تتم إضافة مجموعات مستخدمين</key>
+    <key
+      alias="2faDisableText"
+    >إذا كنت ترغب في تعطيل موفر المصادقة الثنائية هذا، فيجب عليك إدخال الرمز المعروض على جهاز المصادقة الخاص بك:</key>
+    <key alias="2faProviderIsEnabled">موفر المصادقة الثنائية هذا مفعل</key>
+    <key
+      alias="2faProviderIsDisabledMsg"
+    >تم الآن تعطيل موفر المصادقة الثنائية هذا</key>
+    <key
+      alias="2faProviderIsNotDisabledMsg"
+    >حدث خطأ ما أثناء محاولة تعطيل موفر المصادقة الثنائية هذا</key>
+    <key
+      alias="2faDisableForUser"
+    >هل تريد تعطيل موفر المصادقة الثنائية هذا لهذا المستخدم؟</key>
+    <key alias="duplicateLogin">يوجد مستخدم بهذا الاسم بالفعل</key>
+    <key
+      alias="passwordRequiresDigit"
+    >يجب أن تحتوي كلمة المرور على رقم واحد على الأقل ('0'-'9')</key>
+    <key
+      alias="passwordRequiresLower"
+    >يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل ('a'-'z')</key>
+    <key
+      alias="passwordRequiresNonAlphanumeric"
+    >يجب أن تحتوي كلمة المرور على حرف غير أبجدي رقمي واحد على الأقل</key>
+    <key
+      alias="passwordRequiresUniqueChars"
+    >يجب أن تستخدم كلمة المرور %0% أحرفًا مختلفة على الأقل</key>
+    <key
+      alias="passwordRequiresUpper"
+    >يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل ('A'-'Z')</key>
+    <key
+      alias="passwordTooShort"
+    >يجب أن تتكون كلمة المرور من %0% أحرف على الأقل</key>
+    <key alias="allowAccessToAllLanguages">السماح بالوصول إلى جميع اللغات</key>
+    <key alias="userHasPassword">المستخدم لديه كلمة مرور معينة بالفعل</key>
+    <key alias="userHasGroup">المستخدم موجود بالفعل في المجموعة '%0%'</key>
+    <key alias="userLockoutNotEnabled">الحظر غير مفعل لهذا المستخدم</key>
+    <key alias="userNotInGroup">المستخدم ليس في المجموعة '%0%'</key>
+    <key alias="configureTwoFactor">تكوين المصادقة الثنائية</key>
+</area>
+<area alias="validation">
+    <key alias="validation">التحقق</key>
+    <key alias="validateAsEmail">التحقق كعنوان بريد إلكتروني</key>
+    <key alias="validateAsNumber">التحقق كرقم</key>
+    <key alias="validateAsUrl">التحقق كرابط</key>
+    <key alias="enterCustomValidation">...أو أدخل تحققًا مخصصًا</key>
+    <key alias="fieldIsMandatory">الحقل إلزامي</key>
+    <key alias="mandatoryMessage">أدخل رسالة خطأ تحقق مخصصة (اختياري)</key>
+    <key alias="validationRegExp">أدخل تعبيرًا منتظمًا</key>
+    <key
+      alias="validationRegExpMessage"
+    >أدخل رسالة خطأ تحقق مخصصة (اختياري)</key>
+    <key alias="minCount">يجب إضافة %0% على الأقل</key>
+    <key alias="maxCount">يمكنك فقط إضافة %0%</key>
+    <key alias="addUpTo">إضافة حتى %0%</key>
+    <key alias="items">عناصر</key>
+    <key alias="urls">رابط/روابط</key>
+    <key alias="urlsSelected">رابط/روابط محددة</key>
+    <key alias="itemsSelected">عنصر/عناصر محددة</key>
+    <key alias="invalidDate">تاريخ غير صالح</key>
+    <key alias="invalidNumber">ليس رقمًا</key>
+    <key alias="invalidNumberStepSize">ليس حجم خطوة رقمي صالح</key>
+    <key alias="invalidEmail">بريد إلكتروني غير صالح</key>
+    <key alias="invalidNull">القيمة لا يمكن أن تكون فارغة</key>
+    <key alias="invalidEmpty">القيمة لا يمكن أن تكون فارغة</key>
+    <key alias="invalidPattern">القيمة غير صالحة، لا تطابق النمط الصحيح</key>
+    <key alias="customValidation">تحقق مخصص</key>
+    <key
+      alias="entriesShort"
+    ><![CDATA[الحد الأدنى %0% إدخال، يتطلب <strong>%1%</strong> إضافي.]]></key>
+    <key
+      alias="entriesExceed"
+    ><![CDATA[الحد الأقصى %0% إدخال، <strong>%1%</strong> إضافي.]]></key>
+    <key
+      alias="entriesAreasMismatch"
+    >لم يتم استيفاء متطلبات كمية المحتوى لواحد أو أكثر من المناطق.</key>
+    <key alias="invalidMemberGroupName">اسم مجموعة عضو غير صالح</key>
+    <key alias="invalidUserGroupName">اسم مجموعة مستخدم غير صالح</key>
+    <key alias="invalidToken">رمز غير صالح</key>
+    <key alias="invalidUsername">اسم مستخدم غير صالح</key>
+    <key alias="duplicateEmail">البريد الإلكتروني '%0%' مستخدم بالفعل</key>
+    <key
+      alias="duplicateUserGroupName"
+    >اسم مجموعة المستخدمين '%0%' مستخدم بالفعل</key>
+    <key
+      alias="duplicateMemberGroupName"
+    >اسم مجموعة الأعضاء '%0%' مستخدم بالفعل</key>
+    <key alias="duplicateUsername">اسم المستخدم '%0%' مستخدم بالفعل</key>
+</area>
+<area alias="healthcheck">
+    <key
+      alias="checkSuccessMessage"
+    >القيمة مضبوطة على القيمة الموصى بها: '%0%'.</key>
+    <key
+      alias="checkErrorMessageDifferentExpectedValue"
+    >القيمة المتوقعة '%1%' لـ '%2%' في ملف التكوين '%3%'، ولكن تم العثور على '%0%'.</key>
+    <key
+      alias="checkErrorMessageUnexpectedValue"
+    >تم العثور على قيمة غير متوقعة '%0%' لـ '%2%' في ملف التكوين '%3%'.</key>
+    <key
+      alias="macroErrorModeCheckSuccessMessage"
+    >تم تعيين MacroErrors على '%0%'.</key>
+    <key
+      alias="macroErrorModeCheckErrorMessage"
+    >تم تعيين MacroErrors على '%0%' مما سيمنع بعض أو كل الصفحات في موقعك من التحميل بالكامل إذا كانت هناك أي أخطاء في الماكروات. تصحيح هذا سيضبط القيمة على '%1%'.</key>
+    <key alias="httpsCheckValidCertificate">شهادة موقعك صالحة.</key>
+    <key
+      alias="httpsCheckInvalidCertificate"
+    >خطأ في التحقق من الشهادة: '%0%'</key>
+    <key
+      alias="httpsCheckExpiredCertificate"
+    >انتهت صلاحية شهادة SSL لموقعك.</key>
+    <key
+      alias="httpsCheckExpiringCertificate"
+    >شهادة SSL لموقعك تنتهي صلاحيتها خلال %0% يومًا.</key>
+    <key alias="healthCheckInvalidUrl">خطأ في استدعاء الرابط %0% - '%1%'</key>
+    <key
+      alias="httpsCheckIsCurrentSchemeHttps"
+    >أنت حاليًا %0% تشاهد الموقع باستخدام مخطط HTTPS.</key>
+    <key
+      alias="httpsCheckConfigurationRectifyNotPossible"
+    >إعداد التطبيق 'Umbraco:CMS:Global:UseHttps' مضبوط على 'false' في ملف appSettings.json الخاص بك. بمجرد الوصول إلى هذا الموقع باستخدام مخطط HTTPS، يجب ضبطه على 'true'.</key>
+    <key
+      alias="httpsCheckConfigurationCheckResult"
+    >إعداد التطبيق 'Umbraco:CMS:Global:UseHttps' مضبوط على '%0%' في ملف appSettings.json الخاص بك، ملفات تعريف الارتباط الخاصة بك %1% معلمة كآمنة.</key>
+    <key
+      alias="compilationDebugCheckSuccessMessage"
+    >وضع تصحيح التجميع معطل.</key>
+    <key
+      alias="compilationDebugCheckErrorMessage"
+    >وضع تصحيح التجميع مفعل حاليًا. يوصى بتعطيل هذا الإعداد قبل النشر.</key>
+    <key
+      alias="umbracoApplicationUrlCheckResultTrue"
+    ><![CDATA[إعداد التطبيق 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' مضبوط على <strong>%0%</strong>.]]></key>
+    <key
+      alias="umbracoApplicationUrlCheckResultFalse"
+    >إعداد التطبيق 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' غير مضبوط.</key>
+    <key alias="clickJackingCheckHeaderFound">
+      <![CDATA[تم العثور على الرأس أو الوسم <strong>X-Frame-Options</strong> المستخدم للتحكم في إمكانية تضمين موقع داخل إطار من قبل موقع آخر.]]></key>
+<key alias="clickJackingCheckHeaderNotFound">
+      <![CDATA[لم يتم العثور على الرأس أو الوسم <strong>X-Frame-Options</strong> المستخدم للتحكم في إمكانية تضمين موقع داخل إطار من قبل موقع آخر.]]></key>
+    <key alias="noSniffCheckHeaderFound">
+      <![CDATA[تم العثور على الرأس أو الوسم <strong>X-Content-Type-Options</strong> المستخدم للحماية من ثغرات استنشاق MIME.]]></key>
+    <key alias="noSniffCheckHeaderNotFound">
+      <![CDATA[لم يتم العثور على الرأس أو الوسم <strong>X-Content-Type-Options</strong> المستخدم للحماية من ثغرات استنشاق MIME.]]></key>
+    <key alias="hSTSCheckHeaderFound">
+      <![CDATA[تم العثور على الرأس <strong>Strict-Transport-Security</strong>، المعروف أيضًا باسم رأس HSTS.]]></key>
+    <key alias="hSTSCheckHeaderNotFound">
+      <![CDATA[لم يتم العثور على الرأس <strong>Strict-Transport-Security</strong>.]]></key>
+    <key alias="hSTSCheckHeaderFoundOnLocalhost">
+      <![CDATA[تم العثور على الرأس <strong>Strict-Transport-Security</strong>، المعروف أيضًا باسم رأس HSTS. <strong>لا ينبغي أن يكون هذا الرأس موجودًا على localhost.</strong>]]>
+    </key>
+    <key alias="hSTSCheckHeaderNotFoundOnLocalhost">
+      <![CDATA[لم يتم العثور على الرأس <strong>Strict-Transport-Security</strong>. لا ينبغي أن يكون هذا الرأس موجودًا على localhost.]]>
+    </key>
+    <key alias="xssProtectionCheckHeaderFound">
+      <![CDATA[تم العثور على الرأس <strong>X-XSS-Protection</strong>. <strong>يوصى بعدم إضافة هذا الرأس إلى موقعك</strong>.<br />
+    يمكنك القراءة عن هذا على موقع <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a>]]>
+    </key>
+    <key alias="xssProtectionCheckHeaderNotFound">
+      <![CDATA[لم يتم العثور على الرأس <strong>X-XSS-Protection</strong>.]]>
+    </key>
+    <key alias="excessiveHeadersFound">
+      <![CDATA[تم العثور على الرؤوس التالية التي تكشف معلومات عن تكنولوجيا الموقع: <strong>%0%</strong>.]]></key>
+    <key
+      alias="excessiveHeadersNotFound"
+    >لم يتم العثور على رؤوس تكشف معلومات عن تكنولوجيا الموقع.
+    </key>
+    <key
+      alias="smtpMailSettingsNotFound"
+    >في ملف Web.config، لم يتم العثور على system.net/mailsettings.</key>
+    <key
+      alias="smtpMailSettingsHostNotConfigured"
+    >في قسم system.net/mailsettings بملف Web.config، لم يتم تكوين المضيف.
+    </key>
+    <key
+      alias="smtpMailSettingsConnectionSuccess"
+    >إعدادات SMTP مضبوطة بشكل صحيح والخدمة تعمل كما هو متوقع.
+    </key>
+    <key
+      alias="smtpMailSettingsConnectionFail"
+    >تعذر الوصول إلى خادم SMTP المضبوط بالمضيف '%0%' والمنفذ '%1%'. يرجى التحقق لضمان صحة إعدادات SMTP في قسم system.net/mailsettings بملف Web.config.
+    </key>
+    <key alias="notificationEmailsCheckSuccessMessage">
+      <![CDATA[تم تعيين بريد الإشعار على <strong>%0%</strong>.]]></key>
+    <key alias="notificationEmailsCheckErrorMessage">
+      <![CDATA[لا يزال بريد الإشعار مضبوطًا على القيمة الافتراضية <strong>%0%</strong>.]]></key>
+    <key alias="scheduledHealthCheckEmailBody">
+      <![CDATA[<html><body><p>نتائج فحوصات صحة Umbraco المجدولة التي تم تشغيلها في %0% عند %1% هي كما يلي:</p>%2%</body></html>]]></key>
+    <key
+      alias="scheduledHealthCheckEmailSubject"
+    >حالة فحص صحة Umbraco: %0%</key>
+    <key alias="checkGroup">مجموعة الفحص</key>
+    <key alias="helpText">
+      <![CDATA[
+        <p>يقيم فاحص الصحة مناطق مختلفة من موقعك لإعدادات أفضل الممارسات، التكوين، المشكلات المحتملة، إلخ. يمكنك إصلاح المشكلات بسهولة عن طريق الضغط على زر.
+        يمكنك إضافة فحوصات الصحة الخاصة بك، ألق نظرة على <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">الوثائق لمزيد من المعلومات</a> حول فحوصات الصحة المخصصة.</p>
+        ]]>
+    </key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">تعطيل متتبع URL</key>
+    <key alias="enableUrlTracker">تمكين متتبع URL</key>
+    <key alias="originalUrl">URL الأصلي</key>
+    <key alias="redirectedTo">تم التوجيه إلى</key>
+    <key alias="redirectUrlManagement">إدارة URL المُعاد توجيهه</key>
+    <key
+      alias="panelInformation"
+    >توجه عناوين URL التالية إلى عنصر المحتوى هذا:</key>
+    <key alias="noRedirects">لم يتم إجراء أي عمليات إعادة توجيه</key>
+    <key
+      alias="noRedirectsDescription"
+    >عند إعادة تسمية صفحة منشورة أو نقلها، سيتم توجيهها تلقائيًا إلى الصفحة الجديدة.
+    </key>
+    <key alias="redirectRemoved">تمت إزالة URL المُعاد توجيهه.</key>
+    <key alias="redirectRemoveError">خطأ في إزالة URL المُعاد توجيهه.</key>
+    <key alias="redirectRemoveWarning">سيؤدي هذا إلى إزالة إعادة التوجيه</key>
+    <key alias="confirmDisable">هل أنت متأكد أنك تريد تعطيل متتبع URL؟</key>
+    <key alias="disabledConfirm">تم الآن تعطيل متتبع URL.</key>
+    <key
+      alias="disableError"
+    >خطأ في تعطيل متتبع URL، يمكن العثور على مزيد من المعلومات في ملف السجل الخاص بك.</key>
+    <key alias="enabledConfirm">تم الآن تمكين متتبع URL.</key>
+    <key
+      alias="enableError"
+    >خطأ في تمكين متتبع URL، يمكن العثور على مزيد من المعلومات في ملف السجل الخاص بك.</key>
+    <key alias="culture">اللغة</key>
+  </area>
+  <area alias="emptyStates">
+    <key alias="emptyDictionaryTree">لا توجد عناصر قاموس للاختيار من بينها</key>
+  </area>
+  <area alias="textbox">
+    <key
+      alias="characters_left"
+    ><![CDATA[<strong>%0%</strong> أحرف متبقية.]]></key>
+    <key
+      alias="characters_exceed"
+    ><![CDATA[الحد الأقصى %0% حرفًا، <strong>%1%</strong> زيادة.]]></key>
+  </area>
+  <area alias="recycleBin">
+    <key
+      alias="contentTrashed"
+    >تم نقل المحتوى إلى سلة المحذوفات بالمعرف: {0} المتعلق بالمحتوى الأصلي بالمعرف: {1}</key>
+    <key
+      alias="mediaTrashed"
+    >تم نقل الوسائط إلى سلة المحذوفات بالمعرف: {0} المتعلق بعنصر الوسائط الأصلي بالمعرف: {1}</key>
+    <key alias="itemCannotBeRestored">لا يمكن استعادة هذا العنصر تلقائيًا</key>
+    <key
+      alias="itemCannotBeRestoredHelpText"
+    >لا يوجد موقع يمكن استعادة هذا العنصر إليه تلقائيًا. يمكنك نقل العنصر يدويًا باستخدام الشجرة أدناه.
+    </key>
+    <key alias="wasRestored">تمت استعادته تحت</key>
+  </area>
+  <area alias="relationType">
+    <key alias="direction">الاتجاه</key>
+    <key alias="parentToChild">من الأب إلى الابن</key>
+    <key alias="bidirectional">ثنائي الاتجاه</key>
+    <key alias="parent">الأب</key>
+    <key alias="child">الابن</key>
+    <key alias="count">العدد</key>
+    <key alias="relation">العلاقة</key>
+    <key alias="relations">العلاقات</key>
+    <key alias="created">تم الإنشاء</key>
+    <key alias="comment">تعليق</key>
+    <key alias="name">الاسم</key>
+    <key alias="noRelations">لا توجد علاقات لنوع العلاقة هذا</key>
+    <key alias="tabRelationType">نوع العلاقة</key>
+    <key alias="tabRelations">العلاقات</key>
+    <key alias="isDependency">هو تابع</key>
+    <key alias="dependency">نعم</key>
+    <key alias="noDependency">لا</key>
+  </area>
+  <area alias="dashboardTabs">
+    <key alias="contentIntro">ابدأ هنا</key>
+    <key alias="contentRedirectManager">إدارة URL المُعاد توجيهه</key>
+    <key alias="mediaFolderBrowser">المحتوى</key>
+    <key alias="settingsWelcome">مرحبًا</key>
+    <key alias="settingsExamine">إدارة Examine</key>
+    <key alias="settingsPublishedStatus">حالة النشر</key>
+    <key alias="settingsModelsBuilder">منشئ النماذج</key>
+    <key alias="settingsHealthCheck">فحص الصحة</key>
+    <key alias="settingsProfiler">التقييم</key>
+    <key alias="memberIntro">ابدأ هنا</key>
+    <key alias="formsInstall">تثبيت نماذج Umbraco</key>
+    <key alias="settingsAnalytics">بيانات القياس عن بعد</key>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">العودة</key>
+    <key alias="activeListLayout">التخطيط النشط:</key>
+    <key alias="jumpTo">انتقل إلى</key>
+    <key alias="group">مجموعة</key>
+    <key alias="passed">تم بنجاح</key>
+    <key alias="warning">تحذير</key>
+    <key alias="failed">فشل</key>
+    <key alias="suggestion">اقتراح</key>
+    <key alias="checkPassed">تم اجتياز الفحص</key>
+    <key alias="checkFailed">فشل الفحص</key>
+    <key alias="openBackofficeSearch">فتح بحث الواجهة الخلفية</key>
+    <key alias="openCloseBackofficeHelp">فتح/إغلاق مساعدة الواجهة الخلفية</key>
+    <key
+      alias="openCloseBackofficeProfileOptions"
+    >فتح/إغلاق خيارات ملفك الشخصي</key>
+    <key alias="assignDomainDescription">إعداد اللغة وأسماء المضيف لـ %0%</key>
+    <key alias="createDescription">إنشاء عقدة جديدة تحت %0%</key>
+    <key alias="protectDescription">إعداد قيود الوصول على %0%</key>
+    <key alias="rightsDescription">إعداد الأذونات على %0%</key>
+    <key alias="sortDescription">تغيير ترتيب الفرز لـ %0%</key>
+    <key alias="createblueprintDescription">إنشاء قالب محتوى بناءً على %0%</key>
+    <key alias="openContextMenu">فتح قائمة السياق لـ</key>
+    <key alias="currentLanguage">اللغة الحالية</key>
+    <key alias="switchLanguage">تغيير اللغة إلى</key>
+    <key alias="createNewFolder">إنشاء مجلد جديد</key>
+    <key alias="newPartialView">عرض جزئي</key>
+    <key alias="newPartialViewMacro">ماكرو عرض جزئي</key>
+    <key alias="newMember">عضو</key>
+    <key alias="newDataType">نوع البيانات</key>
+    <key
+      alias="redirectDashboardSearchLabel"
+    >بحث لوحة التحكم لإعادة التوجيه</key>
+    <key alias="userGroupSearchLabel">بحث قسم مجموعة المستخدمين</key>
+    <key alias="userSearchLabel">بحث قسم المستخدمين</key>
+    <key alias="createItem">إنشاء عنصر</key>
+    <key alias="create">إنشاء</key>
+    <key alias="edit">تحرير</key>
+    <key alias="name">الاسم</key>
+    <key alias="addNewRow">إضافة صف جديد</key>
+    <key alias="tabExpand">عرض المزيد من الخيارات</key>
+    <key alias="searchOverlayTitle">بحث الواجهة الخلفية لـ Umbraco</key>
+    <key
+      alias="searchOverlayDescription"
+    >ابحث عن عقد المحتوى، عقد الوسائط، إلخ. عبر الواجهة الخلفية.</key>
+    <key
+      alias="searchInputDescription"
+    >عند توفر نتائج الإكمال التلقائي، اضغط على أزرار الأعلى والأسفل، أو استخدم مفتاح Tab واستخدم مفتاح Enter للتحديد.
+    </key>
+    <key alias="path">المسار:</key>
+    <key alias="foundIn">تم العثور عليه في</key>
+    <key alias="hasTranslation">لديه ترجمة</key>
+    <key alias="noTranslation">لا يوجد ترجمة</key>
+    <key alias="dictionaryListCaption">عناصر القاموس</key>
+    <key alias="contextMenuDescription">حدد أحد الخيارات لتحرير العقدة.</key>
+    <key alias="contextDialogDescription">تنفيذ الإجراء %0% على عقدة %1%</key>
+    <key alias="addImageCaption">إضافة تسمية توضيحية للصورة</key>
+    <key alias="searchContentTree">بحث شجرة المحتوى</key>
+    <key alias="maxAmount">الحد الأقصى للكمية</key>
+    <key alias="expandChildItems">توسيع العناصر الفرعية لـ</key>
+    <key alias="openContextNode">فتح عقدة السياق لـ</key>
+  </area>
+  <area alias="references">
+    <key alias="tabName">المراجع</key>
+    <key alias="DataTypeNoReferences">لا توجد مراجع لنوع البيانات هذا.</key>
+    <key alias="itemHasNoReferences">لا توجد مراجع لهذا العنصر.</key>
+    <key alias="labelUsedByDocumentTypes">مستخدم في أنواع المستندات</key>
+    <key alias="labelUsedByMediaTypes">مستخدم في أنواع الوسائط</key>
+    <key alias="labelUsedByMemberTypes">مستخدم في أنواع الأعضاء</key>
+    <key alias="usedByProperties">مستخدم بواسطة</key>
+    <key alias="labelUsedItems">العناصر المستخدمة</key>
+    <key alias="labelUsedDescendants">التابعون المستخدمون</key>
+    <key
+      alias="deleteWarning"
+    >هذا العنصر أو تابعوه قيد الاستخدام. قد يؤدي الحذف إلى روابط معطلة على موقعك.</key>
+    <key
+      alias="unpublishWarning"
+    >هذا العنصر أو تابعوه قيد الاستخدام. قد يؤدي إلغاء النشر إلى روابط معطلة على موقعك. يرجى اتخاذ الإجراءات المناسبة.</key>
+    <key
+      alias="deleteDisabledWarning"
+    >هذا العنصر أو تابعوه قيد الاستخدام. لذلك، تم تعطيل الحذف.</key>
+    <key
+      alias="listViewDialogWarning"
+    >العناصر التالية التي تحاول %0% مستخدمة من قبل محتوى آخر.</key>
+    <key alias="labelUsedByItems">مرجع من العناصر التالية</key>
+    <key alias="labelDependsOnThis">تعتمد العناصر التالية على هذا</key>
+    <key alias="labelDependentDescendants">للعناصر التابعة التالية تبعيات</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="deleteSavedSearch">حذف البحث المحفوظ</key>
+    <key alias="logLevels">مستويات السجل</key>
+    <key alias="selectAllLogLevelFilters">تحديد الكل</key>
+    <key alias="deselectAllLogLevelFilters">إلغاء تحديد الكل</key>
+    <key alias="savedSearches">عمليات البحث المحفوظة</key>
+    <key alias="saveSearch">حفظ البحث</key>
+    <key
+      alias="saveSearchDescription"
+    >أدخل اسمًا وصفيًا لاستعلام البحث الخاص بك</key>
+    <key alias="filterSearch">تصفية البحث</key>
+    <key alias="totalItems">إجمالي العناصر</key>
+    <key alias="timestamp">الطابع الزمني</key>
+    <key alias="level">المستوى</key>
+    <key alias="machine">الجهاز</key>
+    <key alias="message">الرسالة</key>
+    <key alias="exception">استثناء</key>
+    <key alias="properties">الخصائص</key>
+    <key alias="searchWithGoogle">البحث باستخدام Google</key>
+    <key
+      alias="searchThisMessageWithGoogle"
+    >ابحث عن هذه الرسالة باستخدام Google</key>
+    <key alias="searchWithBing">البحث باستخدام Bing</key>
+    <key
+      alias="searchThisMessageWithBing"
+    >ابحث عن هذه الرسالة باستخدام Bing</key>
+    <key alias="searchOurUmbraco">البحث في Our Umbraco</key>
+    <key
+      alias="searchThisMessageOnOurUmbracoForumsAndDocs"
+    >ابحث عن هذه الرسالة في منتديات Our Umbraco والوثائق</key>
+    <key
+      alias="searchOurUmbracoWithGoogle"
+    >البحث في Our Umbraco باستخدام Google</key>
+    <key
+      alias="searchOurUmbracoForumsUsingGoogle"
+    >ابحث في منتديات Our Umbraco باستخدام Google</key>
+    <key alias="searchUmbracoSource">البحث في مصدر Umbraco</key>
+    <key
+      alias="searchWithinUmbracoSourceCodeOnGithub"
+    >ابحث داخل كود مصدر Umbraco على Github</key>
+    <key alias="searchUmbracoIssues">البحث في مشكلات Umbraco</key>
+    <key
+      alias="searchUmbracoIssuesOnGithub"
+    >ابحث في مشكلات Umbraco على Github</key>
+    <key alias="deleteThisSearch">حذف هذا البحث</key>
+    <key alias="findLogsWithRequestId">ابحث عن السجلات باستخدام معرف الطلب</key>
+    <key
+      alias="findLogsWithNamespace"
+    >ابحث عن السجلات باستخدام مساحة الاسم</key>
+    <key
+      alias="findLogsWithMachineName"
+    >ابحث عن السجلات باستخدام اسم الجهاز</key>
+    <key alias="open">فتح</key>
+    <key alias="polling">الاستطلاع</key>
+    <key alias="every2">كل ثانيتين</key>
+    <key alias="every5">كل 5 ثوان</key>
+    <key alias="every10">كل 10 ثوان</key>
+    <key alias="every20">كل 20 ثانية</key>
+    <key alias="every30">كل 30 ثانية</key>
+    <key alias="pollingEvery2">استطلاع كل ثانيتين</key>
+    <key alias="pollingEvery5">استطلاع كل 5 ثوان</key>
+    <key alias="pollingEvery10">استطلاع كل 10 ثوان</key>
+    <key alias="pollingEvery20">استطلاع كل 20 ثانية</key>
+    <key alias="pollingEvery30">استطلاع كل 30 ثانية</key>
+  </area>
+  <area alias="clipboard">
+    <key alias="labelForCopyAllEntries">نسخ %0%</key>
+    <key alias="labelForArrayOfItemsFrom">%0% من %1%</key>
+    <key alias="labelForArrayOfItems">مجموعة من %0%</key>
+    <key alias="labelForRemoveAllEntries">إزالة جميع العناصر</key>
+    <key alias="labelForClearClipboard">مسح الحافظة</key>
+  </area>
+  <area alias="propertyActions">
+    <key alias="tooltipForPropertyActionsMenu">فتح إجراءات الخاصية</key>
+    <key alias="tooltipForPropertyActionsMenuClose">إغلاق إجراءات الخاصية</key>
+  </area>
+  <area alias="nuCache">
+    <key alias="refreshStatus">تحديث الحالة</key>
+    <key alias="memoryCache">ذاكرة التخزين المؤقت</key>
+    <key alias="memoryCacheDescription">
+      <![CDATA[
+            يتيح لك هذا الزر إعادة تحميل ذاكرة التخزين المؤقت في الذاكرة، عن طريق إعادة تحميلها بالكامل من قاعدة البيانات
+    (لكنه لا يعيد بناء ذاكرة التخزين المؤقت لقاعدة البيانات). هذا سريع نسبيًا.
+    استخدمه عندما تعتقد أن ذاكرة التخزين المؤقت لم يتم تحديثها بشكل صحيح، بعد بعض الأحداث
+    التي تم تشغيلها - مما قد يشير إلى مشكلة طفيفة في Umbraco.
+    (ملاحظة: يؤدي إلى إعادة التحميل على جميع الخوادم في بيئة LB).
+    ]]>
+    </key>
+    <key alias="reload">إعادة تحميل</key>
+    <key alias="databaseCache">ذاكرة التخزين المؤقت لقاعدة البيانات</key>
+    <key alias="databaseCacheDescription">
+      <![CDATA[
+    يتيح لك هذا الزر إعادة بناء ذاكرة التخزين المؤقت لقاعدة البيانات، أي محتوى جدول cmsContentNu.
+    <strong>قد تكون إعادة البناء مكلفة.</strong>
+    استخدمه عندما لا يكون إعادة التحميل كافيًا، وتعتقد أن ذاكرة التخزين المؤقت لقاعدة البيانات لم يتم
+    إنشاؤها بشكل صحيح - مما قد يشير إلى مشكلة حرجة في Umbraco.
+    ]]>
+    </key>
+    <key alias="rebuild">إعادة بناء</key>
+    <key alias="internals">الداخليات</key>
+    <key alias="internalsDescription">
+      <![CDATA[
+    يتيح لك هذا الزر تشغيل جمع لقطات NuCache (بعد تشغيل fullCLR GC).
+    ما لم تكن تعرف ما يعنيه ذلك، فربما لا تحتاج إلى استخدامه.
+    ]]>
+    </key>
+    <key alias="collect">جمع</key>
+    <key alias="publishedCacheStatus">حالة ذاكرة التخزين المؤقت المنشورة</key>
+    <key alias="caches">ذاكرات التخزين المؤقت</key>
+  </area>
+  <area alias="profiling">
+    <key alias="performanceProfiling">تقييم الأداء</key>
+    <key alias="performanceProfilingDescription">
+      <![CDATA[
+            <p>
+                يعمل Umbraco حاليًا في وضع التصحيح. هذا يعني أنه يمكنك استخدام أداة تقييم الأداء المدمجة لتقييم الأداء عند عرض الصفحات.
+            </p>
+            <p>
+                إذا كنت تريد تنشيط أداة التقييم لعرض صفحة معينة، ما عليك سوى إضافة <strong>umbDebug=true</strong> إلى سلسلة الاستعلام عند طلب الصفحة.
+            </p>
+            <p>
+                إذا كنت تريد تنشيط أداة التقييم افتراضيًا لجميع عمليات عرض الصفحات، يمكنك استخدام المفتاح أدناه.
+                سيؤدي هذا إلى تعيين ملف تعريف الارتباط في متصفحك، والذي يقوم بعد ذلك بتنشيط أداة التقييم تلقائيًا.
+                بمعنى آخر، سيتم تنشيط أداة التقييم افتراضيًا في متصفحك فقط - وليس متصفحات الآخرين.
+            </p>
+    ]]>
+    </key>
+    <key alias="activateByDefault">تنشيط أداة التقييم افتراضيًا</key>
+    <key alias="reminder">تذكير ودود</key>
+    <key alias="reminderDescription">
+      <![CDATA[
+        <p>
+            لا يجب أبدًا ترك موقع إنتاج يعمل في وضع التصحيح. يتم إيقاف وضع التصحيح عن طريق تعيين <strong>Umbraco:CMS:Hosting:Debug</strong> إلى <strong>false</strong> في appsettings.json، appsettings.{Environment}.json أو عبر متغير البيئة.
+        </p>
+    ]]>
+    </key>
+    <key alias="profilerEnabledDescription">
+      <![CDATA[
+        <p>
+            لا يعمل Umbraco حاليًا في وضع التصحيح، لذلك لا يمكنك استخدام أداة التقييم المدمجة. هكذا يجب أن يكون لموقع إنتاج.
+        </p>
+        <p>
+            يتم تشغيل وضع التصحيح عن طريق تعيين <strong>Umbraco:CMS:Hosting:Debug</strong> إلى <strong>true</strong> في appsettings.json، appsettings.{Environment}.json أو عبر متغير البيئة.
+        </p>
+    ]]>
+    </key>
+  </area>
+  <area alias="settingsDashboardVideos">
+    <key
+      alias="trainingHeadline"
+    >ساعات من مقاطع فيديو تدريب Umbraco تبعد نقرة واحدة فقط</key>
+    <key alias="trainingDescription">
+      <![CDATA[
+            <p>تريد إتقان Umbraco؟ اقضي بضع دقائق في تعلم بعض أفضل الممارسات من خلال مشاهدة أحد هذه الفيديوهات حول استخدام Umbraco. وقم بزيارة <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> لمزيد من فيديوهات Umbraco</p>
+        ]]>
+    </key>
+    <key alias="learningBaseDescription">
+      <![CDATA[
+        <p>تريد إتقان Umbraco؟ اقضي بضع دقائق في تعلم بعض أفضل الممارسات من خلال زيارة <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">قناة Umbraco Learning Base على Youtube</a>. هنا يمكنك العثور على مجموعة من المواد المرئية التي تغطي العديد من جوانب Umbraco.</p>
+      ]]>
+    </key>
+    <key alias="getStarted">لتبدأ</key>
+  </area>
+  <area alias="settingsDashboard">
+    <key alias="start">ابدأ هنا</key>
+    <key
+      alias="startDescription"
+    >يحتوي هذا القسم على اللبنات الأساسية لموقع Umbraco الخاص بك. اتبع الروابط أدناه لمعرفة المزيد حول العمل مع العناصر في قسم الإعدادات
+    </key>
+    <key alias="more">اكتشف المزيد</key>
+    <key alias="bulletPointOne">
+      <![CDATA[
+        اقرأ المزيد حول العمل مع العناصر في الإعدادات <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">في قسم الوثائق</a> من Our Umbraco
+    ]]>
+    </key>
+    <key alias="bulletPointTwo">
+      <![CDATA[
+        اطرح سؤالاً في <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">منتدى المجتمع</a>
+    ]]>
+    </key>
+    <key alias="bulletPointTutorials">
+      <![CDATA[
+        شاهد <a class="btn-link -underline" href="https://umbra.co/ulb" target="_blank" rel="noopener">فيديوهاتنا التعليمية المجانية على Umbraco Learning Base</a>
+    ]]>
+    </key>
+    <key alias="bulletPointFour">
+      <![CDATA[
+        اكتشف <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">أدوات تعزيز الإنتاجية والدعم التجاري لدينا</a>
+    ]]>
+    </key>
+    <key alias="bulletPointFive">
+      <![CDATA[
+        اكتشف فرص <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">التدريب والشهادات</a> في الحياة الواقعية
+    ]]>
+    </key>
+  </area>
+  <area alias="startupDashboard">
+    <key alias="fallbackHeadline">مرحبًا بكم في نظام إدارة المحتوى الودود</key>
+    <key
+      alias="fallbackDescription"
+    >شكرًا لاختيارك Umbraco - نعتقد أن هذا يمكن أن يكون بداية شيء جميل. بينما قد تشعر بالإرهاق في البداية، فقد بذلنا الكثير لجعل منحنى التعلم سلسًا وسريعًا قدر الإمكان.
+    </key>
+  </area>
+  <area alias="formsDashboard">
+    <key alias="formsHeadline">نماذج Umbraco</key>
+    <key
+      alias="formsDescription"
+    >أنشئ نماذج باستخدام واجهة سحب وإفلات سهلة الاستخدام. من نماذج الاتصال البسيطة التي ترسل رسائل بريد إلكتروني إلى الاستبيانات المتقدمة التي تندمج مع أنظمة CRM. سوف يحبه عملاؤك!
+    </key>
+  </area>
+  <area alias="blockEditor">
+    <key alias="headlineCreateBlock">اختر نوع العنصر</key>
+    <key alias="headlineAddSettingsElementType">إرفاق نوع عنصر إعدادات</key>
+    <key alias="headlineAddCustomView">حدد العرض</key>
+    <key alias="headlineAddCustomStylesheet">حدد ورقة الأنماط</key>
+    <key alias="headlineAddThumbnail">اختر الصورة المصغرة</key>
+    <key alias="labelcreateNewElementType">إنشاء نوع عنصر جديد</key>
+    <key alias="labelCustomStylesheet">ورقة أنماط مخصصة</key>
+    <key alias="addCustomStylesheet">إضافة ورقة أنماط</key>
+    <key alias="headlineEditorAppearance">مظهر الكتلة</key>
+    <key alias="headlineDataModels">نماذج البيانات</key>
+    <key alias="headlineCatalogueAppearance">مظهر الكتالوج</key>
+    <key alias="labelBackgroundColor">لون الخلفية</key>
+    <key alias="labelIconColor">لون الأيقونة</key>
+    <key alias="labelContentElementType">نموذج المحتوى</key>
+    <key alias="labelLabelTemplate">التسمية</key>
+    <key alias="labelCustomView">عرض مخصص</key>
+    <key alias="labelCustomViewInfoTitle">عرض وصف العرض المخصص</key>
+    <key
+      alias="labelCustomViewDescription"
+    >تجاوز كيفية ظهور هذه الكتلة في واجهة المستخدم الخلفية. اختر ملف .html يحتوي على العرض الخاص بك.
+    </key>
+    <key alias="labelSettingsElementType">نموذج الإعدادات</key>
+    <key alias="labelEditorSize">حجم محرر التراكب</key>
+    <key alias="addCustomView">إضافة عرض مخصص</key>
+    <key alias="addSettingsElementType">إضافة إعدادات</key>
+    <key alias="confirmDeleteBlockMessage">
+      <![CDATA[هل أنت متأكد أنك تريد حذف المحتوى <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteBlockTypeMessage">
+      <![CDATA[هل أنت متأكد أنك تريد حذف تكوين الكتلة <strong>%0%</strong>?]]></key>
+    <key
+      alias="confirmDeleteBlockTypeNotice"
+    >سيظل محتوى هذه الكتلة موجودًا، لن يكون تحرير هذا المحتوى متاحًا وسيظهر كمحتوى غير مدعوم.
+    </key>
+    <key alias="confirmDeleteBlockGroupMessage">
+      <![CDATA[هل أنت متأكد أنك تريد حذف المجموعة <strong>%0%</strong> وجميع تكوينات الكتل الخاصة بها؟]]></key>
+    <key
+      alias="confirmDeleteBlockGroupNotice"
+    >سيظل محتوى هذه الكتل موجودًا، لن يكون تحرير هذا المحتوى متاحًا وسيظهر كمحتوى غير مدعوم.
+    </key>
+    <key alias="blockConfigurationOverlayTitle"><![CDATA[تكوين '%0%']]></key>
+    <key
+      alias="elementTypeDoesNotExist"
+    >لا يمكن تحريره لأن نوع العنصر غير موجود.</key>
+    <key alias="thumbnail">الصورة المصغرة</key>
+    <key alias="addThumbnail">إضافة صورة مصغرة</key>
+    <key alias="tabCreateEmpty">إنشاء فارغ</key>
+    <key alias="tabClipboard">الحافظة</key>
+    <key alias="tabBlockSettings">الإعدادات</key>
+    <key alias="headlineAdvanced">متقدم</key>
+    <key alias="forceHideContentEditor">إخفاء محرر المحتوى</key>
+    <key
+      alias="forceHideContentEditorHelp"
+    >إخفاء زر تحرير المحتوى ومحرر المحتوى من تراكب محرر الكتل.</key>
+    <key alias="girdInlineEditing">تحرير مضمن</key>
+    <key
+      alias="girdInlineEditingHelp"
+    >تمكين التحرير المضمن للخاصية الأولى. يمكن تحرير الخصائص الإضافية في التراكب.</key>
+    <key
+      alias="blockHasChanges"
+    >لقد أجريت تغييرات على هذا المحتوى. هل أنت متأكد أنك تريد تجاهلها؟</key>
+    <key alias="confirmCancelBlockCreationHeadline">تجاهل الإنشاء؟</key>
+    <key
+      alias="confirmCancelBlockCreationMessage"
+    ><![CDATA[هل أنت متأكد أنك تريد إلغاء الإنشاء.]]></key>
+    <key alias="elementTypeDoesNotExistHeadline">خطأ!</key>
+    <key
+      alias="elementTypeDoesNotExistDescription"
+    >لم يعد نوع العنصر لهذه الكتلة موجودًا</key>
+    <key alias="addBlock">إضافة محتوى</key>
+    <key alias="addThis">إضافة %0%</key>
+    <key
+      alias="propertyEditorNotSupported"
+    >الخاصية '%0%' تستخدم المحرر '%1%' غير المدعوم في الكتل.</key>
+    <key alias="focusParentBlock">ضبط التركيز على الكتلة الحاوية</key>
+    <key alias="areaIdentification">التعريف</key>
+    <key alias="areaValidation">التحقق</key>
+    <key
+      alias="areaValidationEntriesShort"
+    ><![CDATA[<strong>%0%</strong> يجب أن يكون موجودًا على الأقل <strong>%2%</strong> مرة/مرات.]]></key>
+    <key
+      alias="areaValidationEntriesExceed"
+    ><![CDATA[<strong>%0%</strong> يجب أن يكون موجودًا بحد أقصى <strong>%3%</strong> مرة/مرات.]]></key>
+    <key alias="areaNumberOfBlocks">عدد الكتل</key>
+    <key alias="areaDisallowAllBlocks">السماح فقط بأنواع كتل محددة</key>
+    <key alias="areaAllowedBlocks">أنواع الكتل المسموح بها</key>
+    <key
+      alias="areaAllowedBlocksHelp"
+    >حدد أنواع الكتل المسموح بها في هذه المنطقة، واختياريًا عدد كل نوع يجب أن يكون موجودًا.</key>
+    <key
+      alias="confirmDeleteBlockAreaMessage"
+    >هل أنت متأكد أنك تريد حذف هذه المنطقة؟</key>
+    <key
+      alias="confirmDeleteBlockAreaNotice"
+    >سيتم حذف أي كتل تم إنشاؤها حاليًا داخل هذه المنطقة.</key>
+    <key alias="layoutOptions">خيارات التخطيط</key>
+    <key alias="structuralOptions">هيكلية</key>
+    <key alias="sizeOptions">خيارات الحجم</key>
+    <key
+      alias="sizeOptionsHelp"
+    >حدد خيار حجم واحد أو أكثر، هذا يمكّن تغيير حجم الكتلة</key>
+    <key alias="allowedBlockColumns">امتدادات الأعمدة المتاحة</key>
+    <key
+      alias="allowedBlockColumnsHelp"
+    >حدد عدد الأعمدة المختلفة المسموح لهذه الكتلة بالامتداد عليها. هذا لا يمنع الكتل من وضعها في مناطق ذات امتداد عمود أصغر.</key>
+    <key alias="allowedBlockRows">امتدادات الصفوف المتاحة</key>
+    <key
+      alias="allowedBlockRowsHelp"
+    >حدد نطاق صفوف التخطيط المسموح لهذه الكتلة بالامتداد عليها.</key>
+    <key alias="allowBlockInRoot">السماح في الجذر</key>
+    <key
+      alias="allowBlockInRootHelp"
+    >اجعل هذه الكتلة متاحة في جذر التخطيط.</key>
+    <key alias="allowBlockInAreas">السماح في المناطق</key>
+    <key
+      alias="allowBlockInAreasHelp"
+    >اجعل هذه الكتلة متاحة افتراضيًا داخل مناطق الكتل الأخرى (ما لم يتم تعيين أذونات صريحة لهذه المناطق).</key>
+    <key
+      alias="areaAllowedBlocksEmpty"
+    >افتراضيًا، جميع أنواع الكتل مسموح بها في المنطقة، استخدم هذا الخيار للسماح فقط بالأنواع المحددة.</key>
+    <key alias="areas">المناطق</key>
+    <key alias="areasLayoutColumns">أعمدة الشبكة للمناطق</key>
+    <key
+      alias="areasLayoutColumnsHelp"
+    >حدد عدد الأعمدة التي ستكون متاحة للمناطق. إذا لم يتم تحديدها، سيتم استخدام عدد الأعمدة المحدد للتخطيط بأكمله.</key>
+    <key alias="areasConfigurations">المناطق</key>
+    <key
+      alias="areasConfigurationsHelp"
+    >لتمكين تداخل الكتل داخل هذه الكتلة، حدد منطقة واحدة أو أكثر. تتبع المناطق التخطيط المحدد بواسطة تكوين عمود الشبكة الخاص بها. يمكن تعديل 'امتداد العمود' و'امتداد الصف' لكل منطقة باستخدام مربع مقبض القياس في الزاوية اليمنى السفلية من المنطقة المحددة.</key>
+    <key
+      alias="invalidDropPosition"
+    ><![CDATA[<strong>%0%</strong> غير مسموح به في هذه البقعة.]]></key>
+    <key alias="defaultLayoutStylesheet">ورقة أنماط التخطيط الافتراضية</key>
+    <key
+      alias="confirmPasteDisallowedNestedBlockHeadline"
+    >تم رفض المحتوى غير المسموح به</key>
+    <key alias="confirmPasteDisallowedNestedBlockMessage">
+      <![CDATA[احتوى المحتوى المدرج على محتوى غير مسموح به، والذي لم يتم إنشاؤه. هل تريد الاحتفاظ ببقية هذا المحتوى على أي حال؟]]></key>
+    <key alias="areaAliasHelp">
+      <![CDATA[عند استخدام GetBlockGridHTML() لعرض شبكة الكتل، سيتم عرض الاسم المستعار في الترميز كسمة 'data-area-alias'. استخدم سمة الاسم المستعار لاستهداف العنصر للمنطقة. مثال. .umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }]]></key>
+    <key alias="scaleHandlerButtonTitle">اسحب للقياس</key>
+    <key alias="areaCreateLabelTitle">تسمية زر الإنشاء</key>
+    <key
+      alias="areaCreateLabelHelp"
+    >تجاوز نص التسمية لإضافة كتلة جديدة إلى هذه المنطقة، مثال: 'إضافة عنصر واجهة'</key>
+    <key alias="showSizeOptions">عرض خيارات تغيير الحجم</key>
+    <key alias="addBlockType">إضافة كتلة</key>
+    <key alias="addBlockGroup">إضافة مجموعة</key>
+    <key alias="pickSpecificAllowance">اختر مجموعة أو كتلة</key>
+    <key alias="allowanceMinimum">تعيين حد أدنى</key>
+    <key alias="allowanceMaximum">تعيين حد أقصى</key>
+    <key alias="block">كتلة</key>
+    <key alias="tabBlock">كتلة</key>
+    <key alias="tabBlockTypeSettings">الإعدادات</key>
+    <key alias="tabAreas">المناطق</key>
+    <key alias="tabAdvanced">متقدم</key>
+    <key alias="headlineAllowance">الأذونات</key>
+    <key alias="getSampleHeadline">تثبيت نموذج التكوين</key>
+    <key
+      alias="getSampleDescription"
+    ><![CDATA[سيؤدي هذا إلى إضافة كتل أساسية ومساعدتك في البدء مع محرر شبكة الكتل. ستحصل على كتل للعنوان، النص المنسق، الصورة، بالإضافة إلى تخطيط عمودين. ]]></key>
+    <key alias="getSampleButton">تثبيت</key>
+    <key alias="actionEnterSortMode">وضع الفرز</key>
+    <key alias="actionExitSortMode">إنهاء وضع الفرز</key>
+    <key
+      alias="areaAliasIsNotUnique"
+    >يجب أن يكون اسم مستعار هذه المنطقة فريدًا مقارنة بمناطق الكتلة الأخرى.</key>
+    <key alias="configureArea">تكوين المنطقة</key>
+    <key alias="deleteArea">حذف المنطقة</key>
+    <key alias="addColumnSpanOption">إضافة خيار امتداد %0% أعمدة</key>
+    <key alias="insertBlock">إدراج كتلة</key>
+    <key alias="labelInlineMode">عرض مضمن مع النص</key>
+  </area>
+  <area alias="contentTemplatesDashboard">
+    <key alias="whatHeadline">ما هي قوالب المحتوى؟</key>
+    <key
+      alias="whatDescription"
+    >قوالب المحتوى هي محتوى محدد مسبقًا يمكن تحديده عند إنشاء عقدة محتوى جديدة.
+    </key>
+    <key alias="createHeadline">كيف يمكنني إنشاء قالب محتوى؟</key>
+    <key alias="createDescription">
+      <![CDATA[
+            <p>هناك طريقتان لإنشاء قالب محتوى:</p>
+            <ul>
+                <li>انقر بزر الماوس الأيمن على عقدة محتوى وحدد "إنشاء قالب محتوى" لإنشاء قالب محتوى جديد.</li>
+                <li>انقر بزر الماوس الأيمن على شجرة قوالب المحتوى في قسم الإعدادات وحدد نوع المستند الذي تريد إنشاء قالب محتوى له.</li>
+            </ul>
+            <p>بمجرد إعطائه اسمًا، يمكن للمحررين البدء في استخدام قالب المحتوى كأساس لصفحتهم الجديدة.</p>
+        ]]>
+    </key>
+    <key alias="manageHeadline">كيف يمكنني إدارة قوالب المحتوى؟</key>
+    <key
+      alias="manageDescription"
+    >يمكنك تحرير وحذف قوالب المحتوى من شجرة "قوالب المحتوى" في قسم الإعدادات. قم بتوسيع نوع المستند الذي يعتمد عليه قالب المحتوى وانقر عليه للتحرير أو الحذف.
+    </key>
+  </area>
+  <area alias="preview">
+    <key alias="endLabel">إنهاء</key>
+    <key alias="endTitle">إنهاء وضع المعاينة</key>
+    <key alias="openWebsiteLabel">معاينة الموقع</key>
+    <key alias="openWebsiteTitle">فتح الموقع في وضع المعاينة</key>
+    <key alias="returnToPreviewHeadline">معاينة الموقع؟</key>
+    <key
+      alias="returnToPreviewDescription"
+    >لقد أنهيت وضع المعاينة، هل تريد تمكينه مرة أخرى لعرض أحدث نسخة محفوظة من موقعك؟
+    </key>
+    <key alias="returnToPreviewAcceptButton">معاينة أحدث نسخة</key>
+    <key alias="returnToPreviewDeclineButton">عرض النسخة المنشورة</key>
+    <key alias="viewPublishedContentHeadline">عرض النسخة المنشورة؟</key>
+    <key
+      alias="viewPublishedContentDescription"
+    >أنت في وضع المعاينة، هل تريد الخروج لعرض النسخة المنشورة من موقعك؟
+    </key>
+    <key alias="viewPublishedContentAcceptButton">عرض النسخة المنشورة</key>
+    <key alias="viewPublishedContentDeclineButton">البقاء في وضع المعاينة</key>
+  </area>
+  <area alias="permissions">
+    <key alias="FolderCreation">إنشاء مجلد</key>
+    <key alias="FileWritingForPackages">كتابة ملف للحزم</key>
+    <key alias="FileWriting">كتابة ملف</key>
+    <key alias="MediaFolderCreation">إنشاء مجلد وسائط</key>
+  </area>
+  <area alias="treeSearch">
+    <key alias="searchResult">عنصر واحد مسترد</key>
+    <key alias="searchResults">عناصر مستردة</key>
+  </area>
+  <area alias="propertyEditorPicker">
+    <key alias="title">حدد محرر الخاصية</key>
+    <key alias="openPropertyEditorPicker">حدد محرر الخاصية</key>
+  </area>
+  <area alias="analytics">
+    <key alias="consentForAnalytics">الموافقة على بيانات القياس عن بعد</key>
+    <key alias="analyticsLevelSavedSuccess">تم حفظ مستوى القياس عن بعد!</key>
+    <key
+      alias="analyticsDescription"
+    ><![CDATA[من أجل تحسين Umbraco وإضافة وظائف جديدة بناءً على معلومات ذات صلة قدر الإمكان،
+<br>نرغب في جمع معلومات النظام والاستخدام من تثبيتك.
+<br>سيتم مشاركة البيانات المجمعة بشكل منتظم بالإضافة إلى الدروس المستفادة من هذه المقاييس.
+<br>نأمل أن تساعدنا في جمع بعض البيانات القيمة.
+<br>
+<br>نحن <strong>لن نجمع</strong> أي بيانات شخصية مثل المحتوى، الكود، معلومات المستخدم، وستكون جميع البيانات مجهولة بالكامل.]]></key>
+    <key
+      alias="minimalLevelDescription"
+    >سنرسل فقط معرف موقع مجهول لإعلامنا بوجود الموقع.</key>
+    <key
+      alias="basicLevelDescription"
+    >سنرسل معرف موقع مجهول، إصدار Umbraco، والحزم المثبتة</key>
+    <key
+      alias="detailedLevelDescription"
+    ><![CDATA[سنرسل:
+<ul>
+    <li>معرف موقع مجهول، إصدار Umbraco، والحزم المثبتة.</li>
+    <li>عدد: العقد الجذرية، عقد المحتوى، الماكروات، الوسائط، أنواع المستندات، أنواع الخصائص، التركيبات، القوالب، اللغات، النطاقات، مجموعة المستخدمين، المستخدمين، الأعضاء، موفري تسجيل الدخول الخارجيين للواجهة الخلفية، ويب هوكس، أنواع بيانات النص المنسق، الكتل المستخدمة في أنواع بيانات النص المنسق، ومحررات الخصائص قيد الاستخدام.</li>
+    <li>معلومات النظام: خادم الويب، نظام تشغيل الخادم، إطار عمل الخادم، لغة نظام تشغيل الخادم، وموفر قاعدة البيانات.</li>
+    <li>إعدادات التكوين: وضع منشئ النماذج، إذا كان مسار Umbraco المخصص موجودًا، بيئة ASP، ما إذا كان واجهة برمجة التطبيقات للتوصيل ممكّنة، وتسمح بالوصول العام، وما إذا كنت في وضع التصحيح.</li>
+</ul>
+<em>قد نغير ما نرسله على المستوى التفصيلي في المستقبل. إذا قمت باختيار "تفصيلي"، فأنت توافق على جمع المعلومات المجهولة الحالية والمستقبلية.</em>]]></key>
+  </area>
+</language>
