@@ -148,6 +148,12 @@ export class UmbHintController<
 			this.#parent!.addOne({ ...hint, path: newPath });
 		});
 
+		// Remove hints that are not in the local hints anymore:
+		const toRemove = this.#parentHints?.filter((hint) => !hints.find((m) => m.unique === hint.unique));
+		if (toRemove) {
+			this.#parent!.remove(toRemove.map((hint) => hint.unique));
+		}
+
 		this.#parent!.finishChange();
 	};
 
