@@ -4,7 +4,6 @@ import { UmbManagementApiDocumentItemDataRequestManager } from './document-item.
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A data source for Document items that fetches data from the server
@@ -32,16 +31,6 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 		if (!uniques) throw new Error('Uniques are missing');
 
 		const { data, error } = await this.#itemRequestManager.getItems(uniques);
-
-		/*
-		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			api: (args) => DocumentService.getItemDocument({ query: { id: args.uniques } }),
-			uniques,
-		});
-
-		const { data, error } = await itemRequestManager.request();
-				*/
 
 		return { data: this._getMappedItems(data), error };
 	}
