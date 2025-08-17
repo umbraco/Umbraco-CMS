@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.80.1",
-    "@umbraco-cms/backoffice": "^16.1.0",
+    "@umbraco-cms/backoffice": "^UMBRACO_VERSION_FROM_TEMPLATE",
     "chalk": "^5.4.1",
     "cross-env": "^7.0.3",
     "node-fetch": "^3.3.2",
