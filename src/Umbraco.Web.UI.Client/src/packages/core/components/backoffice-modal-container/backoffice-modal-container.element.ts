@@ -146,7 +146,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		dialog.insertBefore(notificationContainer, dialog.firstChild);
 	}
 
-	override async updated(){
+	override async updated() {
 		await Promise.all([this.updateComplete, this.addNotificationContainer()]);
 	}
 
