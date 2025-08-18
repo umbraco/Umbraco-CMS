@@ -1462,6 +1462,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             .Delete<TagRelationshipDto>()
             .Where<TagRelationshipDto>(x => x.PropertyTypeId == propertyTypeId);
         _ = Database.Execute(sql);
+
         sql = Sql()
             .Delete<PropertyDataDto>()
             .Where<PropertyDataDto>(x => x.PropertyTypeId == propertyTypeId);
@@ -1469,13 +1470,20 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
         // Clear the property value permissions, which aren't a hard dependency with a foreign key, but we want to ensure
         // that any for removed property types are cleared.
-        var uniqueIdAsString = string.Format(SqlContext.SqlSyntax.ConvertUniqueIdentifierToString, "uniqueId");
-        var permissionSearchString = SqlContext.SqlSyntax.GetConcat(
-         $"(SELECT {SqlSyntax.GetQuotedColumnName(uniqueIdAsString)} FROM {SqlSyntax.GetQuotedTableName(PropertyTypeDto.TableName)} WHERE id = @PropertyTypeId)",
-           "'|%'");
-        _ = Database.Delete<UserGroup2GranularPermissionDto>(
-           $"WHERE {SqlSyntax.GetQuotedColumnName(uniqueIdAsString)} = @ContentTypeKey AND permission LIKE " + permissionSearchString,
-           new { ContentTypeKey = contentType.Key, PropertyTypeId = propertyTypeId });
+        Sql<ISqlContext> permissionSql = Sql()
+            .Select<PropertyTypeDto>(c => c.UniqueId)
+            .From<PropertyTypeDto>()
+            .Where<PropertyTypeDto>(c => c.Id == propertyTypeId);
+        Guid[] guids = [.. Database.Fetch<Guid>(permissionSql)];
+        IEnumerable<string> permissions = guids.Select(s =>
+            s.ToString().TrimStart('{').TrimEnd('}'));
+
+        Sql<ISqlContext> delSql = Sql()
+            .Delete<UserGroup2GranularPermissionDto>()
+            .Where<UserGroup2GranularPermissionDto>(c => c.UniqueId == contentType.Key)
+            .WhereLowerIn<UserGroup2GranularPermissionDto>(c => c.Permission, permissions);
+
+        _ = Database.Execute(delSql);
 
         // Finally delete the property type.
         sql = Sql()

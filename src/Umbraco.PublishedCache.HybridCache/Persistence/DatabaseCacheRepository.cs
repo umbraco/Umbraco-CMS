@@ -371,6 +371,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         int groupSize,
         IReadOnlyCollection<int>? contentTypeIds)
     {
+        if (contentTypeIds is null)
+        {
+            return;
+        }
+
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
         RemoveByObjectType(contentTypeIds, mediaObjectType);
@@ -402,6 +407,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         int groupSize,
         IReadOnlyCollection<int>? contentTypeIds)
     {
+        if (contentTypeIds is null)
+        {
+            return;
+        }
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
         RemoveByObjectType(contentTypeIds, memberObjectType);

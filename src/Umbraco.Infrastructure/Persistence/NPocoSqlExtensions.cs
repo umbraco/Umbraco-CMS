@@ -143,6 +143,21 @@ namespace Umbraco.Extensions
             return sql.WhereIn(field, values, false, tableAlias);
         }
 
+        /// <summary>
+        /// Appends a WHERE IN clause to the Sql statement with transformation to LOWER.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="field">An expression specifying the field surrounded by LOWER().</param>
+        /// <param name="values">The string values. Getting transformed with .ToLower().</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> WhereLowerIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable<string> values)
+        {
+            IEnumerable<string> lowerValues = values.Select(s => s.ToLower());
+            var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
+            sql.Where($"LOWER({fieldName}) IN (@values)", new { values = lowerValues });
+            return sql;
+        }
 
         public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, Sql<ISqlContext>? valuesSql)
         {

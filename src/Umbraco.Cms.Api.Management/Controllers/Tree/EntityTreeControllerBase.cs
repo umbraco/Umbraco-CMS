@@ -72,7 +72,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             .Select(ancestor =>
             {
                 IEntitySlim? parent = ancestor.ParentId > 0
-                    ? ancestorEntities.Single(a => a.Id == ancestor.ParentId)
+                    ? ancestorEntities.SingleOrDefault(a => a.Id == ancestor.ParentId)
                     : null;
 
                 return MapTreeItemViewModel(parent?.Key, ancestor);
