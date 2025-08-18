@@ -89,7 +89,7 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 
 		// Invalidate cache entries when entities are updated or deleted
 		this.observe(
-			this.#serverEventContext?.byEventSourceAndTypes(this.#serverEventSource, ['Updated', 'Deleted']),
+			this.#serverEventContext?.byEventSourcesAndTypes(this.#serverEventSource, ['Updated', 'Deleted']),
 			(event) => {
 				if (!event) return;
 				this.#dataCache.delete(event.key);
