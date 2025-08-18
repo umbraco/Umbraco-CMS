@@ -55,7 +55,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             Mappers,
             Options.Create(GlobalSettings),
             Options.Create(new UserPasswordConfigurationSettings()),
-            new SystemTextJsonSerializer(),
+            new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             mockRuntimeState.Object,
             PermissionMappers);
         return repository;
@@ -162,7 +162,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 Mock.Of<IMapperCollection>(),
                 Options.Create(GlobalSettings),
                 Options.Create(new UserPasswordConfigurationSettings()),
-                new SystemTextJsonSerializer(),
+                new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
                 mockRuntimeState.Object,
                 PermissionMappers);
 

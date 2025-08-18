@@ -126,6 +126,7 @@ public class UmbracoPlan : MigrationPlan
 
         // To 17.0.0
         To<V_17_0_0.AddGuidsToAuditEntries>("{17D5F6CA-CEB8-462A-AF86-4B9C3BF91CF1}");
+        To<V_17_0_0.MigrateCheckboxListDataTypesAndPropertyData>("{EB1E50B7-CD5E-4B6B-B307-36237DD2C506}");
         To<V_17_0_0.SetDateDefaultsToUtcNow>("{1847C7FF-B021-44EB-BEB0-A77A4376A6F2}");
         To<V_17_0_0.MigrateSystemDatesToUtc>("{7208B20D-6BFC-472E-9374-85EEA817B27D}");
     }

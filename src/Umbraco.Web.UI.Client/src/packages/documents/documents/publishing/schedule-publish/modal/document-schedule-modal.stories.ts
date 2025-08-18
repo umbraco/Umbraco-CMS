@@ -66,7 +66,7 @@ const modalValue: UmbDocumentScheduleModalValue = {
 };
 
 const meta: Meta<UmbDocumentScheduleModalElement> = {
-	title: 'Workspaces/Document/Modals/Schedule',
+	title: 'Entity/Document/Modals/Schedule',
 	component: 'umb-document-schedule-modal',
 	id: 'umb-document-schedule-modal',
 	args: {
@@ -125,7 +125,7 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 export default meta;
 type Story = StoryObj<UmbDocumentScheduleModalElement>;
 
-export const Overview: Story = {};
+export const Docs: Story = {};
 
 export const WithoutVariants: Story = {
 	args: {

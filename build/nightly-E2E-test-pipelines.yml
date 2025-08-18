@@ -9,11 +9,10 @@ schedules:
     branches:
       include:
         - v15/dev
-        - release/16.0
         - main
 
 parameters:
-    # Skipped due to DB locks
+  # Skipped due to DB locks
   - name: sqliteAcceptanceTests
     displayName: Run SQLite Acceptance Tests
     type: boolean
@@ -484,3 +483,51 @@ stages:
               testResultsFiles: '*.xml'
               searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
               testRunTitle: "$(Agent.JobName)"
+
+  - stage: NotifySlackBot
+    displayName: Notify Slack on Failure
+    dependsOn: E2E
+    # This stage will only run if the E2E tests fail or succeed with issues
+    condition: or(
+      eq(dependencies.E2E.result, 'failed'),
+      eq(dependencies.E2E.result, 'succeededWithIssues'))
+    jobs:
+      - job: PostToSlack
+        displayName: Send Slack Notification
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          # We send a payload to the Slack webhook URL, which will post a message to a specific channel
+          - bash: |
+              PROJECT_NAME_ENCODED=$(echo -n "$SYSTEM_TEAMPROJECT" | jq -s -R -r @uri)
+              PIPELINE_URL="${SYSTEM_TEAMFOUNDATIONCOLLECTIONURI}${PROJECT_NAME_ENCODED}/_build/results?buildId=${BUILD_BUILDID}&view=ms.vss-test-web.build-test-results-tab"
+
+              PAYLOAD="{
+                \"attachments\": [
+                  {
+                    \"color\": \"#ff0000\",
+                    \"pretext\": \"Nightly E2E pipeline *${BUILD_DEFINITIONNAME}* (#${BUILD_BUILDNUMBER}) failed!\",
+                    \"title\": \"View Failed E2E Test Results\",
+                    \"title_link\": \"$PIPELINE_URL\",
+                    \"fields\": [
+                      {
+                        \"title\": \"Pipeline\",
+                        \"value\": \"${BUILD_DEFINITIONNAME}\",
+                        \"short\": true
+                      },
+                      {
+                        \"title\": \"Build ID\",
+                        \"value\": \"${BUILD_BUILDID}\",
+                        \"short\": true
+                      }
+                    ]
+                  }
+                ]
+              }"
+
+              echo "Sending Slack message to: $PIPELINE_URL"
+              curl -X POST -H 'Content-type: application/json' \
+                --data "$PAYLOAD" \
+                "$SLACK_WEBHOOK_URL"
+            env:
+              SLACK_WEBHOOK_URL: $(E2ESLACKWEBHOOKURL)

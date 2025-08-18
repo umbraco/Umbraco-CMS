@@ -328,6 +328,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 
 	/**
 	 * Helper to show a notification error.
+	 * @param headline
+	 * @param message
+	 * @param details
+	 * @param color
 	 */
 	async #peekError(headline: string, message: string, details: unknown, color?: UmbNotificationColor) {
 		// Store the host for usage in the following async context

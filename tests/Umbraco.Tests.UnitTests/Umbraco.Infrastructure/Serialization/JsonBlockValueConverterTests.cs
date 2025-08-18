@@ -83,7 +83,7 @@ public class JsonBlockValueConverterTests
             ]
         };
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(blockGridValue);
         var deserialized = serializer.Deserialize<BlockGridValue>(serialized);
 
@@ -173,7 +173,7 @@ public class JsonBlockValueConverterTests
     public void Can_Serialize_BlockGrid_Without_Blocks()
     {
         var blockGridValue = new BlockGridValue();
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(blockGridValue);
         var deserialized = serializer.Deserialize<BlockGridValue>(serialized);
 
@@ -217,7 +217,7 @@ public class JsonBlockValueConverterTests
             ]
         };
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(blockListValue);
         var deserialized = serializer.Deserialize<BlockListValue>(serialized);
 
@@ -265,7 +265,7 @@ public class JsonBlockValueConverterTests
     public void Can_Serialize_BlockList_Without_Blocks()
     {
         var blockListValue = new BlockListValue();
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(blockListValue);
         var deserialized = serializer.Deserialize<BlockListValue>(serialized);
 
@@ -315,7 +315,7 @@ public class JsonBlockValueConverterTests
             Markup = "<p>This is some markup</p>"
         };
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(richTextEditorValue);
         var deserialized = serializer.Deserialize<RichTextEditorValue>(serialized);
 
@@ -371,7 +371,7 @@ public class JsonBlockValueConverterTests
             Markup = "<p>This is some markup</p>"
         };
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(richTextEditorValue);
         var deserialized = serializer.Deserialize<RichTextEditorValue>(serialized);
 
@@ -425,7 +425,7 @@ public class JsonBlockValueConverterTests
             ]
         };
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var serialized = serializer.Serialize(blockListValue);
         var deserialized = serializer.Deserialize<BlockListValue>(serialized);
 
@@ -467,7 +467,7 @@ public class JsonBlockValueConverterTests
         }
 """;
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         Assert.DoesNotThrow(() => serializer.Deserialize<BlockListValue>(json));
     }
 }

@@ -5,11 +5,10 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-user-picker.element.js';
 
 export default {
-	title: 'Property Editor UIs/User Picker',
+	title: 'Extension Type/Property Editor UI/User Picker',
 	component: 'umb-property-editor-ui-user-picker',
 	id: 'umb-property-editor-ui-user-picker',
 } as Meta;
 
-export const AAAOverview: StoryFn<UmbPropertyEditorUIUserPickerElement> = () =>
+export const Docs: StoryFn<UmbPropertyEditorUIUserPickerElement> = () =>
 	html`<umb-property-editor-ui-user-picker></umb-property-editor-ui-user-picker>`;
-AAAOverview.storyName = 'Overview';

@@ -207,7 +207,7 @@ internal class MediaPicker3ValueEditorValidationTests
         var mediaNavigationQueryServiceMock = new Mock<IMediaNavigationQueryService>();
         var valueEditor = new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
-            new SystemTextJsonSerializer(),
+            new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"),
             Mock.Of<IMediaImportService>(),

@@ -676,7 +676,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="value"><see cref="string"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
@@ -710,7 +710,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="value"><see cref="int"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
@@ -746,7 +746,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
         /// <param name="value"><see cref="bool"/> Value to match</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value)
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
@@ -762,7 +762,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="value"><see cref="System.DateTime"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);

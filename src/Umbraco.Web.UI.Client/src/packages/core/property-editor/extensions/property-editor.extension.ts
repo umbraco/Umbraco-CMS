@@ -39,6 +39,7 @@ export interface MetaPropertyEditorSchema {
 }
 
 // Config
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PropertyEditorSettings {
 	properties: PropertyEditorSettingsProperty[];
 	// default data is kept separate from the properties, to give the ability for Property Editor UI to overwrite default values for the property editor settings.
@@ -46,6 +47,7 @@ export interface PropertyEditorSettings {
 	defaultData?: PropertyEditorSettingsDefaultData[];
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PropertyEditorSettingsProperty {
 	label: string;
 	description?: string;
@@ -55,6 +57,7 @@ export interface PropertyEditorSettingsProperty {
 	weight?: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PropertyEditorSettingsDefaultData {
 	alias: string;
 	value: unknown;

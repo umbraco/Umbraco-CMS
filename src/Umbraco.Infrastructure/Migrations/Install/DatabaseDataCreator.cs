@@ -2060,7 +2060,7 @@ internal sealed class DatabaseDataCreator
                     NodeId = -43,
                     EditorAlias = Constants.PropertyEditors.Aliases.CheckBoxList,
                     EditorUiAlias = "Umb.PropertyEditorUi.CheckBoxList",
-                    DbType = "Nvarchar",
+                    DbType = "Ntext",
                 });
         }
 

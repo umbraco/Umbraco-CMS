@@ -8,22 +8,22 @@ import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-tree-item')
 export class UmbTreeItemElement extends UmbExtensionElementAndApiSlotElementBase<ManifestTreeItem> {
-	_entityType?: string;
 	@property({ type: String, reflect: true })
 	get entityType() {
-		return this._entityType;
+		return this.#entityType;
 	}
 	set entityType(newVal) {
-		this._entityType = newVal;
+		this.#entityType = newVal;
 		this.#observeEntityType();
 	}
+	#entityType?: string;
 
 	#observeEntityType() {
-		if (!this._entityType) return;
+		if (!this.#entityType) return;
 
 		const filterByEntityType = (manifest: ManifestTreeItem) => {
-			if (!this._entityType) return false;
-			return manifest.forEntityTypes.includes(this._entityType);
+			if (!this.#entityType) return false;
+			return manifest.forEntityTypes.includes(this.#entityType);
 		};
 
 		this.observe(

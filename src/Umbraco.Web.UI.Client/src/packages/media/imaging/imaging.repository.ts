@@ -51,7 +51,7 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 				continue;
 			}
 
-			const url = urlModels?.[0].url;
+			const url = urlModels?.[0]?.url;
 
 			this.#dataStore.addCrop(unique, url ?? '', imagingModel);
 

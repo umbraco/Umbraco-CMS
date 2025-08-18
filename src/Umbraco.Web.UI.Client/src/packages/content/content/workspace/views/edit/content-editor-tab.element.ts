@@ -28,10 +28,10 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
-	_groups: Array<UmbPropertyTypeContainerModel> = [];
+	private _groups: Array<UmbPropertyTypeContainerModel> = [];
 
 	@state()
-	_hasProperties = false;
+	private _hasProperties = false;
 
 	constructor() {
 		super();

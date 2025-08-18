@@ -25,7 +25,7 @@ public struct ReadOnlyContentBaseAdapter : IReadOnlyContentBase
 
     public int Level => _content.Level;
 
-    public string? Path => _content.Path;
+    public string Path => _content.Path;
 
     public int SortOrder => _content.SortOrder;
 

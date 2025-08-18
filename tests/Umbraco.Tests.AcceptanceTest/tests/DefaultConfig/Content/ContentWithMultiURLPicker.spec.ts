@@ -82,6 +82,7 @@ test('can publish content with the document link', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickDocumentLinkButton();
   await umbracoUi.content.selectLinkByName(linkedDocumentName);
+  await umbracoUi.waitForTimeout(500); // Wait for the document link to be selected
   await umbracoUi.content.clickButtonWithName('Choose');
   await umbracoUi.content.clickAddButton();
   await umbracoUi.content.clickSaveAndPublishButton();
@@ -169,7 +170,7 @@ test('can create content with the media link', async ({umbracoApi, umbracoUi}) =
   await umbracoApi.media.ensureNameNotExists(mediaFileName);
 });
 
-test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) => {
+test('can add multiple links in the content', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -189,6 +190,7 @@ test('can add multiple links in the content', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.content.selectMediaWithName(mediaFileName);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickAddButton();
+  await umbracoUi.waitForTimeout(500); // Wait for the media link to be added
   // Add external link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();
@@ -266,7 +268,7 @@ test('can edit the URL picker in the content', async ({umbracoApi, umbracoUi}) =
   expect(contentData.values[0].value[0].url).toEqual(link);
 });
 
-test('cannot submit an empty link', async ({umbracoApi, umbracoUi}) => {
+test('cannot submit an empty link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -287,7 +289,7 @@ test('cannot submit an empty link', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-test('cannot update the URL picker with an empty link', async ({umbracoApi, umbracoUi}) => {
+test('cannot update the URL picker with an empty link', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -350,9 +352,7 @@ test.skip('cannot submit an empty link using spacebar', async ({umbracoApi, umbr
   await umbracoUi.content.isTextWithMessageVisible(ConstantHelper.validationMessages.emptyLinkPicker);
 });
 
-// TODO: Remove skip when the front-end ready. Currently it is impossible to link to unpublished document
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17974
-test.skip('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the link to an unpublished document', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

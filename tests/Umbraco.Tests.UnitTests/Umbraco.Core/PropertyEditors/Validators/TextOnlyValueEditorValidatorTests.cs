@@ -61,6 +61,6 @@ internal class TextOnlyValueEditorValidatorTests
             new DataEditorAttribute("alias"),
             Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
-            new SystemTextJsonSerializer(),
+            new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>());
 }
