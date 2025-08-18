@@ -1,32 +1,26 @@
-import type { UmbDocumentTypeDetailModel } from '../../types.js';
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
+import type { UmbDocumentTypeDetailModel } from '../../../types.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../../entity.js';
+import { UmbManagementApiDocumentTypeDetailDataRequestManager } from './document-type-detail.server.request-manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentTypeRequestModel,
+	DocumentTypeResponseModel,
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * A data source for the Document Type that fetches data from the server
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSource<UmbDocumentTypeDetailModel> {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbDocumentTypeServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbDocumentTypeServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
+export class UmbDocumentTypeDetailServerDataSource
+	extends UmbControllerBase
+	implements UmbDetailDataSource<UmbDocumentTypeDetailModel>
+{
+	#detailRequestManager = new UmbManagementApiDocumentTypeDetailDataRequestManager(this);
 
 	/**
 	 * Creates a new Document Type scaffold
@@ -74,63 +68,9 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(
-			this.#host,
-			DocumentTypeService.getDocumentTypeById({ path: { id: unique } }),
-		);
+		const { data, error } = await this.#detailRequestManager.read(unique);
 
-		if (error || !data) {
-			return { error };
-		}
-
-		// TODO: make data mapper to prevent errors
-		const DocumentType: UmbDocumentTypeDetailModel = {
-			entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-			unique: data.id,
-			name: data.name,
-			alias: data.alias,
-			description: data.description ?? '',
-			icon: data.icon,
-			allowedAtRoot: data.allowedAsRoot,
-			variesByCulture: data.variesByCulture,
-			variesBySegment: data.variesBySegment,
-			isElement: data.isElement,
-			properties: data.properties.map((property) => {
-				return {
-					id: property.id,
-					unique: property.id,
-					container: property.container,
-					sortOrder: property.sortOrder,
-					alias: property.alias,
-					name: property.name,
-					description: property.description,
-					dataType: { unique: property.dataType.id },
-					variesByCulture: property.variesByCulture,
-					variesBySegment: property.variesBySegment,
-					validation: property.validation,
-					appearance: property.appearance,
-				};
-			}),
-			containers: data.containers as UmbPropertyTypeContainerModel[],
-			allowedContentTypes: data.allowedDocumentTypes.map((allowedDocumentType) => {
-				return {
-					contentType: { unique: allowedDocumentType.documentType.id },
-					sortOrder: allowedDocumentType.sortOrder,
-				};
-			}),
-			compositions: data.compositions.map((composition) => {
-				return {
-					contentType: { unique: composition.documentType.id },
-					compositionType: composition.compositionType,
-				};
-			}),
-			allowedTemplates: data.allowedTemplates,
-			defaultTemplate: data.defaultTemplate ? { id: data.defaultTemplate.id } : null,
-			cleanup: data.cleanup,
-			collection: data.collection ? { unique: data.collection?.id } : null,
-		};
-
-		return { data: DocumentType };
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
 	}
 
 	/**
@@ -190,18 +130,9 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
-		const { data, error } = await tryExecute(
-			this.#host,
-			DocumentTypeService.postDocumentType({
-				body: body,
-			}),
-		);
+		const { data, error } = await this.#detailRequestManager.create(body);
 
-		if (data) {
-			return this.read(data as any);
-		}
-
-		return { error };
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
 	}
 
 	/**
@@ -266,19 +197,9 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
-		const { error } = await tryExecute(
-			this.#host,
-			DocumentTypeService.putDocumentTypeById({
-				path: { id: model.unique },
-				body: body,
-			}),
-		);
+		const { data, error } = await this.#detailRequestManager.update(model.unique, body);
 
-		if (!error) {
-			return this.read(model.unique);
-		}
-
-		return { error };
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
 	}
 
 	/**
@@ -289,12 +210,55 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
+		return this.#detailRequestManager.delete(unique);
+	}
 
-		return tryExecute(
-			this.#host,
-			DocumentTypeService.deleteDocumentTypeById({
-				path: { id: unique },
+	// TODO: change this to a mapper extension when the endpoints returns a $type for DocumentTypeResponseModel
+	#mapServerResponseModelToEntityDetailModel(data: DocumentTypeResponseModel): UmbDocumentTypeDetailModel {
+		return {
+			entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+			unique: data.id,
+			name: data.name,
+			alias: data.alias,
+			description: data.description ?? '',
+			icon: data.icon,
+			allowedAtRoot: data.allowedAsRoot,
+			variesByCulture: data.variesByCulture,
+			variesBySegment: data.variesBySegment,
+			isElement: data.isElement,
+			properties: data.properties.map((property) => {
+				return {
+					id: property.id,
+					unique: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { unique: property.dataType.id },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
 			}),
-		);
+			containers: data.containers as UmbPropertyTypeContainerModel[],
+			allowedContentTypes: data.allowedDocumentTypes.map((allowedDocumentType) => {
+				return {
+					contentType: { unique: allowedDocumentType.documentType.id },
+					sortOrder: allowedDocumentType.sortOrder,
+				};
+			}),
+			compositions: data.compositions.map((composition) => {
+				return {
+					contentType: { unique: composition.documentType.id },
+					compositionType: composition.compositionType,
+				};
+			}),
+			allowedTemplates: data.allowedTemplates,
+			defaultTemplate: data.defaultTemplate ? { id: data.defaultTemplate.id } : null,
+			cleanup: data.cleanup,
+			collection: data.collection ? { unique: data.collection?.id } : null,
+		};
 	}
 }
