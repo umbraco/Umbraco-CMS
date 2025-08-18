@@ -324,7 +324,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								slot="append"
 								popovertarget="popover"
 								title=${this.#getVariantSpecInfo(this._activeVariant)}
-								label="Select a variant">
+								label="Open variant options for split view">
 								${this.#getVariantSpecInfo(this._activeVariant)}
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
@@ -406,6 +406,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	#renderSegmentVariantOption(variantOption: VariantOptionModelType) {
 		const variantId = UmbVariantId.Create(variantOption);
 		const notCreated = this.#isCreateMode(variantOption, variantId);
+		console.log(variantId, notCreated);
 
 		return html`
 			<div class="variant segment-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
@@ -561,7 +562,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				background: none;
 			}
 
-			.variant:hover > .split-view {
+			.variant:hover > .split-view,
+			.variant:focus > .split-view,
+			.variant:focus-within > .split-view {
 				display: flex;
 			}
 
