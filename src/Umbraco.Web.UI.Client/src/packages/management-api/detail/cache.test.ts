@@ -69,6 +69,14 @@ describe('UmbManagementApiDetailDataCache', () => {
 		});
 	});
 
+	describe('GetAll', () => {
+		it('returns all items from the cache', () => {
+			cache.set('item1', { id: 'item1' });
+			cache.set('item2', { id: 'item2' });
+			expect(cache.getAll()).to.deep.equal([{ id: 'item1' }, { id: 'item2' }]);
+		});
+	});
+
 	describe('Delete', () => {
 		it('removes an item from the cache', () => {
 			cache.set('item1', { id: 'item1' });
