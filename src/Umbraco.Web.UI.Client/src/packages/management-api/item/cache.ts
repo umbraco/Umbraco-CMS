@@ -1,16 +1,16 @@
 // Keep internal
-interface UmbCacheEntryModel<ItemModelType> {
+interface UmbCacheEntryModel<ItemDataModelType> {
 	id: string;
-	data: ItemModelType;
+	data: ItemDataModelType;
 }
 
 /**
  * A runtime cache for storing entity item data from the Management Api
  * @class UmbManagementApiItemDataCache
- * @template ItemModelType
+ * @template ItemDataModelType
  */
-export class UmbManagementApiItemDataCache<ItemModelType> {
-	#entries: Map<string, UmbCacheEntryModel<ItemModelType>> = new Map();
+export class UmbManagementApiItemDataCache<ItemDataModelType> {
+	#entries: Map<string, UmbCacheEntryModel<ItemDataModelType>> = new Map();
 
 	/**
 	 * Checks if an entry exists in the cache
@@ -25,11 +25,11 @@ export class UmbManagementApiItemDataCache<ItemModelType> {
 	/**
 	 * Adds an entry to the cache
 	 * @param {string} id - The ID of the entry to add
-	 * @param {ItemModelType} data - The data to cache
+	 * @param {ItemDataModelType} data - The data to cache
 	 * @memberof UmbManagementApiItemDataCache
 	 */
-	set(id: string, data: ItemModelType): void {
-		const cacheEntry: UmbCacheEntryModel<ItemModelType> = {
+	set(id: string, data: ItemDataModelType): void {
+		const cacheEntry: UmbCacheEntryModel<ItemDataModelType> = {
 			id: id,
 			data,
 		};
@@ -40,12 +40,21 @@ export class UmbManagementApiItemDataCache<ItemModelType> {
 	/**
 	 * Retrieves an entry from the cache
 	 * @param {string} id - The ID of the entry to retrieve
-	 * @returns {ItemModelType | undefined} - The cached entry or undefined if not found
+	 * @returns {ItemDataModelType | undefined} - The cached entry or undefined if not found
 	 * @memberof UmbManagementApiItemDataCache
 	 */
-	get(id: string): ItemModelType | undefined {
+	get(id: string): ItemDataModelType | undefined {
 		const entry = this.#entries.get(id);
 		return entry ? entry.data : undefined;
+	}
+
+	/**
+	 * Retrieves all entries from the cache
+	 * @returns {Array<ItemDataModelType>} - An array of all cached entries
+	 * @memberof UmbManagementApiItemDataCache
+	 */
+	getAll(): Array<ItemDataModelType> {
+		return Array.from(this.#entries.values()).map((entry) => entry.data);
 	}
 
 	/**

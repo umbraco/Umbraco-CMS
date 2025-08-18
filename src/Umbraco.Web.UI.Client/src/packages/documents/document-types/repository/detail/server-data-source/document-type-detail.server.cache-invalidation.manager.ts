@@ -7,7 +7,7 @@ export class UmbManagementApiDocumentTypeDetailDataCacheInvalidationManager exte
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			dataCache: documentTypeDetailCache,
-			serverEventSources: ['Umbraco:CMS:DocumentType'],
+			sourceTypes: ['Umbraco:CMS:DocumentType'],
 		});
 	}
 }
