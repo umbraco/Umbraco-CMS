@@ -8,12 +8,10 @@ import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/enti
 export interface UmbManagementApiItemDataRequestManagerArgs<ItemResponseModelType> {
 	getItems: (unique: Array<string>) => Promise<UmbApiResponse<{ data: Array<ItemResponseModelType> }>>;
 	dataCache: UmbManagementApiItemDataCache<ItemResponseModelType>;
-	serverEventSource: string;
 }
 
 export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> extends UmbControllerBase {
 	#dataCache: UmbManagementApiItemDataCache<ItemResponseModelType>;
-	#serverEventSource: string;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 
 	#getItems;
@@ -24,11 +22,10 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 
 		this.#getItems = args.getItems;
 		this.#dataCache = args.dataCache;
-		this.#serverEventSource = args.serverEventSource;
 
 		this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
 			this.#serverEventContext = context;
-			this.#observeServerEvents();
+			this.#observeServerEventsConnection();
 		});
 	}
 
@@ -70,7 +67,7 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 		return { data, error };
 	}
 
-	#observeServerEvents() {
+	#observeServerEventsConnection() {
 		this.observe(
 			this.#serverEventContext?.isConnected,
 			(isConnected) => {
@@ -85,16 +82,6 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 				}
 			},
 			'umbObserveServerEventsConnection',
-		);
-
-		// Invalidate cache entries when entities are updated or deleted
-		this.observe(
-			this.#serverEventContext?.byEventSourceAndTypes(this.#serverEventSource, ['Updated', 'Deleted']),
-			(event) => {
-				if (!event) return;
-				this.#dataCache.delete(event.key);
-			},
-			'umbObserveServerEvents',
 		);
 	}
 }
