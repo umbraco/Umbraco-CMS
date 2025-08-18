@@ -8,11 +8,13 @@ import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/enti
 export interface UmbManagementApiItemDataRequestManagerArgs<ItemResponseModelType> {
 	getItems: (unique: Array<string>) => Promise<UmbApiResponse<{ data: Array<ItemResponseModelType> }>>;
 	dataCache: UmbManagementApiItemDataCache<ItemResponseModelType>;
+	getUniqueMethod: (item: ItemResponseModelType) => string;
 }
 
 export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> extends UmbControllerBase {
 	#dataCache: UmbManagementApiItemDataCache<ItemResponseModelType>;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
+	getUniqueMethod: (item: ItemResponseModelType) => string;
 
 	#getItems;
 	#isConnectedToServerEvents = false;
@@ -22,6 +24,7 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 
 		this.#getItems = args.getItems;
 		this.#dataCache = args.dataCache;
+		this.getUniqueMethod = args.getUniqueMethod;
 
 		this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
 			this.#serverEventContext = context;
@@ -30,7 +33,6 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 	}
 
 	async getItems(ids: Array<string>): Promise<UmbApiResponse<{ data?: Array<ItemResponseModelType> }>> {
-		let data: Array<ItemResponseModelType> | undefined;
 		let error: UmbApiError | UmbCancelError | undefined;
 		let idsToRequest: Array<string> = [...ids];
 		let cacheItems: Array<ItemResponseModelType> = [];
@@ -58,11 +60,11 @@ export class UmbManagementApiItemDataRequestManager<ItemResponseModelType> exten
 
 			if (this.#isConnectedToServerEvents) {
 				// If we are connected to server events, we can cache the server data
-				serverItems?.forEach((item) => this.#dataCache.set(item.id, item));
+				serverItems?.forEach((item) => this.#dataCache.set(this.getUniqueMethod(item), item));
 			}
 		}
 
-		data = [...cacheItems, ...(serverItems ?? [])];
+		const data: Array<ItemResponseModelType> = [...cacheItems, ...(serverItems ?? [])];
 
 		return { data, error };
 	}

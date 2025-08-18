@@ -24,6 +24,10 @@ describe('UmbManagementApiDetailDataCache', () => {
 				expect(cache).to.have.property('get').that.is.a('function');
 			});
 
+			it('has a getAll method', () => {
+				expect(cache).to.have.property('getAll').that.is.a('function');
+			});
+
 			it('has a delete method', () => {
 				expect(cache).to.have.property('delete').that.is.a('function');
 			});
