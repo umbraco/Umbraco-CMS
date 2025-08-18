@@ -22,28 +22,28 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 	/**
 	 * Filters events by the given event source
-	 * @param {string} eventSource
+	 * @param {string} sourceType
 	 * @returns {Observable<UmbManagementApiServerEventModel>} - The filtered events
 	 * @memberof UmbManagementApiServerEventContext
 	 */
-	byEventSource(eventSource: string): Observable<UmbManagementApiServerEventModel> {
-		return this.#events.asObservable().pipe(filter((event) => event.eventSource === eventSource));
+	bySourceType(sourceType: string): Observable<UmbManagementApiServerEventModel> {
+		return this.#events.asObservable().pipe(filter((event) => event.source.type === sourceType));
 	}
 
 	/**
-	 * Filters events by the given event sources and event types
-	 * @param {Array<string>} eventSources - The event sources to filter by
+	 * Filters events by the given source types and event types
+	 * @param {Array<string>} sourceTypes - The source types to filter by
 	 * @param {Array<string>} eventTypes - The event types to filter by
 	 * @returns {Observable<UmbManagementApiServerEventModel>} - The filtered events
 	 * @memberof UmbManagementApiServerEventContext
 	 */
-	byEventSourcesAndTypes(
-		eventSources: Array<string>,
+	bySourceTypesAndEventTypes(
+		sourceTypes: Array<string>,
 		eventTypes: Array<string>,
 	): Observable<UmbManagementApiServerEventModel> {
 		return this.#events
 			.asObservable()
-			.pipe(filter((event) => eventSources.includes(event.eventSource) && eventTypes.includes(event.eventType)));
+			.pipe(filter((event) => sourceTypes.includes(event.source.type) && eventTypes.includes(event.type)));
 	}
 
 	constructor(host: UmbControllerHost) {

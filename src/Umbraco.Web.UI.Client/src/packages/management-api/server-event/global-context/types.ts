@@ -1,5 +1,7 @@
 export interface UmbManagementApiServerEventModel {
-	eventSource: string;
-	eventType: string;
-	key: string;
+	type: string;
+	source: {
+		type: string;
+		id: string;
+	};
 }

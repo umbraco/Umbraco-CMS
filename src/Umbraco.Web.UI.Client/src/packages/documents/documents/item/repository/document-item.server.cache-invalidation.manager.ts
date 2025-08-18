@@ -12,12 +12,12 @@ export class UmbManagementApiDocumentItemDataCacheInvalidationManager extends Um
 			dataCache: documentItemCache,
 			/* The Document item model includes info about the Document Type. 
 			We need to invalidate the cache for both Document and DocumentType events. */
-			serverEventSources: ['Umbraco:CMS:Document', 'Umbraco:CMS:DocumentType'],
+			sourceTypes: ['Umbraco:CMS:Document', 'Umbraco:CMS:DocumentType'],
 		});
 	}
 
 	protected override _onServerEvent(event: UmbManagementApiServerEventModel) {
-		if (event.eventSource === 'Umbraco:CMS:DocumentType') {
+		if (event.source.type === 'Umbraco:CMS:DocumentType') {
 			this.#onDocumentTypeChange(event);
 		} else {
 			this.#onDocumentChange(event);
@@ -26,13 +26,13 @@ export class UmbManagementApiDocumentItemDataCacheInvalidationManager extends Um
 
 	#onDocumentChange(event: UmbManagementApiServerEventModel) {
 		// Invalidate the specific document
-		const documentId = event.key;
+		const documentId = event.source.id;
 		this._dataCache.delete(documentId);
 	}
 
 	#onDocumentTypeChange(event: UmbManagementApiServerEventModel) {
 		// Invalidate all documents of the specified Document Type
-		const documentTypeId = event.key;
+		const documentTypeId = event.source.id;
 		const documentIds = this._dataCache
 			.getAll()
 			.filter((cachedItem) => cachedItem.documentType.id === documentTypeId)
