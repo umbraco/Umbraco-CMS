@@ -9,7 +9,7 @@ export class UmbManagementApiDictionaryItemDataRequestManager extends UmbManagem
 		super(host, {
 			getItems: (ids: Array<string>) => DictionaryService.getItemDictionary({ query: { id: ids } }),
 			dataCache: dictionaryItemCache,
-			serverEventSource: 'Umbraco:CMS:DictionaryItem',
+			getUniqueMethod: (item: DictionaryItemItemResponseModel) => item.id,
 		});
 	}
 }
