@@ -1468,21 +1468,16 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             .Where<PropertyDataDto>(x => x.PropertyTypeId == propertyTypeId);
         _ = Database.Execute(sql);
 
-        // Clear the property value permissions, which aren't a hard dependency with a foreign key, but we want to ensure
-        // that any for removed property types are cleared.
-        Sql<ISqlContext> permissionSql = Sql()
-            .Select<PropertyTypeDto>(c => c.UniqueId)
-            .From<PropertyTypeDto>()
-            .Where<PropertyTypeDto>(c => c.Id == propertyTypeId);
-        Guid[] guids = [.. Database.Fetch<Guid>(permissionSql)];
-        IEnumerable<string> permissions = guids.Select(s =>
-            s.ToString().TrimStart('{').TrimEnd('}'));
-
+        string likeConcat = $"'|{SqlSyntax.GetWildcardPlaceholder()}'";
         Sql<ISqlContext> delSql = Sql()
             .Delete<UserGroup2GranularPermissionDto>()
             .Where<UserGroup2GranularPermissionDto>(c => c.UniqueId == contentType.Key)
-            .WhereLowerIn<UserGroup2GranularPermissionDto>(c => c.Permission, permissions);
-
+            .WhereLike<UserGroup2GranularPermissionDto>(
+                c => c.Permission,
+                Sql().Select<PropertyTypeDto>(c => c.UniqueId)
+                    .From<PropertyTypeDto>()
+                    .Where<PropertyTypeDto>(c => c.Id == propertyTypeId),
+                likeConcat);
         _ = Database.Execute(delSql);
 
         // Finally delete the property type.

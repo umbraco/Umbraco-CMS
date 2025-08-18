@@ -90,6 +90,8 @@ public interface ISqlSyntaxProvider
 
     string GetWildcardPlaceholder();
 
+    string GetWildcardConcat(string concatDefault = "");
+
     string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
 
     string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);

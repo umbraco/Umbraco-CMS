@@ -113,6 +113,17 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public string GetWildcardPlaceholder() => "%";
 
+    public virtual string GetLikeConcat() => "||";
+
+    public virtual string GetWildcardConcat(string concatDefault = "")
+    {
+        if (string.IsNullOrEmpty(concatDefault))
+        {
+            return $"{GetLikeConcat()} '{GetWildcardPlaceholder()}'";
+        }
+        return $"{GetLikeConcat()} {concatDefault}";
+    }
+
     public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) => current;
 
     public abstract string ProviderName { get; }
