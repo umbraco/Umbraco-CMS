@@ -795,23 +795,18 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               # Since these values are set as secrets, we need to see them as an environment variable to be able to use them
               # This is not the best solution, we should split the cases in our matrix into pipeline templates. especially the different app settings, as they have different logic
-              AZUREB2CDOMAIN: $(AZUREB2CDOMAIN)
-              AZUREB2CTENANT: $(AZUREB2CTENANT)
-              AZUREB2CPOLICY: $(AZUREB2CPOLICY)
-              PIPELINEAZUREB2CCLIENTID: $(AZUREB2CCLIENTID)
-              AZUREB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
-              AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
-              AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
+#              AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
+#              AZUREADB2CTENANT: $(AZUREB2CTENANT)
+#              AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
+#              AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
+#              AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
+#              AZUREADB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
+#              AZUREADB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
 
         pool:
           vmImage: $(vmImage)
 
         steps:
-          - pwsh: |
-              $value = $env:AZUREB2CCLIENTID
-              Write-Host "Client ID Length: $($value.Length)"
-              Write-Host "Client Pipeline ID Length: $(PIPELINEAZUREB2CCLIENTID)"
-            displayName: Checks the length of the client id
           - pwsh: |
               Write-Host "Client ID Length: $($env:AZUREB2CCLIENTIDTEST.Length)"
             displayName: Checks Client ID Length
@@ -933,6 +928,12 @@ stages:
               dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
+            env:
+              AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
+              AZUREADB2CTENANT: $(AZUREB2CTENANT)
+              AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
+              AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
+              AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
 
           # Start SQL Server
           - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$(SA_PASSWORD)" mcr.microsoft.com/mssql/server:2022-latest
@@ -985,6 +986,12 @@ stages:
             displayName: Run application (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
             workingDirectory: $(Agent.BuildDirectory)/app
+            env:
+              AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
+              AZUREADB2CTENANT: $(AZUREB2CTENANT)
+              AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
+              AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
+              AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
 
           # Ensures we have the package wait-on installed
           - pwsh: npm install wait-on
