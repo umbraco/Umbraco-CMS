@@ -9,7 +9,6 @@ export class UmbManagementApiDocumentItemDataRequestManager extends UmbManagemen
 		super(host, {
 			getItems: (ids: Array<string>) => DocumentService.getItemDocument({ query: { id: ids } }),
 			dataCache: documentItemCache,
-			serverEventSource: 'Umbraco:CMS:Document',
 		});
 	}
 }
