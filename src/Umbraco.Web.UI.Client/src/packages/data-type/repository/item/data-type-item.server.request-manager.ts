@@ -9,7 +9,6 @@ export class UmbManagementApiDataTypeItemDataRequestManager extends UmbManagemen
 		super(host, {
 			getItems: (ids: Array<string>) => DataTypeService.getItemDataType({ query: { id: ids } }),
 			dataCache: dataTypeItemCache,
-			serverEventSource: 'Umbraco:CMS:DataType',
 		});
 	}
 }
