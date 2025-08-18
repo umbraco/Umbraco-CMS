@@ -1,8 +1,8 @@
 // To be able to test different databases, we need to set an additional UnattendedInstallConfig up because we would have to start from scratch, otherwise we would be using the same database.
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-const azureEmail = process.env.AZUREB2C__TESTUSEREMAIL;
-const azurePassword = process.env.AZUREB2C__TESTUSERPASSWORD;
+const azureEmail = process.env.AZUREADB2CTESTUSEREMAIL;
+const azurePassword = process.env.AZUREADB2CTESTUSERPASSWORD;
 
 // Really simple test to check if we can log in using Azure AD B2C
 test('Log in to Umbraco using Azure AD B2C', async ({page, umbracoUi}) => {

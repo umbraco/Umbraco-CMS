@@ -1022,6 +1022,8 @@ stages:
               CI: true
               CommitId: $(Build.SourceVersion)
               AgentOs: $(Agent.OS)
+              AZUREADB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
+              AZUREADB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
 
           # Stop application
           - bash: kill -15 $(AcceptanceTestProcessId)
