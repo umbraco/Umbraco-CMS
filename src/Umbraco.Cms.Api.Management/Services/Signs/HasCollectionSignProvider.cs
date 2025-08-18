@@ -29,50 +29,25 @@ public class HasCollectionSignProvider : ISignProvider
     {
         foreach (TItem item in itemViewModels)
         {
-            switch (item)
+            if (HasCollection(item))
             {
-                case DocumentTreeItemResponseModel response:
-                    if (response.DocumentType.Collection != null)
-                    {
-                        item.AddSign(Alias);
-                    }
-
-                    break;
-
-                case DocumentCollectionResponseModel response:
-                    if (response.DocumentType.Collection != null)
-                    {
-                        item.AddSign(Alias);
-                    }
-
-                    break;
-
-                case MediaTreeItemResponseModel response:
-                    if (response.MediaType.Collection != null)
-                    {
-                        item.AddSign(Alias);
-                    }
-
-                    break;
-
-                case MediaCollectionResponseModel response:
-                    if (response.MediaType.Collection != null)
-                    {
-                        item.AddSign(Alias);
-                    }
-
-                    break;
-
-                case DocumentItemResponseModel response:
-                    if (response.DocumentType.Collection != null)
-                    {
-                        item.AddSign(Alias);
-                    }
-
-                    break;
+                item.AddSign(Alias);
             }
         }
 
         return Task.CompletedTask;
     }
+
+    /// <summary>
+    /// Determines if the given object contains a Collection on its viewmodel.
+    /// </summary>
+    private bool HasCollection(object item) => item switch
+    {
+        DocumentTreeItemResponseModel { DocumentType.Collection: not null } => true,
+        DocumentCollectionResponseModel { DocumentType.Collection: not null } => true,
+        DocumentItemResponseModel { DocumentType.Collection: not null } => true,
+        MediaTreeItemResponseModel { MediaType.Collection: not null } => true,
+        MediaCollectionResponseModel { MediaType.Collection: not null } => true,
+        _ => false,
+    };
 }
