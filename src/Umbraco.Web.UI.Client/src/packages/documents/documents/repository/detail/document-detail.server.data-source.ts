@@ -38,6 +38,7 @@ export class UmbDocumentServerDataSource
 			throw new Error('Document type unique is missing');
 		}
 
+		// TODO: investigate if we can use the repository here instead
 		const { data } = await new UmbDocumentTypeDetailServerDataSource(this).read(documentTypeUnique);
 		documentTypeIcon = data?.icon ?? null;
 		documentTypeCollection = data?.collection ?? null;

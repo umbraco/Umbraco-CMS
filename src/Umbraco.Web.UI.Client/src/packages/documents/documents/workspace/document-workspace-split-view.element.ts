@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import type { UmbActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './document-workspace-split-view-variant-selector.element.js';
@@ -12,10 +12,10 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	private _workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_variants?: Array<ActiveVariant>;
+	private _variants?: Array<UmbActiveVariant>;
 
 	@state()
-	_icon?: string;
+	private _icon?: string;
 
 	constructor() {
 		super();

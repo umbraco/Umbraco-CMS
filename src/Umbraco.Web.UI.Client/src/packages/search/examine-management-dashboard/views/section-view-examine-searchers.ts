@@ -37,13 +37,13 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	private _workspacePath = 'aa';
 
 	@state()
-	_totalPages = 1;
+	private _totalPages = 1;
 
 	@state()
-	_currentPage = 1;
+	private _currentPage = 1;
 
 	@state()
-	_totalNumberOfResults = 0;
+	private _totalNumberOfResults = 0;
 
 	#paginationManager = new UmbPaginationManager();
 
@@ -132,7 +132,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 				type: 'sidebar',
 				size: 'medium',
 			},
-			data: { searchResult: rowData, name: this.getSearchResultNodeName(rowData) },
+			data: { searchResult: rowData, name: this.#getSearchResultNodeName(rowData) },
 		}).catch(() => undefined);
 	}
 
@@ -159,13 +159,13 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 						label=${this.localize.term('general_search')}
 						@click="${this._onSearch}"></uui-button>
 				</div>
-				${this.renderSearchResults()}
+				${this.#renderSearchResults()}
 			</uui-box>
 		`;
 	}
 
 	// Find the field named 'nodeName' and return its value if it exists in the fields array
-	private getSearchResultNodeName(searchResult: UmbSearchResultModel): string {
+	#getSearchResultNodeName(searchResult: UmbSearchResultModel): string {
 		const nodeNameField = searchResult.fields?.find((field) => field.name?.toUpperCase() === 'NODENAME');
 		return nodeNameField?.values?.join(', ') ?? '';
 	}
@@ -184,7 +184,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		this._onSearch();
 	}
 
-	private renderSearchResults() {
+	#renderSearchResults() {
 		if (this._searchLoading) return html`<uui-loader></uui-loader>`;
 		if (!this._searchResults) return nothing;
 		if (!this._searchResults.length) {
@@ -201,55 +201,55 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 					this._totalPages,
 				)}
 			</div>
-		<div class="table-container">
-			<uui-scroll-container>
-				<uui-table class="search">
-					<uui-table-head>
-						<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
-						<uui-table-head-cell style="width:0">${this.localize.term('general_id')}</uui-table-head-cell>
-						<uui-table-head-cell>${this.localize.term('general_name')}</uui-table-head-cell>
-						<uui-table-head-cell>${this.localize.term('examineManagement_fields')}</uui-table-head-cell>
-						${this.renderHeadCells()}
-					</uui-table-head>
-					${this._searchResults?.map((rowData) => {
-						const indexType = rowData.fields?.find((field) => field.name === '__IndexType')?.values?.join(', ') ?? '';
-						this.#entityType = this.#getEntityTypeFromIndexType(indexType);
-						const unique = rowData.fields?.find((field) => field.name === '__Key')?.values?.join(', ') ?? '';
+			<div class="table-container">
+				<uui-scroll-container>
+					<uui-table class="search">
+						<uui-table-head>
+							<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
+							<uui-table-head-cell style="width:0">${this.localize.term('general_id')}</uui-table-head-cell>
+							<uui-table-head-cell>${this.localize.term('general_name')}</uui-table-head-cell>
+							<uui-table-head-cell>${this.localize.term('examineManagement_fields')}</uui-table-head-cell>
+							${this.renderHeadCells()}
+						</uui-table-head>
+						${this._searchResults?.map((rowData) => {
+							const indexType = rowData.fields?.find((field) => field.name === '__IndexType')?.values?.join(', ') ?? '';
+							this.#entityType = this.#getEntityTypeFromIndexType(indexType);
+							const unique = rowData.fields?.find((field) => field.name === '__Key')?.values?.join(', ') ?? '';
 
-						return html`<uui-table-row>
-							<uui-table-cell> ${rowData.score} </uui-table-cell>
-							<uui-table-cell> ${rowData.id} </uui-table-cell>
-							<uui-table-cell>
-								<uui-button
-									look="secondary"
-									label=${this.localize.term('actions_editContent')}
-									href=${this._workspacePath + this.#entityType + '/edit/' + unique}>
-									${this.getSearchResultNodeName(rowData)}
-								</uui-button>
-							</uui-table-cell>
-							<uui-table-cell>
-								<uui-button
-									class="bright"
-									look="secondary"
-									label=${this.localize.term('examineManagement_fieldValues')}
-									@click=${() => this.#onFieldViewClick(rowData)}>
-									${rowData.fields ? Object.keys(rowData.fields).length : ''}
-									${this.localize.term('examineManagement_fields')}
-								</uui-button>
-							</uui-table-cell>
-							${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
-						</uui-table-row>`;
-					})}
-				</uui-table>
-			</uui-scroll-container>
-			<button class="field-adder" @click="${this.#onFieldFilterClick}">
-				<uui-icon-registry-essential>
-					<uui-tag look="secondary">
-						<uui-icon name="add"></uui-icon>
-					</uui-tag>
-				</uui-icon-registry-essential>
-			</button>
-		</div>
+							return html`<uui-table-row>
+								<uui-table-cell> ${rowData.score} </uui-table-cell>
+								<uui-table-cell> ${rowData.id} </uui-table-cell>
+								<uui-table-cell>
+									<uui-button
+										look="secondary"
+										label=${this.localize.term('actions_editContent')}
+										href=${this._workspacePath + this.#entityType + '/edit/' + unique}>
+										${this.#getSearchResultNodeName(rowData)}
+									</uui-button>
+								</uui-table-cell>
+								<uui-table-cell>
+									<uui-button
+										class="bright"
+										look="secondary"
+										label=${this.localize.term('examineManagement_fieldValues')}
+										@click=${() => this.#onFieldViewClick(rowData)}>
+										${rowData.fields ? Object.keys(rowData.fields).length : ''}
+										${this.localize.term('examineManagement_fields')}
+									</uui-button>
+								</uui-table-cell>
+								${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
+							</uui-table-row>`;
+						})}
+					</uui-table>
+				</uui-scroll-container>
+				<button class="field-adder" @click="${this.#onFieldFilterClick}">
+					<uui-icon-registry-essential>
+						<uui-tag look="secondary">
+							<uui-icon name="add"></uui-icon>
+						</uui-tag>
+					</uui-icon-registry-essential>
+				</button>
+			</div>
 			<uui-pagination
 				.total=${this._totalPages}
 				.current=${this._currentPage}

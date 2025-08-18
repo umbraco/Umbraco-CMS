@@ -30,9 +30,9 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 		super(host, UMB_BLOCK_RTE_MANAGER_CONTEXT, UMB_BLOCK_RTE_ENTRIES_CONTEXT);
 	}
 
-	_gotManager() {}
+	protected override _gotManager() {}
 
-	_gotEntries() {
+	protected override _gotEntries() {
 		// Secure displayInline fits configuration:
 		this.observe(
 			observeMultiple([this.displayInline, this.displayInlineConfig]),
@@ -50,5 +50,5 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 		);
 	}
 
-	_gotContentType() {}
+	protected override _gotContentType() {}
 }
