@@ -26,6 +26,7 @@ export default [
 	// Global ignores
 	{
 		ignores: [
+			'.storybook',
 			'**/eslint.config.js',
 			'**/rollup.config.js',
 			'**/vite.config.ts',
