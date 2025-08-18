@@ -177,7 +177,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 			<umb-image-cropper-field .value=${this.value} .file=${this._file?.temporaryFile?.file} @change=${this.#onChange}>
 				<uui-button slot="actions" compact label=${this.localize.term('content_uploadClear')} @click=${this.#onRemove}>
 					<uui-icon name="icon-trash"></uui-icon>
-					<umb-localize key="content_uploadClear">Remove file(s)</umb-localize>
+					<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
 				</uui-button>
 			</umb-image-cropper-field>
 		`;

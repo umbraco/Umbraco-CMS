@@ -187,6 +187,7 @@ export class UmbPickerSearchManager<
 			// ensure that config params are always included
 			...this.#config?.queryParams,
 			searchFrom: this.#config?.searchFrom,
+			dataTypeUnique: this.#config?.dataTypeUnique,
 		};
 
 		const { data } = await this.#searchProvider.search(args);

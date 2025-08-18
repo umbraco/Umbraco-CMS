@@ -293,7 +293,7 @@ export default {
 		notCreated: 'Ikke oprettet',
 		updateDate: 'Sidst redigeret',
 		updateDateDesc: 'Tidspunkt for seneste redigering',
-		uploadClear: 'Fjern fil',
+		uploadClear: 'Fjern fil(er)',
 		uploadClearImageContext: 'Klik her for at fjerne billedet fra medie filen',
 		uploadClearFileContext: 'Klik her for at fjerne filen fra medie filen',
 		urls: 'Link til dokument',
