@@ -6,12 +6,12 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 export interface UmbManagementApiDetailDataInvalidationManagerArgs<DetailResponseModelType> {
 	dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
-	sourceTypes: Array<string>;
+	eventSources: Array<string>;
 }
 
 export class UmbManagementApiDetailDataCacheInvalidationManager<DetailResponseModelType> extends UmbControllerBase {
 	protected _dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
-	#sourceTypes: Array<string>;
+	#eventSources: Array<string>;
 	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 
 	constructor(
@@ -21,7 +21,7 @@ export class UmbManagementApiDetailDataCacheInvalidationManager<DetailResponseMo
 		super(host);
 		{
 			this._dataCache = args.dataCache;
-			this.#sourceTypes = args.sourceTypes;
+			this.#eventSources = args.eventSources;
 
 			this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
 				this.#serverEventContext = context;
@@ -37,15 +37,15 @@ export class UmbManagementApiDetailDataCacheInvalidationManager<DetailResponseMo
 	 * @memberof UmbManagementApiDetailDataCacheInvalidationManager
 	 */
 	protected _onServerEvent(event: UmbManagementApiServerEventModel) {
-		this._dataCache.delete(event.source.id);
+		this._dataCache.delete(event.key);
 	}
 
 	#observeServerEvents() {
 		this.observe(
-			this.#serverEventContext?.bySourceTypesAndEventTypes(this.#sourceTypes, ['Updated', 'Deleted']),
+			this.#serverEventContext?.byEventSourcesAndEventTypes(this.#eventSources, ['Updated', 'Deleted']),
 			(event) => {
 				if (!event) return;
-				this._dataCache.delete(event.source.id);
+				this._dataCache.delete(event.key);
 			},
 			'umbObserveServerEvents',
 		);

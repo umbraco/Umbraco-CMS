@@ -21,29 +21,29 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 	public readonly isConnected = this.#isConnected.asObservable();
 
 	/**
-	 * Filters events by the given event source
-	 * @param {string} sourceType
+	 * Filters events by the given event types
+	 * @param {string} eventTypes - The event types to filter by
 	 * @returns {Observable<UmbManagementApiServerEventModel>} - The filtered events
 	 * @memberof UmbManagementApiServerEventContext
 	 */
-	bySourceType(sourceType: string): Observable<UmbManagementApiServerEventModel> {
-		return this.#events.asObservable().pipe(filter((event) => event.source.type === sourceType));
+	byEventSource(eventTypes: string): Observable<UmbManagementApiServerEventModel> {
+		return this.#events.asObservable().pipe(filter((event) => event.eventType === eventTypes));
 	}
 
 	/**
-	 * Filters events by the given source types and event types
-	 * @param {Array<string>} sourceTypes - The source types to filter by
+	 * Filters events by the given event sources and event types
+	 * @param {Array<string>} eventSources - The event sources to filter by
 	 * @param {Array<string>} eventTypes - The event types to filter by
 	 * @returns {Observable<UmbManagementApiServerEventModel>} - The filtered events
 	 * @memberof UmbManagementApiServerEventContext
 	 */
-	bySourceTypesAndEventTypes(
-		sourceTypes: Array<string>,
+	byEventSourcesAndEventTypes(
+		eventSources: Array<string>,
 		eventTypes: Array<string>,
 	): Observable<UmbManagementApiServerEventModel> {
 		return this.#events
 			.asObservable()
-			.pipe(filter((event) => sourceTypes.includes(event.source.type) && eventTypes.includes(event.type)));
+			.pipe(filter((event) => eventSources.includes(event.eventSource) && eventTypes.includes(event.eventType)));
 	}
 
 	constructor(host: UmbControllerHost) {
