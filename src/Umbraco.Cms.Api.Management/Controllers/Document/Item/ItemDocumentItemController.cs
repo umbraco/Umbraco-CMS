@@ -19,6 +19,7 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly SignProviderCollection _signProviders;
 
+    [ActivatorUtilitiesConstructor]
     public ItemDocumentItemController(
         IEntityService entityService,
         IDocumentPresentationFactory documentPresentationFactory,
