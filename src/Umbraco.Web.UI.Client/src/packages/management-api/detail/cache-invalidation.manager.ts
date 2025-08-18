@@ -45,7 +45,7 @@ export class UmbManagementApiDetailDataCacheInvalidationManager<DetailResponseMo
 			this.#serverEventContext?.byEventSourcesAndEventTypes(this.#eventSources, ['Updated', 'Deleted']),
 			(event) => {
 				if (!event) return;
-				this._dataCache.delete(event.key);
+				this._onServerEvent(event);
 			},
 			'umbObserveServerEvents',
 		);
