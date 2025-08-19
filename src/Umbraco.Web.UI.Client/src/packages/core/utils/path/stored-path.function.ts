@@ -39,7 +39,7 @@ export function setStoredPath(path: string): void {
  */
 export function redirectToStoredPath(basePath: string, force = false): void {
 	const url = retrieveStoredPath();
-	const isBackofficePath = url?.pathname.startsWith(basePath) ?? true;
+	const isBackofficePath = url?.pathname.startsWith(basePath) ?? false;
 
 	if (isBackofficePath && !force) {
 		history.replaceState(null, '', url?.toString() ?? '');
