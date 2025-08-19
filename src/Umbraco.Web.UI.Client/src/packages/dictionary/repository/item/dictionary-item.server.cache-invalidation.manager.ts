@@ -7,8 +7,7 @@ export class UmbManagementApiDictionaryItemDataCacheInvalidationManager extends 
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			dataCache: dictionaryItemCache,
-			sourceTypes: ['Umbraco:CMS:DictionaryItem'],
+			eventSources: ['Umbraco:CMS:DictionaryItem'],
 		});
-		debugger;
 	}
 }

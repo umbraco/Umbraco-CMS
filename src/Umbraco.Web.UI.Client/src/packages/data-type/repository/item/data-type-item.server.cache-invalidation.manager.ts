@@ -7,7 +7,7 @@ export class UmbManagementApiDataTypeItemDataCacheInvalidationManager extends Um
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			dataCache: dataTypeItemCache,
-			serverEventSources: ['Umbraco:CMS:DataType'],
+			eventSources: ['Umbraco:CMS:DataType'],
 		});
 	}
 }
