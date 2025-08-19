@@ -81,17 +81,23 @@ export class UmbAppElement extends UmbLitElement {
 				// If we are in a popup window, the storage event in UmbAuthContext will catch the signal and close the window.
 				// If we are in the main window, the signal will be caught right here and the user will be redirected to the root.
 				if (!hasOwnOpener(this.backofficePath)) {
-					this.observe(this.#authContext.authorizationSignal, () => {
-						// Redirect to the saved state or root
-						const url = retrieveStoredPath();
-						const isBackofficePath = url?.pathname.startsWith(this.backofficePath) ?? true;
+					this.observe(
+						this.#authContext.isAuthorized.pipe(
+							filter((x) => !!x),
+							first(),
+						),
+						() => {
+							// Redirect to the saved state or root
+							const url = retrieveStoredPath();
+							const isBackofficePath = url?.pathname.startsWith(this.backofficePath) ?? true;
 
-						if (isBackofficePath) {
-							history.replaceState(null, '', url?.toString() ?? '');
-						} else {
-							window.location.href = url?.toString() ?? this.backofficePath;
-						}
-					});
+							if (isBackofficePath) {
+								history.replaceState(null, '', url?.toString() ?? '');
+							} else {
+								window.location.href = url?.toString() ?? this.backofficePath;
+							}
+						},
+					);
 				}
 
 				// Complete the authorization request, which will send the authorization signal
