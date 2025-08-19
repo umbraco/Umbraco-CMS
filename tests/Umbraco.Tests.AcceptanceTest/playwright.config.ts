@@ -44,14 +44,26 @@ export default defineConfig({
       testMatch: '**/*.setup.ts',
     },
     {
-      name: 'chromium',
+      name: 'defaultConfig',
+      testMatch: 'DefaultConfig/**',
       dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
         // Use prepared auth state.
         ignoreHTTPSErrors: true,
-        storageState: STORAGE_STATE,
-      },
+        storageState: STORAGE_STATE
+      }
     },
+    {
+      name: 'extensionRegistry',
+      testMatch: 'ExtensionRegistry/**',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    }
   ],
 });
