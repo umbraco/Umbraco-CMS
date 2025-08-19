@@ -1,9 +1,9 @@
+import { UMB_VIEW_CONTEXT } from './view.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
-import { UmbClassState, mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
+import { UmbClassState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import { UMB_VIEW_CONTEXT } from './view.context-token';
 
 /**
  *
@@ -20,29 +20,30 @@ export class UmbViewContext extends UmbControllerBase {
 
 	public readonly viewAlias: string;
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
-	protected readonly _variantId = this.#variantId.asObservable();
+	protected readonly variantId = this.#variantId.asObservable();
 
 	public hints;
 
 	readonly firstHintOfVariant;
 
-	constructor(host: UmbControllerHost, viewAlias: string, variantId?: UmbVariantId) {
+	constructor(host: UmbControllerHost, viewAlias: string) {
 		super(host);
 		this.viewAlias = viewAlias;
-		this.#variantId.setValue(variantId);
 		this.hints = new UmbHintController<UmbVariantHint>(this, {
 			viewAlias: viewAlias,
-			scaffold: {
-				variantId: variantId,
-			},
 		});
-		this.firstHintOfVariant = mergeObservables([this._variantId, this.hints.hints], ([variantId, hints]) => {
+		this.firstHintOfVariant = mergeObservables([this.variantId, this.hints.hints], ([variantId, hints]) => {
 			if (variantId) {
 				return hints.find((hint) => (hint.variantId ? hint.variantId.equal(variantId!) : true));
 			} else {
 				return hints[0];
 			}
 		});
+	}
+
+	setVariantId(variantId: UmbVariantId | undefined): void {
+		this.#variantId.setValue(variantId);
+		this.hints.updateScaffold({ variantId: variantId });
 	}
 
 	provideAt(controllerHost: UmbClassInterface): void {
@@ -64,7 +65,13 @@ export class UmbViewContext extends UmbControllerBase {
 	}
 
 	inheritFrom(context?: UmbViewContext): void {
-		// TODO: Do you want to inherit the variantId as well? Then I think VariantId needs to become a state.
+		this.observe(
+			context?.variantId,
+			(variantId) => {
+				this.setVariantId(variantId);
+			},
+			'observeParentVariantId',
+		);
 		this.hints.inheritFrom(context?.hints);
 	}
 }

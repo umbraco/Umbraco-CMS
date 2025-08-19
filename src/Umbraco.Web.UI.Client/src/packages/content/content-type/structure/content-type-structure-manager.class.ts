@@ -909,6 +909,12 @@ export class UmbContentTypeStructureManager<
 }
 
 // Get a unique key for a container including all parent type/name pairs
+/**
+ *
+ * @param container
+ * @param containerById
+ * @param chainCache
+ */
 function getContainerChainKey(
 	container: UmbPropertyTypeContainerModel,
 	containerById: Map<string, UmbPropertyTypeContainerModel>,

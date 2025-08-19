@@ -100,6 +100,10 @@ export class UmbContentValidationToHintsManager<
 	}
 }
 
+/**
+ *
+ * @param path {string} The path string to extract the value from.
+ */
 function getValueBetweenBrackets(path: string): string | null {
 	const start = path.indexOf('[');
 	if (start === -1) return null;

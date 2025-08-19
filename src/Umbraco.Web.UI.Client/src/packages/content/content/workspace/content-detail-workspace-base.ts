@@ -6,6 +6,7 @@ import type { UmbContentPropertyDatasetContext } from '../property-dataset-conte
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
+import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
 import {
@@ -55,7 +56,6 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UmbSegmentCollectionRepository, type UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
 import { UmbHintContext, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,

@@ -1,10 +1,10 @@
 import type { UmbPartialSome } from '../../utils/type/index.js';
+import type { UmbHint, UmbIncomingHintBase } from '../types.js';
+import { UMB_HINT_CONTEXT } from './hint.context-token.js';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObjectState, type Observable } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_HINT_CONTEXT } from './hint.context-token.js';
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import type { UmbHint, UmbIncomingHintBase } from '../types.js';
 
 export class UmbHintController<
 	HintType extends UmbHint = UmbHint,
