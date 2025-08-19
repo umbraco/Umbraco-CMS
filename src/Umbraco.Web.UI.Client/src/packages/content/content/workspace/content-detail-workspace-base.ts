@@ -378,12 +378,17 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
 		await this.structure.loadType((data as any)[this.#contentTypePropertyName].unique);
 
+		/**
+		 * TODO: Should we also set Preset Values when loading Content, because maybe content contains uncreated Cultures or Segments.
+		 */
+
 		// Set culture and segment for all values:
 		const cultures = this.#languages.getValue().map((x) => x.unique);
 
 		if (this.structure.variesBySegment) {
 			console.warn('Segments are not yet implemented for preset');
 		}
+		// TODO: Add Segments for Presets:
 		const segments: Array<string> | undefined = this.structure.variesBySegment ? [] : undefined;
 
 		const repo = new UmbDataTypeDetailRepository(this);
