@@ -7,7 +7,7 @@ export class UmbManagementApiMemberGroupItemDataCacheInvalidationManager extends
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			dataCache: memberGroupItemCache,
-			serverEventSources: ['Umbraco:CMS:MemberGroup'],
+			eventSources: ['Umbraco:CMS:MemberGroup'],
 		});
 	}
 }
