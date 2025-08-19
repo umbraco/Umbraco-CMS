@@ -1,31 +1,25 @@
-import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../../types.js';
-import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
+import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../../../types.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../../entity.js';
+import { UmbManagementApiDataTypeDetailDataRequestManager } from './data-type-detail.server.request-manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDataTypeRequestModel,
+	DataTypeResponseModel,
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
  * A data source for the Data Type that fetches data from the server
  * @class UmbDataTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataTypeDetailModel> {
-	#host: UmbControllerHost;
-
-	/**
-	 * Creates an instance of UmbDataTypeServerDataSource.
-	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @memberof UmbDataTypeServerDataSource
-	 */
-	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
+export class UmbDataTypeServerDataSource
+	extends UmbControllerBase
+	implements UmbDetailDataSource<UmbDataTypeDetailModel>
+{
+	#detailRequestManager = new UmbManagementApiDataTypeDetailDataRequestManager(this);
 
 	/**
 	 * Creates a new Data Type scaffold
@@ -57,23 +51,9 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecute(this.#host, DataTypeService.getDataTypeById({ path: { id: unique } }));
+		const { data, error } = await this.#detailRequestManager.read(unique);
 
-		if (error || !data) {
-			return { error };
-		}
-
-		// TODO: make data mapper to prevent errors
-		const dataType: UmbDataTypeDetailModel = {
-			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
-			unique: data.id,
-			name: data.name,
-			editorAlias: data.editorAlias,
-			editorUiAlias: data.editorUiAlias || null,
-			values: data.values as Array<UmbDataTypePropertyValueModel>,
-		};
-
-		return { data: dataType };
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
 	}
 
 	/**
@@ -99,18 +79,9 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			values: model.values,
 		};
 
-		const { data, error } = await tryExecute(
-			this.#host,
-			DataTypeService.postDataType({
-				body: body,
-			}),
-		);
+		const { data, error } = await this.#detailRequestManager.create(body);
 
-		if (data) {
-			return this.read(data as any);
-		}
-
-		return { error };
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
 	}
 
 	/**
@@ -133,19 +104,9 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			values: model.values,
 		};
 
-		const { error } = await tryExecute(
-			this.#host,
-			DataTypeService.putDataTypeById({
-				path: { id: model.unique },
-				body: body,
-			}),
-		);
+		const { data, error } = await this.#detailRequestManager.update(model.unique, body);
 
-		if (!error) {
-			return this.read(model.unique);
-		}
-
-		return { error };
+		return { data: data ? this.#mapServerResponseModelToEntityDetailModel(data) : undefined, error };
 	}
 
 	/**
@@ -156,12 +117,18 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
+		return this.#detailRequestManager.delete(unique);
+	}
 
-		return tryExecute(
-			this.#host,
-			DataTypeService.deleteDataTypeById({
-				path: { id: unique },
-			}),
-		);
+	// TODO: change this to a mapper extension when the endpoints returns a $type for DataTypeResponseModel
+	#mapServerResponseModelToEntityDetailModel(data: DataTypeResponseModel): UmbDataTypeDetailModel {
+		return {
+			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+			unique: data.id,
+			name: data.name,
+			editorAlias: data.editorAlias,
+			editorUiAlias: data.editorUiAlias || null,
+			values: data.values as Array<UmbDataTypePropertyValueModel>,
+		};
 	}
 }
