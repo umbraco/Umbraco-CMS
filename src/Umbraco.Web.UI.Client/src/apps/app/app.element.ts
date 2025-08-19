@@ -76,27 +76,33 @@ export class UmbAppElement extends UmbLitElement {
 					return;
 				}
 
+				// Check that we are not already authorized
+				if (this.#authContext.getIsAuthorized()) {
+					redirectToStoredPath(this.backofficePath, true);
+					return;
+				}
+
 				// Complete the authorization request, which will send the authorization signal
 				try {
 					const result = await this.#authContext.completeAuthorizationRequest();
+
+					if (result === null) {
+						// If the result is null, it could mean that no new token was required, so we can redirect the user
+						// This could happen if the user is already authorized or accidentally enters the oauth_complete url
+						redirectToStoredPath(this.backofficePath, true);
+						return;
+					}
 
 					// If we are in the main window (i.e. no opener), we should redirect to the root after the authorization request is completed.
 					// The authorization request will be completed in the active window (main or popup) and the authorization signal will be sent.
 					// If we are in a popup window, the storage event in UmbAuthContext will catch the signal and close the window.
 					// If we are in the main window, the signal will be caught right here and the user will be redirected to their previous path (or root).
-					if (!hasOwnOpener(this.backofficePath)) {
-						if (result === null) {
-							// If the result is null, it could mean that no new token was required, so we can redirect the user
-							// This could happen if the user is already authorized or accidentally enters the oauth_complete url
-							redirectToStoredPath(this.backofficePath);
-							return;
-						}
+					if (hasOwnOpener(this.backofficePath)) return;
 
-						// Listen for the first authorization signal after the initial authorization request
-						await firstValueFrom(this.#authContext!.authorizationSignal);
-						// When it hits, we should redirect the user to the backoffice
-						redirectToStoredPath(this.backofficePath);
-					}
+					// Listen for the first authorization signal after the initial authorization request
+					await firstValueFrom(this.#authContext.authorizationSignal);
+					// When it hits, we should redirect the user to the backoffice
+					redirectToStoredPath(this.backofficePath);
 				} catch {
 					(component as UmbAppOauthElement).failure = true;
 					console.error('[Fatal] Authorization request failed');
