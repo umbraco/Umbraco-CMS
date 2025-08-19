@@ -3,16 +3,7 @@ import type { UmbLanguageDetailModel } from '../types.js';
 import type { UmbAppLanguageContext } from '../global-contexts/index.js';
 import { UMB_APP_LANGUAGE_CONTEXT } from '../constants.js';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
-import {
-	css,
-	html,
-	customElement,
-	state,
-	repeat,
-	ifDefined,
-	query,
-	nothing,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, query, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
@@ -98,12 +89,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		}
 	}
 
-	#onPopoverToggle(event: ToggleEvent) {
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this._isOpen = event.newState === 'open';
-		if (this._isOpen && !this.#languagesObserver) {
+	async #onBeforePopoverToggle(event: ToggleEvent) {
+		if (event.newState === 'open' && !this.#languagesObserver) {
 			if (this._popoverElement) {
 				const host = this.getBoundingClientRect();
 				this._popoverElement.style.width = `${host.width}px`;
@@ -113,58 +100,59 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		}
 	}
 
+	async #onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._isOpen = event.newState === 'open';
+	}
+
 	#onTriggerKeydown = (e: KeyboardEvent) => {
-		// If popover is open and the user presses Tab, move focus to first option
-		if (this._isOpen && e.key === 'Tab' && !e.shiftKey) {
-			e.preventDefault();
-			const first = this._popoverElement?.querySelector<HTMLElement>('uui-menu-item');
-			first?.focus();
-		}
-	};
-
-	#onItemKeydown = (e: KeyboardEvent) => {
-		// Getting all items(language options) in DOM order as an array:
-		const items = Array.from(this._popoverElement!.querySelectorAll<HTMLElement>('uui-menu-item'));
-
-		// Find the index of the current(focus) element
-		const idx = items.indexOf(e.currentTarget as HTMLElement);
-
-		if (e.key === 'ArrowDown' || e.key === 'Tab') {
-			e.preventDefault();
-			if (items.length - 1 === idx) {
-				this._popoverElement?.hidePopover();
-				(this.renderRoot.querySelector('#toggle') as HTMLElement)?.focus();
-				return;
-			}
-			items[idx + 1]?.focus();
+		// Open popover on arrow up, arrow down, and space
+		if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+			this.#showPopover();
 			return;
 		}
 
-		if (e.key === 'ArrowUp') {
-			e.preventDefault();
-			if (idx === 0) {
-				this._popoverElement?.hidePopover();
-				(this.renderRoot.querySelector('#toggle') as HTMLElement)?.focus();
-				return;
-			}
-			items[idx - 1]?.focus();
+		if (e.key === ' ') {
+			this.#togglePopover();
 			return;
-		}
-
-		if (e.key === 'Enter' || e.key === ' ') {
-			if (idx >= 0) {
-				e.preventDefault();
-				const unique = items[idx].getAttribute('id');
-				if (unique) this.#chooseLanguage(unique);
-				return;
-			}
 		}
 	};
 
 	#chooseLanguage(unique: string) {
 		this.#appLanguageContext?.setLanguage(unique);
-		this._isOpen = false;
+		this.#hidePopover();
+	}
+
+	#showPopover() {
+		this._popoverElement?.showPopover();
+	}
+
+	#hidePopover() {
 		this._popoverElement?.hidePopover();
+	}
+
+	#togglePopover() {
+		this._popoverElement?.togglePopover();
+	}
+
+	#onLanguageSelectionChange(e: CustomEvent) {
+		// Hack: Prevent a selection from being made when the dropdown is closed,
+		// TODO: investigate why the uui-combobox-list can select a value when no longer in the DOM
+		if (this._isOpen === false) return;
+
+		const target = e.target as any;
+		const value = target.value;
+		this.#chooseLanguage(value);
+	}
+
+	#onTriggerClick(e: PointerEvent) {
+		if (this._isOpen) {
+			this.#hidePopover();
+		} else {
+			this.#showPopover();
+		}
 	}
 
 	override render() {
@@ -172,41 +160,51 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	#renderTrigger() {
-		return html` <button
+		return html` <div
 			id="toggle"
 			data-mark="action:open"
 			popovertarget="dropdown-popover"
-			@keydown=${this.#onTriggerKeydown}>
+			@keydown=${this.#onTriggerKeydown}
+			@click=${this.#onTriggerClick}
+			tabindex="0">
 			<span>
 				${this._appLanguage?.name}
 				${this._appLanguageIsReadOnly ? this.#renderReadOnlyTag(this._appLanguage?.unique) : nothing}
 			</span>
 			<uui-symbol-expand .open=${this._isOpen}></uui-symbol-expand>
-		</button>`;
+		</div>`;
 	}
 
 	#renderContent() {
-		return html` <uui-popover-container
+		return html`<uui-popover-container
 			id="dropdown-popover"
 			data-mark="app-language-menu"
-			@beforetoggle=${this.#onPopoverToggle}>
+			@beforetoggle=${this.#onBeforePopoverToggle}
+			@toggle=${this.#onPopoverToggle}>
 			<umb-popover-layout>
 				<uui-scroll-container style="max-height:calc(100vh - (var(--umb-header-layout-height) + 60px));">
-					${repeat(
-						this._languages,
-						(language) => language.unique,
-						(language) => html`
-							<uui-menu-item
-								id=${language.unique}
-								label=${ifDefined(language.name)}
-								data-mark="${language.entityType}:${language.unique}"
-								?active=${language.unique === this._appLanguage?.unique}
-								@click-label=${() => this.#chooseLanguage(language.unique)}
-								@keydown=${this.#onItemKeydown}>
-								${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
-							</uui-menu-item>
-						`,
-					)}
+					${this._isOpen
+						? html`
+								<uui-combobox-list
+									.value=${this._appLanguage?.unique || ''}
+									aria-label="App language"
+									.for=${this}
+									@change=${this.#onLanguageSelectionChange}>
+									${repeat(
+										this._languages,
+										(language) => language.unique,
+										(language) => html`
+											<uui-combobox-list-option role="option" value="${language.unique}">
+												${language.name}
+												${this.#isLanguageReadOnly(language.unique)
+													? this.#renderReadOnlyTag(language.unique)
+													: nothing}
+											</uui-combobox-list-option>
+										`,
+									)}
+								</uui-combobox-list>
+							`
+						: nothing}
 				</uui-scroll-container>
 			</umb-popover-layout>
 		</uui-popover-container>`;
@@ -232,7 +230,6 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			#toggle {
 				color: var(--uui-color-text);
-				width: 100%;
 				text-align: left;
 				background: none;
 				border: none;
@@ -249,12 +246,6 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			#toggle:hover {
 				background-color: var(--uui-color-surface-emphasis);
-			}
-
-			uui-menu-item {
-				color: var(--uui-color-text);
-
-				width: auto;
 			}
 		`,
 	];
