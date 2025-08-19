@@ -21,7 +21,6 @@ export class UmbManagementApiDataTypeDetailDataRequestManager extends UmbManagem
 			update: (id: string, body: UpdateDataTypeRequestModel) => DataTypeService.putDataTypeById({ path: { id }, body }),
 			delete: (id: string) => DataTypeService.deleteDataTypeById({ path: { id } }),
 			dataCache: dataTypeDetailCache,
-			serverEventSource: 'Umbraco:CMS:DataType',
 		});
 	}
 }

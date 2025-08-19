@@ -20,7 +20,6 @@ export interface UmbManagementApiDetailDataRequestManagerArgs<
 	update: (id: string, data: UpdateRequestModelType) => Promise<UmbApiResponse<{ data: unknown }>>;
 	delete: (id: string) => Promise<UmbApiResponse<{ data: unknown }>>;
 	dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
-	serverEventSource: string;
 }
 
 export class UmbManagementApiDetailDataRequestManager<
@@ -29,13 +28,12 @@ export class UmbManagementApiDetailDataRequestManager<
 	UpdateRequestModelType,
 > extends UmbControllerBase {
 	#dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
-	#serverEventSource: string;
-	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 
 	#create;
 	#read;
 	#update;
 	#delete;
+	#serverEventContext?: typeof UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT.TYPE;
 	#isConnectedToServerEvents = false;
 
 	constructor(
@@ -54,7 +52,6 @@ export class UmbManagementApiDetailDataRequestManager<
 		this.#delete = args.delete;
 
 		this.#dataCache = args.dataCache;
-		this.#serverEventSource = args.serverEventSource;
 
 		this.consumeContext(UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT, (context) => {
 			this.#serverEventContext = context;
@@ -129,16 +126,6 @@ export class UmbManagementApiDetailDataRequestManager<
 				}
 			},
 			'umbObserveServerEventsConnection',
-		);
-
-		// Invalidate cache entries when entities are updated or deleted
-		this.observe(
-			this.#serverEventContext?.byEventSourceAndTypes(this.#serverEventSource, ['Updated', 'Deleted']),
-			(event) => {
-				if (!event) return;
-				this.#dataCache.delete(event.key);
-			},
-			'umbObserveServerEvents',
 		);
 	}
 }
