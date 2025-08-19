@@ -9,7 +9,7 @@ export class UmbManagementApiMemberTypeItemDataRequestManager extends UmbManagem
 		super(host, {
 			getItems: (ids: Array<string>) => MemberTypeService.getItemMemberType({ query: { id: ids } }),
 			dataCache: memberTypeItemCache,
-			serverEventSource: 'Umbraco:CMS:MemberType',
+			getUniqueMethod: (item) => item.id,
 		});
 	}
 }

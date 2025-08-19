@@ -9,6 +9,7 @@ export class UmbManagementApiDataTypeItemDataRequestManager extends UmbManagemen
 		super(host, {
 			getItems: (ids: Array<string>) => DataTypeService.getItemDataType({ query: { id: ids } }),
 			dataCache: dataTypeItemCache,
+			getUniqueMethod: (item) => item.id,
 		});
 	}
 }
