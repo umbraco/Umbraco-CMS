@@ -9,7 +9,7 @@ export class UmbManagementApiDocumentTypeItemDataRequestManager extends UmbManag
 		super(host, {
 			getItems: (ids: Array<string>) => DocumentTypeService.getItemDocumentType({ query: { id: ids } }),
 			dataCache: documentTypeItemCache,
-			getUniqueMethod: (item: DocumentTypeItemResponseModel) => item.id,
+			getUniqueMethod: (item) => item.id,
 		});
 	}
 }

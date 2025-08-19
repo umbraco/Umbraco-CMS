@@ -9,7 +9,7 @@ export class UmbManagementApiMemberItemDataRequestManager extends UmbManagementA
 		super(host, {
 			getItems: (ids: Array<string>) => MemberService.getItemMember({ query: { id: ids } }),
 			dataCache: memberItemCache,
-			getUniqueMethod: (item: MemberItemResponseModel) => item.id,
+			getUniqueMethod: (item) => item.id,
 		});
 	}
 }

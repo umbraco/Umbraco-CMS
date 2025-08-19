@@ -9,7 +9,7 @@ export class UmbManagementApiMediaItemDataRequestManager extends UmbManagementAp
 		super(host, {
 			getItems: (ids: Array<string>) => MediaService.getItemMedia({ query: { id: ids } }),
 			dataCache: mediaItemCache,
-			serverEventSource: 'Umbraco:CMS:Media',
+			getUniqueMethod: (item) => item.id,
 		});
 	}
 }

@@ -9,7 +9,7 @@ export class UmbManagementApiDictionaryItemDataRequestManager extends UmbManagem
 		super(host, {
 			getItems: (ids: Array<string>) => DictionaryService.getItemDictionary({ query: { id: ids } }),
 			dataCache: dictionaryItemCache,
-			getUniqueMethod: (item: DictionaryItemItemResponseModel) => item.id,
+			getUniqueMethod: (item) => item.id,
 		});
 	}
 }
