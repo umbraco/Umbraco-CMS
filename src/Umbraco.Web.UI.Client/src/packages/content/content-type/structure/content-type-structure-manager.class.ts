@@ -735,6 +735,20 @@ export class UmbContentTypeStructureManager<
 		});
 	}
 
+	propertyStructuresOfGroupIds(groupIds: Array<string>) {
+		return this.#contentTypes.asObservablePart((docTypes) => {
+			const props: UmbPropertyTypeModel[] = [];
+			docTypes.forEach((docType) => {
+				docType.properties?.forEach((property) => {
+					if (property.container?.id && groupIds.includes(property.container.id)) {
+						props.push(property);
+					}
+				});
+			});
+			return props;
+		});
+	}
+
 	rootContainers(containerType: UmbPropertyContainerTypes) {
 		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType);
@@ -905,6 +919,12 @@ export class UmbContentTypeStructureManager<
 			return Array.from(mergedMap.values());
 		},
 	);
+
+	public mergedContainersOfId(containerId: string) {
+		return createObservablePart(this.contentTypeMergedContainers, (mergedContainers) => {
+			return mergedContainers.find((x) => x.ids.includes(containerId));
+		});
+	}
 }
 
 // Get a unique key for a container including all parent type/name pairs
