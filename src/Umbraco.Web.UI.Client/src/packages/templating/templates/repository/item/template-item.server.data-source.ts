@@ -1,5 +1,6 @@
 import { UMB_TEMPLATE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbTemplateItemModel } from './types.js';
+import { UmbManagementApiTemplateItemDataRequestManager } from './template-item.server.request-manager.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { TemplateItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { TemplateService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -15,6 +16,8 @@ export class UmbTemplateItemServerDataSource extends UmbItemServerDataSourceBase
 	TemplateItemResponseModel,
 	UmbTemplateItemModel
 > {
+	#itemRequestManager = new UmbManagementApiTemplateItemDataRequestManager(this);
+
 	/**
 	 * Creates an instance of UmbTemplateItemServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
@@ -29,13 +32,7 @@ export class UmbTemplateItemServerDataSource extends UmbItemServerDataSourceBase
 	override async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			api: (args) => TemplateService.getItemTemplate({ query: { id: args.uniques } }),
-			uniques,
-		});
-
-		const { data, error } = await itemRequestManager.request();
+		const { data, error } = await this.#itemRequestManager.getItems(uniques);
 
 		return { data: this._getMappedItems(data), error };
 	}
