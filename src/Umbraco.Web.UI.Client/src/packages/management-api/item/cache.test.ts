@@ -1,11 +1,11 @@
-import { UmbManagementApiDetailDataCache } from './cache.js';
+import { UmbManagementApiItemDataCache } from './cache.js';
 import { expect } from '@open-wc/testing';
 
-describe('UmbManagementApiDetailDataCache', () => {
-	let cache: UmbManagementApiDetailDataCache<{ id: string }>;
+describe('UmbManagementApiItemDataCache', () => {
+	let cache: UmbManagementApiItemDataCache<{ id: string }>;
 
 	beforeEach(() => {
-		cache = new UmbManagementApiDetailDataCache();
+		cache = new UmbManagementApiItemDataCache();
 	});
 
 	describe('Public API', () => {

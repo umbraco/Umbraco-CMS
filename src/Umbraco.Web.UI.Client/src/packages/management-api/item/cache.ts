@@ -1,22 +1,22 @@
 // Keep internal
-interface UmbCacheEntryModel<DetailDataModelType> {
+interface UmbCacheEntryModel<ItemDataModelType> {
 	id: string;
-	data: DetailDataModelType;
+	data: ItemDataModelType;
 }
 
 /**
- * A runtime cache for storing entity detail data from the Management Api
- * @class UmbManagementApiDetailDataCache
- * @template DetailDataModelType
+ * A runtime cache for storing entity item data from the Management Api
+ * @class UmbManagementApiItemDataCache
+ * @template ItemDataModelType
  */
-export class UmbManagementApiDetailDataCache<DetailDataModelType> {
-	#entries: Map<string, UmbCacheEntryModel<DetailDataModelType>> = new Map();
+export class UmbManagementApiItemDataCache<ItemDataModelType> {
+	#entries: Map<string, UmbCacheEntryModel<ItemDataModelType>> = new Map();
 
 	/**
 	 * Checks if an entry exists in the cache
 	 * @param {string} id - The ID of the entry to check
 	 * @returns {boolean} - True if the entry exists, false otherwise
-	 * @memberof UmbManagementApiDetailDataCache
+	 * @memberof UmbManagementApiItemDataCache
 	 */
 	has(id: string): boolean {
 		return this.#entries.has(id);
@@ -25,11 +25,11 @@ export class UmbManagementApiDetailDataCache<DetailDataModelType> {
 	/**
 	 * Adds an entry to the cache
 	 * @param {string} id - The ID of the entry to add
-	 * @param {DetailDataModelType} data - The data to cache
-	 * @memberof UmbManagementApiDetailDataCache
+	 * @param {ItemDataModelType} data - The data to cache
+	 * @memberof UmbManagementApiItemDataCache
 	 */
-	set(id: string, data: DetailDataModelType): void {
-		const cacheEntry: UmbCacheEntryModel<DetailDataModelType> = {
+	set(id: string, data: ItemDataModelType): void {
+		const cacheEntry: UmbCacheEntryModel<ItemDataModelType> = {
 			id: id,
 			data,
 		};
@@ -40,27 +40,27 @@ export class UmbManagementApiDetailDataCache<DetailDataModelType> {
 	/**
 	 * Retrieves an entry from the cache
 	 * @param {string} id - The ID of the entry to retrieve
-	 * @returns {DetailDataModelType | undefined} - The cached entry or undefined if not found
-	 * @memberof UmbManagementApiDetailDataCache
+	 * @returns {ItemDataModelType | undefined} - The cached entry or undefined if not found
+	 * @memberof UmbManagementApiItemDataCache
 	 */
-	get(id: string): DetailDataModelType | undefined {
+	get(id: string): ItemDataModelType | undefined {
 		const entry = this.#entries.get(id);
 		return entry ? entry.data : undefined;
 	}
 
 	/**
 	 * Retrieves all entries from the cache
-	 * @returns {Array<DetailDataModelType>} - An array of all cached entries
+	 * @returns {Array<ItemDataModelType>} - An array of all cached entries
 	 * @memberof UmbManagementApiItemDataCache
 	 */
-	getAll(): Array<DetailDataModelType> {
+	getAll(): Array<ItemDataModelType> {
 		return Array.from(this.#entries.values()).map((entry) => entry.data);
 	}
 
 	/**
 	 * Deletes an entry from the cache
 	 * @param {string} id - The ID of the entry to delete
-	 * @memberof UmbManagementApiDetailDataCache
+	 * @memberof UmbManagementApiItemDataCache
 	 */
 	delete(id: string): void {
 		this.#entries.delete(id);
@@ -68,7 +68,7 @@ export class UmbManagementApiDetailDataCache<DetailDataModelType> {
 
 	/**
 	 * Clears all entries from the cache
-	 * @memberof UmbManagementApiDetailDataCache
+	 * @memberof UmbManagementApiItemDataCache
 	 */
 	clear(): void {
 		this.#entries.clear();
