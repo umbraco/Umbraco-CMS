@@ -21,17 +21,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Collection;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 public abstract class MediaCollectionControllerBase : ContentCollectionControllerBase<IMedia, MediaCollectionResponseModel, MediaValueResponseModel, MediaVariantResponseModel>
 {
-    private readonly SignProviderCollection _signProviders;
-
     protected MediaCollectionControllerBase(IUmbracoMapper mapper, SignProviderCollection signProviders)
         : base(mapper, signProviders)
     {
-        _signProviders = signProviders;
     }
 
-    [Obsolete("Please use the constructors with all the parameters. Scheduled to be removed in Umbraco 18")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in Umbraco 18")]
     protected MediaCollectionControllerBase(IUmbracoMapper mapper)
-        : this(mapper, StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+        : base(mapper)
     {
     }
 

@@ -37,7 +37,7 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
         _mediaCollectionPresentationFactory = mediaCollectionPresentationFactory;
     }
 
-    [Obsolete("Please use the constructors with all the parameters. Scheduled to be removed in Umbraco 18")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in Umbraco 18")]
     public ByKeyMediaCollectionController(
         IMediaListViewService mediaListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,

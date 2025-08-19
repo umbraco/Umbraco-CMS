@@ -115,10 +115,5 @@ public static partial class Constants
         public const string DataDirectoryPlaceholder = "|DataDirectory|";
 
         public const string InvariantCulture = "*";
-
-        /// <summary>
-        /// The provider name for Umbraco core backoffice tree and collection signs.
-        /// </summary>
-        public const string UmbracoSignProvider = "umbCore";
     }
 }

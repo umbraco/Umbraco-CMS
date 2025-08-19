@@ -1,7 +1,4 @@
 using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
-using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Services.Signs;

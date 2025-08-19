@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Signs;
 internal class HasScheduleSignProviderTests
 {
     [Test]
-    public async Task HasScheduleSignProvider_Can_Provide_Tree_Signs()
+    public void HasScheduleSignProvider_Can_Provide_Document_Tree_Signs()
     {
         var contentServiceMock = new Mock<IContentService>();
 
@@ -22,7 +22,7 @@ internal class HasScheduleSignProviderTests
     }
 
     [Test]
-    public async Task HasScheduleSignProvider_Can_Provide_Collection_Signs()
+    public void HasScheduleSignProvider_Can_Provide_Document_Collection_Signs()
     {
         var contentServiceMock = new Mock<IContentService>();
 
@@ -31,7 +31,7 @@ internal class HasScheduleSignProviderTests
     }
 
     [Test]
-    public async Task HasScheduleSignProvider_Can_Provide_Plain_Signs()
+    public void HasScheduleSignProvider_Can_Provide_Document_Item_Signs()
     {
         var contentServiceMock = new Mock<IContentService>();
 
@@ -40,7 +40,7 @@ internal class HasScheduleSignProviderTests
     }
 
     [Test]
-    public async Task HasScheduleSignProvider_Should_Populate_Tree_Signs()
+    public async Task HasScheduleSignProvider_Should_Populate_Document_Tree_Signs()
     {
         var entities = new List<EntitySlim>
         {
@@ -68,7 +68,7 @@ internal class HasScheduleSignProviderTests
     }
 
     [Test]
-    public async Task HasScheduleSignProvider_Should_Populate_Collection_Signs()
+    public async Task HasScheduleSignProvider_Should_Populate_Document_Collection_Signs()
     {
         var entities = new List<EntitySlim>
         {
@@ -96,7 +96,7 @@ internal class HasScheduleSignProviderTests
     }
 
     [Test]
-    public async Task HasScheduleSignProvider_Should_Populate_Plain_Signs()
+    public async Task HasScheduleSignProvider_Should_Populate_Document_Item_Signs()
     {
         var entities = new List<EntitySlim>
         {

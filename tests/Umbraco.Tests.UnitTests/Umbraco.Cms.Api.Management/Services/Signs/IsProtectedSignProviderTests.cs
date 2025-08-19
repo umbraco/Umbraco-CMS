@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
@@ -10,21 +10,21 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Signs;
 internal class IsProtectedSignProviderTests
 {
     [Test]
-    public async Task IsProtectedSignProvider_Can_Provide_Tree_Signs()
+    public void IsProtectedSignProvider_Can_Provide_Tree_Signs()
     {
         var sut = new IsProtectedSignProvider();
         Assert.IsTrue(sut.CanProvideSigns<DocumentTreeItemResponseModel>());
     }
 
     [Test]
-    public async Task IsProtectedSignProvider_Can_Provide_Collection_Signs()
+    public void IsProtectedSignProvider_Can_Provide_Collection_Signs()
     {
         var sut = new IsProtectedSignProvider();
         Assert.IsTrue(sut.CanProvideSigns<DocumentCollectionResponseModel>());
     }
 
     [Test]
-    public async Task IsProtectedSignProvider_Can_Provide_Plain_Signs()
+    public void IsProtectedSignProvider_Can_Provide_Plain_Signs()
     {
         var sut = new IsProtectedSignProvider();
         Assert.IsTrue(sut.CanProvideSigns<DocumentItemResponseModel>());

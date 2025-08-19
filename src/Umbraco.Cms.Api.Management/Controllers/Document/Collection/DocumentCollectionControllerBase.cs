@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -27,7 +25,7 @@ public abstract class DocumentCollectionControllerBase : ContentCollectionContro
 
     [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in V18")]
     protected DocumentCollectionControllerBase(IUmbracoMapper mapper)
-        : this(mapper, StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+        : base(mapper)
     {
     }
 

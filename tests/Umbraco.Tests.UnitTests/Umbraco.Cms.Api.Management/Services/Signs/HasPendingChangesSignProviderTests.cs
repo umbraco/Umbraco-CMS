@@ -1,11 +1,9 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-
-
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Signs;
 
@@ -13,28 +11,28 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Signs;
 internal class HasPendingChangesSignProviderTests
 {
     [Test]
-    public async Task HasPendingChangesSignProvider_Can_Provide_Tree_Signs()
+    public void HasPendingChangesSignProvider_Can_Provide_Document_Tree_Signs()
     {
         var sut = new HasPendingChangesSignProvider();
         Assert.IsTrue(sut.CanProvideSigns<DocumentTreeItemResponseModel>());
     }
 
     [Test]
-    public async Task HasPendingChangesSignProvider_Can_Provide_Collection_Signs()
+    public void HasPendingChangesSignProvider_Can_Provide_Document_Collection_Signs()
     {
         var sut = new HasPendingChangesSignProvider();
         Assert.IsTrue(sut.CanProvideSigns<DocumentCollectionResponseModel>());
     }
 
     [Test]
-    public async Task HasPendingChangesSignProvider_Can_Provide_Plain_Signs()
+    public void HasPendingChangesSignProvider_Can_Provide_Document_Item_Signs()
     {
         var sut = new HasPendingChangesSignProvider();
         Assert.IsTrue(sut.CanProvideSigns<DocumentItemResponseModel>());
     }
 
     [Test]
-    public async Task HasPendingChangesSignProvider_Should_Populate_Tree_Signs()
+    public async Task HasPendingChangesSignProvider_Should_Populate_Document_Tree_Signs()
     {
         var sut = new HasPendingChangesSignProvider();
 
@@ -43,15 +41,15 @@ internal class HasPendingChangesSignProviderTests
             new() { Id = Guid.NewGuid() },
             new()
             {
-                Id = Guid.NewGuid(), Variants = new List<DocumentVariantItemResponseModel>
-                {
+                Id = Guid.NewGuid(), Variants =
+                [
                     new()
                     {
                         State = DocumentVariantState.PublishedPendingChanges,
                         Culture = null,
                         Name = "Test",
                     },
-                },
+                ],
             },
         };
 
@@ -65,7 +63,7 @@ internal class HasPendingChangesSignProviderTests
     }
 
     [Test]
-    public async Task HasPendingChangesSignProvider_Should_Populate_Collection_Signs()
+    public async Task HasPendingChangesSignProvider_Should_Populate_Document_Collection_Signs()
     {
         var sut = new HasPendingChangesSignProvider();
 
@@ -74,15 +72,15 @@ internal class HasPendingChangesSignProviderTests
             new() { Id = Guid.NewGuid() },
             new()
             {
-                Id = Guid.NewGuid(), Variants = new List<DocumentVariantResponseModel>
-                {
+                Id = Guid.NewGuid(), Variants =
+                [
                     new()
                     {
                         State = DocumentVariantState.PublishedPendingChanges,
                         Culture = null,
                         Name = "Test",
                     },
-                },
+                ],
             },
         };
 
@@ -96,7 +94,7 @@ internal class HasPendingChangesSignProviderTests
     }
 
     [Test]
-    public async Task HasPendingChangesSignProvider_Should_Populate_Plain_Signs()
+    public async Task HasPendingChangesSignProvider_Should_Populate_Document_Item_Signs()
     {
         var sut = new HasPendingChangesSignProvider();
 
@@ -105,15 +103,15 @@ internal class HasPendingChangesSignProviderTests
             new() { Id = Guid.NewGuid() },
             new()
             {
-                Id = Guid.NewGuid(), Variants = new List<DocumentVariantItemResponseModel>
-                {
+                Id = Guid.NewGuid(), Variants =
+                [
                     new()
                     {
                         State = DocumentVariantState.PublishedPendingChanges,
                         Culture = null,
                         Name = "Test",
                     },
-                },
+                ],
             },
         };
 

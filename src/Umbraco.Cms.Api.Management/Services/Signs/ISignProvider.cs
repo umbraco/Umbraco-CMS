@@ -1,10 +1,9 @@
 using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 namespace Umbraco.Cms.Api.Management.Services.Signs;
 
 /// <summary>
-/// Defines operation for the provision of presentation signs for tree and collection nodes.
+/// Defines operation for the provision of presentation signs for item, tree and collection nodes.
 /// </summary>
 public interface ISignProvider
 {
