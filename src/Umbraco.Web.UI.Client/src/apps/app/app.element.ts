@@ -19,7 +19,7 @@ import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
+import { hasOwnOpener, redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { UmbApiInterceptorController } from '@umbraco-cms/backoffice/resources';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 
@@ -65,6 +65,7 @@ export class UmbAppElement extends UmbLitElement {
 				if (!this.#authContext) {
 					(component as UmbAppOauthElement).failure = true;
 					console.error('[Fatal] Auth context is not available');
+					redirectToStoredPath(this.backofficePath);
 					return;
 				}
 
@@ -73,6 +74,7 @@ export class UmbAppElement extends UmbLitElement {
 				if (!hasCode) {
 					(component as UmbAppOauthElement).failure = true;
 					console.error('[Fatal] No code in query parameters');
+					redirectToStoredPath(this.backofficePath);
 					return;
 				}
 
@@ -86,17 +88,7 @@ export class UmbAppElement extends UmbLitElement {
 							filter((x) => !!x),
 							first(),
 						),
-						() => {
-							// Redirect to the saved state or root
-							const url = retrieveStoredPath();
-							const isBackofficePath = url?.pathname.startsWith(this.backofficePath) ?? true;
-
-							if (isBackofficePath) {
-								history.replaceState(null, '', url?.toString() ?? '');
-							} else {
-								window.location.href = url?.toString() ?? this.backofficePath;
-							}
-						},
+						() => redirectToStoredPath(this.backofficePath),
 					);
 				}
 
