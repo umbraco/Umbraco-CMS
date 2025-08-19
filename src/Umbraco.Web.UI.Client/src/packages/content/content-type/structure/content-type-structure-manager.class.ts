@@ -869,8 +869,7 @@ export class UmbContentTypeStructureManager<
 		super.destroy();
 	}
 
-	// TODO: Make use of this for the structure helpers.
-	readonly contentTypeMergedContainers = createObservablePart(
+	public readonly contentTypeMergedContainers = createObservablePart(
 		this.#contentTypeContainers,
 		(containers: UmbPropertyTypeContainerModel[]): UmbPropertyTypeContainerMergedModel[] => {
 			// Lookup map for containers
