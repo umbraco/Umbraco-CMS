@@ -7,15 +7,17 @@ import {
 	type DataTypeResponseModel,
 	type UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbManagementApiDetailDataRequestManager } from '@umbraco-cms/backoffice/management-api';
-import type { UmbApiResponse } from '@umbraco-cms/backoffice/resources';
+import {
+	UmbManagementApiDetailDataRequestManager,
+	UmbManagementApiInflightRequestCache,
+} from '@umbraco-cms/backoffice/management-api';
 
 export class UmbManagementApiDataTypeDetailDataRequestManager extends UmbManagementApiDetailDataRequestManager<
 	DataTypeResponseModel,
 	UpdateDataTypeRequestModel,
 	CreateDataTypeRequestModel
 > {
-	static #inflightRequestCache = new Map<string, Promise<UmbApiResponse<{ data?: DataTypeResponseModel }>>>();
+	static #inflightRequestCache = new UmbManagementApiInflightRequestCache<DataTypeResponseModel>();
 
 	constructor(host: UmbControllerHost) {
 		super(host, {

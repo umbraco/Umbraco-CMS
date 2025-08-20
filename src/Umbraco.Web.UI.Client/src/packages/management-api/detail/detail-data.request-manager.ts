@@ -1,4 +1,5 @@
 import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '../server-event/constants.js';
+import type { UmbManagementApiInflightRequestCache } from '../inflight-request/cache.js';
 import type { UmbManagementApiDetailDataCache } from './cache.js';
 import {
 	tryExecute,
@@ -20,7 +21,7 @@ export interface UmbManagementApiDetailDataRequestManagerArgs<
 	update: (id: string, data: UpdateRequestModelType) => Promise<UmbApiResponse<{ data: unknown }>>;
 	delete: (id: string) => Promise<UmbApiResponse<{ data: unknown }>>;
 	dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
-	inflightRequestCache: Map<string, Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>>;
+	inflightRequestCache: UmbManagementApiInflightRequestCache<DetailResponseModelType>;
 }
 
 export class UmbManagementApiDetailDataRequestManager<
@@ -29,7 +30,7 @@ export class UmbManagementApiDetailDataRequestManager<
 	UpdateRequestModelType,
 > extends UmbControllerBase {
 	#dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
-	#inflightRequestCache: Map<string, Promise<UmbApiResponse<{ data?: DetailResponseModelType }>>>;
+	#inflightRequestCache: UmbManagementApiInflightRequestCache<DetailResponseModelType>;
 
 	#create;
 	#read;
