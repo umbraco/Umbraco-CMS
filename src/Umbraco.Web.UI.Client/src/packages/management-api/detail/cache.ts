@@ -1,16 +1,16 @@
 // Keep internal
-interface UmbCacheEntryModel<DataModelType> {
+interface UmbCacheEntryModel<DetailDataModelType> {
 	id: string;
-	data: DataModelType;
+	data: DetailDataModelType;
 }
 
 /**
  * A runtime cache for storing entity detail data from the Management Api
  * @class UmbManagementApiDetailDataCache
- * @template DataModelType
+ * @template DetailDataModelType
  */
-export class UmbManagementApiDetailDataCache<DataModelType> {
-	#entries: Map<string, UmbCacheEntryModel<DataModelType>> = new Map();
+export class UmbManagementApiDetailDataCache<DetailDataModelType> {
+	#entries: Map<string, UmbCacheEntryModel<DetailDataModelType>> = new Map();
 
 	/**
 	 * Checks if an entry exists in the cache
@@ -25,11 +25,11 @@ export class UmbManagementApiDetailDataCache<DataModelType> {
 	/**
 	 * Adds an entry to the cache
 	 * @param {string} id - The ID of the entry to add
-	 * @param {DataModelType} data - The data to cache
+	 * @param {DetailDataModelType} data - The data to cache
 	 * @memberof UmbManagementApiDetailDataCache
 	 */
-	set(id: string, data: DataModelType): void {
-		const cacheEntry: UmbCacheEntryModel<DataModelType> = {
+	set(id: string, data: DetailDataModelType): void {
+		const cacheEntry: UmbCacheEntryModel<DetailDataModelType> = {
 			id: id,
 			data,
 		};
@@ -40,12 +40,21 @@ export class UmbManagementApiDetailDataCache<DataModelType> {
 	/**
 	 * Retrieves an entry from the cache
 	 * @param {string} id - The ID of the entry to retrieve
-	 * @returns {DataModelType | undefined} - The cached entry or undefined if not found
+	 * @returns {DetailDataModelType | undefined} - The cached entry or undefined if not found
 	 * @memberof UmbManagementApiDetailDataCache
 	 */
-	get(id: string): DataModelType | undefined {
+	get(id: string): DetailDataModelType | undefined {
 		const entry = this.#entries.get(id);
 		return entry ? entry.data : undefined;
+	}
+
+	/**
+	 * Retrieves all entries from the cache
+	 * @returns {Array<DetailDataModelType>} - An array of all cached entries
+	 * @memberof UmbManagementApiItemDataCache
+	 */
+	getAll(): Array<DetailDataModelType> {
+		return Array.from(this.#entries.values()).map((entry) => entry.data);
 	}
 
 	/**

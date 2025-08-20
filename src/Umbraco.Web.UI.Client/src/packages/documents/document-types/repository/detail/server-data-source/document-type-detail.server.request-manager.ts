@@ -22,7 +22,6 @@ export class UmbManagementApiDocumentTypeDetailDataRequestManager extends UmbMan
 				DocumentTypeService.putDocumentTypeById({ path: { id }, body }),
 			delete: (id: string) => DocumentTypeService.deleteDocumentTypeById({ path: { id } }),
 			dataCache: documentTypeDetailCache,
-			serverEventSource: 'Umbraco:CMS:DocumentType',
 		});
 	}
 }
