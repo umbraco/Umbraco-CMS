@@ -7,4 +7,6 @@ public abstract class ContentTypeCollectionReferenceResponseModelBase
     public string Alias { get; set; } = string.Empty;
 
     public string Icon { get; set; } = string.Empty;
+
+    public ReferenceByIdModel? Collection { get; set; }
 }
