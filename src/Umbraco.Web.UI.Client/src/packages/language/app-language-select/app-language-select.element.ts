@@ -122,45 +122,6 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		}
 	};
 
-	#onItemKeydown = (e: KeyboardEvent) => {
-		// Getting all items(language options) in DOM order as an array:
-		const items = Array.from(this._popoverElement!.querySelectorAll<HTMLElement>('uui-menu-item'));
-
-		// Find the index of the current(focus) element
-		const idx = items.indexOf(e.currentTarget as HTMLElement);
-
-		if (e.key === 'ArrowDown' || e.key === 'Tab') {
-			e.preventDefault();
-			if (items.length - 1 === idx) {
-				this._popoverElement?.hidePopover();
-				(this.renderRoot.querySelector('#toggle') as HTMLElement)?.focus();
-				return;
-			}
-			items[idx + 1]?.focus();
-			return;
-		}
-
-		if (e.key === 'ArrowUp') {
-			e.preventDefault();
-			if (idx === 0) {
-				this._popoverElement?.hidePopover();
-				(this.renderRoot.querySelector('#toggle') as HTMLElement)?.focus();
-				return;
-			}
-			items[idx - 1]?.focus();
-			return;
-		}
-
-		if (e.key === 'Enter' || e.key === ' ') {
-			if (idx >= 0) {
-				e.preventDefault();
-				const unique = items[idx].getAttribute('id');
-				if (unique) this.#chooseLanguage(unique);
-				return;
-			}
-		}
-	};
-
 	#chooseLanguage(unique: string) {
 		this.#appLanguageContext?.setLanguage(unique);
 		this._isOpen = false;
@@ -192,21 +153,21 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			@beforetoggle=${this.#onPopoverToggle}>
 			<umb-popover-layout>
 				<uui-scroll-container style="max-height:calc(100vh - (var(--umb-header-layout-height) + 60px));">
-					${repeat(
-						this._languages,
-						(language) => language.unique,
-						(language) => html`
-							<uui-menu-item
-								id=${language.unique}
-								label=${ifDefined(language.name)}
-								data-mark="${language.entityType}:${language.unique}"
-								?active=${language.unique === this._appLanguage?.unique}
-								@click-label=${() => this.#chooseLanguage(language.unique)}
-								@keydown=${this.#onItemKeydown}>
-								${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
-							</uui-menu-item>
-						`,
-					)}
+					<uui-combobox-list aria-label="App language" .for=${this} .value=${this._appLanguage?.unique || ''}>
+						${repeat(
+							this._languages,
+							(language) => language.unique,
+							(language) => html`
+								<uui-combobox-list-option
+									tabindex="0"
+									@click=${() => this.#chooseLanguage(language.unique)}
+									value=${language.unique}>
+									${language.name}
+									${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
+								</uui-combobox-list-option>
+							`,
+						)}
+					</uui-combobox-list>
 				</uui-scroll-container>
 			</umb-popover-layout>
 		</uui-popover-container>`;
