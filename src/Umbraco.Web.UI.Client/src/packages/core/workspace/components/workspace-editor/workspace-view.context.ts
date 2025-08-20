@@ -7,8 +7,8 @@ export class UmbWorkspaceViewContext extends UmbViewContext {
 
 	public manifest: ManifestWorkspaceView;
 
-	constructor(host: UmbControllerHost, manifest: ManifestWorkspaceView, variantId?: UmbVariantId) {
-		super(host, manifest.alias, variantId);
+	constructor(host: UmbControllerHost, manifest: ManifestWorkspaceView) {
+		super(host, manifest.alias);
 		this.manifest = manifest;
 	}
 }

@@ -47,7 +47,8 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 					workspaceViews
 						.filter((view) => !viewsToKeep.some((x) => x.manifest.alias === view.manifest.alias))
 						.forEach((view) => {
-							const context = new UmbWorkspaceViewContext(this, view.manifest, this.#variantId);
+							const context = new UmbWorkspaceViewContext(this, view.manifest);
+							context.setVariantId(this.#variantId);
 							context.hints.inheritFrom(this.#hints);
 							newViews.push(context);
 						});
