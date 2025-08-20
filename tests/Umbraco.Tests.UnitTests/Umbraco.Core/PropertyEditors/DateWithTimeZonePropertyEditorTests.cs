@@ -1,9 +1,11 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
+using Json.More;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -11,13 +13,17 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
 public class DateWithTimeZonePropertyEditorTests
 {
-    private readonly Mock<IJsonSerializer> _jsonSerializerMock = new(MockBehavior.Strict);
+    private readonly IJsonSerializer _jsonSerializer =
+        new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+
+    private readonly Mock<IDataTypeConfigurationCache> _dataTypeConfigurationCache = new(MockBehavior.Strict);
 
     private static readonly object[] _sourceList1 =
     [
@@ -104,18 +110,11 @@ public class DateWithTimeZonePropertyEditorTests
         DateTimeOffset? expectedDateTimeOffset,
         string? expectedTimeZone)
     {
-        var expectedJson = expectedDateTimeOffset is null ? null : "RESULT_JSON";
-        _jsonSerializerMock.Setup(s => s.Serialize(It.IsAny<DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone>()))
-            .Returns((object _) => expectedJson)
-            .Callback<object?>(o =>
-            {
-                Assert.IsNotNull(o);
-                Assert.IsInstanceOf<DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone>(o);
-                var dateWithTimeZone = (DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone)o;
-                Assert.AreEqual(expectedDateTimeOffset, dateWithTimeZone.Date);
-                Assert.AreEqual(expectedTimeZone, dateWithTimeZone.TimeZone);
-            })
-            .Verifiable(Times.Exactly(expectedJson is null ? 0 : 1));
+        var expectedJson = expectedDateTimeOffset is null ? null : _jsonSerializer.Serialize(new DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone
+        {
+            Date = expectedDateTimeOffset.Value,
+            TimeZone = expectedTimeZone,
+        });
         var result = CreateValueEditor(format: format).FromEditor(
             new ContentPropertyData(
                 value,
@@ -132,6 +131,50 @@ public class DateWithTimeZonePropertyEditorTests
         Assert.AreEqual(expectedJson, result);
     }
 
+    private static readonly object[][] _sourceList4 =
+    [
+        [null, DateTimeWithTimeZoneFormat.DateOnly, null],
+        [null, DateTimeWithTimeZoneFormat.TimeOnly, null],
+        [null, DateTimeWithTimeZoneFormat.DateTime, null],
+        [new DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone { Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.Zero) }, DateTimeWithTimeZoneFormat.DateOnly, "{\"date\":\"2025-08-20\",\"timeZone\":null}"],
+        [new DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone { Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.Zero) }, DateTimeWithTimeZoneFormat.TimeOnly, "{\"date\":\"16:30:00.0000000\",\"timeZone\":null}"],
+        [new DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone { Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.Zero) }, DateTimeWithTimeZoneFormat.DateTime, "{\"date\":\"2025-08-20T16:30:00.0000000Z\",\"timeZone\":null}"],
+        [new DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone { Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.FromHours(-5)) }, DateTimeWithTimeZoneFormat.DateTime, "{\"date\":\"2025-08-20T16:30:00.0000000-05:00\",\"timeZone\":null}"],
+        [new DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone { Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.FromHours(-5)), TimeZone = "Europe/Copenhagen" }, DateTimeWithTimeZoneFormat.DateTime, "{\"date\":\"2025-08-20T16:30:00.0000000-05:00\",\"timeZone\":\"Europe/Copenhagen\"}"],
+    ];
+
+    [TestCaseSource(nameof(_sourceList4))]
+    public void Can_Parse_Values_To_Editor(
+        DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone? storedValue,
+        DateTimeWithTimeZoneFormat format,
+        string? expectedJson)
+    {
+        var valueEditor = CreateValueEditor(format: format);
+        _dataTypeConfigurationCache.Setup(dc => dc.GetConfigurationAs<DateTimeWithTimeZoneConfiguration>(Guid.Empty))
+            .Returns(valueEditor.ConfigurationObject as DateTimeWithTimeZoneConfiguration);
+        var storedValueJson = storedValue is null ? null : _jsonSerializer.Serialize(storedValue);
+        var result = valueEditor.ToEditor(
+            new Property(new PropertyType(Mock.Of<IShortStringHelper>(), "dataType", ValueStorageType.Ntext))
+            {
+                Values =
+                [
+                    new Property.PropertyValue
+                    {
+                        EditedValue = storedValueJson,
+                        PublishedValue = storedValueJson,
+                    }
+                ],
+            });
+        if (expectedJson is null)
+        {
+            Assert.IsNull(result);
+            return;
+        }
+
+        Assert.IsInstanceOf<JsonNode>(result);
+        Assert.AreEqual(expectedJson, (result as JsonNode)?.AsJsonString());
+    }
+
     private DateTimeWithTimeZonePropertyEditor.DateTimeWithTimeZoneDataValueEditor CreateValueEditor(
         DateTimeWithTimeZoneFormat format = DateTimeWithTimeZoneFormat.DateTime,
         DateTimeWithTimeZoneMode timeZoneMode = DateTimeWithTimeZoneMode.All,
@@ -146,11 +189,11 @@ public class DateWithTimeZonePropertyEditorTests
             .Returns((string key, string alias, CultureInfo _, IDictionary<string, string> _) => $"{key}_{alias}");
         var valueEditor = new DateTimeWithTimeZonePropertyEditor.DateTimeWithTimeZoneDataValueEditor(
             Mock.Of<IShortStringHelper>(),
-            _jsonSerializerMock.Object,
+            _jsonSerializer,
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"),
             localizedTextServiceMock.Object,
-            Mock.Of<IDataTypeConfigurationCache>())
+            _dataTypeConfigurationCache.Object)
         {
             ConfigurationObject = new DateTimeWithTimeZoneConfiguration
             {

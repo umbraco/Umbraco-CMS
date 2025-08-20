@@ -120,6 +120,8 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
             var objectValue = DateTimeWithTimeZoneValueConverter.GetObjectValue(dateWithTimeZone, configuration);
 
             JsonNode node = new JsonObject();
+            node["date"] = DateTimeWithTimeZoneValueConverter.GetDateValueAsString(objectValue);
+
             if (objectValue is DateTimeOffset && dateWithTimeZone.TimeZone is null)
             {
                 // If the time zone is not set, we assume the date is in UTC.
@@ -134,8 +136,6 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
             {
                 node["timeZone"] = dateWithTimeZone.TimeZone;
             }
-
-            node["date"] = DateTimeWithTimeZoneValueConverter.GetDateValueAsString(objectValue);
 
             return node;
         }
