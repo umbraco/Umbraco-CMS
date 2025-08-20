@@ -6,13 +6,13 @@ Always reference these instructions first and fallback to search or bash command
 
 Bootstrap, build, and test the repository:
 
-- Install .NET 9 SDK (required by global.json):
-  - `curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 9.0.100`
+- Install .NET SDK (version specified in global.json):
+  - `curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version $(cat global.json | grep -o '"version": "[^"]*' | cut -d'"' -f4)`
   - `export PATH="/home/runner/.dotnet:$PATH"`
-- Install Node.js 22+ (found in src/Umbraco.Web.UI.Client/.nvmrc):
+- Install Node.js (version specified in src/Umbraco.Web.UI.Client/.nvmrc):
   - `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash`
   - `export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"`
-  - `nvm install 22 && nvm use 22`
+  - `nvm install $(cat src/Umbraco.Web.UI.Client/.nvmrc) && nvm use $(cat src/Umbraco.Web.UI.Client/.nvmrc)`
 - Fix shallow clone issue (required for GitVersioning):
   - `git fetch --unshallow`
 - Restore packages:
@@ -147,17 +147,17 @@ git clean -xdf .
 
 ## Version Information
 
-- Target Framework: .NET 9.0
-- Current Version: 16.3.0-rc (from version.json)
-- Node.js Requirement: 22+ (20+ works with warnings)
-- npm Requirement: 10.9+
+- Target Framework: .NET (version specified in global.json)
+- Current Version: (specified in version.json)
+- Node.js Requirement: (specified in src/Umbraco.Web.UI.Client/.nvmrc)
+- npm Requirement: Latest compatible version
 
 ## Known Issues
 
 - Build requires full git history (not shallow clone) due to GitVersioning
 - Some NuGet package security warnings are expected (SixLabors.ImageSharp vulnerabilities)
 - Frontend tests require Playwright browser installation: `npx playwright install`
-- Node.js 20 works but shows engine compatibility warnings (prefer 22+)
+- Older Node.js versions may show engine compatibility warnings (check .nvmrc for current requirement)
 
 ## Timing Expectations
 
