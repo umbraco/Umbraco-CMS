@@ -2,6 +2,12 @@ import { UmbTiptapExtensionApiBase, UmbTiptapToolbarElementApiBase } from './bas
 import { expect } from '@open-wc/testing';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+
+// Test controller host element
+@customElement('test-tiptap-extension-host')
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 // Mock editor for testing
 const createMockEditor = (isActiveResult = false): Editor => ({
@@ -20,17 +26,18 @@ class TestTiptapToolbarElementApi extends UmbTiptapToolbarElementApiBase {
 }
 
 describe('UmbTiptapExtensionApiBase', () => {
-	let host: HTMLElement;
+	let host: UmbTestControllerHostElement;
 	let extension: TestTiptapExtensionApi;
 
 	beforeEach(() => {
-		host = document.createElement('div');
+		host = new UmbTestControllerHostElement();
 		extension = new TestTiptapExtensionApi(host);
+		document.body.appendChild(host);
 	});
 
 	afterEach(() => {
 		extension.destroy();
-		host.remove();
+		document.body.removeChild(host);
 	});
 
 	it('is defined with its own instance', () => {

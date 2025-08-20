@@ -2,6 +2,12 @@ import UmbTiptapUnderlineExtensionApi from './underline.tiptap-api.js';
 import UmbTiptapLinkExtensionApi from './link.tiptap-api.js';
 import UmbTiptapWordCountExtensionApi from './word-count.tiptap-api.js';
 import { expect } from '@open-wc/testing';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+
+// Test controller host element
+@customElement('test-core-extension-host')
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 describe('UmbTiptapUnderlineExtensionApi', () => {
 	let host: HTMLElement;

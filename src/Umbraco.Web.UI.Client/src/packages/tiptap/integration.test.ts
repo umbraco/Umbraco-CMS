@@ -1,6 +1,6 @@
-import { UmbInputTiptapElement } from '../components/input-tiptap/input-tiptap.element.js';
-import { UmbPropertyEditorUiTiptapElement } from '../property-editors/tiptap/property-editor-ui-tiptap.element.js';
-import { UmbTiptapRteContext } from '../contexts/tiptap-rte.context.js';
+import { UmbInputTiptapElement } from './components/input-tiptap/input-tiptap.element.js';
+import { UmbPropertyEditorUiTiptapElement } from './property-editors/tiptap/property-editor-ui-tiptap.element.js';
+import { UmbTiptapRteContext } from './contexts/tiptap-rte.context.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -161,7 +161,7 @@ describe('Tiptap Integration Tests', () => {
 			expect(inputElement?.configuration).to.equal(config);
 			
 			// Should not throw errors with empty configuration
-			expect(() => inputElement?.configuration = config).to.not.throw;
+			expect(() => { if (inputElement) inputElement.configuration = config; }).to.not.throw;
 		});
 	});
 
