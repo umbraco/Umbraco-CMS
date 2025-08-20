@@ -115,10 +115,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 	#onTriggerKeydown = (e: KeyboardEvent) => {
 		// If popover is open and the user presses Tab, move focus to first option
-		if (this._isOpen && e.key === 'Tab' && !e.shiftKey) {
-			e.preventDefault();
-			const first = this._popoverElement?.querySelector<HTMLElement>('uui-menu-item');
-			first?.focus();
+		if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+			this._popoverElement?.showPopover();
 		}
 	};
 
