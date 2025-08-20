@@ -7,16 +7,7 @@ import type {
 	UUIComboboxListEvent,
 	UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
-import {
-	css,
-	html,
-	customElement,
-	state,
-	repeat,
-	ifDefined,
-	query,
-	nothing,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, query, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
