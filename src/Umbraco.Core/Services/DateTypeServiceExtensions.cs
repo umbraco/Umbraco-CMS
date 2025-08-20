@@ -7,14 +7,11 @@ namespace Umbraco.Extensions;
 public static class DateTypeServiceExtensions
 {
     public static bool IsDataTypeIgnoringUserStartNodes(this IDataTypeService dataTypeService, Guid key)
+        => dataTypeService.IsDataTypeIgnoringUserStartNodesAsync(key).GetAwaiter().GetResult();
+
+    public static async Task<bool> IsDataTypeIgnoringUserStartNodesAsync(this IDataTypeService dataTypeService, Guid key)
     {
-        IDataType? dataType = dataTypeService.GetAsync(key).GetAwaiter().GetResult();
-
-        if (dataType != null && dataType.ConfigurationObject is IIgnoreUserStartNodesConfig ignoreStartNodesConfig)
-        {
-            return ignoreStartNodesConfig.IgnoreUserStartNodes;
-        }
-
-        return false;
+        IDataType? dataType = await dataTypeService.GetAsync(key);
+        return dataType is { ConfigurationObject: IIgnoreUserStartNodesConfig { IgnoreUserStartNodes: true } };
     }
 }

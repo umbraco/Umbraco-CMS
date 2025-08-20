@@ -1,5 +1,5 @@
 /* eslint-disable local-rules/no-direct-api-import */
-import { documentTypeDetailCache } from './document-type-detail.server.runtime-cache.js';
+import { documentTypeDetailCache } from './document-type-detail.server.cache.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	DocumentTypeService,
@@ -24,7 +24,6 @@ export class UmbManagementApiDocumentTypeDetailDataRequestManager extends UmbMan
 				DocumentTypeService.putDocumentTypeById({ path: { id }, body }),
 			delete: (id: string) => DocumentTypeService.deleteDocumentTypeById({ path: { id } }),
 			dataCache: documentTypeDetailCache,
-			serverEventSource: 'Umbraco:CMS:DocumentType',
 			inflightRequestCache: UmbManagementApiDocumentTypeDetailDataRequestManager.#inflightRequestCache,
 		});
 	}
