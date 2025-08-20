@@ -47,7 +47,7 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
     /// <inheritdoc/>
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _propertyIndexValueFactory;
 
-    private class DateTimeWithTimeZoneDataValueEditor : DataValueEditor
+    internal class DateTimeWithTimeZoneDataValueEditor : DataValueEditor
     {
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
