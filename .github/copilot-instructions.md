@@ -7,7 +7,7 @@ Always reference these instructions first and fallback to search or bash command
 Bootstrap, build, and test the repository:
 
 - Install .NET SDK (version specified in global.json):
-  - `curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version $(cat global.json | grep -o '"version": "[^"]*' | cut -d'"' -f4)`
+  - `curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version $(jq -r '.sdk.version' global.json)`
   - `export PATH="/home/runner/.dotnet:$PATH"`
 - Install Node.js (version specified in src/Umbraco.Web.UI.Client/.nvmrc):
   - `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash`
