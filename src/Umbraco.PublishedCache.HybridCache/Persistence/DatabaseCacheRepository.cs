@@ -444,7 +444,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 )",
             new { objType = nodeObjectType });
 
-    private void DeleteForObjectTypeAndContentTypes(Guid nodeObjectType, IReadOnlyCollection<int>? contentTypeIds) =>
+    private void DeleteForObjectTypeAndContentTypes(Guid nodeObjectType, IReadOnlyCollection<int> contentTypeIds) =>
         Database.Execute(
             $@"
                 DELETE FROM cmsContentNu
