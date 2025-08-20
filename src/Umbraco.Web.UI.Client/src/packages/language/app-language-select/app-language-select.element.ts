@@ -102,12 +102,11 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		}
 	}
 
-	#onPopoverToggle(event: ToggleEvent) {
+	#onBeforePopoverToggle(event: ToggleEvent) {
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		this._isOpen = event.newState === 'open';
-		if (this._isOpen && !this.#languagesObserver) {
+		if (event.newState === 'open' && !this.#languagesObserver) {
 			if (this._popoverElement) {
 				const host = this.getBoundingClientRect();
 				this._popoverElement.style.width = `${host.width}px`;
@@ -117,16 +116,33 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		}
 	}
 
+	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._isOpen = event.newState === 'open';
+	}
+
+	#onTriggerClick() {
+		if (this._isOpen) {
+			this._popoverElement?.hidePopover();
+		} else {
+			this._popoverElement?.showPopover();
+		}
+		this.requestUpdate();
+	}
+
 	#onTriggerKeydown = (e: KeyboardEvent) => {
-		// If popover is open and the user presses Tab, move focus to first option
 		if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
 			this._popoverElement?.showPopover();
+		}
+		if (e.key === ' ') {
+			this._popoverElement?.togglePopover();
 		}
 	};
 
 	#chooseLanguage(unique: string) {
 		this.#appLanguageContext?.setLanguage(unique);
-		this._isOpen = false;
 		this._popoverElement?.hidePopover();
 	}
 
@@ -138,7 +154,6 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		if (value) {
 			this.#chooseLanguage(value);
 		}
-		debugger;
 	}
 
 	override render() {
@@ -146,24 +161,27 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	#renderTrigger() {
-		return html` <button
+		return html` <div
 			id="toggle"
 			data-mark="action:open"
 			popovertarget="dropdown-popover"
+			tabindex="0"
+			@click=${this.#onTriggerClick}
 			@keydown=${this.#onTriggerKeydown}>
 			<span>
 				${this._appLanguage?.name}
 				${this._appLanguageIsReadOnly ? this.#renderReadOnlyTag(this._appLanguage?.unique) : nothing}
 			</span>
 			<uui-symbol-expand .open=${this._isOpen}></uui-symbol-expand>
-		</button>`;
+		</div>`;
 	}
 
 	#renderContent() {
 		return html` <uui-popover-container
 			id="dropdown-popover"
 			data-mark="app-language-menu"
-			@beforetoggle=${this.#onPopoverToggle}>
+			@beforetoggle=${this.#onBeforePopoverToggle}
+			@toggle=${this.#onPopoverToggle}>
 			<umb-popover-layout>
 				<uui-scroll-container style="max-height:calc(100vh - (var(--umb-header-layout-height) + 60px));">
 					${this.#renderOptions()}
@@ -184,10 +202,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 				this._languages,
 				(language) => language.unique,
 				(language) => html`
-					<uui-combobox-list-option
-						tabindex="0"
-						@click=${() => this.#chooseLanguage(language.unique)}
-						value=${language.unique}>
+					<uui-combobox-list-option tabindex="0" value=${language.unique}>
 						${language.name}
 						${this.#isLanguageReadOnly(language.unique) ? this.#renderReadOnlyTag(language.unique) : nothing}
 					</uui-combobox-list-option>
@@ -216,7 +231,6 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			#toggle {
 				color: var(--uui-color-text);
-				width: 100%;
 				text-align: left;
 				background: none;
 				border: none;
