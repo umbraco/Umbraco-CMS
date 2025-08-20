@@ -109,10 +109,11 @@ For frontend-only changes:
 
 ### Backend-Only Development
 For backend-only changes, disable frontend builds:
-- Comment out frontend build steps in src/Umbraco.Cms.StaticAssets.csproj:
+- Comment out the target named "BuildStaticAssetsPreconditions" in src/Umbraco.Cms.StaticAssets.csproj:
   ```
-  REM npm ci --no-fund --no-audit --prefer-offline
-  REM npm run build:for:cms
+  <!--<Target Name="BuildStaticAssetsPreconditions" BeforeTargets="AssignTargetPaths">
+    [...]
+  </Target>-->
   ```
 - Remember to uncomment before committing
 
