@@ -191,6 +191,11 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
         Assert.AreEqual(LanguageOperationStatus.Success, result.Status);
 
+        // Verify that the create and update dates can be used to distinguish between creates
+        // and updates (as these fields are used in ServerEventSender to emit a "Created" or "Updated"
+        // event.
+        Assert.Greater(result.Result.UpdateDate, result.Result.CreateDate);
+
         // re-get
         languageDaDk = await LanguageService.GetAsync(languageDaDk.IsoCode);
         Assert.NotNull(languageDaDk);
@@ -449,47 +454,5 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(languageResult.Success);
         languageResult = await LanguageService.CreateAsync(languageEnGb, Constants.Security.SuperUserKey);
         Assert.IsTrue(languageResult.Success);
-    }
-
-    [Test]
-    public async Task UpdateAsync_Sets_Dates_For_Server_Events()
-    {
-        // Arrange - get an existing language to update
-        ILanguage language = await LanguageService.GetAsync("da-DK");
-        Assert.NotNull(language);
-        
-        // Store original values
-        var originalCreateDate = language.CreateDate;
-        var originalUpdateDate = language.UpdateDate;
-        
-        // Reset the dates to default to simulate the scenario where dates aren't tracked
-        language.CreateDate = default;
-        language.UpdateDate = default;
-        
-        // Make a change to trigger update
-        language.CultureName = "Updated Danish Culture";
-
-        // Act - update the language
-        var result = await LanguageService.UpdateAsync(language, Constants.Security.SuperUserKey);
-
-        // Assert - verify the operation succeeded
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(LanguageOperationStatus.Success, result.Status);
-        
-        // Verify the dates have been set for server event detection
-        // CreateDate should be DateTime.MinValue for updates (when it was default)
-        Assert.AreEqual(DateTime.MinValue, result.Result.CreateDate);
-        
-        // UpdateDate should be set to current time (when it was default)
-        Assert.AreNotEqual(default(DateTime), result.Result.UpdateDate);
-        Assert.Greater(result.Result.UpdateDate, DateTime.MinValue);
-        
-        // Most importantly for server events: CreateDate != UpdateDate
-        Assert.AreNotEqual(result.Result.CreateDate, result.Result.UpdateDate);
-        
-        // This should result in "Updated" event type instead of "Created"
-        // (mimicking the logic from ServerEventSender.NotifySavedAsync)
-        var eventType = result.Result.CreateDate == result.Result.UpdateDate ? "Created" : "Updated";
-        Assert.AreEqual("Updated", eventType);
     }
 }

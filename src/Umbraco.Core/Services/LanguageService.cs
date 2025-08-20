@@ -89,7 +89,9 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         // So ensure we set something that can be distinguished here.
         if (language.CreateDate == default)
         {
-            language.CreateDate = DateTime.MinValue;
+            // Set such that it's prior to the update date, but not the default date which will be considered
+            // uninitialized and get reset to the current date at the repository.
+            language.CreateDate = DateTime.MinValue.AddHours(1);
         }
 
         if (language.UpdateDate == default)
