@@ -51,7 +51,7 @@ public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCache
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[] payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
         ClearAllIsolatedCacheByEntityType<IDomain>();
 
@@ -61,8 +61,8 @@ public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCache
 
         // notify
         _domainCacheService.Refresh(payloads);
-        // then trigger event
-        base.Refresh(payloads);
+
+        base.RefreshInternal(payloads);
     }
 
     // these events should never trigger

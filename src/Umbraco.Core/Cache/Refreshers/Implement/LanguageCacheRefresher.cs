@@ -96,8 +96,9 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[] payloads)
+    public override void RefreshInternal(JsonPayload[] payloads)
     {
+        // Languages has no concept of "published" languages, so all caches are "internal"
         if (payloads.Length == 0)
         {
             return;
@@ -135,20 +136,9 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
             // clear all domain caches
             RefreshDomains();
             ContentCacheRefresher.RefreshContentTypes(AppCaches); // we need to evict all IContent items
-
-            // now refresh all nucache
-            ContentCacheRefresher.JsonPayload[] clearContentPayload = new[]
-            {
-                new ContentCacheRefresher.JsonPayload()
-                {
-                    ChangeTypes = TreeChangeTypes.RefreshAll
-                }
-            };
         }
-
-        // then trigger event
-        base.Refresh(payloads);
     }
+
 
     // these events should never trigger
     // everything should be PAYLOAD/JSON

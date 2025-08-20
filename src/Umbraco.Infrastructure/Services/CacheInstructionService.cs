@@ -439,6 +439,7 @@ namespace Umbraco.Cms
                 IJsonCacheRefresher refresher = GetJsonRefresher(cacheRefreshers, uniqueIdentifier);
                 if (jsonPayload is not null)
                 {
+                    refresher.RefreshInternal(jsonPayload);
                     refresher.Refresh(jsonPayload);
                 }
             }
