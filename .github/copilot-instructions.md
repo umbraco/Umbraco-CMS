@@ -98,7 +98,8 @@ The solution contains 30 C# projects organized as follows:
 For frontend-only changes:
 1. Configure backend for frontend development:
    ```json
-   // Add to src/Umbraco.Web.UI/appsettings.json under Umbraco:Cms:Security:
+   <!-- Add to src/Umbraco.Web.UI/appsettings.json under Umbraco:Cms:Security: -->
+   ```json
    "BackOfficeHost": "http://localhost:5173",
    "AuthorizeCallbackPathName": "/oauth_complete",
    "AuthorizeCallbackLogoutPathName": "/logout",
