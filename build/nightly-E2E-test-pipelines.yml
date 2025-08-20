@@ -21,7 +21,7 @@ parameters:
   - name: exstensionRegistryAcceptanceTests
     displayName: Run acceptance tests with Exstension Registry
     type: boolean
-    default: false
+    default: true
 
   - name: skipDefaultConfigAcceptanceTests
     displayName: Skip tests with DefaultConfig
@@ -115,9 +115,25 @@ stages:
     dependsOn: Build
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
+      # Enable console logging in Release mode
+      SERILOG__WRITETO__0__NAME: Async
+      SERILOG__WRITETO__0__ARGS__CONFIGURE__0__NAME: Console
+      # Set unattended install settings
+      UMBRACO__CMS__UNATTENDED__INSTALLUNATTENDED: true
+      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERNAME: Playwright Test
+      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD: UmbracoAcceptance123!
+      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL: playwright@umbraco.com
+      # Custom Umbraco settings
+      UMBRACO__CMS__CONTENT__CONTENTVERSIONCLEANUPPOLICY__ENABLECLEANUP: false
+      UMBRACO__CMS__GLOBAL__DISABLEELECTIONFORSINGLESERVER: true
+      UMBRACO__CMS__GLOBAL__INSTALLMISSINGDATABASE: true
+      UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
+      UMBRACO__CMS__GLOBAL__VERSIONCHECKPERIOD: 0
+      UMBRACO__CMS__GLOBAL__USEHTTPS: true
+      UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
+      UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
+      UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
       ASPNETCORE_URLS: https://localhost:44331
-      PlaywrightPassword: UmbracoAcceptance123!
-      PlaywrightUserEmail: playwright@umbraco.com
     jobs:
       # E2E Tests
       - job:
@@ -176,8 +192,8 @@ stages:
               useGlobalJson: true
 
           - pwsh: |
-              "UMBRACO_USER_LOGIN=$(PlaywrightUserEmail)
-              UMBRACO_USER_PASSWORD=$(PlaywrightPassword)
+              "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
+              UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
               STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
               CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
@@ -198,7 +214,7 @@ stages:
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
             displayName: Restore NPM packages
 
-          # Install template
+          # Build application
           - pwsh: |
               $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
               dotnet new nugetconfig
@@ -207,17 +223,12 @@ stages:
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
               dotnet restore UmbracoProject
               cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
-            displayName: Install template
-            workingDirectory: $(Agent.BuildDirectory)/app
-          
-          # Build application
-          - pwsh: |
               dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          # Run application for Linux
+          # Run application
           - bash: |
               nohup dotnet run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
               echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
@@ -225,7 +236,6 @@ stages:
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          # Run application for Windows
           - pwsh: |
               $process = Start-Process dotnet "run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
               Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
@@ -308,36 +318,38 @@ stages:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
-          SA_PASSWORD: UmbracoAcceptance123!
         strategy:
           matrix:
             LinuxPart1Of3:
               testCommand: "npm run test -- --shard=1/3"
               testFolder: "DefaultConfig"
               vmImage: "ubuntu-latest"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             LinuxPart2Of3:
               testCommand: "npm run test -- --shard=2/3"
               testFolder: "DefaultConfig"
               vmImage: "ubuntu-latest"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             LinuxPart3Of3:
               testCommand: "npm run test -- --shard=3/3"
               testFolder: "DefaultConfig"
               vmImage: "ubuntu-latest"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
             WindowsPart1Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=1/3"
               testFolder: "DefaultConfig"
+              testCommand: "npm run test -- --shard=1/3"
             WindowsPart2Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=2/3"
               testFolder: "DefaultConfig"
+              testCommand: "npm run test -- --shard=2/3"
             WindowsPart3Of3:
               vmImage: "windows-latest"
-              testCommand: "npm run test -- --shard=3/3"
               testFolder: "DefaultConfig"
+              testCommand: "npm run test -- --shard=3/3"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -359,8 +371,8 @@ stages:
               useGlobalJson: true
 
           - pwsh: |
-              "UMBRACO_USER_LOGIN=$(PlaywrightUserEmail)
-              UMBRACO_USER_PASSWORD=$(PlaywrightPassword)
+              "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
+              UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
               STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
               CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
@@ -381,7 +393,7 @@ stages:
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
             displayName: Restore NPM packages
 
-          # Install template
+          # Build application
           - pwsh: |
               $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
               dotnet new nugetconfig
@@ -390,11 +402,6 @@ stages:
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
               dotnet restore UmbracoProject
               cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
-            displayName: Install template
-            workingDirectory: $(Agent.BuildDirectory)/app
-
-          # Build application
-          - pwsh: |
               dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
             displayName: Build application
@@ -409,7 +416,7 @@ stages:
             displayName: Start SQL Server LocalDB (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
-          # Run application for Linux
+          # Run application
           - bash: |
               nohup dotnet run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
               echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
@@ -417,7 +424,6 @@ stages:
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          # Run application for Windows
           - pwsh: |
               $process = Start-Process dotnet "run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
               Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
@@ -500,18 +506,16 @@ stages:
               testResultsFiles: '*.xml'
               searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
               testRunTitle: "$(Agent.JobName)"
-              
+
       - job:
         displayName: E2E Tests With Extension Registry
-        condition: ${{ or(eq(parameters.exstensionRegistryAcceptanceTests, true), eq(parameters.skipDefaultConfigAcceptanceTests, true)) }}
         timeoutInMinutes: 180
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
-          SA_PASSWORD: UmbracoAcceptance123!
         strategy:
-          matrix:
+           matrix:
             WindowsExtensionRegistry:
               vmImage: "windows-latest"
               testCommand: "npx playwright test --project=extensionRegistry"
@@ -519,7 +523,9 @@ stages:
             LinuxExtensionRegistry:
               vmImage: "ubuntu-latest"
               testCommand: "npx playwright test --project=extensionRegistry"
-              testFolder: "ExtensionRegistry"    
+              testFolder: "ExtensionRegistry"
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              CONNECTIONSTRINGS__UMBRACODBDSN: "Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -541,8 +547,8 @@ stages:
               useGlobalJson: true
 
           - pwsh: |
-              "UMBRACO_USER_LOGIN=$(PlaywrightUserEmail)
-              UMBRACO_USER_PASSWORD=$(PlaywrightPassword)
+              "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
+              UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
               URL=$(ASPNETCORE_URLS)
               STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
               CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
@@ -572,22 +578,22 @@ stages:
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
               dotnet restore UmbracoProject
               cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
-            displayName: Install template
+            displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          # # Update application to use necessary classes
-          # - pwsh: |
-          #     $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/BackOffice_Override"
-          #     $destinationPath = "UmbracoProject"
-          #     if (Test-Path $sourcePath) {
-          #       Write-Host "Copying files from $sourcePath to $destinationPath"
-          #       Copy-Item -Path $sourcePath\* -Destination $destinationPath -Recurse -Force
-          #     } else {
-          #       Write-Host "No BackOffice_Override folder found at $sourcePath"
-          #     }
-          #   displayName: Update application to use necessary classes
-          #   workingDirectory: $(Agent.BuildDirectory)/app
-
+          # Update application to use necessary classes
+          - pwsh: |
+              $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/BackOffice_Override"
+              $destinationPath = "UmbracoProject"
+              if (Test-Path $sourcePath) {
+                Write-Host "Copying files from $sourcePath to $destinationPath"
+                Copy-Item -Path $sourcePath\* -Destination $destinationPath -Recurse -Force
+              } else {
+                Write-Host "No BackOffice_Override folder found at $sourcePath"
+              }
+            displayName: Update application to use necessary classes
+            workingDirectory: $(Agent.BuildDirectory)/app
+          
           # Build application
           - pwsh: |
               dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
@@ -604,7 +610,7 @@ stages:
             displayName: Start SQL Server LocalDB (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
-          # Run application for Linux
+          # Run application
           - bash: |
               nohup dotnet run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
               echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
@@ -612,7 +618,6 @@ stages:
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          # Run application for Windows
           - pwsh: |
               $process = Start-Process dotnet "run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
               Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
@@ -696,50 +701,50 @@ stages:
               searchFolder: "tests/Umbraco.Tests.AcceptanceTest/results"
               testRunTitle: "$(Agent.JobName)"
 
-  - stage: NotifySlackBot
-    displayName: Notify Slack on Failure
-    dependsOn: E2E
-    # This stage will only run if the E2E tests fail or succeed with issues
-    condition: or(
-      eq(dependencies.E2E.result, 'failed'),
-      eq(dependencies.E2E.result, 'succeededWithIssues'))
-    jobs:
-      - job: PostToSlack
-        displayName: Send Slack Notification
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          # We send a payload to the Slack webhook URL, which will post a message to a specific channel
-          - bash: |
-              PROJECT_NAME_ENCODED=$(echo -n "$SYSTEM_TEAMPROJECT" | jq -s -R -r @uri)
-              PIPELINE_URL="${SYSTEM_TEAMFOUNDATIONCOLLECTIONURI}${PROJECT_NAME_ENCODED}/_build/results?buildId=${BUILD_BUILDID}&view=ms.vss-test-web.build-test-results-tab"
+  # - stage: NotifySlackBot
+  #   displayName: Notify Slack on Failure
+  #   dependsOn: E2E
+  #   # This stage will only run if the E2E tests fail or succeed with issues
+  #   condition: or(
+  #     eq(dependencies.E2E.result, 'failed'),
+  #     eq(dependencies.E2E.result, 'succeededWithIssues'))
+  #   jobs:
+  #     - job: PostToSlack
+  #       displayName: Send Slack Notification
+  #       pool:
+  #         vmImage: 'ubuntu-latest'
+  #       steps:
+  #         # We send a payload to the Slack webhook URL, which will post a message to a specific channel
+  #         - bash: |
+  #             PROJECT_NAME_ENCODED=$(echo -n "$SYSTEM_TEAMPROJECT" | jq -s -R -r @uri)
+  #             PIPELINE_URL="${SYSTEM_TEAMFOUNDATIONCOLLECTIONURI}${PROJECT_NAME_ENCODED}/_build/results?buildId=${BUILD_BUILDID}&view=ms.vss-test-web.build-test-results-tab"
 
-              PAYLOAD="{
-                \"attachments\": [
-                  {
-                    \"color\": \"#ff0000\",
-                    \"pretext\": \"Nightly E2E pipeline *${BUILD_DEFINITIONNAME}* (#${BUILD_BUILDNUMBER}) failed!\",
-                    \"title\": \"View Failed E2E Test Results\",
-                    \"title_link\": \"$PIPELINE_URL\",
-                    \"fields\": [
-                      {
-                        \"title\": \"Pipeline\",
-                        \"value\": \"${BUILD_DEFINITIONNAME}\",
-                        \"short\": true
-                      },
-                      {
-                        \"title\": \"Build ID\",
-                        \"value\": \"${BUILD_BUILDID}\",
-                        \"short\": true
-                      }
-                    ]
-                  }
-                ]
-              }"
+  #             PAYLOAD="{
+  #               \"attachments\": [
+  #                 {
+  #                   \"color\": \"#ff0000\",
+  #                   \"pretext\": \"Nightly E2E pipeline *${BUILD_DEFINITIONNAME}* (#${BUILD_BUILDNUMBER}) failed!\",
+  #                   \"title\": \"View Failed E2E Test Results\",
+  #                   \"title_link\": \"$PIPELINE_URL\",
+  #                   \"fields\": [
+  #                     {
+  #                       \"title\": \"Pipeline\",
+  #                       \"value\": \"${BUILD_DEFINITIONNAME}\",
+  #                       \"short\": true
+  #                     },
+  #                     {
+  #                       \"title\": \"Build ID\",
+  #                       \"value\": \"${BUILD_BUILDID}\",
+  #                       \"short\": true
+  #                     }
+  #                   ]
+  #                 }
+  #               ]
+  #             }"
 
-              echo "Sending Slack message to: $PIPELINE_URL"
-              curl -X POST -H 'Content-type: application/json' \
-                --data "$PAYLOAD" \
-                "$SLACK_WEBHOOK_URL"
-            env:
-              SLACK_WEBHOOK_URL: $(E2ESLACKWEBHOOKURL)
+  #             echo "Sending Slack message to: $PIPELINE_URL"
+  #             curl -X POST -H 'Content-type: application/json' \
+  #               --data "$PAYLOAD" \
+  #               "$SLACK_WEBHOOK_URL"
+  #           env:
+  #             SLACK_WEBHOOK_URL: $(E2ESLACKWEBHOOKURL)
