@@ -23,8 +23,10 @@ Bootstrap, build, and test the repository:
   - `cd src/Umbraco.Web.UI.Client`
   - `npm ci --no-fund --no-audit --prefer-offline` -- takes 11 seconds.
   - `npm run build:for:cms` -- takes 1.25 minutes. NEVER CANCEL. Set timeout to 5+ minutes.
-- Run unit tests:
-  - `dotnet test tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj --configuration Release --verbosity minimal` -- takes 1 minute. NEVER CANCEL. Set timeout to 5+ minutes.
+- Install and build Login
+  - `cd src/Umbraco.Web.UI.Login`
+  - `npm ci --no-fund --no-audit --prefer-offline`
+  - `npm run build`
 - Run the application:
   - `cd src/Umbraco.Web.UI`
   - `dotnet run --no-build` -- Application runs on https://localhost:44339 and http://localhost:11000
@@ -35,7 +37,9 @@ Bootstrap, build, and test the repository:
 - Build and unit tests must pass before committing changes.
 - Frontend build produces output in src/Umbraco.Web.UI.Client/dist-cms/ which gets copied to src/Umbraco.Web.UI/wwwroot/umbraco/backoffice/
 - Always run `dotnet build` and `npm run build:for:cms` before running the application to see your changes.
+- For login-only changes, you can run `npm run build` from src/Umbraco.Web.UI.Login and then `dotnet run --no-build` from src/Umbraco.Web.UI.
 - For frontend-only changes, you can run `npm run dev:server` from src/Umbraco.Web.UI.Client for hot reloading.
+- Frontend changes should be linted using `npm run lint:fix` which uses Eslint.
 
 ## Testing
 
@@ -58,7 +62,7 @@ Bootstrap, build, and test the repository:
 ### Acceptance Tests (E2E)
 - Location: tests/Umbraco.Tests.AcceptanceTest/
 - Requires running Umbraco application and configuration
-- See tests/Umbraco.Tests.AcceptanceTest/README.md for detailed setup
+- See tests/Umbraco.Tests.AcceptanceTest/README.md for detailed setup (requires `npx playwright install` first)
 
 ## Project Structure
 
@@ -169,6 +173,8 @@ git clean -xdf .
 | `dotnet build` | 4.5 minutes | 10+ minutes |
 | `npm ci` | 11 seconds | 30+ seconds |
 | `npm run build:for:cms` | 1.25 minutes | 5+ minutes |
+| `npm test` | 2 minutes | 5+ minutes |
+| `npm run lint` | 1 minute | 5+ minutes |
 | Unit tests | 1 minute | 5+ minutes |
 | Integration tests | Variable | 10+ minutes |
 
