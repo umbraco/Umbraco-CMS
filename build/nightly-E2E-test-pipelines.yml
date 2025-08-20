@@ -575,18 +575,18 @@ stages:
             displayName: Install template
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          # Update application to use necessary classes
-          - pwsh: |
-              $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/BackOffice_Override"
-              $destinationPath = "UmbracoProject"
-              if (Test-Path $sourcePath) {
-                Write-Host "Copying files from $sourcePath to $destinationPath"
-                Copy-Item -Path $sourcePath\* -Destination $destinationPath -Recurse -Force
-              } else {
-                Write-Host "No BackOffice_Override folder found at $sourcePath"
-              }
-            displayName: Update application to use necessary classes
-            workingDirectory: $(Agent.BuildDirectory)/app
+          # # Update application to use necessary classes
+          # - pwsh: |
+          #     $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/$(testFolder)/BackOffice_Override"
+          #     $destinationPath = "UmbracoProject"
+          #     if (Test-Path $sourcePath) {
+          #       Write-Host "Copying files from $sourcePath to $destinationPath"
+          #       Copy-Item -Path $sourcePath\* -Destination $destinationPath -Recurse -Force
+          #     } else {
+          #       Write-Host "No BackOffice_Override folder found at $sourcePath"
+          #     }
+          #   displayName: Update application to use necessary classes
+          #   workingDirectory: $(Agent.BuildDirectory)/app
 
           # Build application
           - pwsh: |
