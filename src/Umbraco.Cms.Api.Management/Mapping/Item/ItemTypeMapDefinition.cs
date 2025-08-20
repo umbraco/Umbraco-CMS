@@ -120,6 +120,7 @@ public class ItemTypeMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private static void Map(IWebhook source, WebhookItemResponseModel target, MapperContext context)
     {
+        target.Id = source.Key;
         target.Name = source.Name ?? source.Url;
         target.Url = source.Url;
         target.Enabled = source.Enabled;

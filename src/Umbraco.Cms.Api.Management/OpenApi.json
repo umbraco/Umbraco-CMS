@@ -48124,12 +48124,29 @@
         "required": [
           "enabled",
           "events",
+          "id",
           "name",
+          "signs",
           "types",
           "url"
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            },
+            "readOnly": true
+          },
           "enabled": {
             "type": "boolean"
           },
