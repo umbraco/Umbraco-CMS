@@ -269,6 +269,20 @@ public static class ObjectExtensions
             }
             else
             {
+                // target is not a generic type
+                var inputString = input as string ?? (input is StringValues sv ? sv.ToString() : null);
+                if (inputString != null)
+                {
+                    // Try convert from string or StringValues, returns an Attempt if the string could be
+                    // processed (either succeeded or failed), else null if we need to try
+                    // other methods
+                    Attempt<object?>? result = TryConvertToFromString(inputString, target);
+                    if (result.HasValue)
+                    {
+                        return result.Value;
+                    }
+                }
+
                 // TODO: Do a check for destination type being IEnumerable<T> and source type implementing IEnumerable<T> with
                 // the same 'T', then we'd have to find the extension method for the type AsEnumerable() and execute it.
                 if (GetCachedCanAssign(input, inputType, target))
@@ -335,6 +349,169 @@ public static class ObjectExtensions
         }
 
         return Attempt<object?>.Fail();
+    }
+
+    /// <summary>
+    /// Attempts to convert the input string to the output type.
+    /// </summary>
+    /// <param name="input">The input.</param>
+    /// <param name="target">The type to convert to</param>
+    /// <returns>
+    /// The <see cref="T:Attempt{object?}" />
+    /// </returns>
+    /// <remarks>
+    /// This code is an optimized version of the original Umbraco method.
+    /// </remarks>
+    private static Attempt<object?>? TryConvertToFromString(this string input, Type target)
+    {
+        // Easy
+        if (target == typeof(string))
+        {
+            return Attempt<object?>.Succeed(input);
+        }
+
+        // Null, empty, whitespaces
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            if (target == typeof(bool))
+            {
+                // null/empty = bool false
+                return Attempt<object?>.Succeed(false);
+            }
+
+            if (target == typeof(DateTime))
+            {
+                // null/empty = min DateTime value
+                return Attempt<object?>.Succeed(DateTime.MinValue);
+            }
+
+            // Cannot decide here,
+            // Any of the types below will fail parsing and will return a failed attempt
+            // but anything else will not be processed and will return null
+            // so even though the string is null/empty we have to proceed.
+        }
+
+        // Look for type conversions in the expected order of frequency of use.
+        //
+        // By using a mixture of ordered if statements and switches we can optimize both for
+        // fast conditional checking for most frequently used types and the branching
+        // that does not depend on previous values available to switch statements.
+        if (target.IsPrimitive)
+        {
+            if (target == typeof(int))
+            {
+                if (int.TryParse(input, out var value))
+                {
+                    return Attempt<object?>.Succeed(value);
+                }
+
+                // Because decimal 100.01m will happily convert to integer 100, it
+                // makes sense that string "100.01" *also* converts to integer 100.
+                var input2 = NormalizeNumberDecimalSeparator(input);
+                return Attempt<object?>.If(decimal.TryParse(input2, out var value2), Convert.ToInt32(value2));
+            }
+
+            if (target == typeof(long))
+            {
+                if (long.TryParse(input, out var value))
+                {
+                    return Attempt<object?>.Succeed(value);
+                }
+
+                // Same as int
+                var input2 = NormalizeNumberDecimalSeparator(input);
+                return Attempt<object?>.If(decimal.TryParse(input2, out var value2), Convert.ToInt64(value2));
+            }
+
+            // TODO: Should we do the decimal trick for short, byte, unsigned?
+            if (target == typeof(bool))
+            {
+                if (bool.TryParse(input, out var value))
+                {
+                    return Attempt<object?>.Succeed(value);
+                }
+
+                // Don't declare failure so the CustomBooleanTypeConverter can try
+                return null;
+            }
+
+            // Calling this method directly is faster than any attempt to cache it.
+            switch (Type.GetTypeCode(target))
+            {
+                case TypeCode.Int16:
+                    return Attempt<object?>.If(short.TryParse(input, out var value), value);
+
+                case TypeCode.Double:
+                    var input2 = NormalizeNumberDecimalSeparator(input);
+                    return Attempt<object?>.If(double.TryParse(input2, out var valueD), valueD);
+
+                case TypeCode.Single:
+                    var input3 = NormalizeNumberDecimalSeparator(input);
+                    return Attempt<object?>.If(float.TryParse(input3, out var valueF), valueF);
+
+                case TypeCode.Char:
+                    return Attempt<object?>.If(char.TryParse(input, out var valueC), valueC);
+
+                case TypeCode.Byte:
+                    return Attempt<object?>.If(byte.TryParse(input, out var valueB), valueB);
+
+                case TypeCode.SByte:
+                    return Attempt<object?>.If(sbyte.TryParse(input, out var valueSb), valueSb);
+
+                case TypeCode.UInt32:
+                    return Attempt<object?>.If(uint.TryParse(input, out var valueU), valueU);
+
+                case TypeCode.UInt16:
+                    return Attempt<object?>.If(ushort.TryParse(input, out var valueUs), valueUs);
+
+                case TypeCode.UInt64:
+                    return Attempt<object?>.If(ulong.TryParse(input, out var valueUl), valueUl);
+            }
+        }
+        else if (target == typeof(Guid))
+        {
+            return Attempt<object?>.If(Guid.TryParse(input, out Guid value), value);
+        }
+        else if (target == typeof(DateTime))
+        {
+            if (DateTime.TryParse(input, out DateTime value))
+            {
+                switch (value.Kind)
+                {
+                    case DateTimeKind.Unspecified:
+                    case DateTimeKind.Utc:
+                        return Attempt<object?>.Succeed(value);
+
+                    case DateTimeKind.Local:
+                        return Attempt<object?>.Succeed(value.ToUniversalTime());
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return Attempt<object?>.Fail();
+        }
+        else if (target == typeof(DateTimeOffset))
+        {
+            return Attempt<object?>.If(DateTimeOffset.TryParse(input, out DateTimeOffset value), value);
+        }
+        else if (target == typeof(TimeSpan))
+        {
+            return Attempt<object?>.If(TimeSpan.TryParse(input, out TimeSpan value), value);
+        }
+        else if (target == typeof(decimal))
+        {
+            var input2 = NormalizeNumberDecimalSeparator(input);
+            return Attempt<object?>.If(decimal.TryParse(input2, out var value), value);
+        }
+        else if (input != null && target == typeof(Version))
+        {
+            return Attempt<object?>.If(Version.TryParse(input, out Version? value), value);
+        }
+
+        // E_NOTIMPL IPAddress, BigInteger
+        return null; // we can't decide...
     }
 
     private static string? ToDebugString(this object? obj, int levels = 0)
