@@ -3,64 +3,8 @@ using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
+public interface IDocumentRepository : IPublishableContentRepository<IContent>
 {
-    /// <summary>
-    ///     Gets publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="contentId"></param>
-    /// <returns>
-    ///     <see cref="ContentScheduleCollection" />
-    /// </returns>
-    ContentScheduleCollection GetContentSchedule(int contentId);
-
-    /// <summary>
-    ///     Persists publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="schedule"></param>
-    void PersistContentSchedule(IContent content, ContentScheduleCollection schedule);
-
-    /// <summary>
-    ///     Clears the publishing schedule for all entries having an a date before (lower than, or equal to) a specified date.
-    /// </summary>
-    void ClearSchedule(DateTime date);
-
-    void ClearSchedule(DateTime date, ContentScheduleAction action);
-
-    bool HasContentForExpiration(DateTime date);
-
-    bool HasContentForRelease(DateTime date);
-
-    /// <summary>
-    ///     Gets <see cref="IContent" /> objects having an expiration date before (lower than, or equal to) a specified date.
-    /// </summary>
-    /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use
-    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
-    /// </remarks>
-    IEnumerable<IContent> GetContentForExpiration(DateTime date);
-
-    /// <summary>
-    ///     Gets <see cref="IContent" /> objects having a release date before (lower than, or equal to) a specified date.
-    /// </summary>
-    /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use
-    ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
-    /// </remarks>
-    IEnumerable<IContent> GetContentForRelease(DateTime date);
-
-    /// <summary>
-    ///     Get the count of published items
-    /// </summary>
-    /// <returns></returns>
-    /// <remarks>
-    ///     We require this on the repo because the IQuery{IContent} cannot supply the 'newest' parameter
-    /// </remarks>
-    int CountPublished(string? contentTypeAlias = null);
-
-    bool IsPathPublished(IContent? content);
-
     /// <summary>
     ///     Used to bulk update the permissions set for a content item. This will replace all permissions
     ///     assigned to an entity with a list of user id &amp; permission pairs.
@@ -93,4 +37,6 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     ///     Returns true if there is any content in the recycle bin
     /// </summary>
     bool RecycleBinSmells();
+
+    bool IsPathPublished(IContent? content);
 }

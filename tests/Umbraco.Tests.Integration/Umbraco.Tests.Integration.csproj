@@ -301,5 +301,29 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.GetScaffold.cs">
       <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Create.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Update.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Delete.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Create.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Update.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Delete.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.Publish.cs">
+      <DependentUpon>ElementPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ElementPublishingServiceTests.Unpublish.cs">
+      <DependentUpon>ElementPublishingServiceTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
