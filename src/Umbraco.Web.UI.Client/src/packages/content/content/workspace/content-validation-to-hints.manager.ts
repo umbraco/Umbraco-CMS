@@ -85,13 +85,11 @@ export class UmbContentValidationToHintsManager<
 						weight: 1000,
 						variantId,
 					});
-					console.log('add one for', hints.getAll());
 					this.#hintedMsgs.add(message.key);
 				});
 			});
 			this.#hintedMsgs.forEach((key) => {
 				if (!messages.some((msg) => msg.key === key)) {
-					console.log('remove one', key);
 					this.#hintedMsgs.delete(key);
 					hints.removeOne(key);
 				}
