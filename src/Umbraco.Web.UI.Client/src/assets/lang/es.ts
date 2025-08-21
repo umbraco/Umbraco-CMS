@@ -123,6 +123,7 @@ export default {
 		listBullet: 'Lista en Viñetas',
 		listNumeric: 'Lista Numérica',
 		macroInsert: 'Insertar macro',
+		openSplitView: 'Abrir vista dividida para ',
 		pictureInsert: 'Insertar imagen',
 		relations: 'Editar relaciones',
 		returnToList: 'Volver al listado',

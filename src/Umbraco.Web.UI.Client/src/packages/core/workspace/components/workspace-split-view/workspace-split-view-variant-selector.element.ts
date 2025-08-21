@@ -406,7 +406,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	#renderSegmentVariantOption(variantOption: VariantOptionModelType) {
 		const variantId = UmbVariantId.Create(variantOption);
 		const notCreated = this.#isCreateMode(variantOption, variantId);
-		console.log(variantId, notCreated);
 
 		return html`
 			<div class="variant segment-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
@@ -489,7 +488,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				: html`
 						<uui-button
 							class="split-view"
-							label="Open Split view for ${variant.language.name}"
+							label=${`${this.localize.term('buttons_openSplitView')} ${variant.language.name}`}
 							@click=${() => this.#openSplitView(variant)}>
 							Open in Split view
 						</uui-button>

@@ -151,6 +151,7 @@ export default {
 		listBullet: 'Bullet List',
 		listNumeric: 'Numeric List',
 		macroInsert: 'Insert macro',
+		openSplitView: 'Open split view for ',
 		pictureInsert: 'Insert picture',
 		publishAndClose: 'Publish and close',
 		publishDescendants: 'Publish with descendants',

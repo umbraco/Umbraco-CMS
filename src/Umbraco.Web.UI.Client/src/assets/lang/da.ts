@@ -151,6 +151,7 @@ export default {
 		listBullet: 'Punktopstilling',
 		listNumeric: 'Nummerorden',
 		macroInsert: 'Indsæt makro',
+		openSplitView: 'Åbn delt visning til ',
 		pictureInsert: 'Indsæt billede',
 		publishAndClose: 'Udgiv og luk',
 		publishDescendants: 'Udgiv med undersider',
