@@ -338,7 +338,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				</umb-input-date>
 				${this.#renderTimeZones()}
 			</div>
-			${this.#renderTimeZoneInfo()}
+			${this.#renderTimeZoneInfo()} ${this.#renderTimeZoneValidation()}
 		`;
 	}
 
@@ -368,9 +368,11 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		`;
 	}
 
-	#renderTimeZoneOption = (option: Option) =>
-		html`<uui-combobox-list-option .value=${option.value} .displayValue=${option.name}>
-			${option.name}
+	#renderTimeZoneOption = (option: UmbTimeZoneOption) =>
+		html`<uui-combobox-list-option
+			.value=${option.value}
+			.displayValue=${option.name + (option.invalid ? ` (${this.localize.term('validation_legacyOption')})` : '')}>
+			${option.name + (option.invalid ? ` (${this.localize.term('validation_legacyOption')})` : '')}
 		</uui-combobox-list-option>`;
 
 	#renderTimeZoneInfo() {
@@ -392,6 +394,18 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 		>`;
 	}
 
+	#renderTimeZoneValidation() {
+		const selectionHasInvalids = this._timeZoneOptions.some((option) => {
+			return option.invalid && option.value === this._selectedTimeZone;
+		});
+
+		if (selectionHasInvalids) {
+			return html`<div class="error"><umb-localize key="validation_legacyOptionDescription"></umb-localize></div>`;
+		}
+
+		return nothing;
+	}
+
 	static override readonly styles = [
 		css`
 			:host {
@@ -407,6 +421,10 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				color: var(--uui-color-text-alt);
 				font-size: var(--uui-type-small-size);
 				font-weight: normal;
+			}
+			.error {
+				color: var(--uui-color-invalid);
+				font-size: var(--uui-font-size-small);
 			}
 		`,
 	];
