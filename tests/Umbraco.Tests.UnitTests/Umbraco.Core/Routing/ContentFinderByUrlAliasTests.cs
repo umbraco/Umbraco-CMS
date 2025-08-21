@@ -43,7 +43,7 @@ public class ContentFinderByUrlAliasTests
         var contentItem = rootContents[0];
         Mock.Get(umbracoContextAccessor).Setup(x => x.TryGetUmbracoContext(out umbracoContext)).Returns(true);
         Mock.Get(umbracoContext).Setup(x => x.Content).Returns(publishedContentCache);
-        Mock.Get(publishedContentCache).Setup(x => x.GetAtRoot(null)).Returns(rootContents);
+        Mock.Get(publishedContentCache).Setup(x => x.GetById(false, It.IsAny<Guid>())).Returns(contentItem);
         Mock.Get(contentItem).Setup(x => x.Id).Returns(nodeMatch);
         Mock.Get(contentItem).Setup(x => x.GetProperty(Constants.Conventions.Content.UrlAlias)).Returns(urlProperty);
         Mock.Get(contentItem).Setup(x => x.ItemType).Returns(PublishedItemType.Content);
