@@ -3,9 +3,7 @@ import type { UmbTemplateItemModel } from './types.js';
 import { UmbManagementApiTemplateItemDataRequestManager } from './template-item.server.request-manager.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { TemplateItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { TemplateService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * A server data source for Template items

@@ -6,7 +6,6 @@ import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
