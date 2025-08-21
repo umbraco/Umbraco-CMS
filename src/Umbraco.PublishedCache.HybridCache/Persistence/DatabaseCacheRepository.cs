@@ -285,7 +285,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
-
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
         _ = await Database.InsertOrUpdateAsync(
            dto,
@@ -354,9 +353,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// Rebuilds the media database cache by clearing and repopulating the cache with the latest media data.
     /// Assumes media tree lock.
     /// </summary>
-    /// <remarks>This method assumes that the media tree is locked during execution to ensure consistency. 
+    /// <remarks>This method assumes that the media tree is locked during execution to ensure consistency.
     /// The operation is performed in two stages: first, the existing cache entries are removed, and then the cache is
-    /// repopulated  with the latest media data. The process is batched to handle large datasets efficiently.</remarks>
+    /// repopulated with the latest media data. The process is batched to handle large datasets efficiently.</remarks>
     /// <param name="serializer">The serializer used to convert media content into a format suitable for database storage.</param>
     /// <param name="groupSize">The number of media items to process in each batch during the cache rebuild operation.</param>
     /// <param name="contentTypeIds">A collection of content type IDs to filter the media items being processed. If null or empty, all media items
@@ -650,7 +649,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeKey,
             builder =>
                 builder.Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("key")));
-
         Sql<ISqlContext> sql = sqlTemplate.Sql(key);
         return sql;
     }
@@ -660,7 +658,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         SqlTemplate sqlTemplate = sqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.OrderByLevelIdSortOrder, s =>
                 s.OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder));
-
         Sql<ISqlContext> sql = sqlTemplate.Sql();
         return sql;
     }
@@ -672,7 +669,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 s.Where<NodeDto>(x =>
                     x.NodeObjectType == SqlTemplate.Arg<Guid?>("nodeObjectType") &&
                     x.Trashed == SqlTemplate.Arg<bool>("trashed")));
-
         Sql<ISqlContext> sql = sqlTemplate.Sql(nodeObjectType, false);
         return sql;
     }
@@ -688,7 +684,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                     .From<NodeDto>()
                     .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                     .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId));
-
         Sql<ISqlContext>? sql = sqlTemplate.Sql();
 
         if (joins != null)
