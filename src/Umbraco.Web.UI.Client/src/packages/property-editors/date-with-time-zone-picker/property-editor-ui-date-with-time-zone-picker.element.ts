@@ -1,4 +1,10 @@
-import { getClientTimeZone, getTimeZoneList, isEquivalentTimeZone, type UmbTimeZone } from '@umbraco-cms/backoffice/utils';
+import {
+	getClientTimeZone,
+	getTimeZoneList,
+	getTimeZoneOffset,
+	isEquivalentTimeZone,
+	type UmbTimeZone,
+} from '@umbraco-cms/backoffice/utils';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -20,6 +26,10 @@ import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffi
 import type { UmbDateTimeWithTimeZone, UmbTimeZonePickerValue } from '@umbraco-cms/backoffice/models';
 import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
 
+interface UmbTimeZoneOption extends UmbTimeZone {
+	offset: string;
+	invalid: boolean;
+}
 /**
  * @element umb-property-editor-ui-date-with-time-zone-picker
  */
@@ -28,7 +38,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	private _timeZoneOptions: Array<UmbTimeZone> = [];
+	private _timeZoneOptions: Array<UmbTimeZoneOption> = [];
 	private _clientTimeZone: UmbTimeZone | undefined;
 
 	@state()
@@ -62,7 +72,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	private _datePickerValue: string = '';
 
 	@state()
-	private _filteredTimeZoneOptions: Array<UmbTimeZone> = [];
+	private _filteredTimeZoneOptions: Array<UmbTimeZoneOption> = [];
 
 	@state()
 	private _selectedTimeZone: string | undefined;
@@ -127,23 +137,47 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 	#prefillTimeZones(config: UmbPropertyEditorConfigCollection, selectedDate: DateTime | undefined) {
 		// Retrieve the time zones from the config
 		const timeZonePickerConfig = config.getValueByAlias<UmbTimeZonePickerValue>('timeZones');
-		this._clientTimeZone = getClientTimeZone(selectedDate);
+		this._clientTimeZone = getClientTimeZone();
 
 		// Retrieve the time zones from the config
 		switch (timeZonePickerConfig?.mode) {
 			case 'all':
-				this._timeZoneOptions = this._filteredTimeZoneOptions = getTimeZoneList(undefined, selectedDate);
+				this._timeZoneOptions = this._filteredTimeZoneOptions = getTimeZoneList(undefined).map((tz) => ({
+					...tz,
+					offset: getTimeZoneOffset(tz.value, selectedDate ?? DateTime.now()),
+					invalid: false,
+				}));
 				break;
 			case 'local': {
-				this._timeZoneOptions = this._filteredTimeZoneOptions = [this._clientTimeZone];
+				this._timeZoneOptions = this._filteredTimeZoneOptions = [this._clientTimeZone].map((tz) => ({
+					...tz,
+					offset: getTimeZoneOffset(tz.value, selectedDate ?? DateTime.now()),
+					invalid: false,
+				}));
 				break;
 			}
-			case 'custom':
-				this._timeZoneOptions = this._filteredTimeZoneOptions = getTimeZoneList(
-					timeZonePickerConfig.timeZones,
-					selectedDate,
+			case 'custom': {
+				this._timeZoneOptions = this._filteredTimeZoneOptions = getTimeZoneList(timeZonePickerConfig.timeZones).map((tz) => ({
+						...tz,
+						offset: getTimeZoneOffset(tz.value, selectedDate ?? DateTime.now()),
+						invalid: false,
+					}),
 				);
+				const selectedTimeZone = this.value?.timeZone;
+				if (
+					selectedTimeZone &&
+					!this._timeZoneOptions.some((opt) => isEquivalentTimeZone(opt.value, selectedTimeZone))) {
+					// If the selected time zone is not in the list, we add it to the options
+					const customTimeZone: UmbTimeZoneOption = {
+						value: selectedTimeZone,
+						name: selectedTimeZone,
+						offset: getTimeZoneOffset(selectedTimeZone, selectedDate ?? DateTime.now()),
+						invalid: true, // Mark as invalid, as it is not in the list of supported time zones
+					};
+					this._timeZoneOptions.push(customTimeZone);
+				}
 				break;
+			}
 			default:
 				return;
 		}
@@ -265,7 +299,7 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 
 		if (updateOffsets) {
 			this._timeZoneOptions.forEach((opt) => {
-				opt.offset = newDate.setZone(opt.value).toFormat('Z');
+				opt.offset = getTimeZoneOffset(opt.value, newDate);
 			});
 			// Update the time zone options (mostly for the offset)
 			this._filteredTimeZoneOptions = this._timeZoneOptions;

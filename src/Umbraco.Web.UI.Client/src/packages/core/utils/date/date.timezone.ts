@@ -1,26 +1,20 @@
-import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
+import type { DateTime } from '@umbraco-cms/backoffice/external/luxon';
 
 export interface UmbTimeZone {
 	value: string;
 	name: string;
-	offset: string;
 }
 
 /**
  * Retrieves a list of supported time zones in the browser.
  * @param {Array<string>} [filter] - An optional array of time zone identifiers to filter the result on.
- * @param {DateTime} [selectedDate] - An optional Luxon DateTime object to format the offset for each time zone.
  * @returns {Array<UmbTimeZone>} An array of objects containing time zone values and names.
  */
-export function getTimeZoneList(
-	filter: Array<string> | undefined = undefined,
-	selectedDate: DateTime | undefined = undefined,
-): Array<UmbTimeZone> {
+export function getTimeZoneList(filter: Array<string> | undefined = undefined): Array<UmbTimeZone> {
 	if (filter) {
 		return filter.map((tz) => ({
 			value: tz,
 			name: getTimeZoneName(tz),
-			offset: getTimeZoneOffset(tz, selectedDate ?? DateTime.now()),
 		}));
 	}
 
@@ -31,11 +25,9 @@ export function getTimeZoneList(
 	// Add UTC to the top of the list
 	timeZones.unshift('UTC');
 
-	const date = selectedDate ?? DateTime.now();
 	return timeZones.map((tz) => ({
 		value: tz,
 		name: getTimeZoneName(tz),
-		offset: getTimeZoneOffset(tz, date),
 	}));
 }
 
@@ -44,12 +36,11 @@ export function getTimeZoneList(
  * @param {DateTime} [selectedDate] - An optional Luxon DateTime object to format the offset of the time zone.
  * @returns {UmbTimeZone} An object containing the client's time zone name and value.
  */
-export function getClientTimeZone(selectedDate: DateTime | undefined = undefined): UmbTimeZone {
+export function getClientTimeZone(): UmbTimeZone {
 	const clientTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 	return {
 		value: clientTimeZone,
 		name: getTimeZoneName(clientTimeZone),
-		offset: getTimeZoneOffset(clientTimeZone, selectedDate ?? DateTime.now()),
 	};
 }
 
@@ -59,7 +50,7 @@ export function getClientTimeZone(selectedDate: DateTime | undefined = undefined
  * @param date - The Luxon DateTime object for which to get the offset.
  * @returns {string} The time zone offset
  */
-function getTimeZoneOffset(timeZoneId: string, date: DateTime): string {
+export function getTimeZoneOffset(timeZoneId: string, date: DateTime): string {
 	return date.setZone(timeZoneId).toFormat('Z');
 }
 
