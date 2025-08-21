@@ -13,7 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
-import type { MappingFunction } from '@umbraco-cms/backoffice/observable-api';
+import type { MappingFunction, Observable } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbArrayState,
 	partialUpdateFrozenArray,
