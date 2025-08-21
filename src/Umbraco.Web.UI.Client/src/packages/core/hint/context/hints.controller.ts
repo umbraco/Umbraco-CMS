@@ -244,6 +244,5 @@ export class UmbHintController<
 		this.#parent = undefined;
 
 		this.#hints.destroy();
-		super.destroy();
 	}
 }
