@@ -789,8 +789,8 @@ export class UmbContentTypeStructureManager<
 		);
 	}
 
-	isOwnerContainer(containerId: string) {
-		return this.getOwnerContentType()?.containers?.filter((x) => x.id === containerId);
+	isOwnerContainer(containerId: string): boolean | undefined {
+		return this.getOwnerContentType()?.containers?.some((x) => x.id === containerId);
 	}
 
 	containersOfParentId(parentId: string, containerType: UmbPropertyContainerTypes) {
@@ -883,6 +883,7 @@ export class UmbContentTypeStructureManager<
 		super.destroy();
 	}
 
+	#mergedContainers: UmbPropertyTypeContainerMergedModel[] = [];
 	public readonly contentTypeMergedContainers = createObservablePart(
 		this.#contentTypeContainers,
 		(containers: UmbPropertyTypeContainerModel[]): UmbPropertyTypeContainerMergedModel[] => {
@@ -900,11 +901,14 @@ export class UmbContentTypeStructureManager<
 
 			for (const container of containers) {
 				const path = getContainerChainKey(container, containerByIdCache, chainCache);
-				const key = path?.join('|') ?? '';
+				const key = path?.join('|') ?? null;
 				if (!mergedMap.has(key)) {
 					// Store the first occurrence
 					mergedMap.set(key, {
+						key: key,
 						ids: [container.id],
+						ownerId: this.isOwnerContainer(container.id) ? container.id : undefined,
+						parentIds: new Set([container.parent?.id ?? null]),
 						path: path,
 						type: container.type,
 						name: container.name,
@@ -912,19 +916,84 @@ export class UmbContentTypeStructureManager<
 					});
 				} else {
 					// existing already then just add the id:
-					mergedMap.get(key)?.ids.push(container.id);
+					const existing = mergedMap.get(key)!;
+					existing.ids.push(container.id);
+					existing.parentIds.add(container.parent?.id ?? null);
+					existing.ownerId ??= this.isOwnerContainer(container.id) ? container.id : undefined;
 				}
 			}
 
-			return Array.from(mergedMap.values());
+			return (this.#mergedContainers = Array.from(mergedMap.values()));
 		},
 	);
 
-	public mergedContainersOfId(containerId: string) {
+	public mergedContainersOfId(id: string): Observable<UmbPropertyTypeContainerMergedModel | undefined> {
 		return createObservablePart(this.contentTypeMergedContainers, (mergedContainers) => {
-			return mergedContainers.find((x) => x.ids.includes(containerId));
+			return mergedContainers.find((x) => x.ids.includes(id));
 		});
 	}
+
+	/**
+	 *
+	 * Find merged containers that match the provided container ids.
+	 * Notice if you can provide one or more ids matching the same container and it will still only return return the matching container once.
+	 * @param containerIds - An array of container ids to find merged containers for.
+	 * @returns {Observable} - An observable that emits the merged containers that match the provided container ids.
+	 */
+	/*
+	public mergedContainersOfIds(searchIds: Array<string>): Observable<Array<UmbPropertyTypeContainerMergedModel>> {
+		return createObservablePart(this.contentTypeMergedContainers, (mergedContainers) => {
+			return mergedContainers.filter((x) => searchIds.some((id) => x.ids.includes(id)));
+		});
+	}
+	*/
+
+	/**
+	 *
+	 * Find merged containers that match the provided container ids.
+	 * Notice if you can provide one or more ids matching the same container and it will still only return return the matching container once.
+	 * @param containerIds - An array of container ids to find merged containers for.
+	 * @returns {UmbPropertyTypeContainerMergedModel | undefined} - The merged containers that match the provided container ids.
+	 */
+	getMergedContainerById(id: string): UmbPropertyTypeContainerMergedModel | undefined {
+		return this.#mergedContainers.find((x) => x.ids.includes(id));
+	}
+
+	/**
+	 *
+	 * Find merged child containers that are children of the provided parent container ids.
+	 * Notice this will find matching containers and include their child containers in this.
+	 * @param containerIds - An array of container ids to find merged child containers for.
+	 * @param type - The type of the containers to find.
+	 * @returns {Observable} - An observable that emits the merged child containers that match the provided container ids.
+	 */
+	public mergedContainersOfParentIdAndType(
+		searchId: string | null,
+		type: UmbPropertyContainerTypes,
+	): Observable<Array<UmbPropertyTypeContainerMergedModel>> {
+		return createObservablePart(this.contentTypeMergedContainers, (mergedContainers) => {
+			return mergedContainers.filter((x) => x.type === type && x.parentIds.has(searchId));
+		});
+	}
+
+	/**
+	 *
+	 * Find merged child containers that are children of one of the provided parent container ids.
+	 * Notice if you can provide one or more ids matching the same parent and it will still only return return the matching child container once.
+	 * @param containerIds - An array of container ids to find merged child containers for.
+	 * @param type - The type of the containers to find.
+	 * @returns {Observable} - An observable that emits the merged child containers that match the provided container ids.
+	 */
+	/*
+	public mergedContainersOfParentIds(
+		searchIds: Array<string | null>,
+		type: UmbPropertyContainerTypes,
+	): Observable<Array<UmbPropertyTypeContainerMergedModel>> {
+		return createObservablePart(this.contentTypeMergedContainers, (mergedContainers) => {
+			return mergedContainers.filter((x) => x.type === type && searchIds.some((id) => x.parentIds.has(id)));
+		});
+	}
+	*/
 }
 
 // Get a unique key for a container including all parent type/name pairs
@@ -950,7 +1019,8 @@ function getContainerChainKey(
 		path = [...getContainerChainKey(parent, containerById, chainCache), ...path];
 	} else if (!container.parent && container.type === 'Group') {
 		// Append root to the containers with no parent.
-		path.unshift(`root`);
+		//path.unshift(`root`);
+		// No that is not part of the responsibility of this one. [NL]
 	}
 
 	chainCache.set(container.id, [...path]);
