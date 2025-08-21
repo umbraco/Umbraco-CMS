@@ -44,6 +44,11 @@ public class DateTimeWithTimeZonePropertyIndexValueFactory : IDateTimeWithTimeZo
 
         DateTimeWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateTimeWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
         var value = DateTimeWithTimeZoneValueConverter.GetValue(sourceStr, configuration, _jsonSerializer);
+        if (value is null)
+        {
+            return [indexValue];
+        }
+
         if (value is DateTimeOffset dateTimeOffset)
         {
             // Index the DateTimeOffset as UTC, so it's easier to query.
