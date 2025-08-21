@@ -153,7 +153,7 @@ const mediaTypeTreeItemMapper = (item: UmbMockMediaTypeModel): MediaTypeTreeItem
 	};
 };
 
-const mediaTypeItemMapper = (item: UmbMockMediaTypeUnionModel): MediaTypeItemResponseModel => {
+const mediaTypeItemMapper = (item: UmbMockMediaTypeModel): MediaTypeItemResponseModel => {
 	return {
 		id: item.id,
 		name: item.name,
