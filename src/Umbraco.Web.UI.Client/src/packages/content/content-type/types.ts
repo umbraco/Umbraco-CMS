@@ -15,7 +15,10 @@ export interface UmbPropertyTypeContainerModel {
 }
 
 export interface UmbPropertyTypeContainerMergedModel {
+	key: string;
 	ids: Array<string>;
+	ownerId?: string;
+	parentIds: Set<string | null>;
 	path: Array<string>;
 	name: string;
 	type: UmbPropertyContainerTypes;
