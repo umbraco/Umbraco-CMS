@@ -85,6 +85,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: false,
 		isDeletable: false,
+		signs: [],
 	},
 	{
 		id: 'user-group-editors-id',
@@ -115,6 +116,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: true,
 		isDeletable: true,
+		signs: [],
 	},
 	{
 		id: 'user-group-sensitive-data-id',
@@ -131,6 +133,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: false,
 		isDeletable: false,
+		signs: [],
 	},
 	{
 		id: 'user-group-translators-id',
@@ -147,6 +150,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: true,
 		isDeletable: true,
+		signs: [],
 	},
 	{
 		id: 'user-group-writers-id',
@@ -168,6 +172,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: true,
 		isDeletable: true,
+		signs: [],
 	},
 	{
 		id: 'forbidden',
@@ -184,5 +189,6 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: false,
 		isDeletable: false,
+		signs: [],
 	},
 ];
