@@ -1,5 +1,6 @@
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -13,6 +14,47 @@ public class DateWithTimeZoneValueConverterTests
 {
     private readonly IJsonSerializer _jsonSerializer =
         new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+
+    [TestCase(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone, true)]
+    [TestCase(Constants.PropertyEditors.Aliases.DateTime, false)]
+    public void IsConverter_For(string propertyEditorAlias, bool expected)
+    {
+        var propertyType = Mock.Of<IPublishedPropertyType>(x => x.EditorAlias == propertyEditorAlias);
+        var converter = new DateTimeWithTimeZoneValueConverter(Mock.Of<IJsonSerializer>(MockBehavior.Strict));
+
+        var result = converter.IsConverter(propertyType);
+
+        Assert.AreEqual(expected, result);
+    }
+
+    [TestCase(DateTimeWithTimeZoneFormat.DateOnly, DateTimeWithTimeZoneMode.None, typeof(DateOnly?))]
+    [TestCase(DateTimeWithTimeZoneFormat.DateOnly, DateTimeWithTimeZoneMode.All, typeof(DateOnly?))]
+    [TestCase(DateTimeWithTimeZoneFormat.DateOnly, DateTimeWithTimeZoneMode.Custom, typeof(DateOnly?))]
+    [TestCase(DateTimeWithTimeZoneFormat.DateOnly, DateTimeWithTimeZoneMode.Local, typeof(DateOnly?))]
+    [TestCase(DateTimeWithTimeZoneFormat.TimeOnly, DateTimeWithTimeZoneMode.None, typeof(TimeOnly?))]
+    [TestCase(DateTimeWithTimeZoneFormat.DateTime, DateTimeWithTimeZoneMode.None, typeof(DateTime?))]
+    [TestCase(DateTimeWithTimeZoneFormat.DateTime, DateTimeWithTimeZoneMode.All, typeof(DateTimeOffset?))]
+    [TestCase(DateTimeWithTimeZoneFormat.DateTime, DateTimeWithTimeZoneMode.Custom, typeof(DateTimeOffset?))]
+    [TestCase(DateTimeWithTimeZoneFormat.DateTime, DateTimeWithTimeZoneMode.Local, typeof(DateTimeOffset?))]
+    public void GetPropertyValueType_ReturnsExpectedType(DateTimeWithTimeZoneFormat format, DateTimeWithTimeZoneMode timeZoneMode, Type expectedType)
+    {
+        var converter = new DateTimeWithTimeZoneValueConverter(Mock.Of<IJsonSerializer>(MockBehavior.Strict));
+        var dataType = new PublishedDataType(
+            0,
+            "test",
+            "test",
+            new Lazy<object?>(() =>
+                new DateTimeWithTimeZoneConfiguration
+                {
+                    Format = format,
+                    TimeZones = new DateTimeWithTimeZoneTimeZones { Mode = timeZoneMode },
+                }));
+        var propertyType = Mock.Of<IPublishedPropertyType>(x => x.DataType == dataType);
+
+        var result = converter.GetPropertyValueType(propertyType);
+
+        Assert.AreEqual(expectedType, result);
+    }
 
     private static object[] _convertToIntermediateCases =
     [
@@ -39,7 +81,7 @@ public class DateWithTimeZoneValueConverterTests
         Assert.AreEqual(expected.TimeZone, dateWithTimeZone.TimeZone);
     }
 
-    private static DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone _convertToObjectInputDate = new()
+    private static readonly DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone _convertToObjectInputDate = new()
     {
         Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.FromHours(-1)),
         TimeZone = "Europe/Copenhagen",
@@ -61,7 +103,8 @@ public class DateWithTimeZoneValueConverterTests
         DateTimeWithTimeZoneMode timeZoneMode,
         object? expected)
     {
-        var dataType = new PublishedDataType(0,
+        var dataType = new PublishedDataType(
+            0,
             "test",
             "test",
             new Lazy<object?>(() =>

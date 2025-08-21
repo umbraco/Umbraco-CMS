@@ -110,11 +110,12 @@ public class DateWithTimeZonePropertyEditorTests
         DateTimeOffset? expectedDateTimeOffset,
         string? expectedTimeZone)
     {
-        var expectedJson = expectedDateTimeOffset is null ? null : _jsonSerializer.Serialize(new DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone
-        {
-            Date = expectedDateTimeOffset.Value,
-            TimeZone = expectedTimeZone,
-        });
+        var expectedJson = expectedDateTimeOffset is null ? null : _jsonSerializer.Serialize(
+            new DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone
+            {
+                Date = expectedDateTimeOffset.Value,
+                TimeZone = expectedTimeZone,
+            });
         var result = CreateValueEditor(format: format).FromEditor(
             new ContentPropertyData(
                 value,
