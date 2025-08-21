@@ -31,7 +31,7 @@ public interface IPublishedCache
     /// <param name="contentId">The content unique identifier.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-    IPublishedContent? GetById(int contentId); // Bookmark
+    IPublishedContent? GetById(int contentId);
 
     /// <summary>
     ///     Gets a content identified by its unique identifier.
