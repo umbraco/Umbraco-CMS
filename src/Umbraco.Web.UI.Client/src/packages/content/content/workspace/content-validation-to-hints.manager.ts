@@ -85,7 +85,6 @@ export class UmbContentValidationToHintsManager<
 						weight: 1000,
 						variantId,
 					});
-					console.log('add one for', hints.getAll());
 					this.#hintedMsgs.add(message.key);
 				});
 			});
