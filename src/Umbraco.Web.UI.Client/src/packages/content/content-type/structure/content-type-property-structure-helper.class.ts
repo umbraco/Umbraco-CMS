@@ -1,13 +1,8 @@
-import type {
-	UmbContentTypeModel,
-	UmbPropertyContainerTypes,
-	UmbPropertyTypeContainerModel,
-	UmbPropertyTypeModel,
-} from '../types.js';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '../types.js';
 import type { UmbContentTypeStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbPropertyTypeUnique = UmbPropertyTypeModel['unique'];
 
