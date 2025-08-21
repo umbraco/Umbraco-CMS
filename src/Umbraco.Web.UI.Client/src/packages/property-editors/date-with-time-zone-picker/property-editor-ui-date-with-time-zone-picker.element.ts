@@ -197,6 +197,8 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 				this._selectedTimeZone = pickedTimeZone.value;
 				return;
 			}
+		} else if (this.value?.date) {
+			return; // If there is a date but no time zone, we don't preselect anything
 		}
 
 		// Check if we can pre-select the client time zone
