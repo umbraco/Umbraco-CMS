@@ -22,30 +22,6 @@ public class ByKeyDocumentController : DocumentControllerBase
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IContentQueryService _contentQueryService;
 
-    [Obsolete("Scheduled for removal in v17")]
-    public ByKeyDocumentController(
-        IAuthorizationService authorizationService,
-        IContentEditingService contentEditingService,
-        IDocumentPresentationFactory documentPresentationFactory)
-    {
-        _authorizationService = authorizationService;
-        _documentPresentationFactory = documentPresentationFactory;
-        _contentQueryService = StaticServiceProvider.Instance.GetRequiredService<IContentQueryService>();
-    }
-
-    // needed for greedy selection until other constructor remains in v17
-    [Obsolete("Scheduled for removal in v17")]
-    public ByKeyDocumentController(
-        IAuthorizationService authorizationService,
-        IContentEditingService contentEditingService,
-        IDocumentPresentationFactory documentPresentationFactory,
-        IContentQueryService contentQueryService)
-    {
-        _authorizationService = authorizationService;
-        _documentPresentationFactory = documentPresentationFactory;
-        _contentQueryService = contentQueryService;
-    }
-
     [ActivatorUtilitiesConstructor]
     public ByKeyDocumentController(
         IAuthorizationService authorizationService,
