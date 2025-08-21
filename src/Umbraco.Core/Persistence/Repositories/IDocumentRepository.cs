@@ -51,6 +51,15 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     IEnumerable<IContent> GetContentForRelease(DateTime date);
 
     /// <summary>
+    ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>
+    ///     The provided collection of content keys filtered for those that are scheduled for publishing.
+    /// </returns>
+    IEnumerable<Guid> GetScheduledContentKeys(Guid[] keys) => [];
+
+    /// <summary>
     ///     Get the count of published items
     /// </summary>
     /// <returns></returns>
