@@ -972,7 +972,9 @@ export class UmbContentTypeStructureManager<
 		type: UmbPropertyContainerTypes,
 	): Observable<Array<UmbPropertyTypeContainerMergedModel>> {
 		return createObservablePart(this.contentTypeMergedContainers, (mergedContainers) => {
-			return mergedContainers.filter((x) => x.type === type && x.parentIds.has(searchId));
+			// First find the path for the parentId, and then find matching children:
+			const parentIds = searchId ? (mergedContainers.find((x) => x.ids.includes(searchId))?.ids ?? []) : [null];
+			return mergedContainers.filter((x) => x.type === type && parentIds.some((id) => x.parentIds.has(id)));
 		});
 	}
 
