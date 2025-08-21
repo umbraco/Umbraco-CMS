@@ -114,8 +114,6 @@ public class ApiRichTextMarkupParserTests
             .Returns<Guid>(key => mockData[key].PublishedContent);
         contentCacheMock.Setup(cc => cc.GetById(It.IsAny<bool>(), It.IsAny<Udi>()))
             .Returns<bool, Udi>((preview, udi) => mockData[((GuidUdi)udi).Guid].PublishedContent);
-        contentCacheMock.Setup(cc => cc.GetById(It.IsAny<Udi>()))
-            .Returns<Udi>(udi => mockData[((GuidUdi)udi).Guid].PublishedContent);
 
         var mediaCacheMock = new Mock<IPublishedMediaCache>();
         mediaCacheMock.Setup(cc => cc.GetById(It.IsAny<bool>(), It.IsAny<Guid>()))
@@ -124,8 +122,6 @@ public class ApiRichTextMarkupParserTests
             .Returns<Guid>(key => mockData[key].PublishedContent);
         mediaCacheMock.Setup(cc => cc.GetById(It.IsAny<bool>(), It.IsAny<Udi>()))
             .Returns<bool, Udi>((preview, udi) => mockData[((GuidUdi)udi).Guid].PublishedContent);
-        mediaCacheMock.Setup(cc => cc.GetById(It.IsAny<Udi>()))
-            .Returns<Udi>(udi => mockData[((GuidUdi)udi).Guid].PublishedContent);
 
         _apiMediaUrlProvider = new Mock<IApiMediaUrlProvider>();
         _apiMediaUrlProvider.Setup(mup => mup.GetUrl(It.IsAny<IPublishedContent>()))
