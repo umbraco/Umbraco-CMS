@@ -203,7 +203,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		this.observe(
 			this.#groupStructureHelper.childContainers,
 			(groups) => {
-				console.log('groups', groups);
 				this._groups = groups;
 				this.#sorter.setModel(this._groups);
 			},
