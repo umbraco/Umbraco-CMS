@@ -1,8 +1,13 @@
-import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '../types.js';
+import type {
+	UmbContentTypeModel,
+	UmbPropertyContainerTypes,
+	UmbPropertyTypeContainerMergedModel,
+	UmbPropertyTypeContainerModel,
+} from '../types.js';
 import type { UmbContentTypeStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * This class is a helper class for managing the structure of containers in a content type.
@@ -11,6 +16,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeModel> extends UmbControllerBase {
 	#init;
 	#initResolver?: (value: unknown) => void;
+	#initRejector?: () => void;
 
 	#containerId?: string | null;
 	#childType?: UmbPropertyContainerTypes = 'Group';
@@ -21,31 +27,55 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 	// State containing the all containers defined in the data:
 	#childContainers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
-	readonly containers = this.#childContainers.asObservable();
+	get containers() {
+		this.#startLegacy();
+		return this.#childContainers.asObservable();
+	}
 
 	// State containing the merged containers (only one pr. name):
-	#mergedChildContainers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
-	readonly mergedContainers = this.#mergedChildContainers.asObservable();
+	#legacyMergedChildContainers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
+	get mergedContainers() {
+		this.#startLegacy();
+		return this.#legacyMergedChildContainers.asObservable();
+	}
+
+	#childContainersMerged = new UmbArrayState<UmbPropertyTypeContainerMergedModel>([], (x) => x.path);
+	public readonly childContainers = this.#childContainersMerged.asObservable();
 
 	// Owner containers are containers owned by the owner Content Type (The specific one up for editing)
 	#ownerChildContainers: UmbPropertyTypeContainerModel[] = [];
 
-	#hasProperties = new UmbArrayState<{ id: string | null; has: boolean }>([], (x) => x.id);
-	readonly hasProperties = this.#hasProperties.asObservablePart((x) => x.some((y) => y.has));
+	#hasProperties = new UmbBooleanState(false);
+	readonly hasProperties = this.#hasProperties.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#init = new Promise((resolve) => {
+		this.#init = new Promise((resolve, reject) => {
 			this.#initResolver = resolve;
+			this.#initRejector = reject;
 		});
 
-		this.#mergedChildContainers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+		this.#legacyMergedChildContainers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+	}
+
+	// TODO: Implement UmbDeprecated and Obsolete this from v.17 [NL]
+	#legacyMergeLogic = false;
+	#startLegacy() {
+		if (this.#legacyMergeLogic) return;
+		console.log(
+			"Pst. we will be deprecating 'mergedContainers' and 'containers' in v.17.0, feel free to use them until v.18.0. But please use 'childContainers'",
+		);
+		this.#legacyMergeLogic = true;
+		this.#legacyObserveContainers();
 		this.observe(this.containers, this.#performContainerMerge, null);
 	}
 
 	public setStructureManager(structure: UmbContentTypeStructureManager<T> | undefined) {
 		if (this.#structure === structure || !structure) return;
 		if (this.#structure && !structure) {
+			this.#initRejector?.();
+			this.#initResolver = undefined;
+			this.#initRejector = undefined;
 			throw new Error(
 				'Structure manager is already set, the helpers are not designed to be re-setup with new managers',
 			);
@@ -53,7 +83,9 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
-		this.#observeContainers();
+		this.#initRejector = undefined;
+		this.#observeContainer();
+		this.#legacyObserveContainers();
 	}
 
 	public getStructureManager() {
@@ -72,7 +104,8 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	public setContainerId(value: string | null | undefined) {
 		if (this.#containerId === value) return;
 		this.#containerId = value;
-		this.#observeContainers();
+		this.#observeContainer();
+		this.#legacyObserveContainers();
 	}
 	public getContainerId() {
 		return this.#containerId;
@@ -81,22 +114,74 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	public setContainerChildType(value?: UmbPropertyContainerTypes) {
 		if (this.#childType === value) return;
 		this.#childType = value;
-		this.#observeContainers();
+		this.#observeContainer();
+		this.#legacyObserveContainers();
 	}
 	public getContainerChildType() {
 		return this.#childType;
 	}
 
+	#observeContainer() {
+		// Determine the observable, leaving it undefined if not ready, in this way the observation will be determined if not everything is ready. [NL]
+		const childObservable =
+			this.#containerId !== undefined && this.#childType
+				? this.#structure?.mergedContainersOfParentIdAndType(this.#containerId, this.#childType)
+				: undefined;
+
+		this.observe(
+			childObservable,
+			(childContainers) => {
+				this.#childContainersMerged.setValue(childContainers ?? []);
+			},
+			'observeChildContainers',
+		);
+
+		if (this.#containerId === null) {
+			this.removeUmbControllerByAlias('observeParentContainer');
+			// Observe root properties:
+			this.observe(
+				this.#structure?.hasPropertyStructuresOfRoot(),
+				(has) => {
+					this.#hasProperties.setValue(has ?? false);
+				},
+				'observeProperties',
+			);
+		} else {
+			// Observe properties of the parent container and matching containers (therefor getting the merged container of the parent id):	[NL]
+			const parentObservable =
+				this.#containerId !== undefined && this.#childType
+					? this.#structure?.mergedContainersOfId(this.#containerId)
+					: undefined;
+
+			this.observe(
+				parentObservable,
+				(parentContainer) => {
+					this.observe(
+						parentContainer ? this.#structure?.hasPropertyStructuresOfGroupIds(parentContainer.ids ?? []) : undefined,
+						(has) => {
+							this.#hasProperties.setValue(has ?? false);
+						},
+						'observeProperties',
+					);
+				},
+				'observeParentContainer',
+			);
+		}
+	}
+
+	// LEGACY properties:
 	#containerName?: string;
 	#containerType?: UmbPropertyContainerTypes;
 	#parentName?: string | null;
 	#parentType?: UmbPropertyContainerTypes;
 
-	#observeContainers() {
+	// LEGACY method:
+	#legacyObserveContainers() {
+		if (!this.#legacyMergeLogic) return;
 		if (!this.#structure || this.#containerId === undefined) return;
 
 		if (this.#containerId === null) {
-			this.#observeHasPropertiesOf(null);
+			//this.#observeHasPropertiesOf(null);
 			this.#observeRootContainers();
 			this.removeUmbControllerByAlias('_observeContainers');
 		} else {
@@ -133,8 +218,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 						this.removeUmbControllerByAlias('_observeContainers');
 						this.#containerName = undefined;
 						this.#containerType = undefined;
-						// TODO: reset has Properties.
-						this.#hasProperties.setValue([]);
+						//this.#hasProperties.setValue([]);
 					}
 				},
 				'_observeMainContainer',
@@ -142,6 +226,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		}
 	}
 
+	// LEGACY method:
 	#observeSimilarContainers() {
 		if (this.#containerName === undefined || !this.#containerType || this.#parentName === undefined) return;
 		this.observe(
@@ -152,13 +237,13 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 				this.#parentType,
 			),
 			(containers) => {
-				this.#hasProperties.setValue([]);
+				//this.#hasProperties.setValue([]);
 				this.#childContainers.setValue([]);
 				this.#containerObservers.forEach((x) => x.destroy());
 				this.#containerObservers = [];
 
 				containers.forEach((container) => {
-					this.#observeHasPropertiesOf(container.id);
+					//this.#observeHasPropertiesOf(container.id);
 
 					this.#containerObservers.push(
 						this.observe(
@@ -184,6 +269,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		);
 	}
 
+	// LEGACY method:
 	#observeRootContainers() {
 		if (!this.#structure || !this.#childType || this.#containerId === undefined) return;
 
@@ -201,6 +287,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		);
 	}
 
+	/*
 	#observeHasPropertiesOf(groupId?: string | null) {
 		if (!this.#structure || groupId === undefined) return;
 
@@ -212,7 +299,9 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			'_observePropertyStructureOfGroup' + groupId,
 		);
 	}
+		*/
 
+	// LEGACY method:
 	#filterNonOwnerContainers(containers: Array<UmbPropertyTypeContainerModel>) {
 		return this.#ownerChildContainers.length > 0
 			? containers.filter(
@@ -226,22 +315,23 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			: containers;
 	}
 
+	// LEGACY method:
 	#performContainerMerge = (containers: Array<UmbPropertyTypeContainerModel>) => {
 		// Remove containers that matches with a owner container:
 		let merged = this.#filterNonOwnerContainers(containers);
 		// Remove containers of same name and type:
 		// This only works cause we are dealing with a single level of containers in this Helper, if we had more levels we would need to be more clever about the parent as well. [NL]
 		merged = merged.filter((x, i, cons) => i === cons.findIndex((y) => y.name === x.name && y.type === x.type));
-		this.#mergedChildContainers.setValue(merged);
+		this.#legacyMergedChildContainers.setValue(merged);
 	};
 
 	/**
 	 * Returns true if the container is an owner container.
 	 * @param containerId
 	 */
-	isOwnerChildContainer(containerId?: string) {
+	isOwnerChildContainer(containerId?: string): boolean | undefined {
 		if (!this.#structure || !containerId) return;
-		return this.#ownerChildContainers.some((x) => x.id === containerId);
+		return this.#structure.isOwnerContainer(containerId);
 	}
 
 	getContentTypeOfContainer(containerId?: string) {

@@ -13,7 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
-import type { MappingFunction } from '@umbraco-cms/backoffice/observable-api';
+import type { MappingFunction, Observable } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbArrayState,
 	partialUpdateFrozenArray,
@@ -497,19 +497,28 @@ export class UmbContentTypeStructureManager<
 
 	makeEmptyContainerName(
 		containerId: string,
-		containerType: UmbPropertyContainerTypes,
-		parentId: string | null = null,
+		legacyContainerType?: UmbPropertyContainerTypes,
+		legacyParentId?: string | null,
 	): string {
 		return (
-			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', containerType, parentId) ?? 'Unnamed'
+			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', legacyContainerType, legacyParentId) ??
+			'Unnamed'
 		);
 	}
 	makeContainerNameUniqueForOwnerContentType(
 		containerId: string,
 		newName: string,
-		containerType: UmbPropertyContainerTypes,
-		parentId: string | null = null,
+		legacyContainerType?: UmbPropertyContainerTypes,
+		legacyParentId?: string | null,
 	) {
+		const container = this.getOwnerContainerById(containerId);
+		if (!container) {
+			console.warn(`Container with id ${containerId} not found in owner content type.`);
+			return null;
+		}
+		const containerType = container.type;
+		const parentId = container.parent?.id ?? null;
+
 		const ownerRootContainers = this.getOwnerContainers(containerType, parentId); //getRootContainers() can't differentiates between compositions and locals
 		if (!ownerRootContainers) {
 			return null;
@@ -746,6 +755,26 @@ export class UmbContentTypeStructureManager<
 				});
 			});
 			return props;
+		});
+	}
+
+	hasPropertyStructuresOfGroupIds(groupIds: Array<string>) {
+		return this.#contentTypes.asObservablePart((docTypes) => {
+			return docTypes.some((docType) => {
+				return docType.properties?.some((property) => {
+					return property.container?.id && groupIds.includes(property.container.id);
+				});
+			});
+		});
+	}
+
+	hasPropertyStructuresOfRoot() {
+		return this.#contentTypes.asObservablePart((docTypes) => {
+			return docTypes.some((docType) => {
+				return docType.properties?.some((property) => {
+					return !property.container;
+				});
+			});
 		});
 	}
 
