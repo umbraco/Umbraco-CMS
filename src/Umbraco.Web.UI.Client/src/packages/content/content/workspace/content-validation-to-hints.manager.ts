@@ -64,7 +64,7 @@ export class UmbContentValidationToHintsManager<
 				structure.getPropertyStructureByAlias(alias).then((property) => {
 					if (!property) return;
 
-					let path: Array<string> = ['root'];
+					let path: Array<string> = [];
 					if (property.container) {
 						const container = this.#containers.find((c) => c.ids.includes(property.container!.id));
 						if (container) {
@@ -78,7 +78,7 @@ export class UmbContentValidationToHintsManager<
 
 					hints.addOne({
 						unique: message.key,
-						path: ['Umb.WorkspaceView.Document.Edit', ...path],
+						path: ['Umb.WorkspaceView.Document.Edit', 'root', ...path],
 						text: '!',
 						/*label: message.body,*/
 						color: 'invalid',
