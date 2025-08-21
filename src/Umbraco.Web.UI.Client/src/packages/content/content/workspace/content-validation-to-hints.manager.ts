@@ -90,7 +90,6 @@ export class UmbContentValidationToHintsManager<
 			});
 			this.#hintedMsgs.forEach((key) => {
 				if (!messages.some((msg) => msg.key === key)) {
-					console.log('remove one', key);
 					this.#hintedMsgs.delete(key);
 					hints.removeOne(key);
 				}
