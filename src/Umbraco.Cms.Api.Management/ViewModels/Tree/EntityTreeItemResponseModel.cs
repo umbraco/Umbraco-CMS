@@ -8,7 +8,15 @@ public class EntityTreeItemResponseModel : TreeItemPresentationModel, IHasSigns
 
     public ReferenceByIdModel? Parent { get; set; }
 
-    public IEnumerable<SignModel> Signs => _signs.AsEnumerable();
+    public IEnumerable<SignModel> Signs
+    {
+        get => _signs.AsEnumerable();
+        set
+        {
+            _signs.Clear();
+            _signs.AddRange(value);
+        }
+    }
 
     public void AddSign(string alias) => _signs.Add(new SignModel { Alias = alias });
 

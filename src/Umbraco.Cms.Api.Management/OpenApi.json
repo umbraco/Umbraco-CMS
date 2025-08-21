@@ -37147,8 +37147,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -37304,8 +37303,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -37544,8 +37542,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -37679,8 +37676,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -37737,8 +37733,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "documentType": {
             "oneOf": [
@@ -37783,8 +37778,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -37849,8 +37843,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "creator": {
             "type": "string",
@@ -37938,8 +37931,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "isTrashed": {
             "type": "boolean"
@@ -38217,8 +38209,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "documentType": {
             "oneOf": [
@@ -38290,8 +38281,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "noAccess": {
             "type": "boolean"
@@ -38356,8 +38346,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -38538,8 +38527,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -38942,8 +38930,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -39250,8 +39237,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "documentType": {
             "oneOf": [
@@ -40307,8 +40293,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "creator": {
             "type": "string",
@@ -40367,8 +40352,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "isTrashed": {
             "type": "boolean"
@@ -40532,8 +40516,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "urls": {
             "type": "array",
@@ -40595,8 +40578,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "noAccess": {
             "type": "boolean"
@@ -40762,8 +40744,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -41110,8 +41091,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -41298,8 +41278,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -41346,8 +41325,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "memberType": {
             "oneOf": [
@@ -41464,8 +41442,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "email": {
             "type": "string"
@@ -41626,8 +41603,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -41960,8 +41936,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -42252,8 +42227,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -44357,8 +44331,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "documentType": {
             "oneOf": [
@@ -44566,8 +44539,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -45513,8 +45485,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -47514,8 +47485,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -47687,8 +47657,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "name": {
             "type": "string"
@@ -48144,8 +48113,7 @@
                   "$ref": "#/components/schemas/SignModel"
                 }
               ]
-            },
-            "readOnly": true
+            }
           },
           "enabled": {
             "type": "boolean"
