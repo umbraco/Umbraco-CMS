@@ -346,7 +346,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	async #tabNameChanged(event: InputEvent, tab: UmbPropertyTypeContainerMergedModel) {
 		if (!this.#workspaceContext || !tab.ownerId) return;
 		this.#processingTabId = tab.ownerId;
-		console.log('this.#processingTabId', this.#processingTabId);
 		let newName = (event.target as HTMLInputElement).value;
 
 		const changedName = this.#workspaceContext.structure.makeContainerNameUniqueForOwnerContentType(
