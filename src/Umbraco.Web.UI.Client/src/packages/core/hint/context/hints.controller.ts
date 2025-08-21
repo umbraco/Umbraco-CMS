@@ -102,38 +102,35 @@ export class UmbHintController<
 				this.#scaffold.update(scaffold as any);
 			}
 		});
-		this.observe(
-			parent?.descendingHints(this.#viewAlias),
-			(hints) => {
-				if (!hints) {
-					// Parent properly lost, so lets assume the parent hints are empty: [NL]
-					hints = [];
-				}
-				this.initiateChange();
-				if (this.#parentHints) {
-					// Remove the local messages that does not exist in the parent anymore:
-					const toRemove = this.#parentHints.filter((hint) => !hints.find((m) => m.unique === hint.unique));
-					this.remove(toRemove.map((hint) => hint.unique));
-				}
-				this.#parentHints = hints;
-
-				hints.forEach((hint) => {
-					// Remove first entry of hint.path, if it matches viewAlias.
-					if (this.#viewAlias && hint.path[0] === this.#viewAlias) {
-						hint = { ...hint, path: hint.path.slice(1) };
-					}
-					this.#hints.appendOne(hint as HintType);
-				});
-
-				this.finishChange();
-			},
-			'observeParentHints',
-		);
-
-		this.observe(this.hints, this.#transferHints, 'observeLocalMessages');
+		this.observe(parent?.descendingHints(this.#viewAlias), this.#receiveHints, 'observeParentHints');
+		this.observe(this.hints, this.#propagateHints, 'observeLocalMessages');
 	}
 
-	#transferHints = (hints: Array<UmbHint>) => {
+	#receiveHints = (hints: UmbHint[] | undefined) => {
+		if (!hints) {
+			// Parent properly lost, so lets assume the parent hints are empty: [NL]
+			hints = [];
+		}
+		this.initiateChange();
+		if (this.#parentHints) {
+			// Remove the local messages that does not exist in the parent anymore:
+			const toRemove = this.#parentHints.filter((hint) => !hints.find((m) => m.unique === hint.unique));
+			this.remove(toRemove.map((hint) => hint.unique));
+		}
+		this.#parentHints = hints;
+
+		hints.forEach((hint) => {
+			// Remove first entry of hint.path, if it matches viewAlias.
+			if (this.#viewAlias && hint.path[0] === this.#viewAlias) {
+				hint = { ...hint, path: hint.path.slice(1) };
+			}
+			this.#hints.appendOne(hint as HintType);
+		});
+
+		this.finishChange();
+	};
+
+	#propagateHints = (hints: Array<UmbHint>) => {
 		if (!this.#parent) return;
 
 		this.#parent!.initiateChange();
@@ -171,10 +168,6 @@ export class UmbHintController<
 	 * @returns {HintType['unique']} Unique value of the hint
 	 */
 	addOne(hint: IncomingHintType): string | symbol {
-		/**
-		 * TODO:
-		 * Works, but the Hint does not stay when navigating away from a variant and back...
-		 */
 		const newHint = { ...this.#scaffold.getValue(), ...hint } as unknown as HintType;
 		newHint.unique ??= Symbol();
 		newHint.weight ??= 0;

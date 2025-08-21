@@ -45,7 +45,6 @@ export class UmbContentValidationToHintsManager<
 		super(host);
 
 		this.observe(structure.contentTypeMergedContainers, (merged) => {
-			//console.log(merged);
 			this.#containers = merged;
 		});
 
