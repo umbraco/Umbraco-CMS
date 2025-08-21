@@ -118,7 +118,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Signs
     private void Map(IContent source, DocumentTypeBlueprintItemResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

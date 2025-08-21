@@ -408,7 +408,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -467,7 +467,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -487,6 +487,7 @@ export type DataTypeContentTypeReferenceModel = {
 
 export type DataTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     editorUiAlias?: string | null;
     editorAlias: string;
@@ -522,6 +523,7 @@ export type DataTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     editorUiAlias?: string | null;
@@ -578,6 +580,7 @@ export type DeleteUsersRequestModel = {
 
 export type DictionaryItemItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -610,6 +613,7 @@ export type DisableUserRequestModel = {
 
 export type DocumentBlueprintItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     documentType: DocumentTypeReferenceResponseModel;
 };
@@ -618,6 +622,7 @@ export type DocumentBlueprintResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
 };
 
@@ -625,6 +630,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
@@ -634,6 +640,7 @@ export type DocumentCollectionResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     creator?: string | null;
     sortOrder: number;
     documentType: DocumentTypeCollectionReferenceResponseModel;
@@ -652,6 +659,7 @@ export type DocumentConfigurationResponseModel = {
 
 export type DocumentItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     isTrashed: boolean;
     isProtected: boolean;
     parent?: ReferenceByIdModel | null;
@@ -701,6 +709,7 @@ export type DocumentResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
     /**
      * @deprecated
@@ -712,10 +721,11 @@ export type DocumentResponseModel = {
 
 export type DocumentTreeItemResponseModel = {
     hasChildren: boolean;
+    id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     noAccess: boolean;
     isTrashed: boolean;
-    id: string;
     createDate: string;
     isProtected: boolean;
     ancestors: Array<ReferenceByIdModel>;
@@ -725,6 +735,7 @@ export type DocumentTreeItemResponseModel = {
 
 export type DocumentTypeBlueprintItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -738,6 +749,7 @@ export type DocumentTypeCollectionReferenceResponseModel = {
     id: string;
     alias: string;
     icon: string;
+    collection?: ReferenceByIdModel | null;
 };
 
 export type DocumentTypeCompositionModel = {
@@ -767,10 +779,17 @@ export type DocumentTypeConfigurationResponseModel = {
 
 export type DocumentTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     isElement: boolean;
     icon?: string | null;
     description?: string | null;
+};
+
+export type DocumentTypePermissionPresentationModel = {
+    $type: string;
+    verbs: Array<string>;
+    documentTypeAlias: string;
 };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
@@ -838,6 +857,7 @@ export type DocumentTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     isElement: boolean;
@@ -915,6 +935,7 @@ export type DocumentVersionResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
     document?: ReferenceByIdModel | null;
 };
@@ -1203,6 +1224,7 @@ export type MediaCollectionResponseModel = {
     values: Array<MediaValueResponseModel>;
     variants: Array<MediaVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     creator?: string | null;
     sortOrder: number;
     mediaType: MediaTypeCollectionReferenceResponseModel;
@@ -1215,6 +1237,7 @@ export type MediaConfigurationResponseModel = {
 
 export type MediaItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     isTrashed: boolean;
     parent?: ReferenceByIdModel | null;
     hasChildren: boolean;
@@ -1242,6 +1265,7 @@ export type MediaResponseModel = {
     values: Array<MediaValueResponseModel>;
     variants: Array<MediaVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     /**
      * @deprecated
      */
@@ -1252,10 +1276,11 @@ export type MediaResponseModel = {
 
 export type MediaTreeItemResponseModel = {
     hasChildren: boolean;
+    id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     noAccess: boolean;
     isTrashed: boolean;
-    id: string;
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
@@ -1265,6 +1290,7 @@ export type MediaTypeCollectionReferenceResponseModel = {
     id: string;
     alias: string;
     icon: string;
+    collection?: ReferenceByIdModel | null;
 };
 
 export type MediaTypeCompositionModel = {
@@ -1290,6 +1316,7 @@ export type MediaTypeConfigurationResponseModel = {
 
 export type MediaTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     icon?: string | null;
 };
@@ -1358,6 +1385,7 @@ export type MediaTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     icon: string;
@@ -1409,6 +1437,7 @@ export type MemberConfigurationResponseModel = {
 
 export type MemberGroupItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -1419,6 +1448,7 @@ export type MemberGroupResponseModel = {
 
 export type MemberItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     memberType: MemberTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
     kind: MemberKindModel;
@@ -1440,6 +1470,7 @@ export type MemberResponseModel = {
     values: Array<MemberValueResponseModel>;
     variants: Array<MemberVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     email: string;
     username: string;
     memberType: MemberTypeReferenceResponseModel;
@@ -1477,6 +1508,7 @@ export type MemberTypeConfigurationResponseModel = {
 
 export type MemberTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     icon?: string | null;
 };
@@ -1544,6 +1576,7 @@ export type MemberTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     icon: string;
 };
@@ -1626,6 +1659,7 @@ export type NamedEntityTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -2133,6 +2167,7 @@ export type PublishedDocumentResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
     /**
      * @deprecated
@@ -2192,6 +2227,7 @@ export type RelationResponseModelWritable = {
 
 export type RelationTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     isDeletable: boolean;
 };
@@ -2343,6 +2379,10 @@ export type SetAvatarRequestModel = {
     file: ReferenceByIdModel;
 };
 
+export type SignModel = {
+    alias: string;
+};
+
 export type SortingRequestModel = {
     parent?: ReferenceByIdModel | null;
     sorting: Array<ItemSortingRequestModel>;
@@ -2382,6 +2422,48 @@ export type StylesheetResponseModel = {
     content: string;
 };
 
+export type SubsetDataTypeTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DataTypeTreeItemResponseModel>;
+};
+
+export type SubsetDocumentBlueprintTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentBlueprintTreeItemResponseModel>;
+};
+
+export type SubsetDocumentTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentTreeItemResponseModel>;
+};
+
+export type SubsetDocumentTypeTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentTypeTreeItemResponseModel>;
+};
+
+export type SubsetMediaTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<MediaTreeItemResponseModel>;
+};
+
+export type SubsetMediaTypeTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<MediaTypeTreeItemResponseModel>;
+};
+
+export type SubsetNamedEntityTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<NamedEntityTreeItemResponseModel>;
+};
+
 export type TagResponseModel = {
     id: string;
     text?: string | null;
@@ -2409,6 +2491,7 @@ export type TemplateConfigurationResponseModel = {
 
 export type TemplateItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     alias: string;
 };
@@ -2777,7 +2860,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2867,6 +2950,7 @@ export type UserExternalLoginProviderModel = {
 
 export type UserGroupItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     icon?: string | null;
     alias?: string | null;
@@ -2884,7 +2968,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
@@ -2905,6 +2989,7 @@ export type UserInstallRequestModelWritable = {
 
 export type UserItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     avatarUrls: Array<string>;
     kind: UserKindModel;
@@ -3023,6 +3108,8 @@ export type WebhookEventResponseModel = {
 };
 
 export type WebhookItemResponseModel = {
+    id: string;
+    signs: Array<SignModel>;
     enabled: boolean;
     name: string;
     events: string;
@@ -3752,6 +3839,7 @@ export type GetTreeDataTypeSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/data-type/siblings';
 };
@@ -3771,7 +3859,7 @@ export type GetTreeDataTypeSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<DataTypeTreeItemResponseModel>;
+    200: SubsetDataTypeTreeItemResponseModel;
 };
 
 export type GetTreeDataTypeSiblingsResponse = GetTreeDataTypeSiblingsResponses[keyof GetTreeDataTypeSiblingsResponses];
@@ -4690,6 +4778,7 @@ export type GetTreeDocumentBlueprintSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/document-blueprint/siblings';
 };
@@ -4709,7 +4798,7 @@ export type GetTreeDocumentBlueprintSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<DocumentBlueprintTreeItemResponseModel>;
+    200: SubsetDocumentBlueprintTreeItemResponseModel;
 };
 
 export type GetTreeDocumentBlueprintSiblingsResponse = GetTreeDocumentBlueprintSiblingsResponses[keyof GetTreeDocumentBlueprintSiblingsResponses];
@@ -5531,6 +5620,7 @@ export type GetTreeDocumentTypeSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/document-type/siblings';
 };
@@ -5550,7 +5640,7 @@ export type GetTreeDocumentTypeSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<DocumentTypeTreeItemResponseModel>;
+    200: SubsetDocumentTypeTreeItemResponseModel;
 };
 
 export type GetTreeDocumentTypeSiblingsResponse = GetTreeDocumentTypeSiblingsResponses[keyof GetTreeDocumentTypeSiblingsResponses];
@@ -7157,6 +7247,7 @@ export type GetTreeDocumentSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/tree/document/siblings';
 };
@@ -7176,7 +7267,7 @@ export type GetTreeDocumentSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<DocumentTreeItemResponseModel>;
+    200: SubsetDocumentTreeItemResponseModel;
 };
 
 export type GetTreeDocumentSiblingsResponse = GetTreeDocumentSiblingsResponses[keyof GetTreeDocumentSiblingsResponses];
@@ -9052,6 +9143,7 @@ export type GetTreeMediaTypeSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/media-type/siblings';
 };
@@ -9071,7 +9163,7 @@ export type GetTreeMediaTypeSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<MediaTypeTreeItemResponseModel>;
+    200: SubsetMediaTypeTreeItemResponseModel;
 };
 
 export type GetTreeMediaTypeSiblingsResponse = GetTreeMediaTypeSiblingsResponses[keyof GetTreeMediaTypeSiblingsResponses];
@@ -10018,6 +10110,7 @@ export type GetTreeMediaSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/tree/media/siblings';
 };
@@ -10037,7 +10130,7 @@ export type GetTreeMediaSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<MediaTreeItemResponseModel>;
+    200: SubsetMediaTreeItemResponseModel;
 };
 
 export type GetTreeMediaSiblingsResponse = GetTreeMediaSiblingsResponses[keyof GetTreeMediaSiblingsResponses];
@@ -14172,7 +14265,7 @@ export type GetTreeTemplateSiblingsResponses = {
     /**
      * OK
      */
-    200: Array<NamedEntityTreeItemResponseModel>;
+    200: SubsetNamedEntityTreeItemResponseModel;
 };
 
 export type GetTreeTemplateSiblingsResponse = GetTreeTemplateSiblingsResponses[keyof GetTreeTemplateSiblingsResponses];
