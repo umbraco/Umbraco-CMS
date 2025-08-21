@@ -4,6 +4,10 @@ import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffi
 import type { UmbTimeZone } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
+export interface UmbTimeZoneOption extends UmbTimeZone {
+	offset: string;
+}
+
 /**
  * @element umb-input-time-zone-picker
  */
@@ -35,7 +39,7 @@ export class UmbInputTimeZonePickerElement extends UmbLitElement {
 	public get options() {
 		return this.#options;
 	}
-	#options: Array<UmbTimeZone> = [];
+	#options: Array<UmbTimeZoneOption> = [];
 
 	@property({ type: String, reflect: true })
 	public set value(value) {

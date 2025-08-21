@@ -1,5 +1,5 @@
 import type UmbInputTimeZoneItemElement from './input-time-zone-item.element.js';
-import type { UmbInputTimeZonePickerElement } from './input-time-zone-picker.element.js';
+import type { UmbInputTimeZonePickerElement, UmbTimeZoneOption } from './input-time-zone-picker.element.js';
 import {
 	html,
 	customElement,
@@ -15,7 +15,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { getTimeZoneList, type UmbTimeZone } from '@umbraco-cms/backoffice/utils';
+import { getTimeZoneList, getTimeZoneOffset } from '@umbraco-cms/backoffice/utils';
 import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
 
 /**
@@ -126,11 +126,15 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	@query('umb-input-time-zone-picker')
 	protected _timeZonePicker?: UmbInputTimeZonePickerElement;
 
-	private _timeZoneList: Array<UmbTimeZone> = [];
+	private _timeZoneList: Array<UmbTimeZoneOption> = [];
 
 	constructor() {
 		super();
-		this._timeZoneList = getTimeZoneList(undefined, DateTime.now());
+		const now = DateTime.now();
+		this._timeZoneList = getTimeZoneList(undefined).map((tz) => ({
+			...tz,
+			offset: getTimeZoneOffset(tz.value, now), // Format offset as string
+		}));
 
 		this.addValidator(
 			'rangeUnderflow',
