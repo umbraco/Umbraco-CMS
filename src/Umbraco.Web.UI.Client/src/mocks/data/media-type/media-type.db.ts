@@ -4,7 +4,7 @@ import { UmbMockEntityTreeManager } from '../utils/entity/entity-tree.manager.js
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
 import { umbDataTypeMockDb } from '../data-type/data-type.db.js';
-import type { UmbMockMediaTypeModel, UmbMockMediaTypeUnionModel } from './media-type.data.js';
+import type { UmbMockMediaTypeModel } from './media-type.data.js';
 import { data } from './media-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
