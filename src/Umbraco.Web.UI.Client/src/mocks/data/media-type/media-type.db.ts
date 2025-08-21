@@ -90,6 +90,7 @@ const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): Umb
 		collection: null,
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		signs: [],
 	};
 };
 
@@ -114,6 +115,7 @@ const createMockMediaTypeMapper = (request: CreateMediaTypeRequestModel): UmbMoc
 		collection: null,
 		isDeletable: false,
 		aliasCanBeChanged: false,
+		signs: [],
 	};
 };
 
@@ -147,6 +149,7 @@ const mediaTypeTreeItemMapper = (item: UmbMockMediaTypeModel): MediaTypeTreeItem
 		isFolder: item.isFolder,
 		icon: item.icon,
 		isDeletable: item.isDeletable,
+		signs: item.signs,
 	};
 };
 
@@ -155,6 +158,7 @@ const mediaTypeItemMapper = (item: UmbMockMediaTypeUnionModel): MediaTypeItemRes
 		id: item.id,
 		name: item.name,
 		icon: item.icon,
+		signs: item.signs,
 	};
 };
 
