@@ -77,11 +77,6 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
             while (pos > 1)
             {
                 route = route.Substring(0, pos);
-                node = umbracoContext.Content?.GetByRoute(route, culture: frequest?.Culture);
-                if (node != null)
-                {
-                    break;
-                }
 
                 pos = route.LastIndexOf('/');
             }
