@@ -234,9 +234,6 @@ public static partial class UmbracoBuilderExtensions
         // We can simplify this registration once the obsolete IBackgroundTaskQueue is removed.
         builder.Services.AddSingleton<HostedServices.BackgroundTaskQueue>();
         builder.Services.AddSingleton<IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
-#pragma warning disable CS0618 // Type or member is obsolete
-        builder.Services.AddSingleton<HostedServices.IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
-#pragma warning restore CS0618 // Type or member is obsolete
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 
