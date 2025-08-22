@@ -151,9 +151,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				view.firstHintOfVariant,
 				(hint) => {
 					if (hint) {
-						this._hintMap.set(view.viewAlias, hint);
+						this._hintMap.set(viewAlias, hint);
 					} else {
-						this._hintMap.delete(view.viewAlias);
+						this._hintMap.delete(viewAlias);
 					}
 					this.requestUpdate('_hintMap');
 				},
