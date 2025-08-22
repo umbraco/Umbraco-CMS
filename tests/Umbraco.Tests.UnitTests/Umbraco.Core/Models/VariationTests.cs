@@ -320,7 +320,7 @@ public class VariationTests
 
         // can publish value
         // and get edited and published values
-        Assert.IsTrue(content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection));
+        Assert.IsTrue(content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection));
         Assert.AreEqual("a", content.GetValue("prop"));
         Assert.AreEqual("a", content.GetValue("prop", published: true));
 
@@ -350,9 +350,9 @@ public class VariationTests
 
         // can publish value
         // and get edited and published values
-        Assert.IsFalse(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection)); // no name
+        Assert.IsFalse(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection)); // no name
         content.SetCultureName("name-fr", langFr);
-        Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection));
+        Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection));
         Assert.IsNull(content.GetValue("prop"));
         Assert.IsNull(content.GetValue("prop", published: true));
         Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -366,7 +366,7 @@ public class VariationTests
         Assert.IsNull(content.GetValue("prop", langFr, published: true));
 
         // can publish all
-        Assert.IsTrue(content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection));
+        Assert.IsTrue(content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection));
         Assert.IsNull(content.GetValue("prop"));
         Assert.IsNull(content.GetValue("prop", published: true));
         Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -376,14 +376,14 @@ public class VariationTests
         content.UnpublishCulture(langFr);
         Assert.AreEqual("c", content.GetValue("prop", langFr));
         Assert.IsNull(content.GetValue("prop", langFr, published: true));
-        Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection));
+        Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection));
         Assert.AreEqual("c", content.GetValue("prop", langFr));
         Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
 
         content.UnpublishCulture(); // clears invariant props if any
         Assert.IsNull(content.GetValue("prop"));
         Assert.IsNull(content.GetValue("prop", published: true));
-        Assert.IsTrue(content.PublishCulture(CultureImpact.All, DateTime.Now, _propertyEditorCollection)); // publishes invariant props if any
+        Assert.IsTrue(content.PublishCulture(CultureImpact.All, DateTime.UtcNow, _propertyEditorCollection)); // publishes invariant props if any
         Assert.IsNull(content.GetValue("prop"));
         Assert.IsNull(content.GetValue("prop", published: true));
 
@@ -442,19 +442,19 @@ public class VariationTests
         var langFrImpact = CultureImpact.Explicit(langFr, true);
 
         Assert.IsTrue(
-            content.PublishCulture(langFrImpact, DateTime.Now, _propertyEditorCollection)); // succeeds because names are ok (not validating properties here)
+            content.PublishCulture(langFrImpact, DateTime.UtcNow, _propertyEditorCollection)); // succeeds because names are ok (not validating properties here)
         Assert.IsFalse(
             propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact)); // fails because prop1 is mandatory
 
         content.SetValue("prop1", "a", langFr);
         Assert.IsTrue(
-            content.PublishCulture(langFrImpact, DateTime.Now, _propertyEditorCollection)); // succeeds because names are ok (not validating properties here)
+            content.PublishCulture(langFrImpact, DateTime.UtcNow, _propertyEditorCollection)); // succeeds because names are ok (not validating properties here)
 
         // Fails because prop2 is mandatory and invariant and the item isn't published.
         // Invariant is validated against the default language except when there isn't a published version, in that case it's always validated.
         Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact));
         content.SetValue("prop2", "x");
-        Assert.IsTrue(content.PublishCulture(langFrImpact, DateTime.Now, _propertyEditorCollection)); // still ok...
+        Assert.IsTrue(content.PublishCulture(langFrImpact, DateTime.UtcNow, _propertyEditorCollection)); // still ok...
         Assert.IsTrue(propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact)); // now it's ok
 
         Assert.AreEqual("a", content.GetValue("prop1", langFr, published: true));
@@ -490,12 +490,12 @@ public class VariationTests
         content.SetValue("prop", "a-es", langEs);
 
         // cannot publish without a name
-        Assert.IsFalse(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection));
+        Assert.IsFalse(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection));
 
         // works with a name
         // and then FR is available, and published
         content.SetCultureName("name-fr", langFr);
-        Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.Now, _propertyEditorCollection));
+        Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false), DateTime.UtcNow, _propertyEditorCollection));
 
         // now UK is available too
         content.SetCultureName("name-uk", langUk);

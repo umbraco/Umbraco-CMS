@@ -149,8 +149,8 @@ public class MemberUserStoreTests
             Email = "fakeemail@umbraco.com",
             UserName = "fakeUsername",
             Comments = "hello",
-            LastLoginDateUtc = DateTime.UtcNow,
-            LastPasswordChangeDateUtc = DateTime.UtcNow,
+            LastLoginDate = DateTime.UtcNow,
+            LastPasswordChangeDate = DateTime.UtcNow,
             EmailConfirmed = true,
             AccessFailedCount = 3,
             LockoutEnd = DateTime.UtcNow.AddDays(10),
@@ -192,8 +192,8 @@ public class MemberUserStoreTests
         Assert.AreEqual(fakeUser.Email, mockMember.Email);
         Assert.AreEqual(fakeUser.UserName, mockMember.Username);
         Assert.AreEqual(fakeUser.Comments, mockMember.Comments);
-        Assert.AreEqual(fakeUser.LastPasswordChangeDateUtc.Value.ToLocalTime(), mockMember.LastPasswordChangeDate);
-        Assert.AreEqual(fakeUser.LastLoginDateUtc.Value.ToLocalTime(), mockMember.LastLoginDate);
+        Assert.AreEqual(fakeUser.LastPasswordChangeDate, mockMember.LastPasswordChangeDate);
+        Assert.AreEqual(fakeUser.LastLoginDate, mockMember.LastLoginDate);
         Assert.AreEqual(fakeUser.AccessFailedCount, mockMember.FailedPasswordAttempts);
         Assert.AreEqual(fakeUser.IsLockedOut, mockMember.IsLockedOut);
         Assert.AreEqual(fakeUser.IsApproved, mockMember.IsApproved);
@@ -218,7 +218,7 @@ public class MemberUserStoreTests
             Email = "a@b.com",
             UserName = "c",
             Comments = "e",
-            LastLoginDateUtc = DateTime.UtcNow,
+            LastLoginDate = DateTime.UtcNow,
             SecurityStamp = "abc",
         };
 
@@ -252,8 +252,8 @@ public class MemberUserStoreTests
         Assert.AreEqual(fakeUser.Email, mockMember.Email);
         Assert.AreEqual(fakeUser.UserName, mockMember.Username);
         Assert.AreEqual(fakeUser.Comments, mockMember.Comments);
-        Assert.IsFalse(fakeUser.LastPasswordChangeDateUtc.HasValue);
-        Assert.AreEqual(fakeUser.LastLoginDateUtc.Value.ToLocalTime(), mockMember.LastLoginDate);
+        Assert.IsFalse(fakeUser.LastPasswordChangeDate.HasValue);
+        Assert.AreEqual(fakeUser.LastLoginDate.Value, mockMember.LastLoginDate);
         Assert.AreEqual(fakeUser.AccessFailedCount, mockMember.FailedPasswordAttempts);
         Assert.AreEqual(fakeUser.IsLockedOut, mockMember.IsLockedOut);
         Assert.AreEqual(fakeUser.IsApproved, mockMember.IsApproved);

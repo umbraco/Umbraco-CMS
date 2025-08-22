@@ -27,8 +27,8 @@ internal sealed class RelationDto
     [ForeignKey(typeof(RelationTypeDto))]
     public int RelationType { get; set; }
 
-    [Column("datetime", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("datetime")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime Datetime { get; set; }
 
     [Column("comment")]

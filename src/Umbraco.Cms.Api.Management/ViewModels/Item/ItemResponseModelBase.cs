@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Item;
+namespace Umbraco.Cms.Api.Management.ViewModels.Item;
 
 public abstract class ItemResponseModelBase : IHasSigns
 {
@@ -6,7 +6,15 @@ public abstract class ItemResponseModelBase : IHasSigns
 
     public Guid Id { get; set; }
 
-    public IEnumerable<SignModel> Signs => _signs.AsEnumerable();
+    public IEnumerable<SignModel> Signs
+    {
+        get => _signs.AsEnumerable();
+        set
+        {
+            _signs.Clear();
+            _signs.AddRange(value);
+        }
+    }
 
     public void AddSign(string alias) => _signs.Add(new SignModel { Alias = alias });
 
