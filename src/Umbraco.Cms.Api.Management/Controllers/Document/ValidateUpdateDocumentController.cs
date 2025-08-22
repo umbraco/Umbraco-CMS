@@ -21,7 +21,6 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
     private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    [ActivatorUtilitiesConstructor]
     public ValidateUpdateDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,

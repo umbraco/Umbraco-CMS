@@ -16,7 +16,6 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
     private readonly IUmbracoMapper _mapper;
     private readonly IContentTypeSearchService _contentTypeSearchService;
 
-    [ActivatorUtilitiesConstructor]
     public SearchDocumentTypeItemController(IUmbracoMapper mapper, IContentTypeSearchService contentTypeSearchService)
     {
         _mapper = mapper;

@@ -21,7 +21,6 @@ public class ValidateCreateDocumentController : CreateDocumentControllerBase
     private readonly IContentEditingService _contentEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    [ActivatorUtilitiesConstructor]
     public ValidateCreateDocumentController(
         IAuthorizationService authorizationService,
         IDocumentEditingPresentationFactory documentEditingPresentationFactory,
