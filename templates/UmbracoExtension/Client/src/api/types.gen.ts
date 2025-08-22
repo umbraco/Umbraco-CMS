@@ -6,6 +6,12 @@ export type DocumentGranularPermissionModel = {
     permission: string;
 };
 
+export type DocumentPropertyValueGranularPermissionModel = {
+    key: string;
+    readonly context: string;
+    permission: string;
+};
+
 export type ReadOnlyUserGroupModel = {
     id: number;
     key: string;
@@ -17,7 +23,7 @@ export type ReadOnlyUserGroupModel = {
     hasAccessToAllLanguages: boolean;
     allowedLanguages: Array<number>;
     permissions: Array<string>;
-    granularPermissions: Array<DocumentGranularPermissionModel | UnknownTypeGranularPermissionModel>;
+    granularPermissions: Array<DocumentGranularPermissionModel | DocumentPropertyValueGranularPermissionModel | UnknownTypeGranularPermissionModel>;
     allowedSections: Array<string>;
 };
 
@@ -40,16 +46,13 @@ export type UserGroupModel = {
     name?: string | null;
     hasAccessToAllLanguages: boolean;
     permissions: Array<string>;
-    granularPermissions: Array<DocumentGranularPermissionModel | UnknownTypeGranularPermissionModel>;
+    granularPermissions: Array<DocumentGranularPermissionModel | DocumentPropertyValueGranularPermissionModel | UnknownTypeGranularPermissionModel>;
     readonly allowedSections: Array<string>;
     readonly userCount: number;
     readonly allowedLanguages: Array<number>;
 };
 
-export enum UserKindModel {
-    DEFAULT = 'Default',
-    API = 'Api'
-}
+export type UserKindModel = 'Default' | 'Api';
 
 export type UserModel = {
     id: number;
@@ -90,20 +93,13 @@ export type UserProfileModel = {
     name?: string | null;
 };
 
-export enum UserStateModel {
-    ACTIVE = 'Active',
-    DISABLED = 'Disabled',
-    LOCKED_OUT = 'LockedOut',
-    INVITED = 'Invited',
-    INACTIVE = 'Inactive',
-    ALL = 'All'
-}
+export type UserStateModel = 'Active' | 'Disabled' | 'LockedOut' | 'Invited' | 'Inactive' | 'All';
 //#endif
 export type PingData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/umbraco/hackclient/api/v1/ping';
+    url: '/umbraco/umbracoextension/api/v1/ping';
 };
 
 export type PingErrors = {
@@ -126,7 +122,7 @@ export type WhatsMyNameData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/umbraco/hackclient/api/v1/whatsMyName';
+    url: '/umbraco/umbracoextension/api/v1/whatsMyName';
 };
 
 export type WhatsMyNameErrors = {
@@ -149,7 +145,7 @@ export type WhatsTheTimeMrWolfData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/umbraco/hackclient/api/v1/whatsTheTimeMrWolf';
+    url: '/umbraco/umbracoextension/api/v1/whatsTheTimeMrWolf';
 };
 
 export type WhatsTheTimeMrWolfErrors = {
@@ -172,7 +168,7 @@ export type WhoAmIData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/umbraco/hackclient/api/v1/whoAmI';
+    url: '/umbraco/umbracoextension/api/v1/whoAmI';
 };
 
 export type WhoAmIErrors = {
