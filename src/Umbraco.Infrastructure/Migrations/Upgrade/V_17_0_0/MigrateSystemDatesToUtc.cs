@@ -53,7 +53,7 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         var timeZoneName = _migrationSettings.Value.LocalServerTimeZone;
         if (string.IsNullOrWhiteSpace(timeZoneName))
         {
-            timeZoneName = _timeProvider.LocalTimeZone.StandardName;
+            timeZoneName = _timeProvider.LocalTimeZone.Id;
             _logger.LogInformation("Migrating system dates to UTC using the detected local server timezone: {TimeZoneName}.", timeZoneName);
         }
         else
