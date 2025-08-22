@@ -13,7 +13,12 @@ export interface UmbValueValidatorArgs<ValueType = unknown> {
 	navigateToError?: () => void;
 }
 
-// The Example Workspace Context Controller:
+/**
+ * UmbValueValidator is a controller that implements the UmbValidator interface.
+ * It validates a value based on a provided check function, manages validation state,
+ * and communicates validation messages to the validation context.
+ * It can also handle navigation to the first invalid element if needed.
+ */
 export class UmbValueValidator<ValueType = unknown> extends UmbControllerBase implements UmbValidator {
 	//
 	#validationContext?: typeof UMB_VALIDATION_CONTEXT.TYPE;
