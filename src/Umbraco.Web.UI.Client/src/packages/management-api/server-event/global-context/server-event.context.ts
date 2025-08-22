@@ -94,8 +94,13 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 			})
 			.build();
 
-		this.#connection.on('notify', (payload: UmbManagementApiServerEventModel) => {
-			this.#events.next(payload);
+		this.#connection.on('notify', (payload) => {
+			const event: UmbManagementApiServerEventModel = {
+				...payload,
+				clientTimestamp: new Date().toISOString(),
+			};
+
+			this.#events.next(event);
 		});
 
 		this.#connection
