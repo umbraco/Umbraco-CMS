@@ -2842,6 +2842,8 @@ export default {
 		config_timeZones_all: 'All - Display all available time zones',
 		config_timeZones_local: 'Local - Display only the local time zone',
 		config_timeZones_custom: 'Custom - Display a pre-defined list of time zones',
+		emptyTimeZone: 'Please select a time zone',
+		invalidTimeZone: 'The selected time zone is not valid',
 	},
 	uiCulture: {
 		ar: 'العربية',

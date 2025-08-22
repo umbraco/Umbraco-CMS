@@ -2846,5 +2846,7 @@ export default {
 		config_timeZones_all: 'Todos - Mostrar todos os fusos horários disponíveis',
 		config_timeZones_local: 'Local - Mostrar apenas o fuso horário local',
 		config_timeZones_custom: 'Personalizado - Mostrar uma lista pré-definida de fusos horários',
+		emptyTimeZone: 'Por favor, selecione um fuso horário',
+		invalidTimeZone: 'O fuso horário selecionado não é válido',
 	},
 } as UmbLocalizationDictionary;
