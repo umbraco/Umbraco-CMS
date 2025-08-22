@@ -16,8 +16,8 @@ public class PropertyBuilderTests
         // Arrange
         const int testId = 4;
         var testKey = Guid.NewGuid();
-        var testCreateDate = DateTime.Now.AddHours(-1);
-        var testUpdateDate = DateTime.Now;
+        var testCreateDate = DateTime.UtcNow.AddHours(-1);
+        var testUpdateDate = DateTime.UtcNow;
         var testPropertyTypeId = 3;
 
         var builder = new PropertyBuilder();

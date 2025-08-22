@@ -26,7 +26,7 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
             expected.PerformingUserKey.Value,
             expected.PerformingDetails,
             expected.PerformingIp,
-            expected.EventDateUtc,
+            expected.EventDate,
             expected.AffectedUserKey.Value,
             expected.AffectedDetails,
             expected.EventType,
@@ -42,7 +42,7 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(expected.PerformingUserId, actual.PerformingUserId);
             Assert.AreEqual(expected.PerformingUserKey, actual.PerformingUserKey);
             Assert.AreEqual(expected.PerformingDetails, actual.PerformingDetails);
-            Assert.AreEqual(expected.EventDateUtc, actual.EventDateUtc);
+            Assert.AreEqual(expected.EventDate, actual.EventDate);
             Assert.AreEqual(expected.AffectedUserId, actual.AffectedUserId);
             Assert.AreEqual(expected.AffectedUserKey, actual.AffectedUserKey);
             Assert.AreEqual(expected.AffectedDetails, actual.AffectedDetails);
@@ -80,7 +80,7 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(Constants.Security.SuperUserKey, actual.PerformingUserKey);
             Assert.AreEqual("performingDetails", actual.PerformingDetails);
             Assert.AreEqual("performingIp", actual.PerformingIp);
-            Assert.AreEqual(eventDateUtc, actual.EventDateUtc);
+            Assert.AreEqual(eventDateUtc, actual.EventDate);
             Assert.AreEqual(Constants.Security.UnknownUserId, actual.AffectedUserId);
             Assert.AreEqual(null, actual.AffectedUserKey);
             Assert.AreEqual("affectedDetails", actual.AffectedDetails);
