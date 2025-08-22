@@ -1,5 +1,8 @@
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -7,22 +10,45 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 ///     Represents a temporary representation of an editor for cases where a data type is created but not editor is
 ///     available.
 /// </summary>
-[HideFromTypeFinder]
-public class MissingPropertyEditor : IDataEditor
+[DataEditor(
+    Constants.PropertyEditors.Aliases.Missing,
+    ValueEditorIsReusable = true)]
+//[HideFromTypeFinder]
+public class MissingPropertyEditor : DataEditor
 {
-    public string Alias => "Umbraco.Missing";
+    private readonly IIOHelper _ioHelper;
 
-    public string Name => "Missing property editor";
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MissingPropertyEditor"/> class.
+    /// </summary>
+    public MissingPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
+        : base(dataValueEditorFactory)
+    {
+        _ioHelper = ioHelper;
+        SupportsReadOnly = true;
+    }
 
-    public bool IsDeprecated => false;
+    /// <inheritdoc />
+    protected override IDataValueEditor CreateValueEditor() =>
+        DataValueEditorFactory.Create<MissingPropertyValueEditor>(Attribute!);
 
-    public IDictionary<string, object> DefaultConfiguration => throw new NotImplementedException();
+    /// <inheritdoc />
+    protected override IConfigurationEditor CreateConfigurationEditor() =>
+        new LabelConfigurationEditor(_ioHelper);
 
-    public IPropertyIndexValueFactory PropertyIndexValueFactory => throw new NotImplementedException();
+    // provides the property value editor
+    internal sealed class MissingPropertyValueEditor : DataValueEditor
+    {
+        public MissingPropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+        {
+        }
 
-    public IConfigurationEditor GetConfigurationEditor() => new ConfigurationEditor();
-
-    public IDataValueEditor GetValueEditor() => throw new NotImplementedException();
-
-    public IDataValueEditor GetValueEditor(object? configurationObject) => throw new NotImplementedException();
+        /// <inheritdoc />
+        public override bool IsReadOnly => true;
+    }
 }

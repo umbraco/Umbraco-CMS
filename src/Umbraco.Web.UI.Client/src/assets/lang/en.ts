@@ -2826,6 +2826,10 @@ export default {
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
 	},
+	missingEditor: {
+		description: 'This property type is no longer installed. Please contact your administrator.',
+		detailsDescription: 'This property type is no longer installed. Please contact your administrator.',
+	},
 	uiCulture: {
 		ar: 'العربية',
 		bs: 'Bosanski',

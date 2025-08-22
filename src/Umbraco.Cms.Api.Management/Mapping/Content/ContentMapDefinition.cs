@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -25,7 +26,8 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                 .Values
                 .Select(propertyValue =>
                 {
-                    IDataEditor? propertyEditor = _propertyEditorCollection[property.PropertyType.PropertyEditorAlias];
+                    IDataEditor? propertyEditor = _propertyEditorCollection[property.PropertyType.PropertyEditorAlias]
+                                                  ?? _propertyEditorCollection[Constants.PropertyEditors.Aliases.Missing];
                     if (propertyEditor == null)
                     {
                         return null;
@@ -44,7 +46,7 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                         Segment = propertyValue.Segment,
                         Alias = property.Alias,
                         Value = propertyEditor.GetValueEditor().ToEditor(publishedProperty ?? property, propertyValue.Culture, propertyValue.Segment),
-                        EditorAlias = propertyEditor.Alias
+                        EditorAlias = propertyEditor.Alias,
                     };
                     additionalPropertyMapping?.Invoke(propertyEditor, variantViewModel);
                     return variantViewModel;
