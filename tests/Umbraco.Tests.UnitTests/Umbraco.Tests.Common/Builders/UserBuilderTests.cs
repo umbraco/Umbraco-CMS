@@ -22,12 +22,12 @@ public class UserBuilderTests
         const bool testIsApproved = true;
         const bool testIsLockedOut = true;
         var testKey = Guid.NewGuid();
-        var testCreateDate = DateTime.Now.AddHours(-1);
-        var testUpdateDate = DateTime.Now;
+        var testCreateDate = DateTime.UtcNow.AddHours(-1);
+        var testUpdateDate = DateTime.UtcNow;
         const int testFailedPasswordAttempts = 22;
-        var testLastLockoutDate = DateTime.Now.AddHours(-2);
-        var testLastLoginDate = DateTime.Now.AddHours(-3);
-        var testLastPasswordChangeDate = DateTime.Now.AddHours(-4);
+        var testLastLockoutDate = DateTime.UtcNow.AddHours(-2);
+        var testLastLoginDate = DateTime.UtcNow.AddHours(-3);
+        var testLastPasswordChangeDate = DateTime.UtcNow.AddHours(-4);
         var testComments = "comments";
         var testSessionTimeout = 5;
         var testStartContentIds = new[] { 3 };

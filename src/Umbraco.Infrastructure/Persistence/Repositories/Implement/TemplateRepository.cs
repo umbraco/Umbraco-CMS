@@ -477,7 +477,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         TemplateDto templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new {entity.Id});
 
         //Save updated entity to db
-        template.UpdateDate = DateTime.Now;
+        template.UpdateDate = DateTime.UtcNow;
         TemplateDto dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, templateDto.PrimaryKey);
         Database.Update(dto.NodeDto);
         Database.Update(dto);
@@ -551,7 +551,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         var viewName = string.Concat(entity.Alias, ".cshtml");
         _viewsFileSystem?.DeleteFile(viewName);
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     #endregion

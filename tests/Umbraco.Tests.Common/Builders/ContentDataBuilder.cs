@@ -142,7 +142,7 @@ internal sealed class ContentDataBuilder : BuilderBase<ContentData>, IWithNameBu
                 {
                     cultureVariation = new CultureVariation
                     {
-                        Date = DateTime.Now,
+                        Date = DateTime.UtcNow,
                         IsDraft = true,
                         Name = _name,
                         UrlSegment = _segment
@@ -176,7 +176,7 @@ internal sealed class ContentDataBuilder : BuilderBase<ContentData>, IWithNameBu
 
     public override ContentData Build()
     {
-        var now = _now ?? DateTime.Now;
+        var now = _now ?? DateTime.UtcNow;
         var versionId = _versionId ?? 1;
         var writerId = _writerId ?? -1;
         var templateId = _templateId ?? 0;
@@ -202,13 +202,13 @@ internal sealed class ContentDataBuilder : BuilderBase<ContentData>, IWithNameBu
     public static ContentData CreateBasic(string name, DateTime? versionDate = null)
         => new ContentDataBuilder()
             .WithName(name)
-            .WithVersionDate(versionDate ?? DateTime.Now)
+            .WithVersionDate(versionDate ?? DateTime.UtcNow)
             .Build();
 
     public static ContentData CreateVariant(string name, Dictionary<string, CultureVariation> cultureInfos, DateTime? versionDate = null, bool published = true)
         => new ContentDataBuilder()
             .WithName(name)
-            .WithVersionDate(versionDate ?? DateTime.Now)
+            .WithVersionDate(versionDate ?? DateTime.UtcNow)
             .WithCultureInfos(cultureInfos)
             .WithPublished(published)
             .Build();

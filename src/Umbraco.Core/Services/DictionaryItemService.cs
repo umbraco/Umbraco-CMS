@@ -176,7 +176,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         if (dictionaryItem.UpdateDate == default)
         {
             // TODO (V17): To align with updates of system dates, this needs to change to DateTime.UtcNow.
-            dictionaryItem.UpdateDate = DateTime.Now;
+            dictionaryItem.UpdateDate = DateTime.UtcNow;
         }
 
         return await SaveAsync(

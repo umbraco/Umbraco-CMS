@@ -83,8 +83,8 @@ public class PublishedRouterTests
         var pc = new Mock<IPublishedContent>();
         pc.Setup(content => content.Id).Returns(1);
         pc.Setup(content => content.Name).Returns("test");
-        pc.Setup(content => content.CreateDate).Returns(DateTime.Now);
-        pc.Setup(content => content.UpdateDate).Returns(DateTime.Now);
+        pc.Setup(content => content.CreateDate).Returns(DateTime.UtcNow);
+        pc.Setup(content => content.UpdateDate).Returns(DateTime.UtcNow);
         pc.Setup(content => content.Path).Returns("-1,1");
         pc.Setup(content => content.Properties).Returns(new Collection<IPublishedProperty>());
         pc.Setup(content => content.ContentType)
