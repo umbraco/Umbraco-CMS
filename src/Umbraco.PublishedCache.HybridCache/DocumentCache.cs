@@ -1,10 +1,8 @@
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
@@ -42,14 +40,6 @@ public sealed class DocumentCache : IPublishedContentCache
     public IPublishedContent? GetById(int contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
     public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
-
-    public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
-    {
-        _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
-
-        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(preview, key)).WhereNotNull();
-        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
-    }
 
     [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
     public string? GetRouteById(bool preview, int contentId, string? culture = null)
