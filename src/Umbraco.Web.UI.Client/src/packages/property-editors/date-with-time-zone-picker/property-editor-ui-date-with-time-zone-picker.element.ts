@@ -25,12 +25,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbDateTimeWithTimeZone, UmbTimeZonePickerValue } from '@umbraco-cms/backoffice/models';
 import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
-import {
-	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-	UmbFormControlMixin,
-	UmbValidationContext,
-} from '@umbraco-cms/backoffice/validation';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 interface UmbTimeZonePickerOption extends UmbTimeZone {
 	offset: string;
@@ -79,32 +74,6 @@ export class UmbPropertyEditorUIDateWithTimeZonePickerElement
 
 	@state()
 	private _selectedTimeZone: string | undefined;
-
-	readonly #validationContext = new UmbValidationContext(this);
-
-	/**
-	 *
-	 */
-	constructor() {
-		super();
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.#gotPropertyContext(context);
-		});
-	}
-
-	#gotPropertyContext(context: typeof UMB_PROPERTY_CONTEXT.TYPE | undefined) {
-		this.observe(
-			context?.dataPath,
-			(dataPath) => {
-				if (dataPath) {
-					// Set the data path for the local validation context:
-					this.#validationContext.setDataPath(dataPath);
-					this.#validationContext.autoReport();
-				}
-			},
-			'observeDataPath',
-		);
-	}
 
 	override connectedCallback() {
 		super.connectedCallback();
