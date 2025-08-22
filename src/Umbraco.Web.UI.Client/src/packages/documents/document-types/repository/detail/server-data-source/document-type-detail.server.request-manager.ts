@@ -7,13 +7,18 @@ import {
 	type DocumentTypeResponseModel,
 	type UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbManagementApiDetailDataRequestManager } from '@umbraco-cms/backoffice/management-api';
+import {
+	UmbManagementApiDetailDataRequestManager,
+	UmbManagementApiInflightRequestCache,
+} from '@umbraco-cms/backoffice/management-api';
 
 export class UmbManagementApiDocumentTypeDetailDataRequestManager extends UmbManagementApiDetailDataRequestManager<
 	DocumentTypeResponseModel,
 	UpdateDocumentTypeRequestModel,
 	CreateDocumentTypeRequestModel
 > {
+	static #inflightRequestCache = new UmbManagementApiInflightRequestCache<DocumentTypeResponseModel>();
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			create: (body: CreateDocumentTypeRequestModel) => DocumentTypeService.postDocumentType({ body }),
@@ -22,6 +27,7 @@ export class UmbManagementApiDocumentTypeDetailDataRequestManager extends UmbMan
 				DocumentTypeService.putDocumentTypeById({ path: { id }, body }),
 			delete: (id: string) => DocumentTypeService.deleteDocumentTypeById({ path: { id } }),
 			dataCache: documentTypeDetailCache,
+			inflightRequestCache: UmbManagementApiDocumentTypeDetailDataRequestManager.#inflightRequestCache,
 		});
 	}
 }

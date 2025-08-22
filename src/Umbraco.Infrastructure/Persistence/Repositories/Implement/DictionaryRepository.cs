@@ -437,7 +437,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(entity.ItemKey));
         IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(entity.Key));
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     private void RecursiveDelete(Guid parentId)

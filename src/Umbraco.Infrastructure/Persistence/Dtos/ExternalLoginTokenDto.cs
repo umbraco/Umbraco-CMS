@@ -31,8 +31,8 @@ internal sealed class ExternalLoginTokenDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string Value { get; set; } = null!;
 
-    [Column("createDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("createDate")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
     [ResultColumn]

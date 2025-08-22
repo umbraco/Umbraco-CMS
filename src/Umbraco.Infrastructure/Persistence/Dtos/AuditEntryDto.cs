@@ -36,9 +36,9 @@ internal sealed class AuditEntryDto
     [Length(Constants.Audit.IpLength)]
     public string? PerformingIp { get; set; }
 
-    [Column("eventDateUtc", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
-    public DateTime EventDateUtc { get; set; }
+    [Column("eventDateUtc")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+    public DateTime EventDate { get; set; }
 
     [Column("affectedUserId")]
     public int AffectedUserId { get; set; }

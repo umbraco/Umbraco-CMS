@@ -307,7 +307,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
             // set
             else if (GetCultureName(culture) != name)
             {
-                this.SetCultureInfo(culture!, name, DateTime.Now);
+                this.SetCultureInfo(culture!, name, DateTime.UtcNow);
             }
         }
 

@@ -23,7 +23,7 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
 
     public void DeactiveStaleServers(TimeSpan staleTimeout)
     {
-        DateTime timeoutDate = DateTime.Now.Subtract(staleTimeout);
+        DateTime timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);
 
         Sql<ISqlContext> sql = Sql()
             .Update<ServerRegistrationDto>(c => c

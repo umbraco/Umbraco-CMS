@@ -244,9 +244,9 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         {
             UserId = userId,
             IpAddress = requestingIpAddress,
-            LoggedInUtc = now,
-            LastValidatedUtc = now,
-            LoggedOutUtc = null,
+            LoggedIn = now,
+            LastValidated = now,
+            LoggedOut = null,
             SessionId = Guid.NewGuid()
         };
         Database.Insert(dto);
@@ -293,13 +293,13 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         Sql<ISqlContext> sql = t.Sql(sessionId);
 
         UserLoginDto? found = Database.FirstOrDefault<UserLoginDto>(sql);
-        if (found == null || found.UserId != userId || found.LoggedOutUtc.HasValue)
+        if (found == null || found.UserId != userId || found.LoggedOut.HasValue)
         {
             return false;
         }
 
         //now detect if there's been a timeout
-        if (DateTime.UtcNow - found.LastValidatedUtc > _globalSettings.TimeOut)
+        if (DateTime.UtcNow - found.LastValidated > _globalSettings.TimeOut)
         {
             //timeout detected, update the record
             if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
@@ -315,7 +315,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
         {
             Logger.LogDebug("Updating LastValidatedUtc for sessionId {sessionId}", sessionId);
         }
-        found.LastValidatedUtc = DateTime.UtcNow;
+        found.LastValidated = DateTime.UtcNow;
         Database.Update(found);
         return true;
     }
@@ -326,13 +326,13 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
     public int ClearLoginSessions(TimeSpan timespan)
     {
         DateTime fromDate = DateTime.UtcNow - timespan;
-        return Database.Delete<UserLoginDto>(Sql().Where<UserLoginDto>(x => x.LastValidatedUtc < fromDate));
+        return Database.Delete<UserLoginDto>(Sql().Where<UserLoginDto>(x => x.LastValidated < fromDate));
     }
 
     public void ClearLoginSession(Guid sessionId) =>
         // TODO: why is that one updating and not deleting?
         Database.Execute(Sql()
-            .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow))
+            .Update<UserLoginDto>(u => u.Set(x => x.LoggedOut, DateTime.UtcNow))
             .Where<UserLoginDto>(x => x.SessionId == sessionId));
 
 
@@ -686,7 +686,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             Database.Execute(delete, new { id = entity.Id, key = GetEntityId(entity) });
         }
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     protected override void PersistNewItem(IUser entity)

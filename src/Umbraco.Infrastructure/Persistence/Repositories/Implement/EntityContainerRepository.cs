@@ -192,7 +192,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         // delete
         Database.Delete(nodeDto);
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     protected override void PersistNewItem(EntityContainer entity)
@@ -246,7 +246,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         // note: sortOrder is NOT managed and always zero for containers
         nodeDto = new NodeDto
         {
-            CreateDate = DateTime.Now,
+            CreateDate = DateTime.UtcNow,
             Level = Convert.ToInt16(level + 1),
             NodeObjectType = entity.ContainerObjectType,
             ParentId = entity.ParentId,

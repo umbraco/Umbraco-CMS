@@ -253,7 +253,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = new Guid(uniqueId),
                 Text = text,
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             };
 
             ConditionalInsert(
@@ -277,7 +277,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = new Guid("916724a5-173d-4619-b97e-b9de133dd6f5"),
                 Text = "SYSTEM DATA: umbraco master root",
                 NodeObjectType = Constants.ObjectTypes.SystemRoot,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             });
         _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
             new NodeDto
@@ -292,7 +292,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.System.RecycleBinContentKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.ContentRecycleBin,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             });
         _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
             new NodeDto
@@ -307,7 +307,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.System.RecycleBinMediaKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.MediaRecycleBin,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             });
 
         InsertDataTypeNodeDto(Constants.DataTypes.LabelString, 35, Constants.DataTypes.Guids.LabelString,
@@ -336,7 +336,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.UploadGuid,
                 Text = "Upload File",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -355,7 +355,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.UploadVideoGuid,
                 Text = "Upload Video",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -374,7 +374,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.UploadAudioGuid,
                 Text = "Upload Audio",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -393,7 +393,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.UploadArticleGuid,
                 Text = "Upload Article",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -412,7 +412,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.UploadVectorGraphicsGuid,
                 Text = "Upload Vector Graphics",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -431,7 +431,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.TextareaGuid,
                 Text = "Textarea",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -450,7 +450,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.TextstringGuid,
                 Text = "Textstring",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -469,7 +469,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.RichtextEditorGuid,
                 Text = "Richtext editor",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -488,7 +488,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.NumericGuid,
                 Text = "Numeric",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -507,7 +507,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.CheckboxGuid,
                 Text = "True/false",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -526,7 +526,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.CheckboxListGuid,
                 Text = "Checkbox list",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -545,7 +545,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.DropdownGuid,
                 Text = "Dropdown",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -564,7 +564,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.DatePickerGuid,
                 Text = "Date Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -583,7 +583,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.RadioboxGuid,
                 Text = "Radiobox",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -602,7 +602,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.DropdownMultipleGuid,
                 Text = "Dropdown multiple",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -621,7 +621,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.ApprovedColorGuid,
                 Text = "Approved Color",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -640,7 +640,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.DatePickerWithTimeGuid,
                 Text = "Date Picker with time",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -659,7 +659,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.ListViewContentGuid,
                 Text = Constants.Conventions.DataTypes.ListViewPrefix + "Content",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -678,7 +678,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.ListViewMediaGuid,
                 Text = Constants.Conventions.DataTypes.ListViewPrefix + "Media",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -697,7 +697,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.TagsGuid,
                 Text = "Tags",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -716,7 +716,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.ImageCropperGuid,
                 Text = "Image Cropper",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -737,7 +737,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.ContentPickerGuid,
                 Text = "Content Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -756,7 +756,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.MemberPickerGuid,
                 Text = "Member Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -776,7 +776,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.RelatedLinksGuid,
                 Text = "Multi URL Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -796,7 +796,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.MediaPicker3Guid,
                 Text = "Media Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -815,7 +815,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.MediaPicker3MultipleGuid,
                 Text = "Multiple Media Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -834,7 +834,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.MediaPicker3SingleImageGuid,
                 Text = "Image Media Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -853,7 +853,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.MediaPicker3MultipleImagesGuid,
                 Text = "Multiple Image Media Picker",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -877,7 +877,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = folderUniqueId,
                 Text = Constants.Conventions.MediaTypes.Folder,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -898,7 +898,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = imageUniqueId,
                 Text = Constants.Conventions.MediaTypes.Image,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -919,7 +919,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = fileUniqueId,
                 Text = Constants.Conventions.MediaTypes.File,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -940,7 +940,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = videoUniqueId,
                 Text = Constants.Conventions.MediaTypes.Video,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -961,7 +961,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = audioUniqueId,
                 Text = Constants.Conventions.MediaTypes.Audio,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -982,7 +982,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = articleUniqueId,
                 Text = Constants.Conventions.MediaTypes.Article,
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -1003,7 +1003,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = svgUniqueId,
                 Text = "Vector Graphics (SVG)",
                 NodeObjectType = Constants.ObjectTypes.MediaType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -1027,7 +1027,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = memberUniqueId,
                 Text = Constants.Conventions.MemberTypes.DefaultAlias,
                 NodeObjectType = Constants.ObjectTypes.MemberType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
@@ -1194,8 +1194,8 @@ internal sealed class DatabaseDataCreator
             Password = "default",
             Email = string.Empty,
             UserLanguage = "en-US",
-            CreateDate = DateTime.Now,
-            UpdateDate = DateTime.Now,
+            CreateDate = DateTime.UtcNow,
+            UpdateDate = DateTime.UtcNow,
         });
 
     private void CreateUserGroupData()
@@ -1212,8 +1212,8 @@ internal sealed class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
                 Icon = "icon-medal",
                 HasAccessToAllLanguages = true,
             });
@@ -1229,8 +1229,8 @@ internal sealed class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = WriterGroupAlias,
                 Name = "Writers",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
                 Icon = "icon-edit",
                 HasAccessToAllLanguages = true,
             });
@@ -1246,8 +1246,8 @@ internal sealed class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = EditorGroupAlias,
                 Name = "Editors",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
                 Icon = "icon-tools",
                 HasAccessToAllLanguages = true,
             });
@@ -1263,8 +1263,8 @@ internal sealed class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = TranslatorGroupAlias,
                 Name = "Translators",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
                 Icon = "icon-globe",
                 HasAccessToAllLanguages = true,
             });
@@ -1278,8 +1278,8 @@ internal sealed class DatabaseDataCreator
                 Key = Constants.Security.SensitiveDataGroupKey,
                 Alias = SensitiveDataGroupAlias,
                 Name = "Sensitive data",
-                CreateDate = DateTime.Now,
-                UpdateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
                 Icon = "icon-lock",
                 HasAccessToAllLanguages = false,
             });
@@ -2340,7 +2340,7 @@ internal sealed class DatabaseDataCreator
         var finalState = upgrader.Plan.FinalState;
 
         _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
-            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });
+            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.UtcNow });
 
 
         upgrader = new Upgrader(new UmbracoPremigrationPlan());
@@ -2348,7 +2348,7 @@ internal sealed class DatabaseDataCreator
         finalState = upgrader.Plan.FinalState;
 
         _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
-            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });
+            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.UtcNow });
     }
 
     private void CreateLogViewerQueryData()
