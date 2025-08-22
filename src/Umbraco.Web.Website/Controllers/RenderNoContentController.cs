@@ -16,6 +16,7 @@ public class RenderNoContentController : Controller
     private readonly GlobalSettings _globalSettings;
     private readonly IDocumentUrlService _urlService;
 
+    [ActivatorUtilitiesConstructor]
     public RenderNoContentController(
         IHostingEnvironment hostingEnvironment,
         IOptionsSnapshot<GlobalSettings> globalSettings,
