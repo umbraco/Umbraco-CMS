@@ -11,7 +11,15 @@ public abstract class ContentResponseModelBase<TValueResponseModelBase, TVariant
 
     public Guid Id { get; set; }
 
-    public IEnumerable<SignModel> Signs => _signs.AsEnumerable();
+    public IEnumerable<SignModel> Signs
+    {
+        get => _signs.AsEnumerable();
+        set
+        {
+            _signs.Clear();
+            _signs.AddRange(value);
+        }
+    }
 
     public void AddSign(string alias) => _signs.Add(new SignModel { Alias = alias });
 
