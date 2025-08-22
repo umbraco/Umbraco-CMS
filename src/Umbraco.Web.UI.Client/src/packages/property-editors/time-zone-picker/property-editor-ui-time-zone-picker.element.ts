@@ -6,9 +6,13 @@ import type {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbTimeZonePickerValue } from '@umbraco-cms/backoffice/models';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import type { UmbInputTimeZoneElement } from '@umbraco-cms/backoffice/components';
+
+export interface UmbTimeZonePickerValue {
+	mode: 'all' | 'local' | 'custom';
+	timeZones: Array<string>;
+}
 
 /**
  * @element umb-property-editor-ui-time-zone-picker

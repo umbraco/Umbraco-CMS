@@ -1,3 +1,4 @@
+import type { UmbTimeZonePickerValue } from '../time-zone-picker/property-editor-ui-time-zone-picker.element.js';
 import {
 	getClientTimeZone,
 	getTimeZoneList,
@@ -23,14 +24,19 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { InputDateType, UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbDateTimeWithTimeZone, UmbTimeZonePickerValue } from '@umbraco-cms/backoffice/models';
 import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+
+interface UmbDateTimeWithTimeZone {
+	date: string | undefined;
+	timeZone: string | undefined;
+}
 
 interface UmbTimeZonePickerOption extends UmbTimeZone {
 	offset: string;
 	invalid: boolean;
 }
+
 /**
  * @element umb-property-editor-ui-date-with-time-zone-picker
  */
