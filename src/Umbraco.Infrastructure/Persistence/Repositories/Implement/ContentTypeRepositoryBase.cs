@@ -1412,20 +1412,29 @@ AND umbracoNode.id <> @id",
 
     private void DeletePropertyType(IContentTypeComposition contentType, int propertyTypeId)
     {
-        // First clear dependencies.
-        Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
-        Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
+        // first clear dependencies
+        Sql<ISqlContext> sql = Sql()
+            .Delete<TagRelationshipDto>()
+            .Where<TagRelationshipDto>(x => x.PropertyTypeId == propertyTypeId);
+        _ = Database.Execute(sql);
 
-        // Clear the property value permissions, which aren't a hard dependency with a foreign key, but we want to ensure
-        // that any for removed property types are cleared.
-        var uniqueIdAsString = string.Format(SqlContext.SqlSyntax.ConvertUniqueIdentifierToString, "uniqueId");
-        var permissionSearchString = SqlContext.SqlSyntax.GetConcat(
-            "(SELECT " + uniqueIdAsString + " FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE id = @PropertyTypeId)",
-            "'|%'");
+        sql = Sql()
+            .Delete<PropertyDataDto>()
+            .Where<PropertyDataDto>(x => x.PropertyTypeId == propertyTypeId);
+        _ = Database.Execute(sql);
 
-        Database.Delete<UserGroup2GranularPermissionDto>(
-            "WHERE uniqueId = @ContentTypeKey AND permission LIKE " + permissionSearchString,
-            new { ContentTypeKey = contentType.Key, PropertyTypeId = propertyTypeId });
+        Sql<ISqlContext> delSql = Sql()
+            .Delete<UserGroup2GranularPermissionDto>()
+            .Where<UserGroup2GranularPermissionDto>(c => c.UniqueId == contentType.Key)
+            .WhereLike<UserGroup2GranularPermissionDto>(
+                c => c.Permission,
+                Sql()
+                    .SelectClosure<PropertyTypeDto>(c => c.ConvertUniqueIdentifierToString(x => x.UniqueId))
+                    .From<PropertyTypeDto>()
+                    .WhereClosure<PropertyTypeDto>(c => c.Id == propertyTypeId),
+                $"'|{SqlSyntax.GetWildcardPlaceholder()}'");
+
+        _ = Database.Execute(delSql);
 
         // Finally delete the property type.
         Database.Delete<PropertyTypeDto>(
