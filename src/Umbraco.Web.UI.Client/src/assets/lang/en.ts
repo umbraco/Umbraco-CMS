@@ -151,7 +151,8 @@ export default {
 		listBullet: 'Bullet List',
 		listNumeric: 'Numeric List',
 		macroInsert: 'Insert macro',
-		openSplitView: 'Open split view for ',
+		openSplitViewFor: (languageName: string) =>
+			languageName ? `Open split view for '${languageName}'` : 'Open split view',
 		pictureInsert: 'Insert picture',
 		publishAndClose: 'Publish and close',
 		publishDescendants: 'Publish with descendants',
