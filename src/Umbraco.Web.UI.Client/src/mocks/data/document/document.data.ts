@@ -44,6 +44,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'default value here',
 			},
 		],
+		signs: [],
 	},
 	{
 		ancestors: [],
@@ -638,6 +639,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
+		signs: [],
 	},
 	{
 		ancestors: [],
@@ -778,6 +780,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
+		signs: [],
 	},
 	{
 		ancestors: [],
@@ -863,6 +866,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:32:24.957009',
 			},
 		],
+		signs: [],
 	},
 	{
 		ancestors: [],
@@ -912,6 +916,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: undefined,
 			},
 		],
+		signs: [],
 	},
 	{
 		ancestors: [],
@@ -979,6 +984,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				},
 			},
 		],
+		signs: [],
 	},
 	{
 		ancestors: [],
@@ -1244,6 +1250,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 		],
+		signs: [],
 	},
 	{
 		ancestors: [],
@@ -1289,6 +1296,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'default value here',
 			},
 		],
+		signs: [],
 	},
 	...permissionsTestData,
 ];
