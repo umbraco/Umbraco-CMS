@@ -67,7 +67,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		);
 		this.#legacyMergeLogic = true;
 		this.#legacyObserveContainers();
-		this.observe(this.containers, this.#performContainerMerge, null);
+		this.observe(this.containers, this.#legacyPerformContainerMerge, null);
 	}
 
 	public setStructureManager(structure: UmbContentTypeStructureManager<T> | undefined) {
@@ -182,7 +182,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 		if (this.#containerId === null) {
 			//this.#observeHasPropertiesOf(null);
-			this.#observeRootContainers();
+			this.#legacyObserveRootContainers();
 			this.removeUmbControllerByAlias('_observeContainers');
 		} else {
 			this.observe(
@@ -270,7 +270,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	// LEGACY method:
-	#observeRootContainers() {
+	#legacyObserveRootContainers() {
 		if (!this.#structure || !this.#childType || this.#containerId === undefined) return;
 
 		this.observe(
@@ -302,7 +302,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		*/
 
 	// LEGACY method:
-	#filterNonOwnerContainers(containers: Array<UmbPropertyTypeContainerModel>) {
+	#legacyFilterNonOwnerContainers(containers: Array<UmbPropertyTypeContainerModel>) {
 		return this.#ownerChildContainers.length > 0
 			? containers.filter(
 					(anyCon) =>
@@ -316,9 +316,9 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	// LEGACY method:
-	#performContainerMerge = (containers: Array<UmbPropertyTypeContainerModel>) => {
+	#legacyPerformContainerMerge = (containers: Array<UmbPropertyTypeContainerModel>) => {
 		// Remove containers that matches with a owner container:
-		let merged = this.#filterNonOwnerContainers(containers);
+		let merged = this.#legacyFilterNonOwnerContainers(containers);
 		// Remove containers of same name and type:
 		// This only works cause we are dealing with a single level of containers in this Helper, if we had more levels we would need to be more clever about the parent as well. [NL]
 		merged = merged.filter((x, i, cons) => i === cons.findIndex((y) => y.name === x.name && y.type === x.type));
