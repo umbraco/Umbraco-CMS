@@ -19,7 +19,7 @@ export class UmbMediaDetailRepository extends UmbDetailRepositoryBase<UmbMediaDe
 
 		if (!result.error) {
 			// Attempt to clear image cache
-			await this.#imagingRepository.clearCacheByUnique(model.unique);
+			await this.#imagingRepository._internal_clearCropByUnique(model.unique);
 		}
 
 		return result;
@@ -33,7 +33,7 @@ export class UmbMediaDetailRepository extends UmbDetailRepositoryBase<UmbMediaDe
 
 		if (!result.error) {
 			// Attempt to clear image cache
-			await this.#imagingRepository.clearCacheByUnique(unique);
+			await this.#imagingRepository._internal_clearCropByUnique(unique);
 		}
 
 		return result;
