@@ -15,27 +15,7 @@ namespace Umbraco.Cms.Core.PublishedCache;
 //
 public class PublishedElement : IPublishedElement
 {
-
     private readonly IPublishedProperty[] _propertiesArray;
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?> values, bool previewing)
-        : this(contentType, key, values, previewing, PropertyCacheLevel.None, null)
-    {
-    }
-
-    [Obsolete("Please use the non-obsolete constructor. Will be removed in V17.")]
-    public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?>? values, bool previewing, PropertyCacheLevel referenceCacheLevel, ICacheManager? cacheManager)
-        : this(
-            contentType,
-            key,
-            values,
-            previewing,
-            referenceCacheLevel,
-            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>().VariationContext ?? new VariationContext(),
-            cacheManager)
-    {
-    }
 
     // initializes a new instance of the PublishedElement class
     // within the context of a published snapshot service (eg a published content property value)

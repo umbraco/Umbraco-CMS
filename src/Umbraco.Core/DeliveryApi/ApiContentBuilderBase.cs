@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Models.DeliveryApi;
+﻿using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
@@ -11,19 +9,6 @@ public abstract class ApiContentBuilderBase<T>
 {
     private readonly IApiContentNameProvider _apiContentNameProvider;
     private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
-
-    [Obsolete("Please use the constructor that takes all parameters. Scheduled for removal in Umbraco 17.")]
-    protected ApiContentBuilderBase(
-        IApiContentNameProvider apiContentNameProvider,
-        IApiContentRouteBuilder apiContentRouteBuilder,
-        IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
-        : this(
-              apiContentNameProvider,
-              apiContentRouteBuilder,
-              outputExpansionStrategyAccessor,
-              StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
-    {
-    }
 
     protected ApiContentBuilderBase(
         IApiContentNameProvider apiContentNameProvider,

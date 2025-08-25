@@ -43,64 +43,12 @@ public sealed class DocumentCache : IPublishedContentCache
 
     public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
-    // TODO: These are all obsolete and should be removed
-
-    [Obsolete("Scheduled for removal in v17")]
-    public IPublishedContent? GetById(bool preview, Udi contentId)
-    {
-        if(contentId is not GuidUdi guidUdi)
-        {
-            throw new NotSupportedException("Only GuidUdi is supported");
-        }
-
-        return GetById(preview, guidUdi.Guid);
-    }
-
-    [Obsolete("Scheduled for removal in v17")]
-    public IPublishedContent? GetById(Udi contentId)
-    {
-        if(contentId is not GuidUdi guidUdi)
-        {
-            throw new NotSupportedException("Only GuidUdi is supported");
-        }
-
-        return GetById(guidUdi.Guid);
-    }
-
     public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
     {
         _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
 
         IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(preview, key)).WhereNotNull();
         return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
-    }
-
-    public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null)
-    {
-        _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
-
-        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(key)).WhereNotNull();
-        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
-    }
-
-    [Obsolete("Scheduled for removal in v17")]
-    public bool HasContent(bool preview) => HasContent();
-
-    [Obsolete("Scheduled for removal in v17")]
-    public bool HasContent() => _documentUrlService.HasAny();
-
-    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
-    public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null)
-    {
-        Guid? key = _documentUrlService.GetDocumentKeyByRoute(route, culture, null, preview);
-        return key is not null ? GetById(preview, key.Value) : null;
-    }
-
-    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
-    public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null)
-    {
-        Guid? key = _documentUrlService.GetDocumentKeyByRoute(route, culture, null, false);
-        return key is not null ? GetById(key.Value) : null;
     }
 
     [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]

@@ -24,6 +24,7 @@ namespace Umbraco.Cms.Core.Routing;
 ///     </para>
 ///     <para>If successful, then the template of the document request is also assigned.</para>
 /// </remarks>
+[Obsolete("Scheduled for removal in Umbraco 18")]
 public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
 {
     private readonly IContentTypeService _contentTypeService;
