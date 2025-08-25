@@ -5,11 +5,13 @@ import type {
 	UmbTiptapToolbarRowViewModel,
 } from '../types.js';
 import type { UmbTiptapToolbarValue } from '../../../components/types.js';
+import type { UmbTiptapToolbarGroupElement } from './tiptap-toolbar-group/tiptap-toolbar-group.element.js';
 import { customElement, css, html, property, repeat, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import './tiptap-toolbar-group/tiptap-toolbar-group.element.js';
 
 @customElement('umb-property-editor-ui-tiptap-toolbar-configuration')
 export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
@@ -239,22 +241,36 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		`;
 	}
 
+	async #onChange(e: Event) {
+		e.stopPropagation();
+		const element = e.target as UmbTiptapToolbarGroupElement;
+		const aliases = element.value.map((item) => item.alias);
+		this.#context.updateToolbarItem(aliases, [element.rowIndex, element.groupIndex]);
+	}
+
+	#handleToolbarClick(event: CustomEvent) {
+		const { groupIndex, index, rowIndex } = event.detail;
+		this.#context?.removeToolbarItem([rowIndex, groupIndex, index]);
+	}
+
 	#renderGroup(group?: UmbTiptapToolbarGroupViewModel, rowIndex = 0, groupIndex = 0) {
 		if (!group) return nothing;
 		const showActionBar = this._toolbar[rowIndex].data.length > 1 && group.data.length === 0;
+		const items: UmbTiptapToolbarExtension[] = group!.data
+			.map((alias) => this.#context?.getExtensionByAlias(alias))
+			.filter((item): item is UmbTiptapToolbarExtension => !!item);
 		return html`
 			<div
 				class="group"
 				dropzone="move"
 				@dragover=${this.#onDragOver}
 				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.data.length - 1])}>
-				<div class="items">
-					${when(
-						group?.data.length === 0,
-						() => html`<em><umb-localize key="tiptap_toolbar_emptyGroup">Empty</umb-localize></em>`,
-						() => html`${group!.data.map((alias, idx) => this.#renderItem(alias, rowIndex, groupIndex, idx))}`,
-					)}
-				</div>
+				<umb-tiptap-toolbar-group
+					.value=${items}
+					.rowIndex=${rowIndex}
+					.groupIndex=${groupIndex}
+					@toolbar-item-click=${this.#handleToolbarClick}
+					@change=${(e: Event) => this.#onChange(e)}></umb-tiptap-toolbar-group>
 				${when(
 					showActionBar,
 					() => html`
@@ -274,62 +290,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				label=${this.localize.term('tiptap_toolbar_addGroup')}
 				@click=${() => this.#context?.insertToolbarGroup(rowIndex, groupIndex + 1)}></uui-button-inline-create>
 		`;
-	}
-
-	#renderItem(alias: string, rowIndex = 0, groupIndex = 0, itemIndex = 0) {
-		const item = this.#context?.getExtensionByAlias(alias);
-		if (!item) return nothing;
-
-		const forbidden = !this.#context?.isExtensionEnabled(item.alias);
-		const label = this.localize.string(item.label);
-
-		switch (item.kind) {
-			case 'styleMenu':
-			case 'menu':
-				return html`
-					<uui-button
-						compact
-						class=${forbidden ? 'forbidden' : ''}
-						draggable="true"
-						label=${label}
-						look=${forbidden ? 'placeholder' : 'outline'}
-						title=${label}
-						?disabled=${forbidden}
-						@click=${() => this.#context.removeToolbarItem([rowIndex, groupIndex, itemIndex])}
-						@dragend=${this.#onDragEnd}
-						@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
-						<div class="inner">
-							<span>${label}</span>
-						</div>
-						<uui-symbol-expand slot="extra" open></uui-symbol-expand>
-					</uui-button>
-				`;
-
-			case 'button':
-			default:
-				return html`
-					<uui-button
-						compact
-						class=${forbidden ? 'forbidden' : ''}
-						data-mark="tiptap-toolbar-item:${item.alias}"
-						draggable="true"
-						look=${forbidden ? 'placeholder' : 'outline'}
-						label=${label}
-						title=${label}
-						?disabled=${forbidden}
-						@click=${() => this.#context.removeToolbarItem([rowIndex, groupIndex, itemIndex])}
-						@dragend=${this.#onDragEnd}
-						@dragstart=${(e: DragEvent) => this.#onDragStart(e, alias, [rowIndex, groupIndex, itemIndex])}>
-						<div class="inner">
-							${when(
-								item.icon,
-								() => html`<umb-icon .name=${item.icon}></umb-icon>`,
-								() => html`<span>${label}</span>`,
-							)}
-						</div>
-					</uui-button>
-				`;
-		}
 	}
 
 	static override readonly styles = [
