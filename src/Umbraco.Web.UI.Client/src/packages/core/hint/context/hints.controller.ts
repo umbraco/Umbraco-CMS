@@ -6,6 +6,11 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObjectState, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
+export interface UmbHintControllerArgs<HintType extends UmbHint = UmbHint> {
+	viewAlias?: string;
+	scaffold?: Partial<HintType>;
+}
+
 export class UmbHintController<
 	HintType extends UmbHint = UmbHint,
 	IncomingHintType extends UmbIncomingHintBase = UmbPartialSome<HintType, 'unique' | 'weight' | 'path'>,
@@ -35,7 +40,7 @@ export class UmbHintController<
 		return this.#scaffold.getValue();
 	}
 
-	constructor(host: UmbControllerHost, args?: { viewAlias?: string; scaffold?: Partial<HintType> }) {
+	constructor(host: UmbControllerHost, args?: UmbHintControllerArgs<HintType>) {
 		super(host);
 
 		this.#viewAlias = args?.viewAlias;
