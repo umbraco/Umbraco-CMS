@@ -131,7 +131,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	}
 
 	#setParentData(structureItems: Array<UmbStructureItemModel>) {
-		/* If the item is not new, the current item is the last item in the array. 
+		/* If the item is not new, the current item is the last item in the array.
 			We filter out the current item unique to handle any case where it could show up */
 		const parent = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique()).pop();
 
@@ -161,7 +161,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 				return entity;
 			})
-			/* If the item is not new, the current item is the last item in the array. 
+			/* If the item is not new, the current item is the last item in the array.
 				We filter out the current item unique to handle any case where it could show up */
 			.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
 

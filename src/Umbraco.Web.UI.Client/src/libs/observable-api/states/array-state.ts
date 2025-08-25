@@ -48,10 +48,10 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 	 * @param {T} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if sortBy has been defined for this state the data will be sorted before set. If data is different than current this will trigger observations to update.
 	 * @example <caption>Example change the data of a state</caption>
-	 * const myState = new UmbArrayState('Good morning');
-	 * // myState.value is equal 'Good morning'.
-	 * myState.setValue('Goodnight')
-	 * // myState.value is equal 'Goodnight'.
+	 * const myState = new UmbArrayState(['Good morning']);
+	 * // myState.value is equal ['Good morning'].
+	 * myState.setValue(['Goodnight'])
+	 * // myState.value is equal ['Goodnight'].
 	 */
 	override setValue(value: T[]) {
 		if (value && this.#sortMethod) {
@@ -59,6 +59,19 @@ export class UmbArrayState<T, U = unknown> extends UmbDeepState<T[]> {
 		} else {
 			super.setValue(value);
 		}
+	}
+
+	/**
+	 * @function clear
+	 * @description - Set the data of this state to an empty array.
+	 * @example <caption>Example clearing the data of a state</caption>
+	 * const myState = new UmbArrayState(['Good morning']);
+	 * // myState.value is equal ['Good morning'].
+	 * myState.clear()
+	 * // myState.value is equal [].
+	 */
+	clear() {
+		super.setValue([]);
 	}
 
 	/**
