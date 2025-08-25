@@ -77,6 +77,7 @@ export class UmbImagingRepository extends UmbRepositoryBase implements UmbApi {
 	 * @param {string} unique The unique identifier for the media item
 	 * @internal
 	 */
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	async _internal_clearCropByUnique(unique: string) {
 		await this.#init;
 		this.#dataStore?.clearCropByUnique(unique);
