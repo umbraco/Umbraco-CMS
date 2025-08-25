@@ -1,1 +1,1 @@
-export * from './valueValidator.controller.js';
+export * from './value-validator.controller.js';
