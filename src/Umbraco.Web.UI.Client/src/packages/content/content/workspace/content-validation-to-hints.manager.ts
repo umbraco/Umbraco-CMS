@@ -77,7 +77,7 @@ export class UmbContentValidationToHintsManager<
 
 					hints.addOne({
 						unique: message.key,
-						path: ['Umb.WorkspaceView.Document.Edit', 'root', ...path],
+						path: ['Umb.WorkspaceView.Document.Edit', ...path],
 						text: '!',
 						/*label: message.body,*/
 						color: 'invalid',

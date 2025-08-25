@@ -33,8 +33,10 @@ export class UmbViewContext extends UmbControllerBase {
 			viewAlias: viewAlias,
 		});
 		this.firstHintOfVariant = mergeObservables([this.variantId, this.hints.hints], ([variantId, hints]) => {
-			if (variantId) {
-				return hints.find((hint) => (hint.variantId ? hint.variantId.equal(variantId!) : true));
+			if (variantId && !variantId.isInvariant()) {
+				return hints.find((hint) =>
+					hint.variantId ? hint.variantId.equal(variantId!) || hint.variantId.isInvariant() : true,
+				);
 			} else {
 				return hints[0];
 			}
