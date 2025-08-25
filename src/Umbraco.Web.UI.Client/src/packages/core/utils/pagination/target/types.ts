@@ -1,4 +1,4 @@
-export interface UmbTargetPaginationModel {
+export interface UmbTargetPaginationRequestModel {
 	target: {
 		unique: string;
 		entityType: string;

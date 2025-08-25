@@ -1,4 +1,4 @@
-export interface UmbOffsetPaginationModel {
+export interface UmbOffsetPaginationRequestModel {
 	skip: number;
 	take: number;
 }
