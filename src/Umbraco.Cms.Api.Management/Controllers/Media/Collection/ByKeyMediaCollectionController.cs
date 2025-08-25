@@ -1,10 +1,13 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -20,16 +23,33 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMediaCollectionPresentationFactory _mediaCollectionPresentationFactory;
 
+    [ActivatorUtilitiesConstructor]
+    public ByKeyMediaCollectionController(
+        IMediaListViewService mediaListViewService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUmbracoMapper mapper,
+        IMediaCollectionPresentationFactory mediaCollectionPresentationFactory,
+        SignProviderCollection signProviders)
+        : base(mapper, signProviders)
+    {
+        _mediaListViewService = mediaListViewService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _mediaCollectionPresentationFactory = mediaCollectionPresentationFactory;
+    }
+
+    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in Umbraco 18")]
     public ByKeyMediaCollectionController(
         IMediaListViewService mediaListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUmbracoMapper mapper,
         IMediaCollectionPresentationFactory mediaCollectionPresentationFactory)
-        : base(mapper)
+        : this(
+            mediaListViewService,
+            backOfficeSecurityAccessor,
+            mapper,
+            mediaCollectionPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
     {
-        _mediaListViewService = mediaListViewService;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _mediaCollectionPresentationFactory = mediaCollectionPresentationFactory;
     }
 
     [HttpGet]
@@ -64,6 +84,7 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
         }
 
         List<MediaCollectionResponseModel> collectionResponseModels = await _mediaCollectionPresentationFactory.CreateCollectionModelAsync(collectionAttempt.Result!);
+        await PopulateSigns(collectionResponseModels);
         return CollectionResult(collectionResponseModels, collectionAttempt.Result!.Items.Total);
     }
 }

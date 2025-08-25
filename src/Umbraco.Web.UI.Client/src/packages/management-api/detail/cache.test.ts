@@ -24,6 +24,10 @@ describe('UmbManagementApiDetailDataCache', () => {
 				expect(cache).to.have.property('get').that.is.a('function');
 			});
 
+			it('has a getAll method', () => {
+				expect(cache).to.have.property('getAll').that.is.a('function');
+			});
+
 			it('has a delete method', () => {
 				expect(cache).to.have.property('delete').that.is.a('function');
 			});
@@ -66,6 +70,14 @@ describe('UmbManagementApiDetailDataCache', () => {
 
 		it('returns undefined if the item does not exist in the cache', () => {
 			expect(cache.get('item2')).to.be.undefined;
+		});
+	});
+
+	describe('GetAll', () => {
+		it('returns all items from the cache', () => {
+			cache.set('item1', { id: 'item1' });
+			cache.set('item2', { id: 'item2' });
+			expect(cache.getAll()).to.deep.equal([{ id: 'item1' }, { id: 'item2' }]);
 		});
 	});
 
