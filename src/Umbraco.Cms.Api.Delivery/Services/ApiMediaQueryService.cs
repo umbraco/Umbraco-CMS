@@ -66,7 +66,11 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     private IPublishedContent? TryGetByPath(string path, IPublishedMediaCache mediaCache)
     {
         var segments = path.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
-        _mediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+        if (_mediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
+        {
+            return null;
+        }
+
         IEnumerable<IPublishedContent> currentChildren = rootKeys.Select(x => mediaCache.GetById(false, x)).WhereNotNull();
         IPublishedContent? resolvedMedia = null;
 
