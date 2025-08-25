@@ -1,12 +1,11 @@
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDataTypeItemModel } from './types.js';
+import { UmbManagementApiDataTypeItemDataRequestManager } from './data-type-item.server.request-manager.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
-import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 
 let manifestPropertyEditorUis: Array<ManifestPropertyEditorUi> = [];
 
@@ -19,12 +18,13 @@ export class UmbDataTypeItemServerDataSource extends UmbItemServerDataSourceBase
 	DataTypeItemResponseModel,
 	UmbDataTypeItemModel
 > {
+	#itemRequestManager = new UmbManagementApiDataTypeItemDataRequestManager(this);
+
 	/**
 	 * Creates an instance of UmbDataTypeItemServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbDataTypeItemServerDataSource
 	 */
-
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			mapper,
@@ -41,13 +41,7 @@ export class UmbDataTypeItemServerDataSource extends UmbItemServerDataSourceBase
 	override async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const itemRequestManager = new UmbItemDataApiGetRequestController(this, {
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			api: (args) => DataTypeService.getItemDataType({ query: { id: args.uniques } }),
-			uniques,
-		});
-
-		const { data, error } = await itemRequestManager.request();
+		const { data, error } = await this.#itemRequestManager.getItems(uniques);
 
 		return { data: this._getMappedItems(data), error };
 	}

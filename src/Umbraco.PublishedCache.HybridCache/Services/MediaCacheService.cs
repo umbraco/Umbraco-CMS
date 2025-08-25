@@ -258,7 +258,7 @@ internal sealed class MediaCacheService : IMediaCacheService
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
+        _databaseCacheRepository.Rebuild(mediaTypeIds: contentTypeIds.ToList());
 
         IEnumerable<Guid> mediaTypeKeys = contentTypeIds.Select(x => _idKeyMap.GetKeyForId(x, UmbracoObjectTypes.MediaType))
             .Where(x => x.Success)
