@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Website.Controllers;
@@ -21,13 +22,13 @@ public class RenderNoContentControllerTests
     [Test]
     public void Redirects_To_Root_When_Content_Published()
     {
-        var mockUmbracoContext = new Mock<IUmbracoContext>();
-        mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(true);
+        var mockUrlService = new Mock<IDocumentUrlService>();
+        mockUrlService.Setup(x => x.HasAny()).Returns(true);
         var mockHostingEnvironment = new Mock<IHostingEnvironment>();
         var controller = new RenderNoContentController(
-            new TestUmbracoContextAccessor(mockUmbracoContext.Object),
             mockHostingEnvironment.Object,
-            new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()));
+            new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()),
+            mockUrlService.Object);
 
         var result = controller.Index() as RedirectResult;
 
@@ -41,8 +42,8 @@ public class RenderNoContentControllerTests
         const string umbracoPathSetting = Constants.System.DefaultUmbracoPath;
         const string umbracoPath = "/umbraco";
         const string viewPath = "~/config/splashes/NoNodes.cshtml";
-        var mockUmbracoContext = new Mock<IUmbracoContext>();
-        mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(false);
+        var mockUrlService = new Mock<IDocumentUrlService>();
+        mockUrlService.Setup(x => x.HasAny()).Returns(false);
         var mockIOHelper = new Mock<IIOHelper>();
         mockIOHelper.Setup(x => x.ResolveUrl(It.Is<string>(y => y == umbracoPathSetting))).Returns(umbracoPath);
         var mockHostingEnvironment = new Mock<IHostingEnvironment>();
@@ -53,7 +54,7 @@ public class RenderNoContentControllerTests
         {
             NoNodesViewPath = viewPath,
         });
-        var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockHostingEnvironment.Object, globalSettings);
+        var controller = new RenderNoContentController(mockHostingEnvironment.Object, globalSettings, mockUrlService.Object);
 
         var result = controller.Index() as ViewResult;
         Assert.IsNotNull(result);
