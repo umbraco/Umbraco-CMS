@@ -1,5 +1,5 @@
 import { UMB_MANAGEMENT_API_SERVER_EVENT_CONTEXT } from '../server-event/constants.js';
-import type { UmbManagementApiInflightRequestCache } from '../inflight-request/cache.js';
+import type { UmbManagementApiInFlightRequestCache } from '../inflight-request/cache.js';
 import type { UmbManagementApiDetailDataCache } from './cache.js';
 import {
 	tryExecute,
@@ -21,7 +21,7 @@ export interface UmbManagementApiDetailDataRequestManagerArgs<
 	update: (id: string, data: UpdateRequestModelType) => Promise<UmbApiResponse<{ data: unknown }>>;
 	delete: (id: string) => Promise<UmbApiResponse<{ data: unknown }>>;
 	dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
-	inflightRequestCache: UmbManagementApiInflightRequestCache<DetailResponseModelType>;
+	inflightRequestCache: UmbManagementApiInFlightRequestCache<DetailResponseModelType>;
 }
 
 export class UmbManagementApiDetailDataRequestManager<
@@ -30,7 +30,7 @@ export class UmbManagementApiDetailDataRequestManager<
 	UpdateRequestModelType,
 > extends UmbControllerBase {
 	#dataCache: UmbManagementApiDetailDataCache<DetailResponseModelType>;
-	#inflightRequestCache: UmbManagementApiInflightRequestCache<DetailResponseModelType>;
+	#inflightRequestCache: UmbManagementApiInFlightRequestCache<DetailResponseModelType>;
 
 	#create;
 	#read;
@@ -86,11 +86,13 @@ export class UmbManagementApiDetailDataRequestManager<
 			const hasInflightRequest = this.#inflightRequestCache.has(inflightCacheKey);
 
 			const request = hasInflightRequest
-				? this.#inflightRequestCache.get(inflightCacheKey)
+				? this.#inflightRequestCache.get(inflightCacheKey)?.requestPromise
 				: tryExecute(this, this.#read(id));
 
 			if (!request) {
-				throw new Error(`Failed to create or retrieve 'read' request for ID: ${id} (cache key: ${inflightCacheKey}). Aborting read.`);
+				throw new Error(
+					`Failed to create or retrieve 'read' request for ID: ${id} (cache key: ${inflightCacheKey}). Aborting read.`,
+				);
 			}
 
 			this.#inflightRequestCache.set(inflightCacheKey, request);
