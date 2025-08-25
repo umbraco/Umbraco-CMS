@@ -467,11 +467,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						<umb-extension-slot
 							.filter=${this.#extensionSlotFilterMethod}
 							.renderMethod=${this.#extensionSlotRenderMethod}
+							.defaultRenderMethod=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							default-element=${this._inlineEditingMode ? 'umb-block-grid-block-inline' : 'umb-block-grid-block'}
 							type="blockEditorCustomView"
 							single
-							>${this.#renderBuiltinBlockView()}</umb-extension-slot
+							></umb-extension-slot
 						>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
