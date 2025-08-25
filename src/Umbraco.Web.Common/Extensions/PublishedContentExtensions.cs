@@ -17,17 +17,6 @@ public static class PublishedContentExtensions
 {
     #region Variations
 
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static string? GetCultureFromDomains(
-        this IPublishedContent content,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        ISiteDomainMapper siteDomainHelper,
-        Uri? current = null)
-    {
-        IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
-        return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper);
-    }
-
     public static string? GetCultureFromDomains(
         this IPublishedContent content,
         IUmbracoContextAccessor umbracoContextAccessor,
