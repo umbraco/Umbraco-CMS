@@ -4,6 +4,7 @@ export * from './collection/constants.js';
 export * from './entity-actions/constants.js';
 export * from './entity-bulk-actions/constants.js';
 export * from './item/constants.js';
+export * from './menu/constants.js';
 export * from './modals/constants.js';
 export * from './paths.js';
 export * from './property-dataset-context/constants.js';
