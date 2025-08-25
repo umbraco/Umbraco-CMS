@@ -176,6 +176,9 @@ export default {
 		confirmActionConfirm: 'Bekræft',
 		morePublishingOptions: 'Flere publiseringsmuligheder',
 		submitChanges: 'Indsæt',
+		openInSplitView: 'Åbn i sidestillet visning',
+		openVersionSelector: 'Åbn udgavevælger',
+		closeVersionSelector: 'Luk udgavevælger',
 	},
 	auditTrailsMedia: {
 		delete: 'Medie slettet',

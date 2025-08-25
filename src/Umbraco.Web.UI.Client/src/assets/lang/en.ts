@@ -177,6 +177,9 @@ export default {
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
 		viewSystemDetails: 'View Umbraco CMS system information and version number',
+		openInSplitView: 'Open in split view',
+		openVersionSelector: 'Open version selector',
+		closeVersionSelector: 'Close version selector',
 	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',

@@ -324,7 +324,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								slot="append"
 								popovertarget="popover"
 								title=${this.#getVariantSpecInfo(this._activeVariant)}
-								label="Open variant options for split view">
+								label=${this._variantSelectorOpen
+									? this.localize.term('buttons_closeVersionSelector')
+									: this.localize.term('buttons_openVersionSelector')}>
 								${this.#getVariantSpecInfo(this._activeVariant)}
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
@@ -490,7 +492,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 							class="split-view"
 							label=${this.localize.term('content_openSplitViewForVariant', this.#getVariantSpecInfo(variant))}
 							@click=${() => this.#openSplitView(variant)}>
-							Open in Split view
+							${this.localize.term('buttons_openInSplitView')}
 						</uui-button>
 					`}
 		`;
