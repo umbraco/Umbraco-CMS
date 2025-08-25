@@ -45,8 +45,8 @@ export class UmbSectionSidebarMenuElement<
 		this.#extensionSlotElement.filter = (menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu;
 		this.#extensionSlotElement.defaultElement = 'umb-menu';
 		this.#extensionSlotElement.events = {
-			'expansion-entry-expanded': this.#onExpansionChange.bind(this),
-			'expansion-entry-collapsed': this.#onExpansionChange.bind(this),
+			[UmbExpansionEntryExpandedEvent.TYPE]: this.#onExpansionChange.bind(this),
+			[UmbExpansionEntryCollapsedEvent.TYPE]: this.#onExpansionChange.bind(this),
 		};
 	}
 
