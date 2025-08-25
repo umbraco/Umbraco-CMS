@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -27,6 +28,11 @@ namespace Umbraco.Extensions
         {
             (string s, object[] a) = sql.SqlContext.VisitDto(predicate, alias);
             return sql.Where(s, a);
+        }
+
+        public static Sql<ISqlContext> WhereClosure<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string? alias = null)
+        {
+            return sql.Where<TDto>(predicate, alias).Append(")");
         }
 
         /// <summary>
@@ -113,10 +119,12 @@ namespace Umbraco.Extensions
         }
 
 
-        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, Sql<ISqlContext>? valuesSql)
+        public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, Sql<ISqlContext>? valuesSql, string concatDefault = "")
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
-            sql.Where(fieldName + " LIKE (" + valuesSql?.SQL + ")", valuesSql?.Arguments);
+            var concat = sql.SqlContext.SqlSyntax.GetWildcardConcat(concatDefault);
+            var likeSelect = sql.SqlContext.SqlSyntax.GetConcat(valuesSql?.SQL ?? string.Empty, concat);
+            _ = sql.Where($"{fieldName} LIKE {likeSelect}", valuesSql?.Arguments);
             return sql;
         }
 
@@ -149,7 +157,7 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext> WhereNotIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable values)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
-            sql.Where(fieldName + " NOT IN (@values)", new { values });
+            _ = sql.Where(fieldName + " NOT IN (@values)", new { values });
             return sql;
         }
 
@@ -162,9 +170,7 @@ namespace Umbraco.Extensions
         /// <param name="values">A subquery returning the value.</param>
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereNotIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, Sql<ISqlContext> values)
-        {
-            return sql.WhereIn(field, values, true);
-        }
+            => sql.WhereIn(field, values, true);
 
         /// <summary>
         /// Appends multiple OR WHERE IN clauses to the Sql statement.
@@ -258,8 +264,8 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> WhereNull<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string? tableAlias = null, bool not = false)
         {
-            var column = sql.GetColumns(columnExpressions: new[] { field }, tableAlias: tableAlias, withAlias: false).First();
-            return sql.Where("(" + column + " IS " + (not ? "NOT " : string.Empty) + "NULL)");
+            var column = sql.GetColumns(columnExpressions: [field], tableAlias: tableAlias, withAlias: false).First();
+            return sql.Where($"({column} IS {(not ? "NOT " : string.Empty)}NULL)");
         }
 
         #endregion
@@ -275,7 +281,7 @@ namespace Umbraco.Extensions
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> From<TDto>(this Sql<ISqlContext> sql, string? alias = null)
         {
-            Type type = typeof (TDto);
+            Type type = typeof(TDto);
             var tableName = type.GetTableName();
 
             var from = sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName);
@@ -738,7 +744,7 @@ namespace Umbraco.Extensions
             var text = "COUNT (" + string.Join(", ", columns) + ")";
             if (alias != null)
             {
-                text += " AS " + sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias);
+                text += " AS " + sqlSyntax.GetQuotedColumnName(alias);
             }
 
             return sql.Select(text);
@@ -1096,7 +1102,7 @@ namespace Umbraco.Extensions
 
             private SqlRef<TDto> Select<TRefDto>(PropertyInfo? propertyInfo, string? tableAlias, Func<SqlRef<TRefDto>, SqlRef<TRefDto>>? nested = null)
             {
-                var referenceName = propertyInfo?.Name ?? typeof (TDto).Name;
+                var referenceName = propertyInfo?.Name ?? typeof(TDto).Name;
                 if (Prefix != null)
                 {
                     referenceName = Prefix + PocoData.Separator + referenceName;
@@ -1163,6 +1169,40 @@ namespace Umbraco.Extensions
             return string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: false, tableAlias: alias));
         }
 
+        public static Sql<ISqlContext> SelectClosure<TDto>(this Sql<ISqlContext> sql, Func<SqlConvert<TDto>, SqlConvert<TDto>> converts)
+        {
+            _ = sql.Append($"(SELECT ");
+
+            var c = new SqlConvert<TDto>(sql.SqlContext);
+            c = converts(c);
+            var first = true;
+            foreach (string setExpression in c.SetExpressions)
+            {
+                _ = sql.Append($"{(first ? string.Empty : ",")} {setExpression}");
+                first = false;
+            }
+
+            if (!first)
+            {
+                _ = sql.Append(" ");
+            }
+
+            return sql;
+        }
+
+        public class SqlConvert<TDto>(ISqlContext sqlContext)
+        {
+            public List<string> SetExpressions { get; } = [];
+
+            public SqlConvert<TDto> ConvertUniqueIdentifierToString(Expression<Func<TDto, object?>> fieldSelector)
+            {
+                var fieldName = sqlContext.SqlSyntax.GetFieldNameForUpdate(fieldSelector);
+                var convertFieldName = string.Format(sqlContext.SqlSyntax.ConvertUniqueIdentifierToString, fieldName);
+                SetExpressions.Add(convertFieldName);
+                return this;
+            }
+        }
+
         #endregion
 
         #region Delete
@@ -1181,6 +1221,19 @@ namespace Umbraco.Extensions
             // FROM optional SQL server, but not elsewhere.
             sql.Append($"DELETE FROM {sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName)}");
             return sql;
+        }
+
+        /// <summary>
+        /// Deletes records from a table based on a predicate.
+        /// </summary>
+        /// <typeparam name="TDto">Table definitio.</typeparam>
+        /// <param name="sql">SqlConext</param>
+        /// <param name="predicate">A predicate to transform and append to the Sql statement (WHERE clause).</param>
+        /// <returns></returns>
+        public static Sql<ISqlContext> Delete<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate)
+        {
+            (string s, object[] a) = sql.SqlContext.VisitDto(predicate);
+            return sql.Delete<TDto>().Where(s, a);
         }
 
         #endregion
@@ -1308,7 +1361,7 @@ namespace Umbraco.Extensions
 
         private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string? tableAlias = null, string? referenceName = null, Expression<Func<TDto, object?>>[]? columnExpressions = null, bool withAlias = true, bool forInsert = false)
         {
-            PocoData? pd = sql.SqlContext.PocoDataFactory.ForType(typeof (TDto));
+            PocoData? pd = sql.SqlContext.PocoDataFactory.ForType(typeof(TDto));
             var tableName = tableAlias ?? pd.TableInfo.TableName;
             var queryColumns = pd.QueryColumns.ToList();
 
