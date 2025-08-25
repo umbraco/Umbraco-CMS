@@ -74,6 +74,8 @@ public interface ISqlSyntaxProvider
 
     string ConvertUniqueIdentifierToString => throw new NotImplementedException();
 
+    string ConvertIntegerToBoolean(int value);
+
     /// <summary>
     ///     Returns the default isolation level for the database
     /// </summary>

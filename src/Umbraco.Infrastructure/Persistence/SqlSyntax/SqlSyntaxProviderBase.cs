@@ -512,6 +512,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual string ConvertUniqueIdentifierToString => "CONVERT(nvarchar(36), {0})";
 
+    public virtual string ConvertIntegerToBoolean(int value) => value == 0 ? "0" : "1";
+
     private DbTypes InitColumnTypeMap()
     {
         var dbTypeMap = new DbTypesFactory();

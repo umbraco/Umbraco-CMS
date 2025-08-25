@@ -991,11 +991,10 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             Database.Execute(sqlInsert);
 
             // insert rows into the documentCultureVariation table
-            cols = Sql().ColumnsForInsert<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited, x => x.Published,
-                x => x.Name, x => x.Available, x => x.LanguageId);
+            cols = Sql().ColumnsForInsert<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited, x => x.Published, x => x.Name, x => x.Available, x => x.LanguageId);
             sqlSelect = Sql().Select<DocumentDto>(x => x.NodeId, x => x.Edited, x => x.Published)
                 .AndSelect<NodeDto>(x => x.Text)
-                .Append($", 1, {defaultLanguageId}") // make Available + default language ID
+                .Append($", {SqlSyntax.ConvertIntegerToBoolean(1)}, {defaultLanguageId}") // make Available + default language ID
                 .From<DocumentDto>()
                 .InnerJoin<NodeDto>().On<NodeDto, DocumentDto>(x => x.NodeId, x => x.NodeId)
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(x => x.NodeId, x => x.NodeId)
