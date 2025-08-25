@@ -154,23 +154,23 @@ export class UmbDefaultTreeContext<
 	/**
 	 * Reloads the tree
 	 * @memberof UmbDefaultTreeContext
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public loadMore = () => this.#loadNextItemsFromTarget();
+	public loadMore = (): Promise<void> => this.#loadNextItemsFromTarget();
 
 	/**
 	 * Load previous items of the tree item
 	 * @memberof UmbTreeItemContextBase
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public loadPrevItems = () => this.#loadPrevItemsFromTarget();
+	public loadPrevItems = (): Promise<void> => this.#loadPrevItemsFromTarget();
 
 	/**
 	 * Load next items of the tree item
 	 * @memberof UmbTreeItemContextBase
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public loadNextItems = () => this.#loadNextItemsFromTarget();
+	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
 
 	#debouncedLoadTree() {
 		if (this.getStartNode()) {
