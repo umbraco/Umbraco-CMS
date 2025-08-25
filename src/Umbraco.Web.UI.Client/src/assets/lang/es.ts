@@ -123,7 +123,6 @@ export default {
 		listBullet: 'Lista en Viñetas',
 		listNumeric: 'Lista Numérica',
 		macroInsert: 'Insertar macro',
-		openSplitViewFor: (languageName: string) => `Abrir vista dividida para '${languageName}'`,
 		pictureInsert: 'Insertar imagen',
 		relations: 'Editar relaciones',
 		returnToList: 'Volver al listado',
@@ -205,6 +204,7 @@ export default {
 		removeTextBox: 'Eliminar caja de texto',
 		contentRoot: 'Raíz de contenido',
 		saveModalTitle: 'Guardar',
+		openSplitViewForVariant: (variant: string) => `Abrir vista dividida para '${variant}'`,
 	},
 	blueprints: {
 		createBlueprintFrom: 'Crear nueva Plantilla de Contenido desde <em>%0%</em>',

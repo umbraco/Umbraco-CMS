@@ -488,7 +488,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				: html`
 						<uui-button
 							class="split-view"
-							label=${this.localize.term('buttons_openSplitViewFor', variant.language.name)}
+							label=${this.localize.term('content_openSplitViewForVariant', this.#getVariantSpecInfo(variant))}
 							@click=${() => this.#openSplitView(variant)}>
 							Open in Split view
 						</uui-button>

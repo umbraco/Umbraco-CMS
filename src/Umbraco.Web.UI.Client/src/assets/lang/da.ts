@@ -151,7 +151,6 @@ export default {
 		listBullet: 'Punktopstilling',
 		listNumeric: 'Nummerorden',
 		macroInsert: 'Indsæt makro',
-		openSplitViewFor: (languageName: string) => `Åbn ${languageName} i sidestillet visning`,
 		pictureInsert: 'Indsæt billede',
 		publishAndClose: 'Udgiv og luk',
 		publishDescendants: 'Udgiv med undersider',
@@ -353,6 +352,7 @@ export default {
 		selectAllVariants: 'Vælg alle varianter',
 		scheduledPendingChanges: 'Denne tidsplan har ændringer, der træder i kraft, når du klikker på "%0%".',
 		noVariantsToProcess: 'Der er ingen tilgængelige varianter',
+		openSplitViewForVariant: (variant: string) => `Åbn ${variant} i sidestillet visning`,
 	},
 	blueprints: {
 		createBlueprintFrom: "Opret en ny indholdsskabelon fra '%0%'",

@@ -151,7 +151,6 @@ export default {
 		listBullet: 'Bullet List',
 		listNumeric: 'Numeric List',
 		macroInsert: 'Insert macro',
-		openSplitViewFor: (languageName: string) => `Open ${languageName} in split view`,
 		pictureInsert: 'Insert picture',
 		publishAndClose: 'Publish and close',
 		publishDescendants: 'Publish with descendants',
@@ -354,6 +353,7 @@ export default {
 		saveModalTitle: 'Save',
 		saveAndPublishModalTitle: 'Save and publish',
 		publishModalTitle: 'Publish',
+		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
