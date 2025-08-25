@@ -4,7 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbContentTypeModel,
 	UmbContentTypeStructureManager,
-	UmbPropertyTypeContainerModel,
+	UmbPropertyTypeContainerMergedModel,
 } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbContentTypeContainerStructureHelper,
@@ -34,7 +34,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	private _tabs?: Array<UmbPropertyTypeContainerModel>;
+	private _tabs?: Array<UmbPropertyTypeContainerMergedModel>;
 
 	@state()
 	private _routerPath?: string;
@@ -64,7 +64,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(
-			this._tabsStructureHelper.mergedContainers,
+			this._tabsStructureHelper.childContainers,
 			(tabs) => {
 				this._tabs = tabs;
 				this.#createRoutes();
@@ -117,7 +117,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 					path,
 					component: () => import('./content-editor-tab.element.js'),
 					setup: (component) => {
-						(component as UmbContentWorkspaceViewEditTabElement).containerId = tab.id;
+						(component as UmbContentWorkspaceViewEditTabElement).containerId = tab.ownerId ?? tab.ids[0];
 					},
 				});
 				this.#createViewContext(path);
