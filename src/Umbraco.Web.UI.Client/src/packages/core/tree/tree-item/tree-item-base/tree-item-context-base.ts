@@ -22,6 +22,8 @@ import {
 	UmbPaginationManager,
 	UmbTargetPaginationManager,
 	debounce,
+	type UmbOffsetPaginationRequestModel,
+	type UmbTargetPaginationRequestModel,
 } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
@@ -189,31 +191,31 @@ export abstract class UmbTreeItemContextBase<
 	/**
 	 * Load children of the tree item
 	 * @memberof UmbTreeItemContextBase
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public loadChildren = () => this.#loadChildren();
+	public loadChildren = (): Promise<void> => this.#loadChildren();
 
 	/**
 	 * Load more children of the tree item
 	 * @deprecated Use `loadNextItems` instead. Will be removed in v18.0.0.
 	 * @memberof UmbTreeItemContextBase
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public loadMore = () => this.#loadNextItemsFromTarget();
+	public loadMore = (): Promise<void> => this.#loadNextItemsFromTarget();
 
 	/**
 	 * Load previous items of the tree item
 	 * @memberof UmbTreeItemContextBase
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public loadPrevItems = () => this.#loadPrevItemsFromTarget();
+	public loadPrevItems = (): Promise<void> => this.#loadPrevItemsFromTarget();
 
 	/**
 	 * Load next items of the tree item
 	 * @memberof UmbTreeItemContextBase
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public loadNextItems = () => this.#loadNextItemsFromTarget();
+	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
 
 	async #loadChildren(target?: { unique: string; entityType: string }) {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
@@ -228,23 +230,30 @@ export abstract class UmbTreeItemContextBase<
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
+		const targetPaging: UmbTargetPaginationRequestModel | undefined = target
+			? {
+					target: {
+						unique: target.unique,
+						entityType: target.entityType,
+					},
+					takeBefore: 5,
+					takeAfter: this.pagination.getPageSize(),
+				}
+			: undefined;
+
+		const offsetPaging: UmbOffsetPaginationRequestModel = {
+			skip: this.pagination.getSkip(),
+			take: this.pagination.getPageSize(),
+		};
+
 		const { data } = await repository.requestTreeItemsOf({
 			parent: {
 				unique: this.unique,
 				entityType: this.entityType,
 			},
-			skip: this.pagination.getSkip(),
-			take: this.pagination.getPageSize(),
-			target: target
-				? {
-						target: {
-							unique: target.unique,
-							entityType: target.entityType,
-						},
-						takeBefore: 5,
-						takeAfter: this.pagination.getPageSize(),
-					}
-				: undefined,
+			skip: offsetPaging.skip, // including this for backward compatibility
+			take: offsetPaging.take, // including this for backward compatibility
+			paging: targetPaging || offsetPaging,
 			foldersOnly,
 			...additionalArgs,
 		});
@@ -292,7 +301,7 @@ export abstract class UmbTreeItemContextBase<
 				entityType: this.entityType,
 			},
 			foldersOnly,
-			target: {
+			paging: {
 				target: this.#startTarget,
 				takeBefore: this.pagination.getPageSize(),
 				takeAfter: 0,
@@ -338,7 +347,7 @@ export abstract class UmbTreeItemContextBase<
 			take: this.pagination.getPageSize(),
 			skip: this.pagination.getSkip(),
 			foldersOnly,
-			target: {
+			paging: {
 				target: this.#endTarget,
 				takeBefore: 0,
 				takeAfter: this.pagination.getPageSize(),

@@ -9,6 +9,7 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { isOffsetPaginationRequest, isTargetPaginationRequest } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source for the Document tree that fetches data from the server
@@ -37,13 +38,15 @@ export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase
 }
 
 const getRootItems = async (args: UmbDocumentTreeRootItemsRequestArgs) => {
-	if (args.target) {
+	const paging = args.paging;
+
+	if (paging && isTargetPaginationRequest(paging)) {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		const { data } = await DocumentService.getTreeDocumentSiblings({
 			query: {
-				target: args.target.target.unique,
-				before: args.target.takeBefore,
-				after: args.target.takeAfter,
+				target: paging.target.unique,
+				before: paging.takeBefore,
+				after: paging.takeAfter,
 			},
 		});
 
@@ -55,61 +58,69 @@ const getRootItems = async (args: UmbDocumentTreeRootItemsRequestArgs) => {
 				totalAfter: data.totalAfter,
 			},
 		};
-	} else {
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		const { data } = await DocumentService.getTreeDocumentRoot({
-			query: { dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
-		});
-
-		return {
-			data: {
-				items: data.items,
-				total: data.total,
-				totalBefore: 0,
-				totalAfter: data.total - data.items.length,
-			},
-		};
 	}
+
+	const skip = paging && isOffsetPaginationRequest(paging) ? paging.skip : args.skip ? args.skip : 0;
+	const take = paging && isOffsetPaginationRequest(paging) ? paging.take : args.take ? args.take : 50;
+
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	const { data } = await DocumentService.getTreeDocumentRoot({
+		query: { dataTypeId: args.dataType?.unique, skip, take },
+	});
+
+	return {
+		data: {
+			items: data.items,
+			total: data.total,
+			totalBefore: 0,
+			totalAfter: data.total - data.items.length,
+		},
+	};
 };
 
 const getChildrenOf = async (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
 		return getRootItems(args);
-	} else {
-		if (args.target) {
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			const { data } = await DocumentService.getTreeDocumentSiblings({
-				query: {
-					target: args.target.target.unique,
-					before: args.target.takeBefore,
-					after: args.target.takeAfter,
-				},
-			});
-
-			return {
-				data: {
-					items: data.items,
-					total: data.totalBefore + data.items.length + data.totalAfter,
-					totalBefore: data.totalBefore,
-					totalAfter: data.totalAfter,
-				},
-			};
-		} else {
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			const { data } = await DocumentService.getTreeDocumentChildren({
-				query: { parentId: args.parent.unique, dataTypeId: args.dataType?.unique, skip: args.skip, take: args.take },
-			});
-
-			return {
-				data: {
-					items: data.items,
-					total: data.total,
-					totalBefore: 0,
-					totalAfter: data.total - data.items.length,
-				},
-			};
-		}
 	}
+
+	const paging = args.paging;
+
+	if (paging && isTargetPaginationRequest(paging)) {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		const { data } = await DocumentService.getTreeDocumentSiblings({
+			query: {
+				target: paging.target.unique,
+				before: paging.takeBefore,
+				after: paging.takeAfter,
+			},
+		});
+
+		return {
+			data: {
+				items: data.items,
+				total: data.totalBefore + data.items.length + data.totalAfter,
+				totalBefore: data.totalBefore,
+				totalAfter: data.totalAfter,
+			},
+		};
+	}
+
+	const skip = paging && isOffsetPaginationRequest(paging) ? paging.skip : args.skip ? args.skip : 0;
+	const take = paging && isOffsetPaginationRequest(paging) ? paging.take : args.take ? args.take : 50;
+
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	const { data } = await DocumentService.getTreeDocumentChildren({
+		query: { parentId: args.parent.unique, dataTypeId: args.dataType?.unique, skip, take },
+	});
+
+	return {
+		data: {
+			items: data.items,
+			total: data.total,
+			totalBefore: 0,
+			totalAfter: data.total - data.items.length,
+		},
+	};
 };
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>

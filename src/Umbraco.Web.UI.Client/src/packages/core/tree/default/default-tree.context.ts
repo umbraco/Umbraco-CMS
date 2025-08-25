@@ -17,6 +17,8 @@ import {
 	UmbSelectionManager,
 	UmbTargetPaginationManager,
 	debounce,
+	type UmbOffsetPaginationRequestModel,
+	type UmbTargetPaginationRequestModel,
 } from '@umbraco-cms/backoffice/utils';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -208,21 +210,21 @@ export class UmbDefaultTreeContext<
 		const startNode = this.getStartNode();
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.#additionalRequestArgs.getValue();
-		const requestArgs = {
-			target: target
-				? {
-						item: {
-							unique: target.unique,
-							entityType: target.entityType,
-						},
-						before: 5,
-						after: this.pagination.getPageSize(),
-					}
-				: undefined,
+
+		const targetPaging: UmbTargetPaginationRequestModel | undefined = target
+			? {
+					target: {
+						unique: target.unique,
+						entityType: target.entityType,
+					},
+					takeBefore: 5,
+					takeAfter: this.pagination.getPageSize(),
+				}
+			: undefined;
+
+		const offsetPaging: UmbOffsetPaginationRequestModel = {
 			skip: this.pagination.getSkip(),
 			take: this.pagination.getPageSize(),
-			foldersOnly,
-			...additionalArgs,
 		};
 
 		const { data } = startNode?.unique
@@ -231,9 +233,19 @@ export class UmbDefaultTreeContext<
 						unique: startNode.unique,
 						entityType: startNode.entityType,
 					},
-					...requestArgs,
+					skip: this.pagination.getSkip(), // including this for backward compatibility
+					take: this.pagination.getPageSize(), // including this for backward compatibility
+					paging: targetPaging || offsetPaging,
+					foldersOnly,
+					...additionalArgs,
 				})
-			: await this.#repository!.requestTreeRootItems(requestArgs);
+			: await this.#repository!.requestTreeRootItems({
+					skip: this.pagination.getSkip(), // including this for backward compatibility
+					take: this.pagination.getPageSize(), // including this for backward compatibility
+					paging: targetPaging || offsetPaging,
+					foldersOnly,
+					...additionalArgs,
+				});
 
 		if (data) {
 			this.#rootItems.setValue(data.items);
@@ -259,14 +271,10 @@ export class UmbDefaultTreeContext<
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.#additionalRequestArgs.getValue();
 
-		const baseRequestArgs = {
-			target: {
-				item: this.#startTarget,
-				before: this.pagination.getPageSize(),
-				after: 0,
-			},
-			foldersOnly,
-			...additionalArgs,
+		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
+			target: this.#startTarget,
+			takeBefore: this.pagination.getPageSize(),
+			takeAfter: 0,
 		};
 
 		const { data } = startNode?.unique
@@ -275,9 +283,15 @@ export class UmbDefaultTreeContext<
 						unique: startNode.unique,
 						entityType: startNode.entityType,
 					},
-					...baseRequestArgs,
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
 				})
-			: await this.#repository!.requestTreeRootItems(baseRequestArgs);
+			: await this.#repository!.requestTreeRootItems({
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
+				});
 
 		if (data) {
 			const reversedItems = [...data.items].reverse();
@@ -299,15 +313,10 @@ export class UmbDefaultTreeContext<
 		const startNode = this.getStartNode();
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.#additionalRequestArgs.getValue();
-
-		const baseRequestArgs = {
-			target: {
-				item: this.#endTarget,
-				before: 0,
-				after: this.pagination.getPageSize(),
-			},
-			foldersOnly,
-			...additionalArgs,
+		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
+			target: this.#endTarget,
+			takeBefore: 0,
+			takeAfter: this.pagination.getPageSize(),
 		};
 
 		const { data } = startNode?.unique
@@ -316,9 +325,15 @@ export class UmbDefaultTreeContext<
 						unique: startNode.unique,
 						entityType: startNode.entityType,
 					},
-					...baseRequestArgs,
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
 				})
-			: await this.#repository!.requestTreeRootItems(baseRequestArgs);
+			: await this.#repository!.requestTreeRootItems({
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
+				});
 
 		if (data) {
 			this.#rootItems.append(data.items);
