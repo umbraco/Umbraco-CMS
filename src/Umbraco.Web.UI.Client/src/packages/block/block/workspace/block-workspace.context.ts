@@ -23,6 +23,7 @@ import { decodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/bac
 
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
@@ -58,9 +59,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly unique = this.#layout.asObservablePart((x) => x?.contentKey);
 	readonly contentKey = this.#layout.asObservablePart((x) => x?.contentKey);
 
-	readonly content = new UmbBlockElementManager(this, 'contentData');
-
-	readonly settings = new UmbBlockElementManager(this, 'settingsData');
+	readonly content = new UmbBlockElementManager(this, 'contentData', UMB_BLOCK_WORKSPACE_VIEW_CONTENT);
+	readonly settings = new UmbBlockElementManager(this, 'settingsData', UMB_BLOCK_WORKSPACE_VIEW_SETTINGS);
 
 	#name = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#name.asObservable();
