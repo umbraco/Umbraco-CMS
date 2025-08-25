@@ -151,8 +151,7 @@ export default {
 		listBullet: 'Punktopstilling',
 		listNumeric: 'Nummerorden',
 		macroInsert: 'Indsæt makro',
-		openSplitViewFor: (languageName: string) =>
-			languageName ? `Åbn delt visning til '${languageName}'` : 'Åben delt visning',
+		openSplitViewFor: (languageName: string) => `Åbn ${languageName} i sidestillet visning`,
 		pictureInsert: 'Indsæt billede',
 		publishAndClose: 'Udgiv og luk',
 		publishDescendants: 'Udgiv med undersider',

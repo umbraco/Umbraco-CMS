@@ -123,8 +123,7 @@ export default {
 		listBullet: 'Lista en Viñetas',
 		listNumeric: 'Lista Numérica',
 		macroInsert: 'Insertar macro',
-		openSplitViewFor: (languageName: string) =>
-			languageName ? `Abrir vista dividida para '${languageName}'` : 'Abrir vista dividida',
+		openSplitViewFor: (languageName: string) => `Abrir vista dividida para '${languageName}'`,
 		pictureInsert: 'Insertar imagen',
 		relations: 'Editar relaciones',
 		returnToList: 'Volver al listado',
