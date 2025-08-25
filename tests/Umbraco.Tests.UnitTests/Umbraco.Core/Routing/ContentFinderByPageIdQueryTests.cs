@@ -10,6 +10,7 @@ using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
+//FIXME: Reintroduce if relevant
 [TestFixture]
 public class ContentFinderByPageIdQueryTests
 {
@@ -29,11 +30,13 @@ public class ContentFinderByPageIdQueryTests
 
         Mock.Get(umbracoContextAccessor).Setup(x => x.TryGetUmbracoContext(out umbracoContext)).Returns(true);
         Mock.Get(umbracoContext).Setup(x => x.Content.GetById(nodeMatch)).Returns(publishedContent);
+        Mock.Get(umbracoContext).Setup(x => x.CleanedUmbracoUrl)
+            .Returns(new Uri(absoluteUrl, UriKind.Absolute));
         Mock.Get(publishedContent).Setup(x => x.Id).Returns(nodeMatch);
 
         var queryStrings = HttpUtility.ParseQueryString(umbracoContext.CleanedUmbracoUrl.Query);
         Mock.Get(requestAccessor).Setup(x => x.GetRequestValue("umbPageID"))
-            .Returns(nodeMatch.ToString);
+            .Returns(queryStrings["umbPageID"]);
 
         var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService);
 
