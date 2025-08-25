@@ -9,7 +9,7 @@
     "generate-client": "node scripts/generate-openapi.js https://localhost:44339/umbraco/swagger/umbracoextension/swagger.json"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.81.1",
+    "@hey-api/openapi-ts": "0.81.1",
     "@umbraco-cms/backoffice": "^UMBRACO_VERSION_FROM_TEMPLATE",
     "chalk": "^5.6.0",
     "cross-env": "^10.0.0",
