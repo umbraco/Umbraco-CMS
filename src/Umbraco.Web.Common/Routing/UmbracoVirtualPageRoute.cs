@@ -47,16 +47,6 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         _umbracoContextAccessor = umbracoContextAccessor;
     }
 
-    [Obsolete("Please use constructor that takes an IUmbracoContextAccessor instead, scheduled for removal in v17")]
-    public UmbracoVirtualPageRoute(
-        EndpointDataSource endpointDataSource,
-        LinkParser linkParser,
-        UriUtility uriUtility,
-        IPublishedRouter publishedRouter)
-        : this(endpointDataSource, linkParser, uriUtility, publishedRouter, StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextAccessor>())
-    {
-    }
-
     /// <summary>
     /// This sets up the virtual page route for the current request if a mtahcing endpoint is found.
     /// </summary>
