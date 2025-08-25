@@ -1,2 +1,2 @@
-export * from './target-pagination-manager/index.js';
+export * from './target/index.js';
 export type * from './types.js';

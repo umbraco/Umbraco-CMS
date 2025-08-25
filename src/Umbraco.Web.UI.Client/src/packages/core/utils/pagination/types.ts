@@ -1,1 +1,2 @@
-export type * from './target-pagination-manager/types.js';
+export type * from './offset/types.js';
+export type * from './target/types.js';
