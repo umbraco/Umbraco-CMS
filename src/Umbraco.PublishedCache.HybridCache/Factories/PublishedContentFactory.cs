@@ -44,8 +44,8 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         {
             _logger.LogDebug(
                 "Creating IPublishedContent for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
-                contentCacheNode.Id,
-                contentCacheNode.Data?.Name ?? "No Name");
+                contentCacheNode.Data?.Name ?? "No Name",
+                contentCacheNode.Id);
 
             IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
             var contentNode = new ContentNode(
@@ -74,8 +74,8 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         {
             _logger.LogDebug(
                 "Using cached IPublishedContent for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
-                contentCacheNode.Id,
-                contentCacheNode.Data?.Name ?? "No Name");
+                contentCacheNode.Data?.Name ?? "No Name",
+                contentCacheNode.Id);
         }
 
         return publishedContent;
@@ -90,8 +90,8 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         {
             _logger.LogDebug(
                 "Creating IPublishedContent for media {ContentCacheNodeName} ({ContentCacheNodeId}).",
-                contentCacheNode.Id,
-                contentCacheNode.Data?.Name ?? "No Name");
+                contentCacheNode.Data?.Name ?? "No Name",
+                contentCacheNode.Id);
 
             IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Media, contentCacheNode.ContentTypeId);
             var contentNode = new ContentNode(
@@ -115,8 +115,8 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         {
             _logger.LogDebug(
                 "Using cached IPublishedContent for media {ContentCacheNodeName} ({ContentCacheNodeId}).",
-                contentCacheNode.Id,
-                contentCacheNode.Data?.Name ?? "No Name");
+                contentCacheNode.Data?.Name ?? "No Name",
+                contentCacheNode.Id);
         }
 
         return publishedContent;
@@ -131,8 +131,8 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         {
             _logger.LogDebug(
                 "Creating IPublishedMember for member {MemberName} ({MemberId}).",
-                member.Id,
-                member.Username);
+                member.Username,
+                member.Id);
 
             IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
 
@@ -165,8 +165,8 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         {
             _logger.LogDebug(
                 "Using cached IPublishedMember for member {MemberName} ({MemberId}).",
-                member.Id,
-                member.Username);
+                member.Username,
+                member.Id);
         }
 
         return publishedMember;
