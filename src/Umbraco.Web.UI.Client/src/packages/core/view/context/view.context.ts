@@ -33,6 +33,7 @@ export class UmbViewContext extends UmbControllerBase {
 			viewAlias: viewAlias,
 		});
 		this.firstHintOfVariant = mergeObservables([this.variantId, this.hints.hints], ([variantId, hints]) => {
+			// Notice, because we in UI have invariant fields on Variants, then we will accept invariant hints on variants.
 			if (variantId) {
 				return hints.find((hint) =>
 					hint.variantId ? hint.variantId.equal(variantId!) || hint.variantId.isInvariant() : true,

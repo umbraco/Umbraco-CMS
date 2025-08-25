@@ -8,6 +8,8 @@ import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbrac
 import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
 
 export const UMB_MEMBER_WORKSPACE_ALIAS = 'Umb.Workspace.Member';
+export const UMB_MEMBER_WORKSPACE_VIEW_CONTENT_ALIAS = 'Umb.WorkspaceView.Member.Content';
+export const UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS = 'Umb.WorkspaceView.Member.Member';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
@@ -45,7 +47,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		kind: 'contentEditor',
-		alias: 'Umb.WorkspaceView.Member.Content',
+		alias: UMB_MEMBER_WORKSPACE_VIEW_CONTENT_ALIAS,
 		name: 'Member Workspace Content View',
 		weight: 1000,
 		meta: {
@@ -65,7 +67,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Member.Member',
+		alias: UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS,
 		name: 'Member Workspace Member View',
 		js: () => import('./views/member/member-workspace-view-member.element.js'),
 		weight: 500,
