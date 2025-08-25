@@ -88,7 +88,7 @@ export class UmbMemberWorkspaceContext
 
 		this.#setupValidationCheckForRootProperty('username');
 		this.#setupValidationCheckForRootProperty('email');
-		this.#setupValidationCheckForRootProperty('password');
+		//this.#setupValidationCheckForRootProperty('password');// Only when in create mode.
 	}
 
 	#hintedMsgs: Set<string> = new Set();
@@ -118,27 +118,33 @@ export class UmbMemberWorkspaceContext
 			`validateObserverFor_${propertyName}`,
 		);
 
-		// Observe Validation and turn it into hint:
-		this.observe(this.validationContext.messages.messagesOfPathAndDescendant(dataPath), (messages) => {
-			messages.forEach((message) => {
-				if (this.#hintedMsgs.has(message.key)) return;
+		this.validationContext.messages.debug('member');
 
-				this.hints.addOne({
-					unique: message.key,
-					path: [UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS],
-					text: '!',
-					color: 'invalid',
-					weight: 1000,
+		// Observe Validation and turn it into hint:
+		this.observe(
+			this.validationContext.messages.messagesOfPathAndDescendant(dataPath),
+			(messages) => {
+				messages.forEach((message) => {
+					if (this.#hintedMsgs.has(message.key)) return;
+
+					this.hints.addOne({
+						unique: message.key,
+						path: [UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS],
+						text: '!',
+						color: 'invalid',
+						weight: 1000,
+					});
+					this.#hintedMsgs.add(message.key);
 				});
-				this.#hintedMsgs.add(message.key);
-			});
-			this.#hintedMsgs.forEach((key) => {
-				if (!messages.some((msg) => msg.key === key)) {
-					this.#hintedMsgs.delete(key);
-					this.hints.removeOne(key);
-				}
-			});
-		});
+				this.#hintedMsgs.forEach((key) => {
+					if (!messages.some((msg) => msg.key === key)) {
+						this.#hintedMsgs.delete(key);
+						this.hints.removeOne(key);
+					}
+				});
+			},
+			`messageObserverFor_${propertyName}`,
+		);
 	}
 
 	async create(memberTypeUnique: string) {
