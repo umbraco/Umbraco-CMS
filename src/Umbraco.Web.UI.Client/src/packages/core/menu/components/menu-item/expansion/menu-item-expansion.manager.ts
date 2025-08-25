@@ -2,7 +2,11 @@ import type { UmbMenuItemExpansionEntryModel } from '../../menu/types.js';
 import { UMB_MENU_CONTEXT } from '../../menu/constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import {
+	createObservablePart,
+	type UmbObserverController,
+	type Observable,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbEntityExpansionManager, type UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
 
 /**
@@ -17,6 +21,7 @@ export class UmbMenuItemExpansionManager extends UmbControllerBase {
 
 	#menuItemAlias?: string;
 	#menuContext?: typeof UMB_MENU_CONTEXT.TYPE;
+	#observerController?: UmbObserverController;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -28,11 +33,21 @@ export class UmbMenuItemExpansionManager extends UmbControllerBase {
 	}
 
 	#observeMenuExpansion() {
-		if (!this.#menuItemAlias) return;
-		this.observe(this.#menuContext?.expansion.expansion, (items) => {
-			const itemsForMenuItem = items?.filter((item) => item.menuItemAlias === this.#menuItemAlias) || [];
-			this.#manager.setExpansion(itemsForMenuItem);
-		});
+		if (!this.#menuContext || !this.#menuItemAlias) {
+			this.#observerController?.destroy();
+			return;
+		}
+
+		this.#observerController = this.observe(
+			createObservablePart(
+				this.#menuContext.expansion.expansion,
+				(items: Array<UmbMenuItemExpansionEntryModel>) =>
+					items?.filter((item) => item.menuItemAlias === this.#menuItemAlias) || [],
+			),
+			(itemsForMenuItem) => {
+				this.#manager.setExpansion(itemsForMenuItem);
+			},
+		);
 	}
 
 	setMenuItemAlias(alias: string | undefined): void {

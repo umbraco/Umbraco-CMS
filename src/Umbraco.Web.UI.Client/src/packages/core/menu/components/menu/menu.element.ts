@@ -24,6 +24,7 @@ export class UmbMenuElement extends UmbLitElement {
 	#context = new UmbDefaultMenuContext(this);
 
 	override render() {
+		//TODO: We should probably have resolved the MENU ITEM CONTEXT not by providing it not as an API, currently this work cause menu items does not have APIs as of their manifest. But if they do this, this would be a problem. [NL]
 		return html`
 			<umb-extension-with-api-slot
 				type="menuItem"

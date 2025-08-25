@@ -9,7 +9,7 @@ import {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import {
 	UmbManagementApiDetailDataRequestManager,
-	UmbManagementApiInflightRequestCache,
+	UmbManagementApiInFlightRequestCache,
 } from '@umbraco-cms/backoffice/management-api';
 
 export class UmbManagementApiDocumentTypeDetailDataRequestManager extends UmbManagementApiDetailDataRequestManager<
@@ -17,7 +17,7 @@ export class UmbManagementApiDocumentTypeDetailDataRequestManager extends UmbMan
 	UpdateDocumentTypeRequestModel,
 	CreateDocumentTypeRequestModel
 > {
-	static #inflightRequestCache = new UmbManagementApiInflightRequestCache<DocumentTypeResponseModel>();
+	static #inflightRequestCache = new UmbManagementApiInFlightRequestCache<DocumentTypeResponseModel>();
 
 	constructor(host: UmbControllerHost) {
 		super(host, {

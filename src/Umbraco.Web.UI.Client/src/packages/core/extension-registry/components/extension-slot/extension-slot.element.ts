@@ -166,6 +166,8 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 			const events = this.#events;
 			if (!events) return;
 
+			this.#removeEventListenersFromExtensionElement();
+
 			Object.entries(events).forEach(([eventName, handler]) => {
 				component.addEventListener(eventName, handler);
 			});
