@@ -17,15 +17,6 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IIdKeyMap _idKeyMap;
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public UserStartNodeEntitiesService(IEntityService entityService)
-        : this(
-            entityService,
-            StaticServiceProvider.Instance.GetRequiredService<ICoreScopeProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
-    }
-
     public UserStartNodeEntitiesService(IEntityService entityService, ICoreScopeProvider scopeProvider, IIdKeyMap idKeyMap)
     {
         _entityService = entityService;

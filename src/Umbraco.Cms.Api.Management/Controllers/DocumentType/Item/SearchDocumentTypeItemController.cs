@@ -16,34 +16,11 @@ public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
     private readonly IUmbracoMapper _mapper;
     private readonly IContentTypeSearchService _contentTypeSearchService;
 
-    [Obsolete("Please use ctor that only accepts IUmbracoMapper & IContentTypeSearchService, scheduled for removal in v17")]
-    public SearchDocumentTypeItemController(IEntitySearchService entitySearchService, IContentTypeService contentTypeService, IUmbracoMapper mapper)
-    : this(mapper, StaticServiceProvider.Instance.GetRequiredService<IContentTypeSearchService>())
-    {
-    }
-
-    [Obsolete("Please use ctor that only accepts IUmbracoMapper & IContentTypeSearchService, scheduled for removal in v17")]
-    // We need to have this constructor, or else we get ambiguous constructor error
-    public SearchDocumentTypeItemController(
-        IEntitySearchService entitySearchService,
-        IContentTypeService contentTypeService,
-        IUmbracoMapper mapper,
-        IContentTypeSearchService contentTypeSearchService)
-        : this(mapper, contentTypeSearchService)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public SearchDocumentTypeItemController(IUmbracoMapper mapper, IContentTypeSearchService contentTypeSearchService)
     {
         _mapper = mapper;
         _contentTypeSearchService = contentTypeSearchService;
     }
-
-    [NonAction]
-    [Obsolete("Scheduled to be removed in v16, use the non obsoleted method instead")]
-    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
-        => await SearchDocumentType(cancellationToken, query, null, skip, take);
 
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
