@@ -113,15 +113,19 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public string GetWildcardPlaceholder() => "%";
 
-    public virtual string GetLikeConcat() => "||";
-
     public virtual string GetWildcardConcat(string concatDefault = "")
     {
         if (string.IsNullOrEmpty(concatDefault))
         {
-            return $"{GetLikeConcat()} '{GetWildcardPlaceholder()}'";
+            return $"'{GetWildcardPlaceholder()}'";
         }
-        return $"{GetLikeConcat()} {concatDefault}";
+
+        if (!concatDefault.StartsWith('\'') || !concatDefault.EndsWith('\''))
+        {
+            return $"'{concatDefault.Trim()}'";
+        }
+
+        return concatDefault;
     }
 
     public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) => current;
@@ -138,7 +142,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
         $"upper({column}) LIKE upper(@{paramIndex})";
 
-    public virtual string GetConcat(params string[] args) => "concat(" + string.Join(",", args) + ")";
+    public virtual string GetConcat(params string[] args) => "CONCAT(" + string.Join(",", args) + ")";
 
     public virtual string GetQuotedTableName(string? tableName) => $"\"{tableName}\"";
 

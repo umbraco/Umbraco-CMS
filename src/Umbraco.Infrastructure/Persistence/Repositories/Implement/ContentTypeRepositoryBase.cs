@@ -1468,16 +1468,17 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             .Where<PropertyDataDto>(x => x.PropertyTypeId == propertyTypeId);
         _ = Database.Execute(sql);
 
-        string likeConcat = $"'|{SqlSyntax.GetWildcardPlaceholder()}'";
         Sql<ISqlContext> delSql = Sql()
             .Delete<UserGroup2GranularPermissionDto>()
             .Where<UserGroup2GranularPermissionDto>(c => c.UniqueId == contentType.Key)
             .WhereLike<UserGroup2GranularPermissionDto>(
                 c => c.Permission,
-                Sql().Select<PropertyTypeDto>(c => c.UniqueId)
+                Sql()
+                    .SelectClosure<PropertyTypeDto>(c => c.ConvertUniqueIdentifierToString(x => x.UniqueId))
                     .From<PropertyTypeDto>()
-                    .Where<PropertyTypeDto>(c => c.Id == propertyTypeId),
-                likeConcat);
+                    .WhereClosure<PropertyTypeDto>(c => c.Id == propertyTypeId),
+                $"'|{SqlSyntax.GetWildcardPlaceholder()}'");
+
         _ = Database.Execute(delSql);
 
         // Finally delete the property type.

@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -28,6 +29,11 @@ namespace Umbraco.Extensions
         {
             (string s, object[] a) = sql.SqlContext.VisitDto(predicate, alias);
             return sql.Where(s, a);
+        }
+
+        public static Sql<ISqlContext> WhereClosure<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string? alias = null)
+        {
+            return sql.Where<TDto>(predicate, alias).Append(")");
         }
 
         public static Sql<ISqlContext> WhereParam<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string param)
@@ -143,11 +149,13 @@ namespace Umbraco.Extensions
             return sql.WhereIn(field, values, false, tableAlias);
         }
 
+
         public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, Sql<ISqlContext>? valuesSql, string concatDefault = "")
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
             var concat = sql.SqlContext.SqlSyntax.GetWildcardConcat(concatDefault);
-            _ = sql.Where($"{fieldName} LIKE ({valuesSql?.SQL}) {concat}", valuesSql?.Arguments);
+            var likeSelect = sql.SqlContext.SqlSyntax.GetConcat(valuesSql?.SQL ?? string.Empty, concat);
+            _ = sql.Where($"{fieldName} LIKE {likeSelect}", valuesSql?.Arguments);
             return sql;
         }
 
@@ -1269,6 +1277,40 @@ namespace Umbraco.Extensions
             }
 
             return string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: false, tableAlias: alias));
+        }
+
+        public static Sql<ISqlContext> SelectClosure<TDto>(this Sql<ISqlContext> sql, Func<SqlConvert<TDto>, SqlConvert<TDto>> converts)
+        {
+            _ = sql.Append($"(SELECT ");
+
+            var c = new SqlConvert<TDto>(sql.SqlContext);
+            c = converts(c);
+            var first = true;
+            foreach (string setExpression in c.SetExpressions)
+            {
+                _ = sql.Append($"{(first ? string.Empty : ",")} {setExpression}");
+                first = false;
+            }
+
+            if (!first)
+            {
+                _ = sql.Append(" ");
+            }
+
+            return sql;
+        }
+
+        public class SqlConvert<TDto>(ISqlContext sqlContext)
+        {
+            public List<string> SetExpressions { get; } = [];
+
+            public SqlConvert<TDto> ConvertUniqueIdentifierToString(Expression<Func<TDto, object?>> fieldSelector)
+            {
+                var fieldName = sqlContext.SqlSyntax.GetFieldNameForUpdate(fieldSelector);
+                var convertFieldName = string.Format(sqlContext.SqlSyntax.ConvertUniqueIdentifierToString, fieldName);
+                SetExpressions.Add(convertFieldName);
+                return this;
+            }
         }
 
         #endregion

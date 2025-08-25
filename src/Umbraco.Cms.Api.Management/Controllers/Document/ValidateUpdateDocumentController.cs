@@ -21,20 +21,6 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
     private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public ValidateUpdateDocumentController(
-        IAuthorizationService authorizationService,
-        IContentEditingService contentEditingService,
-        IDocumentEditingPresentationFactory documentEditingPresentationFactory)
-        : this(
-              authorizationService,
-              contentEditingService,
-              documentEditingPresentationFactory,
-              StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public ValidateUpdateDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,

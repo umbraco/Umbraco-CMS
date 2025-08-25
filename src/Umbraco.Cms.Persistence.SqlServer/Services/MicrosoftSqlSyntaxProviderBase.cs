@@ -46,8 +46,6 @@ public abstract class MicrosoftSqlSyntaxProviderBase<TSyntax> : SqlSyntaxProvide
         return $"[{tableNameParts?[0]}].[{tableNameParts?[1]}]";
     }
 
-    public override string GetLikeConcat() => "+";
-
     public override string GetQuotedColumnName(string? columnName) => $"[{columnName}]";
 
     public override string GetQuotedName(string? name) => $"[{name}]";
