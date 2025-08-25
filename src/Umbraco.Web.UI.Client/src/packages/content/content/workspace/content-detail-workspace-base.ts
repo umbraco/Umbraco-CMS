@@ -310,7 +310,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this.variantOptions,
 			(variantOptions) => {
 				variantOptions.forEach((variantOption) => {
-					const missingThis = this.#variantValidationContexts.filter((x) => {
+					const missingThis = !this.#variantValidationContexts.some((x) => {
 						const variantId = x.getVariantId();
 						if (!variantId) return;
 						return variantId.culture === variantOption.culture && variantId.segment === variantOption.segment;
