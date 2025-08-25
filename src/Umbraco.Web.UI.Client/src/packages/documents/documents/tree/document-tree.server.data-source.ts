@@ -42,8 +42,8 @@ const getRootItems = async (args: UmbDocumentTreeRootItemsRequestArgs) => {
 		const { data } = await DocumentService.getTreeDocumentSiblings({
 			query: {
 				target: args.target.item.unique,
-				before: args.target.before,
-				after: args.target.after,
+				before: args.target.takeBefore,
+				after: args.target.takeAfter,
 			},
 		});
 
@@ -81,8 +81,8 @@ const getChildrenOf = async (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 			const { data } = await DocumentService.getTreeDocumentSiblings({
 				query: {
 					target: args.target.item.unique,
-					before: args.target.before,
-					after: args.target.after,
+					before: args.target.takeBefore,
+					after: args.target.takeAfter,
 				},
 			});
 

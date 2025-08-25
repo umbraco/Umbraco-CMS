@@ -3,6 +3,6 @@ export interface UmbTargetPaginationModel {
 		unique: string;
 		entityType: string;
 	};
-	before: number;
-	after: number;
+	takeBefore: number;
+	takeAfter: number;
 }

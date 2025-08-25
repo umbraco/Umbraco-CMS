@@ -241,8 +241,8 @@ export abstract class UmbTreeItemContextBase<
 							unique: target.unique,
 							entityType: target.entityType,
 						},
-						before: 5,
-						after: this.pagination.getPageSize(),
+						takeBefore: 5,
+						takeAfter: this.pagination.getPageSize(),
 					}
 				: undefined,
 			foldersOnly,
@@ -294,8 +294,8 @@ export abstract class UmbTreeItemContextBase<
 			foldersOnly,
 			target: {
 				item: this.#startTarget,
-				before: this.pagination.getPageSize(),
-				after: 0,
+				takeBefore: this.pagination.getPageSize(),
+				takeAfter: 0,
 			},
 			...additionalArgs,
 		});
@@ -340,8 +340,8 @@ export abstract class UmbTreeItemContextBase<
 			foldersOnly,
 			target: {
 				item: this.#endTarget,
-				before: 0,
-				after: this.pagination.getPageSize(),
+				takeBefore: 0,
+				takeAfter: this.pagination.getPageSize(),
 			},
 			...additionalArgs,
 		});
