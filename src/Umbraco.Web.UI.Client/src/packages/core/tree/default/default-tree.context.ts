@@ -26,6 +26,7 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
@@ -203,7 +204,7 @@ export class UmbDefaultTreeContext<
 		}
 	}
 
-	async #loadRootItems(target?: { unique: string; entityType: string }) {
+	async #loadRootItems(target?: UmbEntityModel) {
 		await this.#init;
 
 		// If we have a start node get children of that instead of the root
@@ -211,16 +212,17 @@ export class UmbDefaultTreeContext<
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.#additionalRequestArgs.getValue();
 
-		const targetPaging: UmbTargetPaginationRequestModel | undefined = target
-			? {
-					target: {
-						unique: target.unique,
-						entityType: target.entityType,
-					},
-					takeBefore: 5,
-					takeAfter: this.pagination.getPageSize(),
-				}
-			: undefined;
+		const targetPaging: UmbTargetPaginationRequestModel | undefined =
+			target && target.unique
+				? {
+						target: {
+							unique: target.unique,
+							entityType: target.entityType,
+						},
+						takeBefore: 5,
+						takeAfter: this.pagination.getPageSize(),
+					}
+				: undefined;
 
 		const offsetPaging: UmbOffsetPaginationRequestModel = {
 			skip: this.pagination.getSkip(),

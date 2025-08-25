@@ -217,7 +217,7 @@ export abstract class UmbTreeItemContextBase<
 	 */
 	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
 
-	async #loadChildren(target?: { unique: string; entityType: string }) {
+	async #loadChildren(target?: UmbEntityModel) {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
 
@@ -230,16 +230,17 @@ export abstract class UmbTreeItemContextBase<
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
-		const targetPaging: UmbTargetPaginationRequestModel | undefined = target
-			? {
-					target: {
-						unique: target.unique,
-						entityType: target.entityType,
-					},
-					takeBefore: 5,
-					takeAfter: this.pagination.getPageSize(),
-				}
-			: undefined;
+		const targetPaging: UmbTargetPaginationRequestModel | undefined =
+			target && target.unique
+				? {
+						target: {
+							unique: target.unique,
+							entityType: target.entityType,
+						},
+						takeBefore: 5,
+						takeAfter: this.pagination.getPageSize(),
+					}
+				: undefined;
 
 		const offsetPaging: UmbOffsetPaginationRequestModel = {
 			skip: this.pagination.getSkip(),
