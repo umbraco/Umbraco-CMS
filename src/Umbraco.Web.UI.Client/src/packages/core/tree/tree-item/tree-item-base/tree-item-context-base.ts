@@ -17,7 +17,14 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbDeprecation, UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbDeprecation,
+	UmbPaginationManager,
+	UmbTargetPaginationManager,
+	debounce,
+	type UmbOffsetPaginationRequestModel,
+	type UmbTargetPaginationRequestModel,
+} from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
@@ -32,7 +39,25 @@ export abstract class UmbTreeItemContextBase<
 {
 	public unique?: UmbEntityUnique;
 	public entityType?: string;
+
+	/**
+	 *
+	 * The pagination manager for the tree item context.
+	 * @memberof UmbTreeItemContextBase
+	 */
 	public readonly pagination = new UmbPaginationManager();
+
+	/**
+	 * The pagination manager for the previous items in the tree item context.
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public readonly paginationPrev = new UmbTargetPaginationManager(this);
+
+	/**
+	 * The pagination manager for the next items in the tree item context.
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public readonly paginationNext = new UmbTargetPaginationManager(this);
 
 	#manifest?: ManifestType;
 
@@ -84,10 +109,11 @@ export abstract class UmbTreeItemContextBase<
 	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
-	// TODO: get this from the tree context
+	#startTarget: any = undefined; // TODO: fix this type
+	#endTarget: any = undefined; // TODO: fix this type
+
 	#paging = {
-		skip: 0,
-		take: 50,
+		take: 5,
 	};
 
 	constructor(host: UmbControllerHost) {
@@ -165,16 +191,33 @@ export abstract class UmbTreeItemContextBase<
 	/**
 	 * Load children of the tree item
 	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
 	 */
-	public loadChildren = () => this.#loadChildren();
+	public loadChildren = (): Promise<void> => this.#loadChildren();
 
 	/**
 	 * Load more children of the tree item
+	 * @deprecated Use `loadNextItems` instead. Will be removed in v18.0.0.
 	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
 	 */
-	public loadMore = () => this.#loadChildren(true);
+	public loadMore = (): Promise<void> => this.#loadNextItemsFromTarget();
 
-	async #loadChildren(loadMore = false) {
+	/**
+	 * Load previous items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
+	 */
+	public loadPrevItems = (): Promise<void> => this.#loadPrevItemsFromTarget();
+
+	/**
+	 * Load next items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
+	 */
+	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
+
+	async #loadChildren(target?: UmbEntityModel) {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
 
@@ -184,8 +227,72 @@ export abstract class UmbTreeItemContextBase<
 
 		this.#isLoading.setValue(true);
 
-		const skip = loadMore ? this.#paging.skip : 0;
-		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
+		const foldersOnly = this.#foldersOnly.getValue();
+		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
+
+		const targetPaging: UmbTargetPaginationRequestModel | undefined =
+			target && target.unique
+				? {
+						target: {
+							unique: target.unique,
+							entityType: target.entityType,
+						},
+						takeBefore: 5,
+						takeAfter: this.pagination.getPageSize(),
+					}
+				: undefined;
+
+		const offsetPaging: UmbOffsetPaginationRequestModel = {
+			skip: this.pagination.getSkip(),
+			take: this.pagination.getPageSize(),
+		};
+
+		const { data } = await repository.requestTreeItemsOf({
+			parent: {
+				unique: this.unique,
+				entityType: this.entityType,
+			},
+			skip: offsetPaging.skip, // including this for backward compatibility
+			take: offsetPaging.take, // including this for backward compatibility
+			paging: targetPaging || offsetPaging,
+			foldersOnly,
+			...additionalArgs,
+		});
+
+		if (data) {
+			this.#childItems.setValue(data.items);
+
+			const hasChildren = data.total > 0;
+			this.#hasChildren.setValue(hasChildren);
+			this.#hasChildrenContext.setHasChildren(hasChildren);
+
+			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
+			this.#startTarget = firstItem ? { unique: firstItem.unique, entityType: firstItem.entityType } : undefined;
+
+			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
+			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
+
+			const totalBefore = data.totalBefore !== undefined ? data.totalBefore : 0;
+			const totalAfter =
+				data.totalAfter !== undefined ? data.totalAfter : data.total - this.#childItems.getValue().length;
+
+			this.paginationPrev.setTotalItems(totalBefore);
+			this.paginationNext.setTotalItems(totalAfter);
+			this.pagination.setTotalItems(data.total);
+		}
+
+		this.#isLoading.setValue(false);
+	}
+
+	async #loadPrevItemsFromTarget() {
+		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
+		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
+
+		const repository = this.treeContext?.getRepository();
+		if (!repository) throw new Error('Could not request children, repository is missing');
+
+		this.#isLoading.setValue(true);
+
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
@@ -195,22 +302,69 @@ export abstract class UmbTreeItemContextBase<
 				entityType: this.entityType,
 			},
 			foldersOnly,
-			skip,
-			take,
+			paging: {
+				target: this.#startTarget,
+				takeBefore: this.pagination.getPageSize(),
+				takeAfter: 0,
+			},
 			...additionalArgs,
 		});
 
 		if (data) {
-			if (loadMore) {
-				const currentItems = this.#childItems.getValue();
-				this.#childItems.setValue([...currentItems, ...data.items]);
-			} else {
-				this.#childItems.setValue(data.items);
+			const reversedItems = [...data.items].reverse();
+			this.#childItems.prepend(reversedItems);
+
+			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
+			this.#startTarget = firstItem ? { unique: firstItem.unique, entityType: firstItem.entityType } : undefined;
+
+			if (data.totalBefore === undefined) {
+				throw new Error('totalBefore is missing in the response');
 			}
 
-			const hasChildren = data.total > 0;
-			this.#hasChildren.setValue(hasChildren);
-			this.#hasChildrenContext.setHasChildren(hasChildren);
+			this.paginationPrev.setTotalItems(data.totalBefore);
+			this.pagination.setTotalItems(data.total);
+		}
+
+		this.#isLoading.setValue(false);
+	}
+
+	async #loadNextItemsFromTarget() {
+		if (this.unique === undefined) throw new Error('Could not request next items, unique key is missing');
+		if (this.entityType === undefined) throw new Error('Could not request next items, entity type is missing');
+
+		const repository = this.treeContext?.getRepository();
+		if (!repository) throw new Error('Could not request next items, repository is missing');
+
+		this.#isLoading.setValue(true);
+
+		const foldersOnly = this.#foldersOnly.getValue();
+		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
+
+		const { data } = await repository.requestTreeItemsOf({
+			parent: {
+				unique: this.unique,
+				entityType: this.entityType,
+			},
+			take: this.pagination.getPageSize(),
+			skip: this.pagination.getSkip(),
+			foldersOnly,
+			paging: {
+				target: this.#endTarget,
+				takeBefore: 0,
+				takeAfter: this.pagination.getPageSize(),
+			},
+			...additionalArgs,
+		});
+
+		if (data) {
+			this.#childItems.append(data.items);
+
+			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
+			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
+
+			const totalAfter =
+				data.totalAfter !== undefined ? data.totalAfter : data.total - this.#childItems.getValue().length;
+			this.paginationNext.setTotalItems(totalAfter);
 
 			this.pagination.setTotalItems(data.total);
 		}
@@ -401,12 +555,19 @@ export abstract class UmbTreeItemContextBase<
 		if (this.unique === undefined) return;
 		if (!this.entityType) return;
 
+		const entity: UmbEntityModel = {
+			entityType: this.entityType,
+			unique: this.unique,
+		};
+
 		this.observe(
-			this.treeContext?.expansion.isExpanded({ entityType: this.entityType, unique: this.unique }),
-			(isExpanded) => {
+			this.treeContext?.expansion.isExpanded(entity),
+			async (isExpanded) => {
 				// If this item has children, load them
 				if (isExpanded && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
-					this.loadChildren();
+					const expansionEntry = await this.treeContext?.expansion.getItem(entity);
+					const target = expansionEntry?.target;
+					this.#loadChildren(target);
 				}
 
 				this.#isOpen.setValue(isExpanded ?? false);
@@ -433,11 +594,7 @@ export abstract class UmbTreeItemContextBase<
 		}
 	};
 
-	#onPageChange = (event: UmbChangeEvent) => {
-		const target = event.target as UmbPaginationManager;
-		this.#paging.skip = target.getSkip();
-		this.loadMore();
-	};
+	#onPageChange = () => this.#loadNextItemsFromTarget();
 
 	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
 

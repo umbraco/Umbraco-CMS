@@ -11,13 +11,22 @@ import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/bac
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbDeprecation, UmbPaginationManager, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbDeprecation,
+	UmbPaginationManager,
+	UmbSelectionManager,
+	UmbTargetPaginationManager,
+	debounce,
+	type UmbOffsetPaginationRequestModel,
+	type UmbTargetPaginationRequestModel,
+} from '@umbraco-cms/backoffice/utils';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	type UmbEntityActionEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
@@ -39,8 +48,11 @@ export class UmbDefaultTreeContext<
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this);
-	public readonly pagination = new UmbPaginationManager();
 	public readonly expansion = new UmbTreeExpansionManager(this);
+
+	public readonly pagination = new UmbPaginationManager();
+	public readonly paginationPrev = new UmbTargetPaginationManager(this);
+	public readonly paginationNext = new UmbTargetPaginationManager(this);
 
 	#hideTreeRoot = new UmbBooleanState(false);
 	hideTreeRoot = this.#hideTreeRoot.asObservable();
@@ -58,9 +70,11 @@ export class UmbDefaultTreeContext<
 	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;
 	#actionEventContext?: UmbActionEventContext;
 
+	#startTarget: any = undefined; // TODO: fix this type
+	#endTarget: any = undefined; // TODO: fix this type
+
 	#paging = {
-		skip: 0,
-		take: 50,
+		take: 5,
 	};
 
 	#initResolver?: () => void;
@@ -141,19 +155,33 @@ export class UmbDefaultTreeContext<
 	/**
 	 * Reloads the tree
 	 * @memberof UmbDefaultTreeContext
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public loadMore = () => this.#debouncedLoadTree(true);
+	public loadMore = (): Promise<void> => this.#loadNextItemsFromTarget();
 
-	#debouncedLoadTree(reload = false) {
+	/**
+	 * Load previous items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
+	 */
+	public loadPrevItems = (): Promise<void> => this.#loadPrevItemsFromTarget();
+
+	/**
+	 * Load next items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
+	 */
+	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
+
+	#debouncedLoadTree() {
 		if (this.getStartNode()) {
-			this.#loadRootItems(reload);
+			this.#loadRootItems();
 			return;
 		}
 
 		const hideTreeRoot = this.getHideTreeRoot();
 		if (hideTreeRoot) {
-			this.#loadRootItems(reload);
+			this.#loadRootItems();
 			return;
 		}
 
@@ -168,6 +196,7 @@ export class UmbDefaultTreeContext<
 		if (data) {
 			this.#treeRoot.setValue(data);
 			this.pagination.setTotalItems(1);
+			this.#observeExpansion();
 
 			if (this.getExpandTreeRoot()) {
 				this.#toggleTreeRootExpansion(true);
@@ -175,42 +204,148 @@ export class UmbDefaultTreeContext<
 		}
 	}
 
-	async #loadRootItems(loadMore = false) {
+	async #loadRootItems(target?: UmbEntityModel) {
 		await this.#init;
-
-		const skip = loadMore ? this.#paging.skip : 0;
-		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
 
 		// If we have a start node get children of that instead of the root
 		const startNode = this.getStartNode();
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.#additionalRequestArgs.getValue();
 
+		const targetPaging: UmbTargetPaginationRequestModel | undefined =
+			target && target.unique
+				? {
+						target: {
+							unique: target.unique,
+							entityType: target.entityType,
+						},
+						takeBefore: 5,
+						takeAfter: this.pagination.getPageSize(),
+					}
+				: undefined;
+
+		const offsetPaging: UmbOffsetPaginationRequestModel = {
+			skip: this.pagination.getSkip(),
+			take: this.pagination.getPageSize(),
+		};
+
 		const { data } = startNode?.unique
 			? await this.#repository!.requestTreeItemsOf({
-					...additionalArgs,
 					parent: {
 						unique: startNode.unique,
 						entityType: startNode.entityType,
 					},
+					skip: this.pagination.getSkip(), // including this for backward compatibility
+					take: this.pagination.getPageSize(), // including this for backward compatibility
+					paging: targetPaging || offsetPaging,
 					foldersOnly,
-					skip,
-					take,
+					...additionalArgs,
 				})
 			: await this.#repository!.requestTreeRootItems({
-					...additionalArgs,
+					skip: this.pagination.getSkip(), // including this for backward compatibility
+					take: this.pagination.getPageSize(), // including this for backward compatibility
+					paging: targetPaging || offsetPaging,
 					foldersOnly,
-					skip,
-					take,
+					...additionalArgs,
 				});
 
 		if (data) {
-			if (loadMore) {
-				const currentItems = this.#rootItems.getValue();
-				this.#rootItems.setValue([...currentItems, ...data.items]);
-			} else {
-				this.#rootItems.setValue(data.items);
+			this.#rootItems.setValue(data.items);
+
+			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
+			this.#startTarget = firstItem ? { unique: firstItem.unique, entityType: firstItem.entityType } : undefined;
+
+			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
+			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
+
+			const totalBefore = data.totalBefore !== undefined ? data.totalBefore : 0;
+			const totalAfter =
+				data.totalAfter !== undefined ? data.totalAfter : data.total - this.#rootItems.getValue().length;
+
+			this.paginationPrev.setTotalItems(totalBefore);
+			this.paginationNext.setTotalItems(totalAfter);
+			this.pagination.setTotalItems(data.total);
+		}
+	}
+
+	async #loadPrevItemsFromTarget() {
+		const startNode = this.getStartNode();
+		const foldersOnly = this.#foldersOnly.getValue();
+		const additionalArgs = this.#additionalRequestArgs.getValue();
+
+		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
+			target: this.#startTarget,
+			takeBefore: this.pagination.getPageSize(),
+			takeAfter: 0,
+		};
+
+		const { data } = startNode?.unique
+			? await this.#repository!.requestTreeItemsOf({
+					parent: {
+						unique: startNode.unique,
+						entityType: startNode.entityType,
+					},
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
+				})
+			: await this.#repository!.requestTreeRootItems({
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
+				});
+
+		if (data) {
+			const reversedItems = [...data.items].reverse();
+			this.#rootItems.prepend(reversedItems);
+
+			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
+			this.#startTarget = firstItem ? { unique: firstItem.unique, entityType: firstItem.entityType } : undefined;
+
+			if (data.totalBefore === undefined) {
+				throw new Error('totalBefore is missing in the response');
 			}
+
+			this.paginationPrev.setTotalItems(data.totalBefore);
+			this.pagination.setTotalItems(data.total);
+		}
+	}
+
+	async #loadNextItemsFromTarget() {
+		const startNode = this.getStartNode();
+		const foldersOnly = this.#foldersOnly.getValue();
+		const additionalArgs = this.#additionalRequestArgs.getValue();
+		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
+			target: this.#endTarget,
+			takeBefore: 0,
+			takeAfter: this.pagination.getPageSize(),
+		};
+
+		const { data } = startNode?.unique
+			? await this.#repository!.requestTreeItemsOf({
+					parent: {
+						unique: startNode.unique,
+						entityType: startNode.entityType,
+					},
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
+				})
+			: await this.#repository!.requestTreeRootItems({
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
+				});
+
+		if (data) {
+			this.#rootItems.append(data.items);
+
+			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
+			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
+
+			const totalAfter =
+				data.totalAfter !== undefined ? data.totalAfter : data.total - this.#rootItems.getValue().length;
+			this.paginationNext.setTotalItems(totalAfter);
 
 			this.pagination.setTotalItems(data.total);
 		}
@@ -331,6 +466,27 @@ export class UmbDefaultTreeContext<
 		return this.#expandTreeRoot.getValue();
 	}
 
+	#observeExpansion() {
+		const entity = this.#treeRoot.getValue();
+		if (!entity) return;
+
+		this.observe(
+			this.expansion.isExpanded(entity),
+			async (isExpanded) => {
+				console.log(`Tree root ${entity.unique} is expanded: ${isExpanded}`);
+				const expansion = this.expansion.getExpansion();
+				const currentEntry = expansion.find(
+					(entry) => entry.unique === entity.unique && entry.entityType === entity.entityType,
+				);
+				const target = currentEntry?.target;
+				this.#startTarget = target;
+				this.#endTarget = target;
+				this.#loadRootItems(target);
+			},
+			'observeExpansion',
+		);
+	}
+
 	#toggleTreeRootExpansion(expand: boolean) {
 		const treeRoot = this.#treeRoot.getValue();
 		if (!treeRoot) return;
@@ -361,11 +517,7 @@ export class UmbDefaultTreeContext<
 		});
 	}
 
-	#onPageChange = (event: UmbChangeEvent) => {
-		const target = event.target as UmbPaginationManager;
-		this.#paging.skip = target.getSkip();
-		this.loadMore();
-	};
+	#onPageChange = () => this.#loadNextItemsFromTarget();
 
 	#observeRepository(repositoryAlias?: string) {
 		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
