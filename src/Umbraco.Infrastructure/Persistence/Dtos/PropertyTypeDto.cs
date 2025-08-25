@@ -10,6 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class PropertyTypeDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.PropertyType;
+
     private string? _alias;
 
     [Column("id")]
@@ -76,7 +78,7 @@ internal class PropertyTypeDto
     [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]
     public DataTypeDto DataTypeDto { get; set; } = null!;
 
-    [Column("UniqueID")]
+    [Column("UniqueId")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     [Constraint(Default = SystemMethods.NewGuid)]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsPropertyTypeUniqueID")]

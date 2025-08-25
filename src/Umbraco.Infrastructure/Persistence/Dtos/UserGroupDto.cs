@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 public class UserGroupDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.UserGroup;
     public UserGroupDto()
     {
         UserGroup2AppDtos = new List<UserGroup2AppDto>();

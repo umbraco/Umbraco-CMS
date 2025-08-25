@@ -8,7 +8,7 @@ public class ColumnInfo
         ColumnName = columnName;
         Ordinal = ordinal;
         ColumnDefault = columnDefault;
-        IsNullable = isNullable.Equals("YES");
+        IsNullable = isNullable?.Equals("YES") ?? false;
         DataType = dataType;
     }
 
@@ -17,7 +17,7 @@ public class ColumnInfo
         TableName = tableName;
         ColumnName = columnName;
         Ordinal = ordinal;
-        IsNullable = isNullable.Equals("YES");
+        IsNullable = isNullable?.Equals("YES") ?? false;
         DataType = dataType;
     }
 
