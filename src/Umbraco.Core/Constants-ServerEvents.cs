@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
@@ -7,6 +7,8 @@ public static partial class Constants
         public static class EventSource
         {
             public const string Document = "Umbraco:CMS:Document";
+
+            public const string DocumentBlueprint = "Umbraco:CMS:DocumentBlueprint";
 
             public const string DocumentType = "Umbraco:CMS:DocumentType";
 
@@ -53,6 +55,7 @@ public static partial class Constants
 
         public static class EventType
         {
+            // TODO (V17): Convert these statics to consts.
             public static string Created = "Created";
 
             public static string Updated = "Updated";

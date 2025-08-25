@@ -487,6 +487,7 @@ export type DataTypeContentTypeReferenceModel = {
 
 export type DataTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     editorUiAlias?: string | null;
     editorAlias: string;
@@ -522,6 +523,7 @@ export type DataTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     editorUiAlias?: string | null;
@@ -578,6 +580,7 @@ export type DeleteUsersRequestModel = {
 
 export type DictionaryItemItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -610,6 +613,7 @@ export type DisableUserRequestModel = {
 
 export type DocumentBlueprintItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     documentType: DocumentTypeReferenceResponseModel;
 };
@@ -618,6 +622,7 @@ export type DocumentBlueprintResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
 };
 
@@ -625,6 +630,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
@@ -634,6 +640,7 @@ export type DocumentCollectionResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     creator?: string | null;
     sortOrder: number;
     documentType: DocumentTypeCollectionReferenceResponseModel;
@@ -652,6 +659,7 @@ export type DocumentConfigurationResponseModel = {
 
 export type DocumentItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     isTrashed: boolean;
     isProtected: boolean;
     parent?: ReferenceByIdModel | null;
@@ -701,6 +709,7 @@ export type DocumentResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
     /**
      * @deprecated
@@ -712,10 +721,11 @@ export type DocumentResponseModel = {
 
 export type DocumentTreeItemResponseModel = {
     hasChildren: boolean;
+    id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     noAccess: boolean;
     isTrashed: boolean;
-    id: string;
     createDate: string;
     isProtected: boolean;
     ancestors: Array<ReferenceByIdModel>;
@@ -725,6 +735,7 @@ export type DocumentTreeItemResponseModel = {
 
 export type DocumentTypeBlueprintItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -738,6 +749,7 @@ export type DocumentTypeCollectionReferenceResponseModel = {
     id: string;
     alias: string;
     icon: string;
+    collection?: ReferenceByIdModel | null;
 };
 
 export type DocumentTypeCompositionModel = {
@@ -767,6 +779,7 @@ export type DocumentTypeConfigurationResponseModel = {
 
 export type DocumentTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     isElement: boolean;
     icon?: string | null;
@@ -844,6 +857,7 @@ export type DocumentTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     isElement: boolean;
@@ -921,6 +935,7 @@ export type DocumentVersionResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
     document?: ReferenceByIdModel | null;
 };
@@ -1209,6 +1224,7 @@ export type MediaCollectionResponseModel = {
     values: Array<MediaValueResponseModel>;
     variants: Array<MediaVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     creator?: string | null;
     sortOrder: number;
     mediaType: MediaTypeCollectionReferenceResponseModel;
@@ -1221,6 +1237,7 @@ export type MediaConfigurationResponseModel = {
 
 export type MediaItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     isTrashed: boolean;
     parent?: ReferenceByIdModel | null;
     hasChildren: boolean;
@@ -1248,6 +1265,7 @@ export type MediaResponseModel = {
     values: Array<MediaValueResponseModel>;
     variants: Array<MediaVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     /**
      * @deprecated
      */
@@ -1258,10 +1276,11 @@ export type MediaResponseModel = {
 
 export type MediaTreeItemResponseModel = {
     hasChildren: boolean;
+    id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     noAccess: boolean;
     isTrashed: boolean;
-    id: string;
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
@@ -1271,6 +1290,7 @@ export type MediaTypeCollectionReferenceResponseModel = {
     id: string;
     alias: string;
     icon: string;
+    collection?: ReferenceByIdModel | null;
 };
 
 export type MediaTypeCompositionModel = {
@@ -1296,6 +1316,7 @@ export type MediaTypeConfigurationResponseModel = {
 
 export type MediaTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     icon?: string | null;
 };
@@ -1364,6 +1385,7 @@ export type MediaTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     icon: string;
@@ -1415,6 +1437,7 @@ export type MemberConfigurationResponseModel = {
 
 export type MemberGroupItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -1425,6 +1448,7 @@ export type MemberGroupResponseModel = {
 
 export type MemberItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     memberType: MemberTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
     kind: MemberKindModel;
@@ -1446,6 +1470,7 @@ export type MemberResponseModel = {
     values: Array<MemberValueResponseModel>;
     variants: Array<MemberVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     email: string;
     username: string;
     memberType: MemberTypeReferenceResponseModel;
@@ -1483,6 +1508,7 @@ export type MemberTypeConfigurationResponseModel = {
 
 export type MemberTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     icon?: string | null;
 };
@@ -1550,6 +1576,7 @@ export type MemberTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     icon: string;
 };
@@ -1632,6 +1659,7 @@ export type NamedEntityTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -2139,6 +2167,7 @@ export type PublishedDocumentResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
     /**
      * @deprecated
@@ -2198,6 +2227,7 @@ export type RelationResponseModelWritable = {
 
 export type RelationTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     isDeletable: boolean;
 };
@@ -2349,6 +2379,10 @@ export type SetAvatarRequestModel = {
     file: ReferenceByIdModel;
 };
 
+export type SignModel = {
+    alias: string;
+};
+
 export type SortingRequestModel = {
     parent?: ReferenceByIdModel | null;
     sorting: Array<ItemSortingRequestModel>;
@@ -2457,6 +2491,7 @@ export type TemplateConfigurationResponseModel = {
 
 export type TemplateItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     alias: string;
 };
@@ -2915,6 +2950,7 @@ export type UserExternalLoginProviderModel = {
 
 export type UserGroupItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     icon?: string | null;
     alias?: string | null;
@@ -2953,6 +2989,7 @@ export type UserInstallRequestModelWritable = {
 
 export type UserItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     avatarUrls: Array<string>;
     kind: UserKindModel;
@@ -3071,6 +3108,8 @@ export type WebhookEventResponseModel = {
 };
 
 export type WebhookItemResponseModel = {
+    id: string;
+    signs: Array<SignModel>;
     enabled: boolean;
     name: string;
     events: string;
@@ -3800,6 +3839,7 @@ export type GetTreeDataTypeSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/data-type/siblings';
 };
@@ -4738,6 +4778,7 @@ export type GetTreeDocumentBlueprintSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/document-blueprint/siblings';
 };
@@ -5579,6 +5620,7 @@ export type GetTreeDocumentTypeSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/document-type/siblings';
 };
@@ -6850,6 +6892,7 @@ export type GetItemDocumentSearchData = {
         take?: number;
         parentId?: string;
         allowedDocumentTypes?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/item/document/search';
 };
@@ -9100,6 +9143,7 @@ export type GetTreeMediaTypeSiblingsData = {
         target?: string;
         before?: number;
         after?: number;
+        foldersOnly?: boolean;
     };
     url: '/umbraco/management/api/v1/tree/media-type/siblings';
 };
@@ -9205,6 +9249,7 @@ export type GetItemMediaSearchData = {
         take?: number;
         parentId?: string;
         allowedMediaTypes?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/item/media/search';
 };
