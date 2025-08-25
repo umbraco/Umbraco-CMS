@@ -1,5 +1,5 @@
 export interface UmbTargetPaginationModel {
-	item: {
+	target: {
 		unique: string;
 		entityType: string;
 	};

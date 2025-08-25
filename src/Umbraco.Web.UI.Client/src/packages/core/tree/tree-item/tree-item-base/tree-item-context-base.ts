@@ -237,7 +237,7 @@ export abstract class UmbTreeItemContextBase<
 			take: this.pagination.getPageSize(),
 			target: target
 				? {
-						item: {
+						target: {
 							unique: target.unique,
 							entityType: target.entityType,
 						},
@@ -293,7 +293,7 @@ export abstract class UmbTreeItemContextBase<
 			},
 			foldersOnly,
 			target: {
-				item: this.#startTarget,
+				target: this.#startTarget,
 				takeBefore: this.pagination.getPageSize(),
 				takeAfter: 0,
 			},
@@ -339,7 +339,7 @@ export abstract class UmbTreeItemContextBase<
 			skip: this.pagination.getSkip(),
 			foldersOnly,
 			target: {
-				item: this.#endTarget,
+				target: this.#endTarget,
 				takeBefore: 0,
 				takeAfter: this.pagination.getPageSize(),
 			},
