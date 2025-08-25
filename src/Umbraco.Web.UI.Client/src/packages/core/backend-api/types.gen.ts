@@ -1161,14 +1161,15 @@ export type ItemSortingRequestModel = {
 
 export type LanguageItemResponseModel = {
     name: string;
-    isoCode: string;
+		isoCode: string;
 };
 
 export type LanguageResponseModel = {
     name: string;
     isDefault: boolean;
     isMandatory: boolean;
-    fallbackIsoCode?: string | null;
+		fallbackIsoCode?: string | null;
+		sortOrder: number;
     isoCode: string;
 };
 
