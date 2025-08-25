@@ -1,5 +1,11 @@
 import type { UmbApiResponse } from '@umbraco-cms/backoffice/resources';
 
+interface UmbInFlightRequestCacheEntryModel<ResponseModelType> {
+	key: string;
+	requestPromise: Promise<RequestResolvedType<ResponseModelType>>;
+	timestamp: string;
+}
+
 // Keep internal
 type RequestResolvedType<ResponseModelType> = UmbApiResponse<{ data?: ResponseModelType }>;
 
@@ -8,8 +14,8 @@ type RequestResolvedType<ResponseModelType> = UmbApiResponse<{ data?: ResponseMo
  * @class UmbManagementApiInflightRequestCache
  * @template ResponseModelType
  */
-export class UmbManagementApiInflightRequestCache<ResponseModelType> {
-	#entries = new Map<string, Promise<RequestResolvedType<ResponseModelType>>>();
+export class UmbManagementApiInFlightRequestCache<ResponseModelType> {
+	#entries = new Map<string, UmbInFlightRequestCacheEntryModel<ResponseModelType>>();
 
 	/**
 	 * Checks if an entry exists in the cache
@@ -28,7 +34,11 @@ export class UmbManagementApiInflightRequestCache<ResponseModelType> {
 	 * @memberof UmbManagementApiInflightRequestCache
 	 */
 	set(key: string, promise: Promise<RequestResolvedType<ResponseModelType>>): void {
-		this.#entries.set(key, promise);
+		this.#entries.set(key, {
+			key,
+			requestPromise: promise,
+			timestamp: new Date().toISOString(),
+		});
 	}
 
 	/**
@@ -37,7 +47,7 @@ export class UmbManagementApiInflightRequestCache<ResponseModelType> {
 	 * @returns {Promise<RequestResolvedType<ResponseModelType>> | undefined} - The cached promise or undefined if not found
 	 * @memberof UmbManagementApiInflightRequestCache
 	 */
-	get(key: string): Promise<RequestResolvedType<ResponseModelType>> | undefined {
+	get(key: string): UmbInFlightRequestCacheEntryModel<ResponseModelType> | undefined {
 		return this.#entries.get(key);
 	}
 
