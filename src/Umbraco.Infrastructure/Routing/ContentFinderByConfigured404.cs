@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
@@ -22,6 +23,8 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
     private readonly IExamineManager _examineManager;
     private readonly ILogger<ContentFinderByConfigured404> _logger;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IDocumentUrlService _documentUrlService;
+    private readonly IPublishedContentCache _publishedContentCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private ContentSettings _contentSettings;
@@ -36,6 +39,8 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         IExamineManager examineManager,
         IVariationContextAccessor variationContextAccessor,
         IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentUrlService documentUrlService,
+        IPublishedContentCache publishedContentCache,
         IDocumentNavigationQueryService documentNavigationQueryService)
     {
         _logger = logger;
@@ -44,6 +49,8 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         _examineManager = examineManager;
         _variationContextAccessor = variationContextAccessor;
         _umbracoContextAccessor = umbracoContextAccessor;
+        _documentUrlService = documentUrlService;
+        _publishedContentCache = publishedContentCache;
         _documentNavigationQueryService = documentNavigationQueryService;
 
         contentSettings.OnChange(x => _contentSettings = x);
@@ -64,6 +71,8 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         examineManager,
         variationContextAccessor,
         umbracoContextAccessor,
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
         StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
     {
     }
@@ -102,6 +111,16 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
             while (pos > 1)
             {
                 route = route.Substring(0, pos);
+                Guid? keyByRoute = _documentUrlService.GetDocumentKeyByRoute(route, frequest.Culture, null, false);
+                if (keyByRoute is not null)
+                {
+                    node = _publishedContentCache.GetById(keyByRoute.Value);
+                }
+
+                if (node is not null)
+                {
+                    break;
+                }
 
                 pos = route.LastIndexOf('/');
             }
