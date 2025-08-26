@@ -1,8 +1,8 @@
 import type { UmbTiptapToolbarExtension } from '../../types.js';
 import type { UmbTiptapToolbarValue } from '../../../../components/types.js';
 import { UmbTiptapToolbarConfigurationContext } from '../../contexts/tiptap-toolbar-configuration.context.js';
+import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { property, state, customElement, html, when, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -141,8 +141,57 @@ export class UmbTiptapToolbarGroupElement<
 				`;
 		}
 	}
+
+	static override styles = [
+		css`
+			.items {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				gap: var(--uui-size-1);
+
+				uui-button {
+					--uui-button-font-weight: normal;
+
+					&[draggable='true'],
+					&[draggable='true'] > .inner {
+						cursor: move;
+					}
+
+					&[disabled],
+					&[disabled] > .inner {
+						cursor: not-allowed;
+					}
+
+					&.forbidden {
+						--color: var(--uui-color-danger);
+						--color-standalone: var(--uui-color-danger-standalone);
+						--color-emphasis: var(--uui-color-danger-emphasis);
+						--color-contrast: var(--uui-color-danger);
+						--uui-button-contrast-disabled: var(--uui-color-danger);
+						--uui-button-border-color-disabled: var(--uui-color-danger);
+					}
+
+					div {
+						display: flex;
+						gap: var(--uui-size-1);
+					}
+
+					uui-symbol-expand {
+						margin-left: var(--uui-size-space-2);
+					}
+				}
+			}
+
+			uui-button[look='outline'] {
+				--uui-button-background-color-hover: var(--uui-color-surface);
+			}
+		`,
+	];
 }
+
 export default UmbTiptapToolbarGroupElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-tiptap-toolbar-group': UmbTiptapToolbarGroupElement;
