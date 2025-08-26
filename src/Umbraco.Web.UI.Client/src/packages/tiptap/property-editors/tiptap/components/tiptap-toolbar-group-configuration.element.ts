@@ -1,12 +1,12 @@
-import { UmbTiptapToolbarConfigurationContext } from '../../contexts/tiptap-toolbar-configuration.context.js';
-import type { UmbTiptapToolbarExtension } from '../../types.js';
+import { UmbTiptapToolbarConfigurationContext } from '../contexts/tiptap-toolbar-configuration.context.js';
+import type { UmbTiptapToolbarExtension } from '../types.js';
 import { css, customElement, html, property, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
 
-@customElement('umb-tiptap-toolbar-group')
-export class UmbTiptapToolbarGroupElement<
+@customElement('umb-tiptap-toolbar-group-configuration')
+export class UmbTiptapToolbarGroupConfigurationElement<
 	TiptapToolbarItem extends UmbTiptapToolbarExtension = UmbTiptapToolbarExtension,
 > extends UmbLitElement {
 	#sorter = new UmbSorterController<TiptapToolbarItem, HTMLElement>(this, {
@@ -168,10 +168,10 @@ export class UmbTiptapToolbarGroupElement<
 	];
 }
 
-export default UmbTiptapToolbarGroupElement;
+export default UmbTiptapToolbarGroupConfigurationElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tiptap-toolbar-group': UmbTiptapToolbarGroupElement;
+		'umb-tiptap-toolbar-group-configuration': UmbTiptapToolbarGroupConfigurationElement;
 	}
 }

@@ -5,14 +5,14 @@ import type {
 	UmbTiptapToolbarRowViewModel,
 } from '../types.js';
 import type { UmbTiptapToolbarValue } from '../../../components/types.js';
-import type { UmbTiptapToolbarGroupElement } from './tiptap-toolbar-group/tiptap-toolbar-group.element.js';
+import type { UmbTiptapToolbarGroupConfigurationElement } from './tiptap-toolbar-group-configuration.element.js';
 import { customElement, css, html, property, repeat, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 
-import './tiptap-toolbar-group/tiptap-toolbar-group.element.js';
+import './tiptap-toolbar-group-configuration.element.js';
 
 @customElement('umb-property-editor-ui-tiptap-toolbar-configuration')
 export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
@@ -77,7 +77,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.#initialized = true;
 	}
 
-	#onChangeToolbarGroup(event: CustomEvent & { target: UmbTiptapToolbarGroupElement }) {
+	#onChangeToolbarGroup(event: CustomEvent & { target: UmbTiptapToolbarGroupConfigurationElement }) {
 		event.stopPropagation();
 		const element = event.target;
 		const aliases = element.items.map((item) => item.alias);
