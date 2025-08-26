@@ -16,10 +16,6 @@ namespace Umbraco.Cms.Web.Common.Mvc;
 /// </remarks>
 public class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
 {
-    public UmbracoMvcConfigureOptions()
-    {
-    }
-
     /// <inheritdoc />
     public void Configure(MvcOptions options)
     {
