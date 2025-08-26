@@ -27,7 +27,7 @@ import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffi
 import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-interface UmbDateTimeWithTimeZone {
+interface UmbDateTime2 {
 	date: string | undefined;
 	timeZone: string | undefined;
 }
@@ -38,11 +38,11 @@ interface UmbTimeZonePickerOption extends UmbTimeZone {
 }
 
 /**
- * @element umb-property-editor-ui-date-with-time-zone-picker
+ * @element umb-property-editor-ui-date-time-picker
  */
-@customElement('umb-property-editor-ui-date-with-time-zone-picker')
+@customElement('umb-property-editor-ui-date-time-picker')
 export class UmbPropertyEditorUIDateWithTimeZonePickerElement
-	extends UmbFormControlMixin<UmbDateTimeWithTimeZone, typeof UmbLitElement, undefined>(UmbLitElement)
+	extends UmbFormControlMixin<UmbDateTime2, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
 	private _timeZoneOptions: Array<UmbTimeZonePickerOption> = [];

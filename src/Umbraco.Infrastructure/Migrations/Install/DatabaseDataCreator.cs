@@ -859,7 +859,7 @@ internal sealed class DatabaseDataCreator
             "id");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.DateTimeWithTimeZone,
+            Constants.DataTypes.Guids.DateTime2Unspecified,
             new NodeDto
             {
                 NodeId = 1055,
@@ -869,8 +869,27 @@ internal sealed class DatabaseDataCreator
                 Level = 1,
                 Path = "-1,1055",
                 SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.DateTimeWithTimeZoneGuid,
-                Text = "Date Picker with Time Zone",
+                UniqueId = Constants.DataTypes.Guids.DateTime2UnspecifiedGuid,
+                Text = "Date Time (Unspecified)",
+                NodeObjectType = Constants.ObjectTypes.DataType,
+                CreateDate = DateTime.Now,
+            },
+            Constants.DatabaseSchema.Tables.Node,
+            "id");
+        ConditionalInsert(
+            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
+            Constants.DataTypes.Guids.DateTime2WithTimeZone,
+            new NodeDto
+            {
+                NodeId = 1056,
+                Trashed = false,
+                ParentId = -1,
+                UserId = -1,
+                Level = 1,
+                Path = "-1,1056",
+                SortOrder = 2,
+                UniqueId = Constants.DataTypes.Guids.DateTime2WithTimeZoneGuid,
+                Text = "Date Time (With Time Zone)",
                 NodeObjectType = Constants.ObjectTypes.DataType,
                 CreateDate = DateTime.Now,
             },
@@ -2321,8 +2340,24 @@ internal sealed class DatabaseDataCreator
                 new DataTypeDto
                 {
                     NodeId = 1055,
-                    EditorAlias = Constants.PropertyEditors.Aliases.DateTimeWithTimeZone,
-                    EditorUiAlias = "Umb.PropertyEditorUi.DateWithTimeZonePicker",
+                    EditorAlias = Constants.PropertyEditors.Aliases.DateTime2,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DateTimePicker",
+                    DbType = "Ntext",
+                    Configuration = "{\"format\": \"date-time\", \"timeFormat\": \"HH:mm\", \"timeZones\": {\"mode\": \"none\"}}",
+                });
+        }
+
+        if (_database.Exists<NodeDto>(1056))
+        {
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.DataType,
+                "pk",
+                false,
+                new DataTypeDto
+                {
+                    NodeId = 1056,
+                    EditorAlias = Constants.PropertyEditors.Aliases.DateTime2,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DateTimePicker",
                     DbType = "Ntext",
                     Configuration = "{\"format\": \"date-time\", \"timeFormat\": \"HH:mm\", \"timeZones\": {\"mode\": \"all\"}}",
                 });

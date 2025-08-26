@@ -6,12 +6,12 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <inheritdoc />
-public class DateTimeWithTimeZonePropertyIndexValueFactory : IDateTimeWithTimeZonePropertyIndexValueFactory
+public class DateTime2PropertyIndexValueFactory : IDateTime2PropertyIndexValueFactory
 {
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly IJsonSerializer _jsonSerializer;
 
-    public DateTimeWithTimeZonePropertyIndexValueFactory(
+    public DateTime2PropertyIndexValueFactory(
         IDataTypeConfigurationCache dataTypeConfigurationCache,
         IJsonSerializer jsonSerializer)
     {
@@ -42,8 +42,8 @@ public class DateTimeWithTimeZonePropertyIndexValueFactory : IDateTimeWithTimeZo
             return [indexValue];
         }
 
-        DateTimeWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateTimeWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
-        var value = DateTimeWithTimeZoneValueConverter.GetValue(sourceStr, configuration, _jsonSerializer);
+        DateTime2Configuration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateTime2Configuration>(property.PropertyType.DataTypeKey);
+        var value = DateTime2ValueConverter.GetValue(sourceStr, configuration, _jsonSerializer);
         if (value is null)
         {
             return [indexValue];

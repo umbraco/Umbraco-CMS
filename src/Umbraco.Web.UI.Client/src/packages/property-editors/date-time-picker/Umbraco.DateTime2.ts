@@ -2,10 +2,10 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Date Time with Time Zone',
-	alias: 'Umbraco.DateTimeWithTimeZone',
+	name: 'Date Time 2',
+	alias: 'Umbraco.DateTime2',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.DateWithTimeZonePicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.DateTimePicker',
 		settings: {
 			properties: [
 				{

@@ -9,26 +9,26 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// The date time with timezone property value converter.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
+public class DateTime2ValueConverter : PropertyValueConverterBase
 {
     private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DateTimeWithTimeZoneValueConverter"/> class.
+    /// Initializes a new instance of the <see cref="DateTime2ValueConverter"/> class.
     /// </summary>
     /// <param name="jsonSerializer">The JSON serializer.</param>
-    public DateTimeWithTimeZoneValueConverter(IJsonSerializer jsonSerializer)
+    public DateTime2ValueConverter(IJsonSerializer jsonSerializer)
         => _jsonSerializer = jsonSerializer;
 
     /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
-        => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone);
+        => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.DateTime2);
 
     /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
     {
-        DateTimeWithTimeZoneConfiguration? config =
-            ConfigurationEditor.ConfigurationAs<DateTimeWithTimeZoneConfiguration>(propertyType.DataType.ConfigurationObject);
+        DateTime2Configuration? config =
+            ConfigurationEditor.ConfigurationAs<DateTime2Configuration>(propertyType.DataType.ConfigurationObject);
         return GetPropertyValueType(config);
     }
 
@@ -44,12 +44,12 @@ public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
         bool preview)
     {
         var sourceStr = source?.ToString();
-        if (sourceStr is null || !_jsonSerializer.TryDeserialize(sourceStr, out DateTimeWithTimeZone? dateWithTimeZone))
+        if (sourceStr is null || !_jsonSerializer.TryDeserialize(sourceStr, out DateTime2? dateTime))
         {
             return null;
         }
 
-        return dateWithTimeZone;
+        return dateTime;
     }
 
     public override object? ConvertIntermediateToObject(
@@ -59,31 +59,31 @@ public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
         object? inter,
         bool preview)
     {
-        DateTimeWithTimeZoneConfiguration? config =
-            ConfigurationEditor.ConfigurationAs<DateTimeWithTimeZoneConfiguration>(propertyType.DataType.ConfigurationObject);
+        DateTime2Configuration? config =
+            ConfigurationEditor.ConfigurationAs<DateTime2Configuration>(propertyType.DataType.ConfigurationObject);
         return GetObjectValue(inter, config);
     }
 
-    private static Type GetPropertyValueType(DateTimeWithTimeZoneConfiguration? config) =>
+    private static Type GetPropertyValueType(DateTime2Configuration? config) =>
         config?.Format switch
         {
-            DateTimeWithTimeZoneFormat.DateOnly => typeof(DateOnly?),
-            DateTimeWithTimeZoneFormat.TimeOnly => typeof(TimeOnly?),
-            DateTimeWithTimeZoneFormat.DateTime when config.TimeZones?.Mode is not { } mode || mode == DateTimeWithTimeZoneMode.None => typeof(DateTime?),
+            DateTime2Configuration.DateTimeFormat.DateOnly => typeof(DateOnly?),
+            DateTime2Configuration.DateTimeFormat.TimeOnly => typeof(TimeOnly?),
+            DateTime2Configuration.DateTimeFormat.DateTime when config.TimeZones?.Mode is not { } mode || mode == DateTime2Configuration.TimeZoneMode.None => typeof(DateTime?),
             _ => typeof(DateTimeOffset?),
         };
 
     internal static object? GetIntermediateValue(string? source, IJsonSerializer jsonSerializer)
     {
-        if (source is null || !jsonSerializer.TryDeserialize(source, out DateTimeWithTimeZone? dateWithTimeZone))
+        if (source is null || !jsonSerializer.TryDeserialize(source, out DateTime2? dateTime))
         {
             return null;
         }
 
-        return dateWithTimeZone;
+        return dateTime;
     }
 
-    internal static object? GetObjectValue(object? inter, DateTimeWithTimeZoneConfiguration? configuration)
+    internal static object? GetObjectValue(object? inter, DateTime2Configuration? configuration)
     {
         Type propertyValueType = GetPropertyValueType(configuration);
         if (inter is null)
@@ -91,30 +91,30 @@ public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
             return propertyValueType.GetDefaultValue();
         }
 
-        if (inter is not DateTimeWithTimeZone dateWithTimeZone)
+        if (inter is not DateTime2 dateTime)
         {
             return propertyValueType.GetDefaultValue();
         }
 
         if (propertyValueType == typeof(DateOnly?))
         {
-            return DateOnly.FromDateTime(dateWithTimeZone.Date.UtcDateTime);
+            return DateOnly.FromDateTime(dateTime.Date.UtcDateTime);
         }
 
         if (propertyValueType == typeof(TimeOnly?))
         {
-            return TimeOnly.FromDateTime(dateWithTimeZone.Date.UtcDateTime);
+            return TimeOnly.FromDateTime(dateTime.Date.UtcDateTime);
         }
 
         if (propertyValueType == typeof(DateTime?))
         {
-            return DateTime.SpecifyKind(dateWithTimeZone.Date.UtcDateTime, DateTimeKind.Unspecified);
+            return DateTime.SpecifyKind(dateTime.Date.UtcDateTime, DateTimeKind.Unspecified);
         }
 
-        return dateWithTimeZone.Date;
+        return dateTime.Date;
     }
 
-    internal static object? GetValue(string? source, DateTimeWithTimeZoneConfiguration? configuration, IJsonSerializer jsonSerializer)
+    internal static object? GetValue(string? source, DateTime2Configuration? configuration, IJsonSerializer jsonSerializer)
     {
         var intermediateValue = GetIntermediateValue(source, jsonSerializer);
         return GetObjectValue(intermediateValue, configuration);
@@ -128,7 +128,7 @@ public class DateTimeWithTimeZoneValueConverter : PropertyValueConverterBase
             _ => throw new ArgumentOutOfRangeException(nameof(value), $"Unsupported type: {value.GetType().FullName}"),
         };
 
-    public class DateTimeWithTimeZone
+    public class DateTime2
     {
         [JsonPropertyName("date")]
         public DateTimeOffset Date { get; init; }

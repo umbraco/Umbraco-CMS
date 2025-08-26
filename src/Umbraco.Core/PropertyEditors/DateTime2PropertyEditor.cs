@@ -18,17 +18,17 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 [DataEditor(
-    Constants.PropertyEditors.Aliases.DateTimeWithTimeZone,
+    Constants.PropertyEditors.Aliases.DateTime2,
     ValueEditorIsReusable = true)]
-public class DateTimeWithTimeZonePropertyEditor : DataEditor
+public class DateTime2PropertyEditor : DataEditor
 {
     private readonly IIOHelper _ioHelper;
-    private readonly IDateTimeWithTimeZonePropertyIndexValueFactory _propertyIndexValueFactory;
+    private readonly IDateTime2PropertyIndexValueFactory _propertyIndexValueFactory;
 
-    public DateTimeWithTimeZonePropertyEditor(
+    public DateTime2PropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        IDateTimeWithTimeZonePropertyIndexValueFactory propertyIndexValueFactory)
+        IDateTime2PropertyIndexValueFactory propertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
@@ -38,21 +38,21 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new DateTimeWithTimeZoneConfigurationEditor(_ioHelper);
+        new DateTime2ConfigurationEditor(_ioHelper);
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<DateTimeWithTimeZoneDataValueEditor>(Attribute!);
+        DataValueEditorFactory.Create<DateTime2DataValueEditor>(Attribute!);
 
     /// <inheritdoc/>
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _propertyIndexValueFactory;
 
-    internal class DateTimeWithTimeZoneDataValueEditor : DataValueEditor
+    internal class DateTime2DataValueEditor : DataValueEditor
     {
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
-        public DateTimeWithTimeZoneDataValueEditor(
+        public DateTime2DataValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
@@ -84,15 +84,15 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
                 return null;
             }
 
-            var configuration = editorValue.DataTypeConfiguration as DateTimeWithTimeZoneConfiguration;
-            if (configuration?.Format == DateTimeWithTimeZoneFormat.TimeOnly)
+            var configuration = editorValue.DataTypeConfiguration as DateTime2Configuration;
+            if (configuration?.Format == DateTime2Configuration.DateTimeFormat.TimeOnly)
             {
                 // Clear the date part if the format is TimeOnly.
                 // This is needed because `DateTimeOffset.TryParse` does not support `DateTimeStyles.NoCurrentDateDefault`.
                 dateTimeOffset = new DateTimeOffset(DateOnly.MinValue, TimeOnly.FromTimeSpan(dateTimeOffset.TimeOfDay), dateTimeOffset.Offset);
             }
 
-            var value = new DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone
+            var value = new DateTime2ValueConverter.DateTime2
             {
                 Date = dateTimeOffset,
                 TimeZone = valueAsJsonObject["timeZone"]?.GetValue<string>(),
@@ -110,18 +110,18 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
                 return null;
             }
 
-            var interValue = DateTimeWithTimeZoneValueConverter.GetIntermediateValue(valueString, _jsonSerializer);
-            if (interValue is not DateTimeWithTimeZoneValueConverter.DateTimeWithTimeZone dateWithTimeZone)
+            var interValue = DateTime2ValueConverter.GetIntermediateValue(valueString, _jsonSerializer);
+            if (interValue is not DateTime2ValueConverter.DateTime2 dateTime)
             {
                 return null;
             }
 
-            DateTimeWithTimeZoneConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateTimeWithTimeZoneConfiguration>(property.PropertyType.DataTypeKey);
-            var objectValue = DateTimeWithTimeZoneValueConverter.GetObjectValue(dateWithTimeZone, configuration);
+            DateTime2Configuration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateTime2Configuration>(property.PropertyType.DataTypeKey);
+            var objectValue = DateTime2ValueConverter.GetObjectValue(dateTime, configuration);
 
             JsonNode node = new JsonObject();
-            node["date"] = DateTimeWithTimeZoneValueConverter.GetDateValueAsString(objectValue);
-            node["timeZone"] = dateWithTimeZone.TimeZone;
+            node["date"] = DateTime2ValueConverter.GetDateValueAsString(objectValue);
+            node["timeZone"] = dateTime.TimeZone;
 
             return node;
         }
@@ -156,13 +156,13 @@ public class DateTimeWithTimeZonePropertyEditor : DataEditor
                 }
 
                 var selectedTimeZone = valueAsJsonObject["timeZone"]?.GetValue<string>();
-                var dataTypeConfig = dataTypeConfiguration as DateTimeWithTimeZoneConfiguration;
-                if (dataTypeConfig?.TimeZones?.Mode is not { } mode || mode == DateTimeWithTimeZoneMode.None)
+                var dataTypeConfig = dataTypeConfiguration as DateTime2Configuration;
+                if (dataTypeConfig?.TimeZones?.Mode is not { } mode || mode == DateTime2Configuration.TimeZoneMode.None)
                 {
                     yield break;
                 }
 
-                if (mode == DateTimeWithTimeZoneMode.Custom
+                if (mode == DateTime2Configuration.TimeZoneMode.Custom
                     && dataTypeConfig.TimeZones.TimeZones.Any(t => t.Equals(selectedTimeZone, StringComparison.InvariantCultureIgnoreCase)) != true)
                 {
                     yield return new ValidationResult(

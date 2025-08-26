@@ -11,7 +11,7 @@ import { manifests as checkboxListManifests } from './checkbox-list/manifests.js
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as colorPickerManifests } from './color-picker/manifests.js';
 import { manifests as datePickerManifests } from './date-picker/manifests.js';
-import { manifests as dateWithTimeZonePickerManifests } from './date-with-time-zone-picker/manifests.js';
+import { manifests as dateTimePickerManifests } from './date-time-picker/manifests.js';
 import { manifests as dropdownManifests } from './dropdown/manifests.js';
 import { manifests as eyeDropperManifests } from './eye-dropper/manifests.js';
 import { manifests as iconPickerManifests } from './icon-picker/manifests.js';
@@ -30,7 +30,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...collectionManifests,
 	...colorPickerManifests,
 	...datePickerManifests,
-	...dateWithTimeZonePickerManifests,
+	...dateTimePickerManifests,
 	...dropdownManifests,
 	...eyeDropperManifests,
 	...iconPickerManifests,
