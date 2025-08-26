@@ -1,9 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -26,6 +27,14 @@ public class MissingPropertyEditor : IDataEditor
     {
         _dataValueEditorFactory = dataValueEditorFactory;
         Alias = missingEditorAlias;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
+    public MissingPropertyEditor()
+        : this(
+        Constants.PropertyEditors.Aliases.Missing,
+        StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
+    {
     }
 
     /// <inheritdoc />
