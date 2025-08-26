@@ -31,6 +31,11 @@ public class MissingPropertyEditor : IDataEditor
     /// <inheritdoc />
     public string Alias { get; }
 
+    /// <summary>
+    /// Gets the name of the editor.
+    /// </summary>
+    public string Name => "Missing property editor";
+
     /// <inheritdoc />
     public bool IsDeprecated => false;
 
