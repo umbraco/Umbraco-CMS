@@ -12,7 +12,7 @@ export class UmbMissingPropertyEditorModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${this.localize.term('general_details')}>
-				<umb-localize key="missingEditor_detailsDescription" .args=${[this.data?.propertyType]}></umb-localize>
+				<umb-localize key="missingEditor_detailsDescription"></umb-localize>
 				<umb-code-block copy>${this.data?.value}</umb-code-block>
 				<uui-button
 					slot="actions"
