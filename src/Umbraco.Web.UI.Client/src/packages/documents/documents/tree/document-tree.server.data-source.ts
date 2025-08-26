@@ -105,6 +105,7 @@ const getChildrenOf = async (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 		};
 	}
 
+	// Including args.skip + args.take for backwards compatibility
 	const skip = paging && isOffsetPaginationRequest(paging) ? paging.skip : args.skip ? args.skip : 0;
 	const take = paging && isOffsetPaginationRequest(paging) ? paging.take : args.take ? args.take : 50;
 
