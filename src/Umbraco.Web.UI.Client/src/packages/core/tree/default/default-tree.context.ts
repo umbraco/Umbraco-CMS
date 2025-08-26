@@ -70,6 +70,7 @@ export class UmbDefaultTreeContext<
 	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;
 	#actionEventContext?: UmbActionEventContext;
 
+	#baseTarget: any = undefined; // TODO: fix this type
 	#startTarget: any = undefined; // TODO: fix this type
 	#endTarget: any = undefined; // TODO: fix this type
 
@@ -153,6 +154,14 @@ export class UmbDefaultTreeContext<
 	public loadTree = debounce(() => this.#debouncedLoadTree(), 100);
 
 	/**
+	 * Reloads the tree in its current expansion state
+	 * @memberof UmbDefaultTreeContext
+	 */
+	// TODO: debouncing the load tree method because multiple props can be set at the same time
+	// that would trigger multiple loadTree calls. This is a temporary solution to avoid that.
+	public reloadTree = debounce(() => this.#debouncedReloadTree(), 100);
+
+	/**
 	 * Reloads the tree
 	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
@@ -188,6 +197,21 @@ export class UmbDefaultTreeContext<
 		this.#loadTreeRoot();
 	}
 
+	#debouncedReloadTree() {
+		if (this.getStartNode()) {
+			this.#reloadRootItems();
+			return;
+		}
+
+		const hideTreeRoot = this.getHideTreeRoot();
+		if (hideTreeRoot) {
+			this.#reloadRootItems();
+			return;
+		}
+
+		this.#reloadTreeRoot();
+	}
+
 	async #loadTreeRoot() {
 		await this.#init;
 
@@ -201,6 +225,17 @@ export class UmbDefaultTreeContext<
 			if (this.getExpandTreeRoot()) {
 				this.#toggleTreeRootExpansion(true);
 			}
+		}
+	}
+
+	async #reloadTreeRoot() {
+		await this.#init;
+
+		const { data } = await this.#repository!.requestTreeRoot();
+
+		if (data) {
+			this.#treeRoot.setValue(data);
+			this.pagination.setTotalItems(1);
 		}
 	}
 
@@ -235,15 +270,15 @@ export class UmbDefaultTreeContext<
 						unique: startNode.unique,
 						entityType: startNode.entityType,
 					},
-					skip: this.pagination.getSkip(), // including this for backward compatibility
-					take: this.pagination.getPageSize(), // including this for backward compatibility
+					skip: offsetPaging.skip, // including this for backward compatibility
+					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging || offsetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await this.#repository!.requestTreeRootItems({
-					skip: this.pagination.getSkip(), // including this for backward compatibility
-					take: this.pagination.getPageSize(), // including this for backward compatibility
+					skip: offsetPaging.skip, // including this for backward compatibility
+					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging || offsetPaging,
 					foldersOnly,
 					...additionalArgs,
@@ -347,6 +382,71 @@ export class UmbDefaultTreeContext<
 				data.totalAfter !== undefined ? data.totalAfter : data.total - this.#rootItems.getValue().length;
 			this.paginationNext.setTotalItems(totalAfter);
 
+			this.pagination.setTotalItems(data.total);
+			debugger;
+		}
+	}
+
+	async #reloadRootItems() {
+		await this.#init;
+
+		// If we have a start node get children of that instead of the root
+		const startNode = this.getStartNode();
+		const foldersOnly = this.#foldersOnly.getValue();
+		const additionalArgs = this.#additionalRequestArgs.getValue();
+
+		const targetPaging: UmbTargetPaginationRequestModel | undefined =
+			this.#baseTarget && this.#baseTarget.unique
+				? {
+						target: {
+							unique: this.#baseTarget.unique,
+							entityType: this.#baseTarget.entityType,
+						},
+						takeBefore: 0, // calculate how many items we have loaded before the baseTarget
+						takeAfter: 0, // calculate how many items we have loaded after the baseTarget
+					}
+				: undefined;
+
+		const offsetPaging: UmbOffsetPaginationRequestModel = {
+			skip: 0, // As we are reloading we reset the skip
+			take: this.pagination.getCurrentPageNumber() * this.#paging.take,
+		};
+
+		const { data } = startNode?.unique
+			? await this.#repository!.requestTreeItemsOf({
+					parent: {
+						unique: startNode.unique,
+						entityType: startNode.entityType,
+					},
+					skip: offsetPaging.skip, // including this for backward compatibility
+					take: offsetPaging.take, // including this for backward compatibility
+					paging: targetPaging || offsetPaging,
+					foldersOnly,
+					...additionalArgs,
+				})
+			: await this.#repository!.requestTreeRootItems({
+					skip: offsetPaging.skip, // including this for backward compatibility
+					take: offsetPaging.take, // including this for backward compatibility
+					paging: targetPaging || offsetPaging,
+					foldersOnly,
+					...additionalArgs,
+				});
+
+		if (data) {
+			this.#rootItems.setValue(data.items);
+
+			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
+			this.#startTarget = firstItem ? { unique: firstItem.unique, entityType: firstItem.entityType } : undefined;
+
+			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
+			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
+
+			const totalBefore = data.totalBefore !== undefined ? data.totalBefore : 0;
+			const totalAfter =
+				data.totalAfter !== undefined ? data.totalAfter : data.total - this.#rootItems.getValue().length;
+
+			this.paginationPrev.setTotalItems(totalBefore);
+			this.paginationNext.setTotalItems(totalAfter);
 			this.pagination.setTotalItems(data.total);
 		}
 	}
@@ -479,9 +579,10 @@ export class UmbDefaultTreeContext<
 					(entry) => entry.unique === entity.unique && entry.entityType === entity.entityType,
 				);
 				const target = currentEntry?.target;
+				this.#baseTarget = target;
 				this.#startTarget = target;
 				this.#endTarget = target;
-				this.#loadRootItems(target);
+				this.#loadRootItems(this.#baseTarget);
 			},
 			'observeExpansion',
 		);
@@ -540,7 +641,7 @@ export class UmbDefaultTreeContext<
 		if (treeRoot === undefined) return;
 		if (event.getUnique() !== treeRoot.unique) return;
 		if (event.getEntityType() !== treeRoot.entityType) return;
-		this.loadTree();
+		this.#reloadRootItems();
 	};
 
 	#removeEventListeners() {

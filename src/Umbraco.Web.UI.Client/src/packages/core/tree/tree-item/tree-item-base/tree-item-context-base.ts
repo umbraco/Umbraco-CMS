@@ -590,7 +590,7 @@ export abstract class UmbTreeItemContextBase<
 		if (this.parentTreeItemContext) {
 			this.parentTreeItemContext.loadChildren();
 		} else {
-			this.treeContext?.loadTree();
+			this.treeContext?.reloadTree();
 		}
 	};
 
