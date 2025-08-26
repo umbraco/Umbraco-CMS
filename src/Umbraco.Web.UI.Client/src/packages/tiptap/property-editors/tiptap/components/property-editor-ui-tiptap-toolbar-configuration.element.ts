@@ -11,6 +11,7 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+
 import './tiptap-toolbar-group/tiptap-toolbar-group.element.js';
 
 @customElement('umb-property-editor-ui-tiptap-toolbar-configuration')
@@ -76,7 +77,14 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.#initialized = true;
 	}
 
-	#onClick(item: UmbTiptapToolbarExtension) {
+	#onChangeToolbarGroup(event: CustomEvent & { target: UmbTiptapToolbarGroupElement }) {
+		event.stopPropagation();
+		const element = event.target;
+		const aliases = element.items.map((item) => item.alias);
+		this.#context.updateToolbarItem(aliases, [element.rowIndex, element.groupIndex]);
+	}
+
+	#onClickAvailableItem(item: UmbTiptapToolbarExtension) {
 		const lastRow = (this.#value?.length ?? 1) - 1;
 		const lastGroup = (this.#value?.[lastRow].length ?? 1) - 1;
 		const lastItem = this.#value?.[lastRow][lastGroup].length ?? 0;
@@ -130,6 +138,11 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		this.#debouncedFilter(query);
 	}
 
+	#onRemoveToolbarItem(event: CustomEvent) {
+		const { groupIndex, index, rowIndex } = event.detail;
+		this.#context?.removeToolbarItem([rowIndex, groupIndex, index]);
+	}
+
 	override render() {
 		return html`${this.#renderDesigner()} ${this.#renderAvailableItems()}`;
 	}
@@ -175,7 +188,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				label=${label}
 				look=${forbidden ? 'placeholder' : 'outline'}
 				?disabled=${forbidden || inUse}
-				@click=${() => this.#onClick(item)}
+				@click=${() => this.#onClickAvailableItem(item)}
 				@dragstart=${(e: DragEvent) => this.#onDragStart(e, item.alias)}
 				@dragend=${this.#onDragEnd}>
 				<div class="inner">
@@ -241,18 +254,6 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 		`;
 	}
 
-	async #onChange(e: Event) {
-		e.stopPropagation();
-		const element = e.target as UmbTiptapToolbarGroupElement;
-		const aliases = element.value.map((item) => item.alias);
-		this.#context.updateToolbarItem(aliases, [element.rowIndex, element.groupIndex]);
-	}
-
-	#handleToolbarClick(event: CustomEvent) {
-		const { groupIndex, index, rowIndex } = event.detail;
-		this.#context?.removeToolbarItem([rowIndex, groupIndex, index]);
-	}
-
 	#renderGroup(group?: UmbTiptapToolbarGroupViewModel, rowIndex = 0, groupIndex = 0) {
 		if (!group) return nothing;
 		const showActionBar = this._toolbar[rowIndex].data.length > 1 && group.data.length === 0;
@@ -266,11 +267,12 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				@dragover=${this.#onDragOver}
 				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.data.length - 1])}>
 				<umb-tiptap-toolbar-group
-					.value=${items}
+					.items=${items}
 					.rowIndex=${rowIndex}
 					.groupIndex=${groupIndex}
-					@toolbar-item-click=${this.#handleToolbarClick}
-					@change=${(e: Event) => this.#onChange(e)}></umb-tiptap-toolbar-group>
+					@change=${this.#onChangeToolbarGroup}
+					@remove=${this.#onRemoveToolbarItem}>
+				</umb-tiptap-toolbar-group>
 				${when(
 					showActionBar,
 					() => html`

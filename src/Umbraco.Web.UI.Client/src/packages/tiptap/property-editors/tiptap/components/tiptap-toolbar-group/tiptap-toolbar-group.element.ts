@@ -1,10 +1,9 @@
-import type { UmbTiptapToolbarExtension } from '../../types.js';
-import type { UmbTiptapToolbarValue } from '../../../../components/types.js';
 import { UmbTiptapToolbarConfigurationContext } from '../../contexts/tiptap-toolbar-configuration.context.js';
-import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbTiptapToolbarExtension } from '../../types.js';
+import { css, customElement, html, property, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-tiptap-toolbar-group')
 export class UmbTiptapToolbarGroupElement<
@@ -21,7 +20,8 @@ export class UmbTiptapToolbarGroupElement<
 			this.dispatchEvent(new CustomEvent('container-change', { detail: { item, model } }));
 		},
 		onChange: ({ model }) => {
-			this._value = model;
+			this.#items = model;
+			this.requestUpdate();
 			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
@@ -29,26 +29,14 @@ export class UmbTiptapToolbarGroupElement<
 	#context = new UmbTiptapToolbarConfigurationContext(this);
 
 	@property({ type: Array, attribute: false })
-	public set value(items) {
-		this._value = items ?? [];
-		this._value = this._value.filter((value, index, self) => self.findIndex((x) => x.alias === value.alias) === index);
-		this.#sorter.setModel(this._value);
+	public set items(value: Array<TiptapToolbarItem> | undefined) {
+		this.#items = (value ?? []).filter((item, index, self) => self.findIndex((x) => x.alias === item.alias) === index);
+		this.#sorter.setModel(this.#items);
 	}
-	public get value() {
-		return this._value;
+	public get items(): Array<TiptapToolbarItem> {
+		return this.#items;
 	}
-
-	@property({ attribute: false })
-	set toolbarValue(value: UmbTiptapToolbarValue | undefined) {
-		if (!value) value = [[[]]];
-		if (value === this.#toolbarValue) return;
-		this.#toolbarValue = this.#context.isValidToolbarValue(value) ? value : [[[]]];
-	}
-	get toolbarValue(): UmbTiptapToolbarValue | undefined {
-		if (this.#toolbarValue === undefined) return undefined;
-		return this.#context.cloneToolbarValue(this.#toolbarValue);
-	}
-	#toolbarValue?: UmbTiptapToolbarValue;
+	#items: Array<TiptapToolbarItem> = [];
 
 	@property({ type: Number })
 	rowIndex = 0;
@@ -56,41 +44,30 @@ export class UmbTiptapToolbarGroupElement<
 	@property({ type: Number })
 	groupIndex = 0;
 
-	@state()
-	private _value: Array<TiptapToolbarItem> = [];
-
-	constructor() {
-		super();
-	}
-
-	protected override firstUpdated() {
-		this.#context.setToolbar(this.toolbarValue);
+	#onRequestRemove(item: TiptapToolbarItem, index = 0) {
+		this.items = this.items.filter((x) => x.alias !== item.alias);
+		const rowIndex = this.rowIndex;
+		const groupIndex = this.groupIndex;
+		this.dispatchEvent(
+			new CustomEvent('remove', { detail: { rowIndex, groupIndex, index }, bubbles: true, composed: true }),
+		);
 	}
 
 	override render() {
 		return html`
 			<div class="items">
 				${when(
-					this.value?.length === 0,
+					this.items?.length === 0,
 					() => html`<em><umb-localize key="tiptap_toolbar_emptyGroup">Empty</umb-localize></em>`,
 					() =>
-						html`${repeat(
-							this.value,
-							(toolbarItem) => toolbarItem.alias,
+						repeat(
+							this.items,
+							(item) => item.alias,
 							(item, index) => this.#renderItem(item, index),
-						)}`,
+						),
 				)}
 			</div>
 		`;
-	}
-
-	#onRequestRemove(item: TiptapToolbarItem, index = 0) {
-		this.value = this.value.filter((x) => x.alias !== item.alias);
-		const rowIndex = this.rowIndex;
-		const groupIndex = this.groupIndex;
-		this.dispatchEvent(
-			new CustomEvent('toolbar-item-click', { detail: { rowIndex, groupIndex, index }, bubbles: true, composed: true }),
-		);
 	}
 
 	#renderItem(item: TiptapToolbarItem, index = 0) {
@@ -104,6 +81,7 @@ export class UmbTiptapToolbarGroupElement<
 					<uui-button
 						compact
 						class=${forbidden ? 'forbidden' : ''}
+						data-mark="tiptap-toolbar-item:${item.alias}"
 						look=${forbidden ? 'placeholder' : 'outline'}
 						label=${label}
 						title=${label}
