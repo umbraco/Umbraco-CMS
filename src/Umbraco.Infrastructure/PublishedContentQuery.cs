@@ -237,7 +237,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
 
     private IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache)
-        => _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false ? null!
+        => _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false ? []
             : rootKeys.Select(x => cache?.GetById(false, x)).WhereNotNull();
 
     #endregion
