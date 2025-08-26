@@ -20,7 +20,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	private _hasRootGroups = false;
 
 	@state()
-	_tabs?: Array<UmbPropertyTypeContainerModel>;
+	private _tabs?: Array<UmbPropertyTypeContainerModel>;
 
 	@state()
 	private _activeTabId?: string | null | undefined;

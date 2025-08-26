@@ -26,7 +26,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _cultureVariantOptions: Array<VariantOptionModelType> = [];
 
 	@state()
-	_activeVariants: Array<UmbVariantId> = [];
+	private _activeVariants: Array<UmbVariantId> = [];
 
 	#splitViewContext?: typeof UMB_WORKSPACE_SPLIT_VIEW_CONTEXT.TYPE;
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
@@ -324,7 +324,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								slot="append"
 								popovertarget="popover"
 								title=${this.#getVariantSpecInfo(this._activeVariant)}
-								label="Select a variant">
+								label=${this._variantSelectorOpen
+									? this.localize.term('buttons_closeVersionSelector')
+									: this.localize.term('buttons_openVersionSelector')}>
 								${this.#getVariantSpecInfo(this._activeVariant)}
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
@@ -488,9 +490,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				: html`
 						<uui-button
 							class="split-view"
-							label="Open Split view for ${variant.language.name}"
+							label=${this.localize.term('content_openSplitViewForVariant', this.#getVariantSpecInfo(variant))}
 							@click=${() => this.#openSplitView(variant)}>
-							Open in Split view
+							${this.localize.term('buttons_openInSplitView')}
 						</uui-button>
 					`}
 		`;
@@ -561,7 +563,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				background: none;
 			}
 
-			.variant:hover > .split-view {
+			.variant:hover > .split-view,
+			.variant:focus > .split-view,
+			.variant:focus-within > .split-view {
 				display: flex;
 			}
 

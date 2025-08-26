@@ -118,7 +118,7 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 				z-index: 100;
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-focus);
-				box-sizing:border-box;
+				box-sizing: border-box;
 			}
 		`,
 	];

@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -305,46 +306,118 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(1, contentType.NoGroupPropertyTypes.Count());
     }
 
-    [TestCase(false)]
-    [TestCase(true)]
-    public async Task Can_Move_Properties_To_Another_Container(bool isElement)
+    public enum PropertyMoveOperation
     {
-        var createModel = ContentTypeCreateModel("Test", "test", isElement: isElement);
-        var container1 = ContentTypePropertyContainerModel("One");
-        createModel.Containers = new[] { container1 };
+        ToEarlier,
+        ToLater,
+    }
 
+    [TestCase(GroupContainerType, PropertyMoveOperation.ToEarlier, false)]
+    [TestCase(TabContainerType, PropertyMoveOperation.ToEarlier, false)]
+    [TestCase(GroupContainerType, PropertyMoveOperation.ToLater, false)]
+    [TestCase(TabContainerType, PropertyMoveOperation.ToLater, false)]
+    [TestCase(GroupContainerType, PropertyMoveOperation.ToEarlier, true)]
+    [TestCase(TabContainerType, PropertyMoveOperation.ToEarlier, true)]
+    [TestCase(GroupContainerType, PropertyMoveOperation.ToLater, true)]
+    [TestCase(TabContainerType, PropertyMoveOperation.ToLater, true)]
+    public async Task Can_Move_Properties_To_Another_Container(string containerType, PropertyMoveOperation propertyMoveOperation, bool isElement)
+    {
+        var container1 = ContentTypePropertyContainerModel($"{containerType} 1", containerType);
+        var container2 = ContentTypePropertyContainerModel($"{containerType} 2", containerType);
         var propertyType1 = ContentTypePropertyTypeModel("Test Property 1", "testProperty1", containerKey: container1.Key);
         var propertyType2 = ContentTypePropertyTypeModel("Test Property 2", "testProperty2", containerKey: container1.Key);
-        createModel.Properties = new[] { propertyType1, propertyType2 };
+        var propertyType3 = ContentTypePropertyTypeModel("Test Property 3", "testProperty3", containerKey: container2.Key);
+        var propertyType4 = ContentTypePropertyTypeModel("Test Property 4", "testProperty4", containerKey: container2.Key);
+        List<ContentTypePropertyTypeModel> properties = [propertyType1, propertyType2, propertyType3, propertyType4];
+        var createModel = ContentTypeCreateModel(
+            "Test Content Type",
+            containers: [container1, container2],
+            propertyTypes: properties,
+            isElement: isElement);
 
-        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        var createAttempt = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(createAttempt.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.Success, createAttempt.Status);
+            Assert.IsNotNull(createAttempt.Result);
 
-        var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
-        var container2 = ContentTypePropertyContainerModel("Two");
-        container2.SortOrder = 0;
-        container1.SortOrder = 1;
-        updateModel.Containers = new[] { container1, container2 };
-        propertyType2.ContainerKey = container2.Key;
-        updateModel.Properties = new[] { propertyType1, propertyType2 };
+            Assert.AreEqual(4, createAttempt.Result.PropertyTypes.Count());
+            Assert.AreEqual(2, createAttempt.Result.PropertyGroups.Count);
+            var createdContainer1 = createAttempt.Result.PropertyGroups.SingleOrDefault(x => x.Key == container1.Key);
+            Assert.NotNull(createdContainer1);
+            Assert.NotNull(createdContainer1.PropertyTypes);
+            Assert.AreEqual(2, createdContainer1.PropertyTypes.Count);
+            Assert.AreEqual("Test Property 1", createdContainer1.PropertyTypes[0].Name);
+            Assert.AreEqual("Test Property 2", createdContainer1.PropertyTypes[1].Name);
+            var createdContainer2 = createAttempt.Result.PropertyGroups.SingleOrDefault(x => x.Key == container2.Key);
+            Assert.NotNull(createdContainer2);
+            Assert.NotNull(createdContainer2.PropertyTypes);
+            Assert.AreEqual(2, createdContainer2.PropertyTypes?.Count);
+            Assert.AreEqual("Test Property 3", createdContainer2.PropertyTypes[0].Name);
+            Assert.AreEqual("Test Property 4", createdContainer2.PropertyTypes[1].Name);
+        });
 
-        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Result);
+        Content content = ContentBuilder.CreateBasicContent(createAttempt.Result!);
+        foreach (var property in properties)
+        {
+            content.Properties[property.Alias]!.SetValue(property.Name);
+        }
 
-        // Ensure it's actually persisted
-        contentType = await ContentTypeService.GetAsync(result.Result!.Key);
+        ContentService.Save(content);
 
-        Assert.IsNotNull(contentType);
-        Assert.AreEqual(isElement, contentType.IsElement);
-        Assert.AreEqual(2, contentType.PropertyGroups.Count);
-        Assert.AreEqual(2, contentType.PropertyTypes.Count());
-        Assert.AreEqual(1, contentType.PropertyGroups.First().PropertyTypes!.Count);
-        Assert.AreEqual(1, contentType.PropertyGroups.Last().PropertyTypes!.Count);
-        Assert.IsEmpty(contentType.NoGroupPropertyTypes);
+        if (propertyMoveOperation == PropertyMoveOperation.ToEarlier)
+        {
+            propertyType3.ContainerKey = container1.Key;
+        }
+        else
+        {
+            propertyType1.ContainerKey = container2.Key;
+        }
 
-        var sortedPropertyGroups = contentType.PropertyGroups.OrderBy(g => g.SortOrder).ToArray();
-        Assert.AreEqual("testProperty2", sortedPropertyGroups.First().PropertyTypes!.Single().Alias);
-        Assert.AreEqual("testProperty1", sortedPropertyGroups.Last().PropertyTypes!.Single().Alias);
+        var updateModel = ContentTypeUpdateModel(
+            "Test Content Type",
+            containers: [container1, container2],
+            propertyTypes: [propertyType1, propertyType2, propertyType3, propertyType4]);
+        var updateAttempt = await ContentTypeEditingService.UpdateAsync(createAttempt.Result, updateModel, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(updateAttempt.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.Success, updateAttempt.Status);
+            Assert.AreEqual(4, updateAttempt.Result!.PropertyTypes.Count());
+            Assert.AreEqual(2, updateAttempt.Result.PropertyGroups.Count);
+
+            var updatedContainer1 = updateAttempt.Result.PropertyGroups.SingleOrDefault(x => x.Key == container1.Key);
+            Assert.NotNull(updatedContainer1?.PropertyTypes);
+            var updatedContainer2 = updateAttempt.Result.PropertyGroups.SingleOrDefault(x => x.Key == container2.Key);
+            Assert.NotNull(updatedContainer2?.PropertyTypes);
+            if (propertyMoveOperation == PropertyMoveOperation.ToEarlier)
+            {
+                Assert.AreEqual(3, updatedContainer1.PropertyTypes.Count);
+                Assert.AreEqual("Test Property 1", updatedContainer1.PropertyTypes[0].Name);
+                Assert.AreEqual("Test Property 2", updatedContainer1.PropertyTypes[1].Name);
+                Assert.AreEqual("Test Property 3", updatedContainer1.PropertyTypes[2].Name);
+                Assert.AreEqual(1, updatedContainer2.PropertyTypes.Count);
+                Assert.AreEqual("Test Property 4", updatedContainer2.PropertyTypes[0].Name);
+            }
+            else
+            {
+                Assert.AreEqual(1, updatedContainer1.PropertyTypes.Count);
+                Assert.AreEqual("Test Property 2", updatedContainer1.PropertyTypes[0].Name);
+                Assert.AreEqual(3, updatedContainer2.PropertyTypes.Count);
+                Assert.AreEqual("Test Property 1", updatedContainer2.PropertyTypes[0].Name);
+                Assert.AreEqual("Test Property 3", updatedContainer2.PropertyTypes[1].Name);
+                Assert.AreEqual("Test Property 4", updatedContainer2.PropertyTypes[2].Name);
+            }
+
+            Assert.AreEqual(0, updateAttempt.Result.NoGroupPropertyTypes.Count());
+
+            var updatedContent = ContentService.GetById(content.Id);
+            foreach (var property in properties)
+            {
+                Assert.AreEqual(property.Name, updatedContent?.Properties[property.Alias]?.GetValue());
+            }
+        });
     }
 
     [TestCase(false)]
@@ -393,18 +466,18 @@ internal sealed partial class ContentTypeEditingServiceTests
         var createModel = ContentTypeCreateModel("Test", "test", isElement: isElement);
         var container1 = ContentTypePropertyContainerModel("One");
         var container2 = ContentTypePropertyContainerModel("Two");
-        createModel.Containers = new[] { container1, container2 };
+        createModel.Containers = [container1, container2];
 
         var propertyType1 = ContentTypePropertyTypeModel("Test Property 1", "testProperty1", containerKey: container1.Key);
         var propertyType2 = ContentTypePropertyTypeModel("Test Property 2", "testProperty2", containerKey: container2.Key);
-        createModel.Properties = new[] { propertyType1, propertyType2 };
+        createModel.Properties = [propertyType1, propertyType2];
 
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
         var updateModel = ContentTypeUpdateModel("Test", "test", isElement: isElement);
-        updateModel.Containers = new[] { container1 };
+        updateModel.Containers = [container1];
         propertyType2.ContainerKey = null;
-        updateModel.Properties = new[] { propertyType1, propertyType2 };
+        updateModel.Properties = [propertyType1, propertyType2];
 
         var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);

@@ -1,21 +1,22 @@
 import { umbDataTypeMockDb } from '../../../../../mocks/data/data-type/data-type.db.js';
-import { html } from '@umbraco-cms/backoffice/external/lit';
-import type { Meta } from '@storybook/web-components-vite';
+import type UmbPropertyEditorUIStylesheetPickerElement from './property-editor-ui-stylesheet-picker.element.js';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 
 import './property-editor-ui-stylesheet-picker.element.js';
 
 const dataTypeData = umbDataTypeMockDb.read('dt-richTextEditor') as unknown as UmbDataTypeDetailModel;
 
-export default {
+const meta: Meta = {
 	title: 'Extension Type/Property Editor UI/Stylesheet Picker',
 	component: 'umb-property-editor-ui-stylesheet-picker',
 	id: 'umb-property-editor-ui-stylesheet-picker',
-} as Meta;
-
-export const Docs = ({ value }: any) =>
-	html`<umb-property-editor-ui-stylesheet-picker .value=${value}></umb-property-editor-ui-stylesheet-picker>`;
-
-Docs.args = {
-	value: dataTypeData?.values?.find((x) => x.alias === 'stylesheets')?.value ?? [],
+	args: {
+		value: dataTypeData?.values?.find((x) => x.alias === 'stylesheets')?.value ?? [],
+	},
 };
+
+export default meta;
+type Story = StoryObj<UmbPropertyEditorUIStylesheetPickerElement>;
+
+export const Docs: Story = {};

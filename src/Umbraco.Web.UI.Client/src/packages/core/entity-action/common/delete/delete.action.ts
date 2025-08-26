@@ -33,7 +33,7 @@ export class UmbDeleteEntityAction<
 		await this.#notify();
 	}
 
-	async _confirmDelete(item: any) {
+	protected async _confirmDelete(item: any) {
 		const headline = this.args.meta.confirm?.headline ?? '#actions_delete';
 		const message = this.args.meta.confirm?.message ?? '#defaultdialogs_confirmdelete';
 

@@ -10,4 +10,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...treeManifests,
 	...entityActionsManifests,
 	...workspaceManifests,
+	{
+		name: 'Partial View Backoffice Entry Point',
+		alias: 'Umb.EntryPoint.Partial View',
+		type: 'backofficeEntryPoint',
+		js: () => import('./entry-point.js'),
+	},
 ];

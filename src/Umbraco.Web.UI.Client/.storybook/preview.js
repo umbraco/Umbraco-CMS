@@ -140,10 +140,10 @@ class UmbStoryBookElement extends UmbLitElement {
 		new UmbModalManagerContext(this);
 		new UmbNotificationContext(this);
 
-		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
+		umbLocalizationRegistry.loadLanguage('en'); // register default language
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
-			appLanguageContext.setLanguage('en-us'); // set default language
+			appLanguageContext?.setLanguage('en'); // set default language
 		});
 	}
 

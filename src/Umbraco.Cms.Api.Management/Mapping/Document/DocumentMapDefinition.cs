@@ -27,7 +27,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         mapper.Define<ContentScheduleCollection, DocumentResponseModel>(Map);
     }
 
-    // Umbraco.Code.MapAll -Urls -Template
+    // Umbraco.Code.MapAll -Urls -Template -Signs
     private void Map(IContent source, DocumentResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -45,7 +45,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll -Urls -Template
+    // Umbraco.Code.MapAll -Urls -Template -Signs
     private void Map(IContent source, PublishedDocumentResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -67,7 +67,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll -IsProtected -Ancestors
+    // Umbraco.Code.MapAll -IsProtected -Ancestors -Signs
     private void Map(IContent source, DocumentCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -101,7 +101,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     }
 
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Signs
     private void Map(IContent source, DocumentBlueprintResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

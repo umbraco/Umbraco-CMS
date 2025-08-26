@@ -35,4 +35,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		name: 'Language Backoffice Entry Point',
+		alias: 'Umb.EntryPoint.Language',
+		type: 'backofficeEntryPoint',
+		js: () => import('./entry-point.js'),
+	},
 ];
