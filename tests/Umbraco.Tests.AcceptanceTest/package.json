@@ -9,7 +9,7 @@
     "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
+    "smokeTest": "npx playwright test DefaultConfig/Content/ContentWithMultiNodeTreePickerDataType",
     "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\"",
     "releaseTest": "npx playwright test DefaultConfig --grep \"@release\""
   },
@@ -21,8 +21,8 @@
     "typescript": "^4.8.3"
   },
   "dependencies": {
-    "@umbraco/json-models-builders": "^2.0.37",
-    "@umbraco/playwright-testhelpers": "^16.0.39",
+    "@umbraco/json-models-builders": "^2.0.38",
+    "@umbraco/playwright-testhelpers": "^16.0.40",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.6.7"

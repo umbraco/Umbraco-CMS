@@ -5,7 +5,7 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Content Picker';
 const contentPickerDocumentTypeName = 'DocumentTypeForContentPicker';
-const contentPickerName = 'TestContentPicker';
+const contentPickerName = 'Test Content Picker';
 let contentPickerDocumentTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
@@ -173,4 +173,3 @@ test('can remove content picker in the content', async ({umbracoApi, umbracoUi})
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
 });
-
