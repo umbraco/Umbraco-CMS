@@ -10,7 +10,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class DataTypeFactory
 {
-    public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger<IDataType> logger, IConfigurationEditorJsonSerializer serializer)
+    public static IDataType BuildEntity(
+        DataTypeDto dto,
+        PropertyEditorCollection editors,
+        ILogger<IDataType> logger,
+        IConfigurationEditorJsonSerializer serializer,
+        IDataValueEditorFactory dataValueEditorFactory)
     {
         // Check we have an editor for the data type.
         if (!editors.TryGet(dto.EditorAlias, out IDataEditor? editor))
@@ -18,7 +23,10 @@ internal static class DataTypeFactory
             logger.LogWarning(
                 "Could not find an editor with alias {EditorAlias}, treating as Missing. " + "The site may fail to boot and/or load data types and run.",
                 dto.EditorAlias);
-            editor = editors[Constants.PropertyEditors.Aliases.Missing] ?? throw new InvalidOperationException("The Missing property editor is not registered.");
+            editor =
+                new MissingPropertyEditor(
+                    dto.EditorAlias,
+                    dataValueEditorFactory);
         }
 
         var dataType = new DataType(editor, serializer);

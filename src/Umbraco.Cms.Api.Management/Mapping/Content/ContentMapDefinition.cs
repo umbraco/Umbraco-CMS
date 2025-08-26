@@ -1,5 +1,6 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
-using Umbraco.Cms.Core;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -13,25 +14,41 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
     where TVariantViewModel : VariantResponseModelBase, new()
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
+    private readonly IDataValueEditorFactory _dataValueEditorFactory;
 
-    protected ContentMapDefinition(PropertyEditorCollection propertyEditorCollection) => _propertyEditorCollection = propertyEditorCollection;
+    protected ContentMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        IDataValueEditorFactory dataValueEditorFactory)
+    {
+        _propertyEditorCollection = propertyEditorCollection;
+        _dataValueEditorFactory = dataValueEditorFactory;
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
+    protected ContentMapDefinition(PropertyEditorCollection propertyEditorCollection)
+        : this(
+            propertyEditorCollection,
+            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
+    {
+    }
 
     protected delegate void ValueViewModelMapping(IDataEditor propertyEditor, TValueViewModel variantViewModel);
 
     protected delegate void VariantViewModelMapping(string? culture, string? segment, TVariantViewModel variantViewModel);
 
-    protected IEnumerable<TValueViewModel> MapValueViewModels(IEnumerable<IProperty> properties, ValueViewModelMapping? additionalPropertyMapping = null, bool published = false) =>
+    protected IEnumerable<TValueViewModel> MapValueViewModels(
+        IEnumerable<IProperty> properties,
+        ValueViewModelMapping? additionalPropertyMapping = null,
+        bool published = false) =>
         properties
             .SelectMany(property => property
                 .Values
                 .Select(propertyValue =>
                 {
-                    IDataEditor? propertyEditor = _propertyEditorCollection[property.PropertyType.PropertyEditorAlias]
-                                                  ?? _propertyEditorCollection[Constants.PropertyEditors.Aliases.Missing];
-                    if (propertyEditor == null)
-                    {
-                        return null;
-                    }
+                    IDataEditor propertyEditor = _propertyEditorCollection[property.PropertyType.PropertyEditorAlias]
+                                                  ?? new MissingPropertyEditor(
+                                                      property.PropertyType.PropertyEditorAlias,
+                                                      _dataValueEditorFactory);
 
                     IProperty? publishedProperty = null;
                     if (published)

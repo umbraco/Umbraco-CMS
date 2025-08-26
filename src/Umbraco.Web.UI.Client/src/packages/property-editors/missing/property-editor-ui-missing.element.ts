@@ -14,6 +14,7 @@ export class UmbPropertyEditorUIMissingElement extends UmbLitElement implements 
 
 	#onDetails(event: Event) {
 		event.stopPropagation();
+
 		umbOpenModal(this, UMB_MISSING_PROPERTY_EDITOR_MODAL, {
 			data: {
 				value: this.value,
@@ -22,7 +23,7 @@ export class UmbPropertyEditorUIMissingElement extends UmbLitElement implements 
 	}
 
 	override render() {
-		return html`<p>${this.localize.term('missingEditor_description')}</p>
+		return html`<umb-localize key="missingEditor_description"></umb-localize>
 			<uui-button
 				id="details-button"
 				look="secondary"

@@ -2827,8 +2827,10 @@ export default {
 		resetUrlLabel: 'Reset',
 	},
 	missingEditor: {
-		description: 'This property type is no longer installed. Please contact your administrator.',
-		detailsDescription: 'This property type is no longer installed. Please contact your administrator.',
+		description:
+			'<p>This property type is no longer available.<br/>Please contact your administrator so they can either delete this property or restore the property type.</p>',
+		detailsDescription:
+			'<p>This property type is no longer available.<br/>Please contact your administrator so they can either delete this property or restore the property type.</p><p><strong>Data:</strong></p>',
 	},
 	uiCulture: {
 		ar: 'العربية',
