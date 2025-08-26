@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Threading.Tasks;
+using Lucene.Net.Search.Similarities;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -38,15 +39,17 @@ public class UmbracoRouteValueTransformerTests
         IUmbracoContextAccessor ctx,
         IRoutableDocumentFilter filter = null,
         IPublishedRouter router = null,
-        IUmbracoRouteValuesFactory routeValuesFactory = null)
-        => GetTransformer(ctx, Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run), filter, router, routeValuesFactory);
+        IUmbracoRouteValuesFactory routeValuesFactory = null,
+        IDocumentUrlService documentUrlService = null)
+        => GetTransformer(ctx, Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run), filter, router, routeValuesFactory, documentUrlService);
 
     private UmbracoRouteValueTransformer GetTransformer(
         IUmbracoContextAccessor ctx,
         IRuntimeState state,
         IRoutableDocumentFilter filter = null,
         IPublishedRouter router = null,
-        IUmbracoRouteValuesFactory routeValuesFactory = null)
+        IUmbracoRouteValuesFactory routeValuesFactory = null,
+        IDocumentUrlService documentUrlService = null)
     {
         var publicAccessRequestHandler = new Mock<IPublicAccessRequestHandler>();
         publicAccessRequestHandler.Setup(x =>
@@ -67,13 +70,14 @@ public class UmbracoRouteValueTransformerTests
             Mock.Of<IControllerActionSearcher>(),
             publicAccessRequestHandler.Object,
             Mock.Of<IUmbracoVirtualPageRoute>(),
-            Mock.Of<IOptionsMonitor<GlobalSettings>>());
+            Mock.Of<IOptionsMonitor<GlobalSettings>>(),
+            documentUrlService ?? Mock.Of<IDocumentUrlService>(x => x.HasAny() == true));
         return transformer;
     }
 
     private IUmbracoContext GetUmbracoContext(bool hasContent)
     {
-        var publishedContent = Mock.Of<IPublishedContentCache>(x => x.HasContent() == hasContent);
+        var publishedContent = Mock.Of<IDocumentUrlService>(x => x.HasAny() == hasContent);
         var uri = new Uri("http://example.com");
 
         var umbracoContext = Mock.Of<IUmbracoContext>(x =>
@@ -142,7 +146,11 @@ public class UmbracoRouteValueTransformerTests
         var umbracoContext = GetUmbracoContext(false);
 
         var transformer = GetTransformerWithRunState(
-            Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)));
+            Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
+            null,
+            null,
+            null,
+            Mock.Of<IDocumentUrlService>(x => x.HasAny() == false));
 
         var result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
         Assert.AreEqual(2, result.Count);

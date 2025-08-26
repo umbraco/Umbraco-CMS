@@ -17,15 +17,6 @@ public sealed class EmailValidator : IValueValidator
     /// <summary>
     /// Initializes a new instance of the <see cref="EmailValidator"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public EmailValidator()
-        : this(StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="EmailValidator"/> class.
-    /// </summary>
     public EmailValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
     /// <inheritdoc />

@@ -22,31 +22,6 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
     private readonly IMediaCacheService _mediaCacheService;
     private readonly ICacheManager _cacheManager;
 
-    [Obsolete("Use the constructor with ICacheManager instead, scheduled for removal in V17.")]
-    public MediaCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IMediaNavigationQueryService mediaNavigationQueryService,
-        IMediaNavigationManagementService mediaNavigationManagementService,
-        IMediaService mediaService,
-        IMediaCacheService mediaCacheService)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            eventAggregator,
-            factory,
-            mediaNavigationQueryService,
-            mediaNavigationManagementService,
-            mediaService,
-            mediaCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<ICacheManager>())
-    {
-    }
-
     public MediaCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
