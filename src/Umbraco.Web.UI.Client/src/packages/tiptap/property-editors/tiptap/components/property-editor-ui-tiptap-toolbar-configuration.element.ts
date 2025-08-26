@@ -266,13 +266,13 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				dropzone="move"
 				@dragover=${this.#onDragOver}
 				@drop=${(e: DragEvent) => this.#onDrop(e, [rowIndex, groupIndex, group.data.length - 1])}>
-				<umb-tiptap-toolbar-group
+				<umb-tiptap-toolbar-group-configuration
 					.items=${items}
 					.rowIndex=${rowIndex}
 					.groupIndex=${groupIndex}
 					@change=${this.#onChangeToolbarGroup}
 					@remove=${this.#onRemoveToolbarItem}>
-				</umb-tiptap-toolbar-group>
+				</umb-tiptap-toolbar-group-configuration>
 				${when(
 					showActionBar,
 					() => html`
