@@ -21,14 +21,12 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// </summary>
     public class DataTypeService : RepositoryService, IDataTypeService
     {
-        private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly IDataTypeRepository _dataTypeRepository;
         private readonly IDataTypeContainerRepository _dataTypeContainerRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly IAuditRepository _auditRepository;
-        private readonly IIOHelper _ioHelper;
         private readonly IDataTypeContainerService _dataTypeContainerService;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly Lazy<IIdKeyMap> _idKeyMap;
@@ -59,6 +57,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
         }
 
+        [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
         public DataTypeService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
@@ -71,15 +70,36 @@ namespace Umbraco.Cms.Core.Services.Implement
             IMemberTypeRepository memberTypeRepository,
             IIOHelper ioHelper,
             Lazy<IIdKeyMap> idKeyMap)
+            : this(
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                dataTypeRepository,
+                auditRepository,
+                contentTypeRepository,
+                mediaTypeRepository,
+                memberTypeRepository,
+                idKeyMap)
+        {
+        }
+
+        public DataTypeService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IDataTypeRepository dataTypeRepository,
+            IAuditRepository auditRepository,
+            IContentTypeRepository contentTypeRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IMemberTypeRepository memberTypeRepository,
+            Lazy<IIdKeyMap> idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
-            _dataValueEditorFactory = dataValueEditorFactory;
             _dataTypeRepository = dataTypeRepository;
             _auditRepository = auditRepository;
             _contentTypeRepository = contentTypeRepository;
             _mediaTypeRepository = mediaTypeRepository;
             _memberTypeRepository = memberTypeRepository;
-            _ioHelper = ioHelper;
             _idKeyMap = idKeyMap;
 
             // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
