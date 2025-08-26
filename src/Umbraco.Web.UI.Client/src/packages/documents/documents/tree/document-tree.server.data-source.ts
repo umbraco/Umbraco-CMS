@@ -44,6 +44,7 @@ const getRootItems = async (args: UmbDocumentTreeRootItemsRequestArgs) => {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		const { data } = await DocumentService.getTreeDocumentSiblings({
 			query: {
+				dataTypeId: args.dataType?.unique,
 				target: paging.target.unique,
 				before: paging.takeBefore,
 				after: paging.takeAfter,
@@ -65,7 +66,11 @@ const getRootItems = async (args: UmbDocumentTreeRootItemsRequestArgs) => {
 
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	const { data } = await DocumentService.getTreeDocumentRoot({
-		query: { dataTypeId: args.dataType?.unique, skip, take },
+		query: {
+			dataTypeId: args.dataType?.unique,
+			skip,
+			take,
+		},
 	});
 
 	return {
@@ -89,6 +94,7 @@ const getChildrenOf = async (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		const { data } = await DocumentService.getTreeDocumentSiblings({
 			query: {
+				dataTypeId: args.dataType?.unique,
 				target: paging.target.unique,
 				before: paging.takeBefore,
 				after: paging.takeAfter,
@@ -111,7 +117,12 @@ const getChildrenOf = async (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	const { data } = await DocumentService.getTreeDocumentChildren({
-		query: { parentId: args.parent.unique, dataTypeId: args.dataType?.unique, skip, take },
+		query: {
+			parentId: args.parent.unique,
+			dataTypeId: args.dataType?.unique,
+			skip,
+			take,
+		},
 	});
 
 	return {
@@ -127,7 +138,9 @@ const getChildrenOf = async (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DocumentService.getTreeDocumentAncestors({
-		query: { descendantId: args.treeItem.unique },
+		query: {
+			descendantId: args.treeItem.unique,
+		},
 	});
 
 const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel => {
