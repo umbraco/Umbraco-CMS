@@ -65,6 +65,63 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
+    public async Task Can_Validate_Invalid_Properties_Segment_Variant()
+    {
+        var elementType = CreateElementTypeWithValidation(ContentVariation.Segment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Segment, blockListDataType);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "invariantText", Value = "Invalid invariant content value" },
+                    new() { Alias = "variantText", Value = "Valid content value (Default)", Segment = null },
+                    new() { Alias = "variantText", Value = "Invalid content value (S1)", Segment = "s1" },
+                    new() { Alias = "variantText", Value = "Valid content value (S2)", Segment = "s2" },
+                },
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "invariantText", Value = "Valid invariant settings value" },
+                    new() { Alias = "variantText", Value = "Invalid content value (Default)", Segment = null },
+                    new() { Alias = "variantText", Value = "Valid content value (S1)", Segment = "s1" },
+                    new() { Alias = "variantText", Value = "Invalid content value (S2)", Segment = "s2" },
+                },
+                null,
+                null));
+
+        var result = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants =
+                [
+                    new VariantModel { Name = "Name", Segment = null },
+                    new VariantModel { Name = "Name", Segment = "s1" },
+                    new VariantModel { Name = "Name", Segment = "s2" },
+                ],
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
+                ]
+            },
+            contentType);
+
+        var errors = result.ValidationErrors.ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(4, errors.Length);
+            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[0].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[2].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[1].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[3].value"));
+        });
+    }
+
+    [Test]
     public async Task Can_Validate_Invalid_Properties_Nested_Blocks()
     {
         var (rootElementType, nestedElementType) = await CreateElementTypeWithValidationAndNestedBlocksAsync();
@@ -345,6 +402,67 @@ internal partial class BlockListElementLevelVariationTests
             Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
             Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == 'da-DK' && @.segment == null)].value"));
             Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'variantText' && @.culture == 'en-US' && @.segment == null)].value"));
+        });
+    }
+
+    [Test]
+    public async Task Can_Validate_Missing_Properties_Segment_Variant()
+    {
+        var elementType = CreateElementTypeWithValidation(ContentVariation.Segment);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Segment, blockListDataType);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    // missing the mandatory "invariantText" (invariant) and "variantText" (for s2)
+                    new() { Alias = "variantText", Value = "Valid content value (S1)", Segment = "s1" },
+                },
+                new List<BlockPropertyValue>
+                {
+                    // missing the mandatory "variantText" (for s1)
+                    new() { Alias = "invariantText", Value = "Valid invariant settings value" },
+                    new() { Alias = "variantText", Value = "Valid settings value in Danish", Segment = "s2" },
+                },
+                null,
+                null));
+
+        // make sure all blocks are exposed
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key, Segment = null },
+            new() { ContentKey = blockListValue.ContentData[0].Key, Segment = "s1" },
+            new() { ContentKey = blockListValue.ContentData[0].Key, Segment = "s2" },
+        ];
+
+        var result = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Variants =
+                [
+                    new VariantModel { Name = "Name", Segment = null },
+                    new VariantModel { Name = "Name", Segment = "s1" },
+                    new VariantModel { Name = "Name", Segment = "s2" },
+                ],
+                Properties =
+                [
+                    new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue) }
+                ]
+            },
+            contentType);
+
+        var errors = result.ValidationErrors.ToArray();
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, errors.Length);
+            Assert.IsTrue(errors.All(error => error.Alias == "blocks" && error.Culture == null && error.Segment == null));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'invariantText' && @.culture == null && @.segment == null)].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".contentData[0].values[?(@.alias == 'variantText' && @.culture == null && @.segment == 's2')].value"));
+            Assert.IsNotNull(errors.FirstOrDefault(error => error.JsonPath == ".settingsData[0].values[?(@.alias == 'variantText' && @.culture == null && @.segment == 's1')].value"));
         });
     }
 

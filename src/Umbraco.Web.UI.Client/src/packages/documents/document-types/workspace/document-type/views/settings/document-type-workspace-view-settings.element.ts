@@ -207,7 +207,6 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	#renderVaryBySegmentProperty() {
 		if (!this._useSegments) return nothing;
-		if (this._isElement) return nothing;
 
 		return html`
 			<umb-property-layout

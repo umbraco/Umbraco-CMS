@@ -33,7 +33,7 @@ public sealed class BlockEditorConverter
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
     }
 
-    public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
+    public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, IEnumerable<BlockItemVariation> variations, PropertyCacheLevel referenceCacheLevel, bool preview)
     {
         // Only convert element types - content types will cause an exception when PublishedModelFactory creates the model
         IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Element, data.ContentTypeKey);
@@ -47,6 +47,10 @@ public sealed class BlockEditorConverter
         var propertyTypesByAlias = publishedContentType
             .PropertyTypes
             .ToDictionary(propertyType => propertyType.Alias);
+
+        var variationKeys = variations
+            .Select(v => VariationKey(v.Culture, v.Segment))
+            .ToArray();
 
         var propertyValues = new Dictionary<string, object?>();
         foreach (BlockPropertyValue property in data.Values)
@@ -72,6 +76,11 @@ public sealed class BlockEditorConverter
                 ? variationContext.Segment
                 : null;
 
+            if (expectedSegment is not null && variationKeys.Contains(VariationKey(expectedCulture, expectedSegment)) is false)
+            {
+                expectedSegment = null;
+            }
+
             if (alignedProperty.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(expectedCulture.NullOrWhiteSpaceAsNull())
                 && alignedProperty.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(expectedSegment.NullOrWhiteSpaceAsNull()))
             {
@@ -95,6 +104,8 @@ public sealed class BlockEditorConverter
         element = _publishedModelFactory.CreateModel(element);
 
         return element;
+
+        string VariationKey(string? culture, string? segment) => $"{culture}:{segment}";
     }
 
     public Type GetModelType(Guid contentTypeKey)

@@ -23,7 +23,10 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
         var elementTypeValidation = new List<ElementTypeValidationModel>();
         var isWildcardCulture = validationContext.Culture == "*";
         var validationContextCulture = isWildcardCulture ? null : validationContext.Culture.NullOrWhiteSpaceAsNull();
-        elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, validationContextCulture, validationContext.Segment));
+        foreach (var segment in validationContext.SegmentsBeingValidated.DefaultIfEmpty(null))
+        {
+            elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, validationContextCulture, segment));
+        }
 
         if (validationContextCulture is null)
         {
@@ -119,12 +122,9 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
                         continue;
                     }
 
-                    if (segment != "*")
+                    if (segment != "*" && blockPropertyValue.Segment.InvariantEquals(segment) is false)
                     {
-                        if (propertyType.VariesBySegment() != (segment is not null) || blockPropertyValue.Segment.InvariantEquals(segment) is false)
-                        {
-                            continue;
-                        }
+                        continue;
                     }
 
                     elementValidation.AddPropertyTypeValidation(
