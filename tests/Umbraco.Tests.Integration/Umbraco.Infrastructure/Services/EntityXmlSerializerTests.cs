@@ -164,10 +164,6 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
 
         var ignored = new FileUploadPropertyEditor(
             DataValueEditorFactory,
-            mediaFileManager,
-            Mock.Of<IOptionsMonitor<ContentSettings>>(x => x.CurrentValue == contentSettings),
-            Services.GetRequiredService<UploadAutoFillProperties>(),
-            ContentService,
             IOHelper);
 
         var media = MediaBuilder.CreateMediaImage(mediaType, -1);

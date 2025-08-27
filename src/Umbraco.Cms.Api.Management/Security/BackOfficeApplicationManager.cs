@@ -32,10 +32,6 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
     }
 
-    [Obsolete("Please use the overload that allows for multiple back-office hosts. Will be removed in V17.")]
-    public async Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default)
-        => await EnsureBackOfficeApplicationAsync([backOfficeUrl], cancellationToken);
-
     public async Task EnsureBackOfficeApplicationAsync(IEnumerable<Uri> backOfficeHosts, CancellationToken cancellationToken = default)
     {
         // Install is okay without this, because we do not need a token to install,
@@ -100,8 +96,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     public async Task DeleteBackOfficeClientCredentialsApplicationAsync(string clientId, CancellationToken cancellationToken = default)
         => await Delete(clientId, cancellationToken);
 
-    [Obsolete("Do not use - for internal usage only. Will be made internal in V17.")]
-    public OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl)
+    internal OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl)
         => BackofficeOpenIddictApplicationDescriptor([backOfficeUrl]);
 
     internal OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri[] backOfficeHosts)

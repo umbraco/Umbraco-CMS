@@ -35,8 +35,8 @@ internal sealed class LogDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? EntityType { get; set; }
 
-    [Column("Datestamp", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("Datestamp")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_datestamp", ForColumns = "Datestamp,userId,NodeId")]
     public DateTime Datestamp { get; set; }
 

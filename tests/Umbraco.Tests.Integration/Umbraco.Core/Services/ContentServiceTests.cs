@@ -679,7 +679,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         // Act
         Thread.Sleep(new TimeSpan(0, 0, 0, 2));
-        var contents = ContentService.GetContentForExpiration(DateTime.Now).ToList();
+        var contents = ContentService.GetContentForExpiration(DateTime.UtcNow).ToList();
 
         // Assert
         Assert.That(contents, Is.Not.Null);
@@ -688,14 +688,33 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public void Can_Get_Scheduled_Content_Keys()
+    {
+        // Arrange
+        var root = ContentService.GetById(Textpage.Id);
+        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
+        var content = ContentService.GetById(Subpage.Id);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
+        ContentService.PersistContentSchedule(content!, contentSchedule);
+        ContentService.Publish(content, content.AvailableCultures.ToArray());
+
+        // Act
+        var keys = ContentService.GetScheduledContentKeys([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
+
+        // Assert
+        Assert.AreEqual(1, keys.Count);
+        Assert.AreEqual(Subpage.Key, keys.First());
+    }
+
+    [Test]
     public void Can_Get_Content_For_Release()
     {
         // Arrange
         // Act
-        var contents = ContentService.GetContentForRelease(DateTime.Now).ToList();
+        var contents = ContentService.GetContentForRelease(DateTime.UtcNow).ToList();
 
         // Assert
-        Assert.That(DateTime.Now.AddMinutes(-5) <= DateTime.Now);
+        Assert.That(DateTime.UtcNow.AddMinutes(-5) <= DateTime.UtcNow);
         Assert.That(contents, Is.Not.Null);
         Assert.That(contents.Any(), Is.True);
         Assert.That(contents.Count(), Is.EqualTo(1));
@@ -1289,7 +1308,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         content.SetCultureName("name-fr", langFr.IsoCode);
         content.SetCultureName("name-da", langDa.IsoCode);
 
-        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.Now, PropertyEditorCollection);
+        content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
         var result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
         content = ContentService.GetById(content.Id);
@@ -1297,7 +1316,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
         content.UnpublishCulture(langFr.IsoCode);
-        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.Now, PropertyEditorCollection);
+        content.PublishCulture(CultureImpact.Explicit(langDa.IsoCode, langDa.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
 
         result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);

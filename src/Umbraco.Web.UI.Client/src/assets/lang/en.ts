@@ -176,7 +176,7 @@ export default {
 		confirmActionConfirm: 'Confirm',
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
-		viewSystemDetails:"View Umbraco CMS system information and version number"
+		viewSystemDetails: 'View Umbraco CMS system information and version number',
 	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',
@@ -295,7 +295,7 @@ export default {
 		notCreated: 'Not created',
 		updateDate: 'Last edited',
 		updateDateDesc: 'Date/time this document was edited',
-		uploadClear: 'Remove file(s)',
+		uploadClear: 'Clear file(s)',
 		uploadClearImageContext: 'Click here to remove the image from the media item',
 		uploadClearFileContext: 'Click here to remove the file from the media item',
 		urls: 'Link to document',

@@ -143,7 +143,7 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             PerformingUserKey = performingUserKey,
             PerformingDetails = performingDetails,
             PerformingIp = performingIp,
-            EventDateUtc = eventDateUtc,
+            EventDate = eventDateUtc,
             AffectedUserId = affectedUserId ?? Constants.Security.UnknownUserId, // Default to UnknownUserId as it is non-nullable
             AffectedUserKey = affectedUserKey,
             AffectedDetails = affectedDetails,

@@ -245,7 +245,7 @@ public abstract class UmbracoUserStore<TUser, TRole>
     public override async Task SetPasswordHashAsync(TUser user, string? passwordHash, CancellationToken cancellationToken = default)
     {
         await base.SetPasswordHashAsync(user, passwordHash, cancellationToken);
-        user.LastPasswordChangeDateUtc = DateTime.UtcNow;
+        user.LastPasswordChangeDate = DateTime.UtcNow;
     }
 
     /// <summary>

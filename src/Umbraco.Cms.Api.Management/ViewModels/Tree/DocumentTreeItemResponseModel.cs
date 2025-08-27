@@ -3,7 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
-public class DocumentTreeItemResponseModel : ContentTreeItemResponseModel
+public class DocumentTreeItemResponseModel : ContentTreeItemResponseModel, IIsProtected
 {
     public bool IsProtected { get; set; }
 

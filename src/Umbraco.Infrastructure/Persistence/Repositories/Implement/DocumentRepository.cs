@@ -4,6 +4,7 @@ using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -400,17 +401,15 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         {
             foreach (ContentVariation v in contentVariation)
             {
-                content.SetCultureInfo(v.Culture, v.Name, DateTime.SpecifyKind(v.Date, DateTimeKind.Local));
+                content.SetCultureInfo(v.Culture, v.Name, v.Date.EnsureUtc());
             }
         }
 
-        // Dates stored in the database are local server time, but for SQL Server, will be considered
-        // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
         if (content.PublishedState is PublishedState.Published && content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
         {
             foreach (ContentVariation v in contentVariation)
             {
-                content.SetPublishInfo(v.Culture, v.Name, DateTime.SpecifyKind(v.Date, DateTimeKind.Local));
+                content.SetPublishInfo(v.Culture, v.Name, v.Date.EnsureUtc());
             }
         }
 
@@ -1672,6 +1671,27 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     /// <inheritdoc />
+    public IEnumerable<Guid> GetScheduledContentKeys(Guid[] keys)
+    {
+        var action = ContentScheduleAction.Release.ToString();
+        DateTime now = DateTime.UtcNow;
+
+        Sql<ISqlContext> sql = SqlContext.Sql();
+        sql
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<DocumentDto>()
+            .InnerJoin<ContentDto>().On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+            .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .WhereIn<NodeDto>(x => x.NodeId, Sql()
+                .Select<ContentScheduleDto>(x => x.NodeId)
+                .From<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x => x.Action == action && x.Date >= now));
+
+        return Database.Fetch<Guid>(sql);
+    }
+
+    /// <inheritdoc />
     public IEnumerable<IContent> GetContentForExpiration(DateTime date)
     {
         var action = ContentScheduleAction.Expire.ToString();
@@ -1815,7 +1835,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             if (publishing && (content.PublishCultureInfos?.ContainsKey(cultureInfo.Culture) ?? false))
             {
                 content.SetPublishInfo(cultureInfo.Culture, uniqueName,
-                    DateTime.Now); //TODO: This is weird, this call will have already been made in the SetCultureName
+                    DateTime.UtcNow); //TODO: This is weird, this call will have already been made in the SetCultureName
             }
         }
     }

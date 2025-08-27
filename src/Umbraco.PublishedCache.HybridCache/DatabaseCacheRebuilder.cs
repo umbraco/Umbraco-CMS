@@ -57,10 +57,6 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
         => (await _longRunningOperationService.GetByTypeAsync(RebuildOperationName, 0, 0)).Total != 0;
 
     /// <inheritdoc/>
-    [Obsolete("Use the overload with the useBackgroundThread parameter. Scheduled for removal in Umbraco 17.")]
-    public void Rebuild() => Rebuild(false);
-
-    /// <inheritdoc/>
     [Obsolete("Use RebuildAsync instead. Scheduled for removal in Umbraco 18.")]
     public void Rebuild(bool useBackgroundThread) =>
         RebuildAsync(useBackgroundThread).GetAwaiter().GetResult();
@@ -120,7 +116,7 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     private Task PerformRebuild()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        _databaseCacheRepository.Rebuild();
+        _databaseCacheRepository.Rebuild([], [], []);
 
         // If the serializer type has changed, we also need to update it in the key value store.
         var currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);

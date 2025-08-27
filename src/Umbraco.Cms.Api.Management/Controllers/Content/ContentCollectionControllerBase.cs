@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -18,36 +21,17 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
     where TVariantResponseModel : VariantResponseModelBase
 {
     private readonly IUmbracoMapper _mapper;
+    private readonly SignProviderCollection _signProviders;
 
-    protected ContentCollectionControllerBase(IUmbracoMapper mapper) => _mapper = mapper;
-
-    [Obsolete("This method is no longer used and will be removed in Umbraco 17.")]
-    protected IActionResult CollectionResult(ListViewPagedModel<TContent> result)
+    protected ContentCollectionControllerBase(IUmbracoMapper mapper, SignProviderCollection signProvider)
     {
-        PagedModel<TContent> collectionItemsResult = result.Items;
-        ListViewConfiguration collectionConfiguration = result.ListViewConfiguration;
-
-        var collectionPropertyAliases = collectionConfiguration
-            .IncludeProperties
-            .Select(p => p.Alias)
-            .WhereNotNull()
-            .ToArray();
-
-        List<TCollectionResponseModel> collectionResponseModels =
-            _mapper.MapEnumerable<TContent, TCollectionResponseModel>(collectionItemsResult.Items, context =>
-            {
-                context.SetIncludedProperties(collectionPropertyAliases);
-            });
-
-        var pageViewModel = new PagedViewModel<TCollectionResponseModel>
-        {
-            Items = collectionResponseModels,
-            Total = collectionItemsResult.Total,
-        };
-
-        return Ok(pageViewModel);
+        _mapper = mapper;
+        _signProviders = signProvider;
     }
 
+    /// <summary>
+    /// Creates a collection result from the provided collection response models and total number of items.
+    /// </summary>
     protected IActionResult CollectionResult(List<TCollectionResponseModel> collectionResponseModels, long totalNumberOfItems)
     {
         var pageViewModel = new PagedViewModel<TCollectionResponseModel>
@@ -104,4 +88,15 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
                 StatusCode = StatusCodes.Status500InternalServerError,
             },
         });
+
+    /// <summary>
+    /// Populates the signs for the collection response models.
+    /// </summary>
+    protected async Task PopulateSigns(IEnumerable<TCollectionResponseModel> itemViewModels)
+    {
+        foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<TCollectionResponseModel>()))
+        {
+            await signProvider.PopulateSignsAsync(itemViewModels);
+        }
+    }
 }

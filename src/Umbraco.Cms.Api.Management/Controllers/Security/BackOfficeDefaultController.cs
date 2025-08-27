@@ -17,12 +17,6 @@ public class BackOfficeDefaultController : Controller
     public BackOfficeDefaultController(IRuntime umbracoRuntime)
         => _umbracoRuntime = umbracoRuntime;
 
-    [Obsolete("Use the non obsoleted constructor instead. Scheduled to be removed in v17")]
-    public BackOfficeDefaultController()
-        : this(StaticServiceProvider.Instance.GetRequiredService<IRuntime>())
-    {
-    }
-
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
