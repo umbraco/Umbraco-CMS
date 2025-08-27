@@ -66,9 +66,6 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	private _currentPage = 1;
 
 	@state()
-	private _totalPages = 1;
-
-	@state()
 	private _hasPreviousItems = false;
 
 	@state()
@@ -77,11 +74,17 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	#observeData() {
 		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
 		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []));
-		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1));
-		this.observe(this._api?.pagination.totalPages, (value) => (this._totalPages = value ?? 1));
 
-		this.observe(this._api?.paginationPrev?.hasMoreItems, (value) => (this._hasPreviousItems = value || false));
-		this.observe(this._api?.paginationNext?.hasMoreItems, (value) => (this._hasNextItems = value || false));
+		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1));
+
+		this.observe(
+			this._api?.targetPagination?.totalPrevItems,
+			(value) => (this._hasPreviousItems = value ? value > 0 : false),
+		);
+		this.observe(
+			this._api?.targetPagination?.totalNextItems,
+			(value) => (this._hasNextItems = value ? value > 0 : false),
+		);
 	}
 
 	protected override async updated(
@@ -182,12 +185,12 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	#renderLoadPrevButton() {
 		if (!this._hasPreviousItems) return nothing;
-		return html` <umb-tree-load-prev-button @click=${this.#onLoadPrev}></umb-tree-load-prev-button>`;
+		return html`<umb-tree-load-prev-button @click=${this.#onLoadPrev}></umb-tree-load-prev-button>`;
 	}
 
 	#renderLoadNextButton() {
 		if (!this._hasNextItems) return nothing;
-		return html` <umb-tree-load-more-button @click=${this.#onLoadNext}></umb-tree-load-more-button> `;
+		return html`<umb-tree-load-more-button @click=${this.#onLoadNext}></umb-tree-load-more-button> `;
 	}
 
 	static override styles = css`
