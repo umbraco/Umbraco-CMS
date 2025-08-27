@@ -1805,8 +1805,9 @@ internal sealed class DatabaseDataCreator
         // For languages we support the installation of records that are additional to the default installed data.
         // We can do this as they are specified by ISO code, which is enough to fully detail them.
         // All other customizable install data is specified by GUID, and hence we only know about the set that are installed by default.
-        bool autoIncrement = SqlSyntax.SupportsIdentityInsert() == false;
-        short startId = (short)(autoIncrement ? 0 : 1);
+        bool applyAutoIncrement = SqlSyntax.SupportsAutoIncrement() && SqlSyntax.SupportsIdentityInsert() == false; // SQLite, SQL Server and PostgreSQL supports it. SQL Server e. g. needs spezial sql statments to handle identity inserts. See usage of SqlSyntax.SupportsIdentityInsert()
+        short startId = (short)(applyAutoIncrement ? 0 : 1);
+        short autoIncrementValue = (short)(applyAutoIncrement ? 0 : 1);
         InstallDefaultDataSettings? languageInstallDefaultDataSettings = _installDefaultDataSettings.Get(Constants.Configuration.NamedOptions.InstallDefaultData.Languages);
         if (languageInstallDefaultDataSettings?.InstallData == InstallDefaultDataOption.Values)
         {
@@ -1827,9 +1828,9 @@ internal sealed class DatabaseDataCreator
                     CultureName = culture.EnglishName,
                     IsDefault = isDefault,
                 };
-                _ = _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", autoIncrement, dto);
+                _ = _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", applyAutoIncrement, dto);
                 isDefault = false;
-                id += (short)(autoIncrement ? 0 : 1);
+                id += autoIncrementValue;
             }
         }
         else
@@ -1843,7 +1844,7 @@ internal sealed class DatabaseDataCreator
                     new LanguageDto { Id = startId, IsoCode = culture.Name, CultureName = culture.EnglishName, IsDefault = true },
                     Constants.DatabaseSchema.Tables.Language,
                     "id",
-                    autoIncrement);
+                    applyAutoIncrement);
             }
         }
     }
