@@ -209,8 +209,8 @@ public class MemberBuilder
     {
         var id = _id ?? 0;
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var name = _name ?? Guid.NewGuid().ToString();
         var creatorId = _creatorId ?? 0;
         var level = _level ?? 1;
@@ -223,9 +223,9 @@ public class MemberBuilder
         var failedPasswordAttempts = _failedPasswordAttempts ?? 0;
         var isApproved = _isApproved ?? false;
         var isLockedOut = _isLockedOut ?? false;
-        var lastLockoutDate = _lastLockoutDate ?? DateTime.Now;
-        var lastLoginDate = _lastLoginDate ?? DateTime.Now;
-        var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
+        var lastLockoutDate = _lastLockoutDate ?? DateTime.UtcNow;
+        var lastLoginDate = _lastLoginDate ?? DateTime.UtcNow;
+        var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.UtcNow;
         var passwordConfig = _passwordConfig ?? "{\"hashAlgorithm\":\"PBKDF2.ASPNETCORE.V3\"}";
 
         if (_memberTypeBuilder is null && _memberType is null)

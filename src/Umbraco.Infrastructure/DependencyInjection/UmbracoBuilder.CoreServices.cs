@@ -36,6 +36,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
@@ -206,7 +207,8 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IVariationContextAccessor>(),
                 factory.GetRequiredService<IExamineManager>(),
                 factory.GetRequiredService<IPublishedContentCache>(),
-                factory.GetRequiredService<IPublishedMediaCache>());
+                factory.GetRequiredService<IPublishedMediaCache>(),
+                factory.GetRequiredService<IDocumentNavigationQueryService>());
         });
 
         // register accessors for cultures
@@ -234,9 +236,6 @@ public static partial class UmbracoBuilderExtensions
         // We can simplify this registration once the obsolete IBackgroundTaskQueue is removed.
         builder.Services.AddSingleton<HostedServices.BackgroundTaskQueue>();
         builder.Services.AddSingleton<IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
-#pragma warning disable CS0618 // Type or member is obsolete
-        builder.Services.AddSingleton<HostedServices.IBackgroundTaskQueue>(s => s.GetRequiredService<HostedServices.BackgroundTaskQueue>());
-#pragma warning restore CS0618 // Type or member is obsolete
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
 

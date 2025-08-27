@@ -198,8 +198,6 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
     }
 
     private IEnumerable<IPublishedContent> GetRootContent(IPublishedMediaCache mediaCache)
-    {
-        _mediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
-        return rootKeys.Select(x => mediaCache.GetById(false, x)).WhereNotNull();
-    }
+        => _mediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false ? []
+            : rootKeys.Select(x => mediaCache.GetById(false, x)).WhereNotNull();
 }

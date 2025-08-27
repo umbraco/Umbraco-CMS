@@ -168,13 +168,15 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         // So ensure we set something that can be distinguished here.
         if (dictionaryItem.CreateDate == default)
         {
-            dictionaryItem.CreateDate = DateTime.MinValue;
+            // Set such that it's prior to the update date, but not the default date which will be considered
+            // uninitialized and get reset to the current date at the repository.
+            dictionaryItem.CreateDate = DateTime.MinValue.AddHours(1);
         }
 
         if (dictionaryItem.UpdateDate == default)
         {
             // TODO (V17): To align with updates of system dates, this needs to change to DateTime.UtcNow.
-            dictionaryItem.UpdateDate = DateTime.Now;
+            dictionaryItem.UpdateDate = DateTime.UtcNow;
         }
 
         return await SaveAsync(

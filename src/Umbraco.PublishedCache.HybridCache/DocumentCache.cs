@@ -41,6 +41,17 @@ public sealed class DocumentCache : IPublishedContentCache
 
     public IPublishedContent? GetById(Guid contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
+    public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
+    {
+        if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
+        {
+            return [];
+        }
+
+        IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(preview, key)).WhereNotNull();
+        return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
+    }
+
     [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
     public string? GetRouteById(bool preview, int contentId, string? culture = null)
     {

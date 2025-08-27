@@ -149,7 +149,11 @@ public class ContentFinderByUrlAlias : IContentFinder
 
         if (cache is not null)
         {
-            _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+            if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
+            {
+                return null;
+            }
+
             foreach (IPublishedContent rootContent in rootKeys.Select(x => cache.GetById(false, x)).WhereNotNull())
             {
                 IPublishedContent? c = rootContent.DescendantsOrSelf(_documentNavigationQueryService, _publishedContentStatusFilteringService)

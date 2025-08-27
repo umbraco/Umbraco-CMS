@@ -427,7 +427,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         // Delete (base) node data
         Database.Delete<NodeDto>("WHERE uniqueID = @Id", new { Id = entity.Key });
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     #endregion

@@ -7,13 +7,18 @@ import {
 	type DataTypeResponseModel,
 	type UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbManagementApiDetailDataRequestManager } from '@umbraco-cms/backoffice/management-api';
+import {
+	UmbManagementApiDetailDataRequestManager,
+	UmbManagementApiInFlightRequestCache,
+} from '@umbraco-cms/backoffice/management-api';
 
 export class UmbManagementApiDataTypeDetailDataRequestManager extends UmbManagementApiDetailDataRequestManager<
 	DataTypeResponseModel,
 	UpdateDataTypeRequestModel,
 	CreateDataTypeRequestModel
 > {
+	static #inflightRequestCache = new UmbManagementApiInFlightRequestCache<DataTypeResponseModel>();
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			create: (body: CreateDataTypeRequestModel) => DataTypeService.postDataType({ body }),
@@ -21,7 +26,7 @@ export class UmbManagementApiDataTypeDetailDataRequestManager extends UmbManagem
 			update: (id: string, body: UpdateDataTypeRequestModel) => DataTypeService.putDataTypeById({ path: { id }, body }),
 			delete: (id: string) => DataTypeService.deleteDataTypeById({ path: { id } }),
 			dataCache: dataTypeDetailCache,
-			serverEventSource: 'Umbraco:CMS:DataType',
+			inflightRequestCache: UmbManagementApiDataTypeDetailDataRequestManager.#inflightRequestCache,
 		});
 	}
 }

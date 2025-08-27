@@ -43,39 +43,6 @@ public class UserPresentationFactory : IUserPresentationFactory
     /// <summary>
     /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public UserPresentationFactory(
-        IEntityService entityService,
-        AppCaches appCaches,
-        MediaFileManager mediaFileManager,
-        IImageUrlGenerator imageUrlGenerator,
-        IUserGroupPresentationFactory userGroupPresentationFactory,
-        IAbsoluteUrlBuilder absoluteUrlBuilder,
-        IEmailSender emailSender,
-        IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
-        IOptionsSnapshot<SecuritySettings> securitySettings,
-        IBackOfficeExternalLoginProviders externalLoginProviders)
-        : this(
-            entityService,
-            appCaches,
-            mediaFileManager,
-            imageUrlGenerator,
-            userGroupPresentationFactory,
-            absoluteUrlBuilder,
-            emailSender,
-            passwordConfigurationPresentationFactory,
-            securitySettings,
-            externalLoginProviders,
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IEnumerable<IPermissionPresentationMapper>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
@@ -87,45 +54,6 @@ public class UserPresentationFactory : IUserPresentationFactory
         IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
         IOptionsSnapshot<SecuritySettings> securitySettings,
         IBackOfficeExternalLoginProviders externalLoginProviders,
-        IUserService userService,
-        IContentService contentService)
-        : this(
-            entityService,
-            appCaches,
-            mediaFileManager,
-            imageUrlGenerator,
-            userGroupPresentationFactory,
-            absoluteUrlBuilder,
-            emailSender,
-            passwordConfigurationPresentationFactory,
-            securitySettings,
-            externalLoginProviders,
-            userService,
-            contentService,
-            StaticServiceProvider.Instance.GetRequiredService<IEnumerable<IPermissionPresentationMapper>>())
-    {
-    }
-
-    // TODO (V17): Remove the unused userService and contentService parameters from this constructor.
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
-    /// </summary>
-    public UserPresentationFactory(
-        IEntityService entityService,
-        AppCaches appCaches,
-        MediaFileManager mediaFileManager,
-        IImageUrlGenerator imageUrlGenerator,
-        IUserGroupPresentationFactory userGroupPresentationFactory,
-        IAbsoluteUrlBuilder absoluteUrlBuilder,
-        IEmailSender emailSender,
-        IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
-        IOptionsSnapshot<SecuritySettings> securitySettings,
-        IBackOfficeExternalLoginProviders externalLoginProviders,
-#pragma warning disable IDE0060 // Remove unused parameter - need to keep these until the next major to avoid breaking changes and/or ambiguous constructor errors
-        IUserService userService,
-        IContentService contentService,
-#pragma warning restore IDE0060 // Remove unused parameter
         IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers)
     {
         _entityService = entityService;

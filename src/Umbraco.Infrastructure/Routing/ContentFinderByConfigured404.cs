@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure;
 
@@ -22,9 +23,10 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
     private readonly IExamineManager _examineManager;
     private readonly ILogger<ContentFinderByConfigured404> _logger;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IPublishedContentCache _publishedContentCache;
+    private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private ContentSettings _contentSettings;
 
     /// <summary>
@@ -38,7 +40,8 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         IVariationContextAccessor variationContextAccessor,
         IUmbracoContextAccessor umbracoContextAccessor,
         IDocumentUrlService documentUrlService,
-        IPublishedContentCache publishedContentCache)
+        IPublishedContentCache publishedContentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService)
     {
         _logger = logger;
         _entityService = entityService;
@@ -48,13 +51,11 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         _umbracoContextAccessor = umbracoContextAccessor;
         _documentUrlService = documentUrlService;
         _publishedContentCache = publishedContentCache;
+        _documentNavigationQueryService = documentNavigationQueryService;
 
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentFinderByConfigured404" /> class.
-    /// </summary>
     [Obsolete("Scheduled for removal in Umbraco 18")]
     public ContentFinderByConfigured404(
         ILogger<ContentFinderByConfigured404> logger,
@@ -71,7 +72,8 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         variationContextAccessor,
         umbracoContextAccessor,
         StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>())
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
     {
     }
 
@@ -137,7 +139,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
             _contentSettings.Error404Collection.ToArray(),
             _entityService,
-            new PublishedContentQuery(_variationContextAccessor, _examineManager, umbracoContext.Content!, umbracoContext.Media),
+            new PublishedContentQuery(_variationContextAccessor, _examineManager, umbracoContext.Content!, umbracoContext.Media, _documentNavigationQueryService),
             errorCulture,
             domainContentId);
 

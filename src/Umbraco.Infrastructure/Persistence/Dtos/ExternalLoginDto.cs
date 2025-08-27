@@ -42,8 +42,8 @@ internal sealed class ExternalLoginDto
     [Index(IndexTypes.NonClustered, ForColumns = "loginProvider,providerKey", Name = "IX_" + TableName + "_ProviderKey")]
     public string ProviderKey { get; set; } = null!;
 
-    [Column("createDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("createDate")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
     /// <summary>
