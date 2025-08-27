@@ -1,10 +1,8 @@
 using System.Collections;
-using System.Data.Common;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -155,7 +153,7 @@ namespace Umbraco.Extensions
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
             var concat = sql.SqlContext.SqlSyntax.GetWildcardConcat(concatDefault);
             var likeSelect = sql.SqlContext.SqlSyntax.GetConcat(valuesSql?.SQL ?? string.Empty, concat);
-            _ = sql.Where($"{fieldName} LIKE {likeSelect}", valuesSql?.Arguments);
+            sql.Where($"{fieldName} LIKE {likeSelect}", valuesSql?.Arguments);
             return sql;
         }
 
@@ -173,7 +171,7 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, string likeValue)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
-            _ = sql.Where($"{fieldName} LIKE ('{likeValue}')");
+            sql.Where($"{fieldName} LIKE ('{likeValue}')");
             return sql;
         }
 
@@ -188,7 +186,7 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext> WhereNotIn<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, IEnumerable values)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(field);
-            _ = sql.Where(fieldName + " NOT IN (@values)", new { values });
+            sql.Where(fieldName + " NOT IN (@values)", new { values });
             return sql;
         }
 
@@ -1281,20 +1279,20 @@ namespace Umbraco.Extensions
 
         public static Sql<ISqlContext> SelectClosure<TDto>(this Sql<ISqlContext> sql, Func<SqlConvert<TDto>, SqlConvert<TDto>> converts)
         {
-            _ = sql.Append($"(SELECT ");
+            sql.Append($"(SELECT ");
 
             var c = new SqlConvert<TDto>(sql.SqlContext);
             c = converts(c);
             var first = true;
             foreach (string setExpression in c.SetExpressions)
             {
-                _ = sql.Append($"{(first ? string.Empty : ",")} {setExpression}");
+                sql.Append($"{(first ? string.Empty : ",")} {setExpression}");
                 first = false;
             }
 
             if (!first)
             {
-                _ = sql.Append(" ");
+                sql.Append(" ");
             }
 
             return sql;
