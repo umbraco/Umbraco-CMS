@@ -1,11 +1,12 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UmbArrayState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbTargetPaginationManager<
 	ItemModelType extends UmbEntityModel = UmbEntityModel,
 > extends UmbControllerBase {
 	#currentItems = new UmbArrayState<ItemModelType>([], (x) => x.unique);
+	#baseTarget = new UmbObjectState<ItemModelType | undefined>(undefined);
 
 	#pageSize = new UmbNumberState(10);
 	public readonly pageSize = this.#pageSize.asObservable();
@@ -18,6 +19,24 @@ export class UmbTargetPaginationManager<
 
 	#totalNextItems = new UmbNumberState(0);
 	public readonly totalNextItems = this.#totalNextItems.asObservable();
+
+	/**
+	 * Gets the target that the pagination is based around
+	 * @returns {ItemModelType | undefined} - The target item that the pagination is based around
+	 * @memberof UmbTargetPaginationManager
+	 */
+	getBaseTarget(): ItemModelType | undefined {
+		return this.#baseTarget.getValue();
+	}
+
+	/**
+	 * Set the target that the pagination will be based around
+	 * @param {(ItemModelType | undefined)} target - The target
+	 * @memberof UmbTargetPaginationManager
+	 */
+	setBaseTarget(target: ItemModelType | undefined) {
+		this.#baseTarget.setValue(target);
+	}
 
 	/**
 	 * Gets the number of items per page

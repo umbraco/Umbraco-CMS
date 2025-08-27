@@ -73,10 +73,6 @@ export class UmbDefaultTreeContext<
 	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;
 	#actionEventContext?: UmbActionEventContext;
 
-	#baseTarget: any = undefined; // TODO: fix this type
-	#startTarget: any = undefined; // TODO: fix this type
-	#endTarget: any = undefined; // TODO: fix this type
-
 	#initResolver?: () => void;
 	#initialized = false;
 
@@ -293,9 +289,6 @@ export class UmbDefaultTreeContext<
 			this.#rootItems.setValue(data.items);
 			this.targetPagination.setCurrentItems(data.items);
 
-			this.#startTarget = this.targetPagination.getNextStartTarget();
-			this.#endTarget = this.targetPagination.getNextEndTarget();
-
 			this.pagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
@@ -309,7 +302,7 @@ export class UmbDefaultTreeContext<
 		const additionalArgs = this.#additionalRequestArgs.getValue();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.#startTarget,
+			target: this.targetPagination.getNextStartTarget(),
 			takeBefore: this.targetPagination.getPageSize(),
 			takeAfter: 0,
 		};
@@ -336,8 +329,6 @@ export class UmbDefaultTreeContext<
 			this.#rootItems.prepend(reversedItems);
 			this.targetPagination.prependCurrentItems(reversedItems);
 
-			this.#startTarget = this.targetPagination.getNextStartTarget();
-
 			if (data.totalBefore === undefined) {
 				throw new Error('totalBefore is missing in the response');
 			}
@@ -353,7 +344,7 @@ export class UmbDefaultTreeContext<
 		const additionalArgs = this.#additionalRequestArgs.getValue();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.#endTarget,
+			target: this.targetPagination.getNextEndTarget(),
 			takeBefore: 0,
 			takeAfter: this.targetPagination.getPageSize(),
 		};
@@ -378,8 +369,6 @@ export class UmbDefaultTreeContext<
 			this.#rootItems.append(data.items);
 			this.targetPagination.appendCurrentItems(data.items);
 
-			this.#endTarget = this.targetPagination.getNextEndTarget();
-
 			this.targetPagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
 		}
@@ -392,13 +381,14 @@ export class UmbDefaultTreeContext<
 		const startNode = this.getStartNode();
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.#additionalRequestArgs.getValue();
+		const baseTarget = this.targetPagination.getBaseTarget();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined =
-			this.#baseTarget && this.#baseTarget.unique
+			baseTarget && baseTarget.unique
 				? {
 						target: {
-							unique: this.#baseTarget.unique,
-							entityType: this.#baseTarget.entityType,
+							unique: baseTarget.unique,
+							entityType: baseTarget.entityType,
 						},
 						takeBefore: 0, // calculate how many items we have loaded before the baseTarget
 						takeAfter: 0, // calculate how many items we have loaded after the baseTarget
@@ -433,9 +423,6 @@ export class UmbDefaultTreeContext<
 		if (data) {
 			this.#rootItems.setValue(data.items);
 			this.targetPagination.setCurrentItems(data.items);
-
-			this.#startTarget = this.targetPagination.getNextStartTarget();
-			this.#endTarget = this.targetPagination.getNextEndTarget();
 
 			this.pagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItems(data.total);
@@ -572,10 +559,8 @@ export class UmbDefaultTreeContext<
 					(entry) => entry.unique === entity.unique && entry.entityType === entity.entityType,
 				);
 				const target = currentEntry?.target;
-				this.#baseTarget = target;
-				this.#startTarget = target;
-				this.#endTarget = target;
-				this.#loadRootItems(this.#baseTarget);
+				this.targetPagination.setBaseTarget(target);
+				this.#loadRootItems(target);
 			},
 			'observeExpansion',
 		);

@@ -93,10 +93,6 @@ export abstract class UmbTreeItemContextBase<
 	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
-	#baseTarget: any = undefined; // TODO: fix this type
-	#startTarget: any = undefined; // TODO: fix this type
-	#endTarget: any = undefined; // TODO: fix this type
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
 
@@ -255,9 +251,6 @@ export abstract class UmbTreeItemContextBase<
 			this.#hasChildren.setValue(hasChildren);
 			this.#hasChildrenContext.setHasChildren(hasChildren);
 
-			this.#startTarget = this.targetPagination.getNextStartTarget();
-			this.#endTarget = this.targetPagination.getNextEndTarget();
-
 			this.pagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
@@ -280,7 +273,7 @@ export abstract class UmbTreeItemContextBase<
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.#startTarget,
+			target: this.targetPagination.getNextStartTarget(),
 			takeBefore: this.targetPagination.getPageSize(),
 			takeAfter: 0,
 		};
@@ -300,8 +293,6 @@ export abstract class UmbTreeItemContextBase<
 			const reversedItems = [...data.items].reverse();
 			this.#childItems.prepend(reversedItems);
 			this.targetPagination.prependCurrentItems(reversedItems);
-
-			this.#startTarget = this.targetPagination.getNextStartTarget();
 
 			if (data.totalBefore === undefined) {
 				throw new Error('totalBefore is missing in the response');
@@ -327,7 +318,7 @@ export abstract class UmbTreeItemContextBase<
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.#endTarget,
+			target: this.targetPagination.getNextEndTarget(),
 			takeBefore: 0,
 			takeAfter: this.targetPagination.getPageSize(),
 		};
@@ -347,8 +338,6 @@ export abstract class UmbTreeItemContextBase<
 		if (data) {
 			this.#childItems.append(data.items);
 			this.targetPagination.appendCurrentItems(data.items);
-
-			this.#endTarget = this.targetPagination.getNextEndTarget();
 
 			this.targetPagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
@@ -552,10 +541,8 @@ export abstract class UmbTreeItemContextBase<
 				if (isExpanded && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
 					const expansionEntry = await this.treeContext?.expansion.getItem(entity);
 					const target = expansionEntry?.target;
-					this.#baseTarget = target;
-					this.#startTarget = target;
-					this.#endTarget = target;
-					this.#loadChildren(this.#baseTarget);
+					this.targetPagination.setBaseTarget(target);
+					this.#loadChildren(target);
 				}
 
 				this.#isOpen.setValue(isExpanded ?? false);
