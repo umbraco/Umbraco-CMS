@@ -198,7 +198,7 @@ export abstract class UmbTreeItemContextBase<
 	 */
 	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
 
-	async #loadChildren() {
+	async #loadChildren(reload = false) {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
 
@@ -221,15 +221,20 @@ export abstract class UmbTreeItemContextBase<
 						},
 						/* When we load from a target we want to load a few items before the target so the target isn't the first item in the list
 						 Currently we use 5, but this could be anything that feels "right".
+						  When reloading from target when want to retrieve the same number of items that a currently loaded
 						*/
-						takeBefore: 5,
-						takeAfter: this.targetPagination.getTakeSize(),
+						takeBefore: reload ? this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget() : 5,
+						takeAfter: reload
+							? this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget()
+							: this.targetPagination.getTakeSize(),
 					}
 				: undefined;
 
 		const offsetPaging: UmbOffsetPaginationRequestModel = {
-			skip: this.pagination.getSkip(),
-			take: this.pagination.getPageSize(),
+			skip: reload ? 0 : this.pagination.getSkip(),
+			take: reload
+				? this.pagination.getCurrentPageNumber() * this.pagination.getPageSize()
+				: this.pagination.getPageSize(),
 		};
 
 		const { data } = await repository.requestTreeItemsOf({
@@ -554,7 +559,7 @@ export abstract class UmbTreeItemContextBase<
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
-		this.loadChildren();
+		this.loadChildren(true);
 	};
 
 	#onReloadStructureRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
@@ -563,7 +568,7 @@ export abstract class UmbTreeItemContextBase<
 		if (event.getEntityType() !== this.entityType) return;
 
 		if (this.parentTreeItemContext) {
-			this.parentTreeItemContext.loadChildren();
+			this.parentTreeItemContext.loadChildren(true);
 		} else {
 			this.treeContext?.reloadTree();
 		}
