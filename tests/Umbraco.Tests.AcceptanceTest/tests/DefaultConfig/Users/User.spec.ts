@@ -96,7 +96,8 @@ test('can add multiple user groups to a user', async ({umbracoApi, umbracoUi}) =
 test('can remove a user group from a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const translatorsUserGroup = await umbracoApi.userGroup.getByName('Translators');
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id, translatorsUserGroup.id]);
   await umbracoUi.user.goToUsers();
 
   // Act
