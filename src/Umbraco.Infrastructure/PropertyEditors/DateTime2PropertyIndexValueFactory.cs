@@ -36,14 +36,13 @@ public class DateTime2PropertyIndexValueFactory : IDateTime2PropertyIndexValueFa
         };
 
         var propertyValue = property.GetValue(culture, segment, published);
-        var sourceStr = propertyValue?.ToString();
-        if (sourceStr is null)
+        if (propertyValue is null)
         {
             return [indexValue];
         }
 
         DateTime2Configuration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateTime2Configuration>(property.PropertyType.DataTypeKey);
-        var value = DateTime2ValueConverter.GetValue(sourceStr, configuration, _jsonSerializer);
+        var value = DateTime2ValueConverter.GetObjectFromSource(propertyValue, configuration, _jsonSerializer);
         if (value is null)
         {
             return [indexValue];

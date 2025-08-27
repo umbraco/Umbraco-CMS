@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 [DataEditor(
     Constants.PropertyEditors.Aliases.DateTime2,
+    ValueType = ValueTypes.Json,
     ValueEditorIsReusable = true)]
 public class DateTime2PropertyEditor : DataEditor
 {
@@ -66,6 +67,7 @@ public class DateTime2PropertyEditor : DataEditor
             Validators.AddRange(new DateTimeWithTimeZoneValidator(localizedTextService));
         }
 
+        /// <inheritdoc/>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             if (editorValue.Value is not JsonObject valueAsJsonObject)
@@ -102,29 +104,28 @@ public class DateTime2PropertyEditor : DataEditor
             return jsonStr;
         }
 
+        /// <inheritdoc/>
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment);
-            if (value is not string valueString)
+
+            var interValue = DateTime2ValueConverter.GetIntermediateFromSource(value, _jsonSerializer);
+            if (interValue is not DateTime2ValueConverter.DateTime2 dateTime2)
             {
                 return null;
             }
 
-            var interValue = DateTime2ValueConverter.GetIntermediateValue(valueString, _jsonSerializer);
-            if (interValue is not DateTime2ValueConverter.DateTime2 dateTime)
-            {
-                return null;
-            }
-
-            DateTime2Configuration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateTime2Configuration>(property.PropertyType.DataTypeKey);
-            var objectValue = DateTime2ValueConverter.GetObjectValue(dateTime, configuration);
+            DateTime2Configuration? configuration = GetConfiguration(property.PropertyType.DataTypeKey);
+            var objectValue = DateTime2ValueConverter.GetObjectFromIntermediate(dateTime2, configuration);
 
             JsonNode node = new JsonObject();
-            node["date"] = DateTime2ValueConverter.GetDateValueAsString(objectValue);
-            node["timeZone"] = dateTime.TimeZone;
-
+            node["date"] = objectValue is null ? null : $"{objectValue:O}";
+            node["timeZone"] = dateTime2.TimeZone;
             return node;
         }
+
+        private DateTime2Configuration? GetConfiguration(Guid dataTypeKey) =>
+            _dataTypeConfigurationCache.GetConfigurationAs<DateTime2Configuration>(dataTypeKey);
 
         /// <summary>
         /// Validates the color selection for the color picker property editor.
