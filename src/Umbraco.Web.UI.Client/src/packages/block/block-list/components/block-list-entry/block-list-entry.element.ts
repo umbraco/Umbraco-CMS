@@ -417,7 +417,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							type="blockEditorCustomView"
 							default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
 							.renderMethod=${this.#extensionSlotRenderMethod}
-							.fallbackRender=${this.#renderBuiltinBlockView}
+							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							.filter=${this.#extensionSlotFilterMethod}
 							single></umb-extension-slot>

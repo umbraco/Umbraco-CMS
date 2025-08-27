@@ -277,7 +277,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 							type="blockEditorCustomView"
 							default-element="umb-ref-rte-block"
 							.renderMethod=${this.#extensionSlotRenderMethod}
-							.fallbackRender=${this.#renderBuiltinBlockView}
+							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							.filter=${this.#filterBlockCustomViews}
 							single></umb-extension-slot>
