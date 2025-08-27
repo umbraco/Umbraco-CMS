@@ -40,24 +40,8 @@ export abstract class UmbTreeItemContextBase<
 	public unique?: UmbEntityUnique;
 	public entityType?: string;
 
-	/**
-	 *
-	 * The pagination manager for the tree item context.
-	 * @memberof UmbTreeItemContextBase
-	 */
 	public readonly pagination = new UmbPaginationManager();
-
-	/**
-	 * The pagination manager for the previous items in the tree item context.
-	 * @memberof UmbTreeItemContextBase
-	 */
-	public readonly paginationPrev = new UmbTargetPaginationManager(this);
-
-	/**
-	 * The pagination manager for the next items in the tree item context.
-	 * @memberof UmbTreeItemContextBase
-	 */
-	public readonly paginationNext = new UmbTargetPaginationManager(this);
+	public readonly targetPagination = new UmbTargetPaginationManager(this);
 
 	#manifest?: ManifestType;
 
@@ -109,16 +93,17 @@ export abstract class UmbTreeItemContextBase<
 	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
+	#baseTarget: any = undefined; // TODO: fix this type
 	#startTarget: any = undefined; // TODO: fix this type
 	#endTarget: any = undefined; // TODO: fix this type
 
-	#paging = {
-		take: 5,
-	};
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
-		this.pagination.setPageSize(this.#paging.take);
+
+		const pageSize = 5;
+		this.pagination.setPageSize(pageSize);
+		this.targetPagination.setPageSize(pageSize);
+
 		this.#consumeContexts();
 
 		// listen for page changes on the pagination manager
@@ -237,8 +222,11 @@ export abstract class UmbTreeItemContextBase<
 							unique: target.unique,
 							entityType: target.entityType,
 						},
+						/* When we load from a target we want to load a few items before the target so the target isn't the first item in the list
+						 Currently we use 5, but this could be anything that feels "right".
+						*/
 						takeBefore: 5,
-						takeAfter: this.pagination.getPageSize(),
+						takeAfter: this.targetPagination.getPageSize(),
 					}
 				: undefined;
 
@@ -261,24 +249,19 @@ export abstract class UmbTreeItemContextBase<
 
 		if (data) {
 			this.#childItems.setValue(data.items);
+			this.targetPagination.setCurrentItems(data.items);
 
 			const hasChildren = data.total > 0;
 			this.#hasChildren.setValue(hasChildren);
 			this.#hasChildrenContext.setHasChildren(hasChildren);
 
-			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
-			this.#startTarget = firstItem ? { unique: firstItem.unique, entityType: firstItem.entityType } : undefined;
+			this.#startTarget = this.targetPagination.getNextStartTarget();
+			this.#endTarget = this.targetPagination.getNextEndTarget();
 
-			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
-			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
-
-			const totalBefore = data.totalBefore !== undefined ? data.totalBefore : 0;
-			const totalAfter =
-				data.totalAfter !== undefined ? data.totalAfter : data.total - this.#childItems.getValue().length;
-
-			this.paginationPrev.setTotalItems(totalBefore);
-			this.paginationNext.setTotalItems(totalAfter);
 			this.pagination.setTotalItems(data.total);
+			this.targetPagination.setTotalItems(data.total);
+			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
+			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
 		}
 
 		this.#isLoading.setValue(false);
@@ -296,33 +279,36 @@ export abstract class UmbTreeItemContextBase<
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
+		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
+			target: this.#startTarget,
+			takeBefore: this.targetPagination.getPageSize(),
+			takeAfter: 0,
+		};
+
 		const { data } = await repository.requestTreeItemsOf({
 			parent: {
 				unique: this.unique,
 				entityType: this.entityType,
 			},
 			foldersOnly,
-			paging: {
-				target: this.#startTarget,
-				takeBefore: this.pagination.getPageSize(),
-				takeAfter: 0,
-			},
+			paging: targetPaging,
 			...additionalArgs,
 		});
 
 		if (data) {
+			// We have loaded previous items so we add them to the top of the array
 			const reversedItems = [...data.items].reverse();
 			this.#childItems.prepend(reversedItems);
+			this.targetPagination.prependCurrentItems(reversedItems);
 
-			const firstItem = data.items.length > 0 ? data.items[0] : undefined;
-			this.#startTarget = firstItem ? { unique: firstItem.unique, entityType: firstItem.entityType } : undefined;
+			this.#startTarget = this.targetPagination.getNextStartTarget();
 
 			if (data.totalBefore === undefined) {
 				throw new Error('totalBefore is missing in the response');
 			}
 
-			this.paginationPrev.setTotalItems(data.totalBefore);
-			this.pagination.setTotalItems(data.total);
+			this.targetPagination.setTotalItems(data.total);
+			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
 		}
 
 		this.#isLoading.setValue(false);
@@ -340,33 +326,32 @@ export abstract class UmbTreeItemContextBase<
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
+		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
+			target: this.#endTarget,
+			takeBefore: 0,
+			takeAfter: this.targetPagination.getPageSize(),
+		};
+
 		const { data } = await repository.requestTreeItemsOf({
 			parent: {
 				unique: this.unique,
 				entityType: this.entityType,
 			},
-			take: this.pagination.getPageSize(),
-			skip: this.pagination.getSkip(),
+			take: this.pagination.getPageSize(), // including this for backward compatibility
+			skip: this.pagination.getSkip(), // including this for backward compatibility
 			foldersOnly,
-			paging: {
-				target: this.#endTarget,
-				takeBefore: 0,
-				takeAfter: this.pagination.getPageSize(),
-			},
+			paging: targetPaging,
 			...additionalArgs,
 		});
 
 		if (data) {
 			this.#childItems.append(data.items);
+			this.targetPagination.appendCurrentItems(data.items);
 
-			const lastItem = data.items.length > 0 ? data.items[data.items.length - 1] : undefined;
-			this.#endTarget = lastItem ? { unique: lastItem.unique, entityType: lastItem.entityType } : undefined;
+			this.#endTarget = this.targetPagination.getNextEndTarget();
 
-			const totalAfter =
-				data.totalAfter !== undefined ? data.totalAfter : data.total - this.#childItems.getValue().length;
-			this.paginationNext.setTotalItems(totalAfter);
-
-			this.pagination.setTotalItems(data.total);
+			this.targetPagination.setTotalItems(data.total);
+			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
 		}
 
 		this.#isLoading.setValue(false);
@@ -567,7 +552,10 @@ export abstract class UmbTreeItemContextBase<
 				if (isExpanded && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
 					const expansionEntry = await this.treeContext?.expansion.getItem(entity);
 					const target = expansionEntry?.target;
-					this.#loadChildren(target);
+					this.#baseTarget = target;
+					this.#startTarget = target;
+					this.#endTarget = target;
+					this.#loadChildren(this.#baseTarget);
 				}
 
 				this.#isOpen.setValue(isExpanded ?? false);

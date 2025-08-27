@@ -42,8 +42,14 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value));
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value));
 
-			this.observe(this.#api.paginationPrev?.hasMoreItems, (value) => (this._hasPreviousItems = value || false));
-			this.observe(this.#api.paginationNext?.hasMoreItems, (value) => (this._hasNextItems = value || false));
+			this.observe(
+				this.#api.targetPagination?.totalPrevItems,
+				(value) => (this._hasPreviousItems = value !== undefined ? value > 0 : false),
+			);
+			this.observe(
+				this.#api.targetPagination?.totalNextItems,
+				(value) => (this._hasNextItems = value !== undefined ? value > 0 : false),
+			);
 
 			this.#initTreeItem();
 		}
