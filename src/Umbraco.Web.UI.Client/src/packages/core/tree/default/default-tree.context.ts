@@ -302,7 +302,7 @@ export class UmbDefaultTreeContext<
 		const additionalArgs = this.#additionalRequestArgs.getValue();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.targetPagination.getNextStartTarget(),
+			target: this.targetPagination.getStartTarget(),
 			takeBefore: this.targetPagination.getPageSize(),
 			takeAfter: 0,
 		};
@@ -344,7 +344,7 @@ export class UmbDefaultTreeContext<
 		const additionalArgs = this.#additionalRequestArgs.getValue();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.targetPagination.getNextEndTarget(),
+			target: this.targetPagination.getEndTarget(),
 			takeBefore: 0,
 			takeAfter: this.targetPagination.getPageSize(),
 		};
@@ -390,8 +390,9 @@ export class UmbDefaultTreeContext<
 							unique: baseTarget.unique,
 							entityType: baseTarget.entityType,
 						},
-						takeBefore: 0, // calculate how many items we have loaded before the baseTarget
-						takeAfter: 0, // calculate how many items we have loaded after the baseTarget
+						// When reloading from target when want to retrieve the same number of items that a currently loaded
+						takeBefore: this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget(),
+						takeAfter: this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget(),
 					}
 				: undefined;
 

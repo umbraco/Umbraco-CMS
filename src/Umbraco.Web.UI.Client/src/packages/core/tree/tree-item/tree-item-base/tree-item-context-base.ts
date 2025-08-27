@@ -273,7 +273,7 @@ export abstract class UmbTreeItemContextBase<
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.targetPagination.getNextStartTarget(),
+			target: this.targetPagination.getStartTarget(),
 			takeBefore: this.targetPagination.getPageSize(),
 			takeAfter: 0,
 		};
@@ -318,7 +318,7 @@ export abstract class UmbTreeItemContextBase<
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.targetPagination.getNextEndTarget(),
+			target: this.targetPagination.getEndTarget(),
 			takeBefore: 0,
 			takeAfter: this.targetPagination.getPageSize(),
 		};

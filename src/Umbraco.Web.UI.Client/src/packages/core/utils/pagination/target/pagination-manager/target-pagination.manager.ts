@@ -5,8 +5,8 @@ import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/back
 export class UmbTargetPaginationManager<
 	ItemModelType extends UmbEntityModel = UmbEntityModel,
 > extends UmbControllerBase {
-	#currentItems = new UmbArrayState<ItemModelType>([], (x) => x.unique);
 	#baseTarget = new UmbObjectState<ItemModelType | undefined>(undefined);
+	#currentItems = new UmbArrayState<ItemModelType>([], (x) => x.unique);
 
 	#pageSize = new UmbNumberState(10);
 	public readonly pageSize = this.#pageSize.asObservable();
@@ -43,7 +43,7 @@ export class UmbTargetPaginationManager<
 	 * @returns {number}
 	 * @memberof UmbPaginationManager
 	 */
-	public getPageSize() {
+	public getPageSize(): number {
 		return this.#pageSize.getValue();
 	}
 
@@ -112,21 +112,33 @@ export class UmbTargetPaginationManager<
 	}
 
 	/**
-	 * Gets the next target that should be used to load items before the base target
-	 * @returns {ItemModelType | undefined} - The target item to load more items before
+	 * Gets the first target of the current item. Use for loading more items before the base target
+	 * @returns {ItemModelType} - The target item to load more items before
 	 * @memberof UmbTargetPaginationManager
 	 */
-	public getNextStartTarget(): ItemModelType | undefined {
-		return this.#currentItems.getValue()[0];
+	public getStartTarget(): ItemModelType {
+		const firstItem = this.#currentItems.getValue()[0];
+
+		if (!firstItem) {
+			throw new Error('No Start Target found');
+		}
+
+		return firstItem;
 	}
 
 	/**
-	 *
-	 * @returns {ItemModelType | undefined} - The target item to load more items before
+	 * Gets the last target of the current items. Use for load more items after the base target
+	 * @returns {ItemModelType} - The target item to load more items before
 	 * @memberof UmbTargetPaginationManager
 	 */
-	public getNextEndTarget(): ItemModelType | undefined {
-		return this.#currentItems.getValue().slice(-1)[0];
+	public getEndTarget(): ItemModelType {
+		const lastItem = this.#currentItems.getValue().slice(-1)[0];
+
+		if (!lastItem) {
+			throw new Error('No End Target found');
+		}
+
+		return lastItem;
 	}
 
 	public setTotalItemsBeforeStartTarget(totalItems: number | undefined) {
@@ -140,10 +152,47 @@ export class UmbTargetPaginationManager<
 	}
 
 	/**
+	 * Gets the number of current items before the target
+	 * @returns {number} - The number of items
+	 * @memberof UmbTargetPaginationManager
+	 */
+	public getNumberOfCurrentItemsBeforeBaseTarget(): number {
+		return this.#getIndexOfBaseTarget();
+	}
+
+	/**
+	 * Gets the number of current items after the target
+	 * @returns {number} - The number of items
+	 * @memberof UmbTargetPaginationManager
+	 */
+	public getNumberOfCurrentItemsAfterBaseTarget(): number {
+		// find the total number of items after the base target
+		const baseTargetIndex = this.#getIndexOfBaseTarget();
+		return this.#currentItems.getValue().length - baseTargetIndex - 1;
+	}
+
+	/**
 	 * Clears the pagination manager values and resets them to their default values
 	 * @memberof UmbPaginationManager
 	 */
 	public clear() {
 		this.#totalItems.setValue(0);
+	}
+
+	#getIndexOfBaseTarget() {
+		const baseTarget = this.getBaseTarget();
+
+		if (!baseTarget) {
+			throw new Error('Base target is not set');
+		}
+
+		const currentItems = this.#currentItems.getValue();
+		const index = currentItems.findIndex((item) => item.unique === baseTarget.unique);
+
+		if (index === -1) {
+			throw new Error('Base target is not in the current items');
+		}
+
+		return index;
 	}
 }
