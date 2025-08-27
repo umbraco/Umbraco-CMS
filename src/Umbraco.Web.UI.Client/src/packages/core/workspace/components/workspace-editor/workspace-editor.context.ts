@@ -38,9 +38,9 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 					(view) => !workspaceViews.some((x) => x.manifest.alias === view.manifest.alias),
 				);
 
-				const diff = viewsToKeep.length !== workspaceViews.length;
+				const hasDiff = viewsToKeep.length !== workspaceViews.length;
 
-				if (diff) {
+				if (hasDiff) {
 					const newViews = [...viewsToKeep];
 
 					// Add ones that are new:
