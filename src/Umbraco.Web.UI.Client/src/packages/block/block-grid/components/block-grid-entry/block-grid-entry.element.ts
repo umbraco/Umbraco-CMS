@@ -467,12 +467,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						<umb-extension-slot
 							.filter=${this.#extensionSlotFilterMethod}
 							.renderMethod=${this.#extensionSlotRenderMethod}
+							.defaultRenderMethod=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							default-element=${this._inlineEditingMode ? 'umb-block-grid-block-inline' : 'umb-block-grid-block'}
 							type="blockEditorCustomView"
-							single
-							>${this.#renderBuiltinBlockView()}</umb-extension-slot
-						>
+							single></umb-extension-slot>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
@@ -494,7 +493,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			: nothing;
 	}
 
-	#renderBuiltinBlockView() {
+	#renderBuiltinBlockView = () => {
 		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
@@ -502,7 +501,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			return this.renderInlineBlock();
 		}
 		return this.#renderRefBlock();
-	}
+	};
 
 	#renderUnsupportedBlock() {
 		return html`<umb-block-grid-block-unsupported
