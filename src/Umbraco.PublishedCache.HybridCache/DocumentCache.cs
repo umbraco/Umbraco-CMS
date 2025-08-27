@@ -1,4 +1,3 @@
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -45,7 +44,10 @@ public sealed class DocumentCache : IPublishedContentCache
 
     public IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
     {
-        _documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+        if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
+        {
+            return [];
+        }
 
         IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(preview, key)).WhereNotNull();
         return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
