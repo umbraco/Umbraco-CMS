@@ -265,16 +265,6 @@ internal sealed class ContentPublishingService : IContentPublishingService
     }
 
     /// <inheritdoc />
-    [Obsolete("This method is not longer used as the 'force' parameter has been extended into options for publishing unpublished and re-publishing changed content. Please use the overload containing the parameter for those options instead. Scheduled for removal in Umbraco 17.")]
-    public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool force, Guid userKey)
-        => await PublishBranchAsync(key, cultures, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, userKey);
-
-    /// <inheritdoc />
-    [Obsolete("Please use the overload containing all parameters. Scheduled for removal in Umbraco 17.")]
-    public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, PublishBranchFilter publishBranchFilter, Guid userKey)
-        => await PublishBranchAsync(key, cultures, publishBranchFilter, userKey, false);
-
-    /// <inheritdoc />
     public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(
         Guid key,
         IEnumerable<string> cultures,
