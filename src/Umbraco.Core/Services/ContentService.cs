@@ -2024,11 +2024,6 @@ public class ContentService : RepositoryService, IContentService
     }
 
     /// <inheritdoc />
-    [Obsolete("This method is not longer used as the 'force' parameter has been split into publishing unpublished and force re-published. Please use the overload containing parameters for those options instead. Scheduled for removal in V17")]
-    public IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId)
-        => PublishBranch(content, force ? PublishBranchFilter.IncludeUnpublished : PublishBranchFilter.Default, cultures, userId);
-
-    /// <inheritdoc />
     public IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId)
     {
         // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
