@@ -98,7 +98,13 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	) => TemplateResult | TemplateResult<1> | HTMLElement | null | undefined | typeof nothing;
 
 	@property({ attribute: false })
-	public defaultRenderMethod?: () => TemplateResult | TemplateResult<1> | HTMLElement | null | undefined | typeof nothing;
+	public defaultRenderMethod?: () =>
+		| TemplateResult
+		| TemplateResult<1>
+		| HTMLElement
+		| null
+		| undefined
+		| typeof nothing;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -139,7 +145,9 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		return this._permitted
 			? this._permitted.length > 0
 				? repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
-				: this.defaultRenderMethod ? this.defaultRenderMethod() : html`<slot></slot>`
+				: this.defaultRenderMethod
+					? this.defaultRenderMethod()
+					: html`<slot></slot>`
 			: nothing;
 	}
 
