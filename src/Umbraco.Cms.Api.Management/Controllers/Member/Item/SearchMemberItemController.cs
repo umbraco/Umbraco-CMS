@@ -24,15 +24,15 @@ public class SearchMemberItemController : MemberItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MemberItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<IActionResult> SearchWithAllowedTypes(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, [FromQuery]IEnumerable<Guid>? allowedMemberTypes = null)
+    public async Task<IActionResult> SearchWithAllowedTypes(CancellationToken cancellationToken, string query, int skip = 0, int take = 100, [FromQuery]IEnumerable<Guid>? allowedMemberTypes = null)
     {
-        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Member, query, null, allowedMemberTypes, skip, take);
+        PagedModel<IEntitySlim> searchResult = await _indexedEntitySearchService.SearchAsync(UmbracoObjectTypes.Member, query, null, allowedMemberTypes, false, "*", skip, take);
         var result = new PagedModel<MemberItemResponseModel>
         {
             Items = searchResult.Items.OfType<IMemberEntitySlim>().Select(_memberPresentationFactory.CreateItemResponseModel),
-            Total = searchResult.Total
+            Total = searchResult.Total,
         };
 
-        return Task.FromResult<IActionResult>(Ok(result));
+        return await Task.FromResult<IActionResult>(Ok(result));
     }
 }
