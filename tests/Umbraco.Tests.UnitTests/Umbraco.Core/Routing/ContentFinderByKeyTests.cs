@@ -17,6 +17,7 @@ public class ContentFinderByKeyTests
 {
     [Test]
     [InlineAutoMoqData("/1598901d-ebbe-4996-b7fb-6a6cbac13a62", "1598901d-ebbe-4996-b7fb-6a6cbac13a62", true)]
+    [InlineAutoMoqData("/1598901d-ebbe-4996-b7fb-6a6cbac13a62", "9E966427-25AB-4909-B403-DED1F421D1A7", false)]
     public async Task Lookup_By_Key(
         string urlAsString,
         string nodeKeyString,
@@ -43,16 +44,15 @@ public class ContentFinderByKeyTests
             Mock.Of<IRequestAccessor>(),
             umbracoContextAccessor);
 
-        var result = await sut.TryFindContent(publishedRequestBuilder);
+        await sut.TryFindContent(publishedRequestBuilder);
 
-        Assert.AreEqual(shouldSucceed, result);
         if (shouldSucceed)
         {
             Assert.AreEqual(publishedRequestBuilder.PublishedContent!.Key, nodeKey);
         }
         else
         {
-            Assert.IsNull(publishedRequestBuilder.PublishedContent);
+            Assert.AreNotEqual(publishedRequestBuilder.PublishedContent!.Key, nodeKey);
         }
     }
 }

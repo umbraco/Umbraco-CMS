@@ -10,7 +10,6 @@ using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
-//FIXME: Reintroduce if relevant
 [TestFixture]
 public class ContentFinderByPageIdQueryTests
 {
