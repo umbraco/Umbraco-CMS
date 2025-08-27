@@ -277,11 +277,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 							type="blockEditorCustomView"
 							default-element="umb-ref-rte-block"
 							.renderMethod=${this.#extensionSlotRenderMethod}
+							.fallbackRender=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							.filter=${this.#filterBlockCustomViews}
-							single>
-							${this.#renderRefBlock()}
-						</umb-extension-slot>
+							single></umb-extension-slot>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
@@ -296,6 +295,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			? html` <uui-action-bar> ${this.#renderEditAction()} ${this.#renderEditSettingsAction()}</uui-action-bar> `
 			: nothing;
 	}
+
+	#renderBuiltinBlockView = () => {
+		// TODO: Missing unsupported rendering [NL]
+		/*if (this._unsupported) {
+			return this.#renderUnsupportedBlock();
+		}*/
+		return this.#renderRefBlock();
+	};
 
 	#renderRefBlock() {
 		return html`<umb-ref-rte-block

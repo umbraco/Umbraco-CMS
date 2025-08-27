@@ -98,13 +98,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	) => TemplateResult | TemplateResult<1> | HTMLElement | null | undefined | typeof nothing;
 
 	@property({ attribute: false })
-	public defaultRenderMethod?: () =>
-		| TemplateResult
-		| TemplateResult<1>
-		| HTMLElement
-		| null
-		| undefined
-		| typeof nothing;
+	public fallbackRender?: () => TemplateResult | TemplateResult<1> | HTMLElement | null | undefined | typeof nothing;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -142,13 +136,16 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 
 	override render() {
+		// First renders something once _permitted is set, this is to avoid flickering. [NL]
 		return this._permitted
 			? this._permitted.length > 0
 				? repeat(this._permitted, (ext) => ext.alias, this.#renderExtension)
-				: this.defaultRenderMethod
-					? this.defaultRenderMethod()
-					: html`<slot></slot>`
+				: this.#renderNoting()
 			: nothing;
+	}
+
+	#renderNoting() {
+		return this.fallbackRender ? this.fallbackRender() : html`<slot></slot>`;
 	}
 
 	#renderExtension = (ext: UmbExtensionElementInitializer, i: number) => {

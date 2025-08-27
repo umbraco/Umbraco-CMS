@@ -399,7 +399,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			${umbDestroyOnDisconnect()}></umb-unsupported-list-block>`;
 	}
 
-	#renderBuiltinBlockView() {
+	#renderBuiltinBlockView = () => {
 		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
@@ -407,7 +407,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			return this.#renderInlineBlock();
 		}
 		return this.#renderRefBlock();
-	}
+	};
 
 	#renderBlock() {
 		return this.contentKey && (this._contentTypeAlias || this._unsupported)
@@ -417,11 +417,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							type="blockEditorCustomView"
 							default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
 							.renderMethod=${this.#extensionSlotRenderMethod}
+							.fallbackRender=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							.filter=${this.#extensionSlotFilterMethod}
-							single
-							>${this.#renderBuiltinBlockView()}</umb-extension-slot
-						>
+							single></umb-extension-slot>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
