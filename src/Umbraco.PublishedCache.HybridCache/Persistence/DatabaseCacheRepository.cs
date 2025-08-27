@@ -65,7 +65,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         Sql<ISqlContext> sql = Sql()
             .Delete<ContentNuDto>()
             .Where<ContentNuDto>(x => x.NodeId == id);
-        _ = await Database.ExecuteAsync(sql);
+        await Database.ExecuteAsync(sql);
     }
 
     /// <inheritdoc/>
@@ -91,7 +91,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 Sql<ISqlContext> sql = Sql()
                     .Delete<ContentNuDto>()
                     .Where<ContentNuDto>(x => x.NodeId == contentCacheNode.Id && x.Published);
-                _ = await Database.ExecuteAsync(sql);
+                await Database.ExecuteAsync(sql);
                 break;
         }
     }
@@ -145,9 +145,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
-        .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
-        .Append(SqlWhereNodeKey(SqlContext, key))
-        .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+            .Append(SqlWhereNodeKey(SqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
         ContentSourceDto? dto = await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
 
@@ -287,23 +287,18 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
 
-        dto.RawData ??= [];
-        dto.Rv++;
-        ContentNuDto? existing = await Database.FirstOrDefaultAsync<ContentNuDto>(
-            Sql()
-                .SelectAll()
-                .From<ContentNuDto>()
-                .Where<ContentNuDto>(x => x.NodeId == dto.NodeId && x.Published == dto.Published));
-        if (existing is null)
-        {
-            _ = await Database.InsertAsync(dto);
-        }
-        else
-        {
-            Sql<ISqlContext> updateSql = Sql().Update<ContentNuDto>(u => u.Set(d => d.Data, dto.Data).Set(rd => rd.RawData, dto.RawData).Set(v => v.Rv, dto.Rv))
-                .Where<ContentNuDto>(x => x.NodeId == dto.NodeId && x.Published == dto.Published);
-            _ = await Database.ExecuteAsync(updateSql);
-        }
+        string c(string s) => SqlSyntax.GetQuotedColumnName(s);
+
+        await Database.InsertOrUpdateAsync(
+            dto,
+            $"SET data = @data, {c("dataRaw")} = @dataRaw, rv = rv + 1 WHERE {c("nodeId")} = @id AND published = @published",
+            new
+            {
+                dataRaw = dto.RawData ?? Array.Empty<byte>(),
+                data = dto.Data,
+                id = dto.NodeId,
+                published = dto.Published,
+            });
     }
 
     /// <summary>
@@ -312,6 +307,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <remarks>
     /// Assumes content tree lock.
     /// </remarks>
+    /// Rebuilds the content database cache by clearing and repopulating the cache with the latest content data.
     private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         if (contentTypeIds is null)
@@ -357,21 +353,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         while (processed < total);
     }
 
-    /// <summary>
     /// Rebuilds the media database cache by clearing and repopulating the cache with the latest media data.
-    /// Assumes media tree lock.
-    /// </summary>
-    /// <remarks>This method assumes that the media tree is locked during execution to ensure consistency.
-    /// The operation is performed in two stages: first, the existing cache entries are removed, and then the cache is
-    /// repopulated with the latest media data. The process is batched to handle large datasets efficiently.</remarks>
-    /// <param name="serializer">The serializer used to convert media content into a format suitable for database storage.</param>
-    /// <param name="groupSize">The number of media items to process in each batch during the cache rebuild operation.</param>
-    /// <param name="contentTypeIds">A collection of content type IDs to filter the media items being processed. If null or empty, all media items
-    /// are processed.</param>
-    private void RebuildMediaDbCache(
-        IContentCacheDataSerializer serializer,
-        int groupSize,
-        IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         if (contentTypeIds is null)
         {
@@ -401,12 +384,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         while (processed < total);
     }
 
-    /// <summary>
-    /// Rebuilds the content database cache for members.
-    /// </summary>
-    /// <remarks>
-    /// Assumes member tree lock.
-    /// </remarks>
+    /// Rebuilds the member database cache by clearing and repopulating the cache with the latest member data.
     private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         if (contentTypeIds is null)
@@ -429,17 +407,17 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             IEnumerable<IMember> descendants =
                 _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
             ContentNuDto[] items = descendants.Select(m => GetDtoFromContent(m, false, serializer)).ToArray();
-            _ = Database.BulkInsertRecords(items);
+            Database.BulkInsertRecords(items);
             processed += items.Length;
         }
         while (processed < total);
     }
 
-    private void RemoveByObjectType(Guid objectType, IReadOnlyCollection<int>? contentTypeIds)
+    private void RemoveByObjectType(Guid objectType, IReadOnlyCollection<int> contentTypeIds)
     {
-        // remove all - if anything fails the transaction will rollback
+        // If the provided contentTypeIds collection is empty, remove all records for the provided object type.
         Sql<ISqlContext> sql;
-        if (contentTypeIds is null || contentTypeIds.Count == 0)
+        if (contentTypeIds.Count == 0)
         {
             sql = Sql()
                 .Delete<ContentNuDto>()
@@ -448,12 +426,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                     Sql().Select<NodeDto>(n => n.NodeId)
                         .From<NodeDto>()
                         .Where<NodeDto>(n => n.NodeObjectType == objectType));
-            _ = Database.Execute(sql);
+            Database.Execute(sql);
         }
         else
         {
-            // assume number of ctypes won't blow IN(...)
-            // must support SQL-CE
+            // Otherwise, if contentTypeIds are provided remove only those records that match the object type and one of the content types.
             sql = Sql()
                 .Delete<ContentNuDto>()
                 .WhereIn<ContentNuDto>(
@@ -464,9 +441,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                     .InnerJoin<ContentDto>()
                     .On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
                     .Where<NodeDto, ContentDto>((n, c) =>
-                        n.NodeObjectType == objectType
-                        && contentTypeIds.Contains(c.ContentTypeId)));
-            _ = Database.Execute(sql);
+                        n.NodeObjectType == objectType &&
+                        contentTypeIds.Contains(c.ContentTypeId)));
+            Database.Execute(sql);
         }
     }
 
