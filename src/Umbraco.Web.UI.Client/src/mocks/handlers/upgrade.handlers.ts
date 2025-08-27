@@ -1,14 +1,14 @@
 const { rest } = window.MockServiceWorker;
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import type { UpgradeSettingsResponseModelReadable } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/upgrade/settings'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<UpgradeSettingsResponseModelReadable>({
+			ctx.json<UpgradeSettingsResponseModel>({
 				currentState: '2b20c6e7',
 				newState: '2b20c6e8',
 				oldVersion: '13.0.0',
