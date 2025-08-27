@@ -29,6 +29,15 @@ namespace Umbraco.Extensions
             return sql.Where(s, a);
         }
 
+        /// <summary>
+        /// Adds a WHERE clause to the SQL query based on the specified predicate and optional alias,  and appends a
+        /// closing parenthesis to the query. This is used for selects within "WHERE [column] IN (SELECT ...)" statements.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the data transfer object (DTO) used to define the predicate.</typeparam>
+        /// <param name="sql">The SQL query to which the WHERE clause will be added.</param>
+        /// <param name="predicate">An expression that defines the condition for the WHERE clause.</param>
+        /// <param name="alias">An optional alias to qualify the table or entity in the query. If null, no alias is used.</param>
+        /// <returns>The modified SQL query with the appended WHERE clause and closing parenthesis.</returns>
         public static Sql<ISqlContext> WhereClosure<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string? alias = null)
         {
             return sql.Where<TDto>(predicate, alias).Append(")");
@@ -147,7 +156,17 @@ namespace Umbraco.Extensions
             return sql.WhereIn(field, values, false, tableAlias);
         }
 
-
+        /// <summary>
+        /// This builds a WHERE clause with a LIKE statement where the value is built from a subquery.
+        /// E.g. for SQL Server: WHERE [field] LIKE CONCAT((SELECT [value] FROM ...), '%').
+        /// Or SQLite : WHERE [field] LIKE ((SELECT [value] FROM ...) || '%').
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="fieldSelector">An expression specifying the field.</param>
+        /// <param name="valuesSql">The sql object to select the values.</param>
+        /// <param name="concatDefault">If ommitted or empty the specific wildcard char is used as suffix for the resulting values from valueSql query.</param>
+        /// <returns></returns>
         public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, Sql<ISqlContext>? valuesSql, string concatDefault = "")
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
