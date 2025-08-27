@@ -493,7 +493,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			: nothing;
 	}
 
-	#renderBuiltinBlockView() {
+	#renderBuiltinBlockView = () => {
 		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
@@ -501,7 +501,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			return this.renderInlineBlock();
 		}
 		return this.#renderRefBlock();
-	}
+	};
 
 	#renderUnsupportedBlock() {
 		return html`<umb-block-grid-block-unsupported
