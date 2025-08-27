@@ -8,8 +8,8 @@ export class UmbTargetPaginationManager<
 	#baseTarget = new UmbObjectState<ItemModelType | undefined>(undefined);
 	#currentItems = new UmbArrayState<ItemModelType>([], (x) => x.unique);
 
-	#pageSize = new UmbNumberState(10);
-	public readonly pageSize = this.#pageSize.asObservable();
+	#takeSize = new UmbNumberState(50);
+	public readonly takeSize = this.#takeSize.asObservable();
 
 	#totalItems = new UmbNumberState(0);
 	public readonly totalItems = this.#totalItems.asObservable();
@@ -25,7 +25,7 @@ export class UmbTargetPaginationManager<
 	 * @returns {ItemModelType | undefined} - The target item that the pagination is based around
 	 * @memberof UmbTargetPaginationManager
 	 */
-	getBaseTarget(): ItemModelType | undefined {
+	public getBaseTarget(): ItemModelType | undefined {
 		return this.#baseTarget.getValue();
 	}
 
@@ -34,7 +34,7 @@ export class UmbTargetPaginationManager<
 	 * @param {(ItemModelType | undefined)} target - The target
 	 * @memberof UmbTargetPaginationManager
 	 */
-	setBaseTarget(target: ItemModelType | undefined) {
+	public setBaseTarget(target: ItemModelType | undefined) {
 		this.#baseTarget.setValue(target);
 	}
 
@@ -43,8 +43,8 @@ export class UmbTargetPaginationManager<
 	 * @returns {number}
 	 * @memberof UmbPaginationManager
 	 */
-	public getPageSize(): number {
-		return this.#pageSize.getValue();
+	public getTakeSize(): number {
+		return this.#takeSize.getValue();
 	}
 
 	/**
@@ -52,8 +52,8 @@ export class UmbTargetPaginationManager<
 	 * @param {number} pageSize
 	 * @memberof UmbPaginationManager
 	 */
-	public setPageSize(pageSize: number) {
-		this.#pageSize.setValue(pageSize);
+	public setTakeSize(pageSize: number) {
+		this.#takeSize.setValue(pageSize);
 	}
 
 	/**

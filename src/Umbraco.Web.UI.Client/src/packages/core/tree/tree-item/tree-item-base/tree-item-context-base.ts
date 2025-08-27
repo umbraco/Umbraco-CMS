@@ -96,9 +96,9 @@ export abstract class UmbTreeItemContextBase<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
 
-		const pageSize = 5;
-		this.pagination.setPageSize(pageSize);
-		this.targetPagination.setPageSize(pageSize);
+		const take = 5;
+		this.pagination.setPageSize(take);
+		this.targetPagination.setTakeSize(take);
 
 		this.#consumeContexts();
 
@@ -198,7 +198,7 @@ export abstract class UmbTreeItemContextBase<
 	 */
 	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
 
-	async #loadChildren(target?: UmbEntityModel) {
+	async #loadChildren() {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
 
@@ -210,19 +210,20 @@ export abstract class UmbTreeItemContextBase<
 
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
+		const baseTarget = this.targetPagination.getBaseTarget();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined =
-			target && target.unique
+			baseTarget && baseTarget.unique
 				? {
 						target: {
-							unique: target.unique,
-							entityType: target.entityType,
+							unique: baseTarget.unique,
+							entityType: baseTarget.entityType,
 						},
 						/* When we load from a target we want to load a few items before the target so the target isn't the first item in the list
 						 Currently we use 5, but this could be anything that feels "right".
 						*/
 						takeBefore: 5,
-						takeAfter: this.targetPagination.getPageSize(),
+						takeAfter: this.targetPagination.getTakeSize(),
 					}
 				: undefined;
 
@@ -274,7 +275,7 @@ export abstract class UmbTreeItemContextBase<
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
 			target: this.targetPagination.getStartTarget(),
-			takeBefore: this.targetPagination.getPageSize(),
+			takeBefore: this.targetPagination.getTakeSize(),
 			takeAfter: 0,
 		};
 
@@ -320,7 +321,7 @@ export abstract class UmbTreeItemContextBase<
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
 			target: this.targetPagination.getEndTarget(),
 			takeBefore: 0,
-			takeAfter: this.targetPagination.getPageSize(),
+			takeAfter: this.targetPagination.getTakeSize(),
 		};
 
 		const { data } = await repository.requestTreeItemsOf({
@@ -540,9 +541,8 @@ export abstract class UmbTreeItemContextBase<
 				// If this item has children, load them
 				if (isExpanded && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
 					const expansionEntry = await this.treeContext?.expansion.getItem(entity);
-					const target = expansionEntry?.target;
-					this.targetPagination.setBaseTarget(target);
-					this.#loadChildren(target);
+					this.targetPagination.setBaseTarget(expansionEntry?.target);
+					this.#loadChildren();
 				}
 
 				this.#isOpen.setValue(isExpanded ?? false);

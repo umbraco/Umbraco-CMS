@@ -26,7 +26,6 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
@@ -89,9 +88,9 @@ export class UmbDefaultTreeContext<
 		// @ts-ignore
 		super(host, UMB_TREE_CONTEXT);
 
-		const pageSize = 5;
-		this.pagination.setPageSize(pageSize);
-		this.targetPagination.setPageSize(pageSize);
+		const take = 5;
+		this.pagination.setPageSize(take);
+		this.targetPagination.setTakeSize(take);
 
 		this.#consumeContexts();
 
@@ -197,20 +196,20 @@ export class UmbDefaultTreeContext<
 
 	#debouncedReloadTree() {
 		if (this.getStartNode()) {
-			this.#reloadRootItems();
+			this.#loadRootItems(true);
 			return;
 		}
 
 		const hideTreeRoot = this.getHideTreeRoot();
 		if (hideTreeRoot) {
-			this.#reloadRootItems();
+			this.#loadRootItems(true);
 			return;
 		}
 
-		this.#reloadTreeRoot();
+		this.#loadTreeRoot(true);
 	}
 
-	async #loadTreeRoot() {
+	async #loadTreeRoot(reload = false) {
 		await this.#init;
 
 		const { data } = await this.#repository!.requestTreeRoot();
@@ -220,49 +219,47 @@ export class UmbDefaultTreeContext<
 			this.pagination.setTotalItems(1);
 			this.#observeExpansion();
 
-			if (this.getExpandTreeRoot()) {
-				this.#toggleTreeRootExpansion(true);
+			if (!reload) {
+				if (this.getExpandTreeRoot()) {
+					this.#toggleTreeRootExpansion(true);
+				}
 			}
 		}
 	}
 
-	async #reloadTreeRoot() {
-		await this.#init;
-
-		const { data } = await this.#repository!.requestTreeRoot();
-
-		if (data) {
-			this.#treeRoot.setValue(data);
-			this.pagination.setTotalItems(1);
-		}
-	}
-
-	async #loadRootItems(target?: UmbEntityModel) {
+	async #loadRootItems(reload = false) {
 		await this.#init;
 
 		// If we have a start node get children of that instead of the root
 		const startNode = this.getStartNode();
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.#additionalRequestArgs.getValue();
+		const baseTarget = this.targetPagination.getBaseTarget();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined =
-			target && target.unique
+			baseTarget && baseTarget.unique
 				? {
 						target: {
-							unique: target.unique,
-							entityType: target.entityType,
+							unique: baseTarget.unique,
+							entityType: baseTarget.entityType,
 						},
 						/* When we load from a target we want to load a few items before the target so the target isn't the first item in the list
 						 Currently we use 5, but this could be anything that feels "right".
+						 When reloading from target when want to retrieve the same number of items that a currently loaded
 						*/
-						takeBefore: 5,
-						takeAfter: this.targetPagination.getPageSize(),
+						takeBefore: reload ? this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget() : 5,
+						takeAfter: reload
+							? this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget()
+							: this.targetPagination.getTakeSize(),
 					}
 				: undefined;
 
 		const offsetPaging: UmbOffsetPaginationRequestModel = {
-			skip: this.pagination.getSkip(),
-			take: this.pagination.getPageSize(),
+			// when reloading we want to get everything from the start
+			skip: reload ? 0 : this.pagination.getSkip(),
+			take: reload
+				? this.pagination.getCurrentPageNumber() * this.pagination.getPageSize()
+				: this.pagination.getPageSize(),
 		};
 
 		const { data } = startNode?.unique
@@ -303,7 +300,7 @@ export class UmbDefaultTreeContext<
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
 			target: this.targetPagination.getStartTarget(),
-			takeBefore: this.targetPagination.getPageSize(),
+			takeBefore: this.targetPagination.getTakeSize(),
 			takeAfter: 0,
 		};
 
@@ -346,7 +343,7 @@ export class UmbDefaultTreeContext<
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
 			target: this.targetPagination.getEndTarget(),
 			takeBefore: 0,
-			takeAfter: this.targetPagination.getPageSize(),
+			takeAfter: this.targetPagination.getTakeSize(),
 		};
 
 		const { data } = startNode?.unique
@@ -370,64 +367,6 @@ export class UmbDefaultTreeContext<
 			this.targetPagination.appendCurrentItems(data.items);
 
 			this.targetPagination.setTotalItems(data.total);
-			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
-		}
-	}
-
-	async #reloadRootItems() {
-		await this.#init;
-
-		// If we have a start node get children of that instead of the root
-		const startNode = this.getStartNode();
-		const foldersOnly = this.#foldersOnly.getValue();
-		const additionalArgs = this.#additionalRequestArgs.getValue();
-		const baseTarget = this.targetPagination.getBaseTarget();
-
-		const targetPaging: UmbTargetPaginationRequestModel | undefined =
-			baseTarget && baseTarget.unique
-				? {
-						target: {
-							unique: baseTarget.unique,
-							entityType: baseTarget.entityType,
-						},
-						// When reloading from target when want to retrieve the same number of items that a currently loaded
-						takeBefore: this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget(),
-						takeAfter: this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget(),
-					}
-				: undefined;
-
-		const offsetPaging: UmbOffsetPaginationRequestModel = {
-			skip: 0, // As we are reloading we reset the skip
-			take: this.pagination.getCurrentPageNumber() * this.pagination.getPageSize(),
-		};
-
-		const { data } = startNode?.unique
-			? await this.#repository!.requestTreeItemsOf({
-					parent: {
-						unique: startNode.unique,
-						entityType: startNode.entityType,
-					},
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
-					paging: targetPaging || offsetPaging,
-					foldersOnly,
-					...additionalArgs,
-				})
-			: await this.#repository!.requestTreeRootItems({
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
-					paging: targetPaging || offsetPaging,
-					foldersOnly,
-					...additionalArgs,
-				});
-
-		if (data) {
-			this.#rootItems.setValue(data.items);
-			this.targetPagination.setCurrentItems(data.items);
-
-			this.pagination.setTotalItems(data.total);
-			this.targetPagination.setTotalItems(data.total);
-			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
 			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
 		}
 	}
@@ -559,9 +498,8 @@ export class UmbDefaultTreeContext<
 				const currentEntry = expansion.find(
 					(entry) => entry.unique === entity.unique && entry.entityType === entity.entityType,
 				);
-				const target = currentEntry?.target;
-				this.targetPagination.setBaseTarget(target);
-				this.#loadRootItems(target);
+				this.targetPagination.setBaseTarget(currentEntry?.target);
+				this.#loadRootItems();
 			},
 			'observeExpansion',
 		);
@@ -620,7 +558,7 @@ export class UmbDefaultTreeContext<
 		if (treeRoot === undefined) return;
 		if (event.getUnique() !== treeRoot.unique) return;
 		if (event.getEntityType() !== treeRoot.entityType) return;
-		this.#reloadRootItems();
+		this.#loadRootItems(true);
 	};
 
 	#removeEventListeners() {
