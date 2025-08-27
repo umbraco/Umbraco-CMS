@@ -471,9 +471,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							.props=${this._blockViewProps}
 							default-element=${this._inlineEditingMode ? 'umb-block-grid-block-inline' : 'umb-block-grid-block'}
 							type="blockEditorCustomView"
-							single
-							></umb-extension-slot
-						>
+							single></umb-extension-slot>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
