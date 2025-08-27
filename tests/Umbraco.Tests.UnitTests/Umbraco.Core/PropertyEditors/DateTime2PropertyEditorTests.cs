@@ -1,6 +1,6 @@
 using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Nodes;
-using Json.More;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -134,23 +134,39 @@ public class DateTime2PropertyEditorTests
 
     private static readonly object[][] _sourceList4 =
     [
-        [null, DateTime2Configuration.DateTimeFormat.DateOnly, null],
-        [null, DateTime2Configuration.DateTimeFormat.TimeOnly, null],
-        [null, DateTime2Configuration.DateTimeFormat.DateTime, null],
-        [new DateTime2ValueConverter.DateTime2 { Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.Zero) }, DateTime2Configuration.DateTimeFormat.DateOnly, "{\"date\":\"2025-08-20\",\"timeZone\":null}"],
-        [new DateTime2ValueConverter.DateTime2 { Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.Zero) }, DateTime2Configuration.DateTimeFormat.TimeOnly, "{\"date\":\"16:30:00.0000000\",\"timeZone\":null}"],
-        [new DateTime2ValueConverter.DateTime2 { Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.Zero) }, DateTime2Configuration.DateTimeFormat.DateTime, "{\"date\":\"2025-08-20T16:30:00.0000000Z\",\"timeZone\":null}"],
-        [new DateTime2ValueConverter.DateTime2 { Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.FromHours(-5)) }, DateTime2Configuration.DateTimeFormat.DateTime, "{\"date\":\"2025-08-20T16:30:00.0000000-05:00\",\"timeZone\":null}"],
-        [new DateTime2ValueConverter.DateTime2 { Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.FromHours(-5)), TimeZone = "Europe/Copenhagen" }, DateTime2Configuration.DateTimeFormat.DateTime, "{\"date\":\"2025-08-20T16:30:00.0000000-05:00\",\"timeZone\":\"Europe/Copenhagen\"}"],
+        [null, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.None, null],
+        [null, null, DateTime2Configuration.DateTimeFormat.TimeOnly, DateTime2Configuration.TimeZoneMode.None, null],
+        [null, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, null],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.None, new { date = "2025-08-20", timeZone = (string?)null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.All, new { date = "2025-08-20", timeZone = (string?)null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.Local, new { date = "2025-08-20", timeZone = (string?)null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.Custom, new { date = "2025-08-20", timeZone = (string?)null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.TimeOnly, DateTime2Configuration.TimeZoneMode.None, new { date = "16:30:00.0000000", timeZone = (string?)null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new { date = "2025-08-20T16:30:00.0000000", timeZone = (string?)null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, new { date = "2025-08-20T16:30:00.0000000+00:00", timeZone = (string?)null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.Local, new { date = "2025-08-20T16:30:00.0000000+00:00", timeZone = (string?)null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.Custom, new { date = "2025-08-20T16:30:00.0000000+00:00", timeZone = (string?)null }],
+        [-5, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new { date = "2025-08-20T21:30:00.0000000", timeZone = (string?)null }],
+        [-5, "Europe/Copenhagen", DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new { date = "2025-08-20T21:30:00.0000000", timeZone = "Europe/Copenhagen" }],
+        [-5, "Europe/Copenhagen", DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, new { date = "2025-08-20T16:30:00.0000000-05:00", timeZone = "Europe/Copenhagen" }],
     ];
 
     [TestCaseSource(nameof(_sourceList4))]
     public void Can_Parse_Values_To_Editor(
-        DateTime2ValueConverter.DateTime2? storedValue,
+        int? offset,
+        string? timeZone,
         DateTime2Configuration.DateTimeFormat format,
-        string? expectedJson)
+        DateTime2Configuration.TimeZoneMode timeZoneMode,
+        object? expectedResult)
     {
-        var valueEditor = CreateValueEditor(format: format);
+        var storedValue = offset is null
+            ? null
+            : new DateTime2ValueConverter.DateTime2
+            {
+                Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.FromHours(offset.Value)),
+                TimeZone = timeZone,
+            };
+        var valueEditor = CreateValueEditor(format: format, timeZoneMode: timeZoneMode);
         _dataTypeConfigurationCache.Setup(dc => dc.GetConfigurationAs<DateTime2Configuration>(Guid.Empty))
             .Returns(valueEditor.ConfigurationObject as DateTime2Configuration);
         var storedValueJson = storedValue is null ? null : _jsonSerializer.Serialize(storedValue);
@@ -166,14 +182,17 @@ public class DateTime2PropertyEditorTests
                     }
                 ],
             });
-        if (expectedJson is null)
+
+        if (expectedResult is null)
         {
             Assert.IsNull(result);
             return;
         }
 
-        Assert.IsInstanceOf<JsonNode>(result);
-        Assert.AreEqual(expectedJson, (result as JsonNode)?.AsJsonString());
+        var test = JsonSerializer.SerializeToNode(expectedResult);
+
+        Assert.IsNotNull(result);
+        Assert.IsTrue(JsonNode.DeepEquals(JsonSerializer.SerializeToNode(expectedResult), result as JsonNode));
     }
 
     private DateTime2PropertyEditor.DateTime2DataValueEditor CreateValueEditor(

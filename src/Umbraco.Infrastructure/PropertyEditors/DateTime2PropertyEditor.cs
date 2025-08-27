@@ -109,18 +109,18 @@ public class DateTime2PropertyEditor : DataEditor
         {
             var value = property.GetValue(culture, segment);
 
-            var interValue = DateTime2ValueConverter.GetIntermediateFromSource(value, _jsonSerializer);
-            if (interValue is not DateTime2ValueConverter.DateTime2 dateTime2)
+            DateTime2ValueConverter.DateTime2? interValue = DateTime2ValueConverter.GetIntermediateFromSource(value, _jsonSerializer);
+            if (interValue is null)
             {
                 return null;
             }
 
             DateTime2Configuration? configuration = GetConfiguration(property.PropertyType.DataTypeKey);
-            var objectValue = DateTime2ValueConverter.GetObjectFromIntermediate(dateTime2, configuration);
+            var objectValue = DateTime2ValueConverter.GetObjectFromIntermediate(interValue, configuration);
 
             JsonNode node = new JsonObject();
             node["date"] = objectValue is null ? null : $"{objectValue:O}";
-            node["timeZone"] = dateTime2.TimeZone;
+            node["timeZone"] = interValue.TimeZone;
             return node;
         }
 
