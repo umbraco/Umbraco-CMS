@@ -98,8 +98,8 @@ internal sealed class ContentPublishingService : IContentPublishingService
     }
 
     /// <inheritdoc />
-    [Obsolete("Use non obsoleted version instead. Scheduled for removal in v17")]
-    public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
+    // TODO - Integrate this implementation into the one above.
+    private async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
         Guid key,
         CultureAndScheduleModel cultureAndSchedule,
         Guid userKey)

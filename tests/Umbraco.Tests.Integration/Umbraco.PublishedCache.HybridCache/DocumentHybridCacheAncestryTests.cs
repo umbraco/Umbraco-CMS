@@ -48,7 +48,7 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
         // Text Page
           // Sub Page <-- Unpublished
                 // Sub Sub Page
-        await ContentPublishingService.PublishBranchAsync(Textpage.Key, Array.Empty<string>(), true, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishBranchAsync(Textpage.Key, Array.Empty<string>(), PublishBranchFilter.All, Constants.Security.SuperUserKey, false);
         await ContentPublishingService.UnpublishAsync(Subpage.Key, null, Constants.Security.SuperUserKey);
 
         var published = await PublishedContentCache.GetByIdAsync(SubSubPage.Key);
@@ -58,7 +58,7 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
     [Test]
     public async Task CanGetPublishedContentIfParentIsPublished()
     {
-        await ContentPublishingService.PublishBranchAsync(Textpage.Key, Array.Empty<string>(), true, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishBranchAsync(Textpage.Key, Array.Empty<string>(), PublishBranchFilter.All, Constants.Security.SuperUserKey, false);
 
         var published = await PublishedContentCache.GetByIdAsync(SubSubPage.Key);
         CacheTestsHelper.AssertPage(SubSubPage, published);
@@ -70,7 +70,7 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
         // Text Page
           // Sub Page <-- Unpublished
             // Sub Sub Page
-        await ContentPublishingService.PublishBranchAsync(Textpage.Key, Array.Empty<string>(), true, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishBranchAsync(Textpage.Key, Array.Empty<string>(), PublishBranchFilter.Default, Constants.Security.SuperUserKey, false);
         await ContentPublishingService.UnpublishAsync(Subpage.Key, null, Constants.Security.SuperUserKey);
 
         // Clear cache also seeds, but we have to reset the seed keys first since these are cached from test startup
