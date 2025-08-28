@@ -827,7 +827,7 @@ stages:
             parameters:
               testFolder: $(testFolder)
               buildConfiguration: ${{ variables.buildConfiguration }}
-              ${{ if eq(variables['additionalEnvironmentVariables'], 'false') }}:
+              ${{ if eq(variables['additionalEnvironmentVariables'], 'true') }}:
                 additionalEnvironmentVariables: $(additionalEnvironmentVariables)
 
           # Build application for AzureADB2C
@@ -848,7 +848,7 @@ stages:
           - template: nightly-E2E-run-application-template.yml
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
-              ${{ if eq(variables['additionalEnvironmentVariables'], 'false') }}:
+              ${{ if eq(variables['additionalEnvironmentVariables'], 'true') }}:
                 additionalEnvironmentVariables: $(additionalEnvironmentVariables)
 
           # Run application for Linux
@@ -884,6 +884,7 @@ stages:
             parameters:
               testCommand: $(testCommand)
               ASPNETCORE_URLS: $(ASPNETCORE_URLS)
-              port: $(port)
+              ${{ if ne(variables['port'], '') }}:
+                port: $(port)
               AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
               AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
