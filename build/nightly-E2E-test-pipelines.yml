@@ -848,6 +848,36 @@ stages:
           - template: nightly-E2E-run-application-template.yml
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
+              ${{ if eq(variables['additionalEnvironmentVariables'], 'false') }}:
+                additionalEnvironmentVariables: $(additionalEnvironmentVariables)
+
+          # Run application for Linux
+          - bash: |
+              nohup dotnet run --project UmbracoProject --configuration ${{parameters.buildConfiguration}} --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
+              echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
+            displayName: Run application (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), eq($(additionalEnvironmentVariables), true))
+            workingDirectory: $(Agent.BuildDirectory)/app
+            env:
+              AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
+              AZUREADB2CTENANT: $(AZUREB2CTENANT)
+              AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
+              AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
+              AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
+
+          # Run application for Windows
+          - pwsh: |
+              $process = Start-Process dotnet "run --project UmbracoProject --configuration ${{parameters.buildConfiguration}} --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
+              Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
+            displayName: Run application (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'), eq($(additionalEnvironmentVariables), true))
+            workingDirectory: $(Agent.BuildDirectory)/app
+            env:
+              AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
+              AZUREADB2CTENANT: $(AZUREB2CTENANT)
+              AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
+              AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
+              AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
 
           # Run tests
           - template: nightly-E2E-run-tests-template.yml

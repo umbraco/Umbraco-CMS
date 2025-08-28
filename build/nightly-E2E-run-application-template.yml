@@ -7,6 +7,10 @@
     type: string
     default: ''
 
+  - name: additionalEnvironmentVariables
+    type: boolean
+    default: false
+
 steps:
   # Start SQL Server Linux
   - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=${{parameters.SA_PASSWORD}}" mcr.microsoft.com/mssql/server:2022-latest
@@ -50,7 +54,7 @@ steps:
       nohup dotnet run --project UmbracoProject --configuration ${{parameters.buildConfiguration}} --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
       echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
     displayName: Run application (Linux)
-    condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+    condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), eq(${{ parameters.additionalEnvironmentVariables }}, false))
     workingDirectory: $(Agent.BuildDirectory)/app
 
   # Run application for Windows
@@ -58,5 +62,5 @@ steps:
       $process = Start-Process dotnet "run --project UmbracoProject --configuration ${{parameters.buildConfiguration}} --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
       Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
     displayName: Run application (Windows)
-    condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+    condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'), eq(${{ parameters.additionalEnvironmentVariables }}, false))
     workingDirectory: $(Agent.BuildDirectory)/app
