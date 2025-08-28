@@ -75,13 +75,6 @@ public interface IDocumentUrlService
     Guid? GetDocumentKeyByRoute(string route, string? culture, int? documentStartNodeId, bool isDraft);
 
     /// <summary>
-    /// Gets all the URLs for a given content key.
-    /// </summary>
-    /// <param name="contentKey">The content key.</param>
-    [Obsolete("This method is obsolete and will be removed in future versions. Use IPublishedUrlInfoProvider.GetAllAsync instead. Scheduled for removal in Umbraco 17.")]
-    Task<IEnumerable<UrlInfo>> ListUrlsAsync(Guid contentKey);
-
-    /// <summary>
     /// Gets the legacy route format for a document key and culture.
     /// </summary>
     /// <param name="key">The key of the document.</param>

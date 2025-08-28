@@ -743,27 +743,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IDataType? dataType = GetDataTypeFromRepository(id);
-            if (dataType == null)
-            {
-                return Task.FromResult(Attempt.FailWithStatus<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>(DataTypeOperationStatus.NotFound, new Dictionary<Udi, IEnumerable<string>>()));
-            }
-
-            IReadOnlyDictionary<Udi, IEnumerable<string>> usages = _dataTypeRepository.FindUsages(dataType.Id);
-            return Task.FromResult(Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, usages));
-        }
-
-        /// <inheritdoc />
-        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            return _dataTypeRepository.FindListViewUsages(id);
-        }
-
-        /// <inheritdoc />
         public Task<PagedModel<RelationItemModel>> GetPagedRelationsAsync(Guid key, int skip, int take)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
