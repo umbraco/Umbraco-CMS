@@ -204,6 +204,7 @@ export default {
 		removeTextBox: 'Eliminar caja de texto',
 		contentRoot: 'Raíz de contenido',
 		saveModalTitle: 'Guardar',
+		openSplitViewForVariant: (variant: string) => `Abrir vista dividida para '${variant}'`,
 	},
 	blueprints: {
 		createBlueprintFrom: 'Crear nueva Plantilla de Contenido desde <em>%0%</em>',
