@@ -50,7 +50,7 @@ public static class UrlProviderExtensions
 
         if (content.Published == false)
         {
-            result.Add(UrlInfo.Message(textService.Localize("content", "itemNotPublished")));
+            result.Add(UrlInfo.AsMessage(textService.Localize("content", "itemNotPublished")));
             return result;
         }
 
@@ -76,14 +76,14 @@ public static class UrlProviderExtensions
         }
 
         // return the real URLs first, then the messages
-        foreach (IGrouping<bool, UrlInfo> urlGroup in urls.GroupBy(x => x.IsUrl).OrderByDescending(x => x.Key))
+        foreach (IGrouping<bool, UrlInfo> urlGroup in urls.GroupBy(x => x.Url is not null).OrderByDescending(x => x.Key))
         {
             // in some cases there will be the same URL for multiple cultures:
             // * The entire branch is invariant
             // * If there are less domain/cultures assigned to the branch than the number of cultures/languages installed
             if (urlGroup.Key)
             {
-                result.AddRange(urlGroup.DistinctBy(x => x.Text, StringComparer.OrdinalIgnoreCase).OrderBy(x => x.Text)
+                result.AddRange(urlGroup.DistinctBy(x => x.Url?.ToString(), StringComparer.OrdinalIgnoreCase).OrderBy(x => x.Url?.ToString())
                     .ThenBy(x => x.Culture));
             }
             else
@@ -94,7 +94,7 @@ public static class UrlProviderExtensions
 
         // get the 'other' URLs - ie not what you'd get with GetUrl() but URLs that would route to the document, nevertheless.
         // for these 'other' URLs, we don't check whether they are routable, collide, anything - we just report them.
-        foreach (UrlInfo otherUrl in publishedUrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Text)
+        foreach (UrlInfo otherUrl in publishedUrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Message)
                      .ThenBy(x => x.Culture))
         {
             // avoid duplicates
@@ -155,7 +155,7 @@ public static class UrlProviderExtensions
 
                 // deal with exceptions
                 case "#ex":
-                    result.Add(UrlInfo.Message(textService.Localize("content", "getUrlException"), culture));
+                    result.Add(UrlInfo.AsMessage(textService.Localize("content", "getUrlException"), culture));
                     break;
 
                 // got a URL, deal with collisions, add URL
@@ -168,7 +168,7 @@ public static class UrlProviderExtensions
                     }
                     else
                     {
-                        result.Add(UrlInfo.Url(url, culture));
+                        result.Add(UrlInfo.AsUrl(url, culture));
                     }
 
                     break;
@@ -193,17 +193,17 @@ public static class UrlProviderExtensions
         if (parent == null)
         {
             // oops, internal error
-            return UrlInfo.Message(textService.Localize("content", "parentNotPublishedAnomaly"), culture);
+            return UrlInfo.AsMessage(textService.Localize("content", "parentNotPublishedAnomaly"), culture);
         }
 
         if (!parent.Published)
         {
             // totally not published
-            return UrlInfo.Message(textService.Localize("content", "parentNotPublished", new[] { parent.Name }), culture);
+            return UrlInfo.AsMessage(textService.Localize("content", "parentNotPublished", new[] { parent.Name }), culture);
         }
 
         // culture not published
-        return UrlInfo.Message(
+        return UrlInfo.AsMessage(
             textService.Localize("content", "parentCultureNotPublished", new[] { parent.Name }),
             culture);
     }
@@ -242,7 +242,7 @@ public static class UrlProviderExtensions
                 logger.LogDebug(logMsg, url, uri, culture);
             }
 
-            var urlInfo = UrlInfo.Message(textService.Localize("content", "routeErrorCannotRoute"), culture);
+            var urlInfo = UrlInfo.AsMessage(textService.Localize("content", "routeErrorCannotRoute"), culture);
             return Attempt.Succeed(urlInfo);
         }
 
@@ -264,7 +264,7 @@ public static class UrlProviderExtensions
             l.Reverse();
             var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent?.Id + ")";
 
-            var urlInfo = UrlInfo.Message(textService.Localize("content", "routeError", new[] { s }), culture);
+            var urlInfo = UrlInfo.AsMessage(textService.Localize("content", "routeError", new[] { s }), culture);
             return Attempt.Succeed(urlInfo);
         }
 

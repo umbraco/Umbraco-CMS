@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -38,4 +39,11 @@ public interface IUrlProvider
     ///     </para>
     /// </remarks>
     IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current);
+
+    /// <summary>
+    ///     Gets the preview URLs of a content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <returns>The preview URLs of the content item.</returns>
+    IEnumerable<UrlInfo> GetPreviewUrls(IContent content);
 }

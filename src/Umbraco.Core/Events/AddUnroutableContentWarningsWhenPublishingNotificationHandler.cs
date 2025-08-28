@@ -108,7 +108,7 @@ public class AddUnroutableContentWarningsWhenPublishingNotificationHandler : INo
             EventMessages eventMessages = _eventMessagesFactory.Get();
             foreach (var culture in successfulCultures)
             {
-                if (urls.Where(u => u.Culture == culture || culture == "*").All(u => u.IsUrl is false))
+                if (urls.Where(u => u.Culture == culture || culture == "*").All(u => u.Url is null))
                 {
                     eventMessages.Add(new EventMessage("Content published", "The document does not have a URL, possibly due to a naming collision with another document. More details can be found under Info.", EventMessageType.Warning));
 
