@@ -764,6 +764,8 @@ stages:
               testFolder: "UnattendedInstallConfig"
               testCommand: "npx playwright test --project=unattendedInstallConfig --grep=InstallSQLServer"
               port: 44331
+              additionalEnvironmentVariables: false
+
             # LocalDB not supported on linux
             #            LinuxUnattendedInstallConfig:
             #              vmImage: "ubuntu-latest"
