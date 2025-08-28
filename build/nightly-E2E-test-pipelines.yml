@@ -856,7 +856,7 @@ stages:
               nohup dotnet run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
               echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
             displayName: Run application (Linux)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), eq($(additionalEnvironmentVariables), true))
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), eq(variables['additionalEnvironmentVariables'], 'true'))
             workingDirectory: $(Agent.BuildDirectory)/app
             env:
               AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
@@ -870,7 +870,7 @@ stages:
               $process = Start-Process dotnet "run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
               Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
             displayName: Run application (Windows)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'), eq($(additionalEnvironmentVariables), true))
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'), eq(variables['additionalEnvironmentVariables'], 'true'))
             workingDirectory: $(Agent.BuildDirectory)/app
             env:
               AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
