@@ -25,12 +25,18 @@ steps:
     displayName: Install wait-on package
 
   - pwsh: |
-      if ("${{ parameters.port }}" -ne "") {
-        Write-Host "Waiting on TCP port ${{ parameters.port }}"
-        npx wait-on -v --interval 1000 --timeout 120000 "tcp:${{ parameters.port }}"
+      $Port = "${{ parameters.port }}"
+      $Url  = "${{ parameters.ASPNETCORE_URLS }}"
+
+      echo $Port
+      echo $Url
+
+      if ($Port -ne "") {
+          Write-Host "Waiting on TCP port $Port"
+          npx wait-on -v --interval 1000 --timeout 120000 "tcp:$Port"
       } else {
-        Write-Host "Waiting on URL ${{ parameters.ASPNETCORE_URLS }}"
-        npx wait-on -v --interval 1000 --timeout 120000 "${{ parameters.ASPNETCORE_URLS }}"
+          Write-Host "Waiting on URL $Url"
+          npx wait-on -v --interval 1000 --timeout 120000 "$Url"
       }
     displayName: Wait for application
     workingDirectory: tests/Umbraco.Tests.AcceptanceTest
