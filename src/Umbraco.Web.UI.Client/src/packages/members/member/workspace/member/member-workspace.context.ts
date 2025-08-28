@@ -117,8 +117,6 @@ export class UmbMemberWorkspaceContext
 			`validateObserverFor_${propertyName}`,
 		);
 
-		this.validationContext.messages.debug('member');
-
 		// Observe Validation and turn it into hint:
 		this.observe(
 			this.validationContext.messages.messagesOfPathAndDescendant(dataPath),
