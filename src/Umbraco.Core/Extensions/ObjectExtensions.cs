@@ -491,6 +491,14 @@ public static class ObjectExtensions
         {
             if (DateTime.TryParse(input, out DateTime value))
             {
+                 // Minimum value of SQL Servers sqlDateTime property is 01/01/1753.
+                 // So if a DateTime.MinValue (01/01/0001) comes in, we need to convert it to sqlDateTime min value.
+                 // This can be removed if we ever migrate our property to DateTime2
+                if (value is { Year: 1, Month: 1, Day: 1 })
+                {
+                    value = value.AddYears(1752);
+                }
+
                 switch (value.Kind)
                 {
                     case DateTimeKind.Unspecified:
