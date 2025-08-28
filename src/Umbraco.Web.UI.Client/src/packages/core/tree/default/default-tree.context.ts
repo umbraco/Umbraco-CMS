@@ -493,13 +493,39 @@ export class UmbDefaultTreeContext<
 		this.observe(
 			this.expansion.entry(entity),
 			async (entry) => {
-				console.log(entry);
+				const isExpanded = entry !== undefined;
+
 				// TODO: optimize this so we don't make too many requests
 				// TODO currently we update the tree every time the expansion state changes which gives
 				// the result that we always load 5 items on top of the target. Revisit this. Maybe we only have to do this
 				// if we haven't loaded any items
-				this.targetPagination.setBaseTarget(entry?.target);
-				this.#loadRootItems();
+
+				const currentBaseTarget = this.targetPagination.getBaseTarget();
+				const newTarget = entry?.target;
+
+				/* If a base target already exists (tree loaded to that point),
+   			don’t auto-reset when the target is removed.
+   			This happens when creating new items not yet in the tree. */
+				if (currentBaseTarget && !newTarget) {
+					return;
+				}
+
+				/* If a new target is set we only want to reload children if the new target isn’t among the already loaded items. */
+				const targetIsLoaded = this.#rootItems
+					.getValue()
+					.some((child) => child.entityType === newTarget?.entityType && newTarget.unique === child.unique);
+				if (newTarget && targetIsLoaded) {
+					return;
+				}
+
+				if (newTarget && targetIsLoaded) {
+					return;
+				}
+
+				if (isExpanded) {
+					this.targetPagination.setBaseTarget(entry?.target);
+					this.#loadRootItems();
+				}
 			},
 			'observeExpansion',
 		);

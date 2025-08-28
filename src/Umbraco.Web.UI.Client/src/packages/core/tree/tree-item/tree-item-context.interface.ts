@@ -23,12 +23,12 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	targetPagination?: UmbTargetPaginationManager;
 	getTreeItem(): TreeItemType | undefined;
 	setTreeItem(treeItem: TreeItemType | undefined): void;
-	loadChildren(): void;
 	toggleContextMenu(): void;
 	select(): void;
 	deselect(): void;
 	constructPath(pathname: string, entityType: string, unique: string): string;
 	loadChildren(): void;
+	reloadChildren(): void;
 	showChildren(): void;
 	hideChildren(): void;
 	// TODO: v18 make these non-optional

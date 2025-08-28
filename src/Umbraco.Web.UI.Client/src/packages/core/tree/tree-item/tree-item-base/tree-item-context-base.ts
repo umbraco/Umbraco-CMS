@@ -176,6 +176,8 @@ export abstract class UmbTreeItemContextBase<
 	 */
 	public loadChildren = (): Promise<void> => this.#loadChildren();
 
+	public reloadChildren = (): Promise<void> => this.#loadChildren(true);
+
 	/**
 	 * Load more children of the tree item
 	 * @deprecated Use `loadNextItems` instead. Will be removed in v18.0.0.
@@ -541,16 +543,36 @@ export abstract class UmbTreeItemContextBase<
 		};
 
 		this.observe(
-			this.treeContext?.expansion.isExpanded(entity),
-			async (isExpanded) => {
-				// If this item has children, load them
-				if (isExpanded && this.#hasChildren.getValue() && this.#isOpen.getValue() === false) {
-					const expansionEntry = await this.treeContext?.expansion.getItem(entity);
-					this.targetPagination.setBaseTarget(expansionEntry?.target);
+			this.treeContext?.expansion.entry(entity),
+			async (entry) => {
+				const isExpanded = entry !== undefined;
+
+				const currentBaseTarget = this.targetPagination.getBaseTarget();
+				const newTarget = entry?.target;
+
+				/* If a base target already exists (tree loaded to that point),
+   			don’t auto-reset when the target is removed.
+   			This happens when creating new items not yet in the tree. */
+				if (currentBaseTarget && !newTarget) {
+					return;
+				}
+
+				/* If a new target is set we only want to reload children if the new target isn’t among the already loaded items. */
+				const targetIsLoaded = this.#childItems
+					.getValue()
+					.some((child) => child.entityType === newTarget?.entityType && newTarget.unique === child.unique);
+
+				if (newTarget && targetIsLoaded) {
+					return;
+				}
+
+				// If this item is expanded and has children, load them
+				if (isExpanded && this.#hasChildren.getValue()) {
+					this.targetPagination.setBaseTarget(entry.target);
 					this.#loadChildren();
 				}
 
-				this.#isOpen.setValue(isExpanded ?? false);
+				this.#isOpen.setValue(isExpanded);
 			},
 			'observeExpansion',
 		);
@@ -559,7 +581,7 @@ export abstract class UmbTreeItemContextBase<
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
-		this.loadChildren(true);
+		this.reloadChildren();
 	};
 
 	#onReloadStructureRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
@@ -568,7 +590,7 @@ export abstract class UmbTreeItemContextBase<
 		if (event.getEntityType() !== this.entityType) return;
 
 		if (this.parentTreeItemContext) {
-			this.parentTreeItemContext.loadChildren(true);
+			this.parentTreeItemContext.reloadChildren();
 		} else {
 			this.treeContext?.reloadTree();
 		}
