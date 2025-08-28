@@ -120,6 +120,8 @@ public class ObjectExtensionsTests
     }
 
     [TestCase("01-01-0001", true)]
+    [TestCase("01-01-1500", true)]
+    [TestCase("01-01-1800", false)]
     public virtual void CanConvertDateTimeMinValueToSqlDateTimeMinValue(string date, bool outcome)
     {
         var dateTime = new DateTime(1753, 01, 01);
