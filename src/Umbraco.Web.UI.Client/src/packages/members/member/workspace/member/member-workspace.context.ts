@@ -3,7 +3,7 @@ import type { UmbMemberDetailModel, UmbMemberVariantModel } from '../../types.js
 import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset.context.js';
 import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/manifests.js';
-import { UMB_MEMBER_WORKSPACE_ALIAS, UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS } from './manifests.js';
+import { UMB_MEMBER_WORKSPACE_ALIAS, UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS } from './constants.js';
 import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
 import { UmbMemberTypeDetailRepository, type UmbMemberTypeDetailModel } from '@umbraco-cms/backoffice/member-type';
