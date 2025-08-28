@@ -1,23 +1,23 @@
 parameters:
   - name: nodeVersion
     type: string
-    default: ' '
+    default: ''
 
   - name: PlaywrightUserEmail
     type: string
-    default: ' '
+    default: ''
 
   - name: PlaywrightPassword
     type: string
-    default: ' '
+    default: ''
 
   - name: ASPNETCORE_URLS
     type: string
-    default: ' '
+    default: ''
 
   - name: npm_config_cache
     type: string
-    default: ' '
+    default: ''
 
 
 steps:

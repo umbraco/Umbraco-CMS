@@ -1,11 +1,11 @@
 ﻿parameters:
   - name: SA_PASSWORD
     type: string
-    default: ' '
+    default: ''
 
   - name: buildConfiguration
     type: string
-    default: ' '
+    default: ''
 
 
 steps:
