@@ -98,7 +98,7 @@
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",
-            "value": "13.10.0"
+            "value": "17.0.0"
           }
         ]
       }
@@ -116,11 +116,11 @@
         "cases": [
           {
             "condition": "(UmbracoRelease == 'Latest')",
-            "value": "net9.0"
+            "value": "net10.0"
           },
           {
             "condition": "(UmbracoRelease == 'LTS')",
-            "value": "net8.0"
+            "value": "net10.0"
           }
         ]
       }
