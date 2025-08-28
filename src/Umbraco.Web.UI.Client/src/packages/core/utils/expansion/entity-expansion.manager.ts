@@ -32,6 +32,18 @@ export class UmbEntityExpansionManager<
 	}
 
 	/**
+	 * Observe the expansion entry for a specific entity
+	 * @param {EntryModelType} entity The entity to observe
+	 * @returns {Observable<EntryModelType | undefined>} An observable of the expansion entry
+	 * @memberof UmbEntityExpansionManager
+	 */
+	entry(entity: EntryModelType): Observable<EntryModelType | undefined> {
+		return this._expansion.asObservablePart((entries) =>
+			entries?.find((entry) => entry.entityType === entity.entityType && entry.unique === entity.unique),
+		);
+	}
+
+	/**
 	 * Sets the expansion state
 	 * @param {UmbEntityExpansionModel<EntryModelType> | undefined} expansion The expansion state
 	 * @memberof UmbEntityExpansionManager

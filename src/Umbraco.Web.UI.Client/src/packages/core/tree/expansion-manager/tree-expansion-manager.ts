@@ -15,6 +15,16 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	expansion = this.#manager.expansion;
 
 	/**
+	 * Observe the expansion entry for a specific entity
+	 * @param {UmbEntityModel} entity - The entity to observe
+	 * @returns {Observable<UmbEntityExpansionEntryModel | undefined>} - An observable of the expansion entry
+	 * @memberof UmbTreeExpansionManager
+	 */
+	entry(entity: UmbEntityModel): Observable<UmbEntityExpansionEntryModel | undefined> {
+		return this.#manager.entry(entity);
+	}
+
+	/**
 	 * Checks if an entity is expanded
 	 * @param {UmbEntityModel} entity The entity to check
 	 * @param {string} entity.entityType The entity type
