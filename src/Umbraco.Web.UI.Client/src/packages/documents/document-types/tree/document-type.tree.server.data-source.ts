@@ -10,6 +10,7 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { isOffsetPaginationRequest, isTargetPaginationRequest } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source for the Document Type tree that fetches data from the server
@@ -35,25 +36,102 @@ export class UmbDocumentTypeTreeServerDataSource extends UmbTreeServerDataSource
 	}
 }
 
-const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
+	const paging = args.paging;
+
+	if (paging && isTargetPaginationRequest(paging)) {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		const { data } = await DocumentTypeService.getTreeDocumentTypeSiblings({
+			query: {
+				foldersOnly: args.foldersOnly,
+				target: paging.target.unique,
+				before: paging.takeBefore,
+				after: paging.takeAfter,
+			},
+		});
+
+		return {
+			data: {
+				items: data.items,
+				total: data.totalBefore + data.items.length + data.totalAfter,
+				totalBefore: data.totalBefore,
+				totalAfter: data.totalAfter,
+			},
+		};
+	}
+
+	const skip = paging && isOffsetPaginationRequest(paging) ? paging.skip : args.skip ? args.skip : 0;
+	const take = paging && isOffsetPaginationRequest(paging) ? paging.take : args.take ? args.take : 50;
+
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentTypeService.getTreeDocumentTypeRoot({
-		query: { foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
+	const { data } = await DocumentTypeService.getTreeDocumentTypeRoot({
+		query: {
+			foldersOnly: args.foldersOnly,
+			skip,
+			take,
+		},
 	});
 
-const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+	return {
+		data: {
+			items: data.items,
+			total: data.total,
+			totalBefore: 0,
+			totalAfter: data.total - data.items.length,
+		},
+	};
+};
+
+const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
-		return getRootItems({
-			foldersOnly: args.foldersOnly,
-			skip: args.skip,
-			take: args.take,
-		});
-	} else {
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentTypeService.getTreeDocumentTypeChildren({
-			query: { parentId: args.parent.unique, foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
-		});
+		return getRootItems(args);
 	}
+
+	const paging = args.paging;
+
+	if (paging && isTargetPaginationRequest(paging)) {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		const { data } = await DocumentTypeService.getTreeDocumentTypeSiblings({
+			query: {
+				foldersOnly: args.foldersOnly,
+				target: paging.target.unique,
+				before: paging.takeBefore,
+				after: paging.takeAfter,
+			},
+		});
+
+		return {
+			data: {
+				items: data.items,
+				total: data.totalBefore + data.items.length + data.totalAfter,
+				totalBefore: data.totalBefore,
+				totalAfter: data.totalAfter,
+			},
+		};
+	}
+
+	// Including args.skip + args.take for backwards compatibility
+	const skip = paging && isOffsetPaginationRequest(paging) ? paging.skip : args.skip ? args.skip : 0;
+	const take = paging && isOffsetPaginationRequest(paging) ? paging.take : args.take ? args.take : 50;
+
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	const { data } = await DocumentTypeService.getTreeDocumentTypeChildren({
+		query: {
+			parentId: args.parent.unique,
+			foldersOnly: args.foldersOnly,
+			skip,
+			take,
+		},
+	});
+
+	return {
+		data: {
+			items: data.items,
+			total: data.total,
+			totalBefore: 0,
+			totalAfter: data.total - data.items.length,
+		},
+	};
 };
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
