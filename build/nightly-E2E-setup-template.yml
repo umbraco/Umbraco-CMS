@@ -19,7 +19,6 @@ parameters:
     type: string
     default: ''
 
-
 steps:
   - task: DownloadPipelineArtifact@2
     displayName: Download NuGet artifacts

@@ -7,7 +7,6 @@
     type: string
     default: ''
 
-
 steps:
   # Start SQL Server Linux
   - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=${{parameters.SA_PASSWORD}}" mcr.microsoft.com/mssql/server:2022-latest
