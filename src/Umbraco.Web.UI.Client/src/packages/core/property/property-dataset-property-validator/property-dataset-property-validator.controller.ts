@@ -1,8 +1,8 @@
+import { UMB_PROPERTY_DATASET_CONTEXT } from '../property-dataset/property-dataset-context.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbValueValidator, type UmbValueValidatorArgs } from '@umbraco-cms/backoffice/validation';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '../property-dataset/property-dataset-context.token';
 
-export interface UmbPropertyDatasetPropertyValidator<ValueType = unknown> extends UmbValueValidatorArgs<ValueType> {
+export interface UmbPropertyDatasetPropertyValidatorArgs<ValueType = unknown> extends UmbValueValidatorArgs<ValueType> {
 	propertyAlias: string;
 }
 
@@ -11,7 +11,7 @@ export class UmbPropertyDatasetPropertyValidator<ValueType = unknown> extends Um
 	//
 	#propertyAlias: string;
 
-	constructor(host: UmbControllerHost, args: UmbPropertyDatasetPropertyValidator<ValueType>) {
+	constructor(host: UmbControllerHost, args: UmbPropertyDatasetPropertyValidatorArgs<ValueType>) {
 		super(host, args);
 		this.#propertyAlias = args.propertyAlias;
 

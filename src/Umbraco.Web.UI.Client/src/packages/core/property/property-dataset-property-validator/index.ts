@@ -1,1 +1,1 @@
-export * from './propertyDatasetPropertyValidator.controller.js';
+export * from './property-dataset-property-validator.controller.js';

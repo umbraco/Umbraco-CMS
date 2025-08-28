@@ -1,8 +1,8 @@
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_VALIDATION_CONTEXT } from '../../context/validation.context-token.js';
+import type { UmbValidator } from '../../interfaces/validator.interface.js';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '../../const.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_VALIDATION_CONTEXT } from '../../context/validation.context-token';
-import type { UmbValidator } from '../../interfaces/validator.interface';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '../../const';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 export interface UmbValueValidatorArgs<ValueType = unknown> {
 	dataPath?: string;
