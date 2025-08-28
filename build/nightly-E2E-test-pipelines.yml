@@ -824,8 +824,8 @@ stages:
           - template: nightly-E2E-build-template.yml
             parameters:
               testFolder: $(testFolder)
-              buildConfiguration: $(buildConfiguration)
-              ${{ if eq(variables['additionalEnvironmentVariables'], 'true') }}:
+              buildConfiguration: ${{ variables.buildConfiguration }}
+              ${{ if eq(variables['additionalEnvironmentVariables'], 'false') }}:
                 additionalEnvironmentVariables: $(additionalEnvironmentVariables)
 
           # Build application for AzureADB2C
