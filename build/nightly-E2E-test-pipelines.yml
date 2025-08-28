@@ -825,7 +825,8 @@ stages:
             parameters:
               testFolder: $(testFolder)
               buildConfiguration: $(buildConfiguration)
-              additionalEnvironmentVariables: $(additionalEnvironmentVariables)
+              ${{ if eq(variables['additionalEnvironmentVariables'], 'true') }}:
+                additionalEnvironmentVariables: $(additionalEnvironmentVariables)
 
           # Build application for AzureADB2C
           - pwsh: |
