@@ -1,8 +1,8 @@
 import type { UmbMemberDetailModel } from '../../types.js';
 import {
-	type CreateMemberRequestModel,
 	MemberService,
 	type UpdateMemberRequestModel,
+	type PostMemberValidateData,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -35,8 +35,7 @@ export class UmbMemberValidationServerDataSource {
 		if (!model.newPassword) throw new Error('Member newPassword is missing');
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: CreateMemberRequestModel = {
+		const body: PostMemberValidateData['body'] = {
 			email: model.email,
 			username: model.username,
 			password: model.newPassword,
