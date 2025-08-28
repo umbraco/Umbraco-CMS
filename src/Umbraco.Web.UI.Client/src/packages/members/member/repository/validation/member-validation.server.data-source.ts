@@ -32,13 +32,13 @@ export class UmbMemberValidationServerDataSource {
 	): Promise<UmbDataSourceResponse<string>> {
 		if (!model) throw new Error('Member is missing');
 		if (!model.unique) throw new Error('Member unique is missing');
-		if (!model.newPassword) throw new Error('Member newPassword is missing');
+		//if (!model.newPassword) throw new Error('Member newPassword is missing');
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 
 		const body: PostMemberValidateData['body'] = {
 			email: model.email,
 			username: model.username,
-			password: model.newPassword,
+			password: model.newPassword ?? '',
 			isApproved: model.isApproved,
 			id: model.unique,
 			memberType: { id: model.memberType.unique },

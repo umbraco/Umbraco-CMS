@@ -15,7 +15,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
-import { UmbValueValidator } from '@umbraco-cms/backoffice/validation';
+import { UmbValueValidator, type UmbValueValidatorArgs } from '@umbraco-cms/backoffice/validation';
 
 type ContentModel = UmbMemberDetailModel;
 type ContentTypeModel = UmbMemberTypeDetailModel;
@@ -87,15 +87,32 @@ export class UmbMemberWorkspaceContext
 
 		this.#setupValidationCheckForRootProperty('username');
 		this.#setupValidationCheckForRootProperty('email');
-		//this.#setupValidationCheckForRootProperty('password');// Only when in create mode.
+		const passwordValidator = this.#setupValidationCheckForRootProperty(
+			'newPassword',
+			(value: string | null | undefined) => {
+				// Only when in create mode.
+				return this.getIsNew() === true && (value === undefined || value === null || value === '');
+			},
+		);
+
+		this.observe(
+			this.isNew,
+			(isNew) => {
+				passwordValidator.runCheck();
+			},
+			null,
+		);
 	}
 
 	#hintedMsgs: Set<string> = new Set();
 
 	// A simple observation function to check for validation issues of a root property and map the validation message to a hint.
-	#setupValidationCheckForRootProperty(propertyName: string) {
+	#setupValidationCheckForRootProperty<ValueType = unknown>(
+		propertyName: string,
+		checkMethod?: UmbValueValidatorArgs<ValueType>['check'],
+	) {
 		const dataPath = `$.${propertyName}`;
-		const validator = new UmbValueValidator(this, {
+		const validator = new UmbValueValidator<ValueType>(this, {
 			dataPath,
 			navigateToError: () => {
 				const router = this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!;
@@ -106,10 +123,11 @@ export class UmbMemberWorkspaceContext
 					window.history.replaceState(null, '', newPath);
 				}
 			},
+			check: checkMethod,
 		});
 		this.observe(
 			this._data.createObservablePartOfCurrent((data) => {
-				return data?.[propertyName as unknown as keyof ContentModel];
+				return data?.[propertyName as unknown as keyof ContentModel] as ValueType;
 			}),
 			(value) => {
 				validator.value = value;
@@ -142,6 +160,8 @@ export class UmbMemberWorkspaceContext
 			},
 			`messageObserverFor_${propertyName}`,
 		);
+
+		return validator;
 	}
 
 	async create(memberTypeUnique: string) {
@@ -202,6 +222,10 @@ export class UmbMemberWorkspaceContext
 
 	get username(): string {
 		return this.#get('username') || '';
+	}
+
+	get newPassword(): string {
+		return this.#get('newPassword') || '';
 	}
 
 	get isLockedOut(): boolean {

@@ -81,7 +81,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 	};
 
 	#renderPasswordInput() {
-		if (this._isNew) {
+		if (this._isNew && this._workspaceContext) {
 			return html`
 				<umb-property-layout label=${this.localize.term('user_password')} mandatory>
 					<uui-input
@@ -90,7 +90,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						label=${this.localize.term('user_passwordEnterNew')}
 						type="password"
 						@input=${() => this.#onPasswordUpdate()}
-						${umbBindToValidation(this, '$.password')}></uui-input>
+						value=${this._workspaceContext.newPassword}
+						required
+						${umbBindToValidation(this, '$.password', this._workspaceContext.newPassword)}></uui-input>
 				</umb-property-layout>
 
 				<umb-property-layout label="Confirm password" mandatory>
@@ -99,6 +101,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						name="confirmPassword"
 						label="Confirm password"
 						type="password"
+						value=${this._workspaceContext.newPassword}
 						@input=${() => this.#onPasswordUpdate()}></uui-input>
 				</umb-property-layout>
 

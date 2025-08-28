@@ -32,7 +32,7 @@ export class UmbValueValidator<ValueType = unknown> extends UmbControllerBase im
 
 	set value(value: ValueType | undefined) {
 		this.#value = value;
-		this.#checkValidation();
+		this.runCheck();
 	}
 	get value(): ValueType | undefined {
 		return this.#value;
@@ -54,12 +54,12 @@ export class UmbValueValidator<ValueType = unknown> extends UmbControllerBase im
 				this.#validationContext?.removeValidator(this);
 				this.#validationContext = context;
 				this.#validationContext?.addValidator(this);
-				this.#checkValidation();
+				this.runCheck();
 			}
 		});
 	}
 
-	#checkValidation() {
+	runCheck() {
 		if (!this.#validationMode) return;
 		// Check validation:
 		this.#isValid = !this.#check(this.#value as ValueType);
@@ -82,7 +82,7 @@ export class UmbValueValidator<ValueType = unknown> extends UmbControllerBase im
 		// If you need to ask the server then it could be done here, instead of asking the server each time the value changes.
 		// In this particular example we do not need to do anything, because our validation is represented via a message that we always set no matter the user interaction.
 		// If we did not like to only to check the Validation State when absolute needed then this method must be implemented.
-		return this.#checkValidation();
+		return this.runCheck();
 	}
 
 	get isValid(): boolean {
@@ -102,6 +102,9 @@ export class UmbValueValidator<ValueType = unknown> extends UmbControllerBase im
 	}
 
 	override destroy(): void {
+		if (!this.#isValid && this.#dataPath) {
+			this.#validationContext?.messages.removeMessagesByTypeAndPath('custom', this.#dataPath);
+		}
 		this.#validationContext = undefined;
 		this.#value = undefined;
 		super.destroy();
