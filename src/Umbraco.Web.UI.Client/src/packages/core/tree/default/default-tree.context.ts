@@ -156,7 +156,7 @@ export class UmbDefaultTreeContext<
 	 */
 	// TODO: debouncing the load tree method because multiple props can be set at the same time
 	// that would trigger multiple loadTree calls. This is a temporary solution to avoid that.
-	public reloadTree = debounce(() => this.#debouncedReloadTree(), 100);
+	public reloadTree = debounce(() => this.#debouncedLoadTree(true), 100);
 
 	/**
 	 * Reloads the tree
@@ -179,25 +179,14 @@ export class UmbDefaultTreeContext<
 	 */
 	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
 
-	#debouncedLoadTree() {
+	#debouncedLoadTree(reload = false) {
 		const hasStartNode = this.getStartNode();
 		const hideTreeRoot = this.getHideTreeRoot();
 
 		if (hasStartNode || hideTreeRoot) {
-			this.#loadRootItems();
+			this.#loadRootItems(reload);
 		} else {
-			this.#loadTreeRoot();
-		}
-	}
-
-	#debouncedReloadTree() {
-		const hasStartNode = this.getStartNode();
-		const hideTreeRoot = this.getHideTreeRoot();
-
-		if (hasStartNode || hideTreeRoot) {
-			this.#loadRootItems(true);
-		} else {
-			this.#loadTreeRoot(true);
+			this.#loadTreeRoot(reload);
 		}
 	}
 
