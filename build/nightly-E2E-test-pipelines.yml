@@ -773,38 +773,39 @@ stages:
             #              SA_PASSWORD: "UmbracoAcceptance123!"
             #              testCommand: "npx playwright test --project=unattendedInstallConfig --grep=InstallSQLServer"
             #              port: 44331
-            # DeliveryApiConfig
-            #            WindowsDeliveryApiConfig:
-            #              vmImage: "windows-latest"
-            #              testFolder: "DeliveryApi"
-            #              testCommand: "npx playwright test --project=deliveryApi"
-            #              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
-            #              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
-            #              additionalEnvironmentVariables: false
 
-            #            LinuxDeliveryApiConfig:
-            #              vmImage: "ubuntu-latest"
-            #              testFolder: "DeliveryApi"
-            #              testCommand: "npx playwright test --project=deliveryApi"
-            #              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
-            #              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
-            #              additionalEnvironmentVariables: false
+            # DeliveryApiConfig
+            WindowsDeliveryApiConfig:
+              vmImage: "windows-latest"
+              testFolder: "DeliveryApi"
+              testCommand: "npx playwright test --project=deliveryApi"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
+            LinuxDeliveryApiConfig:
+              vmImage: "ubuntu-latest"
+              testFolder: "DeliveryApi"
+              testCommand: "npx playwright test --project=deliveryApi"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: false
             # ExternalLogin AzureADB2C
-        #            WindowsExternalLoginAzureADB2C:
-        #              vmImage: "windows-latest"
-        #              testFolder: "ExternalLogin\\AzureADB2C"
-        #              testCommand: "npx playwright test --project=externalLoginAzureADB2C"
-        #              port: 44331
-        #              packageName: "Microsoft.AspNetCore.Authentication.OpenIdConnect"
-        #              packageVersion: "9.0.8"
-        #              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
-        #              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
-        #              additionalEnvironmentVariables: true
+            WindowsExternalLoginAzureADB2C:
+              vmImage: "windows-latest"
+              testFolder: "ExternalLogin\\AzureADB2C"
+              testCommand: "npx playwright test --project=externalLoginAzureADB2C"
+              port: 44331
+              packageName: "Microsoft.AspNetCore.Authentication.OpenIdConnect"
+              packageVersion: "9.0.8"
+              CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
+              CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+              additionalEnvironmentVariables: true
 
         pool:
           vmImage: $(vmImage)
 
         steps:
+          # Setup test environment
           - template: nightly-E2E-setup-template.yml
             parameters:
               nodeVersion: $(nodeVersion)
@@ -821,6 +822,7 @@ stages:
             workingDirectory: $(Agent.BuildDirectory)/app/UmbracoProject
             condition: and(succeeded(), ne(variables['packageName'], ''), ne(variables['packageVersion'], ''))
 
+            # Build application
           - template: nightly-E2E-build-template.yml
             parameters:
               testFolder: $(testFolder)
@@ -842,10 +844,12 @@ stages:
               AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
             condition: and(succeeded(), eq(variables['testFolder'], 'ExternalLogin'))
 
+          # Run application
           - template: nightly-E2E-run-application-template.yml
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
 
+          # Run tests
           - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
