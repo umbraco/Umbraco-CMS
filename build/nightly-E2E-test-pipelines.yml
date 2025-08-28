@@ -884,6 +884,6 @@ stages:
             parameters:
               testCommand: $(testCommand)
               ASPNETCORE_URLS: $(ASPNETCORE_URLS)
-              port: $(port)
+              port: ${{ variables.port }}
               AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
               AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
