@@ -180,33 +180,25 @@ export class UmbDefaultTreeContext<
 	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
 
 	#debouncedLoadTree() {
-		if (this.getStartNode()) {
-			this.#loadRootItems();
-			return;
-		}
-
+		const hasStartNode = this.getStartNode();
 		const hideTreeRoot = this.getHideTreeRoot();
-		if (hideTreeRoot) {
-			this.#loadRootItems();
-			return;
-		}
 
-		this.#loadTreeRoot();
+		if (hasStartNode || hideTreeRoot) {
+			this.#loadRootItems();
+		} else {
+			this.#loadTreeRoot();
+		}
 	}
 
 	#debouncedReloadTree() {
-		if (this.getStartNode()) {
-			this.#loadRootItems(true);
-			return;
-		}
-
+		const hasStartNode = this.getStartNode();
 		const hideTreeRoot = this.getHideTreeRoot();
-		if (hideTreeRoot) {
-			this.#loadRootItems(true);
-			return;
-		}
 
-		this.#loadTreeRoot(true);
+		if (hasStartNode || hideTreeRoot) {
+			this.#loadRootItems(true);
+		} else {
+			this.#loadTreeRoot(true);
+		}
 	}
 
 	async #loadTreeRoot(reload = false) {
