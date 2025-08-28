@@ -1,9 +1,11 @@
 ﻿parameters:
   - name: testFolder
     type: string
+    default: ' '
 
   - name: buildConfiguration
     type: string
+    default: ' '
 
   - name: additionalEnvironmentVariables
     type: boolean

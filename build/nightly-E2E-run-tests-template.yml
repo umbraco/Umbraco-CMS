@@ -1,18 +1,23 @@
 ﻿parameters:
   - name: ASPNETCORE_URLS
     type: string
+    default: ' '
 
   - name: testCommand
     type: string
+    default: ' '
 
   - name: port
     type: string
+    default: ' '
 
   - name: AZUREB2CTESTUSEREMAIL
     type: string
+    default: ' '
 
   - name: AZUREB2CTESTUSERPASSWORD
     type: string
+    default: ' '
 
 steps:
   # Ensures we have the package wait-on installed

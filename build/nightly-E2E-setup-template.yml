@@ -1,18 +1,24 @@
 parameters:
   - name: nodeVersion
     type: string
+    default: ' '
 
   - name: PlaywrightUserEmail
     type: string
+    default: ' '
 
   - name: PlaywrightPassword
     type: string
+    default: ' '
 
   - name: ASPNETCORE_URLS
     type: string
+    default: ' '
 
   - name: npm_config_cache
     type: string
+    default: ' '
+
 
 steps:
   - task: DownloadPipelineArtifact@2

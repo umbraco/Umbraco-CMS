@@ -1,9 +1,12 @@
 ﻿parameters:
   - name: SA_PASSWORD
     type: string
+    default: ' '
 
   - name: buildConfiguration
     type: string
+    default: ' '
+
 
 steps:
   # Start SQL Server Linux
