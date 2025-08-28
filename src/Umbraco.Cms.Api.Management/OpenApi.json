@@ -9982,6 +9982,58 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document/preview-urls": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentPreviewUrls",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentUrlInfoResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user does not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document/sort": {
       "put": {
         "tags": [
@@ -38950,6 +39002,8 @@
       "DocumentUrlInfoModel": {
         "required": [
           "culture",
+          "isExternal",
+          "message",
           "url"
         ],
         "type": "object",
@@ -38960,6 +39014,13 @@
           },
           "url": {
             "type": "string"
+          },
+          "isExternal": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -41111,6 +41172,7 @@
       "MediaUrlInfoModel": {
         "required": [
           "culture",
+          "isExternal",
           "url"
         ],
         "type": "object",
@@ -41121,6 +41183,9 @@
           },
           "url": {
             "type": "string"
+          },
+          "isExternal": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

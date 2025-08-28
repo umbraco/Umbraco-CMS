@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
@@ -120,7 +121,7 @@ public class AliasUrlProvider : IUrlProvider
             {
                 var path = "/" + alias;
                 var uri = new Uri(path, UriKind.Relative);
-                yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _requestConfig).ToString());
+                yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig));
             }
         }
         else
@@ -152,13 +153,18 @@ public class AliasUrlProvider : IUrlProvider
                 {
                     var path = "/" + alias;
                     var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Authority), path));
-                    yield return UrlInfo.Url(
-                        _uriUtility.UriFromUmbraco(uri, _requestConfig).ToString(),
-                        domainUri.Culture);
+                    yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), domainUri.Culture);
                 }
             }
         }
     }
+
+    #endregion
+
+    #region GetPreviewUrls
+
+    /// <inheritdoc />
+    public IEnumerable<UrlInfo> GetPreviewUrls(IContent content) => [];
 
     #endregion
 

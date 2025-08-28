@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
@@ -136,7 +137,7 @@ public class DefaultUrlProvider : IUrlProvider
 
             var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
             uri = _uriUtility.UriFromUmbraco(uri, _requestSettings);
-            yield return UrlInfo.Url(uri.ToString(), culture);
+            yield return UrlInfo.FromUri(uri, culture);
         }
     }
 
@@ -196,12 +197,19 @@ public class DefaultUrlProvider : IUrlProvider
         if (domainUri is not null || string.IsNullOrEmpty(culture) ||
             culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
         {
-            var url = AssembleUrl(domainUri, path, current, mode).ToString();
-            return UrlInfo.Url(url, culture);
+            Uri url = AssembleUrl(domainUri, path, current, mode);
+            return UrlInfo.FromUri(url, culture);
         }
 
         return null;
     }
+
+    #endregion
+
+    #region GetPreviewUrls
+
+    /// <inheritdoc />
+    public IEnumerable<UrlInfo> GetPreviewUrls(IContent content) => [];
 
     #endregion
 

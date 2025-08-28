@@ -40,6 +40,7 @@ public class MediaUrlFactory : IMediaUrlFactory
             {
                 Culture = null,
                 Url = _absoluteUrlBuilder.ToAbsoluteUrl(mediaUrl).ToString(),
+                IsExternal = false,
             })
             .ToArray();
 
