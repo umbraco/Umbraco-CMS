@@ -48,6 +48,8 @@ steps:
     displayName: Start SQL Server LocalDB (Windows)
     condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
+  - pwsh: echo ${{parameters.additionalEnvironmentVariables}}
+
   - ${{ if eq(parameters.additionalEnvironmentVariables, false) }}:
       # Run application for Linux
       - bash: |
