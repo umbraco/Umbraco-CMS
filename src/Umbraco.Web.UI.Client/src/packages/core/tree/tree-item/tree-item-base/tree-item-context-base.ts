@@ -569,6 +569,11 @@ export abstract class UmbTreeItemContextBase<
 					return;
 				}
 
+				// If we already have children and the target didn't change then we don't have to load new children
+				if (isExpanded && this.#childItems.getValue().length > 0) {
+					return;
+				}
+
 				// If this item is expanded and has children, load them
 				if (isExpanded && this.#hasChildren.getValue()) {
 					this.targetPagination.setBaseTarget(entry.target);

@@ -497,6 +497,11 @@ export class UmbDefaultTreeContext<
 					return;
 				}
 
+				// If we already have children and the target didn't change then we don't have to load new children
+				if (isExpanded && this.#rootItems.getValue().length > 0) {
+					return;
+				}
+
 				if (isExpanded) {
 					this.targetPagination.setBaseTarget(entry?.target);
 					this.#loadRootItems();
