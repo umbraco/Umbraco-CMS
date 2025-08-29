@@ -279,7 +279,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		}
 	}
 
-	private _renderTrustDatabseCertificate() {
+	private _renderTrustDatabaseCertificate() {
 		if (this._selectedDatabase?.supportsTrustServerCertificate) {
 			return html`<uui-form-layout-item>
 				<uui-checkbox
