@@ -408,7 +408,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -467,7 +467,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -477,13 +477,6 @@ export enum DataTypeChangeModeModel {
     FALSE = 'False',
     FALSE_WITH_HELP_TEXT = 'FalseWithHelpText'
 }
-
-export type DataTypeContentTypeReferenceModel = {
-    id: string;
-    type: string | null;
-    name: string | null;
-    icon: string | null;
-};
 
 export type DataTypeItemResponseModel = {
     id: string;
@@ -497,16 +490,6 @@ export type DataTypeItemResponseModel = {
 export type DataTypePropertyPresentationModel = {
     alias: string;
     value?: unknown;
-};
-
-export type DataTypePropertyReferenceModel = {
-    name: string;
-    alias: string;
-};
-
-export type DataTypeReferenceResponseModel = {
-    contentType: DataTypeContentTypeReferenceModel;
-    properties: Array<DataTypePropertyReferenceModel>;
 };
 
 export type DataTypeResponseModel = {
@@ -553,6 +536,7 @@ export type DatabaseSettingsPresentationModel = {
     serverPlaceholder: string;
     requiresCredentials: boolean;
     supportsIntegratedAuthentication: boolean;
+    supportsTrustServerCertificate: boolean;
     requiresConnectionTest: boolean;
 };
 
@@ -711,10 +695,6 @@ export type DocumentResponseModel = {
     id: string;
     signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
-    /**
-     * @deprecated
-     */
-    urls: Array<DocumentUrlInfoModel>;
     template?: ReferenceByIdModel | null;
     isTrashed: boolean;
 };
@@ -784,12 +764,6 @@ export type DocumentTypeItemResponseModel = {
     isElement: boolean;
     icon?: string | null;
     description?: string | null;
-};
-
-export type DocumentTypePermissionPresentationModel = {
-    $type: string;
-    verbs: Array<string>;
-    documentTypeAlias: string;
 };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
@@ -1266,10 +1240,6 @@ export type MediaResponseModel = {
     variants: Array<MediaVariantResponseModel>;
     id: string;
     signs: Array<SignModel>;
-    /**
-     * @deprecated
-     */
-    urls: Array<MediaUrlInfoModel>;
     isTrashed: boolean;
     mediaType: MediaTypeReferenceResponseModel;
 };
@@ -2169,10 +2139,6 @@ export type PublishedDocumentResponseModel = {
     id: string;
     signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
-    /**
-     * @deprecated
-     */
-    urls: Array<DocumentUrlInfoModel>;
     template?: ReferenceByIdModel | null;
     isTrashed: boolean;
 };
@@ -2860,7 +2826,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2968,7 +2934,7 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
@@ -3448,41 +3414,6 @@ export type GetDataTypeByIdReferencedByResponses = {
 };
 
 export type GetDataTypeByIdReferencedByResponse = GetDataTypeByIdReferencedByResponses[keyof GetDataTypeByIdReferencedByResponses];
-
-export type GetDataTypeByIdReferencesData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/umbraco/management/api/v1/data-type/{id}/references';
-};
-
-export type GetDataTypeByIdReferencesErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
-};
-
-export type GetDataTypeByIdReferencesError = GetDataTypeByIdReferencesErrors[keyof GetDataTypeByIdReferencesErrors];
-
-export type GetDataTypeByIdReferencesResponses = {
-    /**
-     * OK
-     */
-    200: Array<DataTypeReferenceResponseModel>;
-};
-
-export type GetDataTypeByIdReferencesResponse = GetDataTypeByIdReferencesResponses[keyof GetDataTypeByIdReferencesResponses];
 
 export type GetDataTypeConfigurationData = {
     body?: never;

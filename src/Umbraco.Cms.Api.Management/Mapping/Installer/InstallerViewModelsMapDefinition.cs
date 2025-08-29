@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Api.Management.ViewModels.Installer;
@@ -119,6 +119,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
         target.ServerPlaceholder = source.ServerPlaceholder ?? string.Empty;
         target.SortOrder = source.SortOrder;
         target.SupportsIntegratedAuthentication = source.SupportsIntegratedAuthentication;
+        target.SupportsTrustServerCertificate = source.SupportsTrustServerCertificate;
         target.IsConfigured = false; // Defaults to false, we'll set this to true if needed,
     }
 
@@ -136,6 +137,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
         target.ServerPlaceholder = source.ServerPlaceholder;
         target.SortOrder = source.SortOrder;
         target.SupportsIntegratedAuthentication = source.SupportsIntegratedAuthentication;
+        target.SupportsTrustServerCertificate = source.SupportsTrustServerCertificate;
     }
 
     // Umbraco.Code.MapAll
