@@ -190,6 +190,9 @@ export class UmbTargetPaginationManager<
 	 */
 	public clear() {
 		this.#totalItems.setValue(0);
+		this.#currentItems.clear();
+		this.#totalPrevItems.setValue(0);
+		this.#totalNextItems.setValue(0);
 	}
 
 	#getIndexOfBaseTarget() {
