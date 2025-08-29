@@ -68,7 +68,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				this._inherited = true;
 			} else {
 				this._inheritedFrom = undefined;
-				this._inherited = true;
+				this._inherited = false;
 			}
 		}
 	}
