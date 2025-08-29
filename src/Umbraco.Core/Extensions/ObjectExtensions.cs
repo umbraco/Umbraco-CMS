@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Data.SqlTypes;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -491,12 +492,13 @@ public static class ObjectExtensions
         {
             if (DateTime.TryParse(input, out DateTime value))
             {
-                 // Minimum value of SQL Servers sqlDateTime property is 01/01/1753.
-                 // So if a DateTime.MinValue (01/01/0001) comes in, we need to convert it to sqlDateTime min value.
-                 // This can be removed if we ever migrate our property to DateTime2
-                if (value.Year < 1753)
+                // Minimum value of SQL Servers sqlDateTime property is 01/01/1753.
+                // So if a DateTime.MinValue (01/01/0001) comes in, we need to convert it to sqlDateTime min value.
+                // This can be removed if we ever migrate our property to DateTime2
+                int minYear = SqlDateTime.MinValue.Value.Year;
+                if (value.Year < minYear)
                 {
-                    value = new DateTime(1753, value.Month, value.Day, value.Hour, value.Minute, value.Second, value.Millisecond);
+                    value = new DateTime(minYear, value.Month, value.Day, value.Hour, value.Minute, value.Second, value.Millisecond);
                 }
 
                 switch (value.Kind)
