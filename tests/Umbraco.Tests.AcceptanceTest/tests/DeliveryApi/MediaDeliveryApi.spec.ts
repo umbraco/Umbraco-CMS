@@ -1,6 +1,5 @@
 import {expect} from '@playwright/test';
-import {AliasHelper} from '@umbraco/json-models-builders';
-import {test} from '@umbraco/playwright-testhelpers';
+import {test, AliasHelper} from '@umbraco/playwright-testhelpers';
 
 // Media Folder
 const rootMediaFolderName = 'RootMediaFolder';
