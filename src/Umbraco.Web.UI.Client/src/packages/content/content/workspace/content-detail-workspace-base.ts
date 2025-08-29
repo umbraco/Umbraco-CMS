@@ -4,6 +4,8 @@ import { UmbMergeContentVariantDataController } from '../controller/merge-conten
 import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '../variant-picker/index.js';
 import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
+import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
+import { UmbContentCollectionManager } from '../collection/index.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
@@ -56,8 +58,6 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UmbSegmentCollectionRepository, type UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
 import { UmbHintContext, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
-import { UmbContentCollectionManager } from '../collection/index.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,

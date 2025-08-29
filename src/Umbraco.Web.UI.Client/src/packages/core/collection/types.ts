@@ -1,5 +1,5 @@
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { ManifestCollection } from './extensions/types.js';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 

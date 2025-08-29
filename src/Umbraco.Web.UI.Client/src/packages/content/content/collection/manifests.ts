@@ -1,6 +1,6 @@
-import { UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_HAS_CONTENT_COLLECTION_CONDITION_ALIAS } from './workspace-has-content-collection/constants.js';
 import { manifests as workspaceHasContentCollectionManifests } from './workspace-has-content-collection/manifests.js';
+import { UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [

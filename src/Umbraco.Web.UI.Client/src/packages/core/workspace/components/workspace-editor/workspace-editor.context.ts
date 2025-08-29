@@ -1,3 +1,4 @@
+import type { ManifestWorkspaceView } from '../../types.js';
 import { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { UMB_WORKSPACE_EDITOR_CONTEXT } from './workspace-editor.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -7,7 +8,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbBasicState, mergeObservables, strictEqualityMemoization } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import type { ManifestWorkspaceView } from '../../types.js';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 export class UmbWorkspaceEditorContext extends UmbContextBase {
