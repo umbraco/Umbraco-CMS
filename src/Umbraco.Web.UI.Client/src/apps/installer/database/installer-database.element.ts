@@ -172,7 +172,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				if (error) {
 					this._validationErrorMessage = `The server could not validate the database connection. Details: ${
 						UmbApiError.isUmbApiError(error) ? error.problemDetails.detail : error.message
-					}`;
+						}`;
 					this._installButton.state = 'failed';
 					return;
 				}
@@ -265,27 +265,43 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				required-message="Database name is required"></uui-input>
 		</uui-form-layout-item>`;
 
+	private _renderIntegratedAuthentication() {
+		if (this._selectedDatabase?.supportsIntegratedAuthentication) {
+			return html`<uui-form-layout-item>
+				<uui-checkbox
+					name="useIntegratedAuthentication"
+					label="Use integrated authentication"
+					@change=${this._handleChange}
+					.checked=${this.databaseFormData.useIntegratedAuthentication || false}></uui-checkbox>
+			</uui-form-layout-item>`;
+		} else {
+			return null;
+		}
+	}
+
+	private _renderTrustDatabseCertificate() {
+		if (this._selectedDatabase?.supportsTrustServerCertificate) {
+			return html`<uui-form-layout-item>
+				<uui-checkbox
+					name="trustServerCertificate"
+					label="Trust the database certificate"
+					@change=${this._handleChange}
+					.checked=${this.databaseFormData.trustServerCertificate || false}></uui-checkbox>
+			</uui-form-layout-item>`;
+		} else {
+			return null;
+		}
+	}
+
 	private _renderCredentials = () => html`
 		<h2 class="uui-h4">Credentials</h2>
 		<hr />
-		<uui-form-layout-item>
-			<uui-checkbox
-				name="useIntegratedAuthentication"
-				label="Use integrated authentication"
-				@change=${this._handleChange}
-				.checked=${this.databaseFormData.useIntegratedAuthentication || false}></uui-checkbox>
-		</uui-form-layout-item>
-		<uui-form-layout-item>
-			<uui-checkbox
-				name="trustServerCertificate"
-				label="Trust the database certificate"
-				@change=${this._handleChange}
-				.checked=${this.databaseFormData.trustServerCertificate || false}></uui-checkbox>
-		</uui-form-layout-item>
+		${this._renderIntegratedAuthentication()}
+		${this._renderTrustDatabseCertificate()}
 
 			${
 				!this.databaseFormData.useIntegratedAuthentication
-					? html` <uui-form-layout-item>
+			? html` <uui-form-layout-item>
 								<uui-label for="username" slot="label" required>Username</uui-label>
 								<uui-input
 									type="text"
@@ -311,8 +327,8 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 									required
 									required-message="Password is required"></uui-input>
 							</uui-form-layout-item>`
-					: ''
-			}
+			: ''
+		}
 		</uui-form-layout-item>
 	`;
 
@@ -360,8 +376,8 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			<uui-form>
 				<form id="database-form" name="database" @submit="${this._handleSubmit}">
 					${this._preConfiguredDatabase
-						? this._renderPreConfiguredDatabase(this._preConfiguredDatabase)
-						: this._renderDatabaseSelection()}
+				? this._renderPreConfiguredDatabase(this._preConfiguredDatabase)
+				: this._renderDatabaseSelection()}
 					${this._validationErrorMessage ? html` <div class="error">${this._validationErrorMessage}</div> ` : nothing}
 
 					<div id="buttons">
