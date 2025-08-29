@@ -46,51 +46,6 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         requestSettings.OnChange(settings => _requestSettings = settings);
     }
 
-    [Obsolete("Use the non-obsolete constructor, scheduled for removal in v17")]
-    public ApiContentRouteBuilder(
-        IApiContentPathProvider apiContentPathProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IVariationContextAccessor variationContextAccessor,
-        IRequestPreviewService requestPreviewService,
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService)
-        : this(
-        apiContentPathProvider,
-        globalSettings,
-        variationContextAccessor,
-        requestPreviewService,
-        requestSettings,
-        contentCache,
-        navigationQueryService,
-        publishStatusQueryService,
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor, scheduled for removal in v17")]
-    public ApiContentRouteBuilder(
-        IApiContentPathProvider apiContentPathProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IVariationContextAccessor variationContextAccessor,
-        IRequestPreviewService requestPreviewService,
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService)
-        : this(
-        apiContentPathProvider,
-        globalSettings,
-        variationContextAccessor,
-        requestPreviewService,
-        requestSettings,
-        contentCache,
-        navigationQueryService,
-        StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
-    {
-    }
-
     public IApiContentRoute? Build(IPublishedContent content, string? culture = null)
     {
         if (content.ItemType != PublishedItemType.Content)

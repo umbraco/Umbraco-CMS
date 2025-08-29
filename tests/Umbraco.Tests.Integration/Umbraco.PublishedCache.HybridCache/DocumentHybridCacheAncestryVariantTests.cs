@@ -57,7 +57,7 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
     public async Task AllCulturesUnpublished(bool preview)
     {
         // Publish branch in all cultures
-        var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], true, Constants.Security.SuperUserKey);
+        var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
         Assert.IsTrue(publishAttempt.Success);
         Assert.That(publishAttempt.Result.SucceededItems.Count(), Is.EqualTo(3));
 
@@ -80,7 +80,7 @@ internal sealed class DocumentHybridCacheAncestryVariantTests : UmbracoIntegrati
     [Test]
     public async Task SingleCultureUnpublished()
     {
-        var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], true, Constants.Security.SuperUserKey);
+        var publishAttempt = await ContentPublishingService.PublishBranchAsync(rootContent.Key, [_englishIsoCode, _danishIsoCode], PublishBranchFilter.All, Constants.Security.SuperUserKey, false);
         Assert.IsTrue(publishAttempt.Success);
         Assert.That(publishAttempt.Result.SucceededItems.Count(), Is.EqualTo(3));
 
