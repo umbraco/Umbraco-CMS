@@ -10,6 +10,8 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 	@query('#notifications')
 	private _notificationsElement?: HTMLElement;
 
+	@query('#sr-live') private _srLive?: HTMLDivElement;
+
 	@state()
 	private _notifications?: UmbNotificationHandler[];
 
@@ -39,7 +41,35 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			this._notificationsElement?.showPopover?.(); // To prevent issues in FireFox I added `?.` before `()`  [NL]
+
+			//Announce the newest notification
+			this._announceNewest(this._notifications);
 		});
+	}
+
+	private _getNotificationText(notificatonData: UmbNotificationHandler): string {
+		//Trick to be able to access to the data(notification messagge) inside a private propertity
+		const data = (notificatonData as any)._data ?? {};
+		const notificationText = data.message ?? '';
+		return notificationText;
+	}
+
+	//Announce by replacing the SR text
+	private _announce(message: string) {
+		if (!this._srLive) {
+			this.updateComplete.then(() => this._announce(message));
+			return;
+		}
+		this._srLive.textContent = '';
+		requestAnimationFrame(() => {
+			this._srLive!.textContent = message || '';
+		});
+	}
+
+	private _announceNewest(list?: UmbNotificationHandler[]) {
+		const newest = list?.[list.length - 1];
+		if (!newest) return;
+		this._announce(this._getNotificationText(newest));
 	}
 
 	override render() {
@@ -49,7 +79,9 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 					? repeat(
 							this._notifications,
 							(notification: UmbNotificationHandler) => notification.key,
-							(notification) => html`${notification.element}`,
+							(notification) =>
+								html`${notification.element}
+									<div id="sr-live" role="alert" aria-atomic="true"></div>`,
 						)
 					: ''}
 			</uui-toast-notification-container>
@@ -66,7 +98,6 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 				bottom: 45px;
 				height: auto;
 				padding: var(--uui-size-layout-1);
-
 				position: fixed;
 				width: 100vw;
 				background: 0;
