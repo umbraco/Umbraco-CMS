@@ -11,7 +11,15 @@ import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/bac
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbDeprecation, UmbPaginationManager, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbDeprecation,
+	UmbPaginationManager,
+	UmbSelectionManager,
+	UmbTargetPaginationManager,
+	debounce,
+	type UmbOffsetPaginationRequestModel,
+	type UmbTargetPaginationRequestModel,
+} from '@umbraco-cms/backoffice/utils';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	type UmbEntityActionEvent,
@@ -39,8 +47,14 @@ export class UmbDefaultTreeContext<
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this);
-	public readonly pagination = new UmbPaginationManager();
 	public readonly expansion = new UmbTreeExpansionManager(this);
+
+	// Offset Pagination: TODO: deprecate and expose a new with the name "offsetPagination"
+	// TODO: investigate if there is a way to combine the two paging types
+	public readonly pagination = new UmbPaginationManager();
+
+	// Target Pagination: Keeps track of pages when navigating with a target
+	public readonly targetPagination = new UmbTargetPaginationManager(this);
 
 	#hideTreeRoot = new UmbBooleanState(false);
 	hideTreeRoot = this.#hideTreeRoot.asObservable();
@@ -58,11 +72,6 @@ export class UmbDefaultTreeContext<
 	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;
 	#actionEventContext?: UmbActionEventContext;
 
-	#paging = {
-		skip: 0,
-		take: 50,
-	};
-
 	#initResolver?: () => void;
 	#initialized = false;
 
@@ -79,7 +88,10 @@ export class UmbDefaultTreeContext<
 		// @ts-ignore
 		super(host, UMB_TREE_CONTEXT);
 
-		this.pagination.setPageSize(this.#paging.take);
+		const take = 5;
+		this.pagination.setPageSize(take);
+		this.targetPagination.setTakeSize(take);
+
 		this.#consumeContexts();
 
 		// listen for page changes on the pagination manager
@@ -139,28 +151,46 @@ export class UmbDefaultTreeContext<
 	public loadTree = debounce(() => this.#debouncedLoadTree(), 100);
 
 	/**
+	 * Reloads the tree in its current expansion state
+	 * @memberof UmbDefaultTreeContext
+	 */
+	// TODO: debouncing the load tree method because multiple props can be set at the same time
+	// that would trigger multiple loadTree calls. This is a temporary solution to avoid that.
+	public reloadTree = debounce(() => this.#debouncedLoadTree(true), 100);
+
+	/**
 	 * Reloads the tree
 	 * @memberof UmbDefaultTreeContext
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	public loadMore = () => this.#debouncedLoadTree(true);
+	public loadMore = (): Promise<void> => this.#loadNextItemsFromTarget();
+
+	/**
+	 * Load previous items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
+	 */
+	public loadPrevItems = (): Promise<void> => this.#loadPrevItemsFromTarget();
+
+	/**
+	 * Load next items of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 * @returns {Promise<void>}
+	 */
+	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
 
 	#debouncedLoadTree(reload = false) {
-		if (this.getStartNode()) {
-			this.#loadRootItems(reload);
-			return;
-		}
-
+		const hasStartNode = this.getStartNode();
 		const hideTreeRoot = this.getHideTreeRoot();
-		if (hideTreeRoot) {
-			this.#loadRootItems(reload);
-			return;
-		}
 
-		this.#loadTreeRoot();
+		if (hasStartNode || hideTreeRoot) {
+			this.#loadRootItems(reload);
+		} else {
+			this.#loadTreeRoot(reload);
+		}
 	}
 
-	async #loadTreeRoot() {
+	async #loadTreeRoot(reload = false) {
 		await this.#init;
 
 		const { data } = await this.#repository!.requestTreeRoot();
@@ -168,51 +198,160 @@ export class UmbDefaultTreeContext<
 		if (data) {
 			this.#treeRoot.setValue(data);
 			this.pagination.setTotalItems(1);
+			this.#observeExpansion();
 
-			if (this.getExpandTreeRoot()) {
-				this.#toggleTreeRootExpansion(true);
+			if (!reload) {
+				if (this.getExpandTreeRoot()) {
+					this.#toggleTreeRootExpansion(true);
+				}
 			}
 		}
 	}
 
-	async #loadRootItems(loadMore = false) {
+	async #loadRootItems(reload = false) {
 		await this.#init;
-
-		const skip = loadMore ? this.#paging.skip : 0;
-		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
 
 		// If we have a start node get children of that instead of the root
 		const startNode = this.getStartNode();
 		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.#additionalRequestArgs.getValue();
+		const baseTarget = this.targetPagination.getBaseTarget();
+
+		// When reloading we only want to send the target values with the request if we can find the target to reload from.
+		const canSendTarget = reload === false || (reload && this.targetPagination.hasBaseTargetInCurrentItems());
+
+		const targetPaging: UmbTargetPaginationRequestModel | undefined =
+			baseTarget && baseTarget.unique && canSendTarget
+				? {
+						target: {
+							unique: baseTarget.unique,
+							entityType: baseTarget.entityType,
+						},
+						/* When we load from a target we want to load a few items before the target so the target isn't the first item in the list
+						 Currently we use 5, but this could be anything that feels "right".
+						 When reloading from target when want to retrieve the same number of items that a currently loaded
+						*/
+						takeBefore: reload ? this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget() : 5,
+						takeAfter: reload
+							? this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget()
+							: this.targetPagination.getTakeSize(),
+					}
+				: undefined;
+
+		const offsetPaging: UmbOffsetPaginationRequestModel = {
+			// when reloading we want to get everything from the start
+			skip: reload ? 0 : this.pagination.getSkip(),
+			take: reload
+				? this.pagination.getCurrentPageNumber() * this.pagination.getPageSize()
+				: this.pagination.getPageSize(),
+		};
 
 		const { data } = startNode?.unique
 			? await this.#repository!.requestTreeItemsOf({
-					...additionalArgs,
 					parent: {
 						unique: startNode.unique,
 						entityType: startNode.entityType,
 					},
+					skip: offsetPaging.skip, // including this for backward compatibility
+					take: offsetPaging.take, // including this for backward compatibility
+					paging: targetPaging || offsetPaging,
 					foldersOnly,
-					skip,
-					take,
+					...additionalArgs,
 				})
 			: await this.#repository!.requestTreeRootItems({
-					...additionalArgs,
+					skip: offsetPaging.skip, // including this for backward compatibility
+					take: offsetPaging.take, // including this for backward compatibility
+					paging: targetPaging || offsetPaging,
 					foldersOnly,
-					skip,
-					take,
+					...additionalArgs,
 				});
 
 		if (data) {
-			if (loadMore) {
-				const currentItems = this.#rootItems.getValue();
-				this.#rootItems.setValue([...currentItems, ...data.items]);
-			} else {
-				this.#rootItems.setValue(data.items);
-			}
+			this.#rootItems.setValue(data.items);
+			this.targetPagination.setCurrentItems(data.items);
 
 			this.pagination.setTotalItems(data.total);
+			this.targetPagination.setTotalItems(data.total);
+			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
+			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
+		}
+	}
+
+	async #loadPrevItemsFromTarget() {
+		const startNode = this.getStartNode();
+		const foldersOnly = this.#foldersOnly.getValue();
+		const additionalArgs = this.#additionalRequestArgs.getValue();
+
+		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
+			target: this.targetPagination.getStartTarget(),
+			takeBefore: this.targetPagination.getTakeSize(),
+			takeAfter: 0,
+		};
+
+		const { data } = startNode?.unique
+			? await this.#repository!.requestTreeItemsOf({
+					parent: {
+						unique: startNode.unique,
+						entityType: startNode.entityType,
+					},
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
+				})
+			: await this.#repository!.requestTreeRootItems({
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
+				});
+
+		if (data) {
+			// We have loaded previous items so we add them to the top of the array
+			const reversedItems = [...data.items].reverse();
+			this.#rootItems.prepend(reversedItems);
+			this.targetPagination.prependCurrentItems(reversedItems);
+
+			if (data.totalBefore === undefined) {
+				throw new Error('totalBefore is missing in the response');
+			}
+
+			this.targetPagination.setTotalItems(data.total);
+			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
+		}
+	}
+
+	async #loadNextItemsFromTarget() {
+		const startNode = this.getStartNode();
+		const foldersOnly = this.#foldersOnly.getValue();
+		const additionalArgs = this.#additionalRequestArgs.getValue();
+
+		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
+			target: this.targetPagination.getEndTarget(),
+			takeBefore: 0,
+			takeAfter: this.targetPagination.getTakeSize(),
+		};
+
+		const { data } = startNode?.unique
+			? await this.#repository!.requestTreeItemsOf({
+					parent: {
+						unique: startNode.unique,
+						entityType: startNode.entityType,
+					},
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
+				})
+			: await this.#repository!.requestTreeRootItems({
+					paging: targetPaging,
+					foldersOnly,
+					...additionalArgs,
+				});
+
+		if (data) {
+			this.#rootItems.append(data.items);
+			this.targetPagination.appendCurrentItems(data.items);
+
+			this.targetPagination.setTotalItems(data.total);
+			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
 		}
 	}
 
@@ -331,6 +470,47 @@ export class UmbDefaultTreeContext<
 		return this.#expandTreeRoot.getValue();
 	}
 
+	#observeExpansion() {
+		const entity = this.#treeRoot.getValue();
+		if (!entity) return;
+
+		this.observe(
+			this.expansion.entry(entity),
+			async (entry) => {
+				const isExpanded = entry !== undefined;
+				const currentBaseTarget = this.targetPagination.getBaseTarget();
+				const newTarget = entry?.target;
+
+				/* If a base target already exists (tree loaded to that point),
+   			don’t auto-reset when the target is removed.
+   			This happens when creating new items not yet in the tree. */
+				if (currentBaseTarget && !newTarget) {
+					return;
+				}
+
+				/* If a new target is set we only want to reload children if the new target isn’t among the already loaded items. */
+				const targetIsLoaded = this.#rootItems
+					.getValue()
+					.some((child) => child.entityType === newTarget?.entityType && newTarget.unique === child.unique);
+
+				if (newTarget && targetIsLoaded) {
+					return;
+				}
+
+				// If we already have children and the target didn't change then we don't have to load new children
+				if (isExpanded && this.#rootItems.getValue().length > 0) {
+					return;
+				}
+
+				if (isExpanded) {
+					this.targetPagination.setBaseTarget(entry?.target);
+					this.#loadRootItems();
+				}
+			},
+			'observeExpansion',
+		);
+	}
+
 	#toggleTreeRootExpansion(expand: boolean) {
 		const treeRoot = this.#treeRoot.getValue();
 		if (!treeRoot) return;
@@ -361,11 +541,7 @@ export class UmbDefaultTreeContext<
 		});
 	}
 
-	#onPageChange = (event: UmbChangeEvent) => {
-		const target = event.target as UmbPaginationManager;
-		this.#paging.skip = target.getSkip();
-		this.loadMore();
-	};
+	#onPageChange = () => this.#loadNextItemsFromTarget();
 
 	#observeRepository(repositoryAlias?: string) {
 		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
@@ -388,7 +564,7 @@ export class UmbDefaultTreeContext<
 		if (treeRoot === undefined) return;
 		if (event.getUnique() !== treeRoot.unique) return;
 		if (event.getEntityType() !== treeRoot.entityType) return;
-		this.loadTree();
+		this.#loadRootItems(true);
 	};
 
 	#removeEventListeners() {
