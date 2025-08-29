@@ -953,6 +953,7 @@ export class UmbContentTypeStructureManager<
 	 * Find merged containers that match the provided container ids.
 	 * Notice if you can provide one or more ids matching the same container and it will still only return return the matching container once.
 	 * @param containerIds - An array of container ids to find merged containers for.
+	 * @param id
 	 * @returns {UmbPropertyTypeContainerMergedModel | undefined} - The merged containers that match the provided container ids.
 	 */
 	getMergedContainerById(id: string): UmbPropertyTypeContainerMergedModel | undefined {
@@ -964,6 +965,7 @@ export class UmbContentTypeStructureManager<
 	 * Find merged child containers that are children of the provided parent container ids.
 	 * Notice this will find matching containers and include their child containers in this.
 	 * @param containerIds - An array of container ids to find merged child containers for.
+	 * @param searchId
 	 * @param type - The type of the containers to find.
 	 * @returns {Observable} - An observable that emits the merged child containers that match the provided container ids.
 	 */
