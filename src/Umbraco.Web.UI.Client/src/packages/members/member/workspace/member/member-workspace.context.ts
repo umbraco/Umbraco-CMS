@@ -3,9 +3,12 @@ import type { UmbMemberDetailModel, UmbMemberVariantModel } from '../../types.js
 import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset.context.js';
 import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/manifests.js';
-import { UMB_MEMBER_WORKSPACE_ALIAS, UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS } from './constants.js';
+import {
+	UMB_MEMBER_WORKSPACE_ALIAS,
+	UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS,
+	UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
+} from './constants.js';
 import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
-import { UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
 import { UmbMemberTypeDetailRepository, type UmbMemberTypeDetailModel } from '@umbraco-cms/backoffice/member-type';
 import {
 	UmbWorkspaceIsNewRedirectController,
@@ -15,7 +18,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
-import { UmbValueValidator, type UmbValueValidatorArgs } from '@umbraco-cms/backoffice/validation';
+import { UmbValueValidator } from '@umbraco-cms/backoffice/validation';
+import type { UmbValueValidatorArgs } from '@umbraco-cms/backoffice/validation';
 
 type ContentModel = UmbMemberDetailModel;
 type ContentTypeModel = UmbMemberTypeDetailModel;
@@ -97,7 +101,7 @@ export class UmbMemberWorkspaceContext
 
 		this.observe(
 			this.isNew,
-			(isNew) => {
+			() => {
 				passwordValidator.runCheck();
 			},
 			null,
