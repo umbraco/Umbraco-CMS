@@ -44,7 +44,7 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 	}
 
 	#gotContexts() {
-		if (!this.#workspaceContext && this.#propertyContext) return;
+		if (!this.#workspaceContext || !this.#propertyContext) return;
 		this.observe(this.#propertyContext?.alias, async (propertyAlias) => {
 			if (this.#workspaceContext && propertyAlias) {
 				// Gets the Data Type ID for the current property.
