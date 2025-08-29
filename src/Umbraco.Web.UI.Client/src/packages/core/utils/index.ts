@@ -5,6 +5,7 @@ export * from './deprecation/index.js';
 export * from './diff/index.js';
 export * from './direction/index.js';
 export * from './download/blob-download.function.js';
+export * from './expansion/index.js';
 export * from './get-guid-from-udi.function.js';
 export * from './get-processed-image-url.function.js';
 export * from './guard-manager/index.js';

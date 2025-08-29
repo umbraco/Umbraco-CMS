@@ -2,7 +2,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ManifestService, PackageService } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	CreatePackageRequestModel,
-	UpdatePackageRequestModelWritable,
+	UpdatePackageRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -57,7 +57,7 @@ export class UmbPackageServerDataSource {
 		return await tryExecute(this._host, PackageService.postPackageCreated({ body }));
 	}
 
-	async updateCreatedPackage(id: string, body: UpdatePackageRequestModelWritable) {
+	async updateCreatedPackage(id: string, body: UpdatePackageRequestModel) {
 		return await tryExecute(this._host, PackageService.putPackageCreatedById({ path: { id }, body }));
 	}
 }

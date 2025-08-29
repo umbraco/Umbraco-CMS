@@ -136,26 +136,26 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._routes
-			? html`
-					<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
-						${this.#renderBackButton()}
-						<slot name="header" slot="header"></slot>
-						<slot name="action-menu" slot="action-menu"></slot>
-						${this.#renderViews()} ${this.#renderRoutes()}
-						<slot></slot>
-						${when(
-							!this.enforceNoFooter,
-							() => html`
-								<umb-workspace-footer slot="footer" data-mark="workspace:footer">
-									<slot name="footer-info"></slot>
-									<slot name="actions" slot="actions" data-mark="workspace:footer-actions"></slot>
-								</umb-workspace-footer>
-							`,
-						)}
-					</umb-body-layout>
-				`
-			: nothing;
+		// Notice if no routes then fallback to use a slot.
+		// TODO: Deprecate the slot feature, to rely purely on routes, cause currently bringing an additional route would mean the slotted content would never be shown. [NL]
+		return html`
+			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
+				${this.#renderBackButton()}
+				<slot name="header" slot="header"></slot>
+				<slot name="action-menu" slot="action-menu"></slot>
+				${this.#renderViews()} ${this.#renderRoutes()}
+				<slot></slot>
+				${when(
+					!this.enforceNoFooter,
+					() => html`
+						<umb-workspace-footer slot="footer" data-mark="workspace:footer">
+							<slot name="footer-info"></slot>
+							<slot name="actions" slot="actions" data-mark="workspace:footer-actions"></slot>
+						</umb-workspace-footer>
+					`,
+				)}
+			</umb-body-layout>
+		`;
 	}
 
 	#renderViews() {
@@ -213,7 +213,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRoutes() {
-		if (!this._routes || this._routes.length === 0) return nothing;
+		if (!this._routes || this._routes.length === 0 || !this._workspaceViews || this._workspaceViews.length === 0)
+			return nothing;
 		return html`
 			<umb-router-slot
 				inherit-addendum

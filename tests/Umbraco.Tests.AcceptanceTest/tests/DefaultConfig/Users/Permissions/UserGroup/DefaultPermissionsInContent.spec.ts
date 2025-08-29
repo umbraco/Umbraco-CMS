@@ -435,7 +435,7 @@ test.fixme('can move content with move to permission enabled', {tag: '@release'}
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
   // Act
-  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.clickActionsMenuForContent(childDocumentOneName);
   await umbracoUi.content.clickMoveToActionMenuOption();
   await umbracoUi.content.moveToContentWithName([], moveToDocumentName);
@@ -444,7 +444,7 @@ test.fixme('can move content with move to permission enabled', {tag: '@release'}
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
   await umbracoUi.content.reloadContentTree();
   await umbracoUi.content.isCaretButtonVisibleForContentName(moveToDocumentName, true);
-  await umbracoUi.content.clickCaretButtonForContentName(moveToDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(moveToDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(moveToDocumentName, childDocumentOneName, true);
   await umbracoUi.content.isCaretButtonVisibleForContentName(rootDocumentName, false);
   expect(await umbracoApi.document.getChildrenAmount(rootDocumentId)).toEqual(0);
@@ -489,7 +489,7 @@ test.fixme('can sort children with sort children permission enabled', {tag: '@re
 
   // Assert
   // TODO: uncomment when it is not flaky
-  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
 });
@@ -669,4 +669,4 @@ test('can create and update content with permission enabled', {tag: '@release'},
 
   // Cleanup
   await umbracoApi.document.ensureNameNotExists(updatedDocumentName);
-}); 
+});
