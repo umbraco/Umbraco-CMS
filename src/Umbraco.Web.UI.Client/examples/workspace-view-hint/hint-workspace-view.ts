@@ -46,7 +46,7 @@ export class ExampleHintWorkspaceView extends UmbElementMixin(LitElement) {
 		} else {
 			workspace.hints.addOne({
 				unique: 'exampleHintFromToggleAction',
-				path: ['Umb.WorkspaceView.Document.Edit', 'root'],
+				path: ['Umb.WorkspaceView.Document.Edit'],
 				text: 'Hi',
 				color: 'invalid',
 				weight: 100,
