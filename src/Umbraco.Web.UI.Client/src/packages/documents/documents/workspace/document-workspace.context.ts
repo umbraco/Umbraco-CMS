@@ -28,11 +28,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
-import {
-	UmbContentDetailWorkspaceContextBase,
-	type UmbContentCollectionWorkspaceContext,
-	type UmbContentWorkspaceContext,
-} from '@umbraco-cms/backoffice/content';
+import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
@@ -52,8 +48,7 @@ export class UmbDocumentWorkspaceContext
 	>
 	implements
 		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>,
-		UmbPublishableWorkspaceContext,
-		UmbContentCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
+		UmbPublishableWorkspaceContext
 {
 	/**
 	 * The publishing repository for the document workspace.
@@ -64,6 +59,9 @@ export class UmbDocumentWorkspaceContext
 
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
+	/*
+	 * @deprecated Use `collection.hasCollection` instead, will be removed in v.18
+	 */
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
 		(data) => !!data?.documentType.collection,
 	);
@@ -78,6 +76,7 @@ export class UmbDocumentWorkspaceContext
 		super(host, {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			workspaceAlias: UMB_DOCUMENT_WORKSPACE_ALIAS,
+			collectionAlias: UMB_DOCUMENT_COLLECTION_ALIAS,
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 			contentValidationRepository: UmbDocumentValidationRepository,
@@ -248,6 +247,7 @@ export class UmbDocumentWorkspaceContext
 		});
 	}
 
+	/** @deprecated will be removed in v.18 */
 	getCollectionAlias() {
 		return UMB_DOCUMENT_COLLECTION_ALIAS;
 	}

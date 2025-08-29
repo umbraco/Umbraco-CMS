@@ -1,4 +1,5 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
+import type { ManifestWorkspaceView } from '../../types.js';
 import { UmbWorkspaceEditorContext } from './workspace-editor.context.js';
 import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -9,6 +10,7 @@ import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from 
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-workspace-editor
@@ -55,6 +57,11 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		this.#observeWorkspaceViewHints();
 	}
 	private _variantId?: UmbVariantId | undefined;
+
+	@property({ attribute: false })
+	public set overrides(value: Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined) {
+		this.#navigationContext.setOverrides(value);
+	}
 
 	@state()
 	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];

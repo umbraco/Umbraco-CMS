@@ -19,57 +19,23 @@ export class UmbContentCollectionWorkspaceViewElement extends UmbLitElement impl
 	@state()
 	private _collectionAlias?: string;
 
-	@state()
-	private _documentUnique?: string;
-
-	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
-
 	constructor() {
 		super();
-		this.#observeConfig();
-	}
 
-	async #observeConfig() {
 		this.consumeContext(UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._collectionAlias = workspaceContext?.getCollectionAlias();
-			this._documentUnique = workspaceContext?.getUnique() ?? '';
+			this._collectionAlias = workspaceContext?.collection.getCollectionAlias();
 
 			this.observe(
-				workspaceContext?.structure.ownerContentType,
-				async (contentType) => {
-					if (!contentType || !contentType.collection) return;
-
-					const dataTypeUnique = contentType.collection.unique;
-
-					if (dataTypeUnique) {
-						await this.#dataTypeDetailRepository.requestByUnique(dataTypeUnique);
-						this.observe(
-							await this.#dataTypeDetailRepository.byUnique(dataTypeUnique),
-							(dataType) => {
-								if (!dataType) return;
-								this._config = this.#mapDataTypeConfigToCollectionConfig(dataType);
-								this._loading = false;
-							},
-							'_observeConfigDataType',
-						);
+				workspaceContext?.collection.collectionConfig,
+				(config) => {
+					if (config) {
+						this._config = config;
+						this._loading = false;
 					}
 				},
 				'_observeConfigContentType',
 			);
 		});
-	}
-
-	#mapDataTypeConfigToCollectionConfig(dataType: UmbDataTypeDetailModel): UmbCollectionConfiguration {
-		const config = new UmbPropertyEditorConfigCollection(dataType.values);
-		const pageSize = Number(config.getValueByAlias('pageSize'));
-		return {
-			unique: this._documentUnique,
-			layouts: config?.getValueByAlias('layouts'),
-			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
-			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
-			pageSize: isNaN(pageSize) ? 50 : pageSize,
-			userDefinedProperties: config?.getValueByAlias('includeProperties'),
-		};
 	}
 
 	override render() {
