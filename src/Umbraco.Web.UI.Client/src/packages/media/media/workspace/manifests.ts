@@ -23,30 +23,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceView',
-		kind: 'contentCollection',
-		alias: 'Umb.WorkspaceView.Media.Collection',
-		name: 'Media Workspace Collection View',
-		meta: {
-			label: 'Collection',
-			pathname: 'collection',
-			icon: 'icon-grid',
-		},
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_MEDIA_WORKSPACE_ALIAS,
-			},
-			{
-				alias: UMB_WORKSPACE_HAS_CONTENT_COLLECTION_CONDITION_ALIAS,
-			},
-			{
-				alias: UMB_WORKSPACE_ENTITY_IS_NEW_CONDITION_ALIAS,
-				match: false,
-			},
-		],
-	},
-	{
-		type: 'workspaceView',
 		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.Media.Edit',
 		name: 'Media Workspace Edit View',

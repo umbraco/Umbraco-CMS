@@ -8,6 +8,7 @@ import { UmbBasicState, mergeObservables, strictEqualityMemoization } from '@umb
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import type { ManifestWorkspaceView } from '../../types.js';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 export class UmbWorkspaceEditorContext extends UmbContextBase {
 	//
@@ -16,8 +17,8 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 	 * State holding the permitted Workspace Views as a Workspace View Context
 	 */
 
-	#manifests = new UmbBasicState(<Array<ManifestWorkspaceView>>[]);
-	#overrides = new UmbBasicState(<Array<Partial<ManifestWorkspaceView>>>[]);
+	#manifests = new UmbBasicState<Array<ManifestWorkspaceView>>([]);
+	#overrides = new UmbBasicState<Array<UmbDeepPartialObject<ManifestWorkspaceView>>>([]);
 	public readonly views = mergeObservables(
 		[this.#manifests.asObservable(), this.#overrides.asObservable()],
 		([manifests, overrides]): Array<UmbWorkspaceViewContext> => {
@@ -29,7 +30,6 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 			);
 
 			const hasDiff = contextsToKeep.length !== manifests.length;
-			console.log('manifests', manifests, hasDiff, contextsToKeep);
 			if (hasDiff) {
 				contexts = [...contextsToKeep];
 
@@ -52,10 +52,17 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 					const overrideKeys = Object.keys(override) as Array<keyof ManifestWorkspaceView>;
 					const hasOverrideDiff = overrideKeys.some((key) => context.manifest[key] !== override[key]);
 					if (hasOverrideDiff) {
-						context.manifest = { ...context.manifest, ...override };
+						context.manifest = {
+							...context.manifest,
+							...(override as ManifestWorkspaceView),
+							meta: { ...context.manifest.meta, ...override.meta },
+						};
 					}
 				}
 			});
+
+			// sort contexts to match manifests weights:
+			contexts.sort((a, b): number => (b.manifest.weight || 0) - (a.manifest.weight || 0));
 
 			this.#contexts = contexts;
 			return contexts;
@@ -100,8 +107,8 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 		});
 	}
 
-	setOverrides(overrides: Array<Partial<ManifestWorkspaceView>>): void {
-		this.#overrides.setValue(overrides);
+	setOverrides(overrides?: Array<UmbDeepPartialObject<ManifestWorkspaceView>>): void {
+		this.#overrides.setValue(overrides ?? []);
 	}
 
 	async getViewContext(alias: string): Promise<UmbWorkspaceViewContext | undefined> {

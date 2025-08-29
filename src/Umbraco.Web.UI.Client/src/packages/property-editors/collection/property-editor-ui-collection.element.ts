@@ -14,6 +14,9 @@ import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collect
  */
 @customElement('umb-property-editor-ui-collection')
 export class UmbPropertyEditorUICollectionElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	#workspaceContext?: typeof UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT.TYPE;
+	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
+
 	@property()
 	value?: string;
 
@@ -31,22 +34,33 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 		super();
 
 		this.consumeContext(UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._collectionAlias = workspaceContext?.getCollectionAlias() ?? UMB_DOCUMENT_COLLECTION_ALIAS;
+			this._collectionAlias = workspaceContext?.collection.getCollectionAlias() ?? UMB_DOCUMENT_COLLECTION_ALIAS;
+			this.#gotContexts();
+		});
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
+			this.#propertyContext = propertyContext;
+			this.#gotContexts();
+		});
+	}
 
-			this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
-				this.observe(propertyContext?.alias, async (propertyAlias) => {
-					if (propertyAlias) {
-						// Gets the Data Type ID for the current property.
-						const property = await workspaceContext!.structure.getPropertyStructureByAlias(propertyAlias);
-						const unique = workspaceContext!.getUnique();
-						if (unique && property && this._config) {
-							this._config.unique = unique;
-							this._config.dataTypeId = property.dataType.unique;
-							this.requestUpdate('_config');
-						}
-					}
-				});
-			});
+	#gotContexts() {
+		if (!this.#workspaceContext && this.#propertyContext) return;
+		this.observe(this.#propertyContext?.alias, async (propertyAlias) => {
+			if (this.#workspaceContext && propertyAlias) {
+				// Gets the Data Type ID for the current property.
+				const property = await this.#workspaceContext.structure.getPropertyStructureByAlias(propertyAlias);
+				if (!this.#workspaceContext) {
+					// We got destroyed in the meantime.
+					return;
+				}
+				const unique = this.#workspaceContext.getUnique();
+				if (unique && property && this._config) {
+					// Yeah, well what if this was running before the config was set..? Does not seem right to me, BTW. I just refactored this code a bit. [NL]
+					this._config.unique = unique;
+					this._config.dataTypeId = property.dataType.unique;
+					this.requestUpdate('_config');
+				}
+			}
 		});
 	}
 
@@ -66,6 +80,12 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 	override render() {
 		if (!this._config?.unique || !this._config?.dataTypeId) return html`<uui-loader></uui-loader>`;
 		return html`<umb-collection .alias=${this._collectionAlias} .config=${this._config}></umb-collection>`;
+	}
+
+	override destroy(): void {
+		super.destroy();
+		this.#workspaceContext = undefined;
+		this.#propertyContext = undefined;
 	}
 }
 

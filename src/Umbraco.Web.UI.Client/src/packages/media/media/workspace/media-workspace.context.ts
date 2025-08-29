@@ -15,11 +15,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
-import {
-	UmbContentDetailWorkspaceContextBase,
-	type UmbContentCollectionWorkspaceContext,
-	type UmbContentWorkspaceContext,
-} from '@umbraco-cms/backoffice/content';
+import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 
 type ContentModel = UmbMediaDetailModel;
@@ -32,11 +28,12 @@ export class UmbMediaWorkspaceContext
 		ContentTypeModel,
 		UmbMediaVariantModel
 	>
-	implements
-		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbMediaVariantModel>,
-		UmbContentCollectionWorkspaceContext<ContentTypeModel>
+	implements UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbMediaVariantModel>
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.mediaType.unique);
+	/*
+	 * @deprecated Use `collection.hasCollection` instead, will be removed in v.18
+	 */
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
 	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.mediaType.icon);
 
@@ -51,6 +48,7 @@ export class UmbMediaWorkspaceContext
 			contentValidationRepository: UmbMediaValidationRepository,
 			contentVariantScaffold: UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'mediaType',
+			collectionAlias: UMB_MEDIA_COLLECTION_ALIAS,
 		});
 
 		this.observe(
@@ -124,6 +122,9 @@ export class UmbMediaWorkspaceContext
 		});
 	}
 
+	/*
+	 * @deprecated Use `collection.getCollectionAlias()` instead. Will be removed in v.18
+	 */
 	public getCollectionAlias() {
 		return UMB_MEDIA_COLLECTION_ALIAS;
 	}

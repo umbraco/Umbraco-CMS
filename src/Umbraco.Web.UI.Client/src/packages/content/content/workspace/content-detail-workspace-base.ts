@@ -56,6 +56,8 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UmbSegmentCollectionRepository, type UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
 import { UmbHintContext, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
+import { UmbContentCollectionManager } from '../collection/index.js';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -71,6 +73,7 @@ export interface UmbContentDetailWorkspaceContextArgs<
 	ignoreValidationResultOnSubmit?: boolean;
 	contentVariantScaffold: VariantModelType;
 	contentTypePropertyName: string;
+	collectionAlias?: string;
 	saveModalToken?: UmbModalToken<UmbContentVariantPickerData<VariantOptionModelType>, UmbContentVariantPickerValue>;
 }
 
@@ -102,7 +105,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	extends UmbEntityDetailWorkspaceContextBase<DetailModelType, DetailRepositoryType, CreateArgsType>
 	implements
 		UmbContentWorkspaceContext<DetailModelType, ContentTypeDetailModelType, VariantModelType>,
-		UmbSaveableWorkspaceContext
+		UmbSaveableWorkspaceContext,
+		UmbContentCollectionWorkspaceContext<ContentTypeDetailModelType>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
@@ -139,6 +143,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/* Split View */
 	readonly splitView = new UmbWorkspaceSplitViewManager();
+
+	readonly collection: UmbContentCollectionManager;
 
 	/* Hints */
 	readonly hints = new UmbHintContext<UmbVariantHint>(this);
@@ -208,6 +214,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((x) => x?.variesBySegment);
 		this.varies = this.structure.ownerContentTypeObservablePart((x) =>
 			x ? x.variesByCulture || x.variesBySegment : undefined,
+		);
+
+		this.collection = new UmbContentCollectionManager<ContentTypeDetailModelType>(
+			this,
+			this.structure,
+			args.collectionAlias,
 		);
 
 		new UmbContentValidationToHintsManager<ContentTypeDetailModelType>(
