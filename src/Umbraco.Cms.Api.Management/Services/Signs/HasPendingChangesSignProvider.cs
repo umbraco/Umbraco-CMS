@@ -27,9 +27,9 @@ public class HasPendingChangesSignProvider : ISignProvider
     {
         foreach (TItem item in itemViewModels)
         {
-            if (HasPendingChanges(item))
+            foreach (IHasSigns variant in HasPendingChanges(item))
             {
-                item.AddSign(Alias);
+                variant.AddSign(Alias);
             }
         }
 
@@ -39,11 +39,11 @@ public class HasPendingChangesSignProvider : ISignProvider
     /// <summary>
     /// Determines if the given item has any variant that has pending changes.
     /// </summary>
-    private bool HasPendingChanges(object item) => item switch
+    private static IEnumerable<IHasSigns> HasPendingChanges(object item) => item switch
     {
-        DocumentTreeItemResponseModel { Variants: var v } when v.Any(x => x.State == DocumentVariantState.PublishedPendingChanges) => true,
-        DocumentCollectionResponseModel { Variants: var v } when v.Any(x => x.State == DocumentVariantState.PublishedPendingChanges) => true,
-        DocumentItemResponseModel { Variants: var v } when v.Any(x => x.State == DocumentVariantState.PublishedPendingChanges) => true,
-        _ => false,
+        DocumentTreeItemResponseModel { Variants: var v } => v.Where(x => x.State == DocumentVariantState.PublishedPendingChanges),
+        DocumentCollectionResponseModel { Variants: var v } => v.Where(x => x.State == DocumentVariantState.PublishedPendingChanges),
+        DocumentItemResponseModel { Variants: var v } => v.Where(x => x.State == DocumentVariantState.PublishedPendingChanges),
+        _ => [],
     };
 }
