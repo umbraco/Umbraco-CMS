@@ -49,14 +49,18 @@ steps:
     condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
   - ${{ if eq(parameters.additionalEnvironmentVariables, false) }}:
-      - pwsh: |
-          $process = Start-Process dotnet "run --project UmbracoProject --configuration ${{parameters.buildConfiguration}} --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
-          Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
-        displayName: Run application (Windows)
-        condition: eq(variables['Agent.OS'], 'Windows_NT')
-
+      # Run application for Linux
       - bash: |
           nohup dotnet run --project UmbracoProject --configuration ${{parameters.buildConfiguration}} --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
           echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
         displayName: Run application (Linux)
-        condition: eq(variables['Agent.OS'], 'Linux')
+        condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+        workingDirectory: $(Agent.BuildDirectory)/app
+
+      # Run application for Windows
+      - pwsh: |
+          $process = Start-Process dotnet "run --project UmbracoProject --configuration ${{parameters.buildConfiguration}} --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
+          Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
+        displayName: Run application (Windows)
+        condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+        workingDirectory: $(Agent.BuildDirectory)/app

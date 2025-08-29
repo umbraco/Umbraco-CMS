@@ -849,7 +849,7 @@ stages:
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
               ${{ if eq(variables['additionalEnvironmentVariables'], 'true') }}:
-                additionalEnvironmentVariables: $(additionalEnvironmentVariables)
+                additionalEnvironmentVariables: true
 
           # Run application for Linux
           - bash: |
