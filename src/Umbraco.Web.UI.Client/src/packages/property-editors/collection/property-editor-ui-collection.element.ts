@@ -55,7 +55,7 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 				}
 				const unique = this.#workspaceContext.getUnique();
 				if (unique && property && this._config) {
-					// Yeah, well what if this was running before the config was set..? Does not seem right to me, BTW. I just refactored this code a bit. [NL]
+					// TODO: Handle case where config might not be set when this executes during initialization, its not likely but it is fragile to assume this. [NL]
 					this._config.unique = unique;
 					this._config.dataTypeId = property.dataType.unique;
 					this.requestUpdate('_config');
