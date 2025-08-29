@@ -217,8 +217,11 @@ export class UmbDefaultTreeContext<
 		const additionalArgs = this.#additionalRequestArgs.getValue();
 		const baseTarget = this.targetPagination.getBaseTarget();
 
+		// When reloading we only want to send the target values with the request if we can find the target to reload from.
+		const canSendTarget = reload === false || (reload && this.targetPagination.hasBaseTargetInCurrentItems());
+
 		const targetPaging: UmbTargetPaginationRequestModel | undefined =
-			baseTarget && baseTarget.unique
+			baseTarget && baseTarget.unique && canSendTarget
 				? {
 						target: {
 							unique: baseTarget.unique,

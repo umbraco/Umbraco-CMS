@@ -39,6 +39,19 @@ export class UmbTargetPaginationManager<
 	}
 
 	/**
+	 * Checks if the Base Target is part of the current items
+	 * @returns {boolean} True if the Base Target is in the current items, false otherwise
+	 * @memberof UmbTargetPaginationManager
+	 */
+	public hasBaseTargetInCurrentItems(): boolean {
+		try {
+			return this.#getIndexOfBaseTarget() !== -1;
+		} catch {
+			return false;
+		}
+	}
+
+	/**
 	 * Gets the number of items per page
 	 * @returns {number}
 	 * @memberof UmbPaginationManager
