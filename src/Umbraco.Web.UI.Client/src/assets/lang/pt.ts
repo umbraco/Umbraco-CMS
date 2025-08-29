@@ -2830,4 +2830,10 @@ export default {
 		resetUrlMessage: 'Tem a certeza que quer redefinir este URL?',
 		resetUrlLabel: 'Redefinir',
 	},
+	missingEditor: {
+		description:
+			'<p>Este tipo de propriedade já não se encontra disponível.<br/>Por favor, contacte o administrador do site para que ele possa apagar a propriedade ou restaurar o tipo de propriedade.</p>',
+		detailsDescription:
+			'<p>Este tipo de propriedade já não se encontra disponível.<br/>Por favor, contacte o administrador do site para que ele possa apagar a propriedade ou restaurar o tipo de propriedade.</p><p><strong>Dados:</strong></p>',
+	},
 } as UmbLocalizationDictionary;
