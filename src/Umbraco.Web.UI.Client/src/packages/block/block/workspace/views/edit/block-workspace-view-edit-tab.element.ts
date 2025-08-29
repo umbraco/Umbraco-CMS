@@ -100,7 +100,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 			<umb-block-workspace-view-edit-properties
 				.managerName=${this.#managerName}
 				data-mark="property-group:${group.name}"
-				.containerId=${group.key}></umb-block-workspace-view-edit-properties>
+				.containerId=${group.ids[0]}></umb-block-workspace-view-edit-properties>
 		`;
 	}
 
