@@ -778,6 +778,7 @@ stages:
             WindowsDeliveryApiConfig:
               vmImage: "windows-latest"
               testFolder: "DeliveryApi"
+              port: ''
               testCommand: "npx playwright test --project=deliveryApi"
               CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
@@ -785,6 +786,7 @@ stages:
             LinuxDeliveryApiConfig:
               vmImage: "ubuntu-latest"
               testFolder: "DeliveryApi"
+              port: ''
               testCommand: "npx playwright test --project=deliveryApi"
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
@@ -827,7 +829,7 @@ stages:
             parameters:
               testFolder: $(testFolder)
               buildConfiguration: ${{ variables.buildConfiguration }}
-              additionalEnvironmentVariables: ${{ eq(variables['additionalEnvironmentVariables'], 'true') }}
+              additionalEnvironmentVariables: ${{ eq(variables['additionalEnvironmentVariables'], true) }}
 
           # Build application for AzureADB2C
           - pwsh: |
@@ -847,7 +849,7 @@ stages:
           - template: nightly-E2E-run-application-template.yml
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
-              additionalEnvironmentVariables: ${{ eq(variables['additionalEnvironmentVariables'], 'true') }}
+              additionalEnvironmentVariables: ${{ eq(variables['additionalEnvironmentVariables'], true ) }}
 
           # Run application for Linux
           - bash: |

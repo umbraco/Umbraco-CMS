@@ -50,7 +50,7 @@ steps:
 
   - pwsh: echo ${{parameters.additionalEnvironmentVariables}}
 
-  - ${{ if eq(parameters.additionalEnvironmentVariables, false) }}:
+  - ${{ if eq(parameters.additionalEnvironmentVariables, False) }}:
       # Run application for Linux
       - bash: |
           nohup dotnet run --project UmbracoProject --configuration ${{parameters.buildConfiguration}} --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
