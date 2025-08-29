@@ -220,8 +220,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRoutes() {
-		if (!this._routes || this._routes.length === 0 || !this._workspaceViews || this._workspaceViews.length === 0)
+		if (!this._routes || this._routes.length === 0 || !this._workspaceViews || this._workspaceViews.length === 0) {
 			return nothing;
+		}
 		return html`
 			<umb-router-slot
 				inherit-addendum
