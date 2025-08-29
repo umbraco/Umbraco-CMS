@@ -359,6 +359,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
+				overflow: hidden;
 			}
 
 			:host(.ProseMirror-selectednode) {
