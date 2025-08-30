@@ -8,6 +8,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 public class UserGroup2GranularPermissionDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.UserGroup2GranularPermission;
+
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoUserGroup2GranularPermissionDto", AutoIncrement = true)]
     public int Id { get; set; }

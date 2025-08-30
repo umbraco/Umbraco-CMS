@@ -25,12 +25,18 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
     {
         DateTime timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);
 
-        Database.Update<ServerRegistrationDto>(
-            "SET isActive=0, isSchedulingPublisher=0 WHERE lastNotifiedDate < @timeoutDate", new
-            {
-                /*timeoutDate =*/
-                timeoutDate,
-            });
+        Sql<ISqlContext> sql = Sql()
+            .Update<ServerRegistrationDto>(c => c
+                .Set(x => x.IsActive, false)
+                .Set(x => x.IsSchedulingPublisher, false))
+            .Where<ServerRegistrationDto>(x => x.DateAccessed < timeoutDate);
+
+        // Database.Update<ServerRegistrationDto>(
+        //    $"SET {SqlSyntax.GetQuotedColumnName("isActive")}=0, {SqlSyntax.GetQuotedColumnName("isSchedulingPublisher")}=0 WHERE {SqlSyntax.GetQuotedColumnName("lastNotifiedDate")} < @timeoutDate", new
+        //    {
+        //        /*timeoutDate =*/
+        //        timeoutDate,
+        //    });
         ClearCache();
     }
 
@@ -83,7 +89,7 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> { "DELETE FROM umbracoServer WHERE id = @id" };
+        var list = new List<string> { $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoServer")} WHERE id = @id" };
         return list;
     }
 

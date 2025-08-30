@@ -235,10 +235,17 @@ internal class LongRunningOperationService : ILongRunningOperationService
 
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Success, _timeProvider.GetUtcNow() + _options.Value.ExpirationTime);
-            if (operationTask.Result != null)
+            try
             {
-                await _repository.SetResultAsync(operationId, operationTask.Result);
+                await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Success, _timeProvider.GetUtcNow() + _options.Value.ExpirationTime);
+                if (operationTask.Result != null)
+                {
+                    await _repository.SetResultAsync(operationId, operationTask.Result);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while setting the result for long-running operation {Type} with id {OperationId}.", type, operationId);
             }
 
             scope.Complete();

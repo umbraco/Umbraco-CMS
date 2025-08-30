@@ -115,7 +115,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 {
                     // found only 1 user == the default user with default password
                     // however this always exists on uCloud, also need to check if there are other users too
-                    result = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser");
+                    sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+                        .SelectCount()
+                        .From<UserDto>();
+                    result = _scopeAccessor.AmbientScope?.Database.ExecuteScalar<int>(sql);
                     has = result != 1;
                 }
                 scope.Complete();
