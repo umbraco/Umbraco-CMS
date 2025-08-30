@@ -671,7 +671,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             $"DELETE FROM {QuoteTab(User2ClientIdDto.TableName)} WHERE {userColName} = @id",
             $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.UserStartNode)} WHERE {userColName} = @id",
             @$"DELETE FROM {QuoteTab(ExternalLoginTokenDto.TableName)} WHERE {QuoteCol("externalLoginId")} =
-                (SELECT id FROM {QuoteTab(ExternalLoginTokenDto.TableName)} WHERE {QuoteCol("externalLoginId")} = @key)",
+                (SELECT id FROM {QuoteTab(ExternalLoginDto.TableName)} WHERE {QuoteCol("userOrMemberKey")} = @key)",
             $"DELETE FROM {QuoteTab(ExternalLoginDto.TableName)} WHERE {QuoteCol("userOrMemberKey")} = @key",
             $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.User)} WHERE id = @id",
         };

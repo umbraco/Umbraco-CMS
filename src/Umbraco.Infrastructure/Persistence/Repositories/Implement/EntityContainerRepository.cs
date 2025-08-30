@@ -46,7 +46,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     public IEnumerable<EntityContainer> Get(string name, int level)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
-            .Where<NodeDto>(c => c.Text == name && c.Level == level && NodeObjectTypeId == NodeObjectTypeId);
+            .Where<NodeDto>(c => c.Text == name && c.Level == level && c.NodeObjectType == NodeObjectTypeId);
         return Database.Fetch<NodeDto>(sql).Select(CreateEntity).WhereNotNull();
     }
 

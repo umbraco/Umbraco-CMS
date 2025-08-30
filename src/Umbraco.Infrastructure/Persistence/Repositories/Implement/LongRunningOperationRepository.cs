@@ -35,6 +35,7 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
         _logger = logger;
     }
 
+    [Obsolete("Use constructor with ILogger<LongRunningOperationRepository> instead. Remove after testing!")]
     public LongRunningOperationRepository(
             IJsonSerializer jsonSerializer,
             IScopeAccessor scopeAccessor,
