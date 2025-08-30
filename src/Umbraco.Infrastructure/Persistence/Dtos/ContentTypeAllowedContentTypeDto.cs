@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.ContentChildType)]
+[TableName(TableName)]
 [PrimaryKey("Id", AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class ContentTypeAllowedContentTypeDto

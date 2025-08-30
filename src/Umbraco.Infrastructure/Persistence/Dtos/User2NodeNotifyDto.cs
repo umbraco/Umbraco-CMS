@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.User2NodeNotify)]
+[TableName(TableName)]
 [PrimaryKey("userId", AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class User2NodeNotifyDto

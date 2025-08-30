@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.User2ClientId)]
+[TableName(TableName)]
 [PrimaryKey("userId", AutoIncrement = false)]
 [ExplicitColumns]
 public class User2ClientIdDto

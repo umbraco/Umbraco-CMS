@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.User2UserGroup)]
+[TableName(TableName)]
 [ExplicitColumns]
 public class User2UserGroupDto
 {

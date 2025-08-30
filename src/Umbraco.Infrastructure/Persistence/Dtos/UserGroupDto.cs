@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.UserGroup)]
+[TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
 public class UserGroupDto
