@@ -32,6 +32,14 @@ namespace Umbraco.Cms.Persistence.EFCore;
 /// </remarks>
 public class UmbracoDbContext : DbContext
 {
+    public UmbracoDbContext()
+        : base(ConfigureOptions(new DbContextOptions<UmbracoDbContext>()))
+    {
+    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+    }
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoDbContext"/> class.
     /// </summary>

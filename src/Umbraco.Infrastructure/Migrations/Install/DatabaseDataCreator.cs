@@ -9,7 +9,9 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -85,6 +87,7 @@ internal sealed class DatabaseDataCreator
     private const string ImageMediaTypeKey = "cc07b313-0843-4aa8-bbda-871c8da728c8";
 
     private readonly IDatabase _database;
+    private ISqlSyntaxProvider SqlSyntax => ((IUmbracoDatabase)_database).SqlContext.SqlSyntax;
 
     private readonly IDictionary<string, IList<string>> _entitiesToAlwaysCreate = new Dictionary<string, IList<string>>
     {
@@ -205,7 +208,7 @@ internal sealed class DatabaseDataCreator
         {
             [Constants.Security.AdminGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
             [Constants.Security.EditorGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
-            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":" , ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
+            [Constants.Security.WriterGroupKey] = [ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":", ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
             [Constants.Security.TranslatorGroupKey] = [ActionUpdate.ActionLetter, ActionBrowse.ActionLetter, ActionDocumentPropertyRead.ActionLetter, ActionDocumentPropertyWrite.ActionLetter],
         };
 
@@ -1802,12 +1805,15 @@ internal sealed class DatabaseDataCreator
         // For languages we support the installation of records that are additional to the default installed data.
         // We can do this as they are specified by ISO code, which is enough to fully detail them.
         // All other customizable install data is specified by GUID, and hence we only know about the set that are installed by default.
+        bool applyAutoIncrement = SqlSyntax.SupportsAutoIncrement() && SqlSyntax.SupportsIdentityInsert() == false; // SQLite, SQL Server and PostgreSQL supports it. SQL Server e. g. needs spezial sql statments to handle identity inserts. See usage of SqlSyntax.SupportsIdentityInsert()
+        short startId = (short)(applyAutoIncrement ? 0 : 1);
+        short autoIncrementValue = (short)(applyAutoIncrement ? 0 : 1);
         InstallDefaultDataSettings? languageInstallDefaultDataSettings = _installDefaultDataSettings.Get(Constants.Configuration.NamedOptions.InstallDefaultData.Languages);
         if (languageInstallDefaultDataSettings?.InstallData == InstallDefaultDataOption.Values)
         {
             // Insert the specified languages, ensuring the first is marked as default.
             bool isDefault = true;
-            short id = 1;
+            short id = startId;
             foreach (var isoCode in languageInstallDefaultDataSettings.Values)
             {
                 if (!TryCreateCulture(isoCode, out CultureInfo? culture))
@@ -1822,9 +1828,9 @@ internal sealed class DatabaseDataCreator
                     CultureName = culture.EnglishName,
                     IsDefault = isDefault,
                 };
-                _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, dto);
+                _ = _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", applyAutoIncrement, dto);
                 isDefault = false;
-                id++;
+                id += autoIncrementValue;
             }
         }
         else
@@ -1835,9 +1841,10 @@ internal sealed class DatabaseDataCreator
                 ConditionalInsert(
                     Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
                     culture.Name,
-                    new LanguageDto { Id = 1, IsoCode = culture.Name, CultureName = culture.EnglishName, IsDefault = true },
+                    new LanguageDto { Id = startId, IsoCode = culture.Name, CultureName = culture.EnglishName, IsDefault = true },
                     Constants.DatabaseSchema.Tables.Language,
-                    "id");
+                    "id",
+                    applyAutoIncrement);
             }
         }
     }
