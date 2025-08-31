@@ -22,23 +22,13 @@ export class UmbDefaultTreeContext<
 	extends UmbContextBase
 	implements UmbTreeContext
 {
-	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType>(this);
-
 	#treeRoot = new UmbObjectState<TreeRootType | undefined>(undefined);
 	public readonly treeRoot = this.#treeRoot.asObservable();
-
-	public readonly rootItems = this.#treeItemChildrenManager.children;
 
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly expansion = new UmbTreeExpansionManager(this);
-
-	// Offset Pagination: TODO: deprecate and expose a new with the name "offsetPagination"
-	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
-
-	// Target Pagination: Keeps track of pages when navigating with a target
-	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
 
 	#hideTreeRoot = new UmbBooleanState(false);
 	public readonly hideTreeRoot = this.#hideTreeRoot.asObservable();
@@ -46,6 +36,12 @@ export class UmbDefaultTreeContext<
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
 
+	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType>(this);
+	public readonly rootItems = this.#treeItemChildrenManager.children;
+	// Offset Pagination: TODO: deprecate and expose a new with the name "offsetPagination"
+	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
+	// Target Pagination: Keeps track of pages when navigating with a target
+	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
 	public readonly startNode = this.#treeItemChildrenManager.parent;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
@@ -195,7 +191,7 @@ export class UmbDefaultTreeContext<
 	 * @returns {boolean}
 	 * @memberof UmbDefaultTreeContext
 	 */
-	getHideTreeRoot() {
+	getHideTreeRoot(): boolean {
 		return this.#hideTreeRoot.getValue();
 	}
 
