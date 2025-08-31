@@ -18,5 +18,5 @@ public interface IUserDataService
 
     public Task<Attempt<IUserData, UserDataOperationStatus>> UpdateAsync(IUserData userData);
 
-    public Task<Attempt<UserDataOperationStatus>> DeleteAsync(Guid key);
+    public Task<Attempt<UserDataOperationStatus>> DeleteAsync(Guid key, Guid userKey);
 }

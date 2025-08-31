@@ -82,7 +82,7 @@ public class UserDataService : RepositoryService, IUserDataService
         return Attempt<IUserData, UserDataOperationStatus>.Succeed(UserDataOperationStatus.Success, userData);
     }
 
-    public async Task<Attempt<UserDataOperationStatus>> DeleteAsync(Guid key)
+    public async Task<Attempt<UserDataOperationStatus>> DeleteAsync(Guid key, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUserData? existingUserData = await _userDataRepository.GetAsync(key);
@@ -91,11 +91,19 @@ public class UserDataService : RepositoryService, IUserDataService
             return Attempt<UserDataOperationStatus>.Fail(UserDataOperationStatus.NotFound);
         }
 
+        if (await ReferencedUserExits(userKey) is false)
+        {
+            return Attempt<UserDataOperationStatus>.Fail(UserDataOperationStatus.UserNotFound);
+        }
+
         await _userDataRepository.Delete(existingUserData);
 
         scope.Complete();
         return Attempt<UserDataOperationStatus>.Succeed(UserDataOperationStatus.Success);
     }
+
+    private async Task<bool> ReferencedUserExits(Guid userKey)
+        => await _userService.GetAsync(userKey) is not null;
 
     private async Task<bool> ReferencedUserExits(IUserData userData)
         => await _userService.GetAsync(userData.UserKey) is not null;
