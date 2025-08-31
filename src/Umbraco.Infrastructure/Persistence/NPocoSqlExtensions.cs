@@ -171,7 +171,7 @@ namespace Umbraco.Extensions
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
             var concat = sql.SqlContext.SqlSyntax.GetWildcardConcat(concatDefault);
-            var likeSelect = sql.SqlContext.SqlSyntax.GetConcat(valuesSql?.SQL ?? string.Empty, concat);
+            var likeSelect = sql.SqlContext.SqlSyntax.GetConcat($"({valuesSql?.SQL})", concat);
             sql.Where($"{fieldName} LIKE {likeSelect}", valuesSql?.Arguments);
             return sql;
         }
