@@ -1,31 +1,17 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
-import { UmbRequestReloadTreeItemChildrenEvent } from '../../entity-actions/reload-tree-item-children/index.js';
 import type { ManifestTreeItem } from '../../extensions/types.js';
+import { UmbTreeItemChildrenManager } from '../../tree-item-children.manager.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbArrayState, UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbHasChildrenEntityContext,
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
-import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import {
-	UmbDeprecation,
-	UmbPaginationManager,
-	UmbTargetPaginationManager,
-	debounce,
-	type UmbOffsetPaginationRequestModel,
-	type UmbTargetPaginationRequestModel,
-} from '@umbraco-cms/backoffice/utils';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbHasChildrenEntityContext } from '@umbraco-cms/backoffice/entity-action';
+import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
 
@@ -40,24 +26,13 @@ export abstract class UmbTreeItemContextBase<
 	public unique?: UmbEntityUnique;
 	public entityType?: string;
 
-	public readonly pagination = new UmbPaginationManager();
-	public readonly targetPagination = new UmbTargetPaginationManager(this);
-
 	#manifest?: ManifestType;
 
 	protected readonly _treeItem = new UmbObjectState<TreeItemType | undefined>(undefined);
 	readonly treeItem = this._treeItem.asObservable();
 
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	#childItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
-	readonly childItems = this.#childItems.asObservable();
-
 	#hasChildren = new UmbBooleanState(false);
 	readonly hasChildren = this.#hasChildren.asObservable();
-
-	#isLoading = new UmbBooleanState(false);
-	readonly isLoading = this.#isLoading.asObservable();
 
 	#isSelectable = new UmbBooleanState(false);
 	readonly isSelectable = this.#isSelectable.asObservable();
@@ -80,31 +55,25 @@ export abstract class UmbTreeItemContextBase<
 	#isOpen = new UmbBooleanState(false);
 	isOpen = this.#isOpen.asObservable();
 
-	#foldersOnly = new UmbBooleanState(false);
-	readonly foldersOnly = this.#foldersOnly.asObservable();
+	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType>(this);
+	public readonly childItems = this.#treeItemChildrenManager.children;
+	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
+	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
+	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
+	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
 
 	public treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
-	public parentTreeItemContext?: UmbTreeItemContext<TreeItemType>;
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 	#sectionSidebarContext?: typeof UMB_SECTION_SIDEBAR_CONTEXT.TYPE;
-	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
-
-		const take = 5;
-		this.pagination.setPageSize(take);
-		this.targetPagination.setTakeSize(take);
-
+		this.#treeItemChildrenManager.setTakeSize(5);
 		this.#consumeContexts();
-
-		// listen for page changes on the pagination manager
-		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
-
 		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
 
@@ -149,6 +118,8 @@ export abstract class UmbTreeItemContextBase<
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
 
+		this.#treeItemChildrenManager.setParent({ entityType: treeItem.entityType, unique: treeItem.unique });
+
 		const hasChildren = treeItem.hasChildren || false;
 		this.#hasChildren.setValue(hasChildren);
 		this.#hasChildrenContext.setHasChildren(hasChildren);
@@ -174,9 +145,9 @@ export abstract class UmbTreeItemContextBase<
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadChildren = (): Promise<void> => this.#loadChildren();
+	public loadChildren = (): Promise<void> => this.#treeItemChildrenManager.loadChildren();
 
-	public reloadChildren = (): Promise<void> => this.#loadChildren(true);
+	public reloadChildren = (): Promise<void> => this.#treeItemChildrenManager.reloadChildren();
 
 	/**
 	 * Load more children of the tree item
@@ -184,178 +155,21 @@ export abstract class UmbTreeItemContextBase<
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadMore = (): Promise<void> => this.#loadNextItemsFromTarget();
+	public loadMore = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
 
 	/**
 	 * Load previous items of the tree item
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadPrevItems = (): Promise<void> => this.#loadPrevItemsFromTarget();
+	public loadPrevItems = (): Promise<void> => this.#treeItemChildrenManager.loadPrevChildren();
 
 	/**
 	 * Load next items of the tree item
 	 * @memberof UmbTreeItemContextBase
 	 * @returns {Promise<void>}
 	 */
-	public loadNextItems = (): Promise<void> => this.#loadNextItemsFromTarget();
-
-	async #loadChildren(reload = false) {
-		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
-		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
-
-		// TODO: wait for tree context to be ready
-		const repository = this.treeContext?.getRepository();
-		if (!repository) throw new Error('Could not request children, repository is missing');
-
-		this.#isLoading.setValue(true);
-
-		const foldersOnly = this.#foldersOnly.getValue();
-		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
-		const baseTarget = this.targetPagination.getBaseTarget();
-
-		// When reloading we only want to send the target values with the request if we can find the target to reload from.
-		const canSendTarget = reload === false || (reload && this.targetPagination.hasBaseTargetInCurrentItems());
-
-		const targetPaging: UmbTargetPaginationRequestModel | undefined =
-			baseTarget && baseTarget.unique && canSendTarget
-				? {
-						target: {
-							unique: baseTarget.unique,
-							entityType: baseTarget.entityType,
-						},
-						/* When we load from a target we want to load a few items before the target so the target isn't the first item in the list
-						 Currently we use 5, but this could be anything that feels "right".
-						  When reloading from target when want to retrieve the same number of items that a currently loaded
-						*/
-						takeBefore: reload ? this.targetPagination.getNumberOfCurrentItemsBeforeBaseTarget() : 5,
-						takeAfter: reload
-							? this.targetPagination.getNumberOfCurrentItemsAfterBaseTarget()
-							: this.targetPagination.getTakeSize(),
-					}
-				: undefined;
-
-		const offsetPaging: UmbOffsetPaginationRequestModel = {
-			skip: reload ? 0 : this.pagination.getSkip(),
-			take: reload
-				? this.pagination.getCurrentPageNumber() * this.pagination.getPageSize()
-				: this.pagination.getPageSize(),
-		};
-
-		const { data } = await repository.requestTreeItemsOf({
-			parent: {
-				unique: this.unique,
-				entityType: this.entityType,
-			},
-			skip: offsetPaging.skip, // including this for backward compatibility
-			take: offsetPaging.take, // including this for backward compatibility
-			paging: targetPaging || offsetPaging,
-			foldersOnly,
-			...additionalArgs,
-		});
-
-		if (data) {
-			this.#childItems.setValue(data.items);
-			this.targetPagination.setCurrentItems(data.items);
-
-			const hasChildren = data.total > 0;
-			this.#hasChildren.setValue(hasChildren);
-			this.#hasChildrenContext.setHasChildren(hasChildren);
-
-			this.pagination.setTotalItems(data.total);
-			this.targetPagination.setTotalItems(data.total);
-			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
-			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
-		}
-
-		this.#isLoading.setValue(false);
-	}
-
-	async #loadPrevItemsFromTarget() {
-		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
-		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
-
-		const repository = this.treeContext?.getRepository();
-		if (!repository) throw new Error('Could not request children, repository is missing');
-
-		this.#isLoading.setValue(true);
-
-		const foldersOnly = this.#foldersOnly.getValue();
-		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
-
-		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.targetPagination.getStartTarget(),
-			takeBefore: this.targetPagination.getTakeSize(),
-			takeAfter: 0,
-		};
-
-		const { data } = await repository.requestTreeItemsOf({
-			parent: {
-				unique: this.unique,
-				entityType: this.entityType,
-			},
-			foldersOnly,
-			paging: targetPaging,
-			...additionalArgs,
-		});
-
-		if (data) {
-			// We have loaded previous items so we add them to the top of the array
-			const reversedItems = [...data.items].reverse();
-			this.#childItems.prepend(reversedItems);
-			this.targetPagination.prependCurrentItems(reversedItems);
-
-			if (data.totalBefore === undefined) {
-				throw new Error('totalBefore is missing in the response');
-			}
-
-			this.targetPagination.setTotalItems(data.total);
-			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
-		}
-
-		this.#isLoading.setValue(false);
-	}
-
-	async #loadNextItemsFromTarget() {
-		if (this.unique === undefined) throw new Error('Could not request next items, unique key is missing');
-		if (this.entityType === undefined) throw new Error('Could not request next items, entity type is missing');
-
-		const repository = this.treeContext?.getRepository();
-		if (!repository) throw new Error('Could not request next items, repository is missing');
-
-		this.#isLoading.setValue(true);
-
-		const foldersOnly = this.#foldersOnly.getValue();
-		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
-
-		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.targetPagination.getEndTarget(),
-			takeBefore: 0,
-			takeAfter: this.targetPagination.getTakeSize(),
-		};
-
-		const { data } = await repository.requestTreeItemsOf({
-			parent: {
-				unique: this.unique,
-				entityType: this.entityType,
-			},
-			take: this.pagination.getPageSize(), // including this for backward compatibility
-			skip: this.pagination.getSkip(), // including this for backward compatibility
-			foldersOnly,
-			paging: targetPaging,
-			...additionalArgs,
-		});
-
-		if (data) {
-			this.#childItems.append(data.items);
-			this.targetPagination.appendCurrentItems(data.items);
-
-			this.targetPagination.setTotalItems(data.total);
-			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
-		}
-
-		this.#isLoading.setValue(false);
-	}
+	public loadNextItems = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
 
 	public toggleContextMenu() {
 		if (!this.getTreeItem() || !this.entityType || this.unique === undefined) {
@@ -439,30 +253,6 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeFoldersOnly();
 			this.#observeExpansion();
 		});
-
-		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
-			this.parentTreeItemContext = instance;
-		}).skipHost();
-
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
-			this.#removeEventListeners();
-			this.#actionEventContext = instance;
-
-			this.#actionEventContext?.addEventListener(
-				UmbRequestReloadTreeItemChildrenEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext?.addEventListener(
-				UmbRequestReloadChildrenOfEntityEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-
-			this.#actionEventContext?.addEventListener(
-				UmbRequestReloadStructureForEntityEvent.TYPE,
-				this.#onReloadStructureRequest as unknown as EventListener,
-			);
-		});
 	}
 
 	getTreeItem() {
@@ -505,7 +295,7 @@ export abstract class UmbTreeItemContextBase<
 		this.observe(
 			this.treeContext?.foldersOnly,
 			(foldersOnly) => {
-				this.#foldersOnly.setValue(foldersOnly ?? false);
+				this.#treeItemChildrenManager.setFoldersOnly(foldersOnly ?? false);
 			},
 			'observeFoldersOnly',
 		);
@@ -561,23 +351,21 @@ export abstract class UmbTreeItemContextBase<
 				}
 
 				/* If a new target is set we only want to reload children if the new target isn’t among the already loaded items. */
-				const targetIsLoaded = this.#childItems
-					.getValue()
-					.some((child) => child.entityType === newTarget?.entityType && newTarget.unique === child.unique);
+				const targetIsLoaded = this.#treeItemChildrenManager.isChildLoaded(newTarget);
 
 				if (newTarget && targetIsLoaded) {
 					return;
 				}
 
 				// If we already have children and the target didn't change then we don't have to load new children
-				if (isExpanded && this.#childItems.getValue().length > 0) {
+				if (isExpanded && this.#treeItemChildrenManager.hasLoadedChildren()) {
 					return;
 				}
 
 				// If this item is expanded and has children, load them
 				if (isExpanded && this.#hasChildren.getValue()) {
 					this.targetPagination.setBaseTarget(entry.target);
-					this.#loadChildren();
+					this.#treeItemChildrenManager.loadChildren();
 				}
 
 				this.#isOpen.setValue(isExpanded);
@@ -585,26 +373,6 @@ export abstract class UmbTreeItemContextBase<
 			'observeExpansion',
 		);
 	}
-
-	#onReloadRequest = (event: UmbEntityActionEvent) => {
-		if (event.getUnique() !== this.unique) return;
-		if (event.getEntityType() !== this.entityType) return;
-		this.reloadChildren();
-	};
-
-	#onReloadStructureRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
-		if (!this.unique) return;
-		if (event.getUnique() !== this.unique) return;
-		if (event.getEntityType() !== this.entityType) return;
-
-		if (this.parentTreeItemContext) {
-			this.parentTreeItemContext.reloadChildren();
-		} else {
-			this.treeContext?.reloadTree();
-		}
-	};
-
-	#onPageChange = () => this.#loadNextItemsFromTarget();
 
 	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
 
@@ -632,25 +400,7 @@ export abstract class UmbTreeItemContextBase<
 		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
 	}
 
-	#removeEventListeners = () => {
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadTreeItemChildrenEvent.TYPE,
-			this.#onReloadRequest as EventListener,
-		);
-
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadChildrenOfEntityEvent.TYPE,
-			this.#onReloadRequest as EventListener,
-		);
-
-		this.#actionEventContext?.removeEventListener(
-			UmbRequestReloadStructureForEntityEvent.TYPE,
-			this.#onReloadStructureRequest as unknown as EventListener,
-		);
-	};
-
 	override destroy(): void {
-		this.#removeEventListeners();
 		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
 		super.destroy();
 	}
