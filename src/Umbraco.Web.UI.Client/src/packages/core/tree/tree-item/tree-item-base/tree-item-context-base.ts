@@ -3,13 +3,13 @@ import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/inde
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import type { ManifestTreeItem } from '../../extensions/types.js';
 import { UmbTreeItemChildrenManager } from '../../tree-item-children.manager.js';
+import { UmbTreeItemEntityActionManager } from '../../tree-item-entity-action.managet.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbHasChildrenEntityContext } from '@umbraco-cms/backoffice/entity-action';
 import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
@@ -46,9 +46,6 @@ export abstract class UmbTreeItemContextBase<
 	#isActive = new UmbBooleanState(false);
 	readonly isActive = this.#isActive.asObservable();
 
-	#hasActions = new UmbBooleanState(false);
-	readonly hasActions = this.#hasActions.asObservable();
-
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
 
@@ -61,6 +58,9 @@ export abstract class UmbTreeItemContextBase<
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
 	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
+
+	#treeItemEntityActionManager = new UmbTreeItemEntityActionManager(this);
+	public readonly hasActions = this.#treeItemEntityActionManager.hasActions;
 
 	public treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
 
@@ -119,6 +119,7 @@ export abstract class UmbTreeItemContextBase<
 		this.entityType = treeItem.entityType;
 
 		this.#treeItemChildrenManager.setParent({ entityType: treeItem.entityType, unique: treeItem.unique });
+		this.#treeItemEntityActionManager.setEntity({ entityType: treeItem.entityType, unique: treeItem.unique });
 
 		const hasChildren = treeItem.hasChildren || false;
 		this.#hasChildren.setValue(hasChildren);
@@ -134,7 +135,6 @@ export abstract class UmbTreeItemContextBase<
 		this._treeItem.setValue(treeItem);
 
 		// Update observers:
-		this.#observeActions();
 		this.#observeIsSelectable();
 		this.#observeIsSelected();
 		this.#observeSectionPath();
@@ -311,18 +311,6 @@ export abstract class UmbTreeItemContextBase<
 				this.#checkIsActive();
 			},
 			'observeSectionPath',
-		);
-	}
-
-	#observeActions() {
-		this.observe(
-			umbExtensionsRegistry
-				.byType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.forEntityTypes.includes(this.entityType!)))),
-			(actions) => {
-				this.#hasActions.setValue(actions.length > 0);
-			},
-			'observeActions',
 		);
 	}
 
