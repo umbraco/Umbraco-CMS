@@ -19,6 +19,10 @@
     type: string
     default: ''
 
+  - name: DatabaseType
+    type: string
+    default: ''
+
 steps:
   # Ensures we have the package wait-on installed
   - pwsh: npm install wait-on
@@ -67,14 +71,15 @@ steps:
     displayName: Stop application (Windows)
     condition: and(succeededOrFailed(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
 
-  # Stop SQL Server
-  - pwsh: docker stop mssql
-    displayName: Stop SQL Server Docker image (Linux)
-    condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Linux'))
+  - ${{ if eq(parameters.DatabaseType, 'SQLServer') }}:
+    # Stop SQL Server
+    - pwsh: docker stop mssql
+      displayName: Stop SQL Server Docker image (Linux)
+      condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Linux'))
 
-  - pwsh: SqlLocalDB stop MSSQLLocalDB
-    displayName: Stop SQL Server LocalDB (Windows)
-    condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Windows_NT'))
+    - pwsh: SqlLocalDB stop MSSQLLocalDB
+      displayName: Stop SQL Server LocalDB (Windows)
+      condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Windows_NT'))
 
   # Copy artifacts
   - pwsh: |

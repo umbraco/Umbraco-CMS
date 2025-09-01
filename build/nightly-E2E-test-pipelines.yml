@@ -361,6 +361,7 @@ stages:
             parameters:
               testCommand: $(testCommand)
               ASPNETCORE_URLS: $(ASPNETCORE_URLS)
+              DatabaseType: ${{ variables.DatabaseType }}
 
       - job:
         displayName: E2E Tests (SQL Server)
@@ -431,6 +432,7 @@ stages:
             parameters:
               testCommand: $(testCommand)
               ASPNETCORE_URLS: $(ASPNETCORE_URLS)
+              DatabaseType: ${{ variables.DatabaseType }}
 
       - job:
         displayName: E2E Tests with Different App settings (SQL Server)
@@ -572,3 +574,4 @@ stages:
               port: $(port)
               AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
               AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
+              DatabaseType: ${{ variables.DatabaseType }}
