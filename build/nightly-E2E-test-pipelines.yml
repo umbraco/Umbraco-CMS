@@ -334,7 +334,7 @@ stages:
           vmImage: $(vmImage)
         steps:
           # Setup test environment Template
-          - template: build/nightly-E2E-setup-template.yml
+          - template: nightly-E2E-setup-template.yml
             parameters:
               nodeVersion: $(nodeVersion)
               PlaywrightUserEmail: $(PlaywrightUserEmail)
@@ -343,20 +343,20 @@ stages:
               npm_config_cache: $(npm_config_cache)
 
           # Build application Template
-          - template: build/nightly-E2E-build-template.yml
+          - template: nightly-E2E-build-template.yml
             parameters:
               testFolder: $(testFolder)
               buildConfiguration: ${{ variables.buildConfiguration }}
 
           # Run application Template
-          - template: build/nightly-E2E-run-application-template.yml
+          - template: nightly-E2E-run-application-template.yml
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
               DatabaseType: ${{ variables.DatabaseType }}
               buildConfiguration: ${{ variables.buildConfiguration }}
 
           # Run tests Template
-          - template: build/nightly-E2E-run-tests-template.yml
+          - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
               ASPNETCORE_URLS: $(ASPNETCORE_URLS)
@@ -405,7 +405,7 @@ stages:
           vmImage: $(vmImage)
         steps:
           # Setup test environment Template
-          - template: build/nightly-E2E-setup-template.yml
+          - template: nightly-E2E-setup-template.yml
             parameters:
               nodeVersion: $(nodeVersion)
               PlaywrightUserEmail: $(PlaywrightUserEmail)
@@ -414,20 +414,20 @@ stages:
               npm_config_cache: $(npm_config_cache)
 
           # Build application Template
-          - template: build/nightly-E2E-build-template.yml
+          - template: nightly-E2E-build-template.yml
             parameters:
               testFolder: $(testFolder)
               buildConfiguration: ${{ variables.buildConfiguration }}
 
           # Run application Template
-          - template: build/nightly-E2E-run-application-template.yml
+          - template: nightly-E2E-run-application-template.yml
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
               buildConfiguration: ${{ variables.buildConfiguration }}
               DatabaseType: ${{ variables.DatabaseType }}
 
           # Run tests Template
-          - template: build/nightly-E2E-run-tests-template.yml
+          - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
               ASPNETCORE_URLS: $(ASPNETCORE_URLS)
@@ -489,7 +489,7 @@ stages:
           vmImage: $(vmImage)
         steps:
           # Setup test environment Template
-          - template: build/nightly-E2E-setup-template.yml
+          - template: nightly-E2E-setup-template.yml
             parameters:
               nodeVersion: $(nodeVersion)
               PlaywrightUserEmail: $(PlaywrightUserEmail)
@@ -506,7 +506,7 @@ stages:
             condition: and(succeeded(), ne(variables['packageName'], ''), ne(variables['packageVersion'], ''))
 
           # Build application Template
-          - template: build/nightly-E2E-build-template.yml
+          - template: nightly-E2E-build-template.yml
             parameters:
               testFolder: $(testFolder)
               buildConfiguration: ${{ variables.buildConfiguration }}
@@ -527,7 +527,7 @@ stages:
             condition: and(succeeded(), eq(variables['testFolder'], 'ExternalLogin\\AzureADB2C'))
 
           # Run application Template
-          - template: build/nightly-E2E-run-application-template.yml
+          - template: nightly-E2E-run-application-template.yml
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
               additionalEnvironmentVariables: ${{ eq(variables['additionalEnvironmentVariables'], true ) }}
@@ -563,7 +563,7 @@ stages:
               AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
 
           # Run tests Template
-          - template: build/nightly-E2E-run-tests-template.yml
+          - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
               ASPNETCORE_URLS: $(ASPNETCORE_URLS)
