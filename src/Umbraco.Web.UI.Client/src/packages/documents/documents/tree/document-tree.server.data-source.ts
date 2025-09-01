@@ -41,6 +41,9 @@ const getRootItems = async (args: UmbDocumentTreeRootItemsRequestArgs) => {
 	const paging = args.paging;
 
 	if (paging && isTargetPaginationRequest(paging)) {
+		if (paging.target.unique === null) {
+			throw new Error('Target unique cannot be null when using target pagination');
+		}
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		const { data } = await DocumentService.getTreeDocumentSiblings({
 			query: {
@@ -91,6 +94,10 @@ const getChildrenOf = async (args: UmbDocumentTreeChildrenOfRequestArgs) => {
 	const paging = args.paging;
 
 	if (paging && isTargetPaginationRequest(paging)) {
+		if (paging.target.unique === null) {
+			throw new Error('Target unique cannot be null when using target pagination');
+		}
+
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		const { data } = await DocumentService.getTreeDocumentSiblings({
 			query: {
