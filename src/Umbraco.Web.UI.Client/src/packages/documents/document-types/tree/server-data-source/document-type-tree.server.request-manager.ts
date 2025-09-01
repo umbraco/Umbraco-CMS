@@ -5,34 +5,36 @@ import {
 	DocumentTypeService,
 	type DocumentTypeTreeItemResponseModel,
 	type PagedDocumentTypeTreeItemResponseModel,
+	type SubsetDocumentTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbManagementApiTreeDataRequestManager } from '@umbraco-cms/backoffice/management-api';
-import type {
-	UmbTreeAncestorsOfRequestArgs,
-	UmbTreeChildrenOfRequestArgs,
-	UmbTreeRootItemsRequestArgs,
-} from '@umbraco-cms/backoffice/tree';
 
 export class UmbManagementApiDocumentTypeTreeDataRequestManager extends UmbManagementApiTreeDataRequestManager<
 	PagedDocumentTypeTreeItemResponseModel,
 	PagedDocumentTypeTreeItemResponseModel,
-	Array<DocumentTypeTreeItemResponseModel>
+	Array<DocumentTypeTreeItemResponseModel>,
+	SubsetDocumentTypeTreeItemResponseModel
 > {
 	constructor(host: UmbControllerHost) {
 		super(host, {
-			getRootItems: (args: UmbTreeRootItemsRequestArgs) =>
+			getRootItems: (args: any) =>
 				DocumentTypeService.getTreeDocumentTypeRoot({
 					query: { foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
 				}),
 
-			getChildrenOf: (args: UmbTreeChildrenOfRequestArgs) =>
+			getChildrenOf: (args: any) =>
 				DocumentTypeService.getTreeDocumentTypeChildren({
 					query: { parentId: args.parent.unique, foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
 				}),
 
-			getAncestorsOf: (args: UmbTreeAncestorsOfRequestArgs) =>
+			getAncestorsOf: (args: any) =>
 				DocumentTypeService.getTreeDocumentTypeAncestors({
 					query: { descendantId: args.treeItem.unique },
+				}),
+
+			getSiblingsFrom: (args: any) =>
+				DocumentTypeService.getTreeDocumentTypeSiblings({
+					query: { target: args.target },
 				}),
 		});
 	}
