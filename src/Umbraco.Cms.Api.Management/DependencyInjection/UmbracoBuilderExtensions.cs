@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
@@ -95,6 +95,8 @@ public static partial class UmbracoBuilderExtensions
                     endpoints: applicationBuilder => applicationBuilder.UseEndpoints()));
             });
         }
+
+        builder.AddCollectionBuilders();
 
         return builder;
     }

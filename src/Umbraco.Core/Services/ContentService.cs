@@ -694,6 +694,22 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         }
     }
 
+    /// <inheritdoc/>
+    public IEnumerable<Guid> GetScheduledContentKeys(IEnumerable<Guid> keys)
+    {
+        Guid[] idsA = keys.ToArray();
+        if (idsA.Length == 0)
+        {
+            return Enumerable.Empty<Guid>();
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            scope.ReadLock(Constants.Locks.ContentTree);
+            return _documentRepository.GetScheduledContentKeys(idsA);
+        }
+    }
+
     /// <summary>
     ///     Checks if the passed in <see cref="IContent" /> can be published based on the ancestors publish state.
     /// </summary>

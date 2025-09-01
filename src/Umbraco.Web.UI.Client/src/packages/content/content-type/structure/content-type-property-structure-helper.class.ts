@@ -1,13 +1,8 @@
-import type {
-	UmbContentTypeModel,
-	UmbPropertyContainerTypes,
-	UmbPropertyTypeContainerModel,
-	UmbPropertyTypeModel,
-} from '../types.js';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '../types.js';
 import type { UmbContentTypeStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbPropertyTypeUnique = UmbPropertyTypeModel['unique'];
 
@@ -52,7 +47,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
-		this.#observeContainers();
+		this.#observeContainer();
 	}
 
 	public getStructureManager() {
@@ -62,106 +57,25 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	public setContainerId(value?: string | null) {
 		if (this.#containerId === value) return;
 		this.#containerId = value;
-		this.#observeContainers();
+		this.#observeContainer();
 	}
 	public getContainerId() {
 		return this.#containerId;
 	}
 
-	private _containerName?: string;
-	private _containerType?: UmbPropertyContainerTypes;
-	private _parentName?: string | null;
-	private _parentType?: UmbPropertyContainerTypes;
-
-	#containers?: Array<UmbPropertyTypeContainerModel>;
-	#observeContainers() {
-		if (!this.#structure || this.#containerId === undefined) return;
-
-		if (this.#containerId === null) {
-			this.observe(
-				this.#structure.propertyStructuresOf(null),
-				(properties) => {
-					this.#propertyStructure.setValue(properties);
-				},
-				'observePropertyStructures',
-			);
-			this.removeUmbControllerByAlias('_observeContainers');
-		} else {
-			this.observe(
-				this.#structure.containerById(this.#containerId),
-				(container) => {
-					if (container) {
-						this._containerName = container.name ?? '';
-						this._containerType = container.type;
-						if (container.parent) {
-							// We have a parent for our main container, so lets observe that one as well: [NL]
-							this.observe(
-								this.#structure!.containerById(container.parent.id),
-								(parent) => {
-									if (parent) {
-										this._parentName = parent.name ?? '';
-										this._parentType = parent.type;
-										this.#observeSimilarContainers();
-									} else {
-										this.removeUmbControllerByAlias('_observeContainers');
-										this._parentName = undefined;
-										this._parentType = undefined;
-									}
-								},
-								'_observeMainParentContainer',
-							);
-						} else {
-							this.removeUmbControllerByAlias('_observeMainParentContainer');
-							this._parentName = null; //In this way we want to look for one without a parent. [NL]
-							this._parentType = undefined;
-							this.#observeSimilarContainers();
-						}
-					} else {
-						this.removeUmbControllerByAlias('_observeContainers');
-						this._containerName = undefined;
-						this._containerType = undefined;
-						this.#propertyStructure.setValue([]);
-					}
-				},
-				'_observeMainContainer',
-			);
-		}
-	}
-
-	#observeSimilarContainers() {
-		if (this._containerName === undefined || !this._containerType || this._parentName === undefined) return;
+	#observeContainer() {
 		this.observe(
-			this.#structure!.containersByNameAndTypeAndParent(
-				this._containerName,
-				this._containerType,
-				this._parentName,
-				this._parentType,
-			),
-			(groupContainers) => {
-				if (this.#containers) {
-					// We want to remove properties of groups that does not exist anymore: [NL]
-					const goneGroupContainers = this.#containers.filter((x) => !groupContainers.some((y) => y.id === x.id));
-					const _propertyStructure = this.#propertyStructure
-						.getValue()
-						.filter((x) => !goneGroupContainers.some((y) => y.id === x.container?.id));
-					this.#propertyStructure.setValue(_propertyStructure);
-				}
-
+			this.#containerId ? this.#structure?.mergedContainersOfId(this.#containerId) : undefined,
+			(container) => {
 				this.observe(
-					mergeObservables(
-						groupContainers.map((group) => this.#structure!.propertyStructuresOf(group.id)),
-						(sources) => {
-							return sources.flatMap((x) => x);
-						},
-					),
+					container ? this.#structure?.propertyStructuresOfGroupIds(container.ids ?? []) : undefined,
 					(properties) => {
-						this.#propertyStructure.setValue(properties);
+						this.#propertyStructure.setValue(properties ?? []);
 					},
-					'observePropertyStructures',
+					'observeProperties',
 				);
-				this.#containers = groupContainers;
 			},
-			'_observeContainers',
+			'observeContainer',
 		);
 	}
 

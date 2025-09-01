@@ -39,4 +39,13 @@ public interface IDocumentRepository : IPublishableContentRepository<IContent>
     bool RecycleBinSmells();
 
     bool IsPathPublished(IContent? content);
+
+    /// <summary>
+    ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>
+    ///     The provided collection of content keys filtered for those that are scheduled for publishing.
+    /// </returns>
+    IEnumerable<Guid> GetScheduledContentKeys(Guid[] keys) => [];
 }

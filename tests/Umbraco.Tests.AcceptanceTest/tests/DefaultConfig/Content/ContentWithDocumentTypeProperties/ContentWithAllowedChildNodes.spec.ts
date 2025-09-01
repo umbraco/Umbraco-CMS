@@ -84,7 +84,7 @@ test('can create multiple child nodes with different document types', async ({um
   // verify that the child content displays in the tree after reloading children
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickReloadChildrenActionMenuOption();
-  await umbracoUi.content.clickCaretButtonForContentName(contentName);
+  await umbracoUi.content.openContentCaretButtonForName(contentName);
   await umbracoUi.content.doesContentTreeHaveName(firstChildContentName);
   await umbracoUi.content.doesContentTreeHaveName(secondChildContentName);
 
