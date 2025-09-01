@@ -2343,7 +2343,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.DateTime2,
                     EditorUiAlias = "Umb.PropertyEditorUi.DateTimePicker",
                     DbType = "Ntext",
-                    Configuration = "{\"format\": \"date-time\", \"timeFormat\": \"HH:mm\", \"timeZones\": {\"mode\": \"none\"}}",
+                    Configuration = "{\"format\": \"date-time\", \"timeFormat\": \"HH:mm\", \"timeZones\": null}",
                 });
         }
 
