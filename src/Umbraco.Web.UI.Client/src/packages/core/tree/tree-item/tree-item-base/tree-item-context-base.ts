@@ -329,30 +329,30 @@ export abstract class UmbTreeItemContextBase<
 				const isExpanded = entry !== undefined;
 
 				const currentBaseTarget = this.targetPagination.getBaseTarget();
-				const newTarget = entry?.target;
+				const target = entry?.target;
 
 				/* If a base target already exists (tree loaded to that point),
    			don’t auto-reset when the target is removed.
    			This happens when creating new items not yet in the tree. */
-				if (currentBaseTarget && !newTarget) {
+				if (currentBaseTarget && !target) {
 					return;
 				}
 
 				/* If a new target is set we only want to reload children if the new target isn’t among the already loaded items. */
-				const targetIsLoaded = this.#treeItemChildrenManager.isChildLoaded(newTarget);
-
-				if (newTarget && targetIsLoaded) {
+				const targetIsLoaded = this.#treeItemChildrenManager.isChildLoaded(target);
+				if (target && targetIsLoaded) {
 					return;
 				}
 
 				// If we already have children and the target didn't change then we don't have to load new children
-				if (isExpanded && this.#treeItemChildrenManager.hasLoadedChildren()) {
+				const isNewTarget = target !== currentBaseTarget;
+				if (isExpanded && this.#treeItemChildrenManager.hasLoadedChildren() && !isNewTarget) {
 					return;
 				}
 
 				// If this item is expanded and has children, load them
 				if (isExpanded && this.#hasChildren.getValue()) {
-					this.targetPagination.setBaseTarget(newTarget);
+					this.targetPagination.setBaseTarget(target);
 					this.#treeItemChildrenManager.loadChildren();
 				}
 
