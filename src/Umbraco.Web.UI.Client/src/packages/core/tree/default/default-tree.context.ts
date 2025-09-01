@@ -167,6 +167,7 @@ export class UmbDefaultTreeContext<
 
 		if (data) {
 			this.#treeRoot.setValue(data);
+			this.#treeItemChildrenManager.setParent({ entityType: data.entityType, unique: data.unique });
 			this.pagination.setTotalItems(1);
 			this.#observeExpansion();
 
