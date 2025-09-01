@@ -121,7 +121,7 @@ public class AliasUrlProvider : IUrlProvider
             {
                 var path = "/" + alias;
                 var uri = new Uri(path, UriKind.Relative);
-                yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig));
+                yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), Constants.UrlProviders.Default);
             }
         }
         else
@@ -153,7 +153,7 @@ public class AliasUrlProvider : IUrlProvider
                 {
                     var path = "/" + alias;
                     var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Authority), path));
-                    yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), domainUri.Culture);
+                    yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), Constants.UrlProviders.Default, domainUri.Culture);
                 }
             }
         }

@@ -49,6 +49,13 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     private IEnumerable<DocumentUrlInfo> CreateDocumentUrlInfos(IEnumerable<UrlInfo> urlInfos)
         => urlInfos
             .Where(urlInfo => urlInfo.Url is not null)
-            .Select(urlInfo => new DocumentUrlInfo { Culture = urlInfo.Culture, Url = urlInfo.Url!.ToString(), Message = urlInfo.Message, IsExternal = urlInfo.IsExternal })
+            .Select(urlInfo => new DocumentUrlInfo
+            {
+                Culture = urlInfo.Culture,
+                Url = urlInfo.Url!.ToString(),
+                Message = urlInfo.Message,
+                IsExternal = urlInfo.IsExternal,
+                Provider = urlInfo.Provider,
+            })
             .ToArray();
 }

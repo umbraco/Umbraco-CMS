@@ -134,7 +134,7 @@ public class NewDefaultUrlProvider : IUrlProvider
 
             var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
             uri = _uriUtility.UriFromUmbraco(uri, _requestSettings);
-            yield return UrlInfo.FromUri(uri, culture);
+            yield return UrlInfo.FromUri(uri, Constants.UrlProviders.Default, culture);
         }
     }
 
@@ -142,7 +142,7 @@ public class NewDefaultUrlProvider : IUrlProvider
 
     /// <inheritdoc />
     public IEnumerable<UrlInfo> GetPreviewUrls(IContent content) => [
-        UrlInfo.AsUrl($"/{Constants.System.UmbracoPathSegment}/preview?id={content.Key}")
+        UrlInfo.AsUrl($"/{Constants.System.UmbracoPathSegment}/preview?id={content.Key}", Constants.UrlProviders.Default)
     ];
 
     #endregion
@@ -232,7 +232,7 @@ public class NewDefaultUrlProvider : IUrlProvider
             culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
         {
             Uri url = AssembleUrl(domainUri, path, current, mode);
-            return UrlInfo.FromUri(url, culture);
+            return UrlInfo.FromUri(url, Constants.UrlProviders.Default, culture);
         }
 
         return null;

@@ -12,9 +12,15 @@ public class UrlInfo : IEquatable<UrlInfo>
     /// <summary>
     ///     Initializes a new instance of the <see cref="UrlInfo" /> class.
     /// </summary>
-    public UrlInfo(Uri url, string? culture, string? message = null, bool isExternal = false)
+    public UrlInfo(Uri url, string provider, string? culture, string? message = null, bool isExternal = false)
     {
+        if (provider.IsNullOrWhiteSpace())
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(provider));
+        }
+
         Url = url;
+        Provider = provider;
         Culture = culture;
         Message = message;
         IsExternal = isExternal;
@@ -23,26 +29,32 @@ public class UrlInfo : IEquatable<UrlInfo>
     /// <summary>
     ///     Initializes a new instance of the <see cref="UrlInfo" /> class as a "message only" - that is, not an actual URL.
     /// </summary>
-    public UrlInfo(string message, string? culture = null)
+    public UrlInfo(string message, string provider, string? culture = null)
     {
         if (message.IsNullOrWhiteSpace())
         {
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(message));
         }
 
+        if (provider.IsNullOrWhiteSpace())
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(provider));
+        }
+
         Url = null;
+        Provider = provider;
         Message = message;
         Culture = culture;
     }
 
-    public static UrlInfo AsUrl(string url, string? culture = null, bool isExternal = false)
-        => new(new Uri(url, UriKind.RelativeOrAbsolute), culture: culture, isExternal: isExternal);
+    public static UrlInfo AsUrl(string url, string provider, string? culture = null, bool isExternal = false)
+        => new(new Uri(url, UriKind.RelativeOrAbsolute), provider, culture: culture, isExternal: isExternal);
 
-    public static UrlInfo AsMessage(string message, string? culture = null)
-        => new(message, culture);
+    public static UrlInfo AsMessage(string message, string provider, string? culture = null)
+        => new(message, provider, culture: culture);
 
-    public static UrlInfo FromUri(Uri uri, string? culture = null, bool isExternal = false)
-        => new(uri, culture: culture, isExternal: isExternal);
+    public static UrlInfo FromUri(Uri uri, string provider, string? culture = null, bool isExternal = false)
+        => new(uri, provider, culture: culture, isExternal: isExternal);
 
     /// <summary>
     ///     Gets the culture.
@@ -55,6 +67,8 @@ public class UrlInfo : IEquatable<UrlInfo>
     /// </summary>
     [DataMember(Name = "url")]
     public Uri? Url { get; }
+
+    public string Provider { get; }
 
     /// <summary>
     ///     Gets the message.

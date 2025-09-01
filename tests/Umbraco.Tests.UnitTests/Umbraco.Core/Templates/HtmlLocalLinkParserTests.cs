@@ -182,7 +182,7 @@ public class HtmlLocalLinkParserTests
                 It.IsAny<UrlMode>(),
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.AsUrl("/my-test-url"));
+            .Returns(UrlInfo.AsUrl("/my-test-url", "Test Provider"));
         var contentType = new PublishedContentType(
             Guid.NewGuid(),
             666,
@@ -212,7 +212,7 @@ public class HtmlLocalLinkParserTests
                 It.IsAny<UrlMode>(),
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.AsUrl("/media/1001/my-image.jpg"));
+            .Returns(UrlInfo.AsUrl("/media/1001/my-image.jpg", "Test Provider"));
 
         var umbracoContextAccessor = new TestUmbracoContextAccessor();
 

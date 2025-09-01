@@ -50,7 +50,7 @@ public static class UrlProviderExtensions
 
         if (content.Published == false)
         {
-            result.Add(UrlInfo.AsMessage(textService.Localize("content", "itemNotPublished")));
+            result.Add(UrlInfo.AsMessage(textService.Localize("content", "itemNotPublished"), Constants.UrlProviders.Default));
             return result;
         }
 
@@ -155,7 +155,7 @@ public static class UrlProviderExtensions
 
                 // deal with exceptions
                 case "#ex":
-                    result.Add(UrlInfo.AsMessage(textService.Localize("content", "getUrlException"), culture));
+                    result.Add(UrlInfo.AsMessage(textService.Localize("content", "getUrlException"), Constants.UrlProviders.Default, culture));
                     break;
 
                 // got a URL, deal with collisions, add URL
@@ -168,7 +168,7 @@ public static class UrlProviderExtensions
                     }
                     else
                     {
-                        result.Add(UrlInfo.AsUrl(url, culture));
+                        result.Add(UrlInfo.AsUrl(url, Constants.UrlProviders.Default, culture));
                     }
 
                     break;
@@ -193,18 +193,19 @@ public static class UrlProviderExtensions
         if (parent == null)
         {
             // oops, internal error
-            return UrlInfo.AsMessage(textService.Localize("content", "parentNotPublishedAnomaly"), culture);
+            return UrlInfo.AsMessage(textService.Localize("content", "parentNotPublishedAnomaly"), Constants.UrlProviders.Default, culture);
         }
 
         if (!parent.Published)
         {
             // totally not published
-            return UrlInfo.AsMessage(textService.Localize("content", "parentNotPublished", new[] { parent.Name }), culture);
+            return UrlInfo.AsMessage(textService.Localize("content", "parentNotPublished", new[] { parent.Name }), Constants.UrlProviders.Default, culture);
         }
 
         // culture not published
         return UrlInfo.AsMessage(
             textService.Localize("content", "parentCultureNotPublished", new[] { parent.Name }),
+            Constants.UrlProviders.Default,
             culture);
     }
 
@@ -242,7 +243,7 @@ public static class UrlProviderExtensions
                 logger.LogDebug(logMsg, url, uri, culture);
             }
 
-            var urlInfo = UrlInfo.AsMessage(textService.Localize("content", "routeErrorCannotRoute"), culture);
+            var urlInfo = UrlInfo.AsMessage(textService.Localize("content", "routeErrorCannotRoute"), Constants.UrlProviders.Default, culture);
             return Attempt.Succeed(urlInfo);
         }
 
@@ -264,7 +265,7 @@ public static class UrlProviderExtensions
             l.Reverse();
             var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent?.Id + ")";
 
-            var urlInfo = UrlInfo.AsMessage(textService.Localize("content", "routeError", new[] { s }), culture);
+            var urlInfo = UrlInfo.AsMessage(textService.Localize("content", "routeError", new[] { s }), Constants.UrlProviders.Default, culture);
             return Attempt.Succeed(urlInfo);
         }
 
