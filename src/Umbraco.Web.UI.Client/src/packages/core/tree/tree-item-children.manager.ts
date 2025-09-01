@@ -327,14 +327,14 @@ export class UmbTreeItemChildrenManager<
 
 	/**
 	 * Checks if a specific child is loaded
-	 * @param {(UmbEntityModel | undefined)} item
+	 * @param {(UmbEntityModel | undefined)} entity
 	 * @returns {boolean} - True if items has been loaded
 	 * @memberof UmbRepositoryTreeItemChildrenManager
 	 */
-	public isChildLoaded(item: UmbEntityModel | undefined): boolean {
+	public isChildLoaded(entity: UmbEntityModel | undefined): boolean {
 		return this.#children
 			.getValue()
-			.some((child) => child.entityType === item?.entityType && item.unique === child.unique);
+			.some((child) => child.entityType === entity?.entityType && entity.unique === child.unique);
 	}
 
 	/**

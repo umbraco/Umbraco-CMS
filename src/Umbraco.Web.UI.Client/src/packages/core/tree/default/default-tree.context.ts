@@ -319,7 +319,7 @@ export class UmbDefaultTreeContext<
 				}
 
 				if (isExpanded) {
-					this.targetPagination.setBaseTarget(entry?.target);
+					this.targetPagination.setBaseTarget(newTarget);
 					this.#treeItemChildrenManager.loadChildren();
 				}
 			},

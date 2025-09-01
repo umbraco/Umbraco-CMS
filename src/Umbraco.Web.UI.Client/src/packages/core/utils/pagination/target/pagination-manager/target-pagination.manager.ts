@@ -5,7 +5,7 @@ import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/back
 export class UmbTargetPaginationManager<
 	ItemModelType extends UmbEntityModel = UmbEntityModel,
 > extends UmbControllerBase {
-	#baseTarget = new UmbObjectState<ItemModelType | undefined>(undefined);
+	#baseTarget = new UmbObjectState<UmbEntityModel | undefined>(undefined);
 	#currentItems = new UmbArrayState<ItemModelType>([], (x) => x.unique);
 
 	#takeSize = new UmbNumberState(50);
@@ -22,19 +22,19 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Gets the target that the pagination is based around
-	 * @returns {ItemModelType | undefined} - The target item that the pagination is based around
+	 * @returns {UmbEntityModel | undefined} - The target item that the pagination is based around
 	 * @memberof UmbTargetPaginationManager
 	 */
-	public getBaseTarget(): ItemModelType | undefined {
+	public getBaseTarget(): UmbEntityModel | undefined {
 		return this.#baseTarget.getValue();
 	}
 
 	/**
 	 * Set the target that the pagination will be based around
-	 * @param {(ItemModelType | undefined)} target - The target
+	 * @param {(UmbEntityModel | undefined)} target - The target
 	 * @memberof UmbTargetPaginationManager
 	 */
-	public setBaseTarget(target: ItemModelType | undefined) {
+	public setBaseTarget(target: UmbEntityModel | undefined) {
 		this.#baseTarget.setValue(target);
 	}
 
@@ -126,32 +126,32 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Gets the first target of the current item. Use for loading more items before the base target
-	 * @returns {ItemModelType} - The target item to load more items before
+	 * @returns {UmbEntityModel} - The target item to load more items before
 	 * @memberof UmbTargetPaginationManager
 	 */
-	public getStartTarget(): ItemModelType {
+	public getStartTarget(): UmbEntityModel {
 		const firstItem = this.#currentItems.getValue()[0];
 
 		if (!firstItem) {
 			throw new Error('No Start Target found');
 		}
 
-		return firstItem;
+		return { entityType: firstItem.entityType, unique: firstItem.unique };
 	}
 
 	/**
 	 * Gets the last target of the current items. Use for load more items after the base target
-	 * @returns {ItemModelType} - The target item to load more items before
+	 * @returns {UmbEntityModel} - The target item to load more items before
 	 * @memberof UmbTargetPaginationManager
 	 */
-	public getEndTarget(): ItemModelType {
+	public getEndTarget(): UmbEntityModel {
 		const lastItem = this.#currentItems.getValue().slice(-1)[0];
 
 		if (!lastItem) {
 			throw new Error('No End Target found');
 		}
 
-		return lastItem;
+		return { entityType: lastItem.entityType, unique: lastItem.unique };
 	}
 
 	public setTotalItemsBeforeStartTarget(totalItems: number | undefined) {
