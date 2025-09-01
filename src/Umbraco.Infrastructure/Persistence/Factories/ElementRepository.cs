@@ -1494,6 +1494,27 @@ public class ElementRepository : ContentRepositoryBase<int, IElement, ElementRep
     }
 
     /// <inheritdoc />
+    public IEnumerable<Guid> GetScheduledContentKeys(Guid[] keys)
+    {
+        var action = ContentScheduleAction.Release.ToString();
+        DateTime now = DateTime.UtcNow;
+
+        Sql<ISqlContext> sql = SqlContext.Sql();
+        sql
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<ElementDto>()
+            .InnerJoin<ContentDto>().On<DocumentDto, ElementDto>(left => left.NodeId, right => right.NodeId)
+            .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .WhereIn<NodeDto>(x => x.NodeId, Sql()
+                .Select<ContentScheduleDto>(x => x.NodeId)
+                .From<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x => x.Action == action && x.Date >= now));
+
+        return Database.Fetch<Guid>(sql);
+    }
+
+    /// <inheritdoc />
     public IEnumerable<IElement> GetContentForExpiration(DateTime date)
     {
         var action = ContentScheduleAction.Expire.ToString();
