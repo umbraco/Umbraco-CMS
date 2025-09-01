@@ -1,6 +1,6 @@
-import { UmbTiptapStatusbarConfigurationContext } from './tiptap-statusbar-configuration.context.js';
 import type { UmbTiptapStatusbarValue } from '../../components/types.js';
 import type { UmbTiptapStatusbarViewModel, UmbTiptapStatusbarExtension } from '../types.js';
+import { UmbTiptapStatusbarConfigurationContext } from './tiptap-statusbar-configuration.context.js';
 import { customElement, css, html, property, when, repeat, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

@@ -55,7 +55,9 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 				this._availableExtensions = extensions;
 			});
 
-			this.observe(this.#context.reload, (reload) => { if (reload) this.requestUpdate(); });
+			this.observe(this.#context.reload, (reload) => {
+				if (reload) this.requestUpdate();
+			});
 
 			this.observe(this.#context.toolbar, (toolbar) => {
 				if (!toolbar.length) return;
