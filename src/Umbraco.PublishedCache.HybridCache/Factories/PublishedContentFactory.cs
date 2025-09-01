@@ -73,9 +73,25 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
 
     public IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview)
     {
+        var cacheKey = $"{nameof(PublishedContentFactory)}ElementCache_{contentCacheNode.Id}_{preview}";
+        IPublishedElement? publishedContent = _appCaches.RequestCache.GetCacheItem<IPublishedElement?>(cacheKey);
+        if (publishedContent is not null)
+        {
+            _logger.LogDebug(
+                "Using cached IPublishedElement for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
+                contentCacheNode.Data?.Name ?? "No Name",
+                contentCacheNode.Id);
+            return publishedContent;
+        }
+
+        _logger.LogDebug(
+            "Creating IPublishedElement for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
+            contentCacheNode.Data?.Name ?? "No Name",
+            contentCacheNode.Id);
+
         ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
 
-        IPublishedElement? model = GetPublishedElement(contentNode, preview);
+        publishedContent = GetPublishedElement(contentNode, preview);
 
         if (preview)
         {
@@ -83,7 +99,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             // return model ?? GetPublishedContentAsDraft(model);
         }
 
-        return model;
+        return publishedContent;
     }
 
     /// <inheritdoc/>
