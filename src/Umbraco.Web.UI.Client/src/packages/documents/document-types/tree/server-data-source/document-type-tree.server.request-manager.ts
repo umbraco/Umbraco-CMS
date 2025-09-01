@@ -10,6 +10,7 @@ import {
 import { UmbManagementApiTreeDataRequestManager } from '@umbraco-cms/backoffice/management-api';
 
 export class UmbManagementApiDocumentTypeTreeDataRequestManager extends UmbManagementApiTreeDataRequestManager<
+	DocumentTypeTreeItemResponseModel,
 	PagedDocumentTypeTreeItemResponseModel,
 	PagedDocumentTypeTreeItemResponseModel,
 	Array<DocumentTypeTreeItemResponseModel>,
@@ -19,22 +20,38 @@ export class UmbManagementApiDocumentTypeTreeDataRequestManager extends UmbManag
 		super(host, {
 			getRootItems: (args: any) =>
 				DocumentTypeService.getTreeDocumentTypeRoot({
-					query: { foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
+					query: {
+						foldersOnly: args.foldersOnly,
+						skip: args.skip,
+						take: args.take,
+					},
 				}),
 
 			getChildrenOf: (args: any) =>
 				DocumentTypeService.getTreeDocumentTypeChildren({
-					query: { parentId: args.parent.unique, foldersOnly: args.foldersOnly, skip: args.skip, take: args.take },
+					query: {
+						parentId: args.parent.unique,
+						foldersOnly: args.foldersOnly,
+						skip: args.skip,
+						take: args.take,
+					},
 				}),
 
 			getAncestorsOf: (args: any) =>
 				DocumentTypeService.getTreeDocumentTypeAncestors({
-					query: { descendantId: args.treeItem.unique },
+					query: {
+						descendantId: args.treeItem.unique,
+					},
 				}),
 
 			getSiblingsFrom: (args: any) =>
 				DocumentTypeService.getTreeDocumentTypeSiblings({
-					query: { target: args.target },
+					query: {
+						foldersOnly: args.foldersOnly,
+						target: args.paging.target.unique,
+						before: args.paging.takeBefore,
+						after: args.paging.takeAfter,
+					},
 				}),
 		});
 	}
