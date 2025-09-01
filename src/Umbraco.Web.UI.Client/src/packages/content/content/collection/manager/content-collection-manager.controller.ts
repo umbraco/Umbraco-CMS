@@ -5,8 +5,11 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDataTypeDetailRepository, type UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import type { ManifestWorkspaceView, UmbEntityWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+
+type partialManifestWorkspaceView = Omit<Partial<ManifestWorkspaceView>, 'meta'> & {
+	meta: Partial<ManifestWorkspaceView['meta']>;
+};
 
 export class UmbContentCollectionManager<
 	ContentTypeDetailModelType extends UmbContentTypeModel = UmbContentTypeModel,
@@ -18,7 +21,7 @@ export class UmbContentCollectionManager<
 	#collectionConfig = new UmbObjectState<UmbCollectionConfiguration | undefined>(undefined);
 	readonly collectionConfig = this.#collectionConfig.asObservable();
 
-	#manifestOverrides = new UmbObjectState<UmbDeepPartialObject<ManifestWorkspaceView> | undefined>(undefined);
+	#manifestOverrides = new UmbObjectState<partialManifestWorkspaceView | undefined>(undefined);
 	readonly manifestOverrides = this.#manifestOverrides.asObservable();
 
 	#hasCollection = new UmbBooleanState(false);
@@ -77,7 +80,7 @@ export class UmbContentCollectionManager<
 			userDefinedProperties: config?.getValueByAlias('includeProperties'),
 		});
 
-		const overrides: UmbDeepPartialObject<ManifestWorkspaceView> = {
+		const overrides: partialManifestWorkspaceView = {
 			alias: 'Umb.WorkspaceView.Content.Collection',
 			meta: {},
 		};
