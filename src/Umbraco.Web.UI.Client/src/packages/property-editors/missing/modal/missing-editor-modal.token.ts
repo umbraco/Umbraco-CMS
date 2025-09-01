@@ -1,7 +1,7 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbMissingPropertyModalData {
-	value: string | null;
+	value: string | undefined;
 }
 
 export type UmbMissingPropertyModalResult = undefined;
