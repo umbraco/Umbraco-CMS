@@ -94,19 +94,19 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 				.value=${this.value?.mode ?? 'none'}>
 				<uui-radio
 					name="order"
-					label=${this.localize.term('timeZonePicker_config_timeZones_disabled')}
+					label=${this.localize.term('dateTimePicker_config_timeZones_disabled')}
 					value="none"></uui-radio>
 				<uui-radio
 					name="order"
-					label=${this.localize.term('timeZonePicker_config_timeZones_all')}
+					label=${this.localize.term('dateTimePicker_config_timeZones_all')}
 					value="all"></uui-radio>
 				<uui-radio
 					name="order"
-					label=${this.localize.term('timeZonePicker_config_timeZones_local')}
+					label=${this.localize.term('dateTimePicker_config_timeZones_local')}
 					value="local"></uui-radio>
 				<uui-radio
 					name="order"
-					label=${this.localize.term('timeZonePicker_config_timeZones_custom')}
+					label=${this.localize.term('dateTimePicker_config_timeZones_custom')}
 					value="custom"></uui-radio>
 			</uui-radio-group>
 			<div class="timezone-picker" ?hidden=${this.value?.mode !== 'custom'}>

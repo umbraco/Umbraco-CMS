@@ -2826,7 +2826,7 @@ export default {
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
 	},
-	timeZonePicker: {
+	dateTimePicker: {
 		local: 'Local',
 		differentTimeZoneLabel: (offset: string, localDate: string) =>
 			`The selected time (${offset}) is equivalent to ${localDate} in your local time.`,
@@ -2842,6 +2842,7 @@ export default {
 		config_timeZones_all: 'All - Display all available time zones',
 		config_timeZones_local: 'Local - Display only the local time zone',
 		config_timeZones_custom: 'Custom - Display a pre-defined list of time zones',
+		emptyDate: 'Please select a date',
 		emptyTimeZone: 'Please select a time zone',
 		invalidTimeZone: 'The selected time zone is not valid',
 	},

@@ -10,22 +10,22 @@ export const manifest: ManifestPropertyEditorSchema = {
 			properties: [
 				{
 					alias: 'format',
-					label: '#timeZonePicker_config_format',
+					label: '#dateTimePicker_config_format',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
 					config: [
 						{
 							alias: 'items',
 							value: [
-								{ name: '#timeZonePicker_config_format_datetime', value: 'date-time' },
-								{ name: '#timeZonePicker_config_format_dateOnly', value: 'date-only' },
-								{ name: '#timeZonePicker_config_format_timeOnly', value: 'time-only' },
+								{ name: '#dateTimePicker_config_format_datetime', value: 'date-time' },
+								{ name: '#dateTimePicker_config_format_dateOnly', value: 'date-only' },
+								{ name: '#dateTimePicker_config_format_timeOnly', value: 'time-only' },
 							],
 						},
 					],
 				},
 				{
 					alias: 'timeFormat',
-					label: '#timeZonePicker_config_timeFormat',
+					label: '#dateTimePicker_config_timeFormat',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
 					config: [
 						{
@@ -39,8 +39,8 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 				{
 					alias: 'timeZones',
-					label: '#timeZonePicker_config_timeZones',
-					description: '{#timeZonePicker_config_timeZones_description}',
+					label: '#dateTimePicker_config_timeZones',
+					description: '{#dateTimePicker_config_timeZones_description}',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TimeZonePicker',
 					config: [],
 				},

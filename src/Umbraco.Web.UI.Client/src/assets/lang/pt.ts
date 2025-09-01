@@ -2830,7 +2830,7 @@ export default {
 		resetUrlMessage: 'Tem a certeza que quer redefinir este URL?',
 		resetUrlLabel: 'Redefinir',
 	},
-	timeZonePicker: {
+	dateTimePicker: {
 		local: 'Local',
 		differentTimeZoneLabel: (offset: string, localDate: string) =>
 			`A hora selecionada (${offset}) é equivalente a ${localDate} no fuso horário local.`,
@@ -2846,6 +2846,7 @@ export default {
 		config_timeZones_all: 'Todos - Mostrar todos os fusos horários disponíveis',
 		config_timeZones_local: 'Local - Mostrar apenas o fuso horário local',
 		config_timeZones_custom: 'Personalizado - Mostrar uma lista pré-definida de fusos horários',
+		emptyDate: 'Por favor, selecione uma data',
 		emptyTimeZone: 'Por favor, selecione um fuso horário',
 		invalidTimeZone: 'O fuso horário selecionado não é válido',
 	},
