@@ -48,7 +48,9 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 				this._availableExtensions = extensions;
 			});
 
-			this.observe(this.#context.reload, (reload) => (reload ? this.requestUpdate() : void 0));
+			this.observe(this.#context.reload, (reload) => {
+				if (reload) this.requestUpdate();
+			});
 
 			this.observe(this.#context.statusbar, (statusbar) => {
 				if (!statusbar.length) return;
