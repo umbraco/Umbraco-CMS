@@ -34,7 +34,6 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         var parent = result.Result;
 
         child.Content = "Layout = \"Parent.cshtml\";";
-        await WaitBeforeUpdate();
         result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(TemplateOperationStatus.Success, result.Status);
@@ -61,7 +60,6 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("parent", child.MasterTemplateAlias);
 
         child.Content = "test";
-        await WaitBeforeUpdate();
         result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
@@ -88,7 +86,6 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("parent", child.MasterTemplateAlias);
 
         child.Content = "Layout = \"Parent2.cshtml\";";
-        await WaitBeforeUpdate();
         result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
@@ -126,7 +123,6 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         Assert.AreEqual($"{parent.Path},{child.Id},{childOfChild2.Id}", childOfChild2.Path);
 
         child.Content = "Layout = \"Parent2.cshtml\";";
-        await WaitBeforeUpdate();
         result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
@@ -172,7 +168,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 
         var parent = result.Result;
         parent.Name = "Parent Updated";
-        await WaitBeforeUpdate();
+
         result = await TemplateService.UpdateAsync(parent, Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
@@ -227,7 +223,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
 
         parent.Name = "Parent Updated";
-        await WaitBeforeUpdate();
+
         result = await TemplateService.UpdateAsync(parent, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(TemplateOperationStatus.TemplateNotFound, result.Status);
@@ -249,7 +245,7 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
 
         var child = result.Result;
         child.Content = "Layout = \"Parent.cshtml\";";
-        await WaitBeforeUpdate();
+
         result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(TemplateOperationStatus.MasterTemplateNotFound, result.Status);
@@ -274,7 +270,6 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
         var invalidAlias = new string('a', 256);
         child.Alias = invalidAlias;
 
-        await WaitBeforeUpdate();
         result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(TemplateOperationStatus.InvalidAlias, result.Status);
@@ -295,9 +290,5 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(key, template.Key);
         });
 
-    }
-    private async Task WaitBeforeUpdate()
-    {
-        Thread.Sleep(200); // Wait a bit to ensure the file system is ready for updates
     }
 }
