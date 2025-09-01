@@ -304,6 +304,7 @@ stages:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
+          DatabaseType: SQLite
         strategy:
           matrix:
             LinuxPart1Of3:
@@ -352,6 +353,8 @@ stages:
           - template: nightly-E2E-run-application-template.yml
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
+              DatabaseType: ${{ variables.DatabaseType }}
+              buildConfiguration: ${{ variables.buildConfiguration }}
 
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
@@ -367,6 +370,7 @@ stages:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+          DatabaseType: SQLServer
           SA_PASSWORD: UmbracoAcceptance123!
         strategy:
           matrix:
@@ -419,6 +423,8 @@ stages:
           - template: nightly-E2E-run-application-template.yml
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
+              buildConfiguration: ${{ variables.buildConfiguration }}
+              DatabaseType: ${{ variables.DatabaseType }}
 
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
@@ -432,6 +438,7 @@ stages:
         timeoutInMinutes: 180
         variables:
           SA_PASSWORD: UmbracoAcceptance123!
+          DatabaseType: SQLServer
         strategy:
           matrix:
             # UnattendedInstallConfig
@@ -526,6 +533,8 @@ stages:
             parameters:
               SA_PASSWORD: $(SA_PASSWORD)
               additionalEnvironmentVariables: ${{ eq(variables['additionalEnvironmentVariables'], true ) }}
+              buildConfiguration: ${{ variables.buildConfiguration }}
+              DatabaseType: ${{ variables.DatabaseType }}
 
           # Run application for Linux with additional Environment Variables for Azure AD
           - bash: |

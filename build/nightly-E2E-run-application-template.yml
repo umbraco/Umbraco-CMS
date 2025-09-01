@@ -11,44 +11,49 @@
     type: boolean
     default: false
 
+  - name: DatabaseType
+    type: string
+    default: ''
+
 steps:
-  # Start SQL Server Linux
-  - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=${{parameters.SA_PASSWORD}}" mcr.microsoft.com/mssql/server:2022-latest
-    displayName: Start SQL Server Docker image (Linux)
-    condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
-  - powershell: |
-      $maxAttempts = 12
-      $attempt = 0
-      $status = ""
+  - ${{ if eq(parameters.DatabaseType, 'SQLServer') }}:
+    # Start SQL Server Linux
+    - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=${{parameters.SA_PASSWORD}}" mcr.microsoft.com/mssql/server:2022-latest
+      displayName: Start SQL Server Docker image (Linux)
+      condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
-      while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
-        Start-Sleep -Seconds 5
-        $status = docker inspect -f '{{.State.Status}}' mssql
+    - powershell: |
+        $maxAttempts = 12
+        $attempt = 0
+        $status = ""
 
-        if ($status -ne 'running') {
-          Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
-          $attempt++
+        while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
+          Start-Sleep -Seconds 5
+          $status = docker inspect -f '{{.State.Status}}' mssql
+
+          if ($status -ne 'running') {
+            Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
+            $attempt++
+          }
         }
-      }
 
-      if ($status -eq 'running') {
-        Write-Host "SQL Server container is running"
-        docker ps -a
-      } else {
-        Write-Host "SQL Server did not become ready in time. Last known status: $status"
-        docker logs mssql
-        exit 1
-      }
-    displayName: Wait for SQL Server to be ready (Linux)
-    condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+        if ($status -eq 'running') {
+          Write-Host "SQL Server container is running"
+          docker ps -a
+        } else {
+          Write-Host "SQL Server did not become ready in time. Last known status: $status"
+          docker logs mssql
+          exit 1
+        }
+      displayName: Wait for SQL Server to be ready (Linux)
+      condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
-  # Start SQL Server LocalDB Windows
-  - pwsh: SqlLocalDB start MSSQLLocalDB
-    displayName: Start SQL Server LocalDB (Windows)
-    condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+    # Start SQL Server LocalDB Windows
+    - pwsh: SqlLocalDB start MSSQLLocalDB
+      displayName: Start SQL Server LocalDB (Windows)
+      condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
-  - pwsh: echo ${{parameters.additionalEnvironmentVariables}}
 
   - ${{ if eq(parameters.additionalEnvironmentVariables, False) }}:
       # Run application for Linux
