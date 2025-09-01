@@ -1,8 +1,7 @@
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
 export interface UmbTargetPaginationRequestModel {
-	target: {
-		unique: string;
-		entityType: string;
-	};
+	target: UmbEntityModel;
 	takeBefore: number;
 	takeAfter: number;
 }
