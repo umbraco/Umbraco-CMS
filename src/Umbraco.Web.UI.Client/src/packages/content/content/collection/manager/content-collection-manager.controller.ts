@@ -16,13 +16,13 @@ export class UmbContentCollectionManager<
 	#collectionAlias?: string;
 
 	#collectionConfig = new UmbObjectState<UmbCollectionConfiguration | undefined>(undefined);
-	collectionConfig = this.#collectionConfig.asObservable();
+	readonly collectionConfig = this.#collectionConfig.asObservable();
 
 	#manifestOverrides = new UmbObjectState<UmbDeepPartialObject<ManifestWorkspaceView> | undefined>(undefined);
-	manifestOverrides = this.#manifestOverrides.asObservable();
+	readonly manifestOverrides = this.#manifestOverrides.asObservable();
 
 	#hasCollection = new UmbBooleanState(false);
-	hasCollection = this.#hasCollection.asObservable();
+	readonly hasCollection = this.#hasCollection.asObservable();
 
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
