@@ -1,6 +1,6 @@
 import { Mark, mergeAttributes } from '@tiptap/core';
 
-/** @deprecated This will be relocated in Umbraco 18 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export interface SpanOptions {
 	/**
 	 * HTML attributes to add to the span element.
@@ -35,7 +35,7 @@ function serializeStyles(items: Record<string, string>): string {
 	);
 }
 
-/** @deprecated This will be relocated in Umbraco 18 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const Span = Mark.create<SpanOptions>({
 	name: 'span',
 

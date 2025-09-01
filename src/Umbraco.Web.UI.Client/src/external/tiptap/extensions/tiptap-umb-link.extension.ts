@@ -1,6 +1,6 @@
 import Link from '@tiptap/extension-link';
 
-/** @deprecated This will be relocated in Umbraco 18 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbLink = Link.extend({
 	name: 'umbLink',
 

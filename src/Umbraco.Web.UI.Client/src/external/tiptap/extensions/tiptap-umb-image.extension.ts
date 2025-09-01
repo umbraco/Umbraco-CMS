@@ -1,6 +1,6 @@
 import Image from '@tiptap/extension-image';
 
-/** @deprecated This will be relocated in Umbraco 18 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export interface UmbImageAttributes {
 	src: string;
 	alt?: string;
@@ -14,7 +14,7 @@ export interface UmbImageAttributes {
 	'data-udi'?: string;
 }
 
-/** @deprecated This will be relocated in Umbraco 18 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbImage = Image.extend({
 	addAttributes() {
 		return {

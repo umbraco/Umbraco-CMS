@@ -1,6 +1,6 @@
 import { mergeAttributes, Node } from '@tiptap/core';
 
-/** @deprecated This will be relocated in Umbraco 18 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export interface FigureOptions {
 	/**
 	 * HTML attributes to add to the image element.
@@ -10,7 +10,7 @@ export interface FigureOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
-/** @deprecated This will be relocated in Umbraco 18 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const Figure = Node.create<FigureOptions>({
 	name: 'figure',
 	group: 'block',
