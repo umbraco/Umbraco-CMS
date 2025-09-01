@@ -1,8 +1,13 @@
 // REQUIRED EXTENSIONS
 export * from '@tiptap/core';
-export { StarterKit } from '@tiptap/starter-kit';
+export { Document } from '@tiptap/extension-document';
+export { Dropcursor } from '@tiptap/extension-dropcursor';
+export { Gapcursor } from '@tiptap/extension-gapcursor';
+export { HardBreak } from '@tiptap/extension-hard-break';
+export { History } from '@tiptap/extension-history';
+export { Paragraph } from '@tiptap/extension-paragraph';
 export { Placeholder } from '@tiptap/extension-placeholder';
-export { TextStyle } from '@tiptap/extension-text-style';
+export { Text } from '@tiptap/extension-text';
 
 // OPTIONAL EXTENSIONS
 export { Blockquote } from '@tiptap/extension-blockquote';
@@ -26,9 +31,14 @@ export { TableCell } from '@tiptap/extension-table-cell';
 export { TableHeader } from '@tiptap/extension-table-header';
 export { TableRow } from '@tiptap/extension-table-row';
 export { TextAlign } from '@tiptap/extension-text-align';
+export { TextStyle } from '@tiptap/extension-text-style';
 export { Underline } from '@tiptap/extension-underline';
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 18. [LK] */
+export { StarterKit } from '@tiptap/starter-kit';
+
 // CUSTOM EXTENSIONS
+// TODO: Move the Umbraco-specific (native) extensions to the "tiptap" package in v18. [LK]
 export * from './extensions/tiptap-anchor.extension.js';
 export * from './extensions/tiptap-div.extension.js';
 export * from './extensions/tiptap-figcaption.extension.js';
