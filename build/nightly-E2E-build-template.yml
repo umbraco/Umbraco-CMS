@@ -15,7 +15,7 @@ steps:
   - pwsh: |
       dotnet restore UmbracoProject
       cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
-    displayName: Install Template
+    displayName: Restore project
     workingDirectory: $(Agent.BuildDirectory)/app
 
   # Update application to use necessary app settings
@@ -47,7 +47,7 @@ steps:
       } else {
         Write-Host "No App_Plugins found."
       }
-    displayName: "Update application to use necessary App_Plugins"
+    displayName: Update application to use necessary app plugins
     workingDirectory: $(Agent.BuildDirectory)/app
 
   # Update application to use necessary classes

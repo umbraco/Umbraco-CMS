@@ -28,12 +28,10 @@ steps:
   - pwsh: npm install wait-on
     displayName: Install wait-on package
 
+  # Wait for either the port of the aspnetcore url
   - pwsh: |
       $Port = "${{ parameters.port }}"
       $Url  = "${{ parameters.ASPNETCORE_URLS }}"
-
-      echo $Port
-      echo $Url
 
       if ($Port -ne "") {
           Write-Host "Waiting on TCP port $Port"
@@ -72,14 +70,14 @@ steps:
     condition: and(succeededOrFailed(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
 
   - ${{ if eq(parameters.DatabaseType, 'SQLServer') }}:
-    # Stop SQL Server
-    - pwsh: docker stop mssql
-      displayName: Stop SQL Server Docker image (Linux)
-      condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Linux'))
+      # Stop SQL Server
+      - pwsh: docker stop mssql
+        displayName: Stop SQL Server Docker image (Linux)
+        condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Linux'))
 
-    - pwsh: SqlLocalDB stop MSSQLLocalDB
-      displayName: Stop SQL Server LocalDB (Windows)
-      condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Windows_NT'))
+      - pwsh: SqlLocalDB stop MSSQLLocalDB
+        displayName: Stop SQL Server LocalDB (Windows)
+        condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Windows_NT'))
 
   # Copy artifacts
   - pwsh: |
