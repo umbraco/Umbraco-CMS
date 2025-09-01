@@ -150,7 +150,11 @@ export class UmbDefaultTreeContext<
 		const hideTreeRoot = this.getHideTreeRoot();
 
 		if (hasStartNode || hideTreeRoot) {
-			this.#treeItemChildrenManager.reloadChildren();
+			if (reload) {
+				this.#treeItemChildrenManager.reloadChildren();
+			} else {
+				this.#treeItemChildrenManager.loadChildren();
+			}
 		} else {
 			this.#loadTreeRoot(reload);
 		}
