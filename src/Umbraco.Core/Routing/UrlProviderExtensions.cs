@@ -1,10 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -14,6 +11,8 @@ namespace Umbraco.Extensions;
 
 public static class UrlProviderExtensions
 {
+    private const string UrlProviderAlias = Constants.UrlProviders.Content;
+
     /// <summary>
     ///     Gets the URLs of the content item.
     /// </summary>
@@ -50,7 +49,7 @@ public static class UrlProviderExtensions
 
         if (content.Published == false)
         {
-            result.Add(UrlInfo.AsMessage(textService.Localize("content", "itemNotPublished"), Constants.UrlProviders.Default));
+            result.Add(UrlInfo.AsMessage(textService.Localize("content", "itemNotPublished"), UrlProviderAlias));
             return result;
         }
 
@@ -155,7 +154,7 @@ public static class UrlProviderExtensions
 
                 // deal with exceptions
                 case "#ex":
-                    result.Add(UrlInfo.AsMessage(textService.Localize("content", "getUrlException"), Constants.UrlProviders.Default, culture));
+                    result.Add(UrlInfo.AsMessage(textService.Localize("content", "getUrlException"), UrlProviderAlias, culture));
                     break;
 
                 // got a URL, deal with collisions, add URL
@@ -168,7 +167,7 @@ public static class UrlProviderExtensions
                     }
                     else
                     {
-                        result.Add(UrlInfo.AsUrl(url, Constants.UrlProviders.Default, culture));
+                        result.Add(UrlInfo.AsUrl(url, UrlProviderAlias, culture));
                     }
 
                     break;
@@ -193,19 +192,19 @@ public static class UrlProviderExtensions
         if (parent == null)
         {
             // oops, internal error
-            return UrlInfo.AsMessage(textService.Localize("content", "parentNotPublishedAnomaly"), Constants.UrlProviders.Default, culture);
+            return UrlInfo.AsMessage(textService.Localize("content", "parentNotPublishedAnomaly"), UrlProviderAlias, culture);
         }
 
         if (!parent.Published)
         {
             // totally not published
-            return UrlInfo.AsMessage(textService.Localize("content", "parentNotPublished", new[] { parent.Name }), Constants.UrlProviders.Default, culture);
+            return UrlInfo.AsMessage(textService.Localize("content", "parentNotPublished", new[] { parent.Name }), UrlProviderAlias, culture);
         }
 
         // culture not published
         return UrlInfo.AsMessage(
             textService.Localize("content", "parentCultureNotPublished", new[] { parent.Name }),
-            Constants.UrlProviders.Default,
+            UrlProviderAlias,
             culture);
     }
 
@@ -243,7 +242,7 @@ public static class UrlProviderExtensions
                 logger.LogDebug(logMsg, url, uri, culture);
             }
 
-            var urlInfo = UrlInfo.AsMessage(textService.Localize("content", "routeErrorCannotRoute"), Constants.UrlProviders.Default, culture);
+            var urlInfo = UrlInfo.AsMessage(textService.Localize("content", "routeErrorCannotRoute"), UrlProviderAlias, culture);
             return Attempt.Succeed(urlInfo);
         }
 
@@ -265,7 +264,7 @@ public static class UrlProviderExtensions
             l.Reverse();
             var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent?.Id + ")";
 
-            var urlInfo = UrlInfo.AsMessage(textService.Localize("content", "routeError", new[] { s }), Constants.UrlProviders.Default, culture);
+            var urlInfo = UrlInfo.AsMessage(textService.Localize("content", "routeError", new[] { s }), UrlProviderAlias, culture);
             return Attempt.Succeed(urlInfo);
         }
 

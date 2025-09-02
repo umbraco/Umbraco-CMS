@@ -1,10 +1,7 @@
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -26,7 +23,7 @@ public class NewDefaultUrlProvider : IUrlProvider
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
     private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
-    private readonly ILogger<DefaultUrlProvider> _logger;
+    private readonly ILogger<NewDefaultUrlProvider> _logger;
     private readonly ISiteDomainMapper _siteDomainMapper;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly UriUtility _uriUtility;
@@ -40,7 +37,7 @@ public class NewDefaultUrlProvider : IUrlProvider
     /// </summary>
     public NewDefaultUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        ILogger<DefaultUrlProvider> logger,
+        ILogger<NewDefaultUrlProvider> logger,
         ISiteDomainMapper siteDomainMapper,
         IUmbracoContextAccessor umbracoContextAccessor,
         UriUtility uriUtility,
@@ -67,6 +64,9 @@ public class NewDefaultUrlProvider : IUrlProvider
 
         requestSettings.OnChange(x => _requestSettings = x);
     }
+
+    /// <inheritdoc />
+    public string Alias => Constants.UrlProviders.Content;
 
     /// <summary>
     ///     Gets the other URLs of a published content.
@@ -134,16 +134,18 @@ public class NewDefaultUrlProvider : IUrlProvider
 
             var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
             uri = _uriUtility.UriFromUmbraco(uri, _requestSettings);
-            yield return UrlInfo.FromUri(uri, Constants.UrlProviders.Default, culture);
+            yield return UrlInfo.FromUri(uri, Alias, culture);
         }
     }
 
-    #region GetPreviewUrls
+    #region GetPreviewUrl
 
     /// <inheritdoc />
-    public IEnumerable<UrlInfo> GetPreviewUrls(IContent content) => [
-        UrlInfo.AsUrl($"/{Constants.System.UmbracoPathSegment}/preview?id={content.Key}", Constants.UrlProviders.Default)
-    ];
+    public Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment)
+        => Task.FromResult<UrlInfo?>(
+            UrlInfo.AsUrl(
+                $"/{Constants.System.UmbracoPathSegment}/preview?id={content.Key}&culture={culture}&segment={segment}",
+                Alias));
 
     #endregion
 
@@ -232,7 +234,7 @@ public class NewDefaultUrlProvider : IUrlProvider
             culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
         {
             Uri url = AssembleUrl(domainUri, path, current, mode);
-            return UrlInfo.FromUri(url, Constants.UrlProviders.Default, culture);
+            return UrlInfo.FromUri(url, Alias, culture);
         }
 
         return null;

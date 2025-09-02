@@ -41,6 +41,9 @@ public class AliasUrlProvider : IUrlProvider
         requestConfig.OnChange(x => _requestConfig = x);
     }
 
+    /// <inheritdoc />
+    public string Alias => $"{Constants.UrlProviders.Content}ByAlias";
+
     // note - at the moment we seem to accept pretty much anything as an alias
     // without any form of validation ... could even prob. kill the XPath ...
     // ok, this is somewhat experimental and is NOT enabled by default
@@ -121,7 +124,7 @@ public class AliasUrlProvider : IUrlProvider
             {
                 var path = "/" + alias;
                 var uri = new Uri(path, UriKind.Relative);
-                yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), Constants.UrlProviders.Default);
+                yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), Alias);
             }
         }
         else
@@ -153,7 +156,7 @@ public class AliasUrlProvider : IUrlProvider
                 {
                     var path = "/" + alias;
                     var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Authority), path));
-                    yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), Constants.UrlProviders.Default, domainUri.Culture);
+                    yield return UrlInfo.FromUri(_uriUtility.UriFromUmbraco(uri, _requestConfig), Alias, domainUri.Culture);
                 }
             }
         }
@@ -161,10 +164,11 @@ public class AliasUrlProvider : IUrlProvider
 
     #endregion
 
-    #region GetPreviewUrls
+    #region GetPreviewUrl
 
     /// <inheritdoc />
-    public IEnumerable<UrlInfo> GetPreviewUrls(IContent content) => [];
+    public Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment)
+        => Task.FromResult<UrlInfo?>(null);
 
     #endregion
 

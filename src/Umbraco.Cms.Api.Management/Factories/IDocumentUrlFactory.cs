@@ -9,5 +9,5 @@ public interface IDocumentUrlFactory
 
     Task<IEnumerable<DocumentUrlInfoResponseModel>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems);
 
-    Task<IEnumerable<DocumentUrlInfoResponseModel>> CreatePreviewUrlSetsAsync(IEnumerable<IContent> contentItems);
+    Task<DocumentUrlInfo?> GetPreviewUrlAsync(IContent content, string providerAlias, string? culture, string? segment);
 }

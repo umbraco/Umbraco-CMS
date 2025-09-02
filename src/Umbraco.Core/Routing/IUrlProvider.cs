@@ -45,5 +45,10 @@ public interface IUrlProvider
     /// </summary>
     /// <param name="content">The content item.</param>
     /// <returns>The preview URLs of the content item.</returns>
-    IEnumerable<UrlInfo> GetPreviewUrls(IContent content);
+    Task<UrlInfo?> GetPreviewUrlAsync(IContent content, string? culture, string? segment);
+
+    /// <summary>
+    ///     Gets the alias for the URL provider.
+    /// </summary>
+    public string Alias { get; }
 }

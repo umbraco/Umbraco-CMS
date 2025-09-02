@@ -38,11 +38,11 @@ internal sealed class PublishedUrlInfoProvider_hidetoplevel_false : PublishedUrl
         Assert.AreEqual(1, subPageUrls.Count);
         Assert.IsNotNull(subPageUrls.First().Url);
         Assert.AreEqual("/textpage/text-page-1/", subPageUrls.First().Url!.ToString());
-        Assert.AreEqual(Constants.UrlProviders.Default, subPageUrls.First().Provider);
+        Assert.AreEqual(Constants.UrlProviders.Content, subPageUrls.First().Provider);
 
         Assert.AreEqual(1, childOfSecondRootUrls.Count);
         Assert.IsNotNull(childOfSecondRootUrls.First().Url);
         Assert.AreEqual("/second-root/text-page-1/", childOfSecondRootUrls.First().Url!.ToString());
-        Assert.AreEqual(Constants.UrlProviders.Default, childOfSecondRootUrls.First().Provider);
+        Assert.AreEqual(Constants.UrlProviders.Content, childOfSecondRootUrls.First().Provider);
     }
 }

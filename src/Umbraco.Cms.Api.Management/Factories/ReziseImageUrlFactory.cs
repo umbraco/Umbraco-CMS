@@ -53,7 +53,6 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
                     {
                         Culture = null,
                         Url = _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString(),
-                        IsExternal = false,
                     };
                 }
 
@@ -77,7 +76,6 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
             {
                 Culture = null,
                 Url = _absoluteUrlBuilder.ToAbsoluteUrl(relativeUrl).ToString(),
-                IsExternal = false,
             };
         }
     }

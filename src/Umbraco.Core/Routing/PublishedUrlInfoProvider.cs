@@ -9,6 +9,8 @@ namespace Umbraco.Cms.Core.Routing;
 
 public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
 {
+    private const string UrlProviderAlias = Constants.UrlProviders.Content;
+
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly ILanguageService _languageService;
     private readonly IPublishedRouter _publishedRouter;
@@ -52,7 +54,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
             // Handle "could not get URL"
             if (url is "#" or "#ex")
             {
-                urlInfos.Add(UrlInfo.AsMessage(_localizedTextService.Localize("content", "getUrlException"), Constants.UrlProviders.Default, culture));
+                urlInfos.Add(UrlInfo.AsMessage(_localizedTextService.Localize("content", "getUrlException"), UrlProviderAlias, culture));
                 continue;
             }
 
@@ -65,7 +67,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
                 continue;
             }
 
-            urlInfos.Add(UrlInfo.AsUrl(url, Constants.UrlProviders.Default, culture));
+            urlInfos.Add(UrlInfo.AsUrl(url, UrlProviderAlias, culture));
         }
 
         // If the content is trashed, we can't get the other URLs, as we have no parent structure to navigate through.
@@ -105,7 +107,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
                 _logger.LogDebug(logMsg, url, uri, culture);
             }
 
-            var urlInfo = UrlInfo.AsMessage(_localizedTextService.Localize("content", "routeErrorCannotRoute"), Constants.UrlProviders.Default, culture);
+            var urlInfo = UrlInfo.AsMessage(_localizedTextService.Localize("content", "routeErrorCannotRoute"), UrlProviderAlias, culture);
             return Attempt.Succeed(urlInfo);
         }
 
@@ -118,7 +120,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         {
             var collidingContent = publishedRequest.PublishedContent?.Key.ToString();
 
-            var urlInfo = UrlInfo.AsMessage(_localizedTextService.Localize("content", "routeError", [collidingContent]), Constants.UrlProviders.Default, culture);
+            var urlInfo = UrlInfo.AsMessage(_localizedTextService.Localize("content", "routeError", [collidingContent]), UrlProviderAlias, culture);
             return Attempt.Succeed(urlInfo);
         }
 
