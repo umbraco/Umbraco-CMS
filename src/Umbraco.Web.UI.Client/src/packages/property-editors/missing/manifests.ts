@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./property-editor-ui-missing.element.js'),
 		meta: {
 			label: 'Missing',
-			propertyEditorSchemaAlias: undefined, // By leaving this empty, this editor won't appear in the property editor UI picker modal.
+			propertyEditorSchemaAlias: undefined, // By setting it to undefined, this editor won't appear in the property editor UI picker modal.
 			icon: 'icon-ordered-list',
 			group: '',
 			supportsReadOnly: true,
