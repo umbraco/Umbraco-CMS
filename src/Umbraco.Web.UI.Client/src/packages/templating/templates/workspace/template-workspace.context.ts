@@ -13,6 +13,7 @@ import {
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbTemplateWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbTemplateDetailModel, UmbTemplateDetailRepository>
@@ -65,10 +66,6 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	override async load(unique: string) {
-		// Reset state before load to ensure we don't short-circuit the load method.
-		// Without this on editing a newly created template we won't get the created data,
-		// rather the initial scaffold.
-		super.resetState();
 		const response = await super.load(unique);
 		if (response.data) {
 			this.setMasterTemplate(response.data.masterTemplate?.unique ?? null);
@@ -76,12 +73,15 @@ export class UmbTemplateWorkspaceContext
 		return response;
 	}
 
-	async create(parent: any) {
-		const data = await this.createScaffold({ parent });
+	async create(parent: UmbEntityModel) {
+		const data = await this.createScaffold({
+			parent,
+			preset: { masterTemplate: parent.unique ? { unique: parent.unique } : null },
+		});
 
 		if (data) {
-			if (!parent) return;
-			await this.setMasterTemplate(parent.unique);
+			if (!data.masterTemplate) return;
+			await this.setMasterTemplate(data.masterTemplate.unique);
 		}
 		return data;
 	}
