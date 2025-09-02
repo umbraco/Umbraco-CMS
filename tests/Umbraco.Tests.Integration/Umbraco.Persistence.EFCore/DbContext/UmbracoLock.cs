@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 
-internal class UmbracoLock
+internal sealed class UmbracoLock
 {
     public int Id { get; set; }
 

@@ -18,6 +18,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [],
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 	},
 	{
 		name: 'Folder 2',
@@ -30,6 +31,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [],
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 	},
 	{
 		id: 'forbidden',
@@ -42,6 +44,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 	},
 	{
 		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
@@ -54,6 +57,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 	},
 	{
 		name: 'Text',
@@ -65,6 +69,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'maxChars',
@@ -83,6 +88,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		values: [],
+		signs: [],
 	},
 	{
 		name: 'My JS Property Editor',
@@ -95,6 +101,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		values: [],
+		signs: [],
 	},
 	{
 		name: 'Color Picker',
@@ -106,6 +113,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'useLabel',
@@ -164,6 +172,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'validationLimit',
@@ -181,6 +190,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				//showPalette
@@ -220,6 +230,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'overlaySize',
@@ -253,6 +264,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'startNode',
@@ -298,6 +310,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'format',
@@ -323,6 +336,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'format',
@@ -344,6 +358,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'format',
@@ -365,6 +380,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'inputMode',
@@ -382,6 +398,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'minNumber',
@@ -403,6 +420,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'multiple',
@@ -424,6 +442,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'multiple',
@@ -445,6 +464,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'multiple',
@@ -466,6 +486,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'enableRange',
@@ -503,6 +524,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'default',
@@ -532,6 +554,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'group',
@@ -553,6 +576,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		canIgnoreStartNodes: false,
 		isDeletable: true,
+		signs: [],
 		values: [
 			{
 				alias: 'language',
@@ -570,6 +594,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [],
 	},
 	{
@@ -582,6 +607,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'items',
@@ -599,6 +625,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'items',
@@ -616,6 +643,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'blocks',
@@ -624,7 +652,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 						label: 'Mocked Block Type for Block List',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 						settingsElementTypeKey: 'all-property-editors-document-type-id',
-						icon: 'icon-server-alt',
+						iconColor: '#F5C1BC',
+						backgroundColor: '#1B264F',
 					},
 					{
 						label: 'Mocked Coffee Block',
@@ -632,7 +661,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 						iconColor: '#FFFDD0',
 						backgroundColor: '#633f32',
 						editorSize: 'medium',
-						icon: 'icon-coffee',
 					},
 					{
 						label: 'Headline',
@@ -640,25 +668,21 @@ export const data: Array<UmbMockDataTypeModel> = [
 						settingsElementTypeKey: 'headline-settings-demo-block-id',
 						backgroundColor: 'gold',
 						editorSize: 'medium',
-						icon: 'icon-edit',
 					},
 					{
 						label: 'Image',
 						contentElementTypeKey: 'image-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-picture',
 					},
 					{
 						label: 'Rich Text',
 						contentElementTypeKey: 'rich-text-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-diploma',
 					},
 					{
 						label: 'Two Column Layout',
 						contentElementTypeKey: 'two-column-layout-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-book-alt',
 					},
 				],
 			},
@@ -682,6 +706,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [],
 	},
 	{
@@ -694,6 +719,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'crops',
@@ -727,6 +753,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'fileExtensions',
@@ -748,6 +775,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'fileExtensions',
@@ -769,6 +797,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'fileExtensions',
@@ -790,6 +819,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'fileExtensions',
@@ -811,6 +841,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'blockGroups',
@@ -934,6 +965,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: false,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{ alias: 'pageSize', value: 25 },
 			{ alias: 'orderDirection', value: 'desc' },
@@ -976,6 +1008,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: false,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{ alias: 'pageSize', value: 2 },
 			{ alias: 'orderDirection', value: 'desc' },
@@ -1018,6 +1051,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [],
 	},
 	{
@@ -1030,6 +1064,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'extensions',
@@ -1110,6 +1145,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [],
 	},
 	{
@@ -1122,6 +1158,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [],
 	},
 	{
@@ -1134,6 +1171,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [
 			{
 				alias: 'step',
@@ -1151,6 +1189,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [],
 	},
 	{
@@ -1163,6 +1202,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [],
 	},
 	{
@@ -1175,6 +1215,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [],
 	},
 	{
@@ -1187,6 +1228,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [],
 	},
 	{
@@ -1199,6 +1241,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
+		signs: [],
 		values: [],
 	},
 ];

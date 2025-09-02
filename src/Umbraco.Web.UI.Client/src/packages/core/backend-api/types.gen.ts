@@ -408,7 +408,7 @@ export type CreateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id?: string | null;
 };
 
@@ -467,7 +467,7 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     hasAccessToSensitiveData: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     allowedSections: Array<string>;
     isAdmin: boolean;
 };
@@ -487,6 +487,7 @@ export type DataTypeContentTypeReferenceModel = {
 
 export type DataTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     editorUiAlias?: string | null;
     editorAlias: string;
@@ -522,6 +523,7 @@ export type DataTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     editorUiAlias?: string | null;
@@ -578,6 +580,7 @@ export type DeleteUsersRequestModel = {
 
 export type DictionaryItemItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -610,6 +613,7 @@ export type DisableUserRequestModel = {
 
 export type DocumentBlueprintItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     documentType: DocumentTypeReferenceResponseModel;
 };
@@ -618,6 +622,7 @@ export type DocumentBlueprintResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
 };
 
@@ -625,6 +630,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     documentType?: DocumentTypeReferenceResponseModel | null;
@@ -634,6 +640,7 @@ export type DocumentCollectionResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     creator?: string | null;
     sortOrder: number;
     documentType: DocumentTypeCollectionReferenceResponseModel;
@@ -652,6 +659,7 @@ export type DocumentConfigurationResponseModel = {
 
 export type DocumentItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     isTrashed: boolean;
     isProtected: boolean;
     parent?: ReferenceByIdModel | null;
@@ -701,6 +709,7 @@ export type DocumentResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
     /**
      * @deprecated
@@ -712,10 +721,11 @@ export type DocumentResponseModel = {
 
 export type DocumentTreeItemResponseModel = {
     hasChildren: boolean;
+    id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     noAccess: boolean;
     isTrashed: boolean;
-    id: string;
     createDate: string;
     isProtected: boolean;
     ancestors: Array<ReferenceByIdModel>;
@@ -725,6 +735,7 @@ export type DocumentTreeItemResponseModel = {
 
 export type DocumentTypeBlueprintItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -738,6 +749,7 @@ export type DocumentTypeCollectionReferenceResponseModel = {
     id: string;
     alias: string;
     icon: string;
+    collection?: ReferenceByIdModel | null;
 };
 
 export type DocumentTypeCompositionModel = {
@@ -767,10 +779,17 @@ export type DocumentTypeConfigurationResponseModel = {
 
 export type DocumentTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     isElement: boolean;
     icon?: string | null;
     description?: string | null;
+};
+
+export type DocumentTypePermissionPresentationModel = {
+    $type: string;
+    verbs: Array<string>;
+    documentTypeAlias: string;
 };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
@@ -838,6 +857,7 @@ export type DocumentTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     isElement: boolean;
@@ -915,6 +935,7 @@ export type DocumentVersionResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
     document?: ReferenceByIdModel | null;
 };
@@ -1103,14 +1124,8 @@ export type IndexResponseModel = {
     } | null;
 };
 
-export type InstallRequestModelReadable = {
-    user: UserInstallRequestModelReadable;
-    database: DatabaseInstallRequestModel;
-    telemetryLevel: TelemetryLevelModel;
-};
-
-export type InstallRequestModelWritable = {
-    user: UserInstallRequestModelWritable;
+export type InstallRequestModel = {
+    user: UserInstallRequestModel;
     database: DatabaseInstallRequestModel;
     telemetryLevel: TelemetryLevelModel;
 };
@@ -1203,6 +1218,7 @@ export type MediaCollectionResponseModel = {
     values: Array<MediaValueResponseModel>;
     variants: Array<MediaVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     creator?: string | null;
     sortOrder: number;
     mediaType: MediaTypeCollectionReferenceResponseModel;
@@ -1215,6 +1231,7 @@ export type MediaConfigurationResponseModel = {
 
 export type MediaItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     isTrashed: boolean;
     parent?: ReferenceByIdModel | null;
     hasChildren: boolean;
@@ -1242,6 +1259,7 @@ export type MediaResponseModel = {
     values: Array<MediaValueResponseModel>;
     variants: Array<MediaVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     /**
      * @deprecated
      */
@@ -1252,10 +1270,11 @@ export type MediaResponseModel = {
 
 export type MediaTreeItemResponseModel = {
     hasChildren: boolean;
+    id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     noAccess: boolean;
     isTrashed: boolean;
-    id: string;
     createDate: string;
     mediaType: MediaTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
@@ -1265,6 +1284,7 @@ export type MediaTypeCollectionReferenceResponseModel = {
     id: string;
     alias: string;
     icon: string;
+    collection?: ReferenceByIdModel | null;
 };
 
 export type MediaTypeCompositionModel = {
@@ -1290,6 +1310,7 @@ export type MediaTypeConfigurationResponseModel = {
 
 export type MediaTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     icon?: string | null;
 };
@@ -1358,6 +1379,7 @@ export type MediaTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     isFolder: boolean;
     icon: string;
@@ -1409,6 +1431,7 @@ export type MemberConfigurationResponseModel = {
 
 export type MemberGroupItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -1419,6 +1442,7 @@ export type MemberGroupResponseModel = {
 
 export type MemberItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     memberType: MemberTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
     kind: MemberKindModel;
@@ -1440,6 +1464,7 @@ export type MemberResponseModel = {
     values: Array<MemberValueResponseModel>;
     variants: Array<MemberVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     email: string;
     username: string;
     memberType: MemberTypeReferenceResponseModel;
@@ -1477,6 +1502,7 @@ export type MemberTypeConfigurationResponseModel = {
 
 export type MemberTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     icon?: string | null;
 };
@@ -1544,6 +1570,7 @@ export type MemberTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
     icon: string;
 };
@@ -1626,6 +1653,7 @@ export type NamedEntityTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
     parent?: ReferenceByIdModel | null;
+    signs: Array<SignModel>;
     name: string;
 };
 
@@ -1673,7 +1701,7 @@ export type PackageConfigurationResponseModel = {
     marketplaceUrl: string;
 };
 
-export type PackageDefinitionResponseModelReadable = {
+export type PackageDefinitionResponseModel = {
     name: string;
     contentNodeId?: string | null;
     contentLoadChildNodes: boolean;
@@ -1690,24 +1718,6 @@ export type PackageDefinitionResponseModelReadable = {
     dictionaryItems: Array<string>;
     id: string;
     readonly packagePath: string;
-};
-
-export type PackageDefinitionResponseModelWritable = {
-    name: string;
-    contentNodeId?: string | null;
-    contentLoadChildNodes: boolean;
-    mediaIds: Array<string>;
-    mediaLoadChildNodes: boolean;
-    documentTypes: Array<string>;
-    mediaTypes: Array<string>;
-    dataTypes: Array<string>;
-    templates: Array<string>;
-    partialViews: Array<string>;
-    stylesheets: Array<string>;
-    scripts: Array<string>;
-    languages: Array<string>;
-    dictionaryItems: Array<string>;
-    id: string;
 };
 
 export type PackageMigrationStatusResponseModel = {
@@ -1915,14 +1925,9 @@ export type PagedObjectTypeResponseModel = {
     items: Array<ObjectTypeResponseModel>;
 };
 
-export type PagedPackageDefinitionResponseModelReadable = {
+export type PagedPackageDefinitionResponseModel = {
     total: number;
-    items: Array<PackageDefinitionResponseModelReadable>;
-};
-
-export type PagedPackageDefinitionResponseModelWritable = {
-    total: number;
-    items: Array<PackageDefinitionResponseModelWritable>;
+    items: Array<PackageDefinitionResponseModel>;
 };
 
 export type PagedPackageMigrationStatusResponseModel = {
@@ -1950,14 +1955,9 @@ export type PagedReferenceByIdModel = {
     items: Array<ReferenceByIdModel>;
 };
 
-export type PagedRelationResponseModelReadable = {
+export type PagedRelationResponseModel = {
     total: number;
-    items: Array<RelationResponseModelReadable>;
-};
-
-export type PagedRelationResponseModelWritable = {
-    total: number;
-    items: Array<RelationResponseModelWritable>;
+    items: Array<RelationResponseModel>;
 };
 
 export type PagedRelationTypeResponseModel = {
@@ -1970,14 +1970,9 @@ export type PagedSavedLogSearchResponseModel = {
     items: Array<SavedLogSearchResponseModel>;
 };
 
-export type PagedSearchResultResponseModelReadable = {
+export type PagedSearchResultResponseModel = {
     total: number;
-    items: Array<SearchResultResponseModelReadable>;
-};
-
-export type PagedSearchResultResponseModelWritable = {
-    total: number;
-    items: Array<SearchResultResponseModelWritable>;
+    items: Array<SearchResultResponseModel>;
 };
 
 export type PagedSearcherResponseModel = {
@@ -2133,6 +2128,7 @@ export type PublishedDocumentResponseModel = {
     values: Array<DocumentValueResponseModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
+    signs: Array<SignModel>;
     documentType: DocumentTypeReferenceResponseModel;
     /**
      * @deprecated
@@ -2174,7 +2170,7 @@ export type RelationReferenceModel = {
     name?: string | null;
 };
 
-export type RelationResponseModelReadable = {
+export type RelationResponseModel = {
     id: string;
     relationType: ReferenceByIdModel;
     parent: RelationReferenceModel;
@@ -2183,15 +2179,9 @@ export type RelationResponseModelReadable = {
     readonly comment?: string | null;
 };
 
-export type RelationResponseModelWritable = {
-    id: string;
-    relationType: ReferenceByIdModel;
-    parent: RelationReferenceModel;
-    child: RelationReferenceModel;
-};
-
 export type RelationTypeItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     isDeletable: boolean;
 };
@@ -2287,16 +2277,10 @@ export type ScriptResponseModel = {
     content: string;
 };
 
-export type SearchResultResponseModelReadable = {
+export type SearchResultResponseModel = {
     id: string;
     score: number;
     readonly fieldCount: number;
-    fields: Array<FieldPresentationModel>;
-};
-
-export type SearchResultResponseModelWritable = {
-    id: string;
-    score: number;
     fields: Array<FieldPresentationModel>;
 };
 
@@ -2343,6 +2327,10 @@ export type SetAvatarRequestModel = {
     file: ReferenceByIdModel;
 };
 
+export type SignModel = {
+    alias: string;
+};
+
 export type SortingRequestModel = {
     parent?: ReferenceByIdModel | null;
     sorting: Array<ItemSortingRequestModel>;
@@ -2382,6 +2370,48 @@ export type StylesheetResponseModel = {
     content: string;
 };
 
+export type SubsetDataTypeTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DataTypeTreeItemResponseModel>;
+};
+
+export type SubsetDocumentBlueprintTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentBlueprintTreeItemResponseModel>;
+};
+
+export type SubsetDocumentTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentTreeItemResponseModel>;
+};
+
+export type SubsetDocumentTypeTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<DocumentTypeTreeItemResponseModel>;
+};
+
+export type SubsetMediaTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<MediaTreeItemResponseModel>;
+};
+
+export type SubsetMediaTypeTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<MediaTypeTreeItemResponseModel>;
+};
+
+export type SubsetNamedEntityTreeItemResponseModel = {
+    totalBefore: number;
+    totalAfter: number;
+    items: Array<NamedEntityTreeItemResponseModel>;
+};
+
 export type TagResponseModel = {
     id: string;
     text?: string | null;
@@ -2409,6 +2439,7 @@ export type TemplateConfigurationResponseModel = {
 
 export type TemplateItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     alias: string;
 };
@@ -2705,7 +2736,7 @@ export type UpdateMemberTypeRequestModel = {
     compositions: Array<MemberTypeCompositionModel>;
 };
 
-export type UpdatePackageRequestModelReadable = {
+export type UpdatePackageRequestModel = {
     name: string;
     contentNodeId?: string | null;
     contentLoadChildNodes: boolean;
@@ -2721,23 +2752,6 @@ export type UpdatePackageRequestModelReadable = {
     languages: Array<string>;
     dictionaryItems: Array<string>;
     readonly packagePath: string;
-};
-
-export type UpdatePackageRequestModelWritable = {
-    name: string;
-    contentNodeId?: string | null;
-    contentLoadChildNodes: boolean;
-    mediaIds: Array<string>;
-    mediaLoadChildNodes: boolean;
-    documentTypes: Array<string>;
-    mediaTypes: Array<string>;
-    dataTypes: Array<string>;
-    templates: Array<string>;
-    partialViews: Array<string>;
-    stylesheets: Array<string>;
-    scripts: Array<string>;
-    languages: Array<string>;
-    dictionaryItems: Array<string>;
 };
 
 export type UpdatePartialViewRequestModel = {
@@ -2777,7 +2791,7 @@ export type UpdateUserGroupRequestModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 };
 
 export type UpdateUserGroupsOnUserRequestModel = {
@@ -2815,19 +2829,12 @@ export type UpgradeCheckResponseModel = {
     url: string;
 };
 
-export type UpgradeSettingsResponseModelReadable = {
+export type UpgradeSettingsResponseModel = {
     currentState: string;
     newState: string;
     newVersion: string;
     oldVersion: string;
     readonly reportUrl: string;
-};
-
-export type UpgradeSettingsResponseModelWritable = {
-    currentState: string;
-    newState: string;
-    newVersion: string;
-    oldVersion: string;
 };
 
 export type UserConfigurationResponseModel = {
@@ -2867,6 +2874,7 @@ export type UserExternalLoginProviderModel = {
 
 export type UserGroupItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     icon?: string | null;
     alias?: string | null;
@@ -2884,27 +2892,22 @@ export type UserGroupResponseModel = {
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
-    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+    permissions: Array<DocumentPermissionPresentationModel | DocumentPropertyValuePermissionPresentationModel | DocumentTypePermissionPresentationModel | UnknownTypePermissionPresentationModel>;
     id: string;
     isDeletable: boolean;
     aliasCanBeChanged: boolean;
 };
 
-export type UserInstallRequestModelReadable = {
+export type UserInstallRequestModel = {
     name: string;
     email: string;
     password: string;
     readonly subscribeToNewsletter: boolean;
 };
 
-export type UserInstallRequestModelWritable = {
-    name: string;
-    email: string;
-    password: string;
-};
-
 export type UserItemResponseModel = {
     id: string;
+    signs: Array<SignModel>;
     name: string;
     avatarUrls: Array<string>;
     kind: UserKindModel;
@@ -3023,6 +3026,8 @@ export type WebhookEventResponseModel = {
 };
 
 export type WebhookItemResponseModel = {
+    id: string;
+    signs: Array<SignModel>;
     enabled: boolean;
     name: string;
     events: string;
@@ -3744,6 +3749,38 @@ export type GetTreeDataTypeRootResponses = {
 };
 
 export type GetTreeDataTypeRootResponse = GetTreeDataTypeRootResponses[keyof GetTreeDataTypeRootResponses];
+
+export type GetTreeDataTypeSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+        foldersOnly?: boolean;
+    };
+    url: '/umbraco/management/api/v1/tree/data-type/siblings';
+};
+
+export type GetTreeDataTypeSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDataTypeSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetDataTypeTreeItemResponseModel;
+};
+
+export type GetTreeDataTypeSiblingsResponse = GetTreeDataTypeSiblingsResponses[keyof GetTreeDataTypeSiblingsResponses];
 
 export type GetDictionaryData = {
     body?: never;
@@ -4652,6 +4689,38 @@ export type GetTreeDocumentBlueprintRootResponses = {
 
 export type GetTreeDocumentBlueprintRootResponse = GetTreeDocumentBlueprintRootResponses[keyof GetTreeDocumentBlueprintRootResponses];
 
+export type GetTreeDocumentBlueprintSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+        foldersOnly?: boolean;
+    };
+    url: '/umbraco/management/api/v1/tree/document-blueprint/siblings';
+};
+
+export type GetTreeDocumentBlueprintSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDocumentBlueprintSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetDocumentBlueprintTreeItemResponseModel;
+};
+
+export type GetTreeDocumentBlueprintSiblingsResponse = GetTreeDocumentBlueprintSiblingsResponses[keyof GetTreeDocumentBlueprintSiblingsResponses];
+
 export type PostDocumentTypeData = {
     body?: CreateDocumentTypeRequestModel;
     path?: never;
@@ -5461,6 +5530,38 @@ export type GetTreeDocumentTypeRootResponses = {
 };
 
 export type GetTreeDocumentTypeRootResponse = GetTreeDocumentTypeRootResponses[keyof GetTreeDocumentTypeRootResponses];
+
+export type GetTreeDocumentTypeSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+        foldersOnly?: boolean;
+    };
+    url: '/umbraco/management/api/v1/tree/document-type/siblings';
+};
+
+export type GetTreeDocumentTypeSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDocumentTypeSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetDocumentTypeTreeItemResponseModel;
+};
+
+export type GetTreeDocumentTypeSiblingsResponse = GetTreeDocumentTypeSiblingsResponses[keyof GetTreeDocumentTypeSiblingsResponses];
 
 export type GetDocumentVersionData = {
     body?: never;
@@ -6709,6 +6810,7 @@ export type GetItemDocumentSearchData = {
         take?: number;
         parentId?: string;
         allowedDocumentTypes?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/item/document/search';
 };
@@ -7055,6 +7157,38 @@ export type GetTreeDocumentRootResponses = {
 };
 
 export type GetTreeDocumentRootResponse = GetTreeDocumentRootResponses[keyof GetTreeDocumentRootResponses];
+
+export type GetTreeDocumentSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+        dataTypeId?: string;
+    };
+    url: '/umbraco/management/api/v1/tree/document/siblings';
+};
+
+export type GetTreeDocumentSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeDocumentSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetDocumentTreeItemResponseModel;
+};
+
+export type GetTreeDocumentSiblingsResponse = GetTreeDocumentSiblingsResponses[keyof GetTreeDocumentSiblingsResponses];
 
 export type PostDynamicRootQueryData = {
     body?: DynamicRootRequestModel;
@@ -7465,7 +7599,7 @@ export type GetInstallSettingsResponses = {
 export type GetInstallSettingsResponse = GetInstallSettingsResponses[keyof GetInstallSettingsResponses];
 
 export type PostInstallSetupData = {
-    body?: InstallRequestModelWritable;
+    body?: InstallRequestModel;
     path?: never;
     query?: never;
     url: '/umbraco/management/api/v1/install/setup';
@@ -8920,6 +9054,38 @@ export type GetTreeMediaTypeRootResponses = {
 
 export type GetTreeMediaTypeRootResponse = GetTreeMediaTypeRootResponses[keyof GetTreeMediaTypeRootResponses];
 
+export type GetTreeMediaTypeSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+        foldersOnly?: boolean;
+    };
+    url: '/umbraco/management/api/v1/tree/media-type/siblings';
+};
+
+export type GetTreeMediaTypeSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeMediaTypeSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetMediaTypeTreeItemResponseModel;
+};
+
+export type GetTreeMediaTypeSiblingsResponse = GetTreeMediaTypeSiblingsResponses[keyof GetTreeMediaTypeSiblingsResponses];
+
 export type GetCollectionMediaData = {
     body?: never;
     path?: never;
@@ -9001,6 +9167,7 @@ export type GetItemMediaSearchData = {
         take?: number;
         parentId?: string;
         allowedMediaTypes?: Array<string>;
+        dataTypeId?: string;
     };
     url: '/umbraco/management/api/v1/item/media/search';
 };
@@ -9853,6 +10020,38 @@ export type GetTreeMediaRootResponses = {
 };
 
 export type GetTreeMediaRootResponse = GetTreeMediaRootResponses[keyof GetTreeMediaRootResponses];
+
+export type GetTreeMediaSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+        dataTypeId?: string;
+    };
+    url: '/umbraco/management/api/v1/tree/media/siblings';
+};
+
+export type GetTreeMediaSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeMediaSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetMediaTreeItemResponseModel;
+};
+
+export type GetTreeMediaSiblingsResponse = GetTreeMediaSiblingsResponses[keyof GetTreeMediaSiblingsResponses];
 
 export type GetItemMemberGroupData = {
     body?: never;
@@ -11094,7 +11293,7 @@ export type GetPackageCreatedResponses = {
     /**
      * OK
      */
-    200: PagedPackageDefinitionResponseModelReadable;
+    200: PagedPackageDefinitionResponseModel;
 };
 
 export type GetPackageCreatedResponse = GetPackageCreatedResponses[keyof GetPackageCreatedResponses];
@@ -11197,13 +11396,13 @@ export type GetPackageCreatedByIdResponses = {
     /**
      * OK
      */
-    200: PackageDefinitionResponseModelReadable;
+    200: PackageDefinitionResponseModel;
 };
 
 export type GetPackageCreatedByIdResponse = GetPackageCreatedByIdResponses[keyof GetPackageCreatedByIdResponses];
 
 export type PutPackageCreatedByIdData = {
-    body?: UpdatePackageRequestModelWritable;
+    body?: UpdatePackageRequestModel;
     path: {
         id: string;
     };
@@ -12229,7 +12428,7 @@ export type GetRelationByRelationTypeIdResponses = {
     /**
      * OK
      */
-    200: PagedRelationResponseModelReadable;
+    200: PagedRelationResponseModel;
 };
 
 export type GetRelationByRelationTypeIdResponse = GetRelationByRelationTypeIdResponses[keyof GetRelationByRelationTypeIdResponses];
@@ -12693,7 +12892,7 @@ export type GetSearcherBySearcherNameQueryResponses = {
     /**
      * OK
      */
-    200: PagedSearchResultResponseModelReadable;
+    200: PagedSearchResultResponseModel;
 };
 
 export type GetSearcherBySearcherNameQueryResponse = GetSearcherBySearcherNameQueryResponses[keyof GetSearcherBySearcherNameQueryResponses];
@@ -12841,10 +13040,6 @@ export type GetSegmentErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
 };
 
 export type GetSegmentError = GetSegmentErrors[keyof GetSegmentErrors];
@@ -13962,6 +14157,37 @@ export type GetTreeTemplateRootResponses = {
 
 export type GetTreeTemplateRootResponse = GetTreeTemplateRootResponses[keyof GetTreeTemplateRootResponses];
 
+export type GetTreeTemplateSiblingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        target?: string;
+        before?: number;
+        after?: number;
+    };
+    url: '/umbraco/management/api/v1/tree/template/siblings';
+};
+
+export type GetTreeTemplateSiblingsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetTreeTemplateSiblingsResponses = {
+    /**
+     * OK
+     */
+    200: SubsetNamedEntityTreeItemResponseModel;
+};
+
+export type GetTreeTemplateSiblingsResponse = GetTreeTemplateSiblingsResponses[keyof GetTreeTemplateSiblingsResponses];
+
 export type PostTemporaryFileData = {
     body?: {
         Id: string;
@@ -14146,7 +14372,7 @@ export type GetUpgradeSettingsResponses = {
     /**
      * OK
      */
-    200: UpgradeSettingsResponseModelReadable;
+    200: UpgradeSettingsResponseModel;
 };
 
 export type GetUpgradeSettingsResponse = GetUpgradeSettingsResponses[keyof GetUpgradeSettingsResponses];
@@ -16081,6 +16307,10 @@ export type GetWebhookByIdLogsErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetWebhookByIdLogsResponses = {
@@ -16137,6 +16367,10 @@ export type GetWebhookLogsErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetWebhookLogsResponses = {

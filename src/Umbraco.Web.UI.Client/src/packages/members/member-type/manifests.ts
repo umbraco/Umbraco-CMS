@@ -20,4 +20,10 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...searchManifests,
 	...treeManifests,
 	...workspaceManifests,
+	{
+		name: 'Member Type Backoffice Entry Point',
+		alias: 'Umb.BackofficeEntryPoint.MemberType',
+		type: 'backofficeEntryPoint',
+		js: () => import('./entry-point.js'),
+	},
 ];

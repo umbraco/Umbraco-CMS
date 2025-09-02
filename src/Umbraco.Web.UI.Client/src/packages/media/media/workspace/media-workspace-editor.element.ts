@@ -10,14 +10,14 @@ import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/r
 export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	//
 	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well. [NL]
-	private splitViewElement = new UmbMediaWorkspaceSplitViewElement();
+	private _splitViewElement = new UmbMediaWorkspaceSplitViewElement();
 
 	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
 	#variants?: Array<UmbMediaVariantOptionModel>;
 	#isForbidden = false;
 
 	@state()
-	_routes?: Array<UmbRoute>;
+	private _routes?: Array<UmbRoute>;
 
 	constructor() {
 		super();
@@ -51,13 +51,6 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-	private _handleVariantFolderPart(index: number, folderPart: string) {
-		const variantSplit = folderPart.split('_');
-		const culture = variantSplit[0];
-		const segment = variantSplit[1];
-		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
-	}
-
 	private async _generateRoutes() {
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
@@ -68,13 +61,10 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 				routes.push({
 					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 					path: variantA.unique + '_&_' + variantB.unique,
-					component: this.splitViewElement,
+					component: this._splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
-						const variantSplit = info.match.fragments.consumed.split('_&_');
-						variantSplit.forEach((part, index) => {
-							this._handleVariantFolderPart(index, part);
-						});
+						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
 					},
 				});
 			});
@@ -85,11 +75,11 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 				path: variant.unique,
-				component: this.splitViewElement,
+				component: this._splitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);
-					this._handleVariantFolderPart(0, info.match.fragments.consumed);
+					this.#workspaceContext?.splitView.handleVariantFolderPart(0, info.match.fragments.consumed);
 				},
 			});
 		});

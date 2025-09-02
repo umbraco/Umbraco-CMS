@@ -17,6 +17,10 @@ export class WorkspaceContextCounterElement extends UmbContextBase {
 	increment() {
 		this.#counter.setValue(this.#counter.value + 1);
 	}
+
+	reset() {
+		this.#counter.setValue(0);
+	}
 }
 
 // Declare a api export, so Extension Registry can initialize this class:

@@ -3,6 +3,7 @@ import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_ENTRY_CONTEXT, UMB_BLOCK_MANAGER_C
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
+import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -58,9 +59,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly unique = this.#layout.asObservablePart((x) => x?.contentKey);
 	readonly contentKey = this.#layout.asObservablePart((x) => x?.contentKey);
 
-	readonly content = new UmbBlockElementManager(this, 'contentData');
-
-	readonly settings = new UmbBlockElementManager(this, 'settingsData');
+	readonly content = new UmbBlockElementManager(this, 'contentData', UMB_BLOCK_WORKSPACE_VIEW_CONTENT);
+	readonly settings = new UmbBlockElementManager(this, 'settingsData', UMB_BLOCK_WORKSPACE_VIEW_SETTINGS);
 
 	#name = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#name.asObservable();
@@ -210,7 +210,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				this.observe(
 					contentTypeId ? manager.blockTypeOf(contentTypeId) : undefined,
 					(blockType) => {
-						if (blockType?.editorSize) {
+						if (!blockType?.editorSize) return;
+
+						const editorConfig = manager.getEditorConfiguration();
+						const useInlineEditing = editorConfig?.find((x) => x.alias === 'useInlineEditingAsDefault')?.value;
+
+						if (!useInlineEditing) {
 							this.setEditorSize(blockType.editorSize);
 						}
 					},

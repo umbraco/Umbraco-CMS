@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Core.Templates;
 
@@ -84,7 +83,7 @@ public sealed class HtmlLocalLinkParser
 
     // under normal circumstances, the type attribute is preceded by a space
     // to cover the rare occasion where it isn't, we first replace with a space and then without.
-    private string StripTypeAttributeFromTag(string tag, string type) =>
+    private static string StripTypeAttributeFromTag(string tag, string type) =>
         tag.Replace($" type=\"{type}\"", string.Empty)
             .Replace($"type=\"{type}\"", string.Empty);
 

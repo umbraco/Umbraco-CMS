@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Relation)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class RelationDto
+internal sealed class RelationDto
 {
     [Column("id")]
     [PrimaryKeyColumn]

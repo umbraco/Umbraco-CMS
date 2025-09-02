@@ -169,7 +169,7 @@ test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({u
 });
 
 // Skip this test as the search function is removed
-test.skip('can search a dictionary item in list when have results', async ({umbracoApi, umbracoUi}) => {
+test('can search a dictionary item in list when have results', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
@@ -182,10 +182,9 @@ test.skip('can search a dictionary item in list when have results', async ({umbr
   expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
 });
 
-// Skip this test as the search function is removed
-test.skip('can search a dictionary item in list when have no results', async ({umbracoApi, umbracoUi}) => {
+test('can search a dictionary item in list when have no results', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const emptySearchResultMessage = 'No Dictionary items to choose from';
+  const emptySearchResultMessage = 'No items';
   await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   await umbracoApi.dictionary.create(dictionaryName);
   await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);

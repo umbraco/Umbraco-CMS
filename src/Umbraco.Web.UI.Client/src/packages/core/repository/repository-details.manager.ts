@@ -88,7 +88,7 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 					this.removeUmbControllerByAlias('observeEntry_' + entry);
 				});
 
-				this.#requestNewDetails();
+				this.#requestNewDetails(uniques);
 			},
 			null,
 		);
@@ -151,14 +151,14 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 	 */
 	addEntry(data: DetailType): void {
 		const unique = data.unique;
+		this.#entries.appendOne(data);
+		this.#uniques.appendOne(unique);
 		this.#statuses.appendOne({
 			state: {
 				type: 'success',
 			},
 			unique,
 		});
-		this.#entries.appendOne(data);
-		this.#uniques.appendOne(unique);
 		// Notice in this case we do not have a observable from the repo, but it should maybe be fine that we just listen for ACTION EVENTS.
 	}
 
@@ -181,13 +181,13 @@ export class UmbRepositoryDetailsManager<DetailType extends { unique: string }> 
 		return this.#entries.asObservablePart((items) => items.find((item) => item.unique === unique));
 	}
 
-	async #requestNewDetails(): Promise<void> {
+	async #requestNewDetails(uniques?: Array<DetailType['unique']>): Promise<void> {
+		if (!uniques?.length) return;
+
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
-		const requestedUniques = this.getUniques();
-
-		const newRequestedUniques = requestedUniques.filter((unique) => {
+		const newRequestedUniques = uniques.filter((unique) => {
 			const item = this.#statuses.getValue().find((status) => status.unique === unique);
 			return !item;
 		});

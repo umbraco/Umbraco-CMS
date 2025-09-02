@@ -17,7 +17,7 @@ internal static class ListExtensions
         items.Any(x => x.Suffix.HasValue);
 }
 
-internal class SimilarNodeName
+internal sealed class SimilarNodeName
 {
     public int Id { get; set; }
 
@@ -181,7 +181,7 @@ internal class SimilarNodeName
         return current;
     }
 
-    internal class StructuredName
+    internal sealed class StructuredName
     {
         internal const uint Initialsuffix = 1;
         private const string Spacecharacter = " ";

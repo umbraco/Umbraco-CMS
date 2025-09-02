@@ -1,4 +1,4 @@
-import type { MediaValueType } from '../../property-editors/upload-field/types.js';
+import type { UmbMediaValueType } from '../../property-editors/upload-field/types.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
 import { getMimeTypeFromExtension } from './utils.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -20,11 +20,11 @@ import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	set value(value: MediaValueType) {
+	set value(value: UmbMediaValueType) {
 		this.#src = value?.src ?? '';
 		this.#setPreviewAlias();
 	}
-	get value(): MediaValueType {
+	get value(): UmbMediaValueType {
 		return {
 			src: this.#src,
 			temporaryFileId: this.temporaryFile?.temporaryUnique,
@@ -37,23 +37,11 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	 * @type {Array<string>}
 	 * @default
 	 */
-	@property({
-		type: Array,
-		attribute: 'allowed-file-extensions',
-		converter(value) {
-			if (typeof value === 'string') {
-				return value.split(',').map((ext) => ext.trim());
-			}
-			return value;
-		},
-	})
+	@property({ type: Array, attribute: 'allowed-file-extensions' })
 	allowedFileExtensions?: Array<string>;
 
 	@state()
 	public temporaryFile?: UmbTemporaryFileModel;
-
-	@state()
-	private _extensions?: string[];
 
 	@state()
 	private _previewAlias?: string;
@@ -87,7 +75,14 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	}
 
 	async #setPreviewAlias(): Promise<void> {
-		this._previewAlias = await this.#getPreviewElementAlias();
+		// Store current src to detect changes during async operation
+		const currentSrc = this.#src;
+		const alias = await this.#getPreviewElementAlias();
+
+		// Only update if src hasn't changed in the meantime (prevents race conditions)
+		if (this.#src === currentSrc) {
+			this._previewAlias = alias;
+		}
 	}
 
 	async #getPreviewElementAlias() {
@@ -107,9 +102,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		if (!mimeType) return fallbackAlias;
 
 		// Check for an exact match
-		const exactMatch = manifests.find((manifest) => {
-			return stringOrStringArrayContains(manifest.forMimeTypes, mimeType);
-		});
+		const exactMatch = manifests.find((manifest) => stringOrStringArrayContains(manifest.forMimeTypes, mimeType));
 		if (exactMatch) return exactMatch.alias;
 
 		// Check for wildcard match (e.g. image/*)
@@ -151,6 +144,11 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 		this.temporaryFile = (file as UmbUploadableFile).temporaryFile;
 
+		if (!this.temporaryFile?.file) {
+			console.error('No file available for upload');
+			return;
+		}
+
 		this.#clearObjectUrl();
 
 		const blobUrl = URL.createObjectURL(this.temporaryFile.file);
@@ -176,7 +174,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 			<umb-input-dropzone
 				standalone
 				disable-folder-upload
-				accept=${ifDefined(this._extensions?.join(','))}
+				accept=${ifDefined(this.allowedFileExtensions ? this.allowedFileExtensions.join(',') : undefined)}
 				@change=${this.#onUpload}></umb-input-dropzone>
 		`;
 	}
@@ -203,7 +201,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	#renderButtonRemove() {
 		return html`
 			<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
-				<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
+				<uui-icon name="icon-trash"></uui-icon>
+				<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
 			</uui-button>
 		`;
 	}

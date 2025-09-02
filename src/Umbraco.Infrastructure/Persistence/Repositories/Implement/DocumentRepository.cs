@@ -576,14 +576,14 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
     }
 
-    private class ContentVariation
+    private sealed class ContentVariation
     {
         public string? Culture { get; set; }
         public string? Name { get; set; }
         public DateTime Date { get; set; }
     }
 
-    private class DocumentVariation
+    private sealed class DocumentVariation
     {
         public string? Culture { get; set; }
         public bool Edited { get; set; }
@@ -1553,7 +1553,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     // reading repository purely for looking up by GUID
     // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
     // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
-    private class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
+    private sealed class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
     {
         private readonly DocumentRepository _outerRepo;
 
@@ -1669,6 +1669,27 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         AddGetByQueryOrderBy(sql);
 
         return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<Guid> GetScheduledContentKeys(Guid[] keys)
+    {
+        var action = ContentScheduleAction.Release.ToString();
+        DateTime now = DateTime.UtcNow;
+
+        Sql<ISqlContext> sql = SqlContext.Sql();
+        sql
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<DocumentDto>()
+            .InnerJoin<ContentDto>().On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+            .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .WhereIn<NodeDto>(x => x.NodeId, Sql()
+                .Select<ContentScheduleDto>(x => x.NodeId)
+                .From<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x => x.Action == action && x.Date >= now));
+
+        return Database.Fetch<Guid>(sql);
     }
 
     /// <inheritdoc />
@@ -1821,7 +1842,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
-    private class CultureNodeName
+    private sealed class CultureNodeName
     {
         public int Id { get; set; }
         public string? Name { get; set; }

@@ -1,26 +1,27 @@
-import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types.js';
 import { UmbContentTypeStructureManager } from '../structure/index.js';
+import type { UmbContentTypeCompositionModel, UmbContentTypeDetailModel, UmbContentTypeSortModel } from '../types.js';
 import type { UmbContentTypeWorkspaceContext } from './content-type-workspace-context.interface.js';
+import { UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEntityUpdatedEvent,
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type {
 	UmbDetailRepository,
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
-import {
-	UmbEntityDetailWorkspaceContextBase,
-	type UmbEntityDetailWorkspaceContextArgs,
-	type UmbEntityDetailWorkspaceContextCreateArgs,
-	type UmbRoutableWorkspaceContext,
+import type {
+	UmbEntityDetailWorkspaceContextArgs,
+	UmbEntityDetailWorkspaceContextCreateArgs,
+	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { Observable } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbContentTypeWorkspaceContextArgs extends UmbEntityDetailWorkspaceContextArgs {}
@@ -151,7 +152,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * @param { UmbEntityModel } parent The parent entity
 	 * @memberof UmbContentTypeWorkspaceContextBase
 	 */
-	override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
+	protected override async _create(currentData: DetailModelType, parent: UmbEntityModel) {
 		try {
 			await this.structure.create(parent?.unique);
 
@@ -177,22 +178,34 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	 * Updates the content type for the workspace
 	 * @memberof UmbContentTypeWorkspaceContextBase
 	 */
-	override async _update() {
+	protected override async _update() {
 		try {
 			await this.structure.save();
 
 			this._data.setPersisted(this.structure.getOwnerContentType());
 
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			if (!actionEventContext) {
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			if (!eventContext) {
 				throw new Error('Could not get the action event context');
 			}
-			const event = new UmbRequestReloadStructureForEntityEvent({
-				unique: this.getUnique()!,
-				entityType: this.getEntityType(),
+
+			const unique = this.getUnique()!;
+			const entityType = this.getEntityType();
+
+			const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({
+				unique,
+				entityType,
 			});
 
-			actionEventContext.dispatchEvent(event);
+			eventContext.dispatchEvent(reloadStructureEvent);
+
+			const updatedEvent = new UmbEntityUpdatedEvent({
+				unique,
+				entityType,
+				eventUnique: this._workspaceEventUnique,
+			});
+
+			eventContext.dispatchEvent(updatedEvent);
 		} catch (error) {
 			console.error(error);
 		}

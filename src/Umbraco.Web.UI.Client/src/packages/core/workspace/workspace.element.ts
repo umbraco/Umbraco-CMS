@@ -1,3 +1,4 @@
+import type { ManifestWorkspace } from './extensions/types.js';
 import { nothing, customElement, property, type PropertyValueMap, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -7,7 +8,6 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestWorkspace } from './extensions/types.js';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -19,7 +19,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 	#entityType?: string;
 
 	@state()
-	_component?: HTMLElement;
+	private _component?: HTMLElement;
 
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType(): string | undefined {

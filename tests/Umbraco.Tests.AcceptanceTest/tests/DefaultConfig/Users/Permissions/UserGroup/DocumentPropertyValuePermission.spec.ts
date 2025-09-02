@@ -1,5 +1,5 @@
-import { expect } from '@playwright/test';
-import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {expect} from '@playwright/test';
+import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
@@ -43,7 +43,7 @@ test('cannot see property values without UI read permission', async ({umbracoApi
   await umbracoUi.content.isPropertyEditorUiWithNameVisible('text-box', false);
 });
 
-test('can see property values with UI read but not UI write permission', async ({umbracoApi, umbracoUi}) => {
+test('can see property values with UI read but not UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionAndReadPropertyValuePermission(userGroupName, true, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -58,7 +58,7 @@ test('can see property values with UI read but not UI write permission', async (
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-test('cannot open content without document read permission even with UI read permission', async ({umbracoApi, umbracoUi}) => {
+test('cannot open content without document read permission even with UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionAndReadPropertyValuePermission(userGroupName, false, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -70,7 +70,7 @@ test('cannot open content without document read permission even with UI read per
   await umbracoUi.content.goToContentWithName(documentName);
 
   // Assert
-  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.permissionDenied);
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
 });
 
 test('cannot edit property values without UI write permission', async ({umbracoApi, umbracoUi}) => {
@@ -89,12 +89,10 @@ test('cannot edit property values without UI write permission', async ({umbracoA
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Remove .skip when the front-end is ready. 
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19395
-test.skip('can edit property values with UI write permission', async ({umbracoApi, umbracoUi}) => {
+test('can edit property values with UI write permission', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionAndWritePropertyValuePermission(userGroupName, true, false);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionAndWritePropertyValuePermission(userGroupName, true, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   testUserCookieAndToken = await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();

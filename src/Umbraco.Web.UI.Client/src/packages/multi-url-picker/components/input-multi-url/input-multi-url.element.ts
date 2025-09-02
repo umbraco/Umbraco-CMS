@@ -12,17 +12,21 @@ import {
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbDocumentItemRepository,
+	UmbDocumentUrlRepository,
+	UmbDocumentUrlsDataResolver,
+} from '@umbraco-cms/backoffice/document';
+import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { UmbDocumentUrlRepository, UmbDocumentUrlsDataResolver } from '@umbraco-cms/backoffice/document';
-import { UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 
 /**
  * @element umb-input-multi-url
@@ -30,8 +34,7 @@ import { UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
  * @fires blur - when the input loses focus
  * @fires focus - when the input gains focus
  */
-const elementName = 'umb-input-multi-url';
-@customElement(elementName)
+@customElement('umb-input-multi-url')
 export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<UmbLinkPickerLink>(this, {
 		getUniqueOfElement: (element) => {
@@ -131,13 +134,20 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 		this.#urls = [...data]; // Unfreeze data coming from State, so we can manipulate it.
 		super.value = this.#urls.map((x) => x.url).join(',');
 		this.#sorter.setModel(this.#urls);
-		this.#populateLinksUrl();
+		this.#populateLinksNameAndUrl();
 	}
 	get urls(): Array<UmbLinkPickerLink> {
 		return this.#urls;
 	}
 
 	#urls: Array<UmbLinkPickerLink> = [];
+
+	#documentItemRepository = new UmbDocumentItemRepository(this);
+	#documentUrlRepository = new UmbDocumentUrlRepository(this);
+	#documentUrlsDataResolver = new UmbDocumentUrlsDataResolver(this);
+
+	#mediaItemRepository = new UmbMediaItemRepository(this);
+	#mediaUrlRepository = new UmbMediaUrlRepository(this);
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -164,7 +174,10 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	private _modalRoute?: UmbModalRouteBuilder;
 
 	@state()
-	_resolvedLinkUrls: Array<{ unique: string; url: string }> = [];
+	private _resolvedLinkNames: Array<{ unique: string; name: string }> = [];
+
+	@state()
+	private _resolvedLinkUrls: Array<{ unique: string; url: string }> = [];
 
 	#linkPickerModal;
 
@@ -235,24 +248,40 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 			});
 	}
 
-	#populateLinksUrl() {
-		// Documents and media have URLs saved in the local link format. Display the actual URL to align with what
-		// the user sees when they selected it initially.
+	#populateLinksNameAndUrl() {
+		this._resolvedLinkNames = [];
+		this._resolvedLinkUrls = [];
+
+		// Documents and media have URLs saved in the local link format.
+		// Display the actual URL to align with what the user sees when they selected it initially.
 		this.#urls.forEach(async (link) => {
 			if (!link.unique) return;
 
+			let name: string | undefined = undefined;
 			let url: string | undefined = undefined;
+
 			switch (link.type) {
 				case 'document': {
+					if (!link.name || link.name.length === 0) {
+						name = await this.#getNameForDocument(link.unique);
+					}
 					url = await this.#getUrlForDocument(link.unique);
 					break;
 				}
 				case 'media': {
+					if (!link.name || link.name.length === 0) {
+						name = await this.#getNameForMedia(link.unique);
+					}
 					url = await this.#getUrlForMedia(link.unique);
 					break;
 				}
 				default:
 					break;
+			}
+
+			if (name) {
+				const resolvedName = { unique: link.unique, name };
+				this._resolvedLinkNames = [...this._resolvedLinkNames, resolvedName];
 			}
 
 			if (url) {
@@ -263,30 +292,38 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	async #getUrlForDocument(unique: string) {
-		const documentUrlRepository = new UmbDocumentUrlRepository(this);
-		const { data: documentUrlData } = await documentUrlRepository.requestItems([unique]);
-		const urlsItem = documentUrlData?.[0];
-		const dataResolver = new UmbDocumentUrlsDataResolver(this);
-		dataResolver.setData(urlsItem?.urls);
-		const resolvedUrls = await dataResolver.getUrls();
+		const { data: data } = await this.#documentUrlRepository.requestItems([unique]);
+
+		this.#documentUrlsDataResolver.setData(data?.[0]?.urls);
+
+		const resolvedUrls = await this.#documentUrlsDataResolver.getUrls();
 		return resolvedUrls?.[0]?.url ?? '';
 	}
 
 	async #getUrlForMedia(unique: string) {
-		const mediaUrlRepository = new UmbMediaUrlRepository(this);
-		const { data: mediaUrlData } = await mediaUrlRepository.requestItems([unique]);
-		return mediaUrlData?.[0].url ?? '';
+		const { data } = await this.#mediaUrlRepository.requestItems([unique]);
+		return data?.[0].url ?? '';
 	}
 
-	async #requestRemoveItem(index: number) {
+	async #getNameForDocument(unique: string) {
+		const { data } = await this.#documentItemRepository.requestItems([unique]);
+		return data?.[0]?.name ?? '';
+	}
+
+	async #getNameForMedia(unique: string) {
+		const { data } = await this.#mediaItemRepository.requestItems([unique]);
+		return data?.[0]?.name ?? '';
+	}
+
+	async #requestRemoveItem(index: number, name?: string) {
 		const item = this.#urls[index];
 		if (!item) throw new Error('Could not find item at index: ' + index);
 
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove ${item.name}?`,
-			content: 'Are you sure you want to remove this item',
-			confirmLabel: 'Remove',
+			headline: `Remove ${name || item.name || 'item'}?`,
+			content: 'Are you sure you want to remove this item?',
+			confirmLabel: '#general_remove',
 		});
 
 		this.#removeItem(index);
@@ -318,6 +355,17 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	#dispatchChangeEvent() {
 		this.requestUpdate();
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#getResolvedItemName(link: UmbLinkPickerLink): string {
+		return (link.name || this._resolvedLinkNames.find((name) => name.unique === link.unique)?.name) ?? '';
+	}
+
+	#getResolvedItemUrl(link: UmbLinkPickerLink): string {
+		return (
+			(this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? link.url ?? '') +
+			(link.queryString || '')
+		);
 	}
 
 	override render() {
@@ -356,13 +404,15 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	#renderItem(link: UmbLinkPickerLink, index: number) {
 		const unique = this.#getUnique(link);
 		const href = this.readonly ? undefined : (this._modalRoute?.({ index }) ?? undefined);
-		const resolvedUrl = this._resolvedLinkUrls.find((url) => url.unique === link.unique)?.url ?? '';
+		const name = this.#getResolvedItemName(link);
+		const url = this.#getResolvedItemUrl(link);
+
 		return html`
 			<uui-ref-node
 				id=${unique}
 				href=${ifDefined(href)}
-				name=${link.name || ''}
-				detail=${resolvedUrl + (link.queryString || '')}
+				name=${name || url}
+				detail=${ifDefined(name ? url : undefined)}
 				?readonly=${this.readonly}>
 				<umb-icon slot="icon" name=${link.icon || 'icon-link'}></umb-icon>
 				${when(
@@ -371,7 +421,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 						<uui-action-bar slot="actions">
 							<uui-button
 								label=${this.localize.term('general_remove')}
-								@click=${() => this.#requestRemoveItem(index)}></uui-button>
+								@click=${() => this.#requestRemoveItem(index, name)}></uui-button>
 						</uui-action-bar>
 					`,
 				)}
@@ -390,6 +440,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputMultiUrlElement;
+		'umb-input-multi-url': UmbInputMultiUrlElement;
 	}
 }

@@ -45,47 +45,49 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	#context = new UmbBlockRteEntryContext(this);
 
 	@state()
-	_showContentEdit = false;
+	private _showContentEdit = false;
 
 	@state()
-	_hasSettings = false;
+	private _hasSettings = false;
 
 	@state()
-	_label = '';
+	private _label = '';
 
 	@state()
-	_icon?: string;
+	private _icon?: string;
 
 	@state()
-	_exposed?: boolean;
+	private _exposed?: boolean;
 
 	@state()
-	_showActions?: boolean;
+	private _showActions?: boolean;
 
 	@state()
-	_workspaceEditContentPath?: string;
+	private _workspaceEditContentPath?: string;
 
 	@state()
-	_workspaceEditSettingsPath?: string;
+	private _workspaceEditSettingsPath?: string;
 
 	@state()
-	_contentTypeAlias?: string;
+	private _contentTypeAlias?: string;
 
 	@state()
-	_contentTypeName?: string;
+	private _contentTypeName?: string;
 
 	@state()
-	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
+	private _blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
 		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_contentInvalid?: boolean;
 
 	// 'settings-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_settingsInvalid?: boolean;
 
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel>>) {
@@ -275,11 +277,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 							type="blockEditorCustomView"
 							default-element="umb-ref-rte-block"
 							.renderMethod=${this.#extensionSlotRenderMethod}
+							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							.filter=${this.#filterBlockCustomViews}
-							single>
-							${this.#renderRefBlock()}
-						</umb-extension-slot>
+							single></umb-extension-slot>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
@@ -295,13 +296,22 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			: nothing;
 	}
 
+	#renderBuiltinBlockView = () => {
+		// TODO: Missing unsupported rendering [NL]
+		/*if (this._unsupported) {
+			return this.#renderUnsupportedBlock();
+		}*/
+		return this.#renderRefBlock();
+	};
+
 	#renderRefBlock() {
 		return html`<umb-ref-rte-block
 			.label=${this._label}
 			.icon=${this._icon}
 			.unpublished=${!this._exposed}
 			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}></umb-ref-rte-block>`;
+			.settings=${this._blockViewProps.settings}
+			.config=${this._blockViewProps.config}></umb-ref-rte-block>`;
 	}
 
 	#renderEditAction() {
@@ -353,13 +363,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			:host {
 				position: relative;
 				display: block;
-				user-select: none;
+				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
 			}
+
 			:host(.ProseMirror-selectednode) {
 				umb-ref-rte-block {
-					cursor: not-allowed;
+					--uui-color-default-contrast: initial;
 					outline: 3px solid var(--uui-color-focus);
 				}
 			}

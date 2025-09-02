@@ -96,7 +96,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         blueprint.SetValue("keywords", "blueprint 3");
         blueprint.SetValue("description", "blueprint 4");
 
-        ContentService.SaveBlueprint(blueprint);
+        ContentService.SaveBlueprint(blueprint, null);
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
         Assert.AreEqual(1, found.Length);
@@ -121,7 +121,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         blueprint.SetValue("keywords", "blueprint 3");
         blueprint.SetValue("description", "blueprint 4");
 
-        ContentService.SaveBlueprint(blueprint);
+        ContentService.SaveBlueprint(blueprint, null);
 
         ContentService.DeleteBlueprint(blueprint);
 
@@ -148,7 +148,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             ContentService.Save(originalPage);
 
             var fromContent = ContentService.CreateBlueprintFromContent(originalPage, "hello world");
-            ContentService.SaveBlueprint(fromContent);
+            ContentService.SaveBlueprint(fromContent, originalPage);
 
             Assert.IsTrue(fromContent.HasIdentity);
             Assert.AreEqual("blueprint 1", fromContent.Properties["title"]?.GetValue());
@@ -176,7 +176,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         {
             var blueprint =
                 ContentBuilder.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, Constants.System.Root);
-            ContentService.SaveBlueprint(blueprint);
+            ContentService.SaveBlueprint(blueprint, null);
         }
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
@@ -685,6 +685,25 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(contents, Is.Not.Null);
         Assert.That(contents.Any(), Is.True);
         Assert.That(contents.Count(), Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Can_Get_Scheduled_Content_Keys()
+    {
+        // Arrange
+        var root = ContentService.GetById(Textpage.Id);
+        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
+        var content = ContentService.GetById(Subpage.Id);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
+        ContentService.PersistContentSchedule(content!, contentSchedule);
+        ContentService.Publish(content, content.AvailableCultures.ToArray());
+
+        // Act
+        var keys = ContentService.GetScheduledContentKeys([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
+
+        // Assert
+        Assert.AreEqual(1, keys.Count);
+        Assert.AreEqual(Subpage.Key, keys.First());
     }
 
     [Test]

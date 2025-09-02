@@ -90,6 +90,9 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
 
+        // Database availability check.
+        builder.Services.AddUnique<IDatabaseAvailabilityCheck, DefaultDatabaseAvailabilityCheck>();
+
         // Add runtime mode validation
         builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
         builder.RuntimeModeValidators()
@@ -124,6 +127,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
         builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, SystemTextConfigurationEditorJsonSerializer>();
+        builder.Services.AddUnique<IJsonSerializerEncoderFactory, DefaultJsonSerializerEncoderFactory>();
         builder.Services.AddUnique<IWebhookJsonSerializer, SystemTextWebhookJsonSerializer>();
 
         // register database builder
@@ -356,11 +360,14 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentSavingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, RichTextPropertyNotificationHandler>()
-            .AddNotificationHandler<ContentCopiedNotification, FileUploadContentCopiedNotificationHandler>()
+            .AddNotificationHandler<ContentCopiedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
+            .AddNotificationHandler<ContentScaffoldedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
+            .AddNotificationHandler<ContentSavedBlueprintNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
             .AddNotificationHandler<ContentDeletedNotification, FileUploadContentDeletedNotificationHandler>()
-            .AddNotificationHandler<MediaDeletedNotification, FileUploadMediaDeletedNotificationHandler>()
+            .AddNotificationHandler<ContentDeletedBlueprintNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MediaDeletedNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MemberDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaSavingNotification, FileUploadMediaSavingNotificationHandler>()
-            .AddNotificationHandler<MemberDeletedNotification, FileUploadMemberDeletedNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()

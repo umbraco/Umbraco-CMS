@@ -47,7 +47,16 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Saves a blueprint.
     /// </summary>
+    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 18.")]
     void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Saves a blueprint.
+    /// </summary>
+    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => SaveBlueprint(content, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Deletes a blueprint.
@@ -265,6 +274,15 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     Gets a value indicating whether a document has children.
     /// </summary>
     bool HasChildren(int id);
+
+    /// <summary>
+    ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>
+    ///     The provided collection of content keys filtered for those that are scheduled for publishing.
+    /// </returns>
+    IEnumerable<Guid> GetScheduledContentKeys(IEnumerable<Guid> keys) => [];
 
     #endregion
 

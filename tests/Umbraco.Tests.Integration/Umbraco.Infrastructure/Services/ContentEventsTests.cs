@@ -2089,7 +2089,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         internal sealed class LocalServerMessenger : ServerMessengerBase
         {
             public LocalServerMessenger()
-                : base(false, new SystemTextJsonSerializer())
+                : base(false, new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
             {
             }
 

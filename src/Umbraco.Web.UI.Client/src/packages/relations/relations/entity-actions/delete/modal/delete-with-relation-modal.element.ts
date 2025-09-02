@@ -24,10 +24,10 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 	UmbDeleteWithRelationConfirmModalValue
 > {
 	@state()
-	_name?: string;
+	private _name?: string;
 
 	@state()
-	_referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
 	#itemRepository?: UmbItemRepository<any>;
 

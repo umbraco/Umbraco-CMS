@@ -277,7 +277,7 @@ export default {
 		notCreated: 'Nicht angelegt',
 		updateDate: 'Zuletzt bearbeitet am',
 		updateDateDesc: 'Letzter Änderungszeitpunkt des Dokuments',
-		uploadClear: 'Datei entfernen',
+		uploadClear: 'Datei(en) entfernen',
 		uploadClearImageContext: 'Klicke hier um das das Bild vom Medienelement zu entfernen.',
 		uploadClearFileContext: 'Klicke hier um das das Bild vom Medienelement zu entfernen.',
 		urls: 'Link zum Dokument',
@@ -1025,6 +1025,12 @@ export default {
 	lockout: {
 		lockoutWillOccur: 'Sie haben keine Tätigkeiten mehr durchgeführt und werden automatisch abgemeldet in',
 		renewSession: 'Erneuern Sie, um Ihre Arbeit zu speichern ...',
+	},
+	timeout: {
+		warningHeadline: 'Warnung: Ihre Sitzung läuft bald ab',
+		warningText: 'Ihre Sitzung ist bald abgelaufen und Sie werden in <strong>{0} Sekunden</strong> abgemeldet.',
+		warningLogoutAction: 'Abmelden',
+		warningContinueAction: 'Eingeloggt bleiben',
 	},
 	login: {
 		greeting0: 'Willkommen',

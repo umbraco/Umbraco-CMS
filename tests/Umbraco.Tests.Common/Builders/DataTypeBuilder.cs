@@ -138,7 +138,7 @@ public class DataTypeBuilder
         var creatorId = _creatorId ?? 1;
         var databaseType = _databaseType ?? ValueStorageType.Ntext;
         var sortOrder = _sortOrder ?? 0;
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var dataType = new DataType(editor, serializer, parentId)
         {
@@ -178,10 +178,9 @@ public class DataTypeBuilder
             elementSettingKey,
             editorAlias == Constants.PropertyEditors.Aliases.BlockGrid ? true : null);
 
-
         var dataTypeBuilder = new DataTypeBuilder()
             .WithId(0)
-            .WithDatabaseType(ValueStorageType.Nvarchar)
+            .WithDatabaseType(ValueStorageType.Ntext)
             .AddEditor()
             .WithAlias(editorAlias);
 
