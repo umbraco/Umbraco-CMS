@@ -51,7 +51,7 @@ public class UserDataService : RepositoryService, IUserDataService
             return Attempt<IUserData, UserDataOperationStatus>.Fail(UserDataOperationStatus.AlreadyExists, userData);
         }
 
-        if (await ReferencedUserExits(userData) is false)
+        if (await ReferencedUserExists(userData) is false)
         {
             return Attempt<IUserData, UserDataOperationStatus>.Fail(UserDataOperationStatus.UserNotFound, userData);
         }
@@ -71,7 +71,7 @@ public class UserDataService : RepositoryService, IUserDataService
             return Attempt<IUserData, UserDataOperationStatus>.Fail(UserDataOperationStatus.NotFound, userData);
         }
 
-        if (await ReferencedUserExits(userData) is false)
+        if (await ReferencedUserExists(userData) is false)
         {
             return Attempt<IUserData, UserDataOperationStatus>.Fail(UserDataOperationStatus.UserNotFound, userData);
         }
@@ -91,7 +91,7 @@ public class UserDataService : RepositoryService, IUserDataService
             return Attempt<UserDataOperationStatus>.Fail(UserDataOperationStatus.NotFound);
         }
 
-        if (await ReferencedUserExits(userKey) is false)
+        if (await ReferencedUserExists(userKey) is false)
         {
             return Attempt<UserDataOperationStatus>.Fail(UserDataOperationStatus.UserNotFound);
         }
@@ -102,9 +102,9 @@ public class UserDataService : RepositoryService, IUserDataService
         return Attempt<UserDataOperationStatus>.Succeed(UserDataOperationStatus.Success);
     }
 
-    private async Task<bool> ReferencedUserExits(Guid userKey)
+    private async Task<bool> ReferencedUserExists(Guid userKey)
         => await _userService.GetAsync(userKey) is not null;
 
-    private async Task<bool> ReferencedUserExits(IUserData userData)
+    private async Task<bool> ReferencedUserExists(IUserData userData)
         => await _userService.GetAsync(userData.UserKey) is not null;
 }

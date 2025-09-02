@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -17,8 +16,7 @@ public class DeleteUserDataController : UserDataControllerBase
 
     public DeleteUserDataController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUserDataService userDataService,
-        IUmbracoMapper umbracoMapper)
+        IUserDataService userDataService)
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _userDataService = userDataService;
