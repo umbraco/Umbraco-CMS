@@ -1,10 +1,10 @@
-import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type {
 	UmbMediaTreeChildrenOfRequestArgs,
 	UmbMediaTreeItemModel,
 	UmbMediaTreeRootItemsRequestArgs,
-} from './types.js';
-import { UmbManagementApiMediaTreeDataRequestManager } from './server-data-source/media-tree.server.request-manager.js';
+} from '../types.js';
+import { UmbManagementApiMediaTreeDataRequestManager } from './media-tree.server.request-manager.js';
 import type { UmbTreeAncestorsOfRequestArgs, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
