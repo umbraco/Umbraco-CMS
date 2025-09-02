@@ -130,7 +130,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
-        PopulateSignsOnDocuments(responseModel).GetAwaiter().GetResult();
+        PopulateSignsOnDocuments(responseModel);
 
         return responseModel;
     }
@@ -159,7 +159,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
                 Culture = null,
             };
 
-            PopulateSignsOnVariants(model).GetAwaiter().GetResult();
+            PopulateSignsOnVariants(model);
             yield return model;
             yield break;
         }
@@ -173,7 +173,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
                 State = DocumentVariantStateHelper.GetState(entity, cultureNamePair.Key)
             };
 
-            PopulateSignsOnVariants(model).GetAwaiter().GetResult();
+            PopulateSignsOnVariants(model);
             yield return model;
         }
     }
@@ -290,19 +290,21 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
     }
 
-    private async Task PopulateSignsOnDocuments(DocumentItemResponseModel model)
+    private void PopulateSignsOnDocuments(DocumentItemResponseModel model)
     {
         foreach (ISignProvider signProvider in _signProviderCollection.Where(x => x.CanProvideSigns<DocumentItemResponseModel>()))
         {
-            await signProvider.PopulateSignsAsync(model);
+            IEnumerable<DocumentItemResponseModel> models = [model];
+            signProvider.PopulateSignsAsync(models).GetAwaiter().GetResult();
         }
     }
 
-    private async Task PopulateSignsOnVariants(DocumentVariantItemResponseModel model)
+    private void PopulateSignsOnVariants(DocumentVariantItemResponseModel model)
     {
         foreach (ISignProvider signProvider in _signProviderCollection.Where(x => x.CanProvideSigns<DocumentVariantItemResponseModel>()))
         {
-            await signProvider.PopulateSignsAsync(model);
+            IEnumerable<DocumentVariantItemResponseModel> models = [model];
+            signProvider.PopulateSignsAsync(models).GetAwaiter().GetResult();
         }
     }
 }
