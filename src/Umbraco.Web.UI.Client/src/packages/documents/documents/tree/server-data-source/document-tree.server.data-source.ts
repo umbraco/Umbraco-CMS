@@ -1,10 +1,10 @@
-import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type {
 	UmbDocumentTreeChildrenOfRequestArgs,
 	UmbDocumentTreeItemModel,
 	UmbDocumentTreeRootItemsRequestArgs,
-} from './types.js';
-import { UmbManagementApiDocumentTreeDataRequestManager } from './server-data-source/document-tree.server.request-manager.js';
+} from '../types.js';
+import { UmbManagementApiDocumentTreeDataRequestManager } from './document-tree.server.request-manager.js';
 import type { UmbTreeAncestorsOfRequestArgs, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
