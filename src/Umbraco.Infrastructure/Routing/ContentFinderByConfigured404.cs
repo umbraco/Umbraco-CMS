@@ -1,10 +1,14 @@
 using System.Globalization;
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure;
 
@@ -19,7 +23,10 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
     private readonly IExamineManager _examineManager;
     private readonly ILogger<ContentFinderByConfigured404> _logger;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IDocumentUrlService _documentUrlService;
+    private readonly IPublishedContentCache _publishedContentCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private ContentSettings _contentSettings;
 
     /// <summary>
@@ -31,7 +38,10 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         IOptionsMonitor<ContentSettings> contentSettings,
         IExamineManager examineManager,
         IVariationContextAccessor variationContextAccessor,
-        IUmbracoContextAccessor umbracoContextAccessor)
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentUrlService documentUrlService,
+        IPublishedContentCache publishedContentCache,
+        IDocumentNavigationQueryService documentNavigationQueryService)
     {
         _logger = logger;
         _entityService = entityService;
@@ -39,8 +49,32 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         _examineManager = examineManager;
         _variationContextAccessor = variationContextAccessor;
         _umbracoContextAccessor = umbracoContextAccessor;
+        _documentUrlService = documentUrlService;
+        _publishedContentCache = publishedContentCache;
+        _documentNavigationQueryService = documentNavigationQueryService;
 
         contentSettings.OnChange(x => _contentSettings = x);
+    }
+
+    [Obsolete("Scheduled for removal in Umbraco 18")]
+    public ContentFinderByConfigured404(
+        ILogger<ContentFinderByConfigured404> logger,
+        IEntityService entityService,
+        IOptionsMonitor<ContentSettings> contentSettings,
+        IExamineManager examineManager,
+        IVariationContextAccessor variationContextAccessor,
+        IUmbracoContextAccessor umbracoContextAccessor)
+    : this(
+        logger,
+        entityService,
+        contentSettings,
+        examineManager,
+        variationContextAccessor,
+        umbracoContextAccessor,
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
+    {
     }
 
     /// <summary>
@@ -77,8 +111,13 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
             while (pos > 1)
             {
                 route = route.Substring(0, pos);
-                node = umbracoContext.Content?.GetByRoute(route, culture: frequest?.Culture);
-                if (node != null)
+                Guid? keyByRoute = _documentUrlService.GetDocumentKeyByRoute(route, frequest.Culture, null, false);
+                if (keyByRoute is not null)
+                {
+                    node = _publishedContentCache.GetById(keyByRoute.Value);
+                }
+
+                if (node is not null)
                 {
                     break;
                 }
@@ -100,7 +139,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
             _contentSettings.Error404Collection.ToArray(),
             _entityService,
-            new PublishedContentQuery(_variationContextAccessor, _examineManager, umbracoContext.Content!, umbracoContext.Media),
+            new PublishedContentQuery(_variationContextAccessor, _examineManager, umbracoContext.Content!, umbracoContext.Media, _documentNavigationQueryService),
             errorCulture,
             domainContentId);
 

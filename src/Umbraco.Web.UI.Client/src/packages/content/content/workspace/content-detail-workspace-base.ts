@@ -941,11 +941,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		if (!eventContext) {
 			throw new Error('Event context is missing');
 		}
-		const event = new UmbRequestReloadChildrenOfEntityEvent({
+
+		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({
 			entityType: parent.entityType,
 			unique: parent.unique,
 		});
-		eventContext.dispatchEvent(event);
+
+		eventContext.dispatchEvent(reloadStructureEvent);
+
+		const reloadChildrenEvent = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType: parent.entityType,
+			unique: parent.unique,
+		});
+
+		eventContext.dispatchEvent(reloadChildrenEvent);
 	}
 
 	async #update(variantIds: Array<UmbVariantId>, saveData: DetailModelType) {

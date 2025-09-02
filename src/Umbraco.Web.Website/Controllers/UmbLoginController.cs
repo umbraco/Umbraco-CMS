@@ -26,7 +26,6 @@ public class UmbLoginController : SurfaceController
     private readonly IDocumentNavigationQueryService _navigationQueryService;
     private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
 
-    [ActivatorUtilitiesConstructor]
     public UmbLoginController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IUmbracoDatabaseFactory databaseFactory,
@@ -46,89 +45,6 @@ public class UmbLoginController : SurfaceController
         _twoFactorLoginService = twoFactorLoginService;
         _navigationQueryService = navigationQueryService;
         _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public UmbLoginController(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IUmbracoDatabaseFactory databaseFactory,
-        ServiceContext services,
-        AppCaches appCaches,
-        IProfilingLogger profilingLogger,
-        IPublishedUrlProvider publishedUrlProvider,
-        IMemberSignInManager signInManager,
-        IMemberManager memberManager,
-        ITwoFactorLoginService twoFactorLoginService,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
-        : this(
-            umbracoContextAccessor,
-            databaseFactory,
-            services,
-            appCaches,
-            profilingLogger,
-            publishedUrlProvider,
-            signInManager,
-            memberManager,
-            twoFactorLoginService,
-            navigationQueryService,
-            publishedContentStatusFilteringService)
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public UmbLoginController(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IUmbracoDatabaseFactory databaseFactory,
-        ServiceContext services,
-        AppCaches appCaches,
-        IProfilingLogger profilingLogger,
-        IPublishedUrlProvider publishedUrlProvider,
-        IMemberSignInManager signInManager,
-        IMemberManager memberManager,
-        ITwoFactorLoginService twoFactorLoginService,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService)
-        : this(
-            umbracoContextAccessor,
-            databaseFactory,
-            services,
-            appCaches,
-            profilingLogger,
-            publishedUrlProvider,
-            signInManager,
-            memberManager,
-            twoFactorLoginService,
-            navigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public UmbLoginController(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IUmbracoDatabaseFactory databaseFactory,
-        ServiceContext services,
-        AppCaches appCaches,
-        IProfilingLogger profilingLogger,
-        IPublishedUrlProvider publishedUrlProvider,
-        IMemberSignInManager signInManager,
-        IMemberManager memberManager,
-        ITwoFactorLoginService twoFactorLoginService)
-        : this(
-            umbracoContextAccessor,
-            databaseFactory,
-            services,
-            appCaches,
-            profilingLogger,
-            publishedUrlProvider,
-            signInManager,
-            memberManager,
-            twoFactorLoginService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
-    {
     }
 
     [HttpPost]

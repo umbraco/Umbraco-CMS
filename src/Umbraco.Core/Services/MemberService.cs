@@ -410,14 +410,14 @@ namespace Umbraco.Cms.Core.Services
         }
 
         public IEnumerable<IMember> GetAll(
-            long pageIndex,
-            int pageSize,
+            int skip,
+            int take,
             out long totalRecords,
             string orderBy,
             Direction orderDirection,
             string? memberTypeAlias = null,
             string filter = "") =>
-            GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
+            GetAll(skip, take, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
 
         public IEnumerable<IMember> GetAll(
             long pageIndex,

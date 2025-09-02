@@ -176,6 +176,9 @@ export default {
 		confirmActionConfirm: 'Bekræft',
 		morePublishingOptions: 'Flere publiseringsmuligheder',
 		submitChanges: 'Indsæt',
+		openInSplitView: 'Åbn i sidestillet visning',
+		openVersionSelector: 'Åbn udgavevælger',
+		closeVersionSelector: 'Luk udgavevælger',
 	},
 	auditTrailsMedia: {
 		delete: 'Medie slettet',
@@ -352,6 +355,7 @@ export default {
 		selectAllVariants: 'Vælg alle varianter',
 		scheduledPendingChanges: 'Denne tidsplan har ændringer, der træder i kraft, når du klikker på "%0%".',
 		noVariantsToProcess: 'Der er ingen tilgængelige varianter',
+		openSplitViewForVariant: (variant: string) => `Åbn ${variant} i sidestillet visning`,
 	},
 	blueprints: {
 		createBlueprintFrom: "Opret en ny indholdsskabelon fra '%0%'",

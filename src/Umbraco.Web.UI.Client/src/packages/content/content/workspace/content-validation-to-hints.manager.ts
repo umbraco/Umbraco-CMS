@@ -6,7 +6,7 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbHintController, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import { extractJsonQueryProps, type UmbValidationContext } from '@umbraco-cms/backoffice/validation';
+import { extractJsonQueryProps, type UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /*
@@ -21,7 +21,7 @@ export class UmbContentValidationToHintsManager<
 > extends UmbControllerBase {
 	/*workspace.hints.addOne({
 		unique: 'exampleHintFromToggleAction',
-		path: ['Umb.WorkspaceView.Document.Edit', 'root'],
+		path: ['Umb.WorkspaceView.Document.Edit'],
 		text: 'Hi',
 		color: 'invalid',
 		weight: 100,
@@ -39,8 +39,9 @@ export class UmbContentValidationToHintsManager<
 	constructor(
 		host: UmbControllerHost,
 		structure: UmbContentTypeStructureManager<ContentTypeDetailModelType>,
-		validation: UmbValidationContext,
+		validation: UmbValidationController,
 		hints: UmbHintController<UmbVariantHint>,
+		hintsPathPrefix: Array<string> = ['Umb.WorkspaceView.Document.Edit'],
 	) {
 		super(host);
 
@@ -77,7 +78,7 @@ export class UmbContentValidationToHintsManager<
 
 					hints.addOne({
 						unique: message.key,
-						path: ['Umb.WorkspaceView.Document.Edit', ...path],
+						path: [...hintsPathPrefix, ...path],
 						text: '!',
 						/*label: message.body,*/
 						color: 'invalid',
