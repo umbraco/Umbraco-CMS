@@ -36,6 +36,9 @@ export class UmbDefaultTreeContext<
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
 
+	#hasChildren = new UmbBooleanState(false);
+	readonly hasChildren = this.#hasChildren.asObservable();
+
 	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType>(this);
 	public readonly rootItems = this.#treeItemChildrenManager.children;
 	// Offset Pagination: TODO: deprecate and expose a new with the name "offsetPagination"
@@ -168,6 +171,7 @@ export class UmbDefaultTreeContext<
 		if (data) {
 			this.#treeRoot.setValue(data);
 			this.#treeItemChildrenManager.setParent({ entityType: data.entityType, unique: data.unique });
+			this.#hasChildren.setValue(data.hasChildren);
 			this.pagination.setTotalItems(1);
 			this.#observeExpansion();
 
