@@ -61,14 +61,14 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         IUrlProvider? provider = _urlProviders.FirstOrDefault(provider => provider.Alias.InvariantEquals(providerAlias));
         if (provider is null)
         {
-            _logger.LogError("Could not resolve the URL provider requested for preview: {providerAlias}",  providerAlias);
+            _logger.LogError("Could not resolve a URL provider requested for preview - it was not registered in the URL providers collection.");
             return null;
         }
 
         UrlInfo? previewUrlInfo = await provider.GetPreviewUrlAsync(content, culture, segment);
         if (previewUrlInfo is null)
         {
-            _logger.LogError("The URL provider: {providerAlias} could not generate a preview URL for content with key: {contentKey}",  providerAlias, content.Key);
+            _logger.LogError("The URL provider could not generate a preview URL for content with key: {contentKey}", content.Key);
             return null;
         }
 
