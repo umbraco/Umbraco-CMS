@@ -3,7 +3,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -35,105 +34,84 @@ internal class HasScheduleSignProvider : ISignProvider
         where TItem : IHasSigns
     {
         IEnumerable<Guid> keys = _contentService.GetScheduledContentKeys(items.Select(x => x.Id).ToArray());
+        var itemsById = items.ToDictionary(x => x.Id);
 
         foreach (Guid key in keys)
         {
-            TItem item = items.First(x => x.Id == key);
+            if (!itemsById.TryGetValue(key, out TItem? item))
+            {
+                continue;
+            }
 
             switch (item)
             {
-                case DocumentTreeItemResponseModel document:
-                {
-                    var variants = new List<DocumentVariantItemResponseModel>();
-                    if (document.Variants.Count() == 1)
-                    {
-                        DocumentVariantItemResponseModel variant = document.Variants.First();
-                        variant.AddSign(Alias);
-                        variants.Add(variant);
-                    }
-                    else
-                    {
-                        IEnumerable<ContentSchedule> schedules =
-                            _contentService.GetContentScheduleByContentId(key).GetSchedule();
-                        IEnumerable<string> culturesWithSchedule = schedules
-                            .Select(schedule => schedule.Culture);
-
-                        foreach (DocumentVariantItemResponseModel variant in document.Variants)
-                        {
-                            if (variant.Culture != null && culturesWithSchedule.Contains(variant.Culture))
-                            {
-                                variant.AddSign(Alias);
-                                variants.Add(variant);
-                            }
-                        }
-                    }
-
-                    document.Variants = variants;
+                case DocumentTreeItemResponseModel docTree:
+                    docTree.Variants = BuildVariants(docTree.Variants, key);
                     break;
-                }
 
-                case DocumentCollectionResponseModel document:
-                {
-                    var variants = new List<DocumentVariantResponseModel>();
-                    if (document.Variants.Count() == 1)
-                    {
-                        DocumentVariantResponseModel variant = document.Variants.First();
-                        variant.AddSign(Alias);
-                        variants.Add(variant);
-                    }
-                    else
-                    {
-                        IEnumerable<ContentSchedule> schedules =
-                            _contentService.GetContentScheduleByContentId(key).GetSchedule();
-                        IEnumerable<string> culturesWithSchedule = schedules
-                            .Select(schedule => schedule.Culture);
-
-                        foreach (DocumentVariantResponseModel variant in document.Variants)
-                        {
-                            if (variant.Culture != null && culturesWithSchedule.Contains(variant.Culture))
-                            {
-                                variant.AddSign(Alias);
-                                variants.Add(variant);
-                            }
-                        }
-                    }
-
-                    document.Variants = variants;
+                case DocumentCollectionResponseModel docColl:
+                    docColl.Variants = BuildVariants(docColl.Variants, key);
                     break;
-                }
 
-                case DocumentItemResponseModel document:
-                {
-                    var variants = new List<DocumentVariantItemResponseModel>();
-                    if (document.Variants.Count() == 1)
-                    {
-                        DocumentVariantItemResponseModel variant = document.Variants.First();
-                        variant.AddSign(Alias);
-                        variants.Add(variant);
-                    }
-                    else
-                    {
-                        IEnumerable<ContentSchedule> schedules =
-                            _contentService.GetContentScheduleByContentId(key).GetSchedule();
-                        IEnumerable<string> culturesWithSchedule = schedules
-                            .Select(schedule => schedule.Culture);
-
-                        foreach (DocumentVariantItemResponseModel variant in document.Variants)
-                        {
-                            if (variant.Culture != null && culturesWithSchedule.Contains(variant.Culture))
-                            {
-                                variant.AddSign(Alias);
-                                variants.Add(variant);
-                            }
-                        }
-                    }
-
-                    document.Variants = variants;
+                case DocumentItemResponseModel docItem:
+                    docItem.Variants = BuildVariants(docItem.Variants, key);
                     break;
-                }
             }
         }
 
         return Task.CompletedTask;
     }
+
+    private List<DocumentVariantItemResponseModel> BuildVariants(IEnumerable<DocumentVariantItemResponseModel> variants, Guid id)
+    {
+        var listVariants = variants.ToList();
+        if (listVariants.Count == 1)
+        {
+            DocumentVariantItemResponseModel variant = listVariants[0];
+            variant.AddSign(Alias);
+            return [variant];
+        }
+
+        IEnumerable<string> cultures = GetCulturesWithSchedule(id);
+        var result = new List<DocumentVariantItemResponseModel>(listVariants.Count);
+        foreach (DocumentVariantItemResponseModel variant in listVariants)
+        {
+            if (variant.Culture != null && cultures.Contains(variant.Culture))
+            {
+                variant.AddSign(Alias);
+                result.Add(variant);
+            }
+        }
+
+        return result;
+    }
+
+    private List<DocumentVariantResponseModel> BuildVariants(IEnumerable<DocumentVariantResponseModel> variants, Guid id)
+    {
+        var listVariants = variants.ToList();
+        if (listVariants.Count == 1)
+        {
+            DocumentVariantResponseModel variant = listVariants[0];
+            variant.AddSign(Alias);
+            return [variant];
+        }
+
+        IEnumerable<string> cultures = GetCulturesWithSchedule(id);
+        var result = new List<DocumentVariantResponseModel>(listVariants.Count);
+        foreach (DocumentVariantResponseModel variant in listVariants)
+        {
+            if (variant.Culture != null && cultures.Contains(variant.Culture))
+            {
+                variant.AddSign(Alias);
+                result.Add(variant);
+            }
+        }
+
+        return result;
+    }
+
+    private IEnumerable<string> GetCulturesWithSchedule(Guid id) =>
+        _contentService.GetContentScheduleByContentId(id)
+            .GetSchedule()
+            .Select(s => s.Culture);
 }
