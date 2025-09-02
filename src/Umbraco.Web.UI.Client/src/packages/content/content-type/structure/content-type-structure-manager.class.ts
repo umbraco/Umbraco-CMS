@@ -497,19 +497,38 @@ export class UmbContentTypeStructureManager<
 
 	makeEmptyContainerName(
 		containerId: string,
-		containerType: UmbPropertyContainerTypes,
-		parentId: string | null = null,
+		legacyContainerType?: UmbPropertyContainerTypes,
+		legacyParentId?: string | null,
 	): string {
 		return (
-			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', containerType, parentId) ?? 'Unnamed'
+			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', legacyContainerType, legacyParentId) ??
+			'Unnamed'
 		);
 	}
+	/**
+	 *
+	 * @param {string} containerId - The id of the container to make unique
+	 * @param {string} newName - The new name to make unique
+	 * @param {never} _legacyContainerType - do not use, has no effect. Is deprecated and will be removed in v.17
+	 * @param {never} _legacyParentId - do not use, has no effect. Is deprecated and will be removed in v.17
+	 * @returns
+	 */
 	makeContainerNameUniqueForOwnerContentType(
 		containerId: string,
 		newName: string,
-		containerType: UmbPropertyContainerTypes,
-		parentId: string | null = null,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		_legacyContainerType?: UmbPropertyContainerTypes,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		_legacyParentId?: string | null,
 	) {
+		const container = this.getOwnerContainerById(containerId);
+		if (!container) {
+			console.warn(`Container with id ${containerId} not found in owner content type.`);
+			return null;
+		}
+		const containerType = container.type;
+		const parentId = container.parent?.id ?? null;
+
 		const ownerRootContainers = this.getOwnerContainers(containerType, parentId); //getRootContainers() can't differentiates between compositions and locals
 		if (!ownerRootContainers) {
 			return null;
@@ -749,6 +768,26 @@ export class UmbContentTypeStructureManager<
 		});
 	}
 
+	hasPropertyStructuresOfGroupIds(groupIds: Array<string>) {
+		return this.#contentTypes.asObservablePart((docTypes) => {
+			return docTypes.some((docType) => {
+				return docType.properties?.some((property) => {
+					return property.container?.id && groupIds.includes(property.container.id);
+				});
+			});
+		});
+	}
+
+	hasPropertyStructuresOfRoot() {
+		return this.#contentTypes.asObservablePart((docTypes) => {
+			return docTypes.some((docType) => {
+				return docType.properties?.some((property) => {
+					return !property.container;
+				});
+			});
+		});
+	}
+
 	rootContainers(containerType: UmbPropertyContainerTypes) {
 		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType);
@@ -953,6 +992,7 @@ export class UmbContentTypeStructureManager<
 	 * Find merged containers that match the provided container ids.
 	 * Notice if you can provide one or more ids matching the same container and it will still only return return the matching container once.
 	 * @param containerIds - An array of container ids to find merged containers for.
+	 * @param id
 	 * @returns {UmbPropertyTypeContainerMergedModel | undefined} - The merged containers that match the provided container ids.
 	 */
 	getMergedContainerById(id: string): UmbPropertyTypeContainerMergedModel | undefined {
@@ -964,6 +1004,7 @@ export class UmbContentTypeStructureManager<
 	 * Find merged child containers that are children of the provided parent container ids.
 	 * Notice this will find matching containers and include their child containers in this.
 	 * @param containerIds - An array of container ids to find merged child containers for.
+	 * @param searchId
 	 * @param type - The type of the containers to find.
 	 * @returns {Observable} - An observable that emits the merged child containers that match the provided container ids.
 	 */
