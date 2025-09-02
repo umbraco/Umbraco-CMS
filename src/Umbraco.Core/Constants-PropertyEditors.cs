@@ -234,11 +234,6 @@ public static partial class Constants
             ///     Configuration-less time.
             /// </summary>
             public const string PlainTime = "Umbraco.Plain.Time";
-
-            /// <summary>
-            ///     Label.
-            /// </summary>
-            public const string Missing = "Umbraco.Missing";
         }
 
         /// <summary>

@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [HideFromTypeFinder]
 public class MissingPropertyEditor : IDataEditor
 {
+    private const string EditorAlias = "Umbraco.Missing";
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
     private IDataValueEditor? _valueEditor;
 
@@ -32,8 +33,8 @@ public class MissingPropertyEditor : IDataEditor
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public MissingPropertyEditor()
         : this(
-        Constants.PropertyEditors.Aliases.Missing,
-        StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
+            EditorAlias,
+            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
     {
     }
 
@@ -60,7 +61,7 @@ public class MissingPropertyEditor : IDataEditor
     /// <inheritdoc />
     public IDataValueEditor GetValueEditor() => _valueEditor
         ??= _dataValueEditorFactory.Create<MissingPropertyValueEditor>(
-            new DataEditorAttribute(Constants.PropertyEditors.Aliases.Missing));
+            new DataEditorAttribute(EditorAlias));
 
     /// <inheritdoc />
     public IDataValueEditor GetValueEditor(object? configurationObject) => GetValueEditor();
