@@ -5,11 +5,11 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_3_0;
 
 [Obsolete("Remove in Umbraco 18.")]
-public class AddRichTextEditorCapabilies : AsyncMigrationBase
+public class AddRichTextEditorCapabilities : AsyncMigrationBase
 {
     private readonly IDataTypeService _dataTypeService;
 
-    public AddRichTextEditorCapabilies(IMigrationContext context, IDataTypeService dataTypeService)
+    public AddRichTextEditorCapabilities(IMigrationContext context, IDataTypeService dataTypeService)
         : base(context)
     {
         _dataTypeService = dataTypeService;
