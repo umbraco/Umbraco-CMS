@@ -1,5 +1,5 @@
 import { UMB_DATA_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbDataTypeTreeServerDataSource } from './data-type-tree.server.data-source.js';
+import { UmbDataTypeTreeServerDataSource } from './server-data-source/data-type-tree.server.data-source.js';
 import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from './data-type-tree.store.context-token.js';
 import type { UmbDataTypeTreeItemModel, UmbDataTypeTreeRootModel } from './types.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
