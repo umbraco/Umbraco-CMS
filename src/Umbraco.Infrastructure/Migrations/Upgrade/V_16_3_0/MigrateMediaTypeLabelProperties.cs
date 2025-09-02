@@ -139,12 +139,12 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
         {
             if (_mediaTypeSettings?.InstallData == InstallDefaultDataOption.Values && !_mediaTypeSettings.Values.InvariantContains(mediaTypeKey))
             {
-                return;
+                continue;
             }
 
             if (_mediaTypeSettings?.InstallData == InstallDefaultDataOption.ExceptValues && _mediaTypeSettings.Values.InvariantContains(mediaTypeKey))
             {
-                return;
+                continue;
             }
 
             IMediaType? mediaType = await _mediaTypeService.GetAsync(new Guid(mediaTypeKey));
