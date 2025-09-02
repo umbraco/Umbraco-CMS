@@ -18,6 +18,6 @@ public interface ISignProvider
     /// Populates the provided item view models with signs.
     /// </summary>
     /// <typeparam name="TItem">Type of item view model supporting signs.</typeparam>
-    Task PopulateSignsAsync<TItem>(TItem item)
+    Task PopulateSignsAsync<TItem>(IEnumerable<TItem> items)
         where TItem : IHasSigns;
 }
