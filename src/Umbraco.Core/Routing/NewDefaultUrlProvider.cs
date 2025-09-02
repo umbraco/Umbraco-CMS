@@ -145,7 +145,9 @@ public class NewDefaultUrlProvider : IUrlProvider
         => Task.FromResult<UrlInfo?>(
             UrlInfo.AsUrl(
                 $"/{Constants.System.UmbracoPathSegment}/preview?id={content.Key}&culture={culture}&segment={segment}",
-                Alias));
+                Alias,
+                culture,
+                isExternal: false));
 
     #endregion
 
