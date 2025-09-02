@@ -26,10 +26,8 @@ export class UmbDocumentTypeTreeServerDataSource
 
 		const mappedData = data
 			? {
+					...data,
 					items: data?.items.map((item) => this.#mapItem(item)),
-					total: data.total,
-					totalBefore: data.totalBefore,
-					totalAfter: data.totalAfter,
 				}
 			: undefined;
 
@@ -41,10 +39,8 @@ export class UmbDocumentTypeTreeServerDataSource
 
 		const mappedData = data
 			? {
+					...data,
 					items: data?.items.map((item) => this.#mapItem(item)),
-					total: data.total,
-					totalAfter: data.totalAfter,
-					totalBefore: data.totalBefore,
 				}
 			: undefined;
 
