@@ -2832,8 +2832,8 @@ export default {
 	},
 	missingEditor: {
 		description:
-			'<p>Este tipo de propriedade já não se encontra disponível.<br/>Por favor, contacte o administrador do site para que ele possa apagar a propriedade ou restaurar o tipo de propriedade.</p>',
+			'<p><strong>Erro!</strong> Este tipo de propriedade já não se encontra disponível. Por favor, contacte o administrador.</p>',
 		detailsDescription:
-			'<p>Este tipo de propriedade já não se encontra disponível.<br/>Por favor, contacte o administrador do site para que ele possa apagar a propriedade ou restaurar o tipo de propriedade.</p><p><strong>Dados:</strong></p>',
+			'<p>Este tipo de propriedade já não se encontra disponível.<br/>Por favor, contacte o administrador para que ele possa apagar a propriedade ou restaurar o tipo de propriedade.</p><p><strong>Dados:</strong></p>',
 	},
 } as UmbLocalizationDictionary;
