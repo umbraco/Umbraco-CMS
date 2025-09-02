@@ -19,12 +19,15 @@ public class HasPendingChangesSignProvider : ISignProvider
 
 
     /// <inheritdoc/>
-    public Task PopulateSignsAsync<TItem>(TItem item)
+    public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> items)
         where TItem : IHasSigns
     {
-        if (HasPendingChanges(item))
+        foreach (TItem item in items)
         {
-            item.AddSign(Alias);
+            if (HasPendingChanges(item))
+            {
+                item.AddSign(Alias);
+            }
         }
 
         return Task.CompletedTask;
