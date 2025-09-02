@@ -29,23 +29,28 @@ internal class HasPendingChangesSignProviderTests
     {
         var sut = new HasPendingChangesSignProvider();
 
-        var variant1 = new DocumentVariantItemResponseModel()
+        var variants = new List<DocumentVariantItemResponseModel>
         {
-            State = DocumentVariantState.PublishedPendingChanges, Culture = null, Name = "Test",
+            new()
+            {
+                State = DocumentVariantState.PublishedPendingChanges,
+                Culture = null,
+                Name = "Test",
+            },
+            new()
+            {
+                State = DocumentVariantState.Published,
+                Culture = null,
+                Name = "Test2",
+            },
         };
 
-        var variant2 = new DocumentVariantItemResponseModel()
-        {
-            State = DocumentVariantState.Published, Culture = null, Name = "Test",
-        };
+        await sut.PopulateSignsAsync(variants);
 
-        await sut.PopulateSignsAsync(variant1);
-        await sut.PopulateSignsAsync(variant2);
+        Assert.AreEqual(variants[0].Signs.Count(), 1);
+        Assert.AreEqual(variants[1].Signs.Count(), 0);
 
-        Assert.AreEqual(variant1.Signs.Count(), 1);
-        Assert.AreEqual(variant2.Signs.Count(), 0);
-
-        var signModel = variant1.Signs.First();
+        var signModel = variants[0].Signs.First();
         Assert.AreEqual("Umb.PendingChanges", signModel.Alias);
     }
 
@@ -54,23 +59,28 @@ internal class HasPendingChangesSignProviderTests
     {
         var sut = new HasPendingChangesSignProvider();
 
-        var variant1 = new DocumentVariantResponseModel()
+        var variants = new List<DocumentVariantResponseModel>
         {
-            State = DocumentVariantState.PublishedPendingChanges, Culture = null, Name = "Test",
+            new()
+            {
+                State = DocumentVariantState.PublishedPendingChanges,
+                Culture = null,
+                Name = "Test",
+            },
+            new()
+            {
+                State = DocumentVariantState.Published,
+                Culture = null,
+                Name = "Test2",
+            },
         };
 
-        var variant2 = new DocumentVariantResponseModel()
-        {
-            State = DocumentVariantState.Published, Culture = null, Name = "Test",
-        };
+        await sut.PopulateSignsAsync(variants);
 
-        await sut.PopulateSignsAsync(variant1);
-        await sut.PopulateSignsAsync(variant2);
+        Assert.AreEqual(variants[0].Signs.Count(), 1);
+        Assert.AreEqual(variants[1].Signs.Count(), 0);
 
-        Assert.AreEqual(variant1.Signs.Count(), 1);
-        Assert.AreEqual(variant2.Signs.Count(), 0);
-
-        var signModel = variant1.Signs.First();
+        var signModel = variants[0].Signs.First();
         Assert.AreEqual("Umb.PendingChanges", signModel.Alias);
     }
 }
