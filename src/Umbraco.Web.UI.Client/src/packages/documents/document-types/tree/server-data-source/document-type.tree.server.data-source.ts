@@ -1,7 +1,7 @@
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
-import type { UmbDocumentTypeTreeItemModel } from './types.js';
-import { UmbManagementApiDocumentTypeTreeDataRequestManager } from './server-data-source/document-type-tree.server.request-manager.js';
-import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from './folder/constants.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../folder/constants.js';
+import type { UmbDocumentTypeTreeItemModel } from '../types.js';
+import { UmbManagementApiDocumentTypeTreeDataRequestManager } from './document-type-tree.server.request-manager.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
