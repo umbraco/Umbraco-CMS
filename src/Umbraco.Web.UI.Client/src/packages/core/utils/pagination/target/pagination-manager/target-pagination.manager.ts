@@ -39,6 +39,28 @@ export class UmbTargetPaginationManager<
 	}
 
 	/**
+	 * Gets a new baseTarget from the already loaded items
+	 * @returns {UmbEntityModel | undefined} - The new target item or undefined if no new target could be found
+	 * @memberof UmbTargetPaginationManager
+	 */
+	public getNewBaseTarget(): UmbEntityModel | undefined {
+		const currentTarget = this.getBaseTarget();
+		if (!currentTarget) {
+			return undefined;
+		}
+
+		const currentItems = this.#currentItems.getValue();
+		const currentBaseTargetIndex = currentItems.findIndex((item) => item.unique === currentTarget.unique);
+		if (currentBaseTargetIndex === -1) {
+			return undefined;
+		}
+
+		// When choosing a new base target, we want the next item in the list
+		// TODO: Check for items on both sides of the current base target
+		return currentItems[currentBaseTargetIndex + 1];
+	}
+
+	/**
 	 * Checks if the Base Target is part of the current items
 	 * @returns {boolean} True if the Base Target is in the current items, false otherwise
 	 * @memberof UmbTargetPaginationManager
@@ -107,6 +129,15 @@ export class UmbTargetPaginationManager<
 	}
 
 	/**
+	 * Removes an item from the current items
+	 * @param {UmbEntityModel} entity
+	 * @memberof UmbTargetPaginationManager
+	 */
+	public removeFromCurrentItems(entity: UmbEntityModel) {
+		this.#currentItems.remove([entity.unique]);
+	}
+
+	/**
 	 * Gets the total number of items
 	 * @returns {number}
 	 * @memberof UmbPaginationManager
@@ -140,6 +171,27 @@ export class UmbTargetPaginationManager<
 	}
 
 	/**
+	 * Gets a new start target for the current item. Use for loading more items before the base target
+	 * @returns {UmbEntityModel | undefined} - The target item to load more items before
+	 * @memberof UmbTargetPaginationManager
+	 */
+	public getNewStartTarget(): UmbEntityModel | undefined {
+		const currentTarget = this.getStartTarget();
+		if (!currentTarget) {
+			return undefined;
+		}
+
+		const currentItems = this.#currentItems.getValue();
+		const currentBaseTargetIndex = currentItems.findIndex((item) => item.unique === currentTarget.unique);
+		if (currentBaseTargetIndex === -1) {
+			return undefined;
+		}
+
+		// When choosing a new start target, we want the previous item in the list
+		return currentItems[currentBaseTargetIndex - 1];
+	}
+
+	/**
 	 * Gets the last target of the current items. Use for load more items after the base target
 	 * @returns {UmbEntityModel} - The target item to load more items before
 	 * @memberof UmbTargetPaginationManager
@@ -152,6 +204,27 @@ export class UmbTargetPaginationManager<
 		}
 
 		return { entityType: lastItem.entityType, unique: lastItem.unique };
+	}
+
+	/**
+	 * Gets a new end target for the current item. Use for loading more items after the base target
+	 * @returns {UmbEntityModel | undefined} - The target item to load more items after
+	 * @memberof UmbTargetPaginationManager
+	 */
+	public getNewEndTarget(): UmbEntityModel | undefined {
+		const currentTarget = this.getEndTarget();
+		if (!currentTarget) {
+			return undefined;
+		}
+
+		const currentItems = this.#currentItems.getValue();
+		const currentBaseTargetIndex = currentItems.findIndex((item) => item.unique === currentTarget.unique);
+		if (currentBaseTargetIndex === -1) {
+			return undefined;
+		}
+
+		// When choosing a new end target, we want the next item in the list
+		return currentItems[currentBaseTargetIndex + 1];
 	}
 
 	public setTotalItemsBeforeStartTarget(totalItems: number | undefined) {
