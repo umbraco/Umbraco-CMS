@@ -120,7 +120,7 @@ export abstract class UmbTreeItemContextBase<
 
 		this.#treeItemChildrenManager.setTreeItem(treeItem);
 		this.#treeItemExpansionManager.setTreeItem(treeItem);
-		this.#treeItemEntityActionManager.setEntity({ entityType: treeItem.entityType, unique: treeItem.unique });
+		this.#treeItemEntityActionManager.setTreeItem(treeItem);
 
 		const parentEntity: UmbEntityModel | undefined = treeItem.parent
 			? {

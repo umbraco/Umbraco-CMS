@@ -1,41 +1,55 @@
+import type { UmbTreeItemModel, UmbTreeRootModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-export class UmbTreeItemEntityActionManager extends UmbControllerBase {
+export class UmbTreeItemEntityActionManager<
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
+> extends UmbControllerBase {
 	#hasActions = new UmbBooleanState(false);
 	readonly hasActions = this.#hasActions.asObservable();
 
-	#entity?: UmbEntityModel;
+	#treeItem: TreeItemType | TreeRootType | undefined;
 	#observerController?: UmbObserverController;
 
-	setEntity(entity: UmbEntityModel | undefined) {
-		this.#entity = entity;
-
-		if (entity && entity.entityType) {
-			this.#observeActions();
-		}
-	}
-
-	getEntity() {
-		return this.#entity;
-	}
-
-	#observeActions() {
-		const entityType = this.getEntity()?.entityType;
-
-		if (!entityType) {
+	/**
+	 * Set the parent for which to load children.
+	 * @param {(TreeItemType | TreeRootType | undefined)} treeItem - The tree item model
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public setTreeItem(treeItem: TreeItemType | TreeRootType | undefined) {
+		// If we don't get a tree item stop the observation
+		if (!treeItem) {
 			this.#observerController?.destroy();
 			return;
 		}
 
-		this.observe(
+		// If we get the same tree item again, continue with the same observation
+		if (treeItem.entityType === this.#treeItem?.entityType && treeItem.unique === this.#treeItem?.unique) {
+			return;
+		}
+
+		this.#treeItem = treeItem;
+		this.#observeActionsForTreeItem(this.#treeItem);
+	}
+
+	/**
+	 * Gets the tree item for which to load children.
+	 * @returns {TreeItemType | TreeRootType | undefined} - The tree item for the children
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public getTreeItem(): TreeItemType | TreeRootType | undefined {
+		return this.#treeItem;
+	}
+
+	#observeActionsForTreeItem(treeItem: TreeItemType | TreeRootType) {
+		this.#observerController = this.observe(
 			umbExtensionsRegistry
 				.byType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.forEntityTypes.includes(entityType)))),
+				.pipe(map((actions) => actions.filter((action) => action.forEntityTypes.includes(treeItem.entityType)))),
 			(actions) => {
 				this.#hasActions.setValue(actions.length > 0);
 			},
