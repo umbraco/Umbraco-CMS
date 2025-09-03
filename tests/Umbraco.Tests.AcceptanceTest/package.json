@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@umbraco/json-models-builders": "^2.0.33",
-    "@umbraco/playwright-testhelpers": "file:../../../../v15ExternalLoginHelper/umbraco-playwright-testhelpers-15.0.55.tgz",
+    "@umbraco/playwright-testhelpers": "^15.0.56",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.6.7"
