@@ -125,26 +125,10 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
 
     private async Task MigrateMediaTypeLabels()
     {
-        // update the media types with the new data-type references
-        foreach (string mediaTypeKey in _mediaTypeKeys)
+        // update all media types with the new data-type references
+        IMediaType[] allMediaTypes = _mediaTypeService.GetAll().ToArray();
+        foreach (IMediaType mediaType in allMediaTypes)
         {
-            if (_mediaTypeSettings?.InstallData == InstallDefaultDataOption.Values && !_mediaTypeSettings.Values.InvariantContains(mediaTypeKey))
-            {
-                continue;
-            }
-
-            if (_mediaTypeSettings?.InstallData == InstallDefaultDataOption.ExceptValues && _mediaTypeSettings.Values.InvariantContains(mediaTypeKey))
-            {
-                continue;
-            }
-
-            IMediaType? mediaType = await _mediaTypeService.GetAsync(new Guid(mediaTypeKey));
-
-            if (mediaType is null)
-            {
-                continue;
-            }
-
             bool updated = false;
 
             foreach (IPropertyType propertyType in mediaType.PropertyTypes)
