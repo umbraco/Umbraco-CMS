@@ -632,8 +632,8 @@ stages:
           - template: nightly-E2E-setup-template.yml
             parameters:
               nodeVersion: ${{ variables.nodeVersion }}
-              PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
-              PlaywrightPassword: ${{ variables.PlaywrightPassword }}
+              PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
+              PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               npm_config_cache: ${{ variables.npm_config_cache }}
 
