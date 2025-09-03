@@ -21,15 +21,6 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
     private readonly Guid _labelBytesDataTypeKey = new(Constants.DataTypes.Guids.LabelBytes);
     private readonly Guid _labelPixelsDataTypeKey = new(Constants.DataTypes.Guids.LabelPixels);
 
-    private readonly string[] _mediaTypeKeys =
-    [
-        "cc07b313-0843-4aa8-bbda-871c8da728c8", // Image
-        "4c52d8ab-54e6-40cd-999c-7a5f24903e4d", // File
-        "f6c515bb-653c-4bdc-821c-987729ebe327", // Video
-        "a5ddeee0-8fd8-4cee-a658-6f1fcdb00de3", // Audio
-        "a43e3414-9599-4230-a7d3-943a21b20122", // Article
-        "c4b1efcf-a9d5-41c4-9621-e9d273b52a9c", // Vector Graphics (SVG)
-    ];
 
     public MigrateMediaTypeLabelProperties(
         IMigrationContext context,
