@@ -509,6 +509,7 @@ internal sealed class DataTypeServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(dataType.Key, actual.Key);
         Assert.IsAssignableFrom(typeof(MissingPropertyEditor), actual.Editor);
         Assert.AreEqual("Test Editor", actual.EditorAlias, "The alias should be the same as the original editor");
+        Assert.AreEqual("Umb.PropertyEditorUi.Missing", actual.EditorUiAlias, "The editor UI alias should be the Missing Editor UI");
     }
 
     private class TestEditor : DataEditor
