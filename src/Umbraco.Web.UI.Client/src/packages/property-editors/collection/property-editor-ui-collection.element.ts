@@ -34,6 +34,7 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 		super();
 
 		this.consumeContext(UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#workspaceContext = workspaceContext;
 			this._collectionAlias = workspaceContext?.collection.getCollectionAlias() ?? UMB_DOCUMENT_COLLECTION_ALIAS;
 			this.#gotContexts();
 		});
