@@ -126,7 +126,6 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 				display: flex;
 				flex: 1 1 auto;
 				flex-direction: column;
-				line-height: 0;
 				gap: 1px;
 			}
 
