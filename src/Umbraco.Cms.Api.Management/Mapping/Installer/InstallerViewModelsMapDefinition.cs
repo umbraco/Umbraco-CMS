@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Install.Models;
+﻿using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Api.Management.ViewModels.Installer;

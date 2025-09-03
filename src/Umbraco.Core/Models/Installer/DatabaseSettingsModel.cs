@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Core.Models.Installer;
+﻿namespace Umbraco.Cms.Core.Models.Installer;
 
 public class DatabaseSettingsModel
 {
