@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_3_0;
 
@@ -20,7 +19,6 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
 
     private readonly Guid _labelBytesDataTypeKey = new(Constants.DataTypes.Guids.LabelBytes);
     private readonly Guid _labelPixelsDataTypeKey = new(Constants.DataTypes.Guids.LabelPixels);
-
 
     public MigrateMediaTypeLabelProperties(
         IMigrationContext context,
@@ -135,51 +133,47 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
             {
                 switch (propertyType.Alias)
                 {
-                    case Constants.Conventions.Media.Bytes:
-                        if (propertyType.DataTypeId == Constants.DataTypes.LabelBigint)
+                    case Constants.Conventions.Media.Bytes when propertyType.DataTypeId == Constants.DataTypes.LabelBigint:
+                        propertyType.DataTypeId = Constants.DataTypes.LabelBytes;
+                        propertyType.DataTypeKey = _labelBytesDataTypeKey;
+
+                        if (propertyType.Name == "Size")
                         {
-                            propertyType.DataTypeId = Constants.DataTypes.LabelBytes;
-                            propertyType.DataTypeKey = _labelBytesDataTypeKey;
-
-                            if (propertyType.Name == "Size")
-                            {
-                                propertyType.Name = "File size";
-                            }
-
-                            if (propertyType.Description == "in bytes")
-                            {
-                                propertyType.Description = null;
-                            }
-                            updated = true;
+                            propertyType.Name = "File size";
                         }
+
+                        if (propertyType.Description == "in bytes")
+                        {
+                            propertyType.Description = null;
+                        }
+
+                        updated = true;
 
                         break;
 
-                    case Constants.Conventions.Media.Height:
-                    case Constants.Conventions.Media.Width:
-                        if (propertyType.DataTypeId == Constants.DataTypes.LabelInt)
-                        {
-                            propertyType.DataTypeId = Constants.DataTypes.LabelPixels;
-                            propertyType.DataTypeKey = _labelPixelsDataTypeKey;
+                    case Constants.Conventions.Media.Height when propertyType.DataTypeId == Constants.DataTypes.LabelInt:
+                    case Constants.Conventions.Media.Width when propertyType.DataTypeId == Constants.DataTypes.LabelInt:
+                        propertyType.DataTypeId = Constants.DataTypes.LabelPixels;
+                        propertyType.DataTypeKey = _labelPixelsDataTypeKey;
 
-                            if (propertyType.Description == "in pixels")
-                            {
-                                propertyType.Description = null;
-                            }
-                            updated = true;
+                        if (propertyType.Description == "in pixels")
+                        {
+                            propertyType.Description = null;
                         }
+
+                        updated = true;
 
                         break;
 
-                    case Constants.Conventions.Media.Extension:
-                        if (propertyType.DataTypeId == Constants.DataTypes.LabelString)
+                    case Constants.Conventions.Media.Extension when propertyType.DataTypeId == Constants.DataTypes.LabelString:
+                        if (propertyType.Name == "Type")
                         {
-                            if (propertyType.Name == "Type")
-                            {
-                                propertyType.Name = "File extension";
-                                updated = true;
-                            }
+                            propertyType.Name = "File extension";
                         }
+
+                        updated = true;
+
+                        break;
 
                     default:
                         break;
