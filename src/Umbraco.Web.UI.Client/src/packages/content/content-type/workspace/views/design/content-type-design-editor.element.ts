@@ -716,8 +716,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				justify-content: center;
 				gap: var(--uui-size-space-2);
 				margin-right: calc(var(--uui-size-space-3) * -1);
-			}
-			.tab-inner {
 				pointer-events: none;
 			}
 			.tab-inner > uui-input {
