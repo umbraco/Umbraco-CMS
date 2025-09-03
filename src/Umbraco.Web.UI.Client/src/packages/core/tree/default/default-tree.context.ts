@@ -6,6 +6,7 @@ import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import { UmbTreeItemChildrenManager } from '../tree-item-children.manager.js';
 import type { UmbTreeRepository } from '../data/index.js';
+import { UmbTreeItemTargetExpansionManager } from '../tree-item-expansion.manager.js';
 import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -44,6 +45,11 @@ export class UmbDefaultTreeContext<
 	public readonly startNode = this.#treeItemChildrenManager.startNode;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
+
+	#treeItemExpansionManager = new UmbTreeItemTargetExpansionManager<TreeItemType, TreeRootType>(this, {
+		childrenManager: this.#treeItemChildrenManager,
+		targetPaginationManager: this.targetPagination,
+	});
 
 	#manifest?: ManifestTree;
 	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;
@@ -167,8 +173,8 @@ export class UmbDefaultTreeContext<
 		if (data) {
 			this.#treeRoot.setValue(data);
 			this.#treeItemChildrenManager.setTreeItem(data);
+			this.#treeItemExpansionManager.setTreeItem(data);
 			this.pagination.setTotalItems(1);
-			this.#observeExpansion();
 
 			if (!reload) {
 				if (this.getExpandTreeRoot()) {
@@ -291,45 +297,6 @@ export class UmbDefaultTreeContext<
 	 */
 	getExpandTreeRoot(): boolean | undefined {
 		return this.#expandTreeRoot.getValue();
-	}
-
-	#observeExpansion() {
-		const entity = this.#treeRoot.getValue();
-		if (!entity) return;
-
-		this.observe(
-			this.expansion.entry(entity),
-			async (entry) => {
-				const isExpanded = entry !== undefined;
-				const currentBaseTarget = this.targetPagination.getBaseTarget();
-				const target = entry?.target;
-
-				/* If a base target already exists (tree loaded to that point),
-   			don’t auto-reset when the target is removed.
-   			This happens when creating new items not yet in the tree. */
-				if (currentBaseTarget && !target) {
-					return;
-				}
-
-				/* If a new target is set we only want to reload children if the new target isn’t among the already loaded items. */
-				const targetIsLoaded = this.#treeItemChildrenManager.isChildLoaded(target);
-				if (target && targetIsLoaded) {
-					return;
-				}
-
-				// If we already have children and the target didn't change then we don't have to load new children
-				const isNewTarget = target !== currentBaseTarget;
-				if (isExpanded && this.#treeItemChildrenManager.hasLoadedChildren() && !isNewTarget) {
-					return;
-				}
-
-				if (isExpanded) {
-					this.targetPagination.setBaseTarget(target);
-					this.#treeItemChildrenManager.loadChildren();
-				}
-			},
-			'observeExpansion',
-		);
 	}
 
 	#toggleTreeRootExpansion(expand: boolean) {

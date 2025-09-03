@@ -1,55 +1,90 @@
 import type { UmbTreeItemChildrenManager } from './tree-item-children.manager.js';
-import type { UmbTreeItemModel } from './types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from './types.js';
+import type { UmbDefaultTreeContext } from './default/index.js';
+import { UMB_TREE_CONTEXT } from './default/index.js';
 import type { UmbTargetPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbBooleanState, type UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-interface UmbTreeItemTargetExpansionManagerArgs {
-	childrenManager: UmbTreeItemChildrenManager<UmbTreeItemModel>;
+interface UmbTreeItemTargetExpansionManagerArgs<
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
+> {
+	childrenManager: UmbTreeItemChildrenManager<TreeItemType, TreeRootType>;
 	targetPaginationManager: UmbTargetPaginationManager;
 }
 
-export class UmbTreeItemTargetExpansionManager extends UmbControllerBase {
-	#entity: UmbEntityModel | undefined;
-	#observerController: UmbObserverController | undefined;
-	#init?: Promise<unknown>;
-
-	#childrenManager;
-	#targetPaginationManager;
-
+export class UmbTreeItemTargetExpansionManager<
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
+> extends UmbControllerBase {
 	#isExpanded = new UmbBooleanState(false);
 	isExpanded = this.#isExpanded.asObservable();
 
-	constructor(host: UmbControllerHost, args: UmbTreeItemTargetExpansionManagerArgs) {
+	#treeItem: TreeItemType | TreeRootType | undefined;
+	#observerController: UmbObserverController | undefined;
+	#init?: Promise<unknown>;
+	#childrenManager;
+	#targetPaginationManager;
+	#treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
+
+	constructor(host: UmbControllerHost, args: UmbTreeItemTargetExpansionManagerArgs<TreeItemType, TreeRootType>) {
 		super(host);
 		this.#childrenManager = args.childrenManager;
 		this.#targetPaginationManager = args.targetPaginationManager;
+
+		this.#init = Promise.all([
+			this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				this.#treeContext = treeContext;
+			}).asPromise(),
+		]);
 	}
 
-	setEntity(entity: UmbEntityModel | undefined) {
-		this.#entity = entity;
-
-		if (!entity) {
+	/**
+	 * Set the parent for which to load children.
+	 * @param {(TreeItemType | TreeRootType | undefined)} treeItem - The tree item model
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public setTreeItem(treeItem: TreeItemType | TreeRootType | undefined) {
+		// If we don't get a tree item stop the observation
+		if (!treeItem) {
 			this.#observerController?.destroy();
 			return;
 		}
 
-		this.#observeExpansionForEntity(entity);
+		// If we get the same tree item again, continue with the same observation
+		if (treeItem.entityType === this.#treeItem?.entityType && treeItem.unique === this.#treeItem?.unique) {
+			return;
+		}
+
+		this.#treeItem = treeItem;
+		this.#observeExpansionForTreeItem(this.#treeItem);
 	}
 
-	getEntity() {
-		return this.#entity;
+	/**
+	 * Gets the tree item for which to load children.
+	 * @returns {TreeItemType | TreeRootType | undefined} - The tree item for the children
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public getTreeItem(): TreeItemType | TreeRootType | undefined {
+		return this.#treeItem;
 	}
 
-	async #observeExpansionForEntity(entity: UmbEntityModel) {
+	async #observeExpansionForTreeItem(treeItem: TreeItemType | TreeRootType) {
 		await this.#init;
 
+		if (!this.#treeContext) {
+			throw new Error('Tree context is not set');
+		}
+
 		this.#observerController = this.observe(
-			this.#treeContext?.expansion.entry(entity),
+			this.#treeContext?.expansion.entry(treeItem),
 			async (entry) => {
 				const isExpanded = entry !== undefined;
+				this.#isExpanded.setValue(isExpanded);
 
 				const currentBaseTarget = this.#targetPaginationManager.getBaseTarget();
 				const target = entry?.target;
@@ -78,8 +113,6 @@ export class UmbTreeItemTargetExpansionManager extends UmbControllerBase {
 					this.#targetPaginationManager.setBaseTarget(target);
 					this.#childrenManager.loadChildren();
 				}
-
-				this.#isExpanded.setValue(isExpanded);
 			},
 			'observeExpansion',
 		);

@@ -13,6 +13,7 @@ import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/b
 import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
+import { UmbTreeItemTargetExpansionManager } from '../../tree-item-expansion.manager.js';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
@@ -45,9 +46,6 @@ export abstract class UmbTreeItemContextBase<
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
 
-	#isOpen = new UmbBooleanState(false);
-	isOpen = this.#isOpen.asObservable();
-
 	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
 	public readonly childItems = this.#treeItemChildrenManager.children;
 	public readonly hasChildren = this.#treeItemChildrenManager.hasChildren;
@@ -55,6 +53,12 @@ export abstract class UmbTreeItemContextBase<
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
 	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
+
+	#treeItemExpansionManager = new UmbTreeItemTargetExpansionManager<TreeItemType, TreeRootType>(this, {
+		childrenManager: this.#treeItemChildrenManager,
+		targetPaginationManager: this.targetPagination,
+	});
+	isOpen = this.#treeItemExpansionManager.isExpanded;
 
 	#treeItemEntityActionManager = new UmbTreeItemEntityActionManager(this);
 	public readonly hasActions = this.#treeItemEntityActionManager.hasActions;
@@ -115,6 +119,7 @@ export abstract class UmbTreeItemContextBase<
 		this.entityType = treeItem.entityType;
 
 		this.#treeItemChildrenManager.setTreeItem(treeItem);
+		this.#treeItemExpansionManager.setTreeItem(treeItem);
 		this.#treeItemEntityActionManager.setEntity({ entityType: treeItem.entityType, unique: treeItem.unique });
 
 		const parentEntity: UmbEntityModel | undefined = treeItem.parent
@@ -243,7 +248,6 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
-			this.#observeExpansion();
 		});
 	}
 
@@ -303,54 +307,6 @@ export abstract class UmbTreeItemContextBase<
 				this.#checkIsActive();
 			},
 			'observeSectionPath',
-		);
-	}
-
-	#observeExpansion() {
-		if (this.unique === undefined) return;
-		if (!this.entityType) return;
-
-		const entity: UmbEntityModel = {
-			entityType: this.entityType,
-			unique: this.unique,
-		};
-
-		this.observe(
-			this.treeContext?.expansion.entry(entity),
-			async (entry) => {
-				const isExpanded = entry !== undefined;
-
-				const currentBaseTarget = this.targetPagination.getBaseTarget();
-				const target = entry?.target;
-
-				/* If a base target already exists (tree loaded to that point),
-   			don’t auto-reset when the target is removed.
-   			This happens when creating new items not yet in the tree. */
-				if (currentBaseTarget && !target) {
-					return;
-				}
-
-				/* If a new target is set we only want to reload children if the new target isn’t among the already loaded items. */
-				const targetIsLoaded = this.#treeItemChildrenManager.isChildLoaded(target);
-				if (target && targetIsLoaded) {
-					return;
-				}
-
-				// If we already have children and the target didn't change then we don't have to load new children
-				const isNewTarget = target !== currentBaseTarget;
-				if (isExpanded && this.#treeItemChildrenManager.hasLoadedChildren() && !isNewTarget) {
-					return;
-				}
-
-				// If this item is expanded and has children, load them
-				if (isExpanded && this.#treeItemChildrenManager.getHasChildren()) {
-					this.targetPagination.setBaseTarget(target);
-					this.#treeItemChildrenManager.loadChildren();
-				}
-
-				this.#isOpen.setValue(isExpanded);
-			},
-			'observeExpansion',
 		);
 	}
 
