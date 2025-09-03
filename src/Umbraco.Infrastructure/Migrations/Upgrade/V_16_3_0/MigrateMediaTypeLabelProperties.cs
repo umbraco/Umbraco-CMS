@@ -161,6 +161,11 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
                         {
                             propertyType.DataTypeId = Constants.DataTypes.LabelPixels;
                             propertyType.DataTypeKey = _labelPixelsDataTypeKey;
+
+                            if (propertyType.Description == "in pixels")
+                            {
+                                propertyType.Description = null;
+                            }
                             updated = true;
                         }
 
