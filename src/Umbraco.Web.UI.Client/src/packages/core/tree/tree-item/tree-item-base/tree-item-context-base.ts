@@ -4,6 +4,7 @@ import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import type { ManifestTreeItem } from '../../extensions/types.js';
 import { UmbTreeItemChildrenManager } from '../../tree-item-children.manager.js';
 import { UmbTreeItemEntityActionManager } from '../../tree-item-entity-action.managet.js';
+import { UmbTreeItemTargetExpansionManager } from '../../tree-item-expansion.manager.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -13,7 +14,6 @@ import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/b
 import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
-import { UmbTreeItemTargetExpansionManager } from '../../tree-item-expansion.manager.js';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,
