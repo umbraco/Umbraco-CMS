@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Installer;
+namespace Umbraco.Cms.Core.Models.Installer;
 
 public class DatabaseSettingsModel
 {
@@ -21,6 +21,8 @@ public class DatabaseSettingsModel
     public bool RequiresCredentials { get; set; }
 
     public bool SupportsIntegratedAuthentication { get; set; }
+
+    public bool SupportsTrustServerCertificate { get; set; }
 
     public bool RequiresConnectionTest { get; set; }
 }
