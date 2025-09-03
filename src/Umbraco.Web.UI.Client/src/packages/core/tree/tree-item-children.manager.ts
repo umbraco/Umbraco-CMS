@@ -58,6 +58,7 @@ export class UmbTreeItemChildrenManager<
 
 	#treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType, RequestArgsType>;
 	#parentTreeItemContext?: UmbTreeItemContext<TreeItemType>;
+	#requestMaxRetries = 2;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -195,7 +196,14 @@ export class UmbTreeItemChildrenManager<
 		return this.#loadNextItemsFromTarget();
 	}
 
+	#loadChildrenRetries = 0;
 	async #loadChildren(reload = false) {
+		if (this.#loadChildrenRetries > this.#requestMaxRetries) {
+			this.#loadChildrenRetries = 0;
+			this.#resetChildren();
+			return;
+		}
+
 		const repository = this.#treeContext?.getRepository();
 		if (!repository) throw new Error('Could not request children, repository is missing');
 
@@ -235,7 +243,7 @@ export class UmbTreeItemChildrenManager<
 				: this.offsetPagination.getPageSize(),
 		};
 
-		const { data } = parent?.unique
+		const { data, error } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: {
 						unique: parent.unique,
@@ -254,6 +262,25 @@ export class UmbTreeItemChildrenManager<
 					foldersOnly,
 					...additionalArgs,
 				});
+
+		// We have used a baseTarget that no longer exists on the sever. We need to retry with a new target
+		if (error && error.message.includes('not found')) {
+			this.#loadChildrenRetries++;
+			const newBaseTarget = this.targetPagination.getNewBaseTarget();
+			this.targetPagination.removeFromCurrentItems(baseTarget!);
+
+			if (newBaseTarget) {
+				this.targetPagination.setBaseTarget(newBaseTarget);
+				this.#loadChildren();
+			} else {
+				/* 
+					If we can't find a new base target we reload the children from the top. 
+					We cancel the base target and load using skip/take pagination instead.
+					This can happen if deep linked to a non existing item or all retries have failed.
+				*/
+				this.#resetChildren();
+			}
+		}
 
 		if (data) {
 			this.#children.setValue(data.items);
@@ -265,12 +292,22 @@ export class UmbTreeItemChildrenManager<
 			this.targetPagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
 			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
+
+			this.#loadChildrenRetries = 0;
 		}
 
 		this.#isLoading.setValue(false);
 	}
 
+	#loadPrevItemsRetries = 0;
 	async #loadPrevItemsFromTarget() {
+		if (this.#loadPrevItemsRetries > this.#requestMaxRetries) {
+			// If we have exceeded the maximum number of retries, we need to reset the base target and load from the top
+			this.#loadPrevItemsRetries = 0;
+			this.#resetChildren();
+			return;
+		}
+
 		const repository = this.#treeContext?.getRepository();
 		if (!repository) throw new Error('Could not request children, repository is missing');
 
@@ -279,14 +316,15 @@ export class UmbTreeItemChildrenManager<
 		const parent = this.getStartNode() || this.getTreeItem();
 		const foldersOnly = this.getFoldersOnly();
 		const additionalArgs = this.getAdditionalRequestArgs();
+		const startTarget = this.targetPagination.getStartTarget();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.targetPagination.getStartTarget(),
+			target: startTarget,
 			takeBefore: this.targetPagination.getTakeSize(),
 			takeAfter: 0,
 		};
 
-		const { data } = parent?.unique
+		const { data, error } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: {
 						unique: parent.unique,
@@ -301,6 +339,22 @@ export class UmbTreeItemChildrenManager<
 					foldersOnly,
 					...additionalArgs,
 				});
+
+		if (error && error.message.includes('not found')) {
+			this.#loadPrevItemsRetries++;
+			const newStartTarget = this.targetPagination.getNewStartTarget();
+			this.targetPagination.removeFromCurrentItems(startTarget);
+
+			if (newStartTarget) {
+				this.#loadPrevItemsFromTarget();
+			} else {
+				/* 
+					If we can't find a new end target we reload the children from the top. 
+					We cancel the base target and load using skip/take pagination instead.
+				*/
+				this.#resetChildren();
+			}
+		}
 
 		if (data) {
 			if (data.totalBefore === undefined) {
@@ -321,7 +375,15 @@ export class UmbTreeItemChildrenManager<
 		this.#isLoading.setValue(false);
 	}
 
+	#loadNextItemsRetries = 0;
 	async #loadNextItemsFromTarget() {
+		if (this.#loadNextItemsRetries > this.#requestMaxRetries) {
+			// If we have exceeded the maximum number of retries, we need to reset the base target and load from the top
+			this.#loadNextItemsRetries = 0;
+			this.#resetChildren();
+			return;
+		}
+
 		const repository = this.#treeContext?.getRepository();
 		if (!repository) throw new Error('Could not request children, repository is missing');
 
@@ -330,9 +392,10 @@ export class UmbTreeItemChildrenManager<
 		const parent = this.getStartNode() || this.getTreeItem();
 		const foldersOnly = this.getFoldersOnly();
 		const additionalArgs = this.getAdditionalRequestArgs();
+		const endTarget = this.targetPagination.getEndTarget();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
-			target: this.targetPagination.getEndTarget(),
+			target: endTarget,
 			takeBefore: 0,
 			takeAfter: this.targetPagination.getTakeSize(),
 		};
@@ -342,7 +405,7 @@ export class UmbTreeItemChildrenManager<
 			take: this.offsetPagination.getPageSize(),
 		};
 
-		const { data } = parent?.unique
+		const { data, error } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: {
 						unique: parent.unique,
@@ -362,6 +425,22 @@ export class UmbTreeItemChildrenManager<
 					...additionalArgs,
 				});
 
+		if (error && error.message.includes('not found')) {
+			this.#loadNextItemsRetries++;
+			const newEndTarget = this.targetPagination.getNewEndTarget();
+			this.targetPagination.removeFromCurrentItems(endTarget);
+
+			if (newEndTarget) {
+				this.#loadNextItemsFromTarget();
+			} else {
+				/* 
+					If we can't find a new end target we reload the children from the top. 
+					We cancel the base target and load using skip/take pagination instead.
+				*/
+				this.#resetChildren();
+			}
+		}
+
 		if (data) {
 			this.#children.append(data.items);
 			this.setHasChildren(data.total > 0);
@@ -371,6 +450,8 @@ export class UmbTreeItemChildrenManager<
 			this.targetPagination.appendCurrentItems(data.items);
 			this.targetPagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
+
+			this.#loadNextItemsRetries = 0;
 		}
 
 		this.#isLoading.setValue(false);
@@ -405,6 +486,11 @@ export class UmbTreeItemChildrenManager<
 		this.#children.setValue([]);
 		this.offsetPagination.clear();
 		this.targetPagination.clear();
+	}
+
+	#resetChildren() {
+		this.targetPagination.setBaseTarget(undefined);
+		this.loadChildren();
 	}
 
 	#onPageChange = () => this.loadNextChildren();
