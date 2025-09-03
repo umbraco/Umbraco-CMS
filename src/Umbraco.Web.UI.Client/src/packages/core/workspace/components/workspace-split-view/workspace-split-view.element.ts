@@ -1,22 +1,22 @@
+import type { ManifestWorkspaceView } from '../../types.js';
 import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js';
 import {
 	css,
-	html,
 	customElement,
-	property,
+	html,
 	ifDefined,
+	nothing,
+	property,
 	state,
 	when,
-	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 // import local components
 import './workspace-split-view-variant-selector.element.js';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import type { ManifestWorkspaceView } from '../../types.js';
 
 /**
  *

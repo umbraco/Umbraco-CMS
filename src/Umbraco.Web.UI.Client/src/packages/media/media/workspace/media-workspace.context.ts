@@ -8,15 +8,15 @@ import { UmbMediaValidationRepository } from '../repository/validation/media-val
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/constants.js';
 import type { UmbMediaDetailRepository } from '../repository/index.js';
 import { UMB_MEDIA_WORKSPACE_ALIAS, UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD } from './constants.js';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
-import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
-import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 type ContentModel = UmbMediaDetailModel;
 type ContentTypeModel = UmbMediaTypeDetailModel;

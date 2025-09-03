@@ -2,7 +2,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/document';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -37,6 +37,7 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 			this._collectionAlias = workspaceContext?.collection.getCollectionAlias() ?? UMB_DOCUMENT_COLLECTION_ALIAS;
 			this.#gotContexts();
 		});
+
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 			this.#propertyContext = propertyContext;
 			this.#gotContexts();
@@ -45,6 +46,7 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 
 	#gotContexts() {
 		if (!this.#workspaceContext || !this.#propertyContext) return;
+
 		this.observe(this.#propertyContext?.alias, async (propertyAlias) => {
 			if (this.#workspaceContext && propertyAlias) {
 				// Gets the Data Type ID for the current property.
@@ -53,6 +55,7 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 					// We got destroyed in the meantime.
 					return;
 				}
+
 				const unique = this.#workspaceContext.getUnique();
 				if (unique && property && this._config) {
 					// TODO: Handle case where config might not be set when this executes during initialization, its not likely but it is fragile to assume this. [NL]

@@ -1,10 +1,9 @@
 import { UMB_CONTENT_COLLECTION_WORKSPACE_CONTEXT } from './content-collection-workspace.context-token.js';
 import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collection';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
-const elementName = 'umb-content-collection-workspace-view';
 @customElement('umb-content-collection-workspace-view')
 export class UmbContentCollectionWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
@@ -45,6 +44,6 @@ export { UmbContentCollectionWorkspaceViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbContentCollectionWorkspaceViewElement;
+		'umb-content-collection-workspace-view': UmbContentCollectionWorkspaceViewElement;
 	}
 }

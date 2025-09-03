@@ -6,11 +6,11 @@ import { css, customElement, html, nothing, property, repeat, state, when } from
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-workspace-editor

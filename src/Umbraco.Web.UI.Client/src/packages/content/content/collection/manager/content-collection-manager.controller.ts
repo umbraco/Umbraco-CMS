@@ -1,11 +1,11 @@
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbDataTypeDetailRepository, type UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { ManifestWorkspaceView, UmbEntityWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbCollectionConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UmbContentTypeModel, UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDataTypeDetailRepository, type UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { ManifestWorkspaceView, UmbEntityWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 type partialManifestWorkspaceView = Omit<Partial<ManifestWorkspaceView>, 'meta'> & {
 	meta: Partial<ManifestWorkspaceView['meta']>;
@@ -14,8 +14,8 @@ type partialManifestWorkspaceView = Omit<Partial<ManifestWorkspaceView>, 'meta'>
 export class UmbContentCollectionManager<
 	ContentTypeDetailModelType extends UmbContentTypeModel = UmbContentTypeModel,
 > extends UmbControllerBase {
-	//
 	#host: UmbEntityWorkspaceContext & UmbControllerHost;
+
 	#collectionAlias?: string;
 
 	#collectionConfig = new UmbObjectState<UmbCollectionConfiguration | undefined>(undefined);
@@ -35,6 +35,7 @@ export class UmbContentCollectionManager<
 		collectionAlias?: string,
 	) {
 		super(host);
+
 		this.#host = host;
 		this.#collectionAlias = collectionAlias;
 
@@ -69,8 +70,10 @@ export class UmbContentCollectionManager<
 			this.#manifestOverrides.setValue(undefined);
 			return;
 		}
+
 		const config = new UmbPropertyEditorConfigCollection(dataType.values);
 		const pageSize = Number(config.getValueByAlias('pageSize'));
+
 		this.#collectionConfig.setValue({
 			unique: this.#host.getUnique(),
 			layouts: config?.getValueByAlias('layouts'),
@@ -89,10 +92,12 @@ export class UmbContentCollectionManager<
 		if (overrideIcon && overrideIcon !== '') {
 			overrides.meta!.icon = overrideIcon;
 		}
+
 		const overrideLabel = config?.getValueByAlias<string | undefined>('tabName');
 		if (overrideLabel && overrideLabel !== '') {
 			overrides.meta!.label = overrideLabel;
 		}
+
 		const showFirst = config?.getValueByAlias<boolean | undefined>('showContentFirst');
 		if (showFirst === true) {
 			overrides.weight = 150;

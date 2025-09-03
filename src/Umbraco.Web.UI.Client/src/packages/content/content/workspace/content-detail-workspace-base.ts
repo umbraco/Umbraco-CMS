@@ -1,39 +1,35 @@
 import type { UmbContentDetailModel, UmbElementValueModel } from '../types.js';
+import { UmbContentCollectionManager } from '../collection/index.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '../variant-picker/index.js';
 import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
-import { UmbContentCollectionManager } from '../collection/index.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
-import {
-	UmbEntityDetailWorkspaceContextBase,
-	UmbWorkspaceSplitViewManager,
-	type UmbEntityDetailWorkspaceContextArgs,
-	type UmbEntityDetailWorkspaceContextCreateArgs,
-	type UmbSaveableWorkspaceContext,
-} from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbContentTypeStructureManager,
-	type UmbContentTypeModel,
-	type UmbPropertyTypeModel,
-} from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbVariantId,
-	type UmbEntityVariantModel,
-	type UmbEntityVariantOptionModel,
-} from '@umbraco-cms/backoffice/variant';
-import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
-import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbDataTypeDetailRepository, UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbEntityDetailWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEntityUpdatedEvent,
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
+import { UmbHintContext } from '@umbraco-cms/backoffice/hint';
+import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import {
+	UmbPropertyValuePresetVariantBuilderController,
+	UmbVariantPropertyGuardManager,
+} from '@umbraco-cms/backoffice/property';
+import { UmbSegmentCollectionRepository } from '@umbraco-cms/backoffice/segment';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -41,23 +37,22 @@ import {
 	UmbServerModelValidatorContext,
 	UmbValidationController,
 } from '@umbraco-cms/backoffice/validation';
-import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import {
-	UmbEntityUpdatedEvent,
-	UmbRequestReloadChildrenOfEntityEvent,
-	UmbRequestReloadStructureForEntityEvent,
-} from '@umbraco-cms/backoffice/entity-action';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
-import {
-	UmbPropertyValuePresetVariantBuilderController,
-	UmbVariantPropertyGuardManager,
-	type UmbPropertyTypePresetModel,
-	type UmbPropertyTypePresetModelTypeModel,
-} from '@umbraco-cms/backoffice/property';
-import { UmbSegmentCollectionRepository, type UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
-import { UmbHintContext, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbEntityDetailWorkspaceContextArgs,
+	UmbEntityDetailWorkspaceContextCreateArgs,
+	UmbSaveableWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
+import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
+import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
