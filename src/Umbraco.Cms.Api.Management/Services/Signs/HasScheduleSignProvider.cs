@@ -3,6 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -45,16 +46,16 @@ internal class HasScheduleSignProvider : ISignProvider
 
             switch (item)
             {
-                case DocumentTreeItemResponseModel docTree:
-                    docTree.Variants = BuildVariants(docTree.Variants, key);
+                case DocumentTreeItemResponseModel documentTreeItemResponseModel:
+                    documentTreeItemResponseModel.Variants = BuildVariants(documentTreeItemResponseModel.Variants, key);
                     break;
 
-                case DocumentCollectionResponseModel docColl:
-                    docColl.Variants = BuildVariants(docColl.Variants, key);
+                case DocumentCollectionResponseModel documentCollectionResponseModel:
+                    documentCollectionResponseModel.Variants = BuildVariants(documentCollectionResponseModel.Variants, key);
                     break;
 
-                case DocumentItemResponseModel docItem:
-                    docItem.Variants = BuildVariants(docItem.Variants, key);
+                case DocumentItemResponseModel documentItemResponseModel:
+                    documentItemResponseModel.Variants = BuildVariants(documentItemResponseModel.Variants, key);
                     break;
             }
         }
@@ -62,56 +63,57 @@ internal class HasScheduleSignProvider : ISignProvider
         return Task.CompletedTask;
     }
 
-    private List<DocumentVariantItemResponseModel> BuildVariants(IEnumerable<DocumentVariantItemResponseModel> variants, Guid id)
+    private IEnumerable<DocumentVariantItemResponseModel> BuildVariants(
+        IEnumerable<DocumentVariantItemResponseModel> variants, Guid id)
     {
-        var listVariants = variants.ToList();
-        if (listVariants.Count == 1)
+        DocumentVariantItemResponseModel[] listVariants = variants.ToArray();
+        if (listVariants.Length == 1)
         {
             DocumentVariantItemResponseModel variant = listVariants[0];
             variant.AddSign(Alias);
-            return [variant];
+            return listVariants;
         }
 
-        IEnumerable<string> cultures = GetCulturesWithSchedule(id);
-        var result = new List<DocumentVariantItemResponseModel>(listVariants.Count);
+        IEnumerable<ContentSchedule> schedules = GetSchedule(id);
         foreach (DocumentVariantItemResponseModel variant in listVariants)
         {
-            if (variant.Culture != null && cultures.Contains(variant.Culture))
+            bool isScheduled = schedules.Any(schedule => schedule.Date > DateTime.Now && string.Equals(schedule.Culture, variant.Culture));
+
+            if (isScheduled)
             {
                 variant.AddSign(Alias);
-                result.Add(variant);
             }
         }
 
-        return result;
+        return listVariants;
     }
 
-    private List<DocumentVariantResponseModel> BuildVariants(IEnumerable<DocumentVariantResponseModel> variants, Guid id)
+    private IEnumerable<DocumentVariantResponseModel> BuildVariants(
+        IEnumerable<DocumentVariantResponseModel> variants, Guid id)
     {
-        var listVariants = variants.ToList();
-        if (listVariants.Count == 1)
+        DocumentVariantResponseModel[] listVariants = variants.ToArray();
+        if (listVariants.Length == 1)
         {
             DocumentVariantResponseModel variant = listVariants[0];
             variant.AddSign(Alias);
-            return [variant];
+            return listVariants;
         }
 
-        IEnumerable<string> cultures = GetCulturesWithSchedule(id);
-        var result = new List<DocumentVariantResponseModel>(listVariants.Count);
+        IEnumerable<ContentSchedule> schedules = GetSchedule(id);
+        var result = new List<DocumentVariantResponseModel>(listVariants.Length);
         foreach (DocumentVariantResponseModel variant in listVariants)
         {
-            if (variant.Culture != null && cultures.Contains(variant.Culture))
+            bool isScheduled = schedules.Any(schedule => schedule.Date > DateTime.Now && string.Equals(schedule.Culture, variant.Culture));
+
+            if (isScheduled)
             {
                 variant.AddSign(Alias);
-                result.Add(variant);
             }
         }
 
         return result;
     }
 
-    private IEnumerable<string> GetCulturesWithSchedule(Guid id) =>
-        _contentService.GetContentScheduleByContentId(id)
-            .GetSchedule()
-            .Select(s => s.Culture);
+    private IEnumerable<ContentSchedule> GetSchedule(Guid id) =>
+        _contentService.GetContentScheduleByContentId(id).FullSchedule;
 }
