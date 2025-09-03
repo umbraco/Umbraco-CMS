@@ -64,7 +64,7 @@ public class DateTime2PropertyEditor : DataEditor
         {
             _jsonSerializer = jsonSerializer;
             _dataTypeConfigurationCache = dataTypeConfigurationCache;
-            Validators.AddRange(new DateTimeWithTimeZoneValidator(localizedTextService));
+            Validators.AddRange(new DateTime2Validator(localizedTextService));
         }
 
         /// <inheritdoc/>
@@ -130,11 +130,11 @@ public class DateTime2PropertyEditor : DataEditor
         /// <summary>
         /// Validates the color selection for the color picker property editor.
         /// </summary>
-        private class DateTimeWithTimeZoneValidator : IValueValidator
+        private class DateTime2Validator : IValueValidator
         {
             private readonly ILocalizedTextService _localizedTextService;
 
-            public DateTimeWithTimeZoneValidator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
+            public DateTime2Validator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
 
             /// <inheritdoc/>
             public IEnumerable<ValidationResult> Validate(
