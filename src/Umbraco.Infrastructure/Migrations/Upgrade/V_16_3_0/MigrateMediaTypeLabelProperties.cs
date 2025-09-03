@@ -140,6 +140,16 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
                         {
                             propertyType.DataTypeId = Constants.DataTypes.LabelBytes;
                             propertyType.DataTypeKey = _labelBytesDataTypeKey;
+
+                            if (propertyType.Name == "Size")
+                            {
+                                propertyType.Name = "File size";
+                            }
+
+                            if (propertyType.Description == "in bytes")
+                            {
+                                propertyType.Description = null;
+                            }
                             updated = true;
                         }
 
