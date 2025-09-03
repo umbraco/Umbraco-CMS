@@ -18,6 +18,7 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import {
+	UmbHasChildrenEntityContext,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -33,17 +34,21 @@ export class UmbTreeItemChildrenManager<
 	#children = new UmbArrayState<TreeItemType>([], (x) => x.unique);
 	public readonly children = this.#children.asObservable();
 
+	#hasChildren = new UmbBooleanState(false);
+	public readonly hasChildren = this.#hasChildren.asObservable();
+	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
+
 	#treeItem = new UmbObjectState<TreeItemType | TreeRootType | undefined>(undefined);
-	treeItem = this.#treeItem.asObservable();
+	public readonly treeItem = this.#treeItem.asObservable();
 
 	#foldersOnly = new UmbBooleanState(false);
-	foldersOnly = this.#foldersOnly.asObservable();
+	public readonly foldersOnly = this.#foldersOnly.asObservable();
 
 	#additionalRequestArgs = new UmbObjectState<Partial<RequestArgsType> | object>({});
 	public readonly additionalRequestArgs = this.#additionalRequestArgs.asObservable();
 
 	#startNode = new UmbObjectState<UmbTreeStartNode | undefined>(undefined);
-	startNode = this.#startNode.asObservable();
+	public readonly startNode = this.#startNode.asObservable();
 
 	#isLoading = new UmbBooleanState(false);
 	readonly isLoading = this.#isLoading.asObservable();
@@ -97,6 +102,7 @@ export class UmbTreeItemChildrenManager<
 	 */
 	public setTreeItem(treeItem: TreeItemType | TreeRootType | undefined) {
 		this.#treeItem.setValue(treeItem);
+		this.setHasChildren(treeItem?.hasChildren || false);
 	}
 
 	/**
@@ -142,6 +148,25 @@ export class UmbTreeItemChildrenManager<
 	 */
 	public getStartNode(): UmbTreeStartNode | undefined {
 		return this.#startNode.getValue();
+	}
+
+	/**
+	 * Sets the hasChildren state
+	 * @param {boolean} hasChildren
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public setHasChildren(hasChildren: boolean) {
+		this.#hasChildren.setValue(hasChildren);
+		this.#hasChildrenContext.setHasChildren(hasChildren);
+	}
+
+	/**
+	 * Gets the hasChildren state
+	 * @returns {boolean} - True if the current tree item has children
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public getHasChildren(): boolean {
+		return this.#hasChildren.getValue();
 	}
 
 	/**
@@ -232,6 +257,7 @@ export class UmbTreeItemChildrenManager<
 
 		if (data) {
 			this.#children.setValue(data.items);
+			this.setHasChildren(data.total > 0);
 
 			this.offsetPagination.setTotalItems(data.total);
 
@@ -277,15 +303,17 @@ export class UmbTreeItemChildrenManager<
 				});
 
 		if (data) {
-			// We have loaded previous items so we add them to the top of the array
-			const reversedItems = [...data.items].reverse();
-			this.#children.prepend(reversedItems);
-			this.targetPagination.prependCurrentItems(reversedItems);
-
 			if (data.totalBefore === undefined) {
 				throw new Error('totalBefore is missing in the response');
 			}
 
+			// We have loaded previous items so we add them to the top of the array
+			const reversedItems = [...data.items].reverse();
+			this.#children.prepend(reversedItems);
+
+			this.setHasChildren(data.total > 0);
+
+			this.targetPagination.prependCurrentItems(reversedItems);
 			this.targetPagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
 		}
@@ -336,6 +364,7 @@ export class UmbTreeItemChildrenManager<
 
 		if (data) {
 			this.#children.append(data.items);
+			this.setHasChildren(data.total > 0);
 
 			this.offsetPagination.setTotalItems(data.total);
 
