@@ -342,11 +342,18 @@ stages:
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               npm_config_cache: ${{ variables.npm_config_cache }}
 
-          # Build application Template
-          - template: nightly-E2E-build-template.yml
-            parameters:
-              testFolder: $(testFolder)
-              buildConfiguration: ${{ variables.buildConfiguration }}
+          - pwsh: |
+              dotnet restore UmbracoProject
+              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
+            displayName: Restore project
+            workingDirectory: $(Agent.BuildDirectory)/app
+
+          - pwsh: |
+              dotnet build UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-restore
+              dotnet dev-certs https
+            displayName: Build application
+            workingDirectory: $(Agent.BuildDirectory)/app
+            condition: succeeded()
 
           # Run application Template
           - template: nightly-E2E-run-application-template.yml
@@ -412,11 +419,18 @@ stages:
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               npm_config_cache: ${{ variables.npm_config_cache }}
 
-          # Build application Template
-          - template: nightly-E2E-build-template.yml
-            parameters:
-              testFolder: $(testFolder)
-              buildConfiguration: ${{ variables.buildConfiguration }}
+          - pwsh: |
+              dotnet restore UmbracoProject
+              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
+            displayName: Restore project
+            workingDirectory: $(Agent.BuildDirectory)/app
+
+          - pwsh: |
+              dotnet build UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-restore
+              dotnet dev-certs https
+            displayName: Build application
+            workingDirectory: $(Agent.BuildDirectory)/app
+            condition: succeeded()
 
           # Run application Template
           - template: nightly-E2E-run-application-template.yml
