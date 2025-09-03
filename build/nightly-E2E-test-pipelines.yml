@@ -516,7 +516,7 @@ stages:
           - pwsh: |
               dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
-            displayName: Build application
+            displayName: Build application for AzureADB2C
             workingDirectory: $(Agent.BuildDirectory)/app
             env:
               AZUREADB2CDOMAIN: $(AZUREB2CDOMAIN)
