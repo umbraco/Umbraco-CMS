@@ -52,7 +52,7 @@ export abstract class UmbTreeItemContextBase<
 	#isOpen = new UmbBooleanState(false);
 	isOpen = this.#isOpen.asObservable();
 
-	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType>(this);
+	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
 	public readonly childItems = this.#treeItemChildrenManager.children;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
@@ -118,7 +118,7 @@ export abstract class UmbTreeItemContextBase<
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
 
-		this.#treeItemChildrenManager.setParent({ entityType: treeItem.entityType, unique: treeItem.unique });
+		this.#treeItemChildrenManager.setTreeItem(treeItem);
 		this.#treeItemEntityActionManager.setEntity({ entityType: treeItem.entityType, unique: treeItem.unique });
 
 		const hasChildren = treeItem.hasChildren || false;

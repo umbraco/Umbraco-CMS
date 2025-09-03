@@ -36,13 +36,13 @@ export class UmbDefaultTreeContext<
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
 
-	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType>(this);
+	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
 	public readonly rootItems = this.#treeItemChildrenManager.children;
 	// Offset Pagination: TODO: deprecate and expose a new with the name "offsetPagination"
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	// Target Pagination: Keeps track of pages when navigating with a target
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
-	public readonly startNode = this.#treeItemChildrenManager.parent;
+	public readonly startNode = this.#treeItemChildrenManager.startNode;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
 
@@ -167,7 +167,7 @@ export class UmbDefaultTreeContext<
 
 		if (data) {
 			this.#treeRoot.setValue(data);
-			this.#treeItemChildrenManager.setParent({ entityType: data.entityType, unique: data.unique });
+			this.#treeItemChildrenManager.setTreeItem(data);
 			this.pagination.setTotalItems(1);
 			this.#observeExpansion();
 
@@ -206,7 +206,7 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
-		this.#treeItemChildrenManager.setParent(startNode);
+		this.#treeItemChildrenManager.setStartNode(startNode);
 		// we need to reset the tree if this config changes
 		this.#clearTree();
 		this.loadTree();
@@ -217,8 +217,8 @@ export class UmbDefaultTreeContext<
 	 * @returns {UmbTreeStartNode} - The start node
 	 * @memberof UmbDefaultTreeContext
 	 */
-	getStartNode() {
-		return this.#treeItemChildrenManager.getParent();
+	getStartNode(): UmbTreeStartNode | undefined {
+		return this.#treeItemChildrenManager.getStartNode();
 	}
 
 	/**
