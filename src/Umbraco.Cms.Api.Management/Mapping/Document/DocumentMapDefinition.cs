@@ -21,7 +21,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         PropertyEditorCollection propertyEditorCollection,
         CommonMapper commonMapper,
         IDataValueEditorFactory dataValueEditorFactory)
-        : base(propertyEditorCollection)
+        : base(propertyEditorCollection, dataValueEditorFactory)
         => _commonMapper = commonMapper;
 
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
