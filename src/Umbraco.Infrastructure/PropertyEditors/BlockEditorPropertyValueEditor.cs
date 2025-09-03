@@ -45,8 +45,8 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     /// <inheritdoc />
     public override IEnumerable<UmbracoEntityReference> GetReferences(object? value)
     {
-        TValue? blockValue = ParseBlockValue(value);
-        return blockValue is not null
+         TValue? blockValue = ParseBlockValue(value);
+         return blockValue is not null
             ? GetBlockValueReferences(blockValue)
             : Enumerable.Empty<UmbracoEntityReference>();
     }
