@@ -127,6 +127,7 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 				flex: 1 1 auto;
 				flex-direction: column;
 				line-height: 0;
+				gap: 1px;
 			}
 
 			#name {
@@ -136,7 +137,6 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 
 			#description {
 				width: 100%;
-				margin-top: 1px;
 				--uui-input-height: var(--uui-size-8);
 				--uui-input-border-color: transparent;
 			}
