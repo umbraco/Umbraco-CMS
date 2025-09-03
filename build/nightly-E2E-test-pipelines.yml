@@ -285,14 +285,30 @@ stages:
             displayName: Stop SQL Server LocalDB (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
-  - stage: E2E
-    displayName: E2E Tests
+  - stage: DefaultConfigE2E
+    displayName: Default Config E2E Tests
     dependsOn: Build
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
+      # Enable console logging in Release mode
+      SERILOG__WRITETO__0__NAME: Async
+      SERILOG__WRITETO__0__ARGS__CONFIGURE__0__NAME: Console
+      # Set unattended install settings
+      UMBRACO__CMS__UNATTENDED__INSTALLUNATTENDED: true
+      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERNAME: Playwright Test
+      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD: UmbracoAcceptance123!
+      UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL: playwright@umbraco.com
+      # Custom Umbraco settings
+      UMBRACO__CMS__CONTENT__CONTENTVERSIONCLEANUPPOLICY__ENABLECLEANUP: false
+      UMBRACO__CMS__GLOBAL__DISABLEELECTIONFORSINGLESERVER: true
+      UMBRACO__CMS__GLOBAL__INSTALLMISSINGDATABASE: true
+      UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
+      UMBRACO__CMS__GLOBAL__VERSIONCHECKPERIOD: 0
+      UMBRACO__CMS__GLOBAL__USEHTTPS: true
+      UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
+      UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
+      UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
       ASPNETCORE_URLS: https://localhost:44331
-      PlaywrightPassword: UmbracoAcceptance123!
-      PlaywrightUserEmail: playwright@umbraco.com
     jobs:
       # E2E Tests
       - job:
@@ -337,8 +353,8 @@ stages:
           - template: nightly-E2E-setup-template.yml
             parameters:
               nodeVersion: ${{ variables.nodeVersion }}
-              PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
-              PlaywrightPassword: ${{ variables.PlaywrightPassword }}
+              PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
+              PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               npm_config_cache: ${{ variables.npm_config_cache }}
 
@@ -414,8 +430,8 @@ stages:
           - template: nightly-E2E-setup-template.yml
             parameters:
               nodeVersion: ${{ variables.nodeVersion }}
-              PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
-              PlaywrightPassword: ${{ variables.PlaywrightPassword }}
+              PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
+              PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               npm_config_cache: ${{ variables.npm_config_cache }}
 
@@ -446,6 +462,15 @@ stages:
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               DatabaseType: ${{ variables.DatabaseType }}
 
+  - stage: AdditionalConfigE2E
+    displayName: Additional Config E2E Tests
+    dependsOn: Build
+    variables:
+      npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
+      ASPNETCORE_URLS: https://localhost:44331
+      PlaywrightPassword: UmbracoAcceptance123!
+      PlaywrightUserEmail: playwright@umbraco.com
+    jobs:
       - job:
         displayName: E2E Tests with Different App settings (SQL Server)
         condition: ${{ or(eq(parameters.differentAppSettingsAcceptanceTests, true), eq(parameters.skipDefaultConfigAcceptanceTests, true)) }}
