@@ -15,7 +15,7 @@ public class RebuildDocumentUrls : MigrationBase
     protected override void Migrate()
     {
         // The document URL service requires a write lock that was introduced in a later migration (16.2).
-        // We need to add it here as without it the document URL initialization running in this preceding migration step could fail if URLs
+        // We need to add it here as without it the document URL initialization running in this preceeding migration step could fail if URLs
         // are determined as requiring a rebuild.
         AddDocumentUrlLock.CreateDocumentUrlsLock(Database);
 

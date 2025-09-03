@@ -21,7 +21,7 @@ internal class AddDocumentUrlLock : MigrationBase
     /// </summary>
     /// <param name="database">The <see cref="IUmbracoDatabase"/> associated with the migration scope.</param>
     /// <remarks>
-    /// Exposed internally to allow for calls from other migration steps that precede this one but require the lock to be in place.
+    /// Exosed internally to allow for calls from other migration steps that preceeed this one but require the lock to be in place.
     /// </remarks>
     internal static void CreateDocumentUrlsLock(IUmbracoDatabase database)
     {
