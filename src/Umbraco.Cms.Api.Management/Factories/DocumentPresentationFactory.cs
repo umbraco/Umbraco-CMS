@@ -294,8 +294,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     {
         foreach (ISignProvider signProvider in _signProviderCollection.Where(x => x.CanProvideSigns<DocumentItemResponseModel>()))
         {
-            IEnumerable<DocumentItemResponseModel> models = [model];
-            signProvider.PopulateSignsAsync(models).GetAwaiter().GetResult();
+            signProvider.PopulateSignsAsync([model]).GetAwaiter().GetResult();
         }
     }
 
@@ -303,8 +302,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     {
         foreach (ISignProvider signProvider in _signProviderCollection.Where(x => x.CanProvideSigns<DocumentVariantItemResponseModel>()))
         {
-            IEnumerable<DocumentVariantItemResponseModel> models = [model];
-            signProvider.PopulateSignsAsync(models).GetAwaiter().GetResult();
+            signProvider.PopulateSignsAsync([model]).GetAwaiter().GetResult();
         }
     }
 }
