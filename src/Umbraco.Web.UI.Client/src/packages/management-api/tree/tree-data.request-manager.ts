@@ -48,6 +48,7 @@ export class UmbManagementApiTreeDataRequestManager<
 	#getChildrenOf;
 	#getAncestorsOf;
 	#getSiblingsFrom;
+	#defaultTakeSize = 50;
 
 	constructor(
 		host: UmbControllerHost,
@@ -107,9 +108,8 @@ export class UmbManagementApiTreeDataRequestManager<
 			return { data: mappedData, error };
 		}
 
-		// Including args.skip + args.take for backwards compatibility
-		const skip = paging && isOffsetPaginationRequest(paging) ? paging.skip : args.skip ? args.skip : 0;
-		const take = paging && isOffsetPaginationRequest(paging) ? paging.take : args.take ? args.take : 50;
+		const skip = this.#getSkipFromArgs(args);
+		const take = this.#getTakeFromArgs(args);
 
 		const requestArgs = {
 			...args,
@@ -176,9 +176,8 @@ export class UmbManagementApiTreeDataRequestManager<
 			return { data: mappedData, error };
 		}
 
-		// Including args.skip + args.take for backwards compatibility
-		const skip = paging && isOffsetPaginationRequest(paging) ? paging.skip : args.skip ? args.skip : 0;
-		const take = paging && isOffsetPaginationRequest(paging) ? paging.take : args.take ? args.take : 50;
+		const skip = this.#getSkipFromArgs(args);
+		const take = this.#getTakeFromArgs(args);
 
 		const requestArgs = {
 			...args,
@@ -214,5 +213,27 @@ export class UmbManagementApiTreeDataRequestManager<
 		} as AncestorsOfRequestArgsType;
 
 		return tryExecute(this, this.#getAncestorsOf(requestArgs));
+	}
+
+	#getSkipFromArgs(args: UmbTreeRootItemsRequestArgs | UmbTreeChildrenOfRequestArgs): number {
+		const paging = args.paging;
+
+		if (paging && isOffsetPaginationRequest(paging)) {
+			return paging.skip !== undefined ? paging.skip : 0;
+		}
+
+		// Including args.skip for backwards compatibility
+		return args.skip !== undefined ? args.skip : 0;
+	}
+
+	#getTakeFromArgs(args: UmbTreeRootItemsRequestArgs | UmbTreeChildrenOfRequestArgs): number {
+		const paging = args.paging;
+
+		if (paging && isOffsetPaginationRequest(paging)) {
+			return paging.take !== undefined ? paging.take : this.#defaultTakeSize;
+		}
+
+		// Including args.take for backwards compatibility
+		return args.take !== undefined ? args.take : this.#defaultTakeSize;
 	}
 }
