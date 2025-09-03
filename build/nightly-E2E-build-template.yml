@@ -20,7 +20,7 @@ steps:
 
   # Update application to use necessary app settings
   - pwsh: |
-      $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/${{parameters.testFolder}}"
+      $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/${{parameters.testFolder}}/AdditionalSetup"
       $destinationPath = "UmbracoProject"
       $jsonFiles = Get-ChildItem -Path $sourcePath -Filter "*.json"
       if ($jsonFiles) {
@@ -36,7 +36,7 @@ steps:
 
   # Update application to use necessary App_Plugins
   - pwsh: |
-      $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/${{parameters.testFolder}}"
+      $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/${{parameters.testFolder}}/AdditionalSetup"
       $destinationPath = "UmbracoProject"
       $appPluginsFolders = Get-ChildItem -Path $sourcePath -Directory -Filter "App_Plugins"
       if ($appPluginsFolders) {
@@ -52,7 +52,7 @@ steps:
 
   # Update application to use necessary classes
   - pwsh: |
-      $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/${{parameters.testFolder}}"
+      $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/${{parameters.testFolder}}/AdditionalSetup"
       $destinationPath = "UmbracoProject"
       $csharpFiles = Get-ChildItem -Path $sourcePath -Filter "*.cs"
       if ($csharpFiles) {

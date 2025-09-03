@@ -23,32 +23,32 @@ steps:
         displayName: Start SQL Server Docker image (Linux)
         condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
-      # Waits to make sure the SQL Server docker instance is running
-      - powershell: |
-          $maxAttempts = 12
-          $attempt = 0
-          $status = ""
-
-          while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
-            Start-Sleep -Seconds 5
-            $status = docker inspect -f '{{.State.Status}}' mssql
-
-            if ($status -ne 'running') {
-              Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
-              $attempt++
-            }
-          }
-
-          if ($status -eq 'running') {
-            Write-Host "SQL Server container is running"
-            docker ps -a
-          } else {
-            Write-Host "SQL Server did not become ready in time. Last known status: $status"
-            docker logs mssql
-            exit 1
-          }
-        displayName: Wait for SQL Server to be ready (Linux)
-        condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+#      # Waits to make sure the SQL Server docker instance is running
+#      - powershell: |
+#          $maxAttempts = 12
+#          $attempt = 0
+#          $status = ""
+#
+#          while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
+#            Start-Sleep -Seconds 5
+#            $status = docker inspect -f '{{.State.Status}}' mssql
+#
+#            if ($status -ne 'running') {
+#              Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
+#              $attempt++
+#            }
+#          }
+#
+#          if ($status -eq 'running') {
+#            Write-Host "SQL Server container is running"
+#            docker ps -a
+#          } else {
+#            Write-Host "SQL Server did not become ready in time. Last known status: $status"
+#            docker logs mssql
+#            exit 1
+#          }
+#        displayName: Wait for SQL Server to be ready (Linux)
+#        condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
       # Start SQL Server LocalDB Windows
       - pwsh: SqlLocalDB start MSSQLLocalDB

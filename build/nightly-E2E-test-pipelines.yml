@@ -336,11 +336,11 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: $(nodeVersion)
-              PlaywrightUserEmail: $(PlaywrightUserEmail)
-              PlaywrightPassword: $(PlaywrightPassword)
-              ASPNETCORE_URLS: $(ASPNETCORE_URLS)
-              npm_config_cache: $(npm_config_cache)
+              nodeVersion: ${{ variables.nodeVersion }}
+              PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
+              PlaywrightPassword: ${{ variables.PlaywrightPassword }}
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              npm_config_cache: ${{ variables.npm_config_cache }}
 
           # Build application Template
           - template: nightly-E2E-build-template.yml
@@ -351,7 +351,6 @@ stages:
           # Run application Template
           - template: nightly-E2E-run-application-template.yml
             parameters:
-              SA_PASSWORD: $(SA_PASSWORD)
               DatabaseType: ${{ variables.DatabaseType }}
               buildConfiguration: ${{ variables.buildConfiguration }}
 
@@ -359,7 +358,7 @@ stages:
           - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
-              ASPNETCORE_URLS: $(ASPNETCORE_URLS)
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               DatabaseType: ${{ variables.DatabaseType }}
 
       - job:
@@ -407,11 +406,11 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: $(nodeVersion)
-              PlaywrightUserEmail: $(PlaywrightUserEmail)
-              PlaywrightPassword: $(PlaywrightPassword)
-              ASPNETCORE_URLS: $(ASPNETCORE_URLS)
-              npm_config_cache: $(npm_config_cache)
+              nodeVersion: ${{ variables.nodeVersion }}
+              PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
+              PlaywrightPassword: ${{ variables.PlaywrightPassword }}
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              npm_config_cache: ${{ variables.npm_config_cache }}
 
           # Build application Template
           - template: nightly-E2E-build-template.yml
@@ -422,7 +421,7 @@ stages:
           # Run application Template
           - template: nightly-E2E-run-application-template.yml
             parameters:
-              SA_PASSWORD: $(SA_PASSWORD)
+              SA_PASSWORD: ${{ variables.SA_PASSWORD }}
               buildConfiguration: ${{ variables.buildConfiguration }}
               DatabaseType: ${{ variables.DatabaseType }}
 
@@ -430,7 +429,7 @@ stages:
           - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
-              ASPNETCORE_URLS: $(ASPNETCORE_URLS)
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               DatabaseType: ${{ variables.DatabaseType }}
 
       - job:
@@ -449,14 +448,6 @@ stages:
               testCommand: "npx playwright test --project=unattendedInstallConfig --grep=InstallSQLServer"
               port: 44331
               additionalEnvironmentVariables: false
-            # LocalDB not supported on linux
-            #            LinuxUnattendedInstallConfig:
-            #              vmImage: "ubuntu-latest"
-            #              testFolder: "UnattendedInstallConfig"
-            #              SA_PASSWORD: "UmbracoAcceptance123!"
-            #              testCommand: "npx playwright test --project=unattendedInstallConfig --grep=InstallSQLServer"
-            #              port: 44331
-
             # DeliveryApiConfig
             WindowsDeliveryApiConfig:
               vmImage: "windows-latest"
@@ -491,11 +482,11 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: $(nodeVersion)
-              PlaywrightUserEmail: $(PlaywrightUserEmail)
-              PlaywrightPassword: $(PlaywrightPassword)
-              ASPNETCORE_URLS: $(ASPNETCORE_URLS)
-              npm_config_cache: $(npm_config_cache)
+              nodeVersion: ${{ variables.nodeVersion }}
+              PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
+              PlaywrightPassword: ${{ variables.PlaywrightPassword }}
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              npm_config_cache: ${{ variables.npm_config_cache }}
 
           # Install NuGet package if specified in the matrix
           - pwsh: |
@@ -566,7 +557,7 @@ stages:
           - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
-              ASPNETCORE_URLS: $(ASPNETCORE_URLS)
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               port: $(port)
               AZUREB2CTESTUSEREMAIL: $(AZUREB2CTESTUSEREMAIL)
               AZUREB2CTESTUSERPASSWORD: $(AZUREB2CTESTUSERPASSWORD)
