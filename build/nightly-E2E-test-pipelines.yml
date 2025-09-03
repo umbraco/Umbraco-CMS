@@ -22,6 +22,11 @@ parameters:
     type: boolean
     default: false
 
+  - name: skipIntegrationTests
+    displayName: Skip integration tests
+    type: boolean
+    default: false
+
 variables:
   nodeVersion: 20
   solution: umbraco.sln
@@ -106,6 +111,7 @@ stages:
   - stage: Integration
     displayName: Integration Tests
     dependsOn: Build
+    condition: ${{ eq(parameters.skipIntegrationTests, false) }}
     jobs:
       # Integration Tests (SQLite)
       - job:
