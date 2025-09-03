@@ -1,5 +1,4 @@
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_2_0;
+﻿using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
@@ -13,12 +12,5 @@ public class RebuildDocumentUrls : MigrationBase
         _documentUrlService = documentUrlService;
 
     protected override void Migrate()
-    {
-        // The document URL service requires a write lock that was introduced in a later migration (16.2).
-        // We need to add it here as without it the document URL initialization running in this preceeding migration step could fail if URLs
-        // are determined as requiring a rebuild.
-        AddDocumentUrlLock.CreateDocumentUrlsLock(Database);
-
-        _documentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
-    }
+        => _documentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
 }

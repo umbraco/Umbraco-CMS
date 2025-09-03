@@ -14,26 +14,17 @@ internal class AddDocumentUrlLock : MigrationBase
     {
     }
 
-    protected override void Migrate() => CreateDocumentUrlsLock(Database);
-
-    /// <summary>
-    /// Creates the DocumentUrls lock if it does not already exist.
-    /// </summary>
-    /// <param name="database">The <see cref="IUmbracoDatabase"/> associated with the migration scope.</param>
-    /// <remarks>
-    /// Exosed internally to allow for calls from other migration steps that preceeed this one but require the lock to be in place.
-    /// </remarks>
-    internal static void CreateDocumentUrlsLock(IUmbracoDatabase database)
+    protected override void Migrate()
     {
-        Sql<ISqlContext> sql = database.SqlContext.Sql()
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Select<LockDto>()
             .From<LockDto>()
             .Where<LockDto>(x => x.Id == Constants.Locks.DocumentUrls);
 
-        LockDto? existingLockDto = database.FirstOrDefault<LockDto>(sql);
+        LockDto? existingLockDto = Database.FirstOrDefault<LockDto>(sql);
         if (existingLockDto is null)
         {
-            database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
+            Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.DocumentUrls, Name = "DocumentUrls" });
         }
     }
 }
