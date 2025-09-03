@@ -79,10 +79,10 @@ export class UmbTemplateWorkspaceContext
 			preset: { masterTemplate: parent.unique ? { unique: parent.unique } : null },
 		});
 
-		if (data) {
-			if (!data.masterTemplate) return;
-			await this.setMasterTemplate(data.masterTemplate.unique);
-		}
+		// Set or reset the master template
+		// This is important to reset when a new template is created so the UI reflects the correct state
+		await this.setMasterTemplate(data?.masterTemplate?.unique ?? null);
+
 		return data;
 	}
 
