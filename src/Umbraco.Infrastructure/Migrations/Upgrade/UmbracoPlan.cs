@@ -123,5 +123,8 @@ public class UmbracoPlan : MigrationPlan
         // To 16.2.0
         To<V_16_2_0.AddLongRunningOperations>("{741C22CF-5FB8-4343-BF79-B97A58C2CCBA}");
         To<V_16_2_0.AddDocumentUrlLock>("{BE11D4D3-3A1F-4598-90D4-B548BD188C48}");
+
+        // To 16.3.0
+        To<V_16_3_0.AddRichTextEditorCapabilities>("{A917FCBC-C378-4A08-A36C-220C581A6581}");
     }
 }
