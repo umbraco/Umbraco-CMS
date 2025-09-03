@@ -39,7 +39,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
         var cacheKey = $"{nameof(PublishedContentFactory)}DocumentCache_{contentCacheNode.Id}_{preview}";
-        IPublishedContent? publishedContent;
+        IPublishedContent? publishedContent = null;
         if (_appCaches.RequestCache.IsAvailable)
         {
             publishedContent = _appCaches.RequestCache.GetCacheItem<IPublishedContent?>(cacheKey);
@@ -89,7 +89,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     public IPublishedContent? ToIPublishedMedia(ContentCacheNode contentCacheNode)
     {
         var cacheKey = $"{nameof(PublishedContentFactory)}MediaCache_{contentCacheNode.Id}";
-        IPublishedContent? publishedContent;
+        IPublishedContent? publishedContent = null;
         if (_appCaches.RequestCache.IsAvailable)
         {
             publishedContent = _appCaches.RequestCache.GetCacheItem<IPublishedContent?>(cacheKey);
@@ -134,7 +134,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     public IPublishedMember ToPublishedMember(IMember member)
     {
         string cacheKey = $"{nameof(PublishedContentFactory)}MemberCache_{member.Id}";
-        IPublishedMember? publishedMember;
+        IPublishedMember? publishedMember = null;
         if (_appCaches.RequestCache.IsAvailable)
         {
             publishedMember = _appCaches.RequestCache.GetCacheItem<IPublishedMember?>(cacheKey);
