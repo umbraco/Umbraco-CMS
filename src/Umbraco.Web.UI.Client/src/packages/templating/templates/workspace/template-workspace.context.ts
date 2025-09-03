@@ -101,20 +101,21 @@ export class UmbTemplateWorkspaceContext
 		return this.getData()?.content ? this.getLayoutBlockRegexPattern().test(this.getData()?.content as string) : false;
 	}
 
-	async setMasterTemplate(id: string | null) {
-		if (id === null) {
+	async setMasterTemplate(unique: string | null) {
+		if (unique === null) {
 			this.#masterTemplate.setValue(null);
-			this.#updateMasterTemplateLayoutBlock();
-			return null;
+		} else {
+			// We need the whole template model if the unique id is provided
+			const { data } = await this.itemRepository.requestItems([unique]);
+			if (data) {
+				this.#masterTemplate.setValue(data[0]);
+			}
 		}
 
-		const { data } = await this.itemRepository.requestItems([id]);
-		if (data) {
-			this.#masterTemplate.setValue(data[0]);
-			this.#updateMasterTemplateLayoutBlock();
-			return data[0];
-		}
-		return null;
+		this.#updateMasterTemplateLayoutBlock();
+		this._data.updateCurrent({ masterTemplate: unique ? { unique } : null });
+
+		return unique;
 	}
 
 	#updateMasterTemplateLayoutBlock = () => {
