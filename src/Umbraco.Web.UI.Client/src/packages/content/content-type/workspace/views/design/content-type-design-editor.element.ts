@@ -604,7 +604,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		if (ownedTab) {
 			return html`<div class="not-active">
-				<span class=${hasTabName ? '' : 'invaild'}>${hasTabName ? this.localize.string(tabName) : 'Unnamed'}</span>
+				<span class=${hasTabName ? '' : 'invalid'}>${hasTabName ? this.localize.string(tabName) : 'Unnamed'}</span>
 				${this.renderDeleteFor(tab)}
 			</div>`;
 		} else {
