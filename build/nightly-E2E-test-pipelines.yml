@@ -520,7 +520,7 @@ stages:
           # Run application Template
           - template: nightly-E2E-run-application-template.yml
             parameters:
-              SA_PASSWORD: $(SA_PASSWORD)
+              SA_PASSWORD: ${{ variables.SA_PASSWORD }}
               additionalEnvironmentVariables: ${{ eq(variables['additionalEnvironmentVariables'], true ) }}
               buildConfiguration: ${{ variables.buildConfiguration }}
               DatabaseType: ${{ variables.DatabaseType }}
