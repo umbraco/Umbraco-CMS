@@ -1614,7 +1614,7 @@ internal sealed class DatabaseDataCreator
                     ContentTypeId = 1034,
                     PropertyTypeGroupId = 52,
                     Alias = Constants.Conventions.Media.Bytes,
-                    Name = "Size",
+                    Name = "File size",
                     SortOrder = 0,
                     Mandatory = false,
                     ValidationRegExp = null,
