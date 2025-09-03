@@ -13,11 +13,13 @@ function nodeEqualsType({ types, node }) {
 	return (Array.isArray(types) && types.includes(node.type)) || node.type === types;
 }
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export interface TrailingNodeOptions {
 	node: string;
 	notAfter: string[];
 }
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const TrailingNode = Extension.create<TrailingNodeOptions>({
 	name: 'trailingNode',
 
