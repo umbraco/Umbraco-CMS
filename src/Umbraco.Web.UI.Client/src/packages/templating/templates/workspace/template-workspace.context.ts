@@ -76,12 +76,11 @@ export class UmbTemplateWorkspaceContext
 	async create(parent: UmbEntityModel) {
 		const data = await this.createScaffold({
 			parent,
-			preset: { masterTemplate: parent.unique ? { unique: parent.unique } : null },
 		});
 
 		// Set or reset the master template
 		// This is important to reset when a new template is created so the UI reflects the correct state
-		await this.setMasterTemplate(data?.masterTemplate?.unique ?? null);
+		await this.setMasterTemplate(parent.unique);
 
 		return data;
 	}
