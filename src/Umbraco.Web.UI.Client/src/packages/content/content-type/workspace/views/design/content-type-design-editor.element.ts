@@ -730,7 +730,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				gap: var(--uui-size-space-3);
 			}
 
-			.invaild {
+			.invalid {
 				color: var(--uui-color-danger, var(--uui-color-invalid));
 			}
 
