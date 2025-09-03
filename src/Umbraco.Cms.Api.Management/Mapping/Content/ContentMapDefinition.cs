@@ -39,22 +39,24 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
     protected IEnumerable<TValueViewModel> MapValueViewModels(
         IEnumerable<IProperty> properties,
         ValueViewModelMapping? additionalPropertyMapping = null,
-        bool published = false) =>
-        properties
+        bool published = false)
+    {
+        Dictionary<string, IDataEditor> dataEditors = [];
+        return properties
             .SelectMany(property => property
                 .Values
                 .Select(propertyValue =>
                 {
-                    IDataEditor propertyEditor = _propertyEditorCollection[property.PropertyType.PropertyEditorAlias]
-                                                  ?? new MissingPropertyEditor(
-                                                      property.PropertyType.PropertyEditorAlias,
-                                                      _dataValueEditorFactory);
+                    IDataEditor propertyEditor = GetDataEditor(dataEditors, property);
 
                     IProperty? publishedProperty = null;
                     if (published)
                     {
                         publishedProperty = new Property(property.PropertyType);
-                        publishedProperty.SetValue(propertyValue.PublishedValue, propertyValue.Culture, propertyValue.Segment);
+                        publishedProperty.SetValue(
+                            propertyValue.PublishedValue,
+                            propertyValue.Culture,
+                            propertyValue.Segment);
                     }
 
                     var variantViewModel = new TValueViewModel
@@ -62,7 +64,10 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                         Culture = propertyValue.Culture,
                         Segment = propertyValue.Segment,
                         Alias = property.Alias,
-                        Value = propertyEditor.GetValueEditor().ToEditor(publishedProperty ?? property, propertyValue.Culture, propertyValue.Segment),
+                        Value = propertyEditor.GetValueEditor().ToEditor(
+                            publishedProperty ?? property,
+                            propertyValue.Culture,
+                            propertyValue.Segment),
                         EditorAlias = propertyEditor.Alias,
                     };
                     additionalPropertyMapping?.Invoke(propertyEditor, variantViewModel);
@@ -70,6 +75,7 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                 }))
             .WhereNotNull()
             .ToArray();
+    }
 
     protected IEnumerable<TVariantViewModel> MapVariantViewModels(TContent source, VariantViewModelMapping? additionalVariantMapping = null)
     {
@@ -95,5 +101,23 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                 return variantViewModel;
             }))
             .ToArray();
+    }
+
+    private IDataEditor GetDataEditor(Dictionary<string, IDataEditor> dataEditors, IProperty property)
+    {
+        IDataEditor propertyEditor;
+        if (dataEditors.TryGetValue(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor))
+        {
+            propertyEditor = dataEditor;
+        }
+        else
+        {
+            propertyEditor = _propertyEditorCollection[property.PropertyType.PropertyEditorAlias]
+                             ?? new MissingPropertyEditor(property.PropertyType.PropertyEditorAlias, _dataValueEditorFactory);
+
+            dataEditors[property.PropertyType.PropertyEditorAlias] = propertyEditor;
+        }
+
+        return propertyEditor;
     }
 }
