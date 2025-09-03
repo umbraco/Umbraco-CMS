@@ -1,5 +1,5 @@
 import type { UmbTreeRootItemsRequestArgs } from './data/index.js';
-import type { UmbTreeItemModel, UmbTreeRootModel } from './types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from './types.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from './entity-actions/reload-tree-item-children/index.js';
 import { UMB_TREE_ITEM_CONTEXT, type UmbTreeItemContext } from './tree-item/index.js';
 import type { UmbDefaultTreeContext } from './default/index.js';
@@ -18,12 +18,14 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import {
+	UmbHasChildrenEntityContext,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 
 export class UmbTreeItemChildrenManager<
 	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
 	RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
 > extends UmbControllerBase {
 	public readonly offsetPagination = new UmbPaginationManager();
@@ -32,14 +34,21 @@ export class UmbTreeItemChildrenManager<
 	#children = new UmbArrayState<TreeItemType>([], (x) => x.unique);
 	public readonly children = this.#children.asObservable();
 
-	#parent = new UmbObjectState<UmbEntityModel | undefined>(undefined);
-	parent = this.#parent.asObservable();
+	#hasChildren = new UmbBooleanState(false);
+	public readonly hasChildren = this.#hasChildren.asObservable();
+	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
+
+	#treeItem = new UmbObjectState<TreeItemType | TreeRootType | undefined>(undefined);
+	public readonly treeItem = this.#treeItem.asObservable();
 
 	#foldersOnly = new UmbBooleanState(false);
-	foldersOnly = this.#foldersOnly.asObservable();
+	public readonly foldersOnly = this.#foldersOnly.asObservable();
 
 	#additionalRequestArgs = new UmbObjectState<Partial<RequestArgsType> | object>({});
 	public readonly additionalRequestArgs = this.#additionalRequestArgs.asObservable();
+
+	#startNode = new UmbObjectState<UmbTreeStartNode | undefined>(undefined);
+	public readonly startNode = this.#startNode.asObservable();
 
 	#isLoading = new UmbBooleanState(false);
 	readonly isLoading = this.#isLoading.asObservable();
@@ -47,7 +56,7 @@ export class UmbTreeItemChildrenManager<
 	#takeSize: number = 5;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
-	#treeContext?: UmbDefaultTreeContext<TreeItemType, UmbTreeRootModel, RequestArgsType>;
+	#treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType, RequestArgsType>;
 	#parentTreeItemContext?: UmbTreeItemContext<TreeItemType>;
 
 	constructor(host: UmbControllerHost) {
@@ -88,25 +97,26 @@ export class UmbTreeItemChildrenManager<
 
 	/**
 	 * Set the parent for which to load children.
-	 * @param {(UmbEntityModel | undefined)} parent - The parent entity model.
+	 * @param {(TreeItemType | TreeRootType | undefined)} treeItem - The tree item model
 	 * @memberof UmbTreeItemChildrenManager
 	 */
-	public setParent(parent: UmbEntityModel | undefined) {
-		this.#parent.setValue(parent);
+	public setTreeItem(treeItem: TreeItemType | TreeRootType | undefined) {
+		this.#treeItem.setValue(treeItem);
+		this.setHasChildren(treeItem?.hasChildren || false);
 	}
 
 	/**
-	 * Gets the parent for which to load children.
-	 * @returns {UmbEntityModel | undefined} - The parent for the children
+	 * Gets the tree item for which to load children.
+	 * @returns {TreeItemType | TreeRootType | undefined} - The tree item for the children
 	 * @memberof UmbTreeItemChildrenManager
 	 */
-	public getParent(): UmbEntityModel | undefined {
-		return this.#parent.getValue();
+	public getTreeItem(): TreeItemType | TreeRootType | undefined {
+		return this.#treeItem.getValue();
 	}
 
 	/**
 	 * Sets additional request arguments that will be passed with the request.
-	 * @param {Partial<RequestArgsType>} args
+	 * @param {Partial<RequestArgsType>} args - The additional request arguments
 	 * @memberof UmbTreeItemChildrenManager
 	 */
 	public setAdditionalRequestArgs(args: Partial<RequestArgsType>) {
@@ -120,6 +130,43 @@ export class UmbTreeItemChildrenManager<
 	 */
 	public getAdditionalRequestArgs(): Partial<RequestArgsType> | undefined {
 		return this.#additionalRequestArgs.getValue();
+	}
+
+	/**
+	 * Sets the startNode config
+	 * @param {(UmbTreeStartNode | undefined)} startNode - The start node
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public setStartNode(startNode: UmbTreeStartNode | undefined) {
+		this.#startNode.setValue(startNode);
+	}
+
+	/**
+	 * Gets the startNode config
+	 * @returns {(UmbTreeStartNode | undefined)} - The start node
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public getStartNode(): UmbTreeStartNode | undefined {
+		return this.#startNode.getValue();
+	}
+
+	/**
+	 * Sets the hasChildren state
+	 * @param {boolean} hasChildren
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public setHasChildren(hasChildren: boolean) {
+		this.#hasChildren.setValue(hasChildren);
+		this.#hasChildrenContext.setHasChildren(hasChildren);
+	}
+
+	/**
+	 * Gets the hasChildren state
+	 * @returns {boolean} - True if the current tree item has children
+	 * @memberof UmbTreeItemChildrenManager
+	 */
+	public getHasChildren(): boolean {
+		return this.#hasChildren.getValue();
 	}
 
 	/**
@@ -154,7 +201,7 @@ export class UmbTreeItemChildrenManager<
 
 		this.#isLoading.setValue(true);
 
-		const parent = this.getParent();
+		const parent = this.getStartNode() || this.getTreeItem();
 		const foldersOnly = this.getFoldersOnly();
 		const additionalArgs = this.getAdditionalRequestArgs();
 		const baseTarget = this.targetPagination.getBaseTarget();
@@ -210,6 +257,7 @@ export class UmbTreeItemChildrenManager<
 
 		if (data) {
 			this.#children.setValue(data.items);
+			this.setHasChildren(data.total > 0);
 
 			this.offsetPagination.setTotalItems(data.total);
 
@@ -228,7 +276,7 @@ export class UmbTreeItemChildrenManager<
 
 		this.#isLoading.setValue(true);
 
-		const parent = this.getParent();
+		const parent = this.getStartNode() || this.getTreeItem();
 		const foldersOnly = this.getFoldersOnly();
 		const additionalArgs = this.getAdditionalRequestArgs();
 
@@ -255,15 +303,17 @@ export class UmbTreeItemChildrenManager<
 				});
 
 		if (data) {
-			// We have loaded previous items so we add them to the top of the array
-			const reversedItems = [...data.items].reverse();
-			this.#children.prepend(reversedItems);
-			this.targetPagination.prependCurrentItems(reversedItems);
-
 			if (data.totalBefore === undefined) {
 				throw new Error('totalBefore is missing in the response');
 			}
 
+			// We have loaded previous items so we add them to the top of the array
+			const reversedItems = [...data.items].reverse();
+			this.#children.prepend(reversedItems);
+
+			this.setHasChildren(data.total > 0);
+
+			this.targetPagination.prependCurrentItems(reversedItems);
 			this.targetPagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
 		}
@@ -277,7 +327,7 @@ export class UmbTreeItemChildrenManager<
 
 		this.#isLoading.setValue(true);
 
-		const parent = this.getParent();
+		const parent = this.getStartNode() || this.getTreeItem();
 		const foldersOnly = this.getFoldersOnly();
 		const additionalArgs = this.getAdditionalRequestArgs();
 
@@ -314,6 +364,7 @@ export class UmbTreeItemChildrenManager<
 
 		if (data) {
 			this.#children.append(data.items);
+			this.setHasChildren(data.total > 0);
 
 			this.offsetPagination.setTotalItems(data.total);
 
@@ -381,8 +432,8 @@ export class UmbTreeItemChildrenManager<
 	}
 
 	#onReloadChildrenRequest = (event: UmbEntityActionEvent) => {
-		const entityType = this.getParent()?.entityType;
-		const unique = this.getParent()?.unique;
+		const entityType = this.getTreeItem()?.entityType;
+		const unique = this.getTreeItem()?.unique;
 
 		if (event.getEntityType() !== entityType) return;
 		if (event.getUnique() !== unique) return;
@@ -391,8 +442,8 @@ export class UmbTreeItemChildrenManager<
 	};
 
 	#onReloadStructureForEntityRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
-		const entityType = this.getParent()?.entityType;
-		const unique = this.getParent()?.unique;
+		const entityType = this.getTreeItem()?.entityType;
+		const unique = this.getTreeItem()?.unique;
 
 		if (event.getEntityType() !== entityType) return;
 		if (event.getUnique() !== unique) return;

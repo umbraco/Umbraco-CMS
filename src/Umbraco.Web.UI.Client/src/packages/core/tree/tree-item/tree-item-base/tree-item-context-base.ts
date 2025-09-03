@@ -10,7 +10,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
-import { UmbHasChildrenEntityContext } from '@umbraco-cms/backoffice/entity-action';
 import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
@@ -31,9 +30,6 @@ export abstract class UmbTreeItemContextBase<
 	protected readonly _treeItem = new UmbObjectState<TreeItemType | undefined>(undefined);
 	readonly treeItem = this._treeItem.asObservable();
 
-	#hasChildren = new UmbBooleanState(false);
-	readonly hasChildren = this.#hasChildren.asObservable();
-
 	#isSelectable = new UmbBooleanState(false);
 	readonly isSelectable = this.#isSelectable.asObservable();
 
@@ -52,8 +48,9 @@ export abstract class UmbTreeItemContextBase<
 	#isOpen = new UmbBooleanState(false);
 	isOpen = this.#isOpen.asObservable();
 
-	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType>(this);
+	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
 	public readonly childItems = this.#treeItemChildrenManager.children;
+	public readonly hasChildren = this.#treeItemChildrenManager.hasChildren;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
@@ -67,7 +64,6 @@ export abstract class UmbTreeItemContextBase<
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 	#sectionSidebarContext?: typeof UMB_SECTION_SIDEBAR_CONTEXT.TYPE;
 
-	#hasChildrenContext = new UmbHasChildrenEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
@@ -118,12 +114,8 @@ export abstract class UmbTreeItemContextBase<
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
 
-		this.#treeItemChildrenManager.setParent({ entityType: treeItem.entityType, unique: treeItem.unique });
+		this.#treeItemChildrenManager.setTreeItem(treeItem);
 		this.#treeItemEntityActionManager.setEntity({ entityType: treeItem.entityType, unique: treeItem.unique });
-
-		const hasChildren = treeItem.hasChildren || false;
-		this.#hasChildren.setValue(hasChildren);
-		this.#hasChildrenContext.setHasChildren(hasChildren);
 
 		const parentEntity: UmbEntityModel | undefined = treeItem.parent
 			? {
@@ -351,7 +343,7 @@ export abstract class UmbTreeItemContextBase<
 				}
 
 				// If this item is expanded and has children, load them
-				if (isExpanded && this.#hasChildren.getValue()) {
+				if (isExpanded && this.#treeItemChildrenManager.getHasChildren()) {
 					this.targetPagination.setBaseTarget(target);
 					this.#treeItemChildrenManager.loadChildren();
 				}
