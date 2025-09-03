@@ -67,15 +67,16 @@ export class UmbTemplateWorkspaceContext
 
 	override async load(unique: string) {
 		const response = await super.load(unique);
-		if (response.data) {
-			this.setMasterTemplate(response.data.masterTemplate?.unique ?? null);
-		}
+		await this.setMasterTemplate(response.data?.masterTemplate?.unique ?? null);
 		return response;
 	}
 
 	async create(parent: UmbEntityModel) {
 		const data = await this.createScaffold({
 			parent,
+			preset: {
+				masterTemplate: parent.unique ? { unique: parent.unique } : null,
+			},
 		});
 
 		// Set or reset the master template
