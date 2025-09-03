@@ -171,6 +171,16 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
 
                         break;
 
+                    case Constants.Conventions.Media.Extension:
+                        if (propertyType.DataTypeId == Constants.DataTypes.LabelString)
+                        {
+                            if (propertyType.Name == "Type")
+                            {
+                                propertyType.Name = "File extension";
+                                updated = true;
+                            }
+                        }
+
                     default:
                         break;
                 }
