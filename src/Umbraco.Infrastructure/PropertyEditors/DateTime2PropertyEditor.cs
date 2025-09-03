@@ -128,7 +128,7 @@ public class DateTime2PropertyEditor : DataEditor
             _dataTypeConfigurationCache.GetConfigurationAs<DateTime2Configuration>(dataTypeKey);
 
         /// <summary>
-        /// Validates the color selection for the color picker property editor.
+        /// Validates the date time selection for the DateTime2 property editor.
         /// </summary>
         private class DateTime2Validator : IValueValidator
         {
