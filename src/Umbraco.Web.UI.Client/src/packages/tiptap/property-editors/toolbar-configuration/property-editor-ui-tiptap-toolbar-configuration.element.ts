@@ -364,6 +364,7 @@ export class UmbPropertyEditorUiTiptapToolbarConfigurationElement
 					div {
 						display: flex;
 						gap: var(--uui-size-1);
+						align-items: flex-end;
 					}
 				}
 			}
