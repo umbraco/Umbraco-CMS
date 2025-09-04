@@ -1,14 +1,4 @@
-const UMB_MENU_TIPTAP_FONT_SIZE_ALIAS = 'Umb.Menu.Tiptap.FontSize';
-
-const menu: Array<UmbExtensionManifest> = [
-	{
-		type: 'menu',
-		alias: UMB_MENU_TIPTAP_FONT_SIZE_ALIAS,
-		name: 'Tiptap Font Size Menu',
-	},
-];
-
-const toolbarExtensions: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'menu',
@@ -27,7 +17,6 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 			{ label: '26pt', data: '26pt' },
 			{ label: '48pt', data: '48pt' },
 		],
-		menu: UMB_MENU_TIPTAP_FONT_SIZE_ALIAS,
 		meta: {
 			alias: 'umbFontSize',
 			icon: 'icon-ruler',
@@ -35,5 +24,3 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		},
 	},
 ];
-
-export const manifests: Array<UmbExtensionManifest> = [...menu, ...toolbarExtensions];
