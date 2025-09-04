@@ -22,6 +22,7 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_NOTIFICATION_CONTEXT } from '../notification/notification.context.js';
 
 export class UmbTreeItemChildrenManager<
 	TreeItemType extends UmbTreeItemModel,
@@ -498,10 +499,12 @@ export class UmbTreeItemChildrenManager<
 		this.targetPagination.clear();
 	}
 
-	#resetChildren() {
+	async #resetChildren() {
 		this.targetPagination.clear();
 		this.offsetPagination.clear();
 		this.loadChildren();
+		const notificationManager = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationManager?.peek('danger', { data: { message: 'Menu loading failed. Showing the first items again.' } });
 	}
 
 	#onPageChange = () => this.loadNextChildren();
