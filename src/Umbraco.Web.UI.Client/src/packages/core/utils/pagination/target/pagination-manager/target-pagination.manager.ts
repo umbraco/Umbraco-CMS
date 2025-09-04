@@ -187,8 +187,8 @@ export class UmbTargetPaginationManager<
 			return undefined;
 		}
 
-		// When choosing a new start target, we want the previous item in the list
-		return currentItems[currentBaseTargetIndex - 1];
+		// When choosing a new start target, we want the next item in the list
+		return currentItems[currentBaseTargetIndex + 1];
 	}
 
 	/**
@@ -223,8 +223,8 @@ export class UmbTargetPaginationManager<
 			return undefined;
 		}
 
-		// When choosing a new end target, we want the next item in the list
-		return currentItems[currentBaseTargetIndex + 1];
+		// When choosing a new end target, we want the previous item in the list
+		return currentItems[currentBaseTargetIndex - 1];
 	}
 
 	public setTotalItemsBeforeStartTarget(totalItems: number | undefined) {
