@@ -6,8 +6,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbTreeItemEntityActionManager<
-	TreeItemType extends UmbTreeItemModel,
-	TreeRootType extends UmbTreeRootModel,
+	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel = UmbTreeRootModel,
 > extends UmbControllerBase {
 	#hasActions = new UmbBooleanState(false);
 	readonly hasActions = this.#hasActions.asObservable();

@@ -1,10 +1,10 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
-import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import type { ManifestTreeItem } from '../../extensions/types.js';
 import { UmbTreeItemChildrenManager } from '../../tree-item-children.manager.js';
 import { UmbTreeItemEntityActionManager } from '../../tree-item-entity-action.managet.js';
 import { UmbTreeItemTargetExpansionManager } from '../../tree-item-expansion.manager.js';
+import { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -65,7 +65,7 @@ export abstract class UmbTreeItemContextBase<
 	#treeItemEntityActionManager = new UmbTreeItemEntityActionManager(this);
 	public readonly hasActions = this.#treeItemEntityActionManager.hasActions;
 
-	public treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
+	public treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 	#sectionSidebarContext?: typeof UMB_SECTION_SIDEBAR_CONTEXT.TYPE;
@@ -244,8 +244,6 @@ export abstract class UmbTreeItemContextBase<
 		});
 
 		this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();

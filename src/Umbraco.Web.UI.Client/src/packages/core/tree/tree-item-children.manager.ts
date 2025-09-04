@@ -2,8 +2,7 @@ import type { UmbTreeRootItemsRequestArgs } from './data/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from './types.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from './entity-actions/reload-tree-item-children/index.js';
 import { UMB_TREE_ITEM_CONTEXT, type UmbTreeItemContext } from './tree-item/index.js';
-import type { UmbDefaultTreeContext } from './default/index.js';
-import { UMB_TREE_CONTEXT } from './default/index.js';
+import { UMB_TREE_CONTEXT } from './tree.context.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -25,8 +24,8 @@ import {
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbTreeItemChildrenManager<
-	TreeItemType extends UmbTreeItemModel,
-	TreeRootType extends UmbTreeRootModel,
+	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel = UmbTreeRootModel,
 	RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
 > extends UmbControllerBase {
 	public readonly offsetPagination = new UmbPaginationManager();
@@ -63,7 +62,7 @@ export class UmbTreeItemChildrenManager<
 	#takeSize: number = 5;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
-	#treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType, RequestArgsType>;
+	#treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
 	#parentTreeItemContext?: UmbTreeItemContext<TreeItemType>;
 	#requestMaxRetries = 2;
 
@@ -75,8 +74,6 @@ export class UmbTreeItemChildrenManager<
 		this.#listenForActionEvents();
 
 		this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
 			this.#treeContext = treeContext;
 		});
 
@@ -290,12 +287,13 @@ export class UmbTreeItemChildrenManager<
 		}
 
 		if (data) {
-			this.#children.setValue(data.items);
+			const items = data.items as Array<TreeItemType>;
+			this.#children.setValue(items);
 			this.setHasChildren(data.total > 0);
 
 			this.offsetPagination.setTotalItems(data.total);
 
-			this.targetPagination.setCurrentItems(data.items);
+			this.targetPagination.setCurrentItems(items);
 			this.targetPagination.setTotalItems(data.total);
 			this.targetPagination.setTotalItemsBeforeStartTarget(data.totalBefore);
 			this.targetPagination.setTotalItemsAfterEndTarget(data.totalAfter);
@@ -369,8 +367,10 @@ export class UmbTreeItemChildrenManager<
 				throw new Error('totalBefore is missing in the response');
 			}
 
+			const items = data.items as Array<TreeItemType>;
+
 			// We have loaded previous items so we add them to the top of the array
-			const reversedItems = [...data.items].reverse();
+			const reversedItems = [...items].reverse();
 			this.#children.prepend(reversedItems);
 
 			this.setHasChildren(data.total > 0);
@@ -452,7 +452,8 @@ export class UmbTreeItemChildrenManager<
 		}
 
 		if (data) {
-			this.#children.append(data.items);
+			const items = data.items as Array<TreeItemType>;
+			this.#children.append(items);
 			this.setHasChildren(data.total > 0);
 
 			this.offsetPagination.setTotalItems(data.total);

@@ -1,5 +1,5 @@
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
-import type { UmbTreeContext } from '../tree-context.interface.js';
+import type { UmbTreeContext } from '../tree.context.interface.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import type { ManifestTree } from '../extensions/types.js';
 import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
@@ -7,7 +7,7 @@ import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import { UmbTreeItemChildrenManager } from '../tree-item-children.manager.js';
 import type { UmbTreeRepository } from '../data/index.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item-expansion.manager.js';
-import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
+import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
@@ -21,7 +21,7 @@ export class UmbDefaultTreeContext<
 		RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
 	>
 	extends UmbContextBase
-	implements UmbTreeContext
+	implements UmbTreeContext<TreeItemType, TreeRootType, RequestArgsType>
 {
 	#treeRoot = new UmbObjectState<TreeRootType | undefined>(undefined);
 	public readonly treeRoot = this.#treeRoot.asObservable();
@@ -37,7 +37,7 @@ export class UmbDefaultTreeContext<
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
 
-	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType>(this);
+	#treeItemChildrenManager = new UmbTreeItemChildrenManager<TreeItemType, TreeRootType, RequestArgsType>(this);
 	public readonly rootItems = this.#treeItemChildrenManager.children;
 	public readonly hasChildren = this.#treeItemChildrenManager.hasChildren;
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;

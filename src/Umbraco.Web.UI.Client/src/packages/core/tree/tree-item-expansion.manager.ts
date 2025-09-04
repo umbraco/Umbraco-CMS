@@ -1,23 +1,22 @@
 import type { UmbTreeItemChildrenManager } from './tree-item-children.manager.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from './types.js';
-import type { UmbDefaultTreeContext } from './default/index.js';
-import { UMB_TREE_CONTEXT } from './default/index.js';
+import { UMB_TREE_CONTEXT } from './tree.context.token.js';
 import type { UmbTargetPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, type UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 interface UmbTreeItemTargetExpansionManagerArgs<
-	TreeItemType extends UmbTreeItemModel,
-	TreeRootType extends UmbTreeRootModel,
+	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel = UmbTreeRootModel,
 > {
 	childrenManager: UmbTreeItemChildrenManager<TreeItemType, TreeRootType>;
 	targetPaginationManager: UmbTargetPaginationManager;
 }
 
 export class UmbTreeItemTargetExpansionManager<
-	TreeItemType extends UmbTreeItemModel,
-	TreeRootType extends UmbTreeRootModel,
+	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel = UmbTreeRootModel,
 > extends UmbControllerBase {
 	#isExpanded = new UmbBooleanState(false);
 	isExpanded = this.#isExpanded.asObservable();
@@ -27,7 +26,7 @@ export class UmbTreeItemTargetExpansionManager<
 	#init?: Promise<unknown>;
 	#childrenManager;
 	#targetPaginationManager;
-	#treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
+	#treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost, args: UmbTreeItemTargetExpansionManagerArgs<TreeItemType, TreeRootType>) {
 		super(host);
@@ -36,8 +35,6 @@ export class UmbTreeItemTargetExpansionManager<
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
 				this.#treeContext = treeContext;
 			}).asPromise(),
 		]);

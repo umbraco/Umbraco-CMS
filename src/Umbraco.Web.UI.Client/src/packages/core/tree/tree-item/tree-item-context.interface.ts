@@ -20,8 +20,7 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	hasActions: Observable<boolean>;
 	path: Observable<string>;
 	pagination: UmbPaginationManager;
-	// TODO: v18 make these non-optional
-	targetPagination?: UmbTargetPaginationManager;
+	targetPagination: UmbTargetPaginationManager;
 	getTreeItem(): TreeItemType | undefined;
 	setTreeItem(treeItem: TreeItemType | undefined): void;
 	toggleContextMenu(): void;
@@ -32,9 +31,8 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	reloadChildren(): void;
 	showChildren(): void;
 	hideChildren(): void;
-	// TODO: v18 make these non-optional
-	loadPrevItems?(): void;
-	loadNextItems?(): void;
-	isLoadingPrevChildren?: Observable<boolean>;
-	isLoadingNextChildren?: Observable<boolean>;
+	loadPrevItems(): void;
+	loadNextItems(): void;
+	isLoadingPrevChildren: Observable<boolean>;
+	isLoadingNextChildren: Observable<boolean>;
 }
