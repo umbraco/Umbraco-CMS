@@ -22,7 +22,7 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_NOTIFICATION_CONTEXT } from '../notification/notification.context.js';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbTreeItemChildrenManager<
 	TreeItemType extends UmbTreeItemModel,
