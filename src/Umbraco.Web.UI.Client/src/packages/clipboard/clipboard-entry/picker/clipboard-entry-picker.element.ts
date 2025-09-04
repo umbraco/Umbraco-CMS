@@ -141,7 +141,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	#renderItemIcon(item: UmbClipboardEntryDetailModel) {
 		const iconName = item.icon ?? 'icon-clipboard-entry';
-		return html`<uui-icon slot="icon" name=${iconName}></uui-icon>`;
+		return html`<umb-icon slot="icon" name=${iconName}></umb-icon>`;
 	}
 
 	#renderItemActions(item: UmbClipboardEntryDetailModel) {
