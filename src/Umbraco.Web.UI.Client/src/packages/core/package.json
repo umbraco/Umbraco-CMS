@@ -10,9 +10,11 @@
 		"@types/diff": "^7.0.2",
 		"diff": "^7.0.0",
 		"uuid": "^11.1.0",
-		"@hey-api/client-fetch": "^0.12.0"
+		"@hey-api/openapi-ts": "0.81.1"
 	},
 	"devDependencies": {
-		"@hey-api/openapi-ts": "^0.71.0"
+		"lucide-static": "^0.542.0",
+		"simple-icons": "^15.13.0",
+		"svgo": "^4.0.0"
 	}
 }

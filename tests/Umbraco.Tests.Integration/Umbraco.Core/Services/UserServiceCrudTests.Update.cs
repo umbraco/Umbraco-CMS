@@ -151,7 +151,21 @@ internal sealed partial class UserServiceCrudTests
             Assert.AreEqual(email, updatedUser.Email);
             Assert.AreEqual(name, updatedUser.Name);
         });
+    }
 
+    [Test]
+    public async Task Cannot_Update_User_To_Have_No_Groups()
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+
+        var (updateModel, createdUser) = await CreateUserForUpdate(userService);
+
+        updateModel.UserGroupKeys.Clear();
+
+        var updateAttempt = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        Assert.IsFalse(updateAttempt.Success);
+        Assert.AreEqual(UserOperationStatus.NoUserGroup, updateAttempt.Status);
     }
 
     [Test]

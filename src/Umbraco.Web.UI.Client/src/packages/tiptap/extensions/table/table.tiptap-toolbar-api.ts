@@ -1,7 +1,7 @@
-import { UmbTiptapToolbarElementApiBase } from '../base.js';
+import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
-export class UmbTiptapToolbarTableExtensionApi extends UmbTiptapToolbarElementApiBase {
+export default class UmbTiptapToolbarTableExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override isActive(editor?: Editor, item?: unknown) {
 		if (!item) return super.isActive(editor);
 		return false;
@@ -9,5 +9,3 @@ export class UmbTiptapToolbarTableExtensionApi extends UmbTiptapToolbarElementAp
 
 	override execute() {}
 }
-
-export { UmbTiptapToolbarTableExtensionApi as api };

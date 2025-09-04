@@ -12,6 +12,7 @@ import type { Rect } from '@tiptap/pm/tables';
 
 // NOTE: Custom TableView, to allow for custom styles to be applied to the <table> element. [LK]
 // ref: https://github.com/ueberdosis/tiptap/blob/v2.11.5/packages/extension-table/src/TableView.ts
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export class UmbTableView extends TableView {
 	constructor(node: ProseMirrorNode, cellMinWidth: number) {
 		super(node, cellMinWidth);
@@ -34,13 +35,16 @@ export class UmbTableView extends TableView {
 	}
 }
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTable = Table.configure({ resizable: true, View: UmbTableView });
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTableRow = TableRow.extend({
 	allowGapCursor: false,
 	content: '(tableCell | tableHeader)*',
 });
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTableHeader = TableHeader.extend({
 	addAttributes() {
 		return {
@@ -122,6 +126,7 @@ export const UmbTableHeader = TableHeader.extend({
 	},
 });
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTableCell = TableCell.extend({
 	addAttributes() {
 		return {

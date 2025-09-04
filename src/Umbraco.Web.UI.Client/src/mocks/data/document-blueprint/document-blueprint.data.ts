@@ -40,6 +40,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 				value: 'my blueprint value',
 			},
 		],
+		signs: [],
 	},
 	{
 		id: 'forbidden',
@@ -71,5 +72,6 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 				value: 'my blueprint value',
 			},
 		],
+		signs: [],
 	},
 ];

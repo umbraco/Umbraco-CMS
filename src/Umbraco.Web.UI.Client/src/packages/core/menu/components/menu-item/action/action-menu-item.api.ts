@@ -5,6 +5,11 @@ export abstract class UmbMenuItemActionApiBase<ArgsMetaType = never>
 	extends UmbActionBase<UmbMenuItemActionApiArgs<ArgsMetaType>>
 	implements UmbMenuItemActionApi<ArgsMetaType>
 {
+	/**
+	 * By specifying the `execute` method, the action will act as a button.
+	 * @abstract
+	 * @returns {Promise<void>}
+	 */
 	public execute(): Promise<void> {
 		return Promise.resolve();
 	}

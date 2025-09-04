@@ -44,6 +44,7 @@ const treeItemMapper = (model: UmbMockDictionaryModel): NamedEntityTreeItemRespo
 		id: model.id,
 		parent: model.parent,
 		hasChildren: model.hasChildren,
+		signs: model.signs,
 	};
 };
 
@@ -55,6 +56,7 @@ const createMockMapper = (request: CreateDictionaryItemRequestModel): UmbMockDic
 		translations: request.translations,
 		hasChildren: false,
 		translatedIsoCodes: [],
+		signs: [],
 	};
 };
 
@@ -70,6 +72,7 @@ const itemMapper = (model: UmbMockDictionaryModel): DictionaryItemItemResponseMo
 	return {
 		name: model.name,
 		id: model.id,
+		signs: model.signs,
 	};
 };
 

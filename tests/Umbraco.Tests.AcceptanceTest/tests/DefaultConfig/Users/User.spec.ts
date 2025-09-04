@@ -95,8 +95,10 @@ test('can add multiple user groups to a user', async ({umbracoApi, umbracoUi}) =
 
 test('can remove a user group from a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  const secondUserGroupName = 'Translators';
+  const userGroupWriters = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  const userGroupTranslators = await umbracoApi.userGroup.getByName(secondUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroupWriters.id, userGroupTranslators.id]);
   await umbracoUi.user.goToUsers();
 
   // Act
@@ -107,8 +109,7 @@ test('can remove a user group from a user', {tag: '@smoke'}, async ({umbracoApi,
 
   // Assert
   await umbracoUi.user.isSuccessStateVisibleForSaveButton();
-  const userData = await umbracoApi.user.getByName(nameOfTheUser);
-  expect(userData.userGroupIds).toEqual([]);
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(nameOfTheUser, [userGroupTranslators.id])).toBeTruthy();
 });
 
 test('can update culture for a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -596,4 +597,49 @@ test('can order by newest user', async ({umbracoApi, umbracoUi}) => {
 
 // TODO: Sometimes the frontend does not switch from grid to table, or table to grid.
 test.skip('can change from grid to table view', async ({page, umbracoApi, umbracoUi}) => {
+});
+
+// This test is skipped because currently it is impossible to remove the admin user group from a user
+// Related issue: https://github.com/umbraco/Umbraco-CMS/issues/19917
+test.skip('can remove admin user group from a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const adminUserGroupName = 'Administrators';
+  const editorUserGroupName = 'Editors';
+  const adminUserGroupData = await umbracoApi.userGroup.getByName(adminUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [adminUserGroupData.id]);
+  await umbracoUi.user.goToUsers();
+
+  // Act
+  await umbracoUi.user.clickUserWithName(nameOfTheUser);
+  // Removes the admin user group
+  await umbracoUi.user.clickRemoveButtonForUserGroupWithName(adminUserGroupName);
+  await umbracoUi.user.clickConfirmRemoveButton();
+  // Adds another user group
+  await umbracoUi.user.clickChooseUserGroupsButton();
+  await umbracoUi.user.clickButtonWithName(editorUserGroupName);
+  await umbracoUi.user.clickChooseModalButton();
+  await umbracoUi.user.clickSaveButton();
+
+  // Assert
+  await umbracoUi.user.isSuccessStateVisibleForSaveButton();
+  const editorUserGroupData = await umbracoApi.userGroup.getByName(editorUserGroupName);
+  expect(await umbracoApi.user.doesUserContainUserGroupIds(nameOfTheUser, [editorUserGroupData.id])).toBeTruthy();
+});
+
+// This test is skipped because currently it is possible to remove all user groups from a user
+// Related issue: https://github.com/umbraco/Umbraco-CMS/issues/19992
+test.skip('cannot remove all user group from a user', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+  await umbracoUi.user.goToUsers();
+
+  // Act
+  await umbracoUi.user.clickUserWithName(nameOfTheUser);
+  await umbracoUi.user.clickRemoveButtonForUserGroupWithName(defaultUserGroupName);
+  await umbracoUi.user.clickConfirmRemoveButton();;
+  await umbracoUi.user.clickSaveButton();
+
+  // Assert
+  await umbracoUi.user.isErrorNotificationVisible();
 });

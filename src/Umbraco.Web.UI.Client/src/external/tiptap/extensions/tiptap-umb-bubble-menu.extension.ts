@@ -5,11 +5,13 @@ import { EditorState, Plugin, PluginKey } from '@tiptap/pm/state';
 import { EditorView } from '@tiptap/pm/view';
 import type { PluginView } from '@tiptap/pm/state';
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export interface UmbTiptapBubbleMenuElement extends HTMLElement {
 	editor?: Editor;
 	menuAlias?: string;
 }
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export type UmbBubbleMenuPluginProps = {
 	unique: string;
 	placement?: UUIPopoverContainerElement['placement'];
@@ -20,8 +22,10 @@ export type UmbBubbleMenuPluginProps = {
 		| null;
 };
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export type UmbBubbleMenuOptions = UmbBubbleMenuPluginProps;
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbBubbleMenu = Extension.create<UmbBubbleMenuOptions>({
 	name: 'umbBubbleMenu',
 
@@ -104,6 +108,7 @@ class UmbBubbleMenuPluginView implements PluginView {
 	}
 }
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbBubbleMenuPlugin = (editor: Editor, props: UmbBubbleMenuPluginProps) => {
 	return new Plugin({
 		view(editorView) {

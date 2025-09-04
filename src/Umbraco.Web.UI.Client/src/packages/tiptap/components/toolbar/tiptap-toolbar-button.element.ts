@@ -45,7 +45,7 @@ export class UmbTiptapToolbarButtonElement extends UmbLitElement {
 				look=${this.isActive ? 'outline' : 'default'}
 				label=${label}
 				title=${label}
-				?disabled=${this.api && this.editor && this.api.isDisabled(this.editor)}
+				?disabled=${this.api?.isDisabled(this.editor)}
 				@click=${() => this.api?.execute(this.editor)}>
 				${when(
 					this.manifest?.meta.icon,

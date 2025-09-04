@@ -33,6 +33,7 @@ const permissionsTestDocument = {
 			updateDate: '2023-02-06T15:32:24.957009',
 		},
 	],
+	signs: [],
 };
 
 export const data: Array<UmbMockDocumentModel> = [
@@ -53,6 +54,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			...variant,
 			name: 'Permissions 1',
 		})),
+		signs: [],
 	},
 	{
 		...permissionsTestDocument,
@@ -70,6 +72,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			...variant,
 			name: 'Permissions 2',
 		})),
+		signs: [],
 	},
 	{
 		...permissionsTestDocument,
@@ -87,6 +90,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			...variant,
 			name: 'Permissions 2.1',
 		})),
+		signs: [],
 	},
 	{
 		...permissionsTestDocument,
@@ -104,6 +108,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			...variant,
 			name: 'Permissions 2.2',
 		})),
+		signs: [],
 	},
 	{
 		...permissionsTestDocument,
@@ -125,5 +130,6 @@ export const data: Array<UmbMockDocumentModel> = [
 			...variant,
 			name: 'Permissions 2.2.1',
 		})),
+		signs: [],
 	},
 ];

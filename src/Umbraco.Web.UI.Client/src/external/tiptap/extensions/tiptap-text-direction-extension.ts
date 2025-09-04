@@ -1,10 +1,12 @@
 import { Extension } from '@tiptap/core';
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export interface TextDirectionOptions {
 	directions: Array<'auto' | 'ltr' | 'rtl'>;
 	types: Array<string>;
 }
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const TextDirection = Extension.create<TextDirectionOptions>({
 	name: 'textDirection',
 

@@ -158,3 +158,33 @@ test.fixme('can not publish a mandatory media picker with an empty value', async
   expect(contentData.values[0].value[0].focalPoint).toBeNull();
   expect(contentData.values[0].value[0].crops).toEqual([]);
 });
+
+// This is a test for the regression issue #10431
+test('can add a media image to a media picker in variant content, remove it and then add it again', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', true, true, false);
+  await umbracoApi.document.createDefaultDocumentWithEnglishCulture(contentName, documentTypeId);
+  const mediaFileId = await umbracoApi.media.createDefaultMediaWithImage(mediaFileName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  // Adds media item to a media picker
+  await umbracoUi.content.clickChooseButtonAndSelectMediaWithKey(mediaFileId);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+  // Removes media item from the media picker
+  await umbracoUi.content.removeMediaPickerByName(mediaFileName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+  await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
+
+  // Adds media item to a media picker again
+  await umbracoUi.content.clickChooseButtonAndSelectMediaWithKey(mediaFileId);
+  await umbracoUi.content.clickChooseModalButton();
+
+  // Assert
+  await umbracoUi.content.isMediaNameVisible(mediaFileName);
+});

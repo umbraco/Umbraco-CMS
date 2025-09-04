@@ -1124,14 +1124,8 @@ export type IndexResponseModel = {
     } | null;
 };
 
-export type InstallRequestModelReadable = {
-    user: UserInstallRequestModelReadable;
-    database: DatabaseInstallRequestModel;
-    telemetryLevel: TelemetryLevelModel;
-};
-
-export type InstallRequestModelWritable = {
-    user: UserInstallRequestModelWritable;
+export type InstallRequestModel = {
+    user: UserInstallRequestModel;
     database: DatabaseInstallRequestModel;
     telemetryLevel: TelemetryLevelModel;
 };
@@ -1707,7 +1701,7 @@ export type PackageConfigurationResponseModel = {
     marketplaceUrl: string;
 };
 
-export type PackageDefinitionResponseModelReadable = {
+export type PackageDefinitionResponseModel = {
     name: string;
     contentNodeId?: string | null;
     contentLoadChildNodes: boolean;
@@ -1724,24 +1718,6 @@ export type PackageDefinitionResponseModelReadable = {
     dictionaryItems: Array<string>;
     id: string;
     readonly packagePath: string;
-};
-
-export type PackageDefinitionResponseModelWritable = {
-    name: string;
-    contentNodeId?: string | null;
-    contentLoadChildNodes: boolean;
-    mediaIds: Array<string>;
-    mediaLoadChildNodes: boolean;
-    documentTypes: Array<string>;
-    mediaTypes: Array<string>;
-    dataTypes: Array<string>;
-    templates: Array<string>;
-    partialViews: Array<string>;
-    stylesheets: Array<string>;
-    scripts: Array<string>;
-    languages: Array<string>;
-    dictionaryItems: Array<string>;
-    id: string;
 };
 
 export type PackageMigrationStatusResponseModel = {
@@ -1949,14 +1925,9 @@ export type PagedObjectTypeResponseModel = {
     items: Array<ObjectTypeResponseModel>;
 };
 
-export type PagedPackageDefinitionResponseModelReadable = {
+export type PagedPackageDefinitionResponseModel = {
     total: number;
-    items: Array<PackageDefinitionResponseModelReadable>;
-};
-
-export type PagedPackageDefinitionResponseModelWritable = {
-    total: number;
-    items: Array<PackageDefinitionResponseModelWritable>;
+    items: Array<PackageDefinitionResponseModel>;
 };
 
 export type PagedPackageMigrationStatusResponseModel = {
@@ -1984,14 +1955,9 @@ export type PagedReferenceByIdModel = {
     items: Array<ReferenceByIdModel>;
 };
 
-export type PagedRelationResponseModelReadable = {
+export type PagedRelationResponseModel = {
     total: number;
-    items: Array<RelationResponseModelReadable>;
-};
-
-export type PagedRelationResponseModelWritable = {
-    total: number;
-    items: Array<RelationResponseModelWritable>;
+    items: Array<RelationResponseModel>;
 };
 
 export type PagedRelationTypeResponseModel = {
@@ -2004,14 +1970,9 @@ export type PagedSavedLogSearchResponseModel = {
     items: Array<SavedLogSearchResponseModel>;
 };
 
-export type PagedSearchResultResponseModelReadable = {
+export type PagedSearchResultResponseModel = {
     total: number;
-    items: Array<SearchResultResponseModelReadable>;
-};
-
-export type PagedSearchResultResponseModelWritable = {
-    total: number;
-    items: Array<SearchResultResponseModelWritable>;
+    items: Array<SearchResultResponseModel>;
 };
 
 export type PagedSearcherResponseModel = {
@@ -2209,20 +2170,13 @@ export type RelationReferenceModel = {
     name?: string | null;
 };
 
-export type RelationResponseModelReadable = {
+export type RelationResponseModel = {
     id: string;
     relationType: ReferenceByIdModel;
     parent: RelationReferenceModel;
     child: RelationReferenceModel;
     readonly createDate: string;
     readonly comment?: string | null;
-};
-
-export type RelationResponseModelWritable = {
-    id: string;
-    relationType: ReferenceByIdModel;
-    parent: RelationReferenceModel;
-    child: RelationReferenceModel;
 };
 
 export type RelationTypeItemResponseModel = {
@@ -2323,16 +2277,10 @@ export type ScriptResponseModel = {
     content: string;
 };
 
-export type SearchResultResponseModelReadable = {
+export type SearchResultResponseModel = {
     id: string;
     score: number;
     readonly fieldCount: number;
-    fields: Array<FieldPresentationModel>;
-};
-
-export type SearchResultResponseModelWritable = {
-    id: string;
-    score: number;
     fields: Array<FieldPresentationModel>;
 };
 
@@ -2788,7 +2736,7 @@ export type UpdateMemberTypeRequestModel = {
     compositions: Array<MemberTypeCompositionModel>;
 };
 
-export type UpdatePackageRequestModelReadable = {
+export type UpdatePackageRequestModel = {
     name: string;
     contentNodeId?: string | null;
     contentLoadChildNodes: boolean;
@@ -2804,23 +2752,6 @@ export type UpdatePackageRequestModelReadable = {
     languages: Array<string>;
     dictionaryItems: Array<string>;
     readonly packagePath: string;
-};
-
-export type UpdatePackageRequestModelWritable = {
-    name: string;
-    contentNodeId?: string | null;
-    contentLoadChildNodes: boolean;
-    mediaIds: Array<string>;
-    mediaLoadChildNodes: boolean;
-    documentTypes: Array<string>;
-    mediaTypes: Array<string>;
-    dataTypes: Array<string>;
-    templates: Array<string>;
-    partialViews: Array<string>;
-    stylesheets: Array<string>;
-    scripts: Array<string>;
-    languages: Array<string>;
-    dictionaryItems: Array<string>;
 };
 
 export type UpdatePartialViewRequestModel = {
@@ -2898,19 +2829,12 @@ export type UpgradeCheckResponseModel = {
     url: string;
 };
 
-export type UpgradeSettingsResponseModelReadable = {
+export type UpgradeSettingsResponseModel = {
     currentState: string;
     newState: string;
     newVersion: string;
     oldVersion: string;
     readonly reportUrl: string;
-};
-
-export type UpgradeSettingsResponseModelWritable = {
-    currentState: string;
-    newState: string;
-    newVersion: string;
-    oldVersion: string;
 };
 
 export type UserConfigurationResponseModel = {
@@ -2974,17 +2898,11 @@ export type UserGroupResponseModel = {
     aliasCanBeChanged: boolean;
 };
 
-export type UserInstallRequestModelReadable = {
+export type UserInstallRequestModel = {
     name: string;
     email: string;
     password: string;
     readonly subscribeToNewsletter: boolean;
-};
-
-export type UserInstallRequestModelWritable = {
-    name: string;
-    email: string;
-    password: string;
 };
 
 export type UserItemResponseModel = {
@@ -7681,7 +7599,7 @@ export type GetInstallSettingsResponses = {
 export type GetInstallSettingsResponse = GetInstallSettingsResponses[keyof GetInstallSettingsResponses];
 
 export type PostInstallSetupData = {
-    body?: InstallRequestModelWritable;
+    body?: InstallRequestModel;
     path?: never;
     query?: never;
     url: '/umbraco/management/api/v1/install/setup';
@@ -11375,7 +11293,7 @@ export type GetPackageCreatedResponses = {
     /**
      * OK
      */
-    200: PagedPackageDefinitionResponseModelReadable;
+    200: PagedPackageDefinitionResponseModel;
 };
 
 export type GetPackageCreatedResponse = GetPackageCreatedResponses[keyof GetPackageCreatedResponses];
@@ -11478,13 +11396,13 @@ export type GetPackageCreatedByIdResponses = {
     /**
      * OK
      */
-    200: PackageDefinitionResponseModelReadable;
+    200: PackageDefinitionResponseModel;
 };
 
 export type GetPackageCreatedByIdResponse = GetPackageCreatedByIdResponses[keyof GetPackageCreatedByIdResponses];
 
 export type PutPackageCreatedByIdData = {
-    body?: UpdatePackageRequestModelWritable;
+    body?: UpdatePackageRequestModel;
     path: {
         id: string;
     };
@@ -12510,7 +12428,7 @@ export type GetRelationByRelationTypeIdResponses = {
     /**
      * OK
      */
-    200: PagedRelationResponseModelReadable;
+    200: PagedRelationResponseModel;
 };
 
 export type GetRelationByRelationTypeIdResponse = GetRelationByRelationTypeIdResponses[keyof GetRelationByRelationTypeIdResponses];
@@ -12974,7 +12892,7 @@ export type GetSearcherBySearcherNameQueryResponses = {
     /**
      * OK
      */
-    200: PagedSearchResultResponseModelReadable;
+    200: PagedSearchResultResponseModel;
 };
 
 export type GetSearcherBySearcherNameQueryResponse = GetSearcherBySearcherNameQueryResponses[keyof GetSearcherBySearcherNameQueryResponses];
@@ -14454,7 +14372,7 @@ export type GetUpgradeSettingsResponses = {
     /**
      * OK
      */
-    200: UpgradeSettingsResponseModelReadable;
+    200: UpgradeSettingsResponseModel;
 };
 
 export type GetUpgradeSettingsResponse = GetUpgradeSettingsResponses[keyof GetUpgradeSettingsResponses];

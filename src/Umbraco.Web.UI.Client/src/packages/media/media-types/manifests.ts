@@ -17,4 +17,10 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...searchManifests,
 	...treeManifests,
 	...workspaceManifests,
+	{
+		name: 'Media Type Backoffice Entry Point',
+		alias: 'Umb.EntryPoint.MediaType',
+		type: 'backofficeEntryPoint',
+		js: () => import('./entry-point.js'),
+	},
 ];

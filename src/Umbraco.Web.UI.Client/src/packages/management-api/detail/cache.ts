@@ -1,7 +1,8 @@
 // Keep internal
-interface UmbCacheEntryModel<DetailDataModelType> {
+interface UmbDetailCacheEntryModel<DetailDataModelType> {
 	id: string;
 	data: DetailDataModelType;
+	timestamp: string;
 }
 
 /**
@@ -10,7 +11,7 @@ interface UmbCacheEntryModel<DetailDataModelType> {
  * @template DetailDataModelType
  */
 export class UmbManagementApiDetailDataCache<DetailDataModelType> {
-	#entries: Map<string, UmbCacheEntryModel<DetailDataModelType>> = new Map();
+	#entries: Map<string, UmbDetailCacheEntryModel<DetailDataModelType>> = new Map();
 
 	/**
 	 * Checks if an entry exists in the cache
@@ -29,9 +30,10 @@ export class UmbManagementApiDetailDataCache<DetailDataModelType> {
 	 * @memberof UmbManagementApiDetailDataCache
 	 */
 	set(id: string, data: DetailDataModelType): void {
-		const cacheEntry: UmbCacheEntryModel<DetailDataModelType> = {
+		const cacheEntry: UmbDetailCacheEntryModel<DetailDataModelType> = {
 			id: id,
 			data,
+			timestamp: new Date().toISOString(),
 		};
 
 		this.#entries.set(id, cacheEntry);

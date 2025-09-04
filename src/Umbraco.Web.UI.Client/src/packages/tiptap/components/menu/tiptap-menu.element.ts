@@ -11,11 +11,11 @@ export class UmbTiptapMenuElement extends UmbMenuElement {
 		return html`
 			${when(
 				this.menuAlias || this.manifest?.alias,
-				(menu) => html`
+				(menuAlias) => html`
 					<umb-extension-with-api-slot
 						type="menuItem"
 						default-element="umb-action-menu-item"
-						.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(menu)}></umb-extension-with-api-slot>
+						.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(menuAlias)}></umb-extension-with-api-slot>
 				`,
 			)}
 		`;

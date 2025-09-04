@@ -1,11 +1,12 @@
 import { UMB_TEMPLATE_TREE_ALIAS } from '../tree/index.js';
+import { UMB_TEMPLATE_MENU_ITEM_ALIAS } from './constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',
-		alias: 'Umb.MenuItem.Templates',
+		alias: UMB_TEMPLATE_MENU_ITEM_ALIAS,
 		name: 'Templates Menu Item',
 		weight: 40,
 		meta: {
@@ -17,9 +18,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceContext',
+		kind: 'menuStructure',
 		name: 'Template Menu Structure Workspace Context',
 		alias: 'Umb.Context.Template.Menu.Structure',
 		api: () => import('./template-menu-structure.context.js'),
+		meta: {
+			menuItemAlias: UMB_TEMPLATE_MENU_ITEM_ALIAS,
+		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,

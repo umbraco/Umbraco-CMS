@@ -12,4 +12,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...workspaceManifests,
 	...entityActionManifests,
 	...propertyEditorsManifests,
+	{
+		name: 'Stylesheet Backoffice Entry Point',
+		alias: 'Umb.EntryPoint.Stylesheet',
+		type: 'backofficeEntryPoint',
+		js: () => import('./entry-point.js'),
+	},
 ];

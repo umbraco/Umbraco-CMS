@@ -67,5 +67,11 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_15_0_0.AddDocumentUrl>("{B9133686-B758-404D-AF12-708AA80C7E44}");
         To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{EEB1F012-B44D-4AB4-8756-F7FB547345B4}");
         To<V_14_0_0.AddListViewKeysToDocumentTypes>("{0F49E1A4-AFD8-4673-A91B-F64E78C48174}");
+
+        // To 16.2.0
+        // - This needs to be a pre-migration as it adds a lock to the process for rebuilding document URLs, which is
+        //   called by a migration for 15. By using a pre-migration we ensure the lock record is in place when migrating
+        //   through 15 versions to the latest.
+        To<V_16_2_0.AddDocumentUrlLock>("{5ECCE7A7-2EFC-47A5-A081-FFD94D9F79AA}");
     }
 }

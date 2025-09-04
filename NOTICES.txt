@@ -3,7 +3,9 @@ Third-Party Notices
 
 This file contains notices and attributions for third-party software used in the Umbraco CMS project.
 
-It is not a license and does not grant any rights to use the third-party software.
+Third-party software may contain dependencies that are not explicitly listed here.
+
+This notice is not a license and does not grant any rights to use the third-party software.
 
 Umbraco CMS is licensed under the MIT License, which can be found in the LICENSE file.
 
@@ -110,14 +112,6 @@ Examine: A search and indexing library for .NET
 URL: https://github.com/Shazwazza/Examine
 License: Microsoft Public License (Ms-PL)
 Copyright: 2023 Shannon Deminick
-
----
-
-Glob: A library for matching file paths using glob patterns
-
-URL: https://github.com/isaacs/node-glob
-License: ISC License
-Copyright: 2009-2023 Isaac Z. Schlueter and Contributors
 
 ---
 
@@ -353,38 +347,6 @@ Remark-gfm: A GitHub Flavored Markdown plugin for Remark
 URL: https://github.com/remarkjs/remark-gfm
 License: MIT License
 Copyright: Titus Wormer
-
----
-
-Rollup: A module bundler for JavaScript
-
-URL: https://rollupjs.org/
-License: MIT License
-Copyright: 2015-present Rollup contributors
-
----
-
-Rollup Plugins: A collection of Rollup plugins
-
-URL: https://github.com/rollup/plugins
-License: MIT License
-Copyright: 2019-present Rollup Plugins contributors
-
----
-
-Rollup-plugin-esbuild: A Rollup plugin for using esbuild
-
-URL: https://github.com/egoist/rollup-plugin-esbuild
-License: MIT License
-Copyright: 2020 EGOIST
-
----
-
-Rollup-plugin-import-css: A Rollup plugin for importing CSS files
-
-URL: https://github.com/jleeson/rollup-plugin-import-css
-License: MIT License
-Copyright: 2020 Jacob Leeson
 
 ---
 

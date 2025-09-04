@@ -1,5 +1,6 @@
 import Link from '@tiptap/extension-link';
 
+/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbLink = Link.extend({
 	name: 'umbLink',
 
@@ -11,6 +12,9 @@ export const UmbLink = Link.extend({
 			type: { default: 'external' },
 		};
 	},
+
+	// TODO: [LK] Look to use a NodeView to render the link
+	// https://tiptap.dev/docs/editor/extensions/custom-extensions/node-views/javascript
 
 	addOptions() {
 		return {

@@ -185,7 +185,7 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   const textAreaDataTypeName = 'Textarea';
   const textAreaData = await umbracoApi.dataType.getByName(textAreaDataTypeName);
   const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(settingModelName, groupName, textAreaDataTypeName, textAreaData.id);
-  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithContentAndSettingsElementType(customDataTypeName, elementTypeId, settingsElementTypeId, true);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithContentAndSettingsElementType(customDataTypeName, elementTypeId, settingsElementTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -194,6 +194,7 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickTextButtonWithName(elementTypeName);
   await umbracoUi.content.enterTextstring(contentBlockInputText);
   await umbracoUi.content.clickAddBlockSettingsTabButton();
   await umbracoUi.content.enterTextArea(settingBlockInputText);
@@ -266,7 +267,7 @@ test('can add an invariant block element with invariant RTE Tiptap in the conten
   const customElementTypeName = 'BlockListWithRTEElement';
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
-  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
@@ -300,7 +301,7 @@ test('can add a variant block element with variant RTE Tiptap in the content', a
   await umbracoApi.language.createDanishLanguage();
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
-  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'testGroup', true);
   await umbracoApi.document.createDefaultDocumentWithCulture(contentName, documentTypeId, 'en-US');
   await umbracoUi.goToBackOffice();
@@ -336,8 +337,8 @@ test('can add a variant block element with invariant RTE Tiptap in the content',
   await umbracoApi.language.createDanishLanguage();
   const customRTEDataTypeId = await umbracoApi.dataType.createDefaultTiptapDataType(customRTEDataTypeName);
   const customElementTypeId = await umbracoApi.documentType.createDefaultElementType(customElementTypeName, groupName, customRTEDataTypeName, customRTEDataTypeId);
-  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId, true, true);
-  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'testGroup', true);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, customElementTypeId);
+  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
   await umbracoApi.document.createDefaultDocumentWithCulture(contentName, documentTypeId, 'en-US');
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);

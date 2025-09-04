@@ -3,7 +3,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbContentTypeModel,
 	UmbContentTypeStructureManager,
-	UmbPropertyTypeContainerModel,
+	UmbPropertyTypeContainerMergedModel,
 } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbContentTypeContainerStructureHelper,
@@ -28,7 +28,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
-	private _groups: Array<UmbPropertyTypeContainerModel> = [];
+	private _groups: Array<UmbPropertyTypeContainerMergedModel> = [];
 
 	@state()
 	private _hasProperties = false;
@@ -42,7 +42,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 				workspaceContext?.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
 			);
 		});
-		this.observe(this.#groupStructureHelper.mergedContainers, (groups) => {
+		this.observe(this.#groupStructureHelper.childContainers, (groups) => {
 			this._groups = groups;
 		});
 		this.observe(this.#groupStructureHelper.hasProperties, (hasProperties) => {
@@ -63,12 +63,12 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 				: ''}
 			${repeat(
 				this._groups,
-				(group) => group.id,
+				(group) => group.key,
 				(group) =>
 					html`<uui-box .headline=${this.localize.string(group.name) ?? ''}>
 						<umb-content-workspace-view-edit-properties
 							data-mark="property-group:${group.name}"
-							.containerId=${group.id}></umb-content-workspace-view-edit-properties>
+							.containerId=${group.ids[0]}></umb-content-workspace-view-edit-properties>
 					</uui-box>`,
 			)}
 		`;

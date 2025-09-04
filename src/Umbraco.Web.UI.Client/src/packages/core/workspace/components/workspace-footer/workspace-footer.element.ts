@@ -29,9 +29,6 @@ function ExtensionApiArgsMethod(
 @customElement('umb-workspace-footer')
 export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	@state()
-	private _withinModal = false;
-
-	@state()
 	private _modalContext?: UmbModalContext;
 
 	@state()
@@ -63,13 +60,12 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 							label=${this._isNew ? 'Cancel' : 'Close'}
 							@click=${this.#rejectModal}></uui-button>`
 					: ''}
+
 				<slot name="actions" slot="actions"></slot>
 				<umb-extension-with-api-slot
 					slot="actions"
 					type="workspaceAction"
 					.apiArgs=${ExtensionApiArgsMethod}></umb-extension-with-api-slot>
-
-				<slot name="actions" slot="actions"></slot>
 			</umb-footer-layout>
 		`;
 	}

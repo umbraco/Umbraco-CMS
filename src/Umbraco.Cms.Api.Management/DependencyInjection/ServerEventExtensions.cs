@@ -51,6 +51,7 @@ internal static class ServerEventExtensions
         builder.AddNotificationAsyncHandler<WebhookSavedNotification, ServerEventSender>();
 
         builder.AddNotificationAsyncHandler<ContentDeletedNotification, ServerEventSender>();
+        builder.AddNotificationAsyncHandler<ContentDeletedBlueprintNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaDeletedNotification, ServerEventSender>();
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, ServerEventSender>();
@@ -82,6 +83,7 @@ internal static class ServerEventExtensions
     {
         builder.EventSourceAuthorizers()
             .Append<DocumentEventAuthorizer>()
+            .Append<DocumentBlueprintEventAuthorizer>()
             .Append<DocumentTypeEventAuthorizer>()
             .Append<MediaEventAuthorizer>()
             .Append<MediaTypeEventAuthorizer>()

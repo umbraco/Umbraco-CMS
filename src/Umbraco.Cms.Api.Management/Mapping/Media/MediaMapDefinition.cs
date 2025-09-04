@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
@@ -24,7 +24,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         mapper.Define<IMedia, MediaCollectionResponseModel>((_, _) => new MediaCollectionResponseModel(), Map);
     }
 
-    // Umbraco.Code.MapAll -Urls
+    // Umbraco.Code.MapAll -Urls -Signs
     private void Map(IMedia source, MediaResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -34,7 +34,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         target.IsTrashed = source.Trashed;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Signs
     private void Map(IMedia source, MediaCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
