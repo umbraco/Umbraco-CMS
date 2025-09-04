@@ -90,7 +90,7 @@ public class SingleBlockPropertyEditor : DataEditor
         /// <summary>
         /// Validates whether the block editor holds a single value
         /// </summary>
-        private sealed class SingleBlockValidator : BlockEditorMinMaxValidatorBase<SingleBlockValue, SingleBlockLayoutItem>
+        internal sealed class SingleBlockValidator : BlockEditorMinMaxValidatorBase<SingleBlockValue, SingleBlockLayoutItem>
         {
             private readonly BlockEditorValues<SingleBlockValue, SingleBlockLayoutItem> _blockEditorValues;
 

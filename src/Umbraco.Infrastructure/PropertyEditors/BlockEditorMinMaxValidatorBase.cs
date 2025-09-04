@@ -29,6 +29,16 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
     /// <inheritdoc/>
     public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext);
 
+    // internal method so we can test for error messages being returned without keeping strings in sync
+    internal static string BuildErrorMessage(
+        ILocalizedTextService textService,
+        int? maxNumberOfBlocks,
+        int numberOfBlocks)
+        => textService.Localize(
+            "validation",
+            "entriesExceed",
+            [maxNumberOfBlocks.ToString(), (numberOfBlocks - maxNumberOfBlocks).ToString(),]);
+
     /// <summary>
     /// Validates the number of blocks are within the configured minimum and maximum values.
     /// </summary>
@@ -53,10 +63,7 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
         if (blockEditorData != null && max.HasValue && numberOfBlocks > max)
         {
             yield return new ValidationResult(
-                TextService.Localize(
-                    "validation",
-                    "entriesExceed",
-                    [max.ToString(), (numberOfBlocks - max).ToString(),]),
+                BuildErrorMessage(TextService, max, numberOfBlocks),
                 ["value"]);
         }
     }

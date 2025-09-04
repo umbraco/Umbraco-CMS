@@ -34,6 +34,10 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
 
     private IContentValidationService ContentValidationService => GetRequiredService<IContentValidationService>();
 
+    private IContentEditingModelFactory ContentEditingModelFactory => GetRequiredService<IContentEditingModelFactory>();
+
+    private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
+
     private const string AllTypes = "allTypes";
     private const string MetaType = "metaType";
 
@@ -154,9 +158,10 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         metaTypesType.IsElement = true;
         await ContentTypeService.CreateAsync(metaTypesType, Constants.Security.SuperUserKey);
 
-        var singleBlockContentType = await CreateSingleBlockContentTypePage([allTypesType, metaTypesType]);
+        var rootPageType = await CreateSingleBlockContentTypePage([allTypesType, metaTypesType]);
 
-        var contentElementKey = Guid.NewGuid();
+        var firstElementKey = Guid.NewGuid();
+        var secondElementKey = Guid.NewGuid();
         var blockValue = new SingleBlockValue
         {
             Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
@@ -164,7 +169,8 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
                 {
                     Constants.PropertyEditors.Aliases.SingleBlock,
                     [
-                        new SingleBlockLayoutItem { ContentKey = contentElementKey }
+                        new SingleBlockLayoutItem { ContentKey = firstElementKey },
+                        new SingleBlockLayoutItem { ContentKey = secondElementKey }
                     ]
                 },
             },
@@ -172,7 +178,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             [
                 new BlockItemData
                 {
-                    Key = contentElementKey,
+                    Key = firstElementKey,
                     ContentTypeAlias = allTypesType.Alias,
                     ContentTypeKey = allTypesType.Key,
                     Values =
@@ -186,7 +192,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
                 },
                 new BlockItemData
                 {
-                    Key = contentElementKey,
+                    Key = secondElementKey,
                     ContentTypeAlias = metaTypesType.Alias,
                     ContentTypeKey = metaTypesType.Key,
                     Values =
@@ -202,31 +208,30 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockValue);
 
-        ContentValidationService.ValidatePropertiesAsync(new ContentCreateModel
-        {
-            ContentTypeKey = textPage.Key,
-            PropertyValues = b
-        });
-
         var content = new ContentBuilder()
-            .WithContentType(singleBlockContentType)
+            .WithContentType(rootPageType)
             .WithName("My Blocks")
             .WithPropertyValues(new { block = blocksPropertyValue })
             .Build();
+
+        // No validation, should just save
         ContentService.Save(content);
 
-        var valueEditor = await GetValueEditor(singleBlockContentType);
-        var toEditorValue = valueEditor.ToEditor(content.Properties["block"]!) as SingleBlockValue;
-        Assert.IsNotNull(toEditorValue);
-        Assert.AreEqual(1, toEditorValue.ContentData.Count);
+        // convert to updateModel and run validation
+        var updateModel = await ContentEditingModelFactory.CreateFromAsync(content);
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(updateModel, rootPageType);
 
-        var properties = toEditorValue.ContentData.First().Values;
-        Assert.AreEqual(1, properties.Count);
         Assert.Multiple(() =>
         {
-            var property = properties.First();
-            Assert.AreEqual("contentPicker", property.Alias);
+            Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+            var validationError = validationResult.ValidationErrors.Single();
+            var expectedErrorMessage = SingleBlockPropertyEditor.SingleBlockEditorPropertyValueEditor
+                .SingleBlockValidator
+                .BuildErrorMessage(LocalizedTextService, 1, 2);
+            Assert.AreEqual("block", validationError.Alias);
+            Assert.AreEqual(expectedErrorMessage, validationError.ErrorMessages.Single());
         });
+
     }
 
     [Test]
