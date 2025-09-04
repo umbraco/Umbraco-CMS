@@ -4,7 +4,7 @@ import type {
 	UmbManagementApiTreeRootItemsRequestArgs,
 	UmbManagementApiTreeSiblingsFromRequestArgs,
 } from './types.js';
-import { tryExecute, type UmbApiResponse } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, UmbError, type UmbApiResponse } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
@@ -13,6 +13,7 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 import { isOffsetPaginationRequest, isTargetPaginationRequest } from '@umbraco-cms/backoffice/utils';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export interface UmbManagementApiTreeDataRequestManagerArgs<
 	TreeItemType,
@@ -34,7 +35,7 @@ export interface UmbManagementApiTreeDataRequestManagerArgs<
 }
 
 export class UmbManagementApiTreeDataRequestManager<
-	TreeItemType,
+	TreeItemType extends { parent: { id: string } | null },
 	RootItemsRequestArgsType extends UmbManagementApiTreeRootItemsRequestArgs,
 	RootItemsDataResponseType extends { items: Array<TreeItemType>; total: number },
 	ChildrenOfRequestArgsType extends UmbManagementApiTreeChildrenOfRequestArgs,
@@ -94,18 +95,13 @@ export class UmbManagementApiTreeDataRequestManager<
 				},
 			} as SiblingsFromRequestArgsType;
 
-			const { data, error } = await tryExecute(this, this.#getSiblingsFrom(requestArgs));
+			const { data: responseData, error: responseError } = await tryExecute(this, this.#getSiblingsFrom(requestArgs));
 
-			const mappedData = data
-				? {
-						items: data.items,
-						total: data.totalBefore + data.items.length + data.totalAfter,
-						totalBefore: data.totalBefore,
-						totalAfter: data.totalAfter,
-					}
-				: undefined;
+			if (responseError) {
+				return { error: responseError };
+			}
 
-			return { data: mappedData, error };
+			return this.#handleSiblingsResponseData(responseData, null);
 		}
 
 		const skip = this.#getSkipFromArgs(args);
@@ -162,18 +158,13 @@ export class UmbManagementApiTreeDataRequestManager<
 				},
 			} as unknown as SiblingsFromRequestArgsType;
 
-			const { data, error } = await tryExecute(this, this.#getSiblingsFrom(requestArgs));
+			const { data: responseData, error: responseError } = await tryExecute(this, this.#getSiblingsFrom(requestArgs));
 
-			const mappedData = data
-				? {
-						items: data.items,
-						total: data.totalBefore + data.items.length + data.totalAfter,
-						totalBefore: data.totalBefore,
-						totalAfter: data.totalAfter,
-					}
-				: undefined;
+			if (responseError) {
+				return { error: responseError };
+			}
 
-			return { data: mappedData, error };
+			return this.#handleSiblingsResponseData(responseData, args.parent.unique);
 		}
 
 		const skip = this.#getSkipFromArgs(args);
@@ -235,5 +226,40 @@ export class UmbManagementApiTreeDataRequestManager<
 
 		// Including args.take for backwards compatibility
 		return args.take !== undefined ? args.take : this.#defaultTakeSize;
+	}
+
+	#getTargetResultHasValidParents(data: Array<TreeItemType>, parentUnique: string | null): boolean {
+		return data.every((item) => {
+			if (item.parent) {
+				return item.parent.id === parentUnique;
+			} else {
+				return parentUnique === null;
+			}
+		});
+	}
+
+	#handleSiblingsResponseData(responseData: SiblingsFromDataResponseType | undefined, parentUnique: UmbEntityUnique) {
+		let data = undefined;
+		let error = undefined;
+
+		if (responseData) {
+			// The siblings endpoint doesn't know about the parent context, so it will return items that may not have the correct parent
+			const hasValidParents = this.#getTargetResultHasValidParents(responseData?.items, parentUnique);
+			// IF all parents match the request args we return the data
+			if (hasValidParents) {
+				data = {
+					items: responseData.items,
+					total: responseData.totalBefore + responseData.items.length + responseData.totalAfter,
+					totalBefore: responseData.totalBefore,
+					totalAfter: responseData.totalAfter,
+				};
+				// We have gotten a result where the parent do not match. We return an error that the requested target could not be found for the parent.
+				// This could happen if a requested target has been moved to another parent.
+			} else {
+				error = new UmbError('Target was not found within parent');
+			}
+		}
+
+		return { data, error };
 	}
 }
