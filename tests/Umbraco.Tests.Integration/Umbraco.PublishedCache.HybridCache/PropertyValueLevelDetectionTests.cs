@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
@@ -43,6 +43,9 @@ internal sealed class PropertyValueLevelDetectionTests : UmbracoIntegrationTestW
     [TestCase("invalidSourceLevel", false)]
     [TestCase("invalidInterLevel", false)]
     [TestCase("invalidObjectLevel", false)]
+    [TestCase("nullSourceLevel", false)]
+    [TestCase("nullInterLevel", false)]
+    [TestCase("nullObjectLevel", false)]
     [TestCase("somethingElse", false)]
     public void Can_Detect_Property_Value_At_All_Levels_For_Document(string titleValue, bool expectHasValue)
     {
@@ -94,6 +97,9 @@ internal sealed class PropertyValueLevelDetectionTests : UmbracoIntegrationTestW
     [TestCase("invalidSourceLevel", false)]
     [TestCase("invalidInterLevel", false)]
     [TestCase("invalidObjectLevel", false)]
+    [TestCase("nullSourceLevel", false)]
+    [TestCase("nullInterLevel", false)]
+    [TestCase("nullObjectLevel", false)]
     [TestCase("somethingElse", false)]
     public async Task Can_Detect_Property_Value_At_All_Levels_For_Element(string titleValue, bool expectHasValue)
     {
@@ -137,10 +143,13 @@ internal sealed class PropertyValueLevelDetectionTests : UmbracoIntegrationTestW
             {
                 PropertyValueLevel.Source when value?.ToString() is "validSourceLevel" => true,
                 PropertyValueLevel.Source when value?.ToString() is "invalidSourceLevel" => false,
+                PropertyValueLevel.Source when value?.ToString() is "nullSourceLevel" => null,
                 PropertyValueLevel.Inter when value?.ToString() is "validInterLevel" => true,
                 PropertyValueLevel.Inter when value?.ToString() is "invalidInterLevel" => false,
+                PropertyValueLevel.Source when value?.ToString() is "nullInternalLevel" => null,
                 PropertyValueLevel.Object when value?.ToString() is "validObjectLevel" => true,
                 PropertyValueLevel.Object when value?.ToString() is "invalidObjectLevel" => false,
+                PropertyValueLevel.Source when value?.ToString() is "nullObjectlLevel" => null,
                 _ => null,
             };
     }
