@@ -53,11 +53,11 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     /// <summary>
     ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
     /// </summary>
-    /// <param name="keys">The content keys.</param>
+    /// <param name="documentIds">The IDs of the documents.</param>
     /// <returns>
     ///     The provided collection of content keys filtered for those that are scheduled for publishing.
     /// </returns>
-    IEnumerable<Guid> GetScheduledContentKeys(Guid[] keys) => [];
+    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds);
 
     /// <summary>
     ///     Get the count of published items
