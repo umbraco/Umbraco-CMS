@@ -81,8 +81,8 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		if (this.#sectionPathMap.has(clickedSectionAlias)) {
 			const storedPath = this.#sectionPathMap.get(clickedSectionAlias);
 			history.pushState(null, '', storedPath);
-			// Nothing stored, so we navigate to the regular section path
 		} else {
+			// Nothing stored, so we navigate to the regular section path
 			const sectionPath = this.#getSectionPath(manifest);
 			history.pushState(null, '', sectionPath);
 		}
