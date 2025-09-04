@@ -71,11 +71,18 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _hasNextItems = false;
 
+	@state()
+	private _isLoadingPrevChildren = false;
+
+	@state()
+	private _isLoadingNextChildren = false;
+
 	#observeData() {
 		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
 		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []));
-
 		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1));
+		this.observe(this._api?.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false));
+		this.observe(this._api?.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false));
 
 		this.observe(
 			this._api?.targetPagination?.totalPrevItems,
@@ -185,12 +192,16 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	#renderLoadPrevButton() {
 		if (!this._hasPreviousItems) return nothing;
-		return html`<umb-tree-load-prev-button @click=${this.#onLoadPrev}></umb-tree-load-prev-button>`;
+		return html`<umb-tree-load-prev-button
+			@click=${this.#onLoadPrev}
+			.loading=${this._isLoadingPrevChildren}></umb-tree-load-prev-button>`;
 	}
 
 	#renderLoadNextButton() {
 		if (!this._hasNextItems) return nothing;
-		return html`<umb-tree-load-more-button @click=${this.#onLoadNext}></umb-tree-load-more-button> `;
+		return html`<umb-tree-load-more-button
+			@click=${this.#onLoadNext}
+			.loading=${this._isLoadingNextChildren}></umb-tree-load-more-button> `;
 	}
 
 	static override styles = css`

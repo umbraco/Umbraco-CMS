@@ -1,10 +1,16 @@
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-tree-load-prev-button')
 export class UmbTreeLoadPrevButtonElement extends UmbLitElement {
+	@property({ type: Boolean })
+	loading: boolean = false;
+
 	override render() {
+		const state: UUIButtonState = this.loading ? 'waiting' : undefined;
 		return html`<uui-button
+			state=${ifDefined(state)}
 			data-mark="tree:load-prev"
 			id="load-prev"
 			look="secondary"

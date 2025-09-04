@@ -51,7 +51,13 @@ export class UmbTreeItemChildrenManager<
 	public readonly startNode = this.#startNode.asObservable();
 
 	#isLoading = new UmbBooleanState(false);
-	readonly isLoading = this.#isLoading.asObservable();
+	public readonly isLoading = this.#isLoading.asObservable();
+
+	#isLoadingPrevChildren = new UmbBooleanState(false);
+	public readonly isLoadingPrevChildren = this.#isLoadingPrevChildren.asObservable();
+
+	#isLoadingNextChildren = new UmbBooleanState(false);
+	public readonly isLoadingNextChildren = this.#isLoadingNextChildren.asObservable();
 
 	#takeSize: number = 5;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
@@ -312,6 +318,7 @@ export class UmbTreeItemChildrenManager<
 		if (!repository) throw new Error('Could not request children, repository is missing');
 
 		this.#isLoading.setValue(true);
+		this.#isLoadingPrevChildren.setValue(true);
 
 		const parent = this.getStartNode() || this.getTreeItem();
 		const foldersOnly = this.getFoldersOnly();
@@ -373,6 +380,7 @@ export class UmbTreeItemChildrenManager<
 		}
 
 		this.#isLoading.setValue(false);
+		this.#isLoadingPrevChildren.setValue(false);
 	}
 
 	#loadNextItemsRetries = 0;
@@ -388,6 +396,7 @@ export class UmbTreeItemChildrenManager<
 		if (!repository) throw new Error('Could not request children, repository is missing');
 
 		this.#isLoading.setValue(true);
+		this.#isLoadingNextChildren.setValue(true);
 
 		const parent = this.getStartNode() || this.getTreeItem();
 		const foldersOnly = this.getFoldersOnly();
@@ -455,6 +464,7 @@ export class UmbTreeItemChildrenManager<
 		}
 
 		this.#isLoading.setValue(false);
+		this.#isLoadingNextChildren.setValue(false);
 	}
 
 	/**

@@ -25,6 +25,12 @@ export abstract class UmbTreeItemElementBase<
 	@state()
 	private _label?: string;
 
+	@state()
+	private _isLoadingPrevChildren = false;
+
+	@state()
+	private _isLoadingNextChildren = false;
+
 	@property({ type: Object, attribute: false })
 	public set api(value: TreeItemContextType | undefined) {
 		this.#api = value;
@@ -41,6 +47,8 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.path, (value) => (this._href = value));
 			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value));
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value));
+			this.observe(this.#api.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false));
+			this.observe(this.#api.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false));
 
 			this.observe(
 				this.#api.targetPagination?.totalPrevItems,
@@ -239,11 +247,17 @@ export abstract class UmbTreeItemElementBase<
 
 	#renderLoadPrevButton() {
 		if (!this._hasPreviousItems) return nothing;
-		return html` <umb-tree-load-prev-button @click=${this.#onLoadPrev}></umb-tree-load-prev-button>`;
+		return html` <umb-tree-load-prev-button
+			@click=${this.#onLoadPrev}
+			.loading=${this._isLoadingPrevChildren}></umb-tree-load-prev-button>`;
 	}
 
 	#renderLoadNextButton() {
 		if (!this._hasNextItems) return nothing;
-		return html` <umb-tree-load-more-button @click=${this.#onLoadNext}></umb-tree-load-more-button> `;
+		return html`
+			<umb-tree-load-more-button
+				@click=${this.#onLoadNext}
+				.loading=${this._isLoadingNextChildren}></umb-tree-load-more-button>
+		`;
 	}
 }

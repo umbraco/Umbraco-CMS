@@ -20,6 +20,7 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	hasActions: Observable<boolean>;
 	path: Observable<string>;
 	pagination: UmbPaginationManager;
+	// TODO: v18 make these non-optional
 	targetPagination?: UmbTargetPaginationManager;
 	getTreeItem(): TreeItemType | undefined;
 	setTreeItem(treeItem: TreeItemType | undefined): void;
@@ -34,4 +35,6 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> exten
 	// TODO: v18 make these non-optional
 	loadPrevItems?(): void;
 	loadNextItems?(): void;
+	isLoadingPrevChildren?: Observable<boolean>;
+	isLoadingNextChildren?: Observable<boolean>;
 }

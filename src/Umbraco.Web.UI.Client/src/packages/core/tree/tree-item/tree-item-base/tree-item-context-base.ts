@@ -53,6 +53,8 @@ export abstract class UmbTreeItemContextBase<
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
 	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
+	public readonly isLoadingPrevChildren = this.#treeItemChildrenManager.isLoadingPrevChildren;
+	public readonly isLoadingNextChildren = this.#treeItemChildrenManager.isLoadingNextChildren;
 
 	#treeItemExpansionManager = new UmbTreeItemTargetExpansionManager<TreeItemType, TreeRootType>(this, {
 		childrenManager: this.#treeItemChildrenManager,
