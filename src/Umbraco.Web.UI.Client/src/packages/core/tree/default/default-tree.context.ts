@@ -69,7 +69,7 @@ export class UmbDefaultTreeContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_CONTEXT);
-		this.#treeItemChildrenManager.setTakeSize(5);
+		this.#treeItemChildrenManager.setTakeSize(50);
 		// always load the tree root because we need the root entity to reload the entire tree
 		this.#loadTreeRoot();
 	}
