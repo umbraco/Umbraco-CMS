@@ -688,7 +688,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Get_Scheduled_Content_Keys()
+    public void Can_Get_Content_Schedules_By_Keys()
     {
         // Arrange
         var root = ContentService.GetById(Textpage.Id);
@@ -699,11 +699,32 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // Act
-        var keys = ContentService.GetScheduledContentKeys([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
+        var keys = ContentService.GetContentSchedulesByIds([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
 
         // Assert
         Assert.AreEqual(1, keys.Count);
-        Assert.AreEqual(Subpage.Key, keys.First());
+        Assert.AreEqual(keys[0].Key, Subpage.Id);
+        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
+    }
+
+    [Test]
+    public void Can_Get_Content_Schedules_By_Content_Id()
+    {
+        // Arrange
+        var root = ContentService.GetById(Textpage.Id);
+        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
+        var content = ContentService.GetById(Subpage.Id);
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
+        ContentService.PersistContentSchedule(content!, contentSchedule);
+        ContentService.Publish(content, content.AvailableCultures.ToArray());
+
+        // Act
+        var keys = ContentService.GetContentSchedulesByIds([Textpage.Id, Subpage.Id, Subpage2.Id]).ToList();
+
+        // Assert
+        Assert.AreEqual(1, keys.Count);
+        Assert.AreEqual(keys[0].Key, Subpage.Id);
+        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
     }
 
     [Test]
