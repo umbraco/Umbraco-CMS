@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -30,7 +31,8 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
         IContentValidationServiceBase<TContentType> validationService,
         ITreeEntitySortingService treeEntitySortingService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             contentService,
             contentTypeService,
@@ -41,7 +43,8 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
             userIdKeyResolver,
             validationService,
             optionsMonitor,
-            relationService)
+            relationService,
+            contentTypeFilters)
     {
         _logger = logger;
         _treeEntitySortingService = treeEntitySortingService;
