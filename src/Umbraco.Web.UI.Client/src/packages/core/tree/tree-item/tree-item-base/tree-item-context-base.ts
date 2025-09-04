@@ -2,7 +2,7 @@ import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import type { ManifestTreeItem } from '../../extensions/types.js';
 import { UmbTreeItemChildrenManager } from '../tree-item-children.manager.js';
-import { UmbTreeItemEntityActionManager } from '../tree-item-entity-action.managet.js';
+import { UmbTreeItemEntityActionManager } from '../tree-item-entity-action.manager.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item-expansion.manager.js';
 import { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
