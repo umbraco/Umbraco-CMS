@@ -68,8 +68,10 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		event.preventDefault();
 
 		// Store the current path for the section so we can redirect to it next time the section is visited
-		const currentPath = window.location.pathname;
-		this.#sectionPathMap.set(this._currentSectionAlias, currentPath);
+		if (this._currentSectionAlias) {
+			const currentPath = window.location.pathname;
+			this.#sectionPathMap.set(this._currentSectionAlias, currentPath);
+		}
 
 		if (!manifest) {
 			throw new Error('Section manifest is missing');
