@@ -314,6 +314,7 @@ stages:
       UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
       UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
       UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
+      ASPNETCORE_URLS: https://localhost:44331
     jobs:
       # E2E Tests
       - job:
@@ -360,7 +361,7 @@ stages:
               nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
-              ASPNETCORE_URLS: ${{ variables.UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL }}
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               npm_config_cache: ${{ variables.npm_config_cache }}
 
           - pwsh: |
@@ -386,7 +387,7 @@ stages:
           - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
-              ASPNETCORE_URLS: ${{ variables.UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL }}
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               DatabaseType: ${{ variables.DatabaseType }}
 
       - job:
@@ -437,7 +438,7 @@ stages:
               nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
-              ASPNETCORE_URLS: ${{ variables.UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL }}
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               npm_config_cache: ${{ variables.npm_config_cache }}
 
           - pwsh: |
@@ -464,7 +465,7 @@ stages:
           - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
-              ASPNETCORE_URLS: ${{ variables.UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL }}
+              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
               DatabaseType: ${{ variables.DatabaseType }}
 
   - stage: AdditionalConfigE2E
