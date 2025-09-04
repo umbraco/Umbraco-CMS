@@ -266,6 +266,7 @@ export class UmbTargetPaginationManager<
 		this.#currentItems.clear();
 		this.#totalPrevItems.setValue(0);
 		this.#totalNextItems.setValue(0);
+		this.#baseTarget.setValue(undefined);
 	}
 
 	#getIndexOfBaseTarget() {
