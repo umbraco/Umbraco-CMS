@@ -37,9 +37,9 @@ steps:
       useGlobalJson: true
 
   - pwsh: |
-      "UMBRACO_USER_LOGIN=${{parameters.PlaywrightUserEmail}}
-      UMBRACO_USER_PASSWORD=${{parameters.PlaywrightPassword}}
-      URL=${{parameters.ASPNETCORE_URLS}}
+      "UMBRACO_USER_LOGIN=${{ parameters.PlaywrightUserEmail }}
+      UMBRACO_USER_PASSWORD=${{ parameters.PlaywrightPassword }}
+      URL=${{ parameters.ASPNETCORE_URLS }}
       STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
     displayName: Generate .env
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
@@ -52,7 +52,7 @@ steps:
       restoreKeys: |
         npm_e2e | "$(Agent.OS)"
         npm_e2e
-      path: ${{parameters.npm_config_cache}}
+      path: ${{ parameters.npm_config_cache }}
 
   - script: npm ci --no-fund --no-audit --prefer-offline
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest

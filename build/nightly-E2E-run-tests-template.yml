@@ -49,7 +49,7 @@ steps:
     workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
   # Test
-  - pwsh: ${{parameters.testCommand}}
+  - pwsh: ${{ parameters.testCommand }}
     displayName: Run Playwright tests
     continueOnError: true
     workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -57,8 +57,8 @@ steps:
       CI: true
       CommitId: $(Build.SourceVersion)
       AgentOs: $(Agent.OS)
-      AZUREADB2CTESTUSEREMAIL: ${{parameters.AZUREB2CTESTUSEREMAIL}}
-      AZUREADB2CTESTUSERPASSWORD: ${{parameters.AZUREB2CTESTUSERPASSWORD}}
+      AZUREADB2CTESTUSEREMAIL: ${{ parameters.AZUREB2CTESTUSEREMAIL }}
+      AZUREADB2CTESTUSERPASSWORD: ${{ parameters.AZUREB2CTESTUSERPASSWORD }}
 
   # Stop application
   - bash: kill -15 $(AcceptanceTestProcessId)

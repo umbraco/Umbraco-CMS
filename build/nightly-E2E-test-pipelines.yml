@@ -314,7 +314,6 @@ stages:
       UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
       UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
       UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
-      ASPNETCORE_URLS: https://localhost:44331
     jobs:
       # E2E Tests
       - job:
@@ -361,7 +360,7 @@ stages:
               nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
-              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              ASPNETCORE_URLS: ${{ variables.UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL }}
               npm_config_cache: ${{ variables.npm_config_cache }}
 
           - pwsh: |
@@ -387,7 +386,7 @@ stages:
           - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
-              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              ASPNETCORE_URLS: ${{ variables.UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL }}
               DatabaseType: ${{ variables.DatabaseType }}
 
       - job:
@@ -438,7 +437,7 @@ stages:
               nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
-              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              ASPNETCORE_URLS: ${{ variables.UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL }}
               npm_config_cache: ${{ variables.npm_config_cache }}
 
           - pwsh: |
@@ -465,7 +464,7 @@ stages:
           - template: nightly-E2E-run-tests-template.yml
             parameters:
               testCommand: $(testCommand)
-              ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
+              ASPNETCORE_URLS: ${{ variables.UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL }}
               DatabaseType: ${{ variables.DatabaseType }}
 
   - stage: AdditionalConfigE2E
@@ -550,7 +549,7 @@ stages:
 
           # Build application for AzureADB2C
           - pwsh: |
-              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
+              dotnet build UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-restore
               dotnet dev-certs https
             displayName: Build application for AzureADB2C
             workingDirectory: $(Agent.BuildDirectory)/app
@@ -572,7 +571,7 @@ stages:
 
           # Run application for Linux with additional Environment Variables for Azure AD
           - bash: |
-              nohup dotnet run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
+              nohup dotnet run --project UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
               echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
             displayName: Run application (Linux)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), eq(variables['testFolder'], 'ExternalLogin\AzureADB2C'))
@@ -586,7 +585,7 @@ stages:
 
           # Run application for Windows with additional Environment Variables for Azure AD
           - pwsh: |
-              $process = Start-Process dotnet "run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
+              $process = Start-Process dotnet "run --project UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
               Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
             displayName: Run application (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'), eq(variables['testFolder'], 'ExternalLogin\AzureADB2C'))
