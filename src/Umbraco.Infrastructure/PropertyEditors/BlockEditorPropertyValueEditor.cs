@@ -49,8 +49,11 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
     /// <inheritdoc />
     public override IEnumerable<UmbracoEntityReference> GetReferences(object? value)
     {
-        // Group by property editor alias to avoid duplicate lookups and optimize value parsing
-        foreach (var valuesByPropertyEditorAlias in GetAllPropertyValues(value).GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Value))
+        // Group by property editor alias to avoid duplicate lookups and optimize value parsing.
+        // We don't throw on error here because we want to be able to parse what we can, even if some of the data is invalid. In cases where migrating
+        // from nested content to blocks, we don't want to trigger a fatal error for retrieving references, as this isn't vital to the operation.
+        // See: https://github.com/umbraco/Umbraco-CMS/issues/19784 and Umbraco support cases.
+        foreach (IGrouping<string, object?> valuesByPropertyEditorAlias in GetAllPropertyValues(value, throwOnError: false).GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Value))
         {
             if (!_propertyEditors.TryGet(valuesByPropertyEditorAlias.Key, out IDataEditor? dataEditor))
             {
@@ -84,11 +87,11 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
         }
     }
 
-    private IEnumerable<BlockItemData.BlockPropertyValue> GetAllPropertyValues(object? value)
+    private IEnumerable<BlockItemData.BlockPropertyValue> GetAllPropertyValues(object? value, bool throwOnError = true)
     {
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
-        BlockEditorData? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
+        BlockEditorData? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson, throwOnError);
         if (blockEditorData is null)
         {
             yield break;
