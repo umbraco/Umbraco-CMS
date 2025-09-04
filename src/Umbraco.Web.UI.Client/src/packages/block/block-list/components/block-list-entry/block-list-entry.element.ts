@@ -309,7 +309,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
-		const blockLabel = this._label;
+		const blockLabel = this.#context.getName();
 
 		const entryName = workspaceName
 			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`

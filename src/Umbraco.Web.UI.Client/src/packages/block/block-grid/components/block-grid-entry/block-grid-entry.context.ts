@@ -301,7 +301,7 @@ export class UmbBlockGridEntryContext
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
-		const blockLabel = this.getLabel();
+		const blockLabel = this.getName();
 
 		const entryName = workspaceName
 			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
