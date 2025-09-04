@@ -131,6 +131,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	}
 
 	static override readonly styles = css`
+		:host {
+			display: contents;
+		}
 		#name {
 			width: 100%;
 			flex: 1 1 auto;
