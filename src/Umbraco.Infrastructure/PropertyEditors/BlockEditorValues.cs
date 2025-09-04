@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -25,7 +26,7 @@ internal class BlockEditorValues
         _logger = logger;
     }
 
-    public BlockEditorData? DeserializeAndClean(object? propertyValue)
+    public BlockEditorData? DeserializeAndClean(object? propertyValue, bool throwOnError = true)
     {
         var propertyValueAsString = propertyValue?.ToString();
         if (string.IsNullOrWhiteSpace(propertyValueAsString))
@@ -33,7 +34,27 @@ internal class BlockEditorValues
             return null;
         }
 
-        BlockEditorData blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
+        BlockEditorData blockEditorData;
+        try
+        {
+            blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
+        }
+        catch (JsonSerializationException ex)
+        {
+            if (throwOnError)
+            {
+                throw;
+            }
+            else
+            {
+                _logger.LogWarning(
+                    "Could not deserialize the provided property value into a block editor value: {PropertyValue}. Error: {ErrorMessage}.",
+                    propertyValueAsString,
+                    ex.Message);
+                return null;
+            }
+        }
+
         return Clean(blockEditorData);
     }
 
