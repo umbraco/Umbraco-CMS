@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -44,9 +45,26 @@ public class MigrateMediaTypeLabelProperties : AsyncMigrationBase
             return;
         }
 
-        IfNotExistsCreateBytesLabel();
-        IfNotExistsCreatePixelsLabel();
+        ToggleIndentityInsertForNodes(true);
+        try
+        {
+            IfNotExistsCreateBytesLabel();
+            IfNotExistsCreatePixelsLabel();
+        }
+        finally
+        {
+            ToggleIndentityInsertForNodes(false);
+        }
+
         await MigrateMediaTypeLabels();
+    }
+
+    private void ToggleIndentityInsertForNodes(bool toggleOn)
+    {
+        if (SqlSyntax.SupportsIdentityInsert())
+        {
+            Database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(NodeDto.TableName)} {(toggleOn ? "ON" : "OFF")} "));
+        }
     }
 
     private void IfNotExistsCreateBytesLabel()
