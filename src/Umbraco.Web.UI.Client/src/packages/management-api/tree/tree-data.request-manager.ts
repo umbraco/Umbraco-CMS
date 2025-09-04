@@ -14,6 +14,7 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 import { isOffsetPaginationRequest, isTargetPaginationRequest } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { ReferenceByIdModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbManagementApiTreeDataRequestManagerArgs<
 	TreeItemType,
@@ -35,7 +36,7 @@ export interface UmbManagementApiTreeDataRequestManagerArgs<
 }
 
 export class UmbManagementApiTreeDataRequestManager<
-	TreeItemType extends { parent: { id: string } | null },
+	TreeItemType extends { parent?: ReferenceByIdModel | null },
 	RootItemsRequestArgsType extends UmbManagementApiTreeRootItemsRequestArgs,
 	RootItemsDataResponseType extends { items: Array<TreeItemType>; total: number },
 	ChildrenOfRequestArgsType extends UmbManagementApiTreeChildrenOfRequestArgs,
@@ -98,7 +99,7 @@ export class UmbManagementApiTreeDataRequestManager<
 			const { data: responseData, error: responseError } = await tryExecute(this, this.#getSiblingsFrom(requestArgs));
 
 			if (responseError) {
-				return { error: responseError };
+				return { data: undefined, error: responseError };
 			}
 
 			return this.#handleSiblingsResponseData(responseData, null);
@@ -161,7 +162,7 @@ export class UmbManagementApiTreeDataRequestManager<
 			const { data: responseData, error: responseError } = await tryExecute(this, this.#getSiblingsFrom(requestArgs));
 
 			if (responseError) {
-				return { error: responseError };
+				return { data: undefined, error: responseError };
 			}
 
 			return this.#handleSiblingsResponseData(responseData, args.parent.unique);
