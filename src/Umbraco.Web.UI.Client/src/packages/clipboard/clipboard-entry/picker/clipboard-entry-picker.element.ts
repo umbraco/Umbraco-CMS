@@ -1,9 +1,9 @@
 import { UmbClipboardCollectionRepository } from '../../collection/index.js';
 import type { UmbClipboardEntryDetailModel } from '../types.js';
-import { html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityContext, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -170,6 +170,14 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 		super.destroy();
 	}
+
+	static override styles = [
+		css`
+			:host {
+				--uui-menu-item-flat-structure: 1;
+			}
+		`,
+	];
 }
 
 declare global {
