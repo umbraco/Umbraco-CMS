@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -5,6 +6,7 @@ using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
@@ -19,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors;
 [DataEditor(
     Constants.PropertyEditors.Aliases.SingleBlock,
     ValueType = ValueTypes.Json,
-    ValueEditorIsReusable = false)] //todo check reusability
+    ValueEditorIsReusable = false)]
 public class SingleBlockPropertyEditor : DataEditor
 {
     private readonly IJsonSerializer _jsonSerializer;
@@ -65,11 +67,14 @@ public class SingleBlockPropertyEditor : DataEditor
             ILanguageService languageService,
             IIOHelper ioHelper,
             IBlockEditorElementTypeCache elementTypeCache,
-            ILogger<SingleBlockEditorPropertyValueEditor> logger)
+            ILogger<SingleBlockEditorPropertyValueEditor> logger,
+            ILocalizedTextService textService,
+            IPropertyValidationService propertyValidationService)
             : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute)
         {
             BlockEditorValues = new BlockEditorValues<SingleBlockValue, SingleBlockLayoutItem>(blockEditorDataConverter, elementTypeCache, logger);
-            //todo check blocklistpropertyeditorbase constructor
+            Validators.Add(new BlockEditorValidator<SingleBlockValue, SingleBlockLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));
+            Validators.Add(new SingleBlockValidator(BlockEditorValues, textService));
         }
 
         protected override SingleBlockValue CreateWithLayout(IEnumerable<SingleBlockLayoutItem> layout) =>
@@ -80,6 +85,25 @@ public class SingleBlockPropertyEditor : DataEditor
         {
             var configuration = ConfigurationObject as SingleBlockConfiguration;
             return configuration?.Blocks.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
+        }
+
+        /// <summary>
+        /// Validates whether the block editor holds a single value
+        /// </summary>
+        private sealed class SingleBlockValidator : BlockEditorMinMaxValidatorBase<SingleBlockValue, SingleBlockLayoutItem>
+        {
+            private readonly BlockEditorValues<SingleBlockValue, SingleBlockLayoutItem> _blockEditorValues;
+
+            public SingleBlockValidator(BlockEditorValues<SingleBlockValue, SingleBlockLayoutItem> blockEditorValues, ILocalizedTextService textService)
+                : base(textService) =>
+                _blockEditorValues = blockEditorValues;
+
+            public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
+            {
+                BlockEditorData<SingleBlockValue, SingleBlockLayoutItem>? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
+
+                return ValidateNumberOfBlocks(blockEditorData, 0, 1);
+            }
         }
     }
 }

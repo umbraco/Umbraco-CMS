@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -30,6 +31,8 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
     private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
+    private IContentValidationService ContentValidationService => GetRequiredService<IContentValidationService>();
 
     private const string AllTypes = "allTypes";
     private const string MetaType = "metaType";
@@ -127,6 +130,102 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             var property = properties.First();
             Assert.AreEqual(elementTypeName == AllTypes ? "contentPicker" : "metadescription", property.Alias);
             Assert.AreEqual(elementTypeName == AllTypes ? textPage.Key : "something very meta", property.Value);
+        });
+    }
+
+    /// <summary>
+    /// There should be some validation when publishing through the contentEditingService
+    /// </summary>
+    [Test]
+    public async Task CanNotSelectMultipleConfiguredBlocks()
+    {
+        var textPageContentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
+        textPageContentType.AllowedTemplates = [];
+        await ContentTypeService.CreateAsync(textPageContentType, Constants.Security.SuperUserKey);
+
+        var textPage = ContentBuilder.CreateTextpageContent(textPageContentType, "My Picked Content", -1);
+        ContentService.Save(textPage);
+
+        var allTypesType = ContentTypeBuilder.CreateAllTypesContentType("allTypesType", "All Types type");
+        allTypesType.IsElement = true;
+        await ContentTypeService.CreateAsync(allTypesType, Constants.Security.SuperUserKey);
+
+        var metaTypesType = ContentTypeBuilder.CreateMetaContentType();
+        metaTypesType.IsElement = true;
+        await ContentTypeService.CreateAsync(metaTypesType, Constants.Security.SuperUserKey);
+
+        var singleBlockContentType = await CreateSingleBlockContentTypePage([allTypesType, metaTypesType]);
+
+        var contentElementKey = Guid.NewGuid();
+        var blockValue = new SingleBlockValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.SingleBlock,
+                    [
+                        new SingleBlockLayoutItem { ContentKey = contentElementKey }
+                    ]
+                },
+            },
+            ContentData =
+            [
+                new BlockItemData
+                {
+                    Key = contentElementKey,
+                    ContentTypeAlias = allTypesType.Alias,
+                    ContentTypeKey = allTypesType.Key,
+                    Values =
+                    [
+                        new BlockPropertyValue
+                        {
+                            Alias = "contentPicker",
+                            Value = textPage.GetUdi(),
+                        }
+                    ],
+                },
+                new BlockItemData
+                {
+                    Key = contentElementKey,
+                    ContentTypeAlias = metaTypesType.Alias,
+                    ContentTypeKey = metaTypesType.Key,
+                    Values =
+                    [
+                        new BlockPropertyValue
+                        {
+                            Alias = "metadescription",
+                            Value = "something very meta",
+                        }
+                    ],
+                }
+            ],
+        };
+        var blocksPropertyValue = JsonSerializer.Serialize(blockValue);
+
+        ContentValidationService.ValidatePropertiesAsync(new ContentCreateModel
+        {
+            ContentTypeKey = textPage.Key,
+            PropertyValues = b
+        });
+
+        var content = new ContentBuilder()
+            .WithContentType(singleBlockContentType)
+            .WithName("My Blocks")
+            .WithPropertyValues(new { block = blocksPropertyValue })
+            .Build();
+        ContentService.Save(content);
+
+        var valueEditor = await GetValueEditor(singleBlockContentType);
+        var toEditorValue = valueEditor.ToEditor(content.Properties["block"]!) as SingleBlockValue;
+        Assert.IsNotNull(toEditorValue);
+        Assert.AreEqual(1, toEditorValue.ContentData.Count);
+
+        var properties = toEditorValue.ContentData.First().Values;
+        Assert.AreEqual(1, properties.Count);
+        Assert.Multiple(() =>
+        {
+            var property = properties.First();
+            Assert.AreEqual("contentPicker", property.Alias);
         });
     }
 
