@@ -1,6 +1,6 @@
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
+import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import type { UmbTreeItemChildrenManager } from './tree-item-children.manager.js';
-import type { UmbTreeItemModel, UmbTreeRootModel } from './types.js';
-import { UMB_TREE_CONTEXT } from './tree.context.token.js';
 import type { UmbTargetPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

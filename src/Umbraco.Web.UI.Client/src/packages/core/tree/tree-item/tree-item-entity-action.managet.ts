@@ -1,4 +1,4 @@
-import type { UmbTreeItemModel, UmbTreeRootModel } from './types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
