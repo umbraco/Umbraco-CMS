@@ -499,7 +499,8 @@ export class UmbTreeItemChildrenManager<
 	}
 
 	#resetChildren() {
-		this.targetPagination.setBaseTarget(undefined);
+		this.targetPagination.clear();
+		this.offsetPagination.clear();
 		this.loadChildren();
 	}
 
