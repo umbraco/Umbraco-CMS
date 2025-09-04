@@ -127,9 +127,11 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbClipboardEntryDetailModel) {
+		const label = item.name ?? item.unique;
 		return html`
 			<uui-menu-item
-				label=${item.name ?? ''}
+				label=${label}
+				title=${label}
 				selectable
 				@selected=${() => this.#selectionManager.select(item.unique)}
 				@deselected=${() => this.#selectionManager.deselect(item.unique)}
