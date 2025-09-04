@@ -3,7 +3,6 @@ import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../ty
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../entity-actions/reload-tree-item-children/index.js';
 import type { UmbTreeItemContext } from './tree-item-context.interface.js';
-import { UMB_TREE_ITEM_CONTEXT } from './tree-item-base/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -23,6 +22,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UMB_TREE_ITEM_CONTEXT } from './tree-item.context.token.js';
 
 export class UmbTreeItemChildrenManager<
 	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
@@ -64,7 +64,7 @@ export class UmbTreeItemChildrenManager<
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
-	#parentTreeItemContext?: UmbTreeItemContext<TreeItemType>;
+	#parentTreeItemContext?: typeof UMB_TREE_ITEM_CONTEXT.TYPE;
 	#requestMaxRetries = 2;
 
 	constructor(host: UmbControllerHost) {

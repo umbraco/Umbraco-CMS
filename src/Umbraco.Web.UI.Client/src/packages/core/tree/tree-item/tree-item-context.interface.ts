@@ -5,7 +5,9 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextMinimal } from '@umbraco-cms/backoffice/context-api';
 import type { UmbTargetPaginationManager } from '@umbraco-cms/backoffice/utils';
 
-export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel> extends UmbApi, UmbContextMinimal {
+export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel = UmbTreeItemModel>
+	extends UmbApi,
+		UmbContextMinimal {
 	unique?: string | null;
 	entityType?: string;
 	treeItem: Observable<TreeItemType | undefined>;

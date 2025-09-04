@@ -5,11 +5,11 @@ import { UmbTreeItemChildrenManager } from '../tree-item-children.manager.js';
 import { UmbTreeItemEntityActionManager } from '../tree-item-entity-action.manager.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item-expansion.manager.js';
 import { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
+import { UMB_TREE_ITEM_CONTEXT } from '../tree-item.context.token.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
@@ -341,5 +341,3 @@ export abstract class UmbTreeItemContextBase<
 		super.destroy();
 	}
 }
-
-export const UMB_TREE_ITEM_CONTEXT = new UmbContextToken<UmbTreeItemContext<any>>('UmbTreeItemContext');
