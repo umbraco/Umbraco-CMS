@@ -1010,23 +1010,13 @@ public class ContentService : RepositoryService, IContentService
 
 
     /// <inheritdoc/>
-    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds)
+    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys)
     {
-        if (documentIds.Length == 0)
+        if (keys.Length == 0)
         {
             return ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            scope.ReadLock(Constants.Locks.Languages);
-            return _documentRepository.GetContentSchedulesByIds(documentIds);
-        }
-    }
-
-    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys)
-    {
         List<int> contentIds = [];
         foreach (var key in keys)
         {
@@ -1039,7 +1029,11 @@ public class ContentService : RepositoryService, IContentService
             contentIds.Add(contentId.Result);
         }
 
-        return GetContentSchedulesByIds(contentIds.ToArray());
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            scope.ReadLock(Constants.Locks.ContentTree);
+            return _documentRepository.GetContentSchedulesByIds(contentIds.ToArray());
+        }
     }
 
     /// <summary>
