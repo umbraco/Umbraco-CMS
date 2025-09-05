@@ -13,6 +13,7 @@ import {
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbTemplateWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbTemplateDetailModel, UmbTemplateDetailRepository>
@@ -66,19 +67,22 @@ export class UmbTemplateWorkspaceContext
 
 	override async load(unique: string) {
 		const response = await super.load(unique);
-		if (response.data) {
-			this.setMasterTemplate(response.data.masterTemplate?.unique ?? null);
-		}
+		await this.setMasterTemplate(response.data?.masterTemplate?.unique ?? null);
 		return response;
 	}
 
-	async create(parent: any) {
-		const data = await this.createScaffold({ parent });
+	async create(parent: UmbEntityModel) {
+		const data = await this.createScaffold({
+			parent,
+			preset: {
+				masterTemplate: parent.unique ? { unique: parent.unique } : null,
+			},
+		});
 
-		if (data) {
-			if (!parent) return;
-			await this.setMasterTemplate(parent.unique);
-		}
+		// Set or reset the master template
+		// This is important to reset when a new template is created so the UI reflects the correct state
+		await this.setMasterTemplate(parent.unique);
+
 		return data;
 	}
 
@@ -98,20 +102,21 @@ export class UmbTemplateWorkspaceContext
 		return this.getData()?.content ? this.getLayoutBlockRegexPattern().test(this.getData()?.content as string) : false;
 	}
 
-	async setMasterTemplate(id: string | null) {
-		if (id === null) {
+	async setMasterTemplate(unique: string | null) {
+		if (unique === null) {
 			this.#masterTemplate.setValue(null);
-			this.#updateMasterTemplateLayoutBlock();
-			return null;
+		} else {
+			// We need the whole template model if the unique id is provided
+			const { data } = await this.itemRepository.requestItems([unique]);
+			if (data) {
+				this.#masterTemplate.setValue(data[0]);
+			}
 		}
 
-		const { data } = await this.itemRepository.requestItems([id]);
-		if (data) {
-			this.#masterTemplate.setValue(data[0]);
-			this.#updateMasterTemplateLayoutBlock();
-			return data[0];
-		}
-		return null;
+		this.#updateMasterTemplateLayoutBlock();
+		this._data.updateCurrent({ masterTemplate: unique ? { unique } : null });
+
+		return unique;
 	}
 
 	#updateMasterTemplateLayoutBlock = () => {

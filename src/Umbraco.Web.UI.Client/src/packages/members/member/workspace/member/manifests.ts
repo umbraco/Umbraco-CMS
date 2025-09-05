@@ -1,4 +1,9 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
+import {
+	UMB_MEMBER_WORKSPACE_ALIAS,
+	UMB_MEMBER_WORKSPACE_VIEW_CONTENT_ALIAS,
+	UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS,
+} from './constants.js';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
@@ -6,11 +11,6 @@ import type {
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 import { UMB_CONTENT_HAS_PROPERTIES_WORKSPACE_CONDITION } from '@umbraco-cms/backoffice/content';
-import {
-	UMB_MEMBER_WORKSPACE_ALIAS,
-	UMB_MEMBER_WORKSPACE_VIEW_CONTENT_ALIAS,
-	UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS,
-} from './constants.js';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
