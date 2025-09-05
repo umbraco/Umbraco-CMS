@@ -3,7 +3,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Editors;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
