@@ -5,7 +5,7 @@ const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Content Picker';
 const contentPickerDocumentTypeName = 'DocumentTypeForContentPicker';
-const contentPickerName = 'Test Content Picker';
+const contentPickerName = 'TestContentPicker';
 let contentPickerDocumentTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
