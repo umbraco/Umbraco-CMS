@@ -59,7 +59,7 @@ export class UmbTreeItemChildrenManager<
 	#isLoadingNextChildren = new UmbBooleanState(false);
 	public readonly isLoadingNextChildren = this.#isLoadingNextChildren.asObservable();
 
-	#takeSize: number = 5;
+	#takeSize: number = 50;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
