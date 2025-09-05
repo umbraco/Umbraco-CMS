@@ -25,6 +25,7 @@ public class DefaultUrlProvider : IUrlProvider
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
     private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
+    private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestSettings;
 
@@ -36,7 +37,8 @@ public class DefaultUrlProvider : IUrlProvider
         UriUtility uriUtility,
         ILocalizationService localizationService,
         IDocumentNavigationQueryService navigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+        IPublishedUrlProvider publishedUrlProvider)
     {
         _requestSettings = requestSettings.CurrentValue;
         _logger = logger;
@@ -46,11 +48,12 @@ public class DefaultUrlProvider : IUrlProvider
         _localizationService = localizationService;
         _navigationQueryService = navigationQueryService;
         _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
+        _publishedUrlProvider = publishedUrlProvider;
 
         requestSettings.OnChange(x => _requestSettings = x);
     }
 
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
+    [Obsolete("Use the other constructor - Scheduled for removal in V18")]
     public DefaultUrlProvider(
         IOptionsMonitor<RequestHandlerSettings> requestSettings,
         ILogger<DefaultUrlProvider> logger,
@@ -58,60 +61,18 @@ public class DefaultUrlProvider : IUrlProvider
         IUmbracoContextAccessor umbracoContextAccessor,
         UriUtility uriUtility,
         ILocalizationService localizationService,
-        IPublishedContentCache contentCache,
         IDocumentNavigationQueryService navigationQueryService,
         IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
-        : this(
-            requestSettings,
-            logger,
-            siteDomainMapper,
-            umbracoContextAccessor,
-            uriUtility,
-            localizationService,
-            navigationQueryService,
-            publishedContentStatusFilteringService)
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public DefaultUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        ILogger<DefaultUrlProvider> logger,
-        ISiteDomainMapper siteDomainMapper,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        UriUtility uriUtility,
-        ILocalizationService localizationService,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService)
-        : this(
-            requestSettings,
-            logger,
-            siteDomainMapper,
-            umbracoContextAccessor,
-            uriUtility,
-            localizationService,
-            navigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public DefaultUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        ILogger<DefaultUrlProvider> logger,
-        ISiteDomainMapper siteDomainMapper,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        UriUtility uriUtility,
-        ILocalizationService localizationService)
-        : this(
-            requestSettings,
-            logger,
-            siteDomainMapper,
-            umbracoContextAccessor,
-            uriUtility,
-            localizationService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
+    : this(
+        requestSettings,
+        logger,
+        siteDomainMapper,
+        umbracoContextAccessor,
+        uriUtility,
+        localizationService,
+        navigationQueryService,
+        publishedContentStatusFilteringService,
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>())
     {
     }
 
@@ -163,7 +124,7 @@ public class DefaultUrlProvider : IUrlProvider
             var culture = d.Culture;
 
             // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
-            var route = umbracoContext.Content?.GetRouteById(id, culture);
+            var route = _publishedUrlProvider.GetUrl(d.Id, UrlMode.Default, culture, current);
             if (route == null)
             {
                 continue;
@@ -194,7 +155,7 @@ public class DefaultUrlProvider : IUrlProvider
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
         // will not use cache if previewing
-        var route = umbracoContext.Content?.GetRouteById(content.Id, culture);
+        var route = _publishedUrlProvider.GetUrl(content.Id, mode, culture, current);
 
         return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
     }

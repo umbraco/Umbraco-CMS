@@ -20,6 +20,10 @@ internal sealed class AuditEntryDto
     [Column("performingUserId")]
     public int PerformingUserId { get; set; }
 
+    [Column("performingUserKey")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public Guid? PerformingUserKey { get; set; }
+
     [Column("performingDetails")]
     [NullSetting(NullSetting = NullSettings.Null)]
     [Length(Constants.Audit.DetailsLength)]
@@ -30,12 +34,16 @@ internal sealed class AuditEntryDto
     [Length(Constants.Audit.IpLength)]
     public string? PerformingIp { get; set; }
 
-    [Column("eventDateUtc", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
-    public DateTime EventDateUtc { get; set; }
+    [Column("eventDateUtc")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+    public DateTime EventDate { get; set; }
 
     [Column("affectedUserId")]
     public int AffectedUserId { get; set; }
+
+    [Column("affectedUserKey")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public Guid? AffectedUserKey { get; set; }
 
     [Column("affectedDetails")]
     [NullSetting(NullSetting = NullSettings.Null)]

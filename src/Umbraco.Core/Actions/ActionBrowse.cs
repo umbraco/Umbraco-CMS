@@ -33,11 +33,4 @@ public class ActionBrowse : IAction
 
     /// <inheritdoc />
     public bool CanBePermissionAssigned => true;
-
-    /// <inheritdoc />
-    public string Icon => string.Empty;
-
-
-    /// <inheritdoc />
-    public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
 }

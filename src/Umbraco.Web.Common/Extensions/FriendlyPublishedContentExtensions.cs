@@ -110,7 +110,7 @@ public static class FriendlyPublishedContentExtensions
     ///     The specific culture to get the name for. If null is used the current culture is used (Default is
     ///     null).
     /// </param>
-    public static string? Name(
+    public static string Name(
         this IPublishedContent content,
         string? culture = null)
         => content.Name(VariationContextAccessor, culture);
@@ -505,7 +505,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? Children(
+    public static IEnumerable<IPublishedContent> Children(
         this IPublishedContent content,
         Func<IPublishedContent, bool> predicate,
         string? culture = null)
@@ -521,7 +521,7 @@ public static class FriendlyPublishedContentExtensions
     /// </param>
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <returns>The children of the content, of any of the specified types.</returns>
-    public static IEnumerable<IPublishedContent>? ChildrenOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
+    public static IEnumerable<IPublishedContent> ChildrenOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
         => content.ChildrenOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
 
     /// <summary>
@@ -537,7 +537,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
     /// </remarks>
-    public static IEnumerable<T>? Children<T>(this IPublishedContent content, string? culture = null)
+    public static IEnumerable<T> Children<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
         => content.Children<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
 
@@ -576,7 +576,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? Siblings(this IPublishedContent content, string? culture = null)
+    public static IEnumerable<IPublishedContent> Siblings(this IPublishedContent content, string? culture = null)
         => content.Siblings(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
 
     /// <summary>
@@ -592,7 +592,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? SiblingsOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
+    public static IEnumerable<IPublishedContent> SiblingsOfType(this IPublishedContent content, string contentTypeAlias, string? culture = null)
         => content.SiblingsOfType(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), contentTypeAlias, culture);
 
     /// <summary>
@@ -608,7 +608,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>
     ///     <para>Note that in V7 this method also return the content node self.</para>
     /// </remarks>
-    public static IEnumerable<T>? Siblings<T>(this IPublishedContent content, string? culture = null)
+    public static IEnumerable<T> Siblings<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
         => content.Siblings<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
 
@@ -636,7 +636,7 @@ public static class FriendlyPublishedContentExtensions
     /// </param>
     /// <param name="contentTypeAlias">The content type alias.</param>
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
-    public static IEnumerable<IPublishedContent>? SiblingsAndSelfOfType(
+    public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(
         this IPublishedContent content,
         string contentTypeAlias,
         string? culture = null)
@@ -652,7 +652,7 @@ public static class FriendlyPublishedContentExtensions
     ///     null)
     /// </param>
     /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
-    public static IEnumerable<T>? SiblingsAndSelf<T>(this IPublishedContent content, string? culture = null)
+    public static IEnumerable<T> SiblingsAndSelf<T>(this IPublishedContent content, string? culture = null)
         where T : class, IPublishedContent
         => content.SiblingsAndSelf<T>(GetNavigationQueryService(content), GetPublishedStatusFilteringService(content), culture);
 
@@ -674,28 +674,6 @@ public static class FriendlyPublishedContentExtensions
     /// </remarks>
     public static string Url(this IPublishedContent content, string? culture = null, UrlMode mode = UrlMode.Default)
         => content.Url(PublishedUrlProvider, culture, mode);
-
-    /// <summary>
-    ///     Gets the children of the content in a DataTable.
-    /// </summary>
-    /// <param name="content">The content.</param>
-    /// <param name="contentTypeAliasFilter">An optional content type alias.</param>
-    /// <param name="culture">
-    ///     The specific culture to filter for. If null is used the current culture is used. (Default is
-    ///     null)
-    /// </param>
-    /// <returns>The children of the content.</returns>
-    [Obsolete("This method is no longer used in Umbraco. The method will be removed in Umbraco 17.")]
-    public static DataTable ChildrenAsTable(this IPublishedContent content, string contentTypeAliasFilter = "", string? culture = null)
-        => content.ChildrenAsTable(
-            GetNavigationQueryService(content),
-            GetPublishedStatusFilteringService(content),
-            ContentTypeService,
-            MediaTypeService,
-            MemberTypeService,
-            PublishedUrlProvider,
-            contentTypeAliasFilter,
-            culture);
 
     /// <summary>
     ///     Gets the url for a media.
@@ -749,7 +727,7 @@ public static class FriendlyPublishedContentExtensions
     public static string? GetCultureFromDomains(
         this IPublishedContent content,
         Uri? current = null)
-        => content.GetCultureFromDomains(UmbracoContextAccessor, SiteDomainHelper, DomainCache, PublishedContentCache, DocumentNavigationQueryService, current);
+        => content.GetCultureFromDomains(UmbracoContextAccessor, SiteDomainHelper, DomainCache, DocumentNavigationQueryService, GetPublishedStatusFilteringService(content), current);
 
     public static IEnumerable<PublishedSearchResult> SearchDescendants(
         this IPublishedContent content,

@@ -21,6 +21,6 @@ public class UserDeletedWebhookEvent : WebhookEventBase<UserDeletedNotification>
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(UserDeletedNotification notification)
+    public override object ConvertNotificationToRequestPayload(UserDeletedNotification notification)
         => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

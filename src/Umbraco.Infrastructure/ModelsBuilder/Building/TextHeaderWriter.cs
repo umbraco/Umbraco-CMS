@@ -8,13 +8,6 @@ internal static class TextHeaderWriter
     ///     Outputs an "auto-generated" header to a string builder.
     /// </summary>
     /// <param name="sb">The string builder.</param>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public static void WriteHeader(StringBuilder sb) => WriteHeader(sb, true);
-
-    /// <summary>
-    ///     Outputs an "auto-generated" header to a string builder.
-    /// </summary>
-    /// <param name="sb">The string builder.</param>
     /// <param name="includeVersion">Flag indicating whether the tool version number should be included in the output.</param>
     public static void WriteHeader(StringBuilder sb, bool includeVersion)
     {

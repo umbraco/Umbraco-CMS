@@ -63,8 +63,8 @@ public class MemberGroupBuilder
     {
         var id = _id ?? 1;
         var key = _key ?? Guid.NewGuid();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var name = _name ?? Guid.NewGuid().ToString();
         var creatorId = _creatorId ?? 1;
 

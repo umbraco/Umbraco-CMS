@@ -23,8 +23,8 @@ public class PropertyTypeBuilderTests
         const string testName = "Test";
         const int testSortOrder = 9;
         const int testDataTypeId = 5;
-        var testCreateDate = DateTime.Now.AddHours(-1);
-        var testUpdateDate = DateTime.Now;
+        var testCreateDate = DateTime.UtcNow.AddHours(-1);
+        var testUpdateDate = DateTime.UtcNow;
         const string testDescription = "testing";
         const int testPropertyGroupId = 11;
         const bool testMandatory = true;

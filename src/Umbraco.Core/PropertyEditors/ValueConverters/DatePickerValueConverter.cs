@@ -15,24 +15,21 @@ public class DatePickerValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         => ParseDateTimeValue(source);
 
     internal static DateTime ParseDateTimeValue(object? source)
     {
-        if (source is null)
-        {
-            return DateTime.MinValue;
-        }
-
         if (source is DateTime dateTimeValue)
         {
-            return dateTimeValue;
+            return DateTime.SpecifyKind(dateTimeValue, DateTimeKind.Unspecified);
         }
 
-        Attempt<DateTime> attempt = source.TryConvertTo<DateTime>();
-        return attempt.Success
-            ? attempt.Result
-            : DateTime.MinValue;
+        if (source.TryConvertTo<DateTime>() is { Success: true } attempt)
+        {
+            return DateTime.SpecifyKind(attempt.Result, DateTimeKind.Unspecified);
+        }
+
+        return DateTime.MinValue;
     }
 }
