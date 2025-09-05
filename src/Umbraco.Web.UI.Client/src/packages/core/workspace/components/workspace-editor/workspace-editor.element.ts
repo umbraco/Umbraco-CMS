@@ -1,12 +1,14 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
+import type { ManifestWorkspaceView } from '../../types.js';
 import { UmbWorkspaceEditorContext } from './workspace-editor.context.js';
 import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
@@ -55,6 +57,11 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		this.#observeWorkspaceViewHints();
 	}
 	private _variantId?: UmbVariantId | undefined;
+
+	@property({ attribute: false })
+	public set overrides(value: Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined) {
+		this.#navigationContext.setOverrides(value);
+	}
 
 	@state()
 	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
@@ -136,26 +143,26 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._routes
-			? html`
-					<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
-						${this.#renderBackButton()}
-						<slot name="header" slot="header"></slot>
-						<slot name="action-menu" slot="action-menu"></slot>
-						${this.#renderViews()} ${this.#renderRoutes()}
-						<slot></slot>
-						${when(
-							!this.enforceNoFooter,
-							() => html`
-								<umb-workspace-footer slot="footer" data-mark="workspace:footer">
-									<slot name="footer-info"></slot>
-									<slot name="actions" slot="actions" data-mark="workspace:footer-actions"></slot>
-								</umb-workspace-footer>
-							`,
-						)}
-					</umb-body-layout>
-				`
-			: nothing;
+		// Notice if no routes then fallback to use a slot.
+		// TODO: Deprecate the slot feature, to rely purely on routes, cause currently bringing an additional route would mean the slotted content would never be shown. [NL]
+		return html`
+			<umb-body-layout main-no-padding .headline=${this.headline} ?loading=${this.loading}>
+				${this.#renderBackButton()}
+				<slot name="header" slot="header"></slot>
+				<slot name="action-menu" slot="action-menu"></slot>
+				${this.#renderViews()} ${this.#renderRoutes()}
+				<slot></slot>
+				${when(
+					!this.enforceNoFooter,
+					() => html`
+						<umb-workspace-footer slot="footer" data-mark="workspace:footer">
+							<slot name="footer-info"></slot>
+							<slot name="actions" slot="actions" data-mark="workspace:footer-actions"></slot>
+						</umb-workspace-footer>
+					`,
+				)}
+			</umb-body-layout>
+		`;
 	}
 
 	#renderViews() {
@@ -213,7 +220,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRoutes() {
-		if (!this._routes || this._routes.length === 0) return nothing;
+		if (!this._routes || this._routes.length === 0 || !this._workspaceViews || this._workspaceViews.length === 0) {
+			return nothing;
+		}
 		return html`
 			<umb-router-slot
 				inherit-addendum
