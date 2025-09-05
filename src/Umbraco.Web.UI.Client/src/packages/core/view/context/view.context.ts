@@ -4,6 +4,8 @@ import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffi
 import { UmbClassState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import type { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
 /**
  *
@@ -15,10 +17,19 @@ import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/
  */
 export class UmbViewContext extends UmbControllerBase {
 	//
-	#providerCtrl: any;
+	#providerCtrl?: UmbContextProviderController;
+	#consumeParentCtrl?: UmbContextConsumerController<typeof UMB_VIEW_CONTEXT.TYPE>;
 	#currentProvideHost?: UmbClassInterface;
+	#localize = new UmbLocalizationController(this);
+
+	#active = false;
+	#deactivatedFromOutside = false;
+	#explicitInheritance?: boolean;
+	#parentView?: UmbViewContext;
+	#title?: string;
 
 	public readonly viewAlias: string;
+
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	protected readonly variantId = this.#variantId.asObservable();
 
@@ -42,14 +53,24 @@ export class UmbViewContext extends UmbControllerBase {
 				return hints[0];
 			}
 		});
+
+		this.#consumeParentCtrl = this.consumeContext(UMB_VIEW_CONTEXT, (parentView) => {
+			// In case of explicit inheritance we do not want to overview the parent view.
+			if (this.#explicitInheritance) return;
+			this.#parentView = parentView;
+		}).skipHost();
 	}
 
-	setVariantId(variantId: UmbVariantId | undefined): void {
+	public setVariantId(variantId: UmbVariantId | undefined): void {
 		this.#variantId.setValue(variantId);
 		this.hints.updateScaffold({ variantId: variantId });
 	}
 
-	provideAt(controllerHost: UmbClassInterface): void {
+	public setBrowserTitle(title: string): void {
+		this.#title = title;
+	}
+
+	public provideAt(controllerHost: UmbClassInterface): void {
 		if (this.#currentProvideHost === controllerHost) return;
 
 		this.unprovide();
@@ -59,7 +80,7 @@ export class UmbViewContext extends UmbControllerBase {
 		this.hints.provideAt(controllerHost);
 	}
 
-	unprovide(): void {
+	public unprovide(): void {
 		if (this.#providerCtrl) {
 			this.#providerCtrl.destroy();
 			this.#providerCtrl = undefined;
@@ -67,14 +88,53 @@ export class UmbViewContext extends UmbControllerBase {
 		this.hints.unprovide();
 	}
 
-	inheritFrom(context?: UmbViewContext): void {
+	override hostConnected(): void {
+		super.hostConnected();
+		// CHeck that we have a providerController, otherwise this is not provided. [NL]
+		if (this.#providerCtrl && !this.#deactivatedFromOutside) {
+			this.activate();
+		}
+	}
+
+	override hostDisconnected(): void {
+		// CHeck that we have a providerController, otherwise this is not provided. [NL]
+		if (this.#providerCtrl && this.#parentView) {
+			this.#parentView.activate();
+		}
+		super.hostDisconnected();
+	}
+
+	public inheritFrom(context?: UmbViewContext): void {
+		this.#explicitInheritance = true;
+		this.#consumeParentCtrl?.destroy();
+		this.#consumeParentCtrl = undefined;
+		this.#parentView = context;
+		this.#inheritFromParent();
+	}
+
+	#inheritFromParent(): void {
 		this.observe(
-			context?.variantId,
+			this.#parentView?.variantId,
 			(variantId) => {
 				this.setVariantId(variantId);
 			},
 			'observeParentVariantId',
 		);
-		this.hints.inheritFrom(context?.hints);
+		this.hints.inheritFrom(this.#parentView?.hints);
+	}
+
+	public activate() {
+		this.#active = true;
+		if (this.#title) {
+			document.title = this.#localize.string(this.#title);
+		}
+	}
+
+	/**
+	 * Deactivate the view context.
+	 * We cannot conclude that this means the parent should be activated, it can be because of a child being activated.
+	 */
+	public deactivate() {
+		this.#deactivatedFromOutside = true;
 	}
 }

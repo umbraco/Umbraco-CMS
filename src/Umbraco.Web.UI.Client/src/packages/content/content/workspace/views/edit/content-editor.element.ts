@@ -106,7 +106,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 					(component as UmbContentWorkspaceViewEditTabElement).containerId = null;
 				},
 			});
-			this.#createViewContext('root');
+			this.#createViewContext('root', '#general_generic');
 		}
 
 		if (this._tabs.length > 0) {
@@ -120,7 +120,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 						(component as UmbContentWorkspaceViewEditTabElement).containerId = tab.ownerId ?? tab.ids[0];
 					},
 				});
-				this.#createViewContext(path);
+				this.#createViewContext(path, tabName);
 			});
 		}
 
@@ -140,11 +140,12 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		this._routes = routes;
 	}
 
-	#createViewContext(viewAlias: string) {
+	#createViewContext(viewAlias: string, tabName: string) {
 		if (!this.#tabViewContexts.find((context) => context.viewAlias === viewAlias)) {
 			const view = new UmbViewContext(this, viewAlias);
 			this.#tabViewContexts.push(view);
 
+			view.setBrowserTitle(tabName);
 			view.inheritFrom(this.#viewContext);
 
 			this.observe(
