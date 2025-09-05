@@ -1,14 +1,4 @@
-const UMB_MENU_TIPTAP_FONT_FAMILY_ALIAS = 'Umb.Menu.Tiptap.FontFamily';
-
-const menu: Array<UmbExtensionManifest> = [
-	{
-		type: 'menu',
-		alias: UMB_MENU_TIPTAP_FONT_FAMILY_ALIAS,
-		name: 'Tiptap Font Family Menu',
-	},
-];
-
-const toolbarExtensions: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'menu',
@@ -23,7 +13,6 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 			{ label: 'Cursive', appearance: { style: 'font-family: cursive;' }, data: 'cursive' },
 			{ label: 'Fantasy', appearance: { style: 'font-family: fantasy;' }, data: 'fantasy' },
 		],
-		menu: UMB_MENU_TIPTAP_FONT_FAMILY_ALIAS,
 		meta: {
 			alias: 'umbFontFamily',
 			icon: 'icon-ruler-alt',
@@ -31,5 +20,3 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		},
 	},
 ];
-
-export const manifests: Array<UmbExtensionManifest> = [...menu, ...toolbarExtensions];
