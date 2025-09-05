@@ -37379,7 +37379,8 @@
           "requiresServer",
           "serverPlaceholder",
           "sortOrder",
-          "supportsIntegratedAuthentication"
+          "supportsIntegratedAuthentication",
+          "supportsTrustServerCertificate"
         ],
         "type": "object",
         "properties": {
@@ -37417,6 +37418,9 @@
             "type": "boolean"
           },
           "supportsIntegratedAuthentication": {
+            "type": "boolean"
+          },
+          "supportsTrustServerCertificate": {
             "type": "boolean"
           },
           "requiresConnectionTest": {

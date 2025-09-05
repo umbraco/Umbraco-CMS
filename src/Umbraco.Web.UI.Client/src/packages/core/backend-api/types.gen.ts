@@ -553,6 +553,7 @@ export type DatabaseSettingsPresentationModel = {
     serverPlaceholder: string;
     requiresCredentials: boolean;
     supportsIntegratedAuthentication: boolean;
+    supportsTrustServerCertificate: boolean;
     requiresConnectionTest: boolean;
 };
 
