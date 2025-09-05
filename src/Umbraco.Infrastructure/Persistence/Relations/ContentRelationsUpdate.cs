@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Relations;
 /// <summary>
 /// Defines a notification handler for content saved operations that persists relations.
 /// </summary>
-internal class ContentRelationsUpdate :
+internal sealed class ContentRelationsUpdate :
     IDistributedCacheNotificationHandler<ContentSavedNotification>,
     IDistributedCacheNotificationHandler<ContentPublishedNotification>,
     IDistributedCacheNotificationHandler<MediaSavedNotification>,
