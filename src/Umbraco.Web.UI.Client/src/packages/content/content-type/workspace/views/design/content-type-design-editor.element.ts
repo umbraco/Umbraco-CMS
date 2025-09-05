@@ -476,7 +476,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		// TODO: Localize this:
 		if (this._sortModeActive) return;
 		return html`
-			<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab">
+			<uui-button id="add-tab" data-mark="add-tab-button" @click="${this.#addTab}" label="Add tab">
 				<uui-icon name="icon-add"></uui-icon>
 				Add tab
 			</uui-button>
@@ -493,6 +493,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				${this._compositionRepositoryAlias
 					? html`
 							<uui-button
+								data-mark="edit-compositions"
 								look="outline"
 								label=${this.localize.term('contentTypeEditor_compositions')}
 								compact
@@ -502,7 +503,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 							</uui-button>
 						`
 					: ''}
-				<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
+				<uui-button
+					data-mark="toggle-sort-mode"
+					look="outline"
+					label=${sortButtonText}
+					compact
+					@click=${this.#toggleSortMode}>
 					<uui-icon name="icon-height"></uui-icon>
 					${sortButtonText}
 				</uui-button>
@@ -576,6 +582,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				${ownedTab
 					? html`<uui-icon name="icon-grip" class="drag-${tabId}"> </uui-icon>${this.localize.string(tabName)}
 							<uui-input
+								data-mark="tab:sort-input"
 								label="sort order"
 								type="number"
 								value=${ifDefined(tab.sortOrder)}
@@ -588,6 +595,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (tabActive && ownedTab) {
 			return html`<div class="tab-inner">
 				<uui-input
+					data-mark="tab:name-input"
 					id="input"
 					look="placeholder"
 					placeholder="Unnamed"
@@ -623,6 +631,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	renderDeleteFor(tab: UmbPropertyTypeContainerMergedModel) {
 		return html`<uui-button
+			data-mark="tab:delete"
 			label=${this.localize.term('actions_remove')}
 			class="trash"
 			slot="append"
