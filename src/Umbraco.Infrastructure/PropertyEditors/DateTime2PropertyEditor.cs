@@ -100,8 +100,7 @@ public class DateTime2PropertyEditor : DataEditor
                 TimeZone = valueAsJsonObject["timeZone"]?.GetValue<string>(),
             };
 
-            var jsonStr = _jsonSerializer.Serialize(value);
-            return jsonStr;
+            return _jsonSerializer.Serialize(value);
         }
 
         /// <inheritdoc/>
@@ -118,10 +117,11 @@ public class DateTime2PropertyEditor : DataEditor
             DateTime2Configuration? configuration = GetConfiguration(property.PropertyType.DataTypeKey);
             var objectValue = DateTime2ValueConverter.GetObjectFromIntermediate(interValue, configuration);
 
-            JsonNode node = new JsonObject();
-            node["date"] = objectValue is null ? null : $"{objectValue:O}";
-            node["timeZone"] = interValue.TimeZone;
-            return node;
+            return new JsonObject
+            {
+                ["date"] = objectValue is null ? null : $"{objectValue:O}",
+                ["timeZone"] = interValue.TimeZone
+            };
         }
 
         private DateTime2Configuration? GetConfiguration(Guid dataTypeKey) =>
@@ -149,7 +149,7 @@ public class DateTime2PropertyEditor : DataEditor
                 }
 
                 var selectedDate = valueAsJsonObject["date"]?.GetValue<string>();
-                if (selectedDate.IsNullOrWhiteSpace() || !DateTimeOffset.TryParse(selectedDate, out DateTimeOffset _))
+                if (selectedDate.IsNullOrWhiteSpace() || DateTimeOffset.TryParse(selectedDate, out DateTimeOffset _) is false)
                 {
                     yield return new ValidationResult(
                         _localizedTextService.Localize("validation", "invalidDate", [selectedDate]),
