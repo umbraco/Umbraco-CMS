@@ -10,6 +10,7 @@ using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using PublishedElement = Umbraco.Cms.Core.PublishedCache.PublishedElement;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.PublishedCache.HybridCache;
 
