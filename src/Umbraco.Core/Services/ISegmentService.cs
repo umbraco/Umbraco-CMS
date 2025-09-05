@@ -22,6 +22,7 @@ public interface ISegmentService
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The number of items to take.</param>
     /// <returns>The paged list of segments.</returns>
+    [Obsolete("This method is temporary and will be removed in a future release (planned for v20). A more permanent solution will follow.")]
     Task<Attempt<PagedModel<Segment>?, SegmentOperationStatus>> GetPagedSegmentsForDocumentAsync(
         Guid id,
         int skip = 0,

@@ -6,5 +6,6 @@ public class SegmentResponseModel
 
     public required string Alias { get; set; } = string.Empty;
 
+    [Obsolete("This property is temporary and will be removed in a future release (planned for v20). A more permanent solution will follow.")]
     public IEnumerable<string>? Cultures { get; set; } = null;
 }
