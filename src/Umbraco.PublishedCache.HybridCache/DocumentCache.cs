@@ -52,15 +52,4 @@ public sealed class DocumentCache : IPublishedContentCache
         IEnumerable<IPublishedContent> rootContent = rootKeys.Select(key => GetById(preview, key)).WhereNotNull();
         return culture is null ? rootContent : rootContent.Where(x => x.IsInvariantOrHasCulture(culture));
     }
-
-    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
-    public string? GetRouteById(bool preview, int contentId, string? culture = null)
-    {
-        IPublishedContent? content = GetById(preview, contentId);
-
-        return content is not null ? _publishedUrlProvider.Value.GetUrl(content, UrlMode.Relative, culture) : null;
-    }
-
-    [Obsolete("Use IPublishedUrlProvider.GetUrl instead, scheduled for removal in v17")]
-    public string? GetRouteById(int contentId, string? culture = null) => GetRouteById(false, contentId, culture);
 }

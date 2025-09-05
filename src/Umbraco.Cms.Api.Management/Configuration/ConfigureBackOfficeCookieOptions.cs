@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -219,9 +220,43 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 }
 
                 return Task.CompletedTask;
-            }
+            },
+            // FIXME: We want to change this over to using an attribute on the backoffice controllers
+            // See this for more: https://github.com/dotnet/aspnetcore/issues/63093#issuecomment-3201530217
+            OnRedirectToLogin = context =>
+            {
+                if (IsXhr(context.Request))
+                {
+                    context.Response.Headers.Location = context.RedirectUri;
+                    context.Response.StatusCode = 401;
+                }
+                else
+                {
+                    context.Response.Redirect(context.RedirectUri);
+                }
+
+                return Task.CompletedTask;
+            },
+            OnRedirectToAccessDenied = context =>
+            {
+                if (IsXhr(context.Request))
+                {
+                    context.Response.Headers.Location = context.RedirectUri;
+                    context.Response.StatusCode = 403;
+                }
+                else
+                {
+                    context.Response.Redirect(context.RedirectUri);
+                }
+
+                return Task.CompletedTask;
+            },
         };
     }
+
+    private bool IsXhr(HttpRequest request) =>
+        string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
+        string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
 
     /// <summary>
     ///     Ensures the ticket is renewed if the <see cref="SecuritySettings.KeepUserLoggedIn" /> is set to true

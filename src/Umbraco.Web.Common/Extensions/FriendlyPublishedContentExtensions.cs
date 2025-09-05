@@ -727,7 +727,7 @@ public static class FriendlyPublishedContentExtensions
     public static string? GetCultureFromDomains(
         this IPublishedContent content,
         Uri? current = null)
-        => content.GetCultureFromDomains(UmbracoContextAccessor, SiteDomainHelper, DomainCache, PublishedContentCache, DocumentNavigationQueryService, current);
+        => content.GetCultureFromDomains(UmbracoContextAccessor, SiteDomainHelper, DomainCache, DocumentNavigationQueryService, GetPublishedStatusFilteringService(content), current);
 
     public static IEnumerable<PublishedSearchResult> SearchDescendants(
         this IPublishedContent content,
