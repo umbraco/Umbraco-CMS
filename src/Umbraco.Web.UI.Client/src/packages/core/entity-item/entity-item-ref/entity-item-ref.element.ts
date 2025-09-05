@@ -6,6 +6,7 @@ import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 
 import './default-item-ref.element.js';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
@@ -196,6 +197,43 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 				display: block;
 				position: relative;
 			}
+
+			:host::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+
+			:host([drag-placeholder]) {
+				--uui-color-focus:transparent;
+			}
+
+			:host([drag-placeholder])::after {
+				display: block;
+				border-width: 2px;
+				border-color: var(--uui-color-interactive-emphasis);
+				animation: ${UUIBlinkAnimationValue};
+			}
+			:host([drag-placeholder])::before {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-interactive-emphasis);
+				opacity: 0.12;
+			}
+			:host([drag-placeholder]) > * {
+				transition: opacity 50ms 16ms;
+				opacity: 0;
+			}
+
 		`,
 	];
 }
