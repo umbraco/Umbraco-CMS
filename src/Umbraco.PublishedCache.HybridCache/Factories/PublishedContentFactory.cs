@@ -78,14 +78,18 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     public IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview)
     {
         var cacheKey = $"{nameof(PublishedContentFactory)}ElementCache_{contentCacheNode.Id}_{preview}";
-        IPublishedElement? publishedContent = _appCaches.RequestCache.GetCacheItem<IPublishedElement?>(cacheKey);
-        if (publishedContent is not null)
+        IPublishedElement? publishedElement = null;
+        if (_appCaches.RequestCache.IsAvailable)
         {
-            _logger.LogDebug(
-                "Using cached IPublishedElement for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
-                contentCacheNode.Data?.Name ?? "No Name",
-                contentCacheNode.Id);
-            return publishedContent;
+            publishedElement = _appCaches.RequestCache.GetCacheItem<IPublishedElement?>(cacheKey);
+            if (publishedElement is not null)
+            {
+                _logger.LogDebug(
+                    "Using cached IPublishedElement for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
+                    contentCacheNode.Data?.Name ?? "No Name",
+                    contentCacheNode.Id);
+                return publishedElement;
+            }
         }
 
         _logger.LogDebug(
@@ -95,7 +99,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
 
         ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
 
-        publishedContent = GetPublishedElement(contentNode, preview);
+        publishedElement = GetPublishedElement(contentNode, preview);
 
         if (preview)
         {
@@ -103,7 +107,12 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             // return model ?? GetPublishedContentAsDraft(model);
         }
 
-        return publishedContent;
+        if (_appCaches.RequestCache.IsAvailable && publishedElement is not null)
+        {
+            _appCaches.RequestCache.Set(cacheKey, publishedElement);
+        }
+
+        return publishedElement;
     }
 
     /// <inheritdoc/>
