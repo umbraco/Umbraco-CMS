@@ -475,7 +475,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		// TODO: Localize this:
 		if (this._sortModeActive) return;
 		return html`
-			<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab">
+			<uui-button id="add-tab" data-mark="add-tab-button" @click="${this.#addTab}" label="Add tab">
 				<uui-icon name="icon-add"></uui-icon>
 				Add tab
 			</uui-button>
@@ -492,6 +492,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				${this._compositionRepositoryAlias
 					? html`
 							<uui-button
+								data-mark="edit-compositions"
 								look="outline"
 								label=${this.localize.term('contentTypeEditor_compositions')}
 								compact
@@ -501,7 +502,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 							</uui-button>
 						`
 					: ''}
-				<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
+				<uui-button
+					data-mark="toggle-sort-mode"
+					look="outline"
+					label=${sortButtonText}
+					compact
+					@click=${this.#toggleSortMode}>
 					<uui-icon name="icon-height"></uui-icon>
 					${sortButtonText}
 				</uui-button>
@@ -571,26 +577,28 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		const tabName = hasTabName ? tab.name : 'Unnamed';
 		const tabId = tab.ownerId ?? tab.ids[0];
 		if (this._sortModeActive) {
-			return html`<div class="tab">
+			return html`<div class="tab-inner">
 				${ownedTab
-					? html`<uui-icon name="icon-grip" class="drag-${tabId}"> </uui-icon>${tabName}
+					? html`<uui-icon name="icon-grip" class="drag-${tabId}"> </uui-icon>${this.localize.string(tabName)}
 							<uui-input
+								data-mark="tab:sort-input"
 								label="sort order"
 								type="number"
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
 								@change=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`
-					: html`<uui-icon name="icon-merge"></uui-icon>${tab.name!}`}
+					: html`<uui-icon name="icon-merge"></uui-icon>${this.localize.string(tabName)}`}
 			</div>`;
 		}
 
 		if (tabActive && ownedTab) {
-			return html`<div class="tab">
+			return html`<div class="tab-inner">
 				<uui-input
+					data-mark="tab:name-input"
 					id="input"
 					look="placeholder"
 					placeholder="Unnamed"
-					label=${tab.name!}
+					label=${this.localize.term('settings_tabname')}
 					value="${tab.name!}"
 					auto-width
 					minlength="1"
@@ -604,12 +612,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		if (ownedTab) {
 			return html`<div class="not-active">
-				<span class=${hasTabName ? '' : 'invaild'}>${hasTabName ? tab.name : 'Unnamed'}</span> ${this.renderDeleteFor(
-					tab,
-				)}
+				<span class=${hasTabName ? '' : 'invalid'}>${hasTabName ? this.localize.string(tabName) : 'Unnamed'}</span>
+				${this.renderDeleteFor(tab)}
 			</div>`;
 		} else {
-			return html`<div class="not-active"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
+			return html`<div class="not-active">
+				<uui-icon name="icon-merge"></uui-icon>${this.localize.string(tabName)}
+			</div>`;
 		}
 	}
 
@@ -621,6 +630,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	renderDeleteFor(tab: UmbPropertyTypeContainerMergedModel) {
 		return html`<uui-button
+			data-mark="tab:delete"
 			label=${this.localize.term('actions_remove')}
 			class="trash"
 			slot="append"
@@ -708,6 +718,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				background-color: var(--uui-color-surface);
 			}
 
+			.tab-inner {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: var(--uui-size-space-2);
+				margin-right: calc(var(--uui-size-space-3) * -1);
+			}
+
 			.not-active uui-button {
 				pointer-events: auto;
 			}
@@ -721,7 +739,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				gap: var(--uui-size-space-3);
 			}
 
-			.invaild {
+			.invalid {
 				color: var(--uui-color-danger, var(--uui-color-invalid));
 			}
 
