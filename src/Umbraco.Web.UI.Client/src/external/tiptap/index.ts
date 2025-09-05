@@ -127,7 +127,7 @@ export {
 	Underline,
 } from '@tiptap/extension-underline';
 
-/** @deprecated No longer used internally. This will be removed in Umbraco 18. [LK] */
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export { StarterKit } from '@tiptap/starter-kit';
 
 // CUSTOM EXTENSIONS
