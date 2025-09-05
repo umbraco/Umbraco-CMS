@@ -136,7 +136,7 @@ internal sealed class ContentRelationsUpdate :
             else if (reference.Udi is not GuidUdi udi || !keysLookup.TryGetValue(udi.Guid, out var id))
             {
                 // Relations only support references to items that are stored in the NodeDto table (because of foreign key constraints).
-                _logger.LogInformation("The reference to {Udi} can not be saved as relation, because doesn't have a node ID.", reference.Udi);
+                _logger.LogInformation("The reference to {Udi} can not be saved as relation, because it doesn't have a node ID.", reference.Udi);
             }
             else
             {
