@@ -85,7 +85,6 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
         }
 
         List<DocumentCollectionResponseModel> collectionResponseModels = await _documentCollectionPresentationFactory.CreateCollectionModelAsync(collectionAttempt.Result!);
-        await PopulateSigns(collectionResponseModels);
         return CollectionResult(collectionResponseModels, collectionAttempt.Result!.Items.Total);
     }
 }

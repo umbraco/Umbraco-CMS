@@ -84,7 +84,6 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
         }
 
         List<MediaCollectionResponseModel> collectionResponseModels = await _mediaCollectionPresentationFactory.CreateCollectionModelAsync(collectionAttempt.Result!);
-        await PopulateSigns(collectionResponseModels);
         return CollectionResult(collectionResponseModels, collectionAttempt.Result!.Items.Total);
     }
 }
