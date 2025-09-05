@@ -17,6 +17,16 @@ parameters:
     type: boolean
     default: false
 
+  - name: differentAppSettingsAcceptanceTests
+    displayName: Run acceptance tests with different app settings
+    type: boolean
+    default: false
+
+  - name: skipDefaultConfigAcceptanceTests
+    displayName: Skip tests with DefaultConfig
+    type: boolean
+    default: false
+
 variables:
   nodeVersion: 20
   solution: umbraco.sln
