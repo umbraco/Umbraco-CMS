@@ -1,8 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Mapping;
@@ -15,8 +17,23 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
 {
     private readonly CommonMapper _commonMapper;
 
-    public DocumentMapDefinition(PropertyEditorCollection propertyEditorCollection, CommonMapper commonMapper)
-        : base(propertyEditorCollection) => _commonMapper = commonMapper;
+    public DocumentMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        CommonMapper commonMapper,
+        IDataValueEditorFactory dataValueEditorFactory)
+        : base(propertyEditorCollection, dataValueEditorFactory)
+        => _commonMapper = commonMapper;
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
+    public DocumentMapDefinition(
+        PropertyEditorCollection propertyEditorCollection,
+        CommonMapper commonMapper)
+        : this(
+            propertyEditorCollection,
+            commonMapper,
+            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
+    {
+    }
 
     public void DefineMaps(IUmbracoMapper mapper)
     {

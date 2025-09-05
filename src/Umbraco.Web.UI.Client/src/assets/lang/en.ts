@@ -2831,6 +2831,12 @@ export default {
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
 	},
+	missingEditor: {
+		description:
+			'<p><strong>Error!</strong> This property type is no longer available. Please reach out to your administrator.</p>',
+		detailsDescription:
+			'<p>This property type is no longer available.<br/>Please contact your administrator so they can either delete this property or restore the property type.</p><p><strong>Data:</strong></p>',
+	},
 	uiCulture: {
 		ar: 'العربية',
 		bs: 'Bosanski',

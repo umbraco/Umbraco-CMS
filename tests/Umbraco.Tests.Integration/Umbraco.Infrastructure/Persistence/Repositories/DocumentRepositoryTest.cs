@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -103,7 +104,14 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out TemplateRepository tr);
         var editors = new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
-        dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, editors, LoggerFactory.CreateLogger<DataTypeRepository>(), LoggerFactory, ConfigurationEditorJsonSerializer);
+        dtdRepository = new DataTypeRepository(
+            scopeAccessor,
+            appCaches,
+            editors,
+            LoggerFactory.CreateLogger<DataTypeRepository>(),
+            LoggerFactory,
+            ConfigurationEditorJsonSerializer,
+            Services.GetRequiredService<IDataValueEditorFactory>());
         return ctRepository;
     }
 
