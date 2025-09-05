@@ -45,6 +45,30 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
     protected abstract UmbracoObjectTypes FolderObjectType { get; }
 
+    /// <inheritdoc/>
+    protected override Guid? GetParentKey(IEntitySlim? entity)
+    {
+        if (entity is null || entity.ParentId <= 0)
+        {
+            return Constants.System.RootKey;
+        }
+
+        Attempt<Guid> getKeyAttempt = EntityService.GetKey(entity.ParentId, ItemObjectType);
+        if (getKeyAttempt.Success)
+        {
+            return getKeyAttempt.Result;
+        }
+
+        // Parent could be a folder, so try that too.
+        getKeyAttempt = EntityService.GetKey(entity.ParentId, FolderObjectType);
+        if (getKeyAttempt.Success)
+        {
+            return getKeyAttempt.Result;
+        }
+
+        return Constants.System.RootKey;
+    }
+
     protected void RenderFoldersOnly(bool foldersOnly) => _foldersOnly = foldersOnly;
 
     protected override IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)

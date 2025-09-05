@@ -73,9 +73,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         }
 
         IEntitySlim? entity = siblings.FirstOrDefault();
-        Guid? parentKey = entity?.ParentId > 0
-            ? EntityService.GetKey(entity.ParentId, ItemObjectType).Result
-            : Constants.System.RootKey;
+        Guid? parentKey = GetParentKey(entity);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(parentKey, siblings);
 
@@ -85,6 +83,14 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         return Ok(result);
     }
+
+    /// <summary>
+    /// Gets the parent key for an entity, or root if null or no parent.
+    /// </summary>
+    protected virtual Guid? GetParentKey(IEntitySlim? entity) =>
+        entity?.ParentId > 0
+            ? EntityService.GetKey(entity.ParentId, ItemObjectType).Result
+            : Constants.System.RootKey;
 
     protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
     {
