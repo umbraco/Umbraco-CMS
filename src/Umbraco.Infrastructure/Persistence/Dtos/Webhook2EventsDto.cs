@@ -1,13 +1,15 @@
-﻿using System.Data;
+using System.Data;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.Webhook2Events)]
+[TableName(TableName)]
 public class Webhook2EventsDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.Webhook2Events;
+
     [Column("webhookId")]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_webhookEvent2WebhookDto", OnColumns = "webhookId, event")]
     [ForeignKey(typeof(WebhookDto), OnDelete = Rule.Cascade)]

@@ -2,11 +2,15 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying;
 
@@ -163,5 +167,34 @@ public class ContentTypeRepositorySqlClausesTest : BaseUsingSqlSyntax
         }
 
         Debug.Print(sql.SQL);
+    }
+
+    [Test]
+    public void Can_Verify_WhereLike_Clause()
+    {
+        var key = Guid.NewGuid();
+        var propertyTypeId = 1234;
+        Sql<ISqlContext> sql = Sql()
+            .Delete<UserGroup2GranularPermissionDto>()
+            .Where<UserGroup2GranularPermissionDto>(c => c.UniqueId == key)
+            .WhereLike<UserGroup2GranularPermissionDto>(
+                c => c.Permission,
+                Sql()
+                    .SelectClosure<PropertyTypeDto>(c => c.ConvertUniqueIdentifierToString(x => x.UniqueId))
+                    .From<PropertyTypeDto>()
+                    .WhereClosure<PropertyTypeDto>(c => c.Id == propertyTypeId),
+                $"'|{SqlContext.SqlSyntax.GetWildcardPlaceholder()}'");
+
+        string expectedSQL =
+@"DELETE FROM [umbracoUserGroup2GranularPermission]
+WHERE (([umbracoUserGroup2GranularPermission].[uniqueId] = @0))
+AND ([umbracoUserGroup2GranularPermission].[permission] LIKE CONCAT(((SELECT 
+ CONVERT(nvarchar(36), [cmsPropertyType].[UniqueId])
+ 
+FROM [cmsPropertyType]
+WHERE (([cmsPropertyType].[id] = @1))
+)),'|%'))".Replace("\r", string.Empty);
+        var typedSql = sql.SQL;
+        Assert.That(typedSql, Is.EqualTo(expectedSQL));
     }
 }

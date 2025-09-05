@@ -530,12 +530,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // needs to be an outer join since there's no guarantee that any of the nodes have values for this property
             Sql<ISqlContext> innerSql = Sql().Select($@"CASE
-                            WHEN intValue IS NOT NULL THEN {sortedInt}
-                            WHEN decimalValue IS NOT NULL THEN {sortedDecimal}
-                            WHEN dateValue IS NOT NULL THEN {sortedDate}
+                            WHEN {SqlSyntax.GetQuotedColumnName("intValue")} IS NOT NULL THEN {sortedInt}
+                            WHEN {SqlSyntax.GetQuotedColumnName("decimalValue")} IS NOT NULL THEN {sortedDecimal}
+                            WHEN {SqlSyntax.GetQuotedColumnName("dateValue")} IS NOT NULL THEN {sortedDate}
                             ELSE {sortedString}
-                        END AS customPropVal,
-                        cver.nodeId AS customPropNodeId")
+                        END AS {SqlSyntax.GetQuotedName("customPropVal")},
+                        cver.{SqlSyntax.GetQuotedColumnName("nodeId")} AS {SqlSyntax.GetQuotedName("customPropNodeId")}")
                 .From<ContentVersionDto>("cver")
                 .InnerJoin<PropertyDataDto>("opdata")
                     .On<ContentVersionDto, PropertyDataDto>((version, pdata) => version.Id == pdata.VersionId, "cver", "opdata")
@@ -550,14 +550,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var innerSqlString = ParameterHelper.ProcessParams(innerSql.SQL, innerSql.Arguments, argsList);
 
             // create the outer join complete sql fragment
-            var outerJoinTempTable = $@"LEFT OUTER JOIN ({innerSqlString}) AS customPropData
-                ON customPropData.customPropNodeId = {Constants.DatabaseSchema.Tables.Node}.id "; // trailing space is important!
+            var outerJoinTempTable = $@"LEFT OUTER JOIN ({innerSqlString}) AS {SqlSyntax.GetQuotedName("customPropData")}
+                ON {SqlSyntax.GetQuotedName("customPropData")}.{SqlSyntax.GetQuotedColumnName("customPropNodeId")} = {SqlSyntax.GetQuotedTableName(NodeDto.TableName)}.id "; // trailing space is important!
 
             // insert this just above the first WHERE
             var newSql = InsertBefore(sql.SQL, "WHERE", outerJoinTempTable);
 
             // see notes in ApplyOrdering: the field MUST be selected + aliased
-            newSql = InsertBefore(newSql, "FROM", ", customPropData.customPropVal AS ordering "); // trailing space is important!
+            newSql = InsertBefore(newSql, "FROM", $", {SqlSyntax.GetQuotedName("customPropData")}.{SqlSyntax.GetQuotedColumnName("customPropVal")} AS ordering "); // trailing space is important!
 
             // create the new sql
             sql = Sql(newSql, argsList.ToArray());
@@ -1016,7 +1016,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected virtual bool SortorderExists(int parentId, int sortOrder)
         {
             SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.SortOrderExists, tsql => tsql
-                .Select("sortOrder")
+                .Select<NodeDto>(c => c.SortOrder)
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
                 x.ParentId == SqlTemplate.Arg<int>("parentId") &&
@@ -1031,7 +1031,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected virtual int GetNewChildSortOrder(int parentId, int first)
         {
             SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql => tsql
-                .Select("MAX(sortOrder)")
+                .SelectMax<NodeDto>(c => c.SortOrder)
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
 

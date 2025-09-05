@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.NodeData)]
+[TableName(TableName)]
 [PrimaryKey("nodeId", AutoIncrement = false)]
 [ExplicitColumns]
 public class ContentNuDto
