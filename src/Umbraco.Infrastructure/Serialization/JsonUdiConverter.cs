@@ -16,7 +16,7 @@ public sealed class JsonUdiConverter : JsonConverter<Udi>
     /// <inheritdoc />
     public override Udi? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.GetString() is string value && !string.IsNullOrWhiteSpace(value))
+        if (reader.GetString() is string value && string.IsNullOrWhiteSpace(value) is false)
         {
             return UdiParser.Parse(value);
         }
