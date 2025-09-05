@@ -153,7 +153,7 @@ public class DateTime2PropertyEditor : DataEditor
                 if (value.Date is null || DateTimeOffset.TryParse(value.Date, out DateTimeOffset _) is false)
                 {
                     yield return new ValidationResult(
-                        _localizedTextService.Localize("validation", "invalidNull"),
+                        _localizedTextService.Localize("validation", "invalidDate"),
                         ["value"]);
                 }
 

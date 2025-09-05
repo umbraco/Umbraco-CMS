@@ -48,7 +48,7 @@ public class DateTime2PropertyEditorTests
             Assert.AreEqual(1, result.Count);
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_invalidNull", validationResult.ErrorMessage);
+            Assert.AreEqual("validation_invalidDate", validationResult.ErrorMessage);
         }
     }
 
