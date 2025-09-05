@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Moq;
 using NUnit.Framework;
@@ -28,7 +27,6 @@ public class DateTime2PropertyEditorTests
     private static readonly object[] _sourceList1 =
     [
         new object[] { null, true },
-        new object[] { "INVALID", false },
         new object[] { JsonNode.Parse("{}"), false },
         new object[] { JsonNode.Parse("{\"test\": \"\"}"), false },
         new object[] { JsonNode.Parse("{\"date\": \"\"}"), false },
@@ -50,7 +48,7 @@ public class DateTime2PropertyEditorTests
             Assert.AreEqual(1, result.Count);
 
             var validationResult = result.First();
-            Assert.AreEqual("validation_invalidDate", validationResult.ErrorMessage);
+            Assert.AreEqual("validation_invalidNull", validationResult.ErrorMessage);
         }
     }
 
@@ -137,18 +135,18 @@ public class DateTime2PropertyEditorTests
         [null, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.None, null],
         [null, null, DateTime2Configuration.DateTimeFormat.TimeOnly, DateTime2Configuration.TimeZoneMode.None, null],
         [null, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, null],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.None, new { date = "2025-08-20", timeZone = (string?)null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.All, new { date = "2025-08-20", timeZone = (string?)null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.Local, new { date = "2025-08-20", timeZone = (string?)null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.Custom, new { date = "2025-08-20", timeZone = (string?)null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.TimeOnly, DateTime2Configuration.TimeZoneMode.None, new { date = "16:30:00.0000000", timeZone = (string?)null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new { date = "2025-08-20T16:30:00.0000000", timeZone = (string?)null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, new { date = "2025-08-20T16:30:00.0000000+00:00", timeZone = (string?)null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.Local, new { date = "2025-08-20T16:30:00.0000000+00:00", timeZone = (string?)null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.Custom, new { date = "2025-08-20T16:30:00.0000000+00:00", timeZone = (string?)null }],
-        [-5, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new { date = "2025-08-20T21:30:00.0000000", timeZone = (string?)null }],
-        [-5, "Europe/Copenhagen", DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new { date = "2025-08-20T21:30:00.0000000", timeZone = "Europe/Copenhagen" }],
-        [-5, "Europe/Copenhagen", DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, new { date = "2025-08-20T16:30:00.0000000-05:00", timeZone = "Europe/Copenhagen" }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.Local, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.Custom, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.TimeOnly, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "16:30:00.0000000", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.Local, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.Custom, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
+        [-5, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T21:30:00.0000000", TimeZone = null }],
+        [-5, "Europe/Copenhagen", DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T21:30:00.0000000", TimeZone = "Europe/Copenhagen" }],
+        [-5, "Europe/Copenhagen", DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000-05:00", TimeZone = "Europe/Copenhagen" }],
     ];
 
     [TestCaseSource(nameof(_sourceList4))]
@@ -189,10 +187,11 @@ public class DateTime2PropertyEditorTests
             return;
         }
 
-        var test = JsonSerializer.SerializeToNode(expectedResult);
-
         Assert.IsNotNull(result);
-        Assert.IsTrue(JsonNode.DeepEquals(JsonSerializer.SerializeToNode(expectedResult), result as JsonNode));
+        Assert.IsInstanceOf<DateTime2PropertyEditor.DateTime2ApiModel>(result);
+        var apiModel = (DateTime2PropertyEditor.DateTime2ApiModel)result;
+        Assert.AreEqual(((DateTime2PropertyEditor.DateTime2ApiModel)expectedResult).Date, apiModel.Date);
+        Assert.AreEqual(((DateTime2PropertyEditor.DateTime2ApiModel)expectedResult).TimeZone, apiModel.TimeZone);
     }
 
     private DateTime2PropertyEditor.DateTime2DataValueEditor CreateValueEditor(

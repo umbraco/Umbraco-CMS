@@ -65,7 +65,7 @@ public class DateTime2ValueConverterTests
     ];
 
     [TestCaseSource(nameof(_convertToIntermediateCases))]
-    public void Can_Convert_To_Intermediate_Value(string? input, DateTime2ValueConverter.DateTime2Dto? expected)
+    public void Can_Convert_To_Intermediate_Value(string? input, object? expected)
     {
         var result = new DateTime2ValueConverter(_jsonSerializer).ConvertSourceToIntermediate(null!, null!, input, false);
         if (expected is null)
@@ -77,8 +77,9 @@ public class DateTime2ValueConverterTests
         Assert.IsNotNull(result);
         Assert.IsInstanceOf<DateTime2ValueConverter.DateTime2Dto>(result);
         var dateTime = (DateTime2ValueConverter.DateTime2Dto)result;
-        Assert.AreEqual(expected.Date, dateTime.Date);
-        Assert.AreEqual(expected.TimeZone, dateTime.TimeZone);
+        Assert.IsInstanceOf<DateTime2ValueConverter.DateTime2Dto>(dateTime);
+        Assert.AreEqual(((DateTime2ValueConverter.DateTime2Dto)expected).Date, dateTime.Date);
+        Assert.AreEqual(((DateTime2ValueConverter.DateTime2Dto)expected).TimeZone, dateTime.TimeZone);
     }
 
     private static readonly DateTime2ValueConverter.DateTime2Dto _convertToObjectInputDate = new()
@@ -98,7 +99,7 @@ public class DateTime2ValueConverterTests
 
     [TestCaseSource(nameof(_convertToObjectCases))]
     public void Can_Convert_To_Object(
-        DateTime2ValueConverter.DateTime2Dto? input,
+        object? input,
         DateTime2Configuration.DateTimeFormat format,
         DateTime2Configuration.TimeZoneMode timeZoneMode,
         object? expected)

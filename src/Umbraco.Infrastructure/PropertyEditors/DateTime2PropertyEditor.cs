@@ -3,7 +3,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
@@ -140,42 +139,6 @@ public class DateTime2PropertyEditor : DataEditor
             public DateTime2Validator(ILocalizedTextService localizedTextService)
                 => _localizedTextService = localizedTextService;
 
-            /// <inheritdoc/>
-            public IEnumerable<ValidationResult> Validate(
-                object? value,
-                string? valueType,
-                object? dataTypeConfiguration,
-                PropertyValidationContext validationContext)
-            {
-                if (value is not JsonObject valueAsJsonObject)
-                {
-                    yield break;
-                }
-
-                var selectedDate = valueAsJsonObject["date"]?.GetValue<string>();
-                if (selectedDate.IsNullOrWhiteSpace() || DateTimeOffset.TryParse(selectedDate, out DateTimeOffset _) is false)
-                {
-                    yield return new ValidationResult(
-                        _localizedTextService.Localize("validation", "invalidDate", [selectedDate]),
-                        ["value"]);
-                }
-
-                var selectedTimeZone = valueAsJsonObject["timeZone"]?.GetValue<string>();
-                var dataTypeConfig = dataTypeConfiguration as DateTime2Configuration;
-                if (dataTypeConfig?.TimeZones?.Mode is not { } mode || mode == DateTime2Configuration.TimeZoneMode.None)
-                {
-                    yield break;
-                }
-
-                if (mode == DateTime2Configuration.TimeZoneMode.Custom
-                    && dataTypeConfig.TimeZones.TimeZones.Any(t => t.Equals(selectedTimeZone, StringComparison.InvariantCultureIgnoreCase)) != true)
-                {
-                    yield return new ValidationResult(
-                        _localizedTextService.Localize("validation", "notOneOfOptions", [selectedTimeZone]),
-                        ["value"]);
-                }
-            }
-
             public IEnumerable<ValidationResult> Validate(
                 DateTime2ApiModel? value,
                 DateTime2Configuration? configuration,
@@ -187,7 +150,7 @@ public class DateTime2PropertyEditor : DataEditor
                     yield break;
                 }
 
-                if (value.Date is null)
+                if (value.Date is null || DateTimeOffset.TryParse(value.Date, out DateTimeOffset _) is false)
                 {
                     yield return new ValidationResult(
                         _localizedTextService.Localize("validation", "invalidNull"),
@@ -210,7 +173,7 @@ public class DateTime2PropertyEditor : DataEditor
         }
     }
 
-    private class DateTime2ApiModel
+    internal class DateTime2ApiModel
     {
         [JsonPropertyName("date")]
         public string? Date { get; set; }
