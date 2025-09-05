@@ -37,9 +37,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-tab-key'),
 		getUniqueOfModel: (tab) => tab.key,
 		identifier: 'content-type-tabs-sorter',
-		itemSelector: 'uui-tab',
+		itemSelector: 'uui-tab:not(#root-tab)',
 		containerSelector: 'uui-tab-group',
 		disabledItemSelector: ':not([sortable])',
+		ignorerSelector: 'uui-input',
 		resolvePlacement: (args) => args.relatedRect.left + args.relatedRect.width * 0.5 > args.pointerX,
 		onChange: ({ model }) => {
 			this._tabs = model;
@@ -724,6 +725,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				justify-content: center;
 				gap: var(--uui-size-space-2);
 				margin-right: calc(var(--uui-size-space-3) * -1);
+				pointer-events: none;
+			}
+			.tab-inner > uui-input {
+				pointer-events: auto;
 			}
 
 			.not-active uui-button {
