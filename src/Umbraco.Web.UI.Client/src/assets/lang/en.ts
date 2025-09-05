@@ -2859,5 +2859,6 @@ export default {
 		uk: 'Українська',
 		zh: '中文',
 		'zh-tw': '中文（正體，台灣）',
+		vi: 'Tiếng Việt',
 	},
 } as UmbLocalizationDictionary;
