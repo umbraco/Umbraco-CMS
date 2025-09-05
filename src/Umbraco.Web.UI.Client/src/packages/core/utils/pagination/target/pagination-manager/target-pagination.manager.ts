@@ -55,9 +55,12 @@ export class UmbTargetPaginationManager<
 			return undefined;
 		}
 
-		// When choosing a new base target, we want the next item in the list
-		// TODO: Check for items on both sides of the current base target
-		return currentItems[currentBaseTargetIndex + 1];
+		/* When choosing a new base target we check on both sides of the current base target 
+		as the base target could be the first or last item */
+		const nextItem = currentItems[currentBaseTargetIndex + 1];
+		const previousItem = currentItems[currentBaseTargetIndex - 1];
+
+		return nextItem || previousItem;
 	}
 
 	/**
