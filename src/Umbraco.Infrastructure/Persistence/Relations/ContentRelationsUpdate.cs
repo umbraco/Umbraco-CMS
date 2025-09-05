@@ -53,13 +53,25 @@ internal class ContentRelationsUpdate :
     public void Handle(ContentSavedNotification notification) => PersistRelations(notification.SavedEntities);
 
     /// <inheritdoc/>
+    public void Handle(IEnumerable<ContentSavedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.SavedEntities));
+
+    /// <inheritdoc/>
     public void Handle(ContentPublishedNotification notification) => PersistRelations(notification.PublishedEntities);
+
+    /// <inheritdoc/>
+    public void Handle(IEnumerable<ContentPublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.PublishedEntities));
 
     /// <inheritdoc/>
     public void Handle(MediaSavedNotification notification) => PersistRelations(notification.SavedEntities);
 
     /// <inheritdoc/>
+    public void Handle(IEnumerable<MediaSavedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.SavedEntities));
+
+    /// <inheritdoc/>
     public void Handle(MemberSavedNotification notification) => PersistRelations(notification.SavedEntities);
+
+    /// <inheritdoc/>
+    public void Handle(IEnumerable<MemberSavedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.SavedEntities));
 
     private void PersistRelations(IEnumerable<IContentBase> entities)
     {

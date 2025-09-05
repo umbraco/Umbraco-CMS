@@ -1080,10 +1080,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #endregion
 
-        [Obsolete("This method is no longer used as the persistance of relations has been moved to a notification handler. Scheduled for removal in Umbraco 19.")]
+        [Obsolete("This method is no longer used as the persistance of relations has been moved to the ContentRelationsUpdate notification handler. Scheduled for removal in Umbraco 18.")]
         protected void PersistRelations(TEntity entity)
-        {
-        }
+            => Logger.LogWarning("ContentRepositoryBase.PersistRelations was called but this is now an obsolete, no-op method that is unused in Umbraco. No relations were peristed. Relations persistance has moved to the ContentRelationsUpdate notification handler.")
 
         /// <summary>
         /// Inserts property values for the content entity
