@@ -75,11 +75,11 @@ public class AvailableSegmentsController : DocumentControllerBase
         => OperationStatusResult(
             status,
             problemDetailsBuilder => status switch
-        {
-            _ => StatusCode(
-                StatusCodes.Status500InternalServerError,
-                problemDetailsBuilder
-                .WithTitle("Unknown segment operation status.")
-                .Build()),
-        });
+            {
+                _ => StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    problemDetailsBuilder
+                        .WithTitle("Unknown segment operation status.")
+                        .Build()),
+            });
 }
