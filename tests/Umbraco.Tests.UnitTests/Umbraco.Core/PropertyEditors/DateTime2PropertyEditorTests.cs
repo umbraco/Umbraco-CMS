@@ -111,7 +111,7 @@ public class DateTime2PropertyEditorTests
         string? expectedTimeZone)
     {
         var expectedJson = expectedDateTimeOffset is null ? null : _jsonSerializer.Serialize(
-            new DateTime2ValueConverter.DateTime2
+            new DateTime2ValueConverter.DateTime2Dto
             {
                 Date = expectedDateTimeOffset.Value,
                 TimeZone = expectedTimeZone,
@@ -161,7 +161,7 @@ public class DateTime2PropertyEditorTests
     {
         var storedValue = offset is null
             ? null
-            : new DateTime2ValueConverter.DateTime2
+            : new DateTime2ValueConverter.DateTime2Dto
             {
                 Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.FromHours(offset.Value)),
                 TimeZone = timeZone,

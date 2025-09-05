@@ -4,11 +4,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -64,24 +66,25 @@ public class DateTime2PropertyEditor : DataEditor
         {
             _jsonSerializer = jsonSerializer;
             _dataTypeConfigurationCache = dataTypeConfigurationCache;
-            Validators.AddRange(new DateTime2Validator(localizedTextService));
+            var validators = new TypedJsonValidatorRunner<DateTime2ApiModel, DateTime2Configuration>(
+                jsonSerializer,
+                new DateTime2Validator(localizedTextService));
+
+            Validators.Add(validators);
         }
 
         /// <inheritdoc/>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            if (editorValue.Value is not JsonObject valueAsJsonObject)
+            if (editorValue.Value is null ||
+                _jsonSerializer.TryDeserialize(editorValue.Value, out DateTime2ApiModel? dateTime2ApiModel) is false)
             {
-                return null;
+                return base.FromEditor(editorValue, currentValue);
             }
 
-            var selectedDate = valueAsJsonObject["date"]?.GetValue<string>();
-            if (selectedDate.IsNullOrWhiteSpace())
-            {
-                return null;
-            }
-
-            if (!DateTimeOffset.TryParse(selectedDate, null, DateTimeStyles.AssumeUniversal, out DateTimeOffset dateTimeOffset))
+            var selectedDate = dateTime2ApiModel.Date;
+            if (selectedDate.IsNullOrWhiteSpace()
+                || !DateTimeOffset.TryParse(selectedDate, null, DateTimeStyles.AssumeUniversal, out DateTimeOffset dateTimeOffset))
             {
                 return null;
             }
@@ -94,10 +97,10 @@ public class DateTime2PropertyEditor : DataEditor
                 dateTimeOffset = new DateTimeOffset(DateOnly.MinValue, TimeOnly.FromTimeSpan(dateTimeOffset.TimeOfDay), dateTimeOffset.Offset);
             }
 
-            var value = new DateTime2ValueConverter.DateTime2
+            var value = new DateTime2ValueConverter.DateTime2Dto
             {
                 Date = dateTimeOffset,
-                TimeZone = valueAsJsonObject["timeZone"]?.GetValue<string>(),
+                TimeZone = dateTime2ApiModel.TimeZone,
             };
 
             return _jsonSerializer.Serialize(value);
@@ -108,7 +111,7 @@ public class DateTime2PropertyEditor : DataEditor
         {
             var value = property.GetValue(culture, segment);
 
-            DateTime2ValueConverter.DateTime2? interValue = DateTime2ValueConverter.GetIntermediateFromSource(value, _jsonSerializer);
+            DateTime2ValueConverter.DateTime2Dto? interValue = DateTime2ValueConverter.GetIntermediateFromSource(value, _jsonSerializer);
             if (interValue is null)
             {
                 return null;
@@ -117,10 +120,10 @@ public class DateTime2PropertyEditor : DataEditor
             DateTime2Configuration? configuration = GetConfiguration(property.PropertyType.DataTypeKey);
             var objectValue = DateTime2ValueConverter.GetObjectFromIntermediate(interValue, configuration);
 
-            return new JsonObject
+            return new DateTime2ApiModel
             {
-                ["date"] = objectValue is null ? null : $"{objectValue:O}",
-                ["timeZone"] = interValue.TimeZone
+                Date = objectValue is null ? null : $"{objectValue:O}",
+                TimeZone = interValue.TimeZone,
             };
         }
 
@@ -130,11 +133,12 @@ public class DateTime2PropertyEditor : DataEditor
         /// <summary>
         /// Validates the date time selection for the DateTime2 property editor.
         /// </summary>
-        private class DateTime2Validator : IValueValidator
+        private class DateTime2Validator : ITypedJsonValidator<DateTime2ApiModel, DateTime2Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 
-            public DateTime2Validator(ILocalizedTextService localizedTextService) => _localizedTextService = localizedTextService;
+            public DateTime2Validator(ILocalizedTextService localizedTextService)
+                => _localizedTextService = localizedTextService;
 
             /// <inheritdoc/>
             public IEnumerable<ValidationResult> Validate(
@@ -171,6 +175,47 @@ public class DateTime2PropertyEditor : DataEditor
                         ["value"]);
                 }
             }
+
+            public IEnumerable<ValidationResult> Validate(
+                DateTime2ApiModel? value,
+                DateTime2Configuration? configuration,
+                string? valueType,
+                PropertyValidationContext validationContext)
+            {
+                if (value is null)
+                {
+                    yield break;
+                }
+
+                if (value.Date is null)
+                {
+                    yield return new ValidationResult(
+                        _localizedTextService.Localize("validation", "invalidNull"),
+                        ["value"]);
+                }
+
+                if (configuration?.TimeZones?.Mode is not { } mode || mode == DateTime2Configuration.TimeZoneMode.None)
+                {
+                    yield break;
+                }
+
+                if (mode == DateTime2Configuration.TimeZoneMode.Custom
+                    && configuration.TimeZones.TimeZones.Any(t => t.Equals(value.TimeZone, StringComparison.InvariantCultureIgnoreCase)) != true)
+                {
+                    yield return new ValidationResult(
+                        _localizedTextService.Localize("validation", "notOneOfOptions", [value.TimeZone]),
+                        ["value"]);
+                }
+            }
         }
+    }
+
+    private class DateTime2ApiModel
+    {
+        [JsonPropertyName("date")]
+        public string? Date { get; set; }
+
+        [JsonPropertyName("timeZone")]
+        public string? TimeZone { get; set; }
     }
 }

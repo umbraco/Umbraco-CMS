@@ -59,13 +59,13 @@ public class DateTime2ValueConverterTests
     private static object[] _convertToIntermediateCases =
     [
         new object[] { null, null },
-        new object[] { """{"date":"2025-08-20T16:30:00.0000000Z","timeZone":null}""", new DateTime2ValueConverter.DateTime2 { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.Zero), TimeZone = null } },
-        new object[] { """{"date":"2025-08-20T16:30:00.0000000Z","timeZone":"Europe/Copenhagen"}""", new DateTime2ValueConverter.DateTime2 { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.Zero), TimeZone = "Europe/Copenhagen" } },
-        new object[] { """{"date":"2025-08-20T16:30:00.0000000-05:00","timeZone":"Europe/Copenhagen"}""", new DateTime2ValueConverter.DateTime2 { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.FromHours(-5)), TimeZone = "Europe/Copenhagen" } },
+        new object[] { """{"date":"2025-08-20T16:30:00.0000000Z","timeZone":null}""", new DateTime2ValueConverter.DateTime2Dto { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.Zero), TimeZone = null } },
+        new object[] { """{"date":"2025-08-20T16:30:00.0000000Z","timeZone":"Europe/Copenhagen"}""", new DateTime2ValueConverter.DateTime2Dto { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.Zero), TimeZone = "Europe/Copenhagen" } },
+        new object[] { """{"date":"2025-08-20T16:30:00.0000000-05:00","timeZone":"Europe/Copenhagen"}""", new DateTime2ValueConverter.DateTime2Dto { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.FromHours(-5)), TimeZone = "Europe/Copenhagen" } },
     ];
 
     [TestCaseSource(nameof(_convertToIntermediateCases))]
-    public void Can_Convert_To_Intermediate_Value(string? input, DateTime2ValueConverter.DateTime2? expected)
+    public void Can_Convert_To_Intermediate_Value(string? input, DateTime2ValueConverter.DateTime2Dto? expected)
     {
         var result = new DateTime2ValueConverter(_jsonSerializer).ConvertSourceToIntermediate(null!, null!, input, false);
         if (expected is null)
@@ -75,13 +75,13 @@ public class DateTime2ValueConverterTests
         }
 
         Assert.IsNotNull(result);
-        Assert.IsInstanceOf<DateTime2ValueConverter.DateTime2>(result);
-        var dateTime = (DateTime2ValueConverter.DateTime2)result;
+        Assert.IsInstanceOf<DateTime2ValueConverter.DateTime2Dto>(result);
+        var dateTime = (DateTime2ValueConverter.DateTime2Dto)result;
         Assert.AreEqual(expected.Date, dateTime.Date);
         Assert.AreEqual(expected.TimeZone, dateTime.TimeZone);
     }
 
-    private static readonly DateTime2ValueConverter.DateTime2 _convertToObjectInputDate = new()
+    private static readonly DateTime2ValueConverter.DateTime2Dto _convertToObjectInputDate = new()
     {
         Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.FromHours(-1)),
         TimeZone = "Europe/Copenhagen",
@@ -98,7 +98,7 @@ public class DateTime2ValueConverterTests
 
     [TestCaseSource(nameof(_convertToObjectCases))]
     public void Can_Convert_To_Object(
-        DateTime2ValueConverter.DateTime2? input,
+        DateTime2ValueConverter.DateTime2Dto? input,
         DateTime2Configuration.DateTimeFormat format,
         DateTime2Configuration.TimeZoneMode timeZoneMode,
         object? expected)

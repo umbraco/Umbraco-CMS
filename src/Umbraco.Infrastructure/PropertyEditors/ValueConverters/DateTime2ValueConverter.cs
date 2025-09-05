@@ -63,13 +63,13 @@ public class DateTime2ValueConverter : PropertyValueConverterBase
     /// <param name="source">The source value.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <returns>The intermediate representation.</returns>
-    internal static DateTime2? GetIntermediateFromSource(object? source, IJsonSerializer jsonSerializer) =>
+    internal static DateTime2Dto? GetIntermediateFromSource(object? source, IJsonSerializer jsonSerializer) =>
         source switch
         {
             // This DateTime check is for compatibility with the "deprecated" `Umbraco.DateTime`.
             // Once that is removed, this can be removed too.
-            DateTime dateTime => new DateTime2 { Date = new DateTimeOffset(dateTime, TimeSpan.Zero) },
-            string sourceStr => jsonSerializer.TryDeserialize(sourceStr, out DateTime2? dateTime2) ? dateTime2 : null,
+            DateTime dateTime => new DateTime2Dto { Date = new DateTimeOffset(dateTime, TimeSpan.Zero) },
+            string sourceStr => jsonSerializer.TryDeserialize(sourceStr, out DateTime2Dto? dateTime2) ? dateTime2 : null,
             _ => null,
         };
 
@@ -82,7 +82,7 @@ public class DateTime2ValueConverter : PropertyValueConverterBase
     internal static object? GetObjectFromIntermediate(object? inter, DateTime2Configuration? configuration)
     {
         Type propertyValueType = GetPropertyValueType(configuration);
-        if (inter is not DateTime2 dateTime2)
+        if (inter is not DateTime2Dto dateTime2)
         {
             return propertyValueType.GetDefaultValue();
         }
@@ -111,7 +111,7 @@ public class DateTime2ValueConverter : PropertyValueConverterBase
         DateTime2Configuration? configuration,
         IJsonSerializer jsonSerializer)
     {
-        var intermediateValue = GetIntermediateFromSource(source, jsonSerializer);
+        DateTime2Dto? intermediateValue = GetIntermediateFromSource(source, jsonSerializer);
         return GetObjectFromIntermediate(intermediateValue, configuration);
     }
 
@@ -124,7 +124,10 @@ public class DateTime2ValueConverter : PropertyValueConverterBase
             _ => typeof(DateTimeOffset?),
         };
 
-    public class DateTime2
+    /// <summary>
+    ///     Model/DTO that represents the JSON that DateTime2 stores.
+    /// </summary>
+    internal class DateTime2Dto
     {
         [JsonPropertyName("date")]
         public DateTimeOffset Date { get; init; }
