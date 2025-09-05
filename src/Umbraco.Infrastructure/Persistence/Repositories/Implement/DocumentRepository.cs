@@ -1346,7 +1346,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     /// <inheritdoc />
-    public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
+    public void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule)
     {
         if (content == null)
         {

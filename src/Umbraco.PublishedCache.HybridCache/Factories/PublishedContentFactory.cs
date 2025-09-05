@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -58,17 +58,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             contentCacheNode.Data?.Name ?? "No Name",
             contentCacheNode.Id);
 
-        IPublishedContentType contentType =
-            _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
-        var contentNode = new ContentNode(
-            contentCacheNode.Id,
-            contentCacheNode.Key,
-            contentCacheNode.SortOrder,
-            contentCacheNode.CreateDate,
-            contentCacheNode.CreatorId,
-            contentType,
-            preview ? contentCacheNode.Data : null,
-            preview ? null : contentCacheNode.Data);
+        ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
 
         publishedContent = GetModel(contentNode, preview);
 
@@ -83,6 +73,46 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         }
 
         return publishedContent;
+    }
+
+    public IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview)
+    {
+        var cacheKey = $"{nameof(PublishedContentFactory)}ElementCache_{contentCacheNode.Id}_{preview}";
+        IPublishedElement? publishedElement = null;
+        if (_appCaches.RequestCache.IsAvailable)
+        {
+            publishedElement = _appCaches.RequestCache.GetCacheItem<IPublishedElement?>(cacheKey);
+            if (publishedElement is not null)
+            {
+                _logger.LogDebug(
+                    "Using cached IPublishedElement for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
+                    contentCacheNode.Data?.Name ?? "No Name",
+                    contentCacheNode.Id);
+                return publishedElement;
+            }
+        }
+
+        _logger.LogDebug(
+            "Creating IPublishedElement for document {ContentCacheNodeName} ({ContentCacheNodeId}).",
+            contentCacheNode.Data?.Name ?? "No Name",
+            contentCacheNode.Id);
+
+        ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
+
+        publishedElement = GetPublishedElement(contentNode, preview);
+
+        if (preview)
+        {
+            // TODO ELEMENTS: what is the element equivalent of this?
+            // return model ?? GetPublishedContentAsDraft(model);
+        }
+
+        if (_appCaches.RequestCache.IsAvailable && publishedElement is not null)
+        {
+            _appCaches.RequestCache.Set(cacheKey, publishedElement);
+        }
+
+        return publishedElement;
     }
 
     /// <inheritdoc/>
@@ -188,6 +218,20 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         return publishedMember;
     }
 
+    private ContentNode CreateContentNode(ContentCacheNode contentCacheNode, bool preview)
+    {
+        IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
+        return new ContentNode(
+            contentCacheNode.Id,
+            contentCacheNode.Key,
+            contentCacheNode.SortOrder,
+            contentCacheNode.CreateDate,
+            contentCacheNode.CreatorId,
+            contentType,
+            preview ? contentCacheNode.Data : null,
+            preview ? null : contentCacheNode.Data);
+    }
+
     private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
     {
         var properties = member
@@ -222,12 +266,25 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         properties[alias] = new[] { new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty } };
     }
 
+    // TODO ELEMENTS: rename this to GetPublishedContent
     private IPublishedContent? GetModel(ContentNode node, bool preview)
     {
         ContentData? contentData = preview ? node.DraftModel : node.PublishedModel;
         return contentData == null
             ? null
             : new PublishedContent(
+                node,
+                preview,
+                _elementsCache,
+                _variationContextAccessor);
+    }
+
+    private IPublishedElement? GetPublishedElement(ContentNode node, bool preview)
+    {
+        ContentData? contentData = preview ? node.DraftModel : node.PublishedModel;
+        return contentData == null
+            ? null
+            : new PublishedElement(
                 node,
                 preview,
                 _elementsCache,
