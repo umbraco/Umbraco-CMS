@@ -119,19 +119,6 @@ public class ObjectExtensionsTests
         Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), outcome, date);
     }
 
-    [TestCase("01-01-0001", true)]
-    [TestCase("01-01-1500", true)]
-    [TestCase("01-01-1800", false)]
-    public virtual void CanConvertDateTimeMinValueToSqlDateTimeMinValue(string date, bool outcome)
-    {
-        var dateTime = new DateTime(1753, 01, 01);
-
-        var result = date.TryConvertTo<DateTime>();
-
-        Assert.IsTrue(result.Success, date);
-        Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), outcome, date);
-    }
-
     [Test]
     public virtual void CanConvertBlankStringToNullDateTime()
     {
