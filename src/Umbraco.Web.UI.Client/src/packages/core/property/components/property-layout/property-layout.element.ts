@@ -124,11 +124,12 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			#headerColumn {
 				position: relative;
 				height: min-content;
+				top: var(--umb-property-layout-header-top);
 			}
 			/*@container (width > 600px) {*/
 			:host(:not([orientation='vertical'])) #headerColumn {
 				position: sticky;
-				top: calc(var(--uui-size-space-2) * -1);
+				top: var(--umb-property-layout-header-top, calc(var(--uui-size-space-2) * -1));
 			}
 			/*}*/
 
