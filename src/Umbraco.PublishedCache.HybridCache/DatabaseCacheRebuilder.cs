@@ -120,7 +120,7 @@ internal sealed class DatabaseCacheRebuilder : IDatabaseCacheRebuilder
     private Task PerformRebuild()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        _databaseCacheRepository.Rebuild();
+        _databaseCacheRepository.Rebuild([], [], []);
 
         // If the serializer type has changed, we also need to update it in the key value store.
         var currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);

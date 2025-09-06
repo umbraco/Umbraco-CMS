@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Routing
             }
         }
 
-        private IEnumerable<string> ValidateDomains(IEnumerable<string> domains) =>
+        private static IEnumerable<string> ValidateDomains(IEnumerable<string> domains) =>
             // must use authority format w/optional scheme and port, but no path
             // any domain should appear only once
             domains.Select(domain =>
@@ -368,7 +368,7 @@ namespace Umbraco.Cms.Core.Routing
             // therefore it is safe to return and exit the configuration lock
         }
 
-        private DomainAndUri? MapDomain(
+        private static DomainAndUri? MapDomain(
             IReadOnlyCollection<DomainAndUri> domainAndUris,
             Dictionary<string, string[]>? qualifiedSites,
             string currentAuthority,

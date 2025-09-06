@@ -9,7 +9,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  */
 export class UmbValidationContext extends UmbValidationController {
 	constructor(host: UmbControllerHost) {
-		// This is overridden to avoid setting a controllerAlias, this might make sense, but currently i want to leave it out. [NL]
 		super(host);
 		this.provideContext(UMB_VALIDATION_CONTEXT, this);
 	}

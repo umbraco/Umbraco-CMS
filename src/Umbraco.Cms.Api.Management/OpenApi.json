@@ -1831,6 +1831,14 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -1839,14 +1847,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetDataTypeTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -4445,6 +4450,14 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -4453,14 +4466,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetDocumentBlueprintTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -6762,6 +6772,14 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -6770,14 +6788,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetDocumentTypeTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -10394,6 +10409,14 @@
                 "format": "uuid"
               }
             }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -11208,6 +11231,14 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -11216,14 +11247,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetDocumentTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -16020,6 +16048,14 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "foldersOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -16028,14 +16064,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetMediaTypeTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -16287,6 +16320,14 @@
                 "type": "string",
                 "format": "uuid"
               }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -18550,6 +18591,14 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -18558,14 +18607,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/MediaTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetMediaTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -28769,14 +28815,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SubsetNamedEntityTreeItemResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -36736,6 +36779,9 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                },
+                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -37022,6 +37068,9 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                },
+                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -37081,13 +37130,24 @@
           "editorAlias",
           "id",
           "isDeletable",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -37215,7 +37275,8 @@
           "id",
           "isDeletable",
           "isFolder",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
@@ -37233,6 +37294,16 @@
               }
             ],
             "nullable": true
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -37454,13 +37525,24 @@
       "DictionaryItemItemResponseModel": {
         "required": [
           "id",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -37577,13 +37659,24 @@
         "required": [
           "documentType",
           "id",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -37602,6 +37695,7 @@
         "required": [
           "documentType",
           "id",
+          "signs",
           "values",
           "variants"
         ],
@@ -37631,6 +37725,16 @@
             "type": "string",
             "format": "uuid"
           },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
+          },
           "documentType": {
             "oneOf": [
               {
@@ -37646,7 +37750,8 @@
           "hasChildren",
           "id",
           "isFolder",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
@@ -37664,6 +37769,16 @@
               }
             ],
             "nullable": true
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -37689,6 +37804,7 @@
           "id",
           "isProtected",
           "isTrashed",
+          "signs",
           "sortOrder",
           "values",
           "variants"
@@ -37718,6 +37834,16 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "creator": {
             "type": "string",
@@ -37788,6 +37914,7 @@
           "id",
           "isProtected",
           "isTrashed",
+          "signs",
           "variants"
         ],
         "type": "object",
@@ -37795,6 +37922,16 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "isTrashed": {
             "type": "boolean"
@@ -38033,6 +38170,7 @@
           "documentType",
           "id",
           "isTrashed",
+          "signs",
           "urls",
           "values",
           "variants"
@@ -38062,6 +38200,16 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "documentType": {
             "oneOf": [
@@ -38105,12 +38253,17 @@
           "isProtected",
           "isTrashed",
           "noAccess",
+          "signs",
           "variants"
         ],
         "type": "object",
         "properties": {
           "hasChildren": {
             "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
           },
           "parent": {
             "oneOf": [
@@ -38120,15 +38273,21 @@
             ],
             "nullable": true
           },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
+          },
           "noAccess": {
             "type": "boolean"
           },
           "isTrashed": {
             "type": "boolean"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
           },
           "createDate": {
             "type": "string",
@@ -38170,13 +38329,24 @@
       "DocumentTypeBlueprintItemResponseModel": {
         "required": [
           "id",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -38223,6 +38393,14 @@
           },
           "icon": {
             "type": "string"
+          },
+          "collection": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -38332,13 +38510,24 @@
         "required": [
           "id",
           "isElement",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -38356,6 +38545,36 @@
           }
         },
         "additionalProperties": false
+      },
+      "DocumentTypePermissionPresentationModel": {
+        "required": [
+          "$type",
+          "documentTypeAlias",
+          "verbs"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "verbs": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "documentTypeAlias": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentTypePermissionPresentationModel": "#/components/schemas/DocumentTypePermissionPresentationModel"
+          }
+        }
       },
       "DocumentTypePropertyTypeContainerResponseModel": {
         "required": [
@@ -38683,7 +38902,8 @@
           "id",
           "isElement",
           "isFolder",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
@@ -38701,6 +38921,16 @@
               }
             ],
             "nullable": true
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -38969,6 +39199,7 @@
         "required": [
           "documentType",
           "id",
+          "signs",
           "values",
           "variants"
         ],
@@ -38997,6 +39228,16 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "documentType": {
             "oneOf": [
@@ -40013,6 +40254,7 @@
         "required": [
           "id",
           "mediaType",
+          "signs",
           "sortOrder",
           "values",
           "variants"
@@ -40042,6 +40284,16 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "creator": {
             "type": "string",
@@ -40083,6 +40335,7 @@
           "id",
           "isTrashed",
           "mediaType",
+          "signs",
           "variants"
         ],
         "type": "object",
@@ -40090,6 +40343,16 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "isTrashed": {
             "type": "boolean"
@@ -40214,6 +40477,7 @@
           "id",
           "isTrashed",
           "mediaType",
+          "signs",
           "urls",
           "values",
           "variants"
@@ -40243,6 +40507,16 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "urls": {
             "type": "array",
@@ -40276,12 +40550,17 @@
           "isTrashed",
           "mediaType",
           "noAccess",
+          "signs",
           "variants"
         ],
         "type": "object",
         "properties": {
           "hasChildren": {
             "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
           },
           "parent": {
             "oneOf": [
@@ -40291,15 +40570,21 @@
             ],
             "nullable": true
           },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
+          },
           "noAccess": {
             "type": "boolean"
           },
           "isTrashed": {
             "type": "boolean"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
           },
           "createDate": {
             "type": "string",
@@ -40342,6 +40627,14 @@
           },
           "icon": {
             "type": "string"
+          },
+          "collection": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -40434,13 +40727,24 @@
       "MediaTypeItemResponseModel": {
         "required": [
           "id",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -40759,7 +41063,8 @@
           "id",
           "isDeletable",
           "isFolder",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
@@ -40777,6 +41082,16 @@
               }
             ],
             "nullable": true
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -40946,13 +41261,24 @@
       "MemberGroupItemResponseModel": {
         "required": [
           "id",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -40982,6 +41308,7 @@
           "id",
           "kind",
           "memberType",
+          "signs",
           "variants"
         ],
         "type": "object",
@@ -40989,6 +41316,16 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "memberType": {
             "oneOf": [
@@ -41066,6 +41403,7 @@
           "isTwoFactorEnabled",
           "kind",
           "memberType",
+          "signs",
           "username",
           "values",
           "variants"
@@ -41095,6 +41433,16 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "email": {
             "type": "string"
@@ -41238,13 +41586,24 @@
       "MemberTypeItemResponseModel": {
         "required": [
           "id",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -41549,7 +41908,8 @@
           "hasChildren",
           "icon",
           "id",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
@@ -41567,6 +41927,16 @@
               }
             ],
             "nullable": true
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -41829,7 +42199,8 @@
         "required": [
           "hasChildren",
           "id",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
@@ -41847,6 +42218,16 @@
               }
             ],
             "nullable": true
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -43911,6 +44292,7 @@
           "documentType",
           "id",
           "isTrashed",
+          "signs",
           "urls",
           "values",
           "variants"
@@ -43940,6 +44322,16 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "documentType": {
             "oneOf": [
@@ -44130,13 +44522,24 @@
         "required": [
           "id",
           "isDeletable",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -44632,6 +45035,18 @@
         },
         "additionalProperties": false
       },
+      "SignModel": {
+        "required": [
+          "alias"
+        ],
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "SortingRequestModel": {
         "required": [
           "sorting"
@@ -44776,6 +45191,209 @@
         },
         "additionalProperties": false
       },
+      "SubsetDataTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetDocumentBlueprintTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetDocumentTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetDocumentTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetMediaTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetMediaTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubsetNamedEntityTreeItemResponseModel": {
+        "required": [
+          "items",
+          "totalAfter",
+          "totalBefore"
+        ],
+        "type": "object",
+        "properties": {
+          "totalBefore": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalAfter": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "TagResponseModel": {
         "required": [
           "id",
@@ -44850,13 +45468,24 @@
         "required": [
           "alias",
           "id",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -46515,6 +47144,9 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                },
+                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -46836,13 +47468,24 @@
       "UserGroupItemResponseModel": {
         "required": [
           "id",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -46941,6 +47584,9 @@
                   "$ref": "#/components/schemas/DocumentPropertyValuePermissionPresentationModel"
                 },
                 {
+                  "$ref": "#/components/schemas/DocumentTypePermissionPresentationModel"
+                },
+                {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
@@ -46994,13 +47640,24 @@
           "avatarUrls",
           "id",
           "kind",
-          "name"
+          "name",
+          "signs"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
           },
           "name": {
             "type": "string"
@@ -47436,12 +48093,28 @@
         "required": [
           "enabled",
           "events",
+          "id",
           "name",
+          "signs",
           "types",
           "url"
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "signs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SignModel"
+                }
+              ]
+            }
+          },
           "enabled": {
             "type": "boolean"
           },

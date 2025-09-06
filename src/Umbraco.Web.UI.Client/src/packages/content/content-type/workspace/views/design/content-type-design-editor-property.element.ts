@@ -69,12 +69,15 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	public ownerVariesBySegment?: boolean;
 
 	@property({ type: Boolean, reflect: true, attribute: '_inherited' })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _inherited?: boolean;
 
 	@state()
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _inheritedContentTypeId?: string;
 
 	@state()
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _inheritedContentTypeName?: string;
 
 	@property({ type: String, reflect: false })
@@ -451,6 +454,10 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				position: sticky;
 				top: var(--uui-size-space-4);
 				height: min-content;
+			}
+
+			#header i {
+				opacity: 0.55;
 			}
 
 			#editor {

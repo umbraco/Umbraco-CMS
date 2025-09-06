@@ -37,9 +37,12 @@ export class UmbVariantId {
 	}
 
 	public static FromString(str: string): UmbVariantId {
-		const split = str.split('_');
-		const culture = split[0] === UMB_INVARIANT_CULTURE ? null : split[0];
-		const segment = split[1] ?? null;
+		const firstUnderscoreIndex = str.indexOf('_');
+		let culture: string | null = firstUnderscoreIndex === -1 ? str : str.substring(0, firstUnderscoreIndex);
+		culture = culture === UMB_INVARIANT_CULTURE ? null : culture;
+
+		const segment = firstUnderscoreIndex === -1 ? null : str.substring(firstUnderscoreIndex + 1) || null;
+
 		return Object.freeze(new UmbVariantId(culture, segment));
 	}
 

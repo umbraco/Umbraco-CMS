@@ -47,7 +47,7 @@ export class UmbPreviewSegmentElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (this._segments.length <= 1) return nothing;
+		if (!this._segments.length) return nothing;
 		return html`
 			<uui-button look="primary" popovertarget="segments-popover">
 				<div>

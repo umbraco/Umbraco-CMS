@@ -1,26 +1,33 @@
 import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
 import {expect} from "@playwright/test";
 
+// Document Type
 const rootDocumentTypeName = 'RootDocumentType';
 const childDocumentTypeOneName = 'ChildDocumentTypeOne';
 const childDocumentTypeTwoName = 'ChildDocumentTypeTwo';
 let childDocumentTypeId = null;
 let rootDocumentTypeId = null;
+
+// Document
 const rootDocumentName = 'RootDocument';
 const childDocumentOneName = 'ChildDocumentOne';
 const childDocumentTwoName = 'SecondChildDocument';
 let rootDocumentId = null;
 
+// Data Type
 const dataTypeName = 'Textstring';
 let dataTypeId = null;
 const documentText = 'This is test document text';
 
+// Document Blueprint
 const testDocumentName = 'TestDocument';
 const documentBlueprintName = 'TestBlueprintName';
 
+// User
 const testUser = ConstantHelper.testUserCredentials;
 let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
+// User Group
 const userGroupName = 'TestUserGroup';
 let userGroupId = null;
 
@@ -49,7 +56,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
 });
 
-test('can browse content node with permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can read content node with permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -64,7 +71,7 @@ test('can browse content node with permission enabled', async ({umbracoApi, umbr
   await umbracoUi.content.doesDocumentHaveName(rootDocumentName);
 });
 
-test('can not browse content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -76,12 +83,10 @@ test('can not browse content node with permission disabled', async ({umbracoApi,
   await umbracoUi.content.goToContentWithName(rootDocumentName);
 
   // Assert
-  await umbracoUi.content.isErrorNotificationVisible();
-  // TODO: Uncomment this when this issue is fixed https://github.com/umbraco/Umbraco-CMS/issues/18533
-  //await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.noAccessToResource);
+  await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
 });
 
-test('can create document blueprint with permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can create document blueprint with permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateDocumentBlueprintPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -113,7 +118,7 @@ test('can not create document blueprint with permission disabled', async ({umbra
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can delete content with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can delete content with delete permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteDocumentPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -127,7 +132,8 @@ test('can delete content with delete permission enabled', async ({umbracoApi, um
   await umbracoUi.content.clickConfirmTrashButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.movedToRecycleBin);
+  await umbracoUi.content.waitForContentToBeTrashed();
+  await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName);
 });
 
 test('can not delete content with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -144,7 +150,7 @@ test('can not delete content with delete permission disabled', async ({umbracoAp
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can empty recycle bin with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can empty recycle bin with delete permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.moveToRecycleBin(rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteDocumentPermission(userGroupName);
@@ -159,7 +165,8 @@ test('can empty recycle bin with delete permission enabled', async ({umbracoApi,
   await umbracoUi.content.clickConfirmEmptyRecycleBinButton();
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.emptiedRecycleBin);
+  await umbracoUi.content.waitForRecycleBinToBeEmptied();
+  await umbracoUi.content.isItemVisibleInRecycleBin(rootDocumentName, false, false);
 });
 
 test('can not empty recycle bin with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -177,7 +184,7 @@ test('can not empty recycle bin with delete permission disabled', async ({umbrac
   await umbracoUi.content.isActionsMenuForRecycleBinVisible(false);
 });
 
-test('can create content with create permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can create content with create permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateDocumentPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -238,7 +245,7 @@ test('can not create notifications with notification permission disabled', async
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can publish content with publish permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can publish content with publish permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublishPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -270,7 +277,8 @@ test('can not publish content with publish permission disabled', async ({umbraco
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Bug, does nothing in the frontend.
+// Remove .skip when the front-end is ready. Currently there is no "Permissions" menu item displays
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19339
 test.skip('can set permissions with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsPermission(userGroupName);
@@ -301,7 +309,7 @@ test('can not set permissions with set permissions permission disabled', async (
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can unpublish content with unpublish permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can unpublish content with unpublish permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.publish(rootDocumentId);
   expect(await umbracoApi.document.isDocumentPublished(rootDocumentId)).toBeTruthy();
@@ -337,7 +345,7 @@ test('can not unpublish content with unpublish permission disabled', async ({umb
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can update content with update permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can update content with update permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -374,7 +382,7 @@ test('can not update content with update permission disabled', async ({umbracoAp
 });
 
 // Needs create permission to be enabled to duplicate content
-test.fixme('can duplicate content with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can duplicate content with duplicate permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedContentName = rootDocumentName + ' (1)';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDuplicatePermission(userGroupName);
@@ -416,7 +424,7 @@ test('can not duplicate content with duplicate permission disabled', async ({umb
 });
 
 // Needs create permission to be enabled to move content
-test.fixme('can move content with move to permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can move content with move to permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const moveToDocumentName = 'SecondRootDocument';
   const moveToDocumentId = await umbracoApi.document.createDocumentWithTextContent(moveToDocumentName, rootDocumentTypeId, documentText, dataTypeName);
@@ -427,7 +435,7 @@ test.fixme('can move content with move to permission enabled', async ({umbracoAp
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
 
   // Act
-  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.clickActionsMenuForContent(childDocumentOneName);
   await umbracoUi.content.clickMoveToActionMenuOption();
   await umbracoUi.content.moveToContentWithName([], moveToDocumentName);
@@ -436,7 +444,7 @@ test.fixme('can move content with move to permission enabled', async ({umbracoAp
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
   await umbracoUi.content.reloadContentTree();
   await umbracoUi.content.isCaretButtonVisibleForContentName(moveToDocumentName, true);
-  await umbracoUi.content.clickCaretButtonForContentName(moveToDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(moveToDocumentName);
   await umbracoUi.content.isChildContentInTreeVisible(moveToDocumentName, childDocumentOneName, true);
   await umbracoUi.content.isCaretButtonVisibleForContentName(rootDocumentName, false);
   expect(await umbracoApi.document.getChildrenAmount(rootDocumentId)).toEqual(0);
@@ -460,7 +468,7 @@ test('can not move content with move to permission disabled', async ({umbracoApi
 });
 
 // Needs a better way to assert
-test.fixme('can sort children with sort children permission enabled', async ({umbracoApi, umbracoUi}) => {
+test.fixme('can sort children with sort children permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSortChildrenPermission(userGroupName);
@@ -481,7 +489,7 @@ test.fixme('can sort children with sort children permission enabled', async ({um
 
   // Assert
   // TODO: uncomment when it is not flaky
-  await umbracoUi.content.clickCaretButtonForContentName(rootDocumentName);
+  await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
 });
@@ -501,7 +509,7 @@ test('can not sort children with sort children permission disabled', async ({umb
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can set culture and hostnames with culture and hostnames permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can set culture and hostnames with culture and hostnames permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const domainName = '/domain';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCultureAndHostnamesPermission(userGroupName);
@@ -539,8 +547,7 @@ test('can not set culture and hostnames with culture and hostnames permission di
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// TODO: Notification is not correct 'Public access setting created' should be 'access'
-test.skip('can set public access with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can set public access with public access permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPublicAccessPermission(userGroupName);
   const testMemberGroup = 'TestMemberGroup';
@@ -574,7 +581,7 @@ test('can not set public access with public access permission disabled', async (
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can rollback content with rollback permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can rollback content with rollback permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithRollbackPermission(userGroupName);
   await umbracoApi.document.publish(rootDocumentId);
@@ -593,6 +600,7 @@ test('can rollback content with rollback permission enabled', async ({umbracoApi
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedTextStringText);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.clickRollbackButton();
+  await umbracoUi.waitForTimeout(700); // Wait for the rollback items to load
   await umbracoUi.content.clickLatestRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
@@ -615,7 +623,7 @@ test('can not rollback content with rollback permission disabled', async ({umbra
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can not see delete button in content for userGroup with delete permission disabled and create permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can not see delete button in content for userGroup with delete permission disabled and create permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeletePermissionAndCreatePermission(userGroupName, false, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -661,4 +669,4 @@ test('can create and update content with permission enabled', {tag: '@release'},
 
   // Cleanup
   await umbracoApi.document.ensureNameNotExists(updatedDocumentName);
-}); 
+});

@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -13,8 +16,21 @@ namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerBase
     where TItem : EntityTreeItemResponseModel, new()
 {
+    private readonly SignProviderCollection _signProviders;
+
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected EntityTreeControllerBase(IEntityService entityService)
-        => EntityService = entityService;
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+    {
+    }
+
+    protected EntityTreeControllerBase(IEntityService entityService, SignProviderCollection signProviders)
+    {
+        EntityService = entityService;
+        _signProviders = signProviders;
+    }
 
     protected IEntityService EntityService { get; }
 
@@ -22,34 +38,38 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected virtual Ordering ItemOrdering => Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
 
-    protected Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
+    protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
         IEntitySlim[] rootEntities = GetPagedRootEntities(skip, take, out var totalItems);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(null, rootEntities);
 
+        await PopulateSigns(treeItemViewModels);
+
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
-        return Task.FromResult<ActionResult<PagedViewModel<TItem>>>(Ok(result));
+        return Ok(result);
     }
 
-    protected Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentId, int skip, int take)
+    protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentId, int skip, int take)
     {
         IEntitySlim[] children = GetPagedChildEntities(parentId, skip, take, out var totalItems);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(parentId, children);
 
+        await PopulateSigns(treeItemViewModels);
+
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
-        return Task.FromResult<ActionResult<PagedViewModel<TItem>>>(Ok(result));
+        return Ok(result);
     }
 
-    protected Task<ActionResult<IEnumerable<TItem>>> GetSiblings(Guid target, int before, int after)
+    protected async Task<ActionResult<SubsetViewModel<TItem>>> GetSiblings(Guid target, int before, int after)
     {
-        IEntitySlim[] siblings = EntityService.GetSiblings(target, ItemObjectType, before, after, ItemOrdering).ToArray();
+        IEntitySlim[] siblings = GetSiblingEntities(target, before, after, out var totalBefore, out var totalAfter);
         if (siblings.Length == 0)
         {
-            return Task.FromResult<ActionResult<IEnumerable<TItem>>>(NotFound());
+            return NotFound();
         }
 
         IEntitySlim? entity = siblings.FirstOrDefault();
@@ -57,15 +77,20 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             ? EntityService.GetKey(entity.ParentId, ItemObjectType).Result
             : Constants.System.RootKey;
 
-        TItem[] treeItemsViewModels = MapTreeItemViewModels(parentKey, siblings);
-        return Task.FromResult<ActionResult<IEnumerable<TItem>>>(Ok(treeItemsViewModels));
+        TItem[] treeItemViewModels = MapTreeItemViewModels(parentKey, siblings);
+
+        await PopulateSigns(treeItemViewModels);
+
+        SubsetViewModel<TItem> result = SubsetViewModel(treeItemViewModels, totalBefore, totalAfter);
+
+        return Ok(result);
     }
 
     protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
     {
         IEntitySlim[] ancestorEntities = await GetAncestorEntitiesAsync(descendantKey, includeSelf);
 
-        TItem[] result = ancestorEntities
+        TItem[] treeItemViewModels = ancestorEntities
             .Select(ancestor =>
             {
                 IEntitySlim? parent = ancestor.ParentId > 0
@@ -76,7 +101,9 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             })
             .ToArray();
 
-        return Ok(result);
+        await PopulateSigns(treeItemViewModels);
+
+        return Ok(treeItemViewModels);
     }
 
     protected virtual Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey, bool includeSelf)
@@ -110,7 +137,8 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             .ToArray();
 
     protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems) =>
-        EntityService.GetPagedChildren(
+        EntityService
+            .GetPagedChildren(
                 parentKey,
                 ItemObjectType,
                 skip,
@@ -119,8 +147,28 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 ordering: ItemOrdering)
             .ToArray();
 
+    protected virtual IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter) =>
+        EntityService
+            .GetSiblings(
+                target,
+                [ItemObjectType],
+                before,
+                after,
+                out totalBefore,
+                out totalAfter,
+                ordering: ItemOrdering)
+        .ToArray();
+
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
+
+    protected virtual async Task PopulateSigns(TItem[] treeItemViewModels)
+    {
+        foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<TItem>()))
+        {
+            await signProvider.PopulateSignsAsync(treeItemViewModels);
+        }
+    }
 
     protected virtual TItem MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
@@ -131,9 +179,9 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             Parent = parentKey.HasValue
                 ? new ReferenceByIdModel
                 {
-                    Id = parentKey.Value
+                    Id = parentKey.Value,
                 }
-                : null
+                : null,
         };
 
         return viewModel;
@@ -141,4 +189,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected PagedViewModel<TItem> PagedViewModel(IEnumerable<TItem> treeItemViewModels, long totalItems)
         => new() { Total = totalItems, Items = treeItemViewModels };
+
+    protected SubsetViewModel<TItem> SubsetViewModel(IEnumerable<TItem> treeItemViewModels, long totalBefore, long totalAfter)
+        => new() { TotalBefore = totalBefore, TotalAfter = totalAfter, Items = treeItemViewModels };
 }

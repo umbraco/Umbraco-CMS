@@ -79,7 +79,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	}
 
 	@state()
-	public _alias?: string;
+	private _alias?: string;
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;

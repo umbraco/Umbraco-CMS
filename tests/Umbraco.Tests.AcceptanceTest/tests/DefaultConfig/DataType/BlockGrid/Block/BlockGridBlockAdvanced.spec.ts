@@ -42,7 +42,7 @@ test.skip('can remove a custom view from a block', async ({umbracoApi, umbracoUi
   await umbracoUi.dataType.goToBlockAdvancedTab();
 });
 
-// TODO: Remove skip and update test when the front-end is ready. Currently stylesheets are saved as arrays
+// TODO: Remove skip and update test when the front-end is ready. Currently it is not possible to add a custom stylesheet to a block
 test.skip('can remove a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css'
@@ -80,7 +80,7 @@ test('can update overlay size in a block', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainOverlaySize(blockGridEditorName, contentElementTypeId, overlaySize)).toBeTruthy();
 });
 
-test('can enable inline editing mode in a block', async ({umbracoApi, umbracoUi}) => {
+test('can enable inline editing mode in a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -119,7 +119,7 @@ test('can disable inline editing mode in a block', async ({umbracoApi, umbracoUi
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainInlineEditing(blockGridEditorName, contentElementTypeId, false)).toBeTruthy();
 });
 
-test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
+test('can enable hide content editor in a block', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);

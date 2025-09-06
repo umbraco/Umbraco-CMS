@@ -1,9 +1,12 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Services.Signs;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
@@ -28,9 +31,16 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         }
     }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected FolderTreeControllerBase(IEntityService entityService)
-        : base(entityService) =>
-        // ReSharper disable once VirtualMemberCallInConstructor
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+    {
+    }
+
+    protected FolderTreeControllerBase(IEntityService entityService, SignProviderCollection signProviders)
+        : base(entityService, signProviders) =>
         _folderObjectTypeId = FolderObjectType.GetGuid();
 
     protected abstract UmbracoObjectTypes FolderObjectType { get; }
@@ -50,6 +60,24 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             skip,
             take,
             out totalItems);
+
+    protected override IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter)
+    {
+        totalBefore = 0;
+        totalAfter = 0;
+
+        UmbracoObjectTypes[] siblingObjectTypes = GetObjectTypes();
+
+        return EntityService.GetSiblings(
+                target,
+                siblingObjectTypes,
+                before,
+                after,
+                out totalBefore,
+                out totalAfter,
+                ordering: ItemOrdering)
+            .ToArray();
+    }
 
     protected override TItem MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
@@ -93,19 +121,19 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     {
         totalItems = 0;
 
-        UmbracoObjectTypes[] childObjectTypes = _foldersOnly ? [FolderObjectType] : [FolderObjectType, ItemObjectType];
+        UmbracoObjectTypes[] childObjectTypes = GetObjectTypes();
 
-        IEntitySlim[] itemEntities = EntityService.GetPagedChildren(
-                    parentKey,
-                    [FolderObjectType, ItemObjectType],
-                    childObjectTypes,
-                    skip,
-                    take,
-                    false,
-                    out totalItems,
-                    ordering: ItemOrdering)
-                .ToArray();
-
-        return itemEntities;
+        return EntityService.GetPagedChildren(
+                parentKey,
+                [FolderObjectType, ItemObjectType],
+                childObjectTypes,
+                skip,
+                take,
+                false,
+                out totalItems,
+                ordering: ItemOrdering)
+            .ToArray();
     }
+
+    private UmbracoObjectTypes[] GetObjectTypes() => _foldersOnly ? [FolderObjectType] : [FolderObjectType, ItemObjectType];
 }
