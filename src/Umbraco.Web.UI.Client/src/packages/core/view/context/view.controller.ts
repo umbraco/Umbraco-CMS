@@ -6,7 +6,6 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import { UmbViewController } from './view.controller.js';
 
 /**
  *
@@ -16,7 +15,7 @@ import { UmbViewController } from './view.controller.js';
  * Browser Title?
  *
  */
-export class UmbViewContext extends UmbViewController {
+export class UmbViewController extends UmbControllerBase {
 	//
 	#providerCtrl?: UmbContextProviderController;
 	#consumeParentCtrl?: UmbContextConsumerController<typeof UMB_VIEW_CONTEXT.TYPE>;
@@ -27,7 +26,7 @@ export class UmbViewContext extends UmbViewController {
 	#deactivatedFromOutside = false;
 	#inherit?: boolean;
 	#explicitInheritance?: boolean;
-	#parentView?: UmbViewContext;
+	#parentView?: UmbViewController;
 	#title?: string;
 
 	public readonly viewAlias: string | null;
@@ -129,7 +128,7 @@ export class UmbViewContext extends UmbViewController {
 		this.#updateTitle();
 	}
 
-	public inheritFrom(context?: UmbViewContext): void {
+	public inheritFrom(context?: UmbViewController): void {
 		this.#explicitInheritance = true;
 		this.#consumeParentCtrl?.destroy();
 		this.#consumeParentCtrl = undefined;
