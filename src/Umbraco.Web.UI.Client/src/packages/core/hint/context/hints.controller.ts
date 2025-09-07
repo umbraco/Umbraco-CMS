@@ -16,8 +16,8 @@ export class UmbHintController<
 	IncomingHintType extends UmbIncomingHintBase = UmbPartialSome<HintType, 'unique' | 'weight' | 'path'>,
 > extends UmbControllerBase {
 	//
-	#viewAlias?: string;
-	getViewAlias(): string | undefined {
+	#viewAlias: string | null;
+	getViewAlias(): string | null {
 		return this.#viewAlias;
 	}
 	#scaffold = new UmbObjectState<Partial<HintType>>({});
@@ -43,7 +43,7 @@ export class UmbHintController<
 	constructor(host: UmbControllerHost, args?: UmbHintControllerArgs<HintType>) {
 		super(host);
 
-		this.#viewAlias = args?.viewAlias;
+		this.#viewAlias = args?.viewAlias ?? null;
 		if (args?.scaffold) {
 			this.#scaffold.setValue(args?.scaffold);
 		}
@@ -82,7 +82,7 @@ export class UmbHintController<
 		return this.#hints.asObservablePart(fn);
 	}
 
-	descendingHints(viewAlias?: string): Observable<Array<UmbHint> | undefined> {
+	descendingHints(viewAlias?: string | null): Observable<Array<UmbHint> | undefined> {
 		if (viewAlias) {
 			return this.#hints.asObservablePart((hints) => {
 				return hints.filter((hint) => hint.path[0] === viewAlias);
@@ -101,6 +101,9 @@ export class UmbHintController<
 
 	inheritFrom(parent: UmbHintController | undefined): void {
 		if (this.#parent === parent) return;
+		if (this.#viewAlias === null) {
+			throw new Error('A Hint Controller needs a view alias to be able to inherit from a parent.');
+		}
 		this.#parent = parent;
 		this.observe(this.#parent?.scaffold, (scaffold) => {
 			if (scaffold) {
@@ -141,6 +144,9 @@ export class UmbHintController<
 		this.#parent!.initiateChange();
 
 		const viewAlias = this.getViewAlias();
+		if (!viewAlias) {
+			throw new Error('A Hint Controller needs a view alias to be able to propagate to a parent.');
+		}
 
 		hints.forEach((hint) => {
 			let newPath = hint.path;
