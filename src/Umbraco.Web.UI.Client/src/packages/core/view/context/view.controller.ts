@@ -12,8 +12,6 @@ import type { UmbContextConsumerController, UmbContextProviderController } from 
  * TODO:
  * Include Shortcuts
  *
- * Browser Title?
- *
  */
 export class UmbViewController extends UmbControllerBase {
 	//
@@ -166,11 +164,11 @@ export class UmbViewController extends UmbControllerBase {
 
 	public getComputedTitle(): string | undefined {
 		const titles = [];
-		if (this.#title) {
-			titles.push(this.#localize.string(this.#title));
-		}
 		if (this.#parentView) {
 			titles.push(this.#parentView.getComputedTitle());
+		}
+		if (this.#title) {
+			titles.push(this.#localize.string(this.#title));
 		}
 		return titles.length > 0 ? titles.join(' | ') : undefined;
 	}
