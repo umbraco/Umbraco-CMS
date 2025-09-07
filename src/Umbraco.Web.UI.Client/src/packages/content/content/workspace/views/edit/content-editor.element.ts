@@ -10,7 +10,12 @@ import {
 	UmbContentTypeContainerStructureHelper,
 	UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/content-type';
-import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import type {
+	PageComponent,
+	UmbRoute,
+	UmbRouterSlotChangeEvent,
+	UmbRouterSlotInitEvent,
+} from '@umbraco-cms/backoffice/router';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
@@ -104,6 +109,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				component: () => import('./content-editor-tab.element.js'),
 				setup: (component) => {
 					(component as UmbContentWorkspaceViewEditTabElement).containerId = null;
+					this.#provideViewContext('root', component);
 				},
 			});
 			this.#createViewContext('root', '#general_generic');
@@ -118,6 +124,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 					component: () => import('./content-editor-tab.element.js'),
 					setup: (component) => {
 						(component as UmbContentWorkspaceViewEditTabElement).containerId = tab.ownerId ?? tab.ids[0];
+						this.#provideViewContext(path, component);
 					},
 				});
 				this.#createViewContext(path, tabName);
@@ -161,6 +168,13 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				'umbObserveState_' + viewAlias,
 			);
 		}
+	}
+	#provideViewContext(viewAlias: string, component: PageComponent) {
+		const view = this.#tabViewContexts.find((context) => context.viewAlias === viewAlias);
+		if (!view) {
+			throw new Error(`View context with alias ${viewAlias} not found`);
+		}
+		view.provideAt(component as any);
 	}
 
 	override render() {
