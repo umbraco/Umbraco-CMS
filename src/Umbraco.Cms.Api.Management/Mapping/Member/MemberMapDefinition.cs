@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Mapping;
@@ -17,7 +17,7 @@ public class MemberMapDefinition : ContentMapDefinition<IMember, MemberValueResp
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IMember, MemberResponseModel>((_, _) => new MemberResponseModel(), Map);
 
-    // Umbraco.Code.MapAll -IsTwoFactorEnabled -Groups -Kind
+    // Umbraco.Code.MapAll -IsTwoFactorEnabled -Groups -Kind -Signs
     private void Map(IMember source, MemberResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

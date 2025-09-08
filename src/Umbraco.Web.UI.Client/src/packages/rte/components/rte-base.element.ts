@@ -21,10 +21,21 @@ import type {
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 
+/**
+ * The abstract base class that is used as a base for the rich-text-editor component.
+ * @cssprop --umb-rte-width - The width of the rich-text-editor (default: unset)
+ * @cssprop --umb-rte-min-width - The minimum width of the rich-text-editor (default: unset)
+ * @cssprop --umb-rte-max-width - The maximum width of the rich-text-editor (default: 100%)
+ * @cssprop --umb-rte-height - The height of the rich-text-editor (default: 100%)
+ * @cssprop --umb-rte-min-height - The minimum height of the rich-text-editor (default: 100%)
+ * @cssprop --umb-rte-max-height - The maximum height of the rich-text-editor (default: 100%)
+ */
 export abstract class UmbPropertyEditorUiRteElementBase
 	extends UmbFormControlMixin<UmbPropertyEditorRteValueType | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
+	public name?: string;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
