@@ -67,6 +67,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _invalidData?: UmbContentPickerValueType;
 
 	#propertyTypeUnique?: string;
+	#dataTypeUnique?: string;
 
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
 	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
@@ -114,6 +115,10 @@ export class UmbPropertyEditorUIContentPickerElement
 		this.consumeContext(UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT, (context) => {
 			this.observe(context?.unique, (propertyTypeUnique) => {
 				this.#propertyTypeUnique = propertyTypeUnique;
+			});
+
+			this.observe(context?.dataType, (dataType) => {
+				this.#dataTypeUnique = dataType?.unique;
 			});
 		});
 	}
