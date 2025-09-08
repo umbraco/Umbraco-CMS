@@ -294,14 +294,7 @@ public class PropertyValidationService : IPropertyValidationService
     /// </summary>
     private bool IsPropertyValueValid(IPropertyType propertyType, object? value, PropertyValidationContext validationContext)
     {
-        IDataEditor? editor = GetDataEditor(propertyType);
-        if (editor == null)
-        {
-            // nothing much we can do validation wise if the property editor has been removed.
-            // the property will be displayed as a label, so flagging it as invalid would be pointless.
-            return true;
-        }
-
+        IDataEditor editor = GetDataEditor(propertyType);
         var configuration = GetDataType(propertyType)?.ConfigurationObject;
         IDataValueEditor valueEditor = editor.GetValueEditor(configuration);
 
