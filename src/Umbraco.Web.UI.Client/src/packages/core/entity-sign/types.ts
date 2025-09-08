@@ -1,2 +1,2 @@
-export type * from './entity-sign-element.interface.js';
-export type * from './entity-sign.extension.js';
+export type * from './extensions/entity-sign-element.interface.js';
+export type * from './extensions/entity-sign.extension.js';
