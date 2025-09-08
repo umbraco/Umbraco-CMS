@@ -1,11 +1,11 @@
-import { UMB_MEMBER_TYPE_TREE_ALIAS } from '../constants.js';
+import { UMB_MEMBER_TYPE_MENU_ITEM_ALIAS, UMB_MEMBER_TYPE_TREE_ALIAS } from '../constants.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'menuItem',
 		kind: 'tree',
-		alias: 'Umb.MenuItem.MemberTypes',
+		alias: UMB_MEMBER_TYPE_MENU_ITEM_ALIAS,
 		name: 'Member Type Menu Item',
 		weight: 700,
 		meta: {
@@ -16,9 +16,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'workspaceContext',
+		kind: 'menuStructure',
 		name: 'Member Type Menu Structure Workspace Context',
 		alias: 'Umb.Context.MemberType.Menu.Structure',
 		api: () => import('./member-type-menu-structure.context.js'),
+		meta: {
+			menuItemAlias: UMB_MEMBER_TYPE_MENU_ITEM_ALIAS,
+		},
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,

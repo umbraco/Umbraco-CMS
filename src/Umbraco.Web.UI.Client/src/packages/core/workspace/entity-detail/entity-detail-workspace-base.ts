@@ -388,11 +388,20 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!eventContext) throw new Error('Event context not found.');
-		const event = new UmbRequestReloadChildrenOfEntityEvent({
+
+		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({
 			entityType: parent.entityType,
 			unique: parent.unique,
 		});
-		eventContext.dispatchEvent(event);
+
+		eventContext.dispatchEvent(reloadStructureEvent);
+
+		const reloadChildren = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType: parent.entityType,
+			unique: parent.unique,
+		});
+
+		eventContext.dispatchEvent(reloadChildren);
 	}
 
 	protected async _update(currentData: DetailModelType) {

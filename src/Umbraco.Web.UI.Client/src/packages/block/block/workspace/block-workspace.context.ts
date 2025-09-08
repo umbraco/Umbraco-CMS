@@ -3,6 +3,7 @@ import { UMB_BLOCK_ENTRIES_CONTEXT, UMB_BLOCK_ENTRY_CONTEXT, UMB_BLOCK_MANAGER_C
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
+import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -23,7 +24,6 @@ import { decodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/bac
 
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
