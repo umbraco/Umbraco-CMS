@@ -159,7 +159,7 @@ public class ContentEditingModelFactory : IContentEditingModelFactory
                         }
                     }
 
-                    // Also add invariant value if it exists
+                    // Also add the invariant value if it exists
                     var invariantValue = property.GetValue();
                     if (invariantValue != null)
                     {

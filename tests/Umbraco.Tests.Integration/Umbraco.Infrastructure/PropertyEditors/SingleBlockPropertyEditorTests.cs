@@ -40,6 +40,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
 
     private const string AllTypes = "allTypes";
     private const string MetaType = "metaType";
+    private const string TextType = "textType";
 
     [Theory]
     [TestCase(AllTypes)]
@@ -135,6 +136,136 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             Assert.AreEqual(elementTypeName == AllTypes ? "contentPicker" : "metadescription", property.Alias);
             Assert.AreEqual(elementTypeName == AllTypes ? textPage.Key : "something very meta", property.Value);
         });
+
+        // convert to updateModel and run validation
+        var updateModel = await ContentEditingModelFactory.CreateFromAsync(content);
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(updateModel, singleBlockContentType);
+
+        Assert.AreEqual(0, validationResult.ValidationErrors.Count());
+    }
+
+    [Theory]
+    [TestCase(AllTypes, true)]
+    [TestCase(MetaType, true)]
+    [TestCase(TextType, false)]
+    [Ignore("Reenable when configured block validation is introduced")]
+    public async Task ValidatesConfiguredBlocks(string elementTypeName, bool shouldPass)
+    {
+        if (elementTypeName != AllTypes && elementTypeName != MetaType && elementTypeName != TextType)
+        {
+            throw new ArgumentOutOfRangeException(nameof(elementTypeName));
+        }
+
+        var textPageContentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
+        textPageContentType.AllowedTemplates = [];
+        await ContentTypeService.CreateAsync(textPageContentType, Constants.Security.SuperUserKey);
+
+        var textPage = ContentBuilder.CreateTextpageContent(textPageContentType, "My Picked Content", -1);
+        ContentService.Save(textPage);
+
+        var allTypesType = ContentTypeBuilder.CreateAllTypesContentType("allTypesType", "All Types type");
+        allTypesType.IsElement = true;
+        await ContentTypeService.CreateAsync(allTypesType, Constants.Security.SuperUserKey);
+
+        var metaTypesType = ContentTypeBuilder.CreateMetaContentType();
+        metaTypesType.IsElement = true;
+        await ContentTypeService.CreateAsync(metaTypesType, Constants.Security.SuperUserKey);
+
+        var textType = new ContentTypeBuilder()
+            .WithAlias("TextType")
+            .WithName("Text type")
+            .AddPropertyGroup()
+            .WithAlias("content")
+            .WithName("Content")
+            .WithSortOrder(1)
+            .WithSupportsPublishing(true)
+            .AddPropertyType()
+            .WithAlias("title")
+            .WithName("Title")
+            .WithSortOrder(1)
+            .Done()
+            .Done()
+            .Build();
+        textType.IsElement = true;
+        await ContentTypeService.CreateAsync(textType, Constants.Security.SuperUserKey);
+
+        // do not allow textType to be a valid block
+        var singleBlockContentType = await CreateSingleBlockContentTypePage([allTypesType, metaTypesType]);
+
+        var contentElementKey = Guid.NewGuid();
+        var blockValue = new SingleBlockValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.SingleBlock,
+                    [
+                        new SingleBlockLayoutItem { ContentKey = contentElementKey }
+                    ]
+                },
+            },
+            ContentData =
+            [
+                elementTypeName == AllTypes
+                ? new BlockItemData
+                {
+                    Key = contentElementKey,
+                    ContentTypeAlias = allTypesType.Alias,
+                    ContentTypeKey = allTypesType.Key,
+                    Values =
+                    [
+                        new BlockPropertyValue
+                        {
+                            Alias = "contentPicker",
+                            Value = textPage.GetUdi(),
+                        }
+                    ],
+                }
+                : elementTypeName == MetaType ?
+                    new BlockItemData
+                    {
+                        Key = contentElementKey,
+                        ContentTypeAlias = metaTypesType.Alias,
+                        ContentTypeKey = metaTypesType.Key,
+                        Values =
+                        [
+                            new BlockPropertyValue
+                            {
+                                Alias = "metadescription",
+                                Value = "something very meta",
+                            }
+                        ],
+                    }
+                    : new BlockItemData
+                    {
+                        Key = contentElementKey,
+                        ContentTypeAlias = textType.Alias,
+                        ContentTypeKey = textType.Key,
+                        Values =
+                        [
+                            new BlockPropertyValue
+                            {
+                                Alias = "title",
+                                Value = "a random title",
+                            }
+                        ],
+                    },
+            ],
+        };
+        var blocksPropertyValue = JsonSerializer.Serialize(blockValue);
+
+        var content = new ContentBuilder()
+            .WithContentType(singleBlockContentType)
+            .WithName("My Blocks")
+            .WithPropertyValues(new { block = blocksPropertyValue })
+            .Build();
+        ContentService.Save(content);
+
+        // convert to updateModel and run validation
+        var updateModel = await ContentEditingModelFactory.CreateFromAsync(content);
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(updateModel, singleBlockContentType);
+
+        Assert.AreEqual(shouldPass ? 0 : 1, validationResult.ValidationErrors.Count());
     }
 
     /// <summary>
@@ -158,7 +289,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         metaTypesType.IsElement = true;
         await ContentTypeService.CreateAsync(metaTypesType, Constants.Security.SuperUserKey);
 
-        var rootPageType = await CreateSingleBlockContentTypePage([allTypesType, metaTypesType]);
+        var singleBlockContentType = await CreateSingleBlockContentTypePage([allTypesType, metaTypesType]);
 
         var firstElementKey = Guid.NewGuid();
         var secondElementKey = Guid.NewGuid();
@@ -209,7 +340,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
         var blocksPropertyValue = JsonSerializer.Serialize(blockValue);
 
         var content = new ContentBuilder()
-            .WithContentType(rootPageType)
+            .WithContentType(singleBlockContentType)
             .WithName("My Blocks")
             .WithPropertyValues(new { block = blocksPropertyValue })
             .Build();
@@ -219,7 +350,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
 
         // convert to updateModel and run validation
         var updateModel = await ContentEditingModelFactory.CreateFromAsync(content);
-        var validationResult = await ContentValidationService.ValidatePropertiesAsync(updateModel, rootPageType);
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(updateModel, singleBlockContentType);
 
         Assert.Multiple(() =>
         {
