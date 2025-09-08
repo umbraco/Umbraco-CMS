@@ -21,7 +21,7 @@ internal sealed class SingleBlockPropertyValueCreator : BlockPropertyValueCreato
         _constructorCache = constructorCache;
     }
 
-    // todo this really cant be refined?
+    // The underlying Value is still stored as an array to allow for code reuse and easier migration
     public BlockListItem? CreateBlockModel(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
     {
         BlockListModel CreateEmptyModel() => BlockListModel.Empty;

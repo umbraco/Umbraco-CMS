@@ -108,8 +108,7 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
                 return null;
             }
 
-            // the underlying value is still stored in an array to allow reuse of exising base code
-            // so we use the BlockListPropertyValueCreator to create the value and return the single item
+
             var creator = new SingleBlockPropertyValueCreator(_blockConverter, _variationContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache);
             return creator.CreateBlockModel(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks);
         }
