@@ -41,13 +41,19 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
         ValueViewModelMapping? additionalPropertyMapping = null,
         bool published = false)
     {
-        Dictionary<string, IDataEditor> dataEditors = [];
+        Dictionary<string, IDataEditor> missingPropertyEditors = [];
         return properties
             .SelectMany(property => property
                 .Values
                 .Select(propertyValue =>
                 {
-                    IDataEditor propertyEditor = GetDataEditor(dataEditors, property);
+                    IDataEditor? propertyEditor = _propertyEditorCollection[property.PropertyType.PropertyEditorAlias];
+                    if (propertyEditor is null && !missingPropertyEditors.TryGetValue(property.PropertyType.PropertyEditorAlias, out propertyEditor))
+                    {
+                        // We cache the missing property editors to avoid creating multiple instances of them
+                        propertyEditor = new MissingPropertyEditor(property.PropertyType.PropertyEditorAlias, _dataValueEditorFactory);
+                        missingPropertyEditors[property.PropertyType.PropertyEditorAlias] = propertyEditor;
+                    }
 
                     IProperty? publishedProperty = null;
                     if (published)
@@ -101,23 +107,5 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
                 return variantViewModel;
             }))
             .ToArray();
-    }
-
-    private IDataEditor GetDataEditor(Dictionary<string, IDataEditor> dataEditors, IProperty property)
-    {
-        IDataEditor propertyEditor;
-        if (dataEditors.TryGetValue(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor))
-        {
-            propertyEditor = dataEditor;
-        }
-        else
-        {
-            propertyEditor = _propertyEditorCollection[property.PropertyType.PropertyEditorAlias]
-                             ?? new MissingPropertyEditor(property.PropertyType.PropertyEditorAlias, _dataValueEditorFactory);
-
-            dataEditors[property.PropertyType.PropertyEditorAlias] = propertyEditor;
-        }
-
-        return propertyEditor;
     }
 }
