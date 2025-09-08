@@ -11,5 +11,10 @@
 		"diff": "^7.0.0",
 		"uuid": "^11.1.0",
 		"@hey-api/openapi-ts": "0.81.1"
+	},
+	"devDependencies": {
+		"lucide-static": "^0.542.0",
+		"simple-icons": "^15.13.0",
+		"svgo": "^4.0.0"
 	}
 }

@@ -47,7 +47,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
-		this.#observeContainers();
+		this.#observeContainer();
 	}
 
 	public getStructureManager() {
@@ -57,13 +57,13 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	public setContainerId(value?: string | null) {
 		if (this.#containerId === value) return;
 		this.#containerId = value;
-		this.#observeContainers();
+		this.#observeContainer();
 	}
 	public getContainerId() {
 		return this.#containerId;
 	}
 
-	#observeContainers() {
+	#observeContainer() {
 		this.observe(
 			this.#containerId ? this.#structure?.mergedContainersOfId(this.#containerId) : undefined,
 			(container) => {
