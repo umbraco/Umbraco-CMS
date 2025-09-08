@@ -5,6 +5,7 @@ using System.Data.SqlTypes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 
@@ -29,11 +30,9 @@ public class DateTimePropertyEditor : DataEditor
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()
     {
-        return DataValueEditorFactory.Create<DateTimePropertyValueEditor>(Attribute!);
-
-        // IDataValueEditor editor = base.CreateValueEditor();
-        // editor.Validators.Add(new DateTimeValidator());
-        // return editor;
+        DateTimePropertyValueEditor editor = DataValueEditorFactory.Create<DateTimePropertyValueEditor>(Attribute!);
+        editor.Validators.Add(new DateTimeValidator());
+        return editor;
     }
 
     internal sealed class DateTimePropertyValueEditor : DataValueEditor
@@ -52,22 +51,41 @@ public class DateTimePropertyEditor : DataEditor
         {
             if (editorValue.DataTypeConfiguration is Dictionary<string, object> dictionary)
             {
-                string[] array = ["hh:mm", "hh:mm:ss"];
+                KeyValuePair<string, object> keyValuePair = dictionary.FirstOrDefault(kvp => kvp.Key is "Format");
+                string value = keyValuePair.Value as string ?? string.Empty;
 
-                // Ensures we don't care about the customers formatting, weather the wish to write
-                // hh:mm or HH:MM etc...
-                if (!dictionary.Values.OfType<string>().Any(value => array.Contains(value, StringComparer.InvariantCultureIgnoreCase)))
+                if (!IsTimeOnly(value))
                 {
-                    return editorValue.Value;
+                    return base.FromEditor(editorValue, currentValue);
                 }
 
-                if (DateTime.TryParse(editorValue.Value as string, out DateTime myDate) || editorValue.Value is DateTime)
+                if ((editorValue.Value is string stringValue && DateTime.TryParse(stringValue, out DateTime myDate))
+                    || (editorValue.Value is DateTime dateValue && (myDate = dateValue) == dateValue))
                 {
-                    editorValue.Value = new DateTime(SqlDateTime.MinValue.Value.Year, myDate.Month, myDate.Day, myDate.Hour, myDate.Minute, myDate.Second).ToString("yyyy-MM-dd HH:mm:ss");
+                    int year = myDate.Year > SqlDateTime.MinValue.Value.Year ? myDate.Year : SqlDateTime.MinValue.Value.Year;
+                    return new DateTime(year, myDate.Month, myDate.Day, myDate.Hour, myDate.Minute, myDate.Second).ToString("yyyy-MM-dd HH:mm:ss");
                 }
             }
 
-            return editorValue.Value;
+            return base.FromEditor(editorValue, currentValue);
+        }
+
+        private bool IsTimeOnly(string value)
+        {
+            HashSet<char> allowedSpecifiers = ['H', 'h', 'm', 's', 'f'];
+            HashSet<char> allowedSeperators = ['/', '\\', '%', '-', ':', ' ', '.', '\'', '"'];
+
+            foreach (char c in value)
+            {
+                if (allowedSpecifiers.Contains(c) || allowedSeperators.Contains(c))
+                {
+                    continue;
+                }
+
+                return false;
+            }
+
+            return true;
         }
     }
 }
