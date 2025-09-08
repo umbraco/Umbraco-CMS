@@ -21,7 +21,7 @@ export class UmbUfmVirtualRenderController extends UmbControllerBase {
 					items.push(node.textContent ?? '');
 				}
 			}
-		} else if (element.hasChildNodes()) {
+		} else {
 			for (const node of element.childNodes) {
 				if (node.nodeType === Node.ELEMENT_NODE) {
 					items.push(this.#getTextFromDescendants(node as Element));
