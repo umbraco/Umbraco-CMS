@@ -20,7 +20,7 @@ test('can get content from delivery api', async ({umbracoApi}) => {
   await umbracoApi.document.publish(documentId);
 
   // Assert
-  expect(await umbracoApi.deliveryApi.doesContentItemWithIdContainValues(documentId, contentName, AliasHelper.toAlias(documentTypeName), [propertyValue])).toBeTruthy();
+  expect(await umbracoApi.contentDeliveryApi.doesContentItemWithIdContainValues(documentId, contentName, AliasHelper.toAlias(documentTypeName), [propertyValue])).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -35,7 +35,7 @@ test('can get media image from delivery api', async ({umbracoApi}) => {
   const mediaUrl = await umbracoApi.media.getMediaUrlById(mediaId);
 
   // Assert
-  expect(await umbracoApi.deliveryApi.doesMediaItemWithIdContainValues(mediaId, mediaName, mediaTypeName, mediaUrl)).toBeTruthy();
+  expect(await umbracoApi.mediaDeliveryApi.doesMediaItemWithIdContainValues(mediaId, mediaName, mediaTypeName, mediaUrl)).toBeTruthy();
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaName);
