@@ -21,8 +21,9 @@ public class PropertyValidationService : IPropertyValidationService
     private readonly ICultureDictionary _cultureDictionary;
     private readonly ILanguageService _languageService;
     private readonly ContentSettings _contentSettings;
+    private readonly IDataValueEditorFactory _dataValueEditorFactory;
 
-    [Obsolete("Use the constructor that accepts ILanguageService and ContentSettings options. Will be removed in V17.")]
+    [Obsolete("Use the non-obsolete constructor. Will be removed in V17.")]
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
@@ -36,7 +37,29 @@ public class PropertyValidationService : IPropertyValidationService
             valueEditorCache,
             cultureDictionary,
             StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>(),
+            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor. Will be removed in V18.")]
+    public PropertyValidationService(
+        PropertyEditorCollection propertyEditors,
+        IDataTypeService dataTypeService,
+        ILocalizedTextService textService,
+        IValueEditorCache valueEditorCache,
+        ICultureDictionary cultureDictionary,
+        ILanguageService languageService,
+        IOptions<ContentSettings> contentSettings)
+        : this(
+            propertyEditors,
+            dataTypeService,
+            textService,
+            valueEditorCache,
+            cultureDictionary,
+            languageService,
+            contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
     {
     }
 
@@ -47,7 +70,8 @@ public class PropertyValidationService : IPropertyValidationService
         IValueEditorCache valueEditorCache,
         ICultureDictionary cultureDictionary,
         ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings)
+        IOptions<ContentSettings> contentSettings,
+        IDataValueEditorFactory dataValueEditorFactory)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
@@ -55,6 +79,7 @@ public class PropertyValidationService : IPropertyValidationService
         _valueEditorCache = valueEditorCache;
         _cultureDictionary = cultureDictionary;
         _languageService = languageService;
+        _dataValueEditorFactory = dataValueEditorFactory;
         _contentSettings = contentSettings.Value;
     }
 
@@ -75,12 +100,7 @@ public class PropertyValidationService : IPropertyValidationService
             throw new InvalidOperationException("No data type found by id " + propertyType.DataTypeId);
         }
 
-        IDataEditor? dataEditor = GetDataEditor(propertyType);
-        if (dataEditor == null)
-        {
-            throw new InvalidOperationException("No property editor found by alias " +
-                                                propertyType.PropertyEditorAlias);
-        }
+        IDataEditor dataEditor = GetDataEditor(propertyType);
 
         // only validate culture invariant properties if
         // - AllowEditInvariantFromNonDefault is true, or
@@ -291,6 +311,9 @@ public class PropertyValidationService : IPropertyValidationService
     private IDataType? GetDataType(IPropertyType propertyType)
         => _dataTypeService.GetDataType(propertyType.DataTypeId);
 
-    private IDataEditor? GetDataEditor(IPropertyType propertyType)
-        => _propertyEditors[propertyType.PropertyEditorAlias];
+    private IDataEditor GetDataEditor(IPropertyType propertyType)
+        => _propertyEditors[propertyType.PropertyEditorAlias]
+           ?? new MissingPropertyEditor(
+               propertyType.PropertyEditorAlias,
+               _dataValueEditorFactory);
 }
