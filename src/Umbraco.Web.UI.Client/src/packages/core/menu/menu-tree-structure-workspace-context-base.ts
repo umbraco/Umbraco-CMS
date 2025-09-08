@@ -1,5 +1,6 @@
-import type { UmbStructureItemModel } from './types.js';
+import type { ManifestWorkspaceContextMenuStructureKind, UmbStructureItemModel } from './types.js';
 import { UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT } from './menu-structure-workspace-context.context-token.js';
+import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu/index.js';
 import type { UmbTreeRepository, UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -7,6 +8,8 @@ import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/back
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -14,6 +17,8 @@ interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 
 // TODO: introduce base class for all menu structure workspaces to handle ancestors and parent
 export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContextBase {
+	manifest?: ManifestWorkspaceContextMenuStructureKind;
+
 	#workspaceContext?: typeof UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT.TYPE;
 	#args: UmbMenuTreeStructureWorkspaceContextBaseArgs;
 
@@ -28,6 +33,8 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
+	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
+	#isModalContext: boolean = false;
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
@@ -35,17 +42,44 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
 
+		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
+			this.#isModalContext = modalContext !== undefined;
+		});
+
+		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
+			this.#sectionSidebarMenuContext = instance;
+		});
+
 		this.consumeContext(UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext?.unique, (value) => {
 				if (!value) return;
 				this.#requestStructure();
 			});
+
+			this.observe(this.#workspaceContext?.isNew, (value) => {
+				if (value === undefined) return;
+				this.#requestStructure();
+			});
 		});
 	}
 
 	async #requestStructure() {
+		const isNew = this.#workspaceContext?.getIsNew();
+		const uniqueObservable = isNew
+			? this.#workspaceContext?._internal_createUnderParentEntityUnique
+			: this.#workspaceContext?.unique;
+		const entityTypeObservable = isNew
+			? this.#workspaceContext?._internal_createUnderParentEntityType
+			: this.#workspaceContext?.entityType;
+
 		let structureItems: Array<UmbStructureItemModel> = [];
+
+		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
+		if (unique === undefined) throw new Error('Unique is not available');
+
+		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
+		if (!entityType) throw new Error('Entity type is not available');
 
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel, UmbTreeRootModel>>(
 			this,
@@ -65,22 +99,10 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 			];
 		}
 
-		const isNew = this.#workspaceContext?.getIsNew();
-
-		const entityTypeObservable = isNew
-			? this.#workspaceContext?._internal_createUnderParentEntityType
-			: this.#workspaceContext?.entityType;
-		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
-		if (!entityType) throw new Error('Entity type is not available');
+		const isRoot = entityType === root?.entityType;
 
 		// If the entity type is different from the root entity type, then we can request the ancestors.
-		if (entityType !== root?.entityType) {
-			const uniqueObservable = isNew
-				? this.#workspaceContext?._internal_createUnderParentEntityUnique
-				: this.#workspaceContext?.unique;
-			const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
-			if (!unique) throw new Error('Unique is not available');
-
+		if (!isRoot) {
 			const { data } = await treeRepository.requestTreeItemAncestors({ treeItem: { unique, entityType } });
 
 			if (data) {
@@ -93,12 +115,18 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 					};
 				});
 
-				structureItems.push(...ancestorItems);
-
-				this.#structure.setValue(structureItems);
-				this.#setParentData(structureItems);
 				this.#setAncestorData(data);
+
+				structureItems.push(...ancestorItems);
 			}
+		}
+
+		this.#structure.setValue(structureItems);
+		this.#setParentData(structureItems);
+
+		const menuItemAlias = this.manifest?.meta?.menuItemAlias;
+		if (menuItemAlias && !this.#isModalContext) {
+			this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 		}
 	}
 
@@ -138,5 +166,26 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 			.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
 
 		this.#ancestorContext.setAncestors(ancestorEntities);
+	}
+
+	#expandSectionSidebarMenu(structureItems: Array<UmbStructureItemModel>, menuItemAlias: string) {
+		const linkedEntries = linkEntityExpansionEntries(structureItems);
+		// Filter out the current entity as we don't want to expand it
+		const expandableItems = linkedEntries.filter((item) => item.unique !== this.#workspaceContext?.getUnique());
+		const expandableItemsWithMenuItem = expandableItems.map((item) => {
+			return {
+				...item,
+				menuItemAlias,
+			};
+		});
+		this.#sectionSidebarMenuContext?.expansion.expandItems(expandableItemsWithMenuItem);
+	}
+
+	override destroy(): void {
+		super.destroy();
+		this.#structure.destroy();
+		this.#parent.destroy();
+		this.#parentContext.destroy();
+		this.#ancestorContext.destroy();
 	}
 }

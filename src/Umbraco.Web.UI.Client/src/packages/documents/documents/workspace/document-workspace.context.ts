@@ -19,26 +19,23 @@ import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingReposit
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
+import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
+import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
-	type UmbPublishableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
-import {
-	UmbContentDetailWorkspaceContextBase,
-	type UmbContentCollectionWorkspaceContext,
-	type UmbContentWorkspaceContext,
-} from '@umbraco-cms/backoffice/content';
-import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
-import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 
 type ContentModel = UmbDocumentDetailModel;
@@ -52,8 +49,7 @@ export class UmbDocumentWorkspaceContext
 	>
 	implements
 		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>,
-		UmbPublishableWorkspaceContext,
-		UmbContentCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
+		UmbPublishableWorkspaceContext
 {
 	/**
 	 * The publishing repository for the document workspace.
@@ -63,10 +59,16 @@ export class UmbDocumentWorkspaceContext
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
+
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
+
+	/*
+	 * @deprecated Use `collection.hasCollection` instead, will be removed in v.18
+	 */
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
 		(data) => !!data?.documentType.collection,
 	);
+
 	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
 
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
@@ -78,6 +80,7 @@ export class UmbDocumentWorkspaceContext
 		super(host, {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			workspaceAlias: UMB_DOCUMENT_WORKSPACE_ALIAS,
+			collectionAlias: UMB_DOCUMENT_COLLECTION_ALIAS,
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 			contentValidationRepository: UmbDocumentValidationRepository,
@@ -248,6 +251,7 @@ export class UmbDocumentWorkspaceContext
 		});
 	}
 
+	/** @deprecated will be removed in v.18 */
 	getCollectionAlias() {
 		return UMB_DOCUMENT_COLLECTION_ALIAS;
 	}
