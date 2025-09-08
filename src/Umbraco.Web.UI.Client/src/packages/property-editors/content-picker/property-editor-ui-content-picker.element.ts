@@ -15,13 +15,10 @@ import type {
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 // import of local component
 import './components/input-content/index.js';
-import { UMB_PICKER_EXPANSION_CONTEXT } from 'src/packages/core/picker/expansion/picker-expansion.context.token.js';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_PROPERTY_TYPE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
-import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 type UmbContentPickerValueType = UmbInputContentElement['selection'];
 
