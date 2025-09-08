@@ -3,6 +3,7 @@ import type { UmbTreeItemModel } from '../../types.js';
 import { html, ifDefined, nothing, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { ManifestEntitySign } from '@umbraco-cms/backoffice/entity-sign';
 
 export abstract class UmbTreeItemElementBase<
 	TreeItemModelType extends UmbTreeItemModel,
@@ -139,7 +140,8 @@ export abstract class UmbTreeItemElementBase<
 				.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
 				label=${this._label}
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
-				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
+				${this.renderIconContainer()} ${this.#renderSigns()} ${this.renderLabel()} ${this.#renderActions()}
+				${this.#renderChildItems()}
 				<slot></slot>
 				${this.#renderPaging()}
 			</uui-menu-item>
@@ -160,6 +162,16 @@ export abstract class UmbTreeItemElementBase<
 				}}></slot>
 			${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}
 		`;
+	}
+
+	#renderSigns() {
+		return this._item
+			? html`<umb-extension-slot
+					slot="icon"
+					type="entitySign"
+					.filter=${(manifest: ManifestEntitySign) =>
+						manifest.forEntityTypes.includes(this._item!.entityType)}></umb-extension-slot>`
+			: nothing;
 	}
 
 	#renderIcon() {
