@@ -25,13 +25,16 @@ namespace Umbraco.Cms.Infrastructure.PropertyEditors;
 public class SingleBlockPropertyEditor : DataEditor
 {
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly IIOHelper _ioHelper;
 
     public SingleBlockPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        IJsonSerializer jsonSerializer)
+        IJsonSerializer jsonSerializer,
+        IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _jsonSerializer = jsonSerializer;
+        _ioHelper = ioHelper;
     }
 
     // todo
@@ -52,6 +55,10 @@ public class SingleBlockPropertyEditor : DataEditor
         DataValueEditorFactory.Create<SingleBlockEditorPropertyValueEditor>(Attribute!, CreateBlockEditorDataConverter());
 
     //todo check CanMergePartialPropertyValues & MergePartialPropertyValueForCulture
+
+    /// <inheritdoc/>
+    protected override IConfigurationEditor CreateConfigurationEditor() =>
+        new SingleBlockConfigurationEditor(_ioHelper);
 
     internal sealed class SingleBlockEditorPropertyValueEditor : BlockEditorPropertyValueEditor<SingleBlockValue, SingleBlockLayoutItem>
     {
