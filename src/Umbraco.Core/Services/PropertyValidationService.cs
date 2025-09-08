@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
@@ -64,6 +65,15 @@ public class PropertyValidationService : IPropertyValidationService
         object? postedValue,
         PropertyValidationContext validationContext)
     {
+        if (postedValue is JsonObject jsonObject && jsonObject.TryGetPropertyValue("src", out JsonNode? source))
+        {
+            string sourceString = source!.GetValue<string>();
+            if (string.IsNullOrEmpty(sourceString))
+            {
+                throw new ArgumentNullException(nameof(postedValue));
+            }
+        }
+
         if (propertyType is null)
         {
             throw new ArgumentNullException(nameof(propertyType));
