@@ -13,7 +13,7 @@ export class UmbMissingPropertyEditorModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${this.localize.term('general_details')}>
 				<umb-localize key="missingEditor_detailsDescription"></umb-localize>
-				<umb-code-block copy>${this.data?.value}</umb-code-block>
+				<umb-code-block copy id="codeblock">${this.data?.value}</umb-code-block>
 				<uui-button
 					slot="actions"
 					id="close"
@@ -29,6 +29,10 @@ export class UmbMissingPropertyEditorModalElement extends UmbModalBaseElement<
 		css`
 			uui-dialog-layout {
 				max-inline-size: 60ch;
+			}
+			#codeblock {
+				max-height: 300px;
+				overflow: auto;
 			}
 		`,
 	];

@@ -32,7 +32,7 @@ export class UmbPropertyEditorUIMissingElement
 			data: {
 				// If the value is an object, we stringify it to make sure we can display it properly.
 				// If it's a primitive value, we just convert it to string.
-				value: !this.value || typeof this.value !== 'object' ? String(this.value) : JSON.stringify(this.value),
+				value: typeof this.value === 'object' ? JSON.stringify(this.value, null, 2) : String(this.value),
 			},
 		}).catch(() => undefined);
 	}
