@@ -29,7 +29,7 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
     /// <inheritdoc/>
     public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext);
 
-    // internal method so we can test for error messages being returned without keeping strings in sync
+    // internal method so we can test for specific error messages being returned without keeping strings in sync
     internal static string BuildErrorMessage(
         ILocalizedTextService textService,
         int? maxNumberOfBlocks,
