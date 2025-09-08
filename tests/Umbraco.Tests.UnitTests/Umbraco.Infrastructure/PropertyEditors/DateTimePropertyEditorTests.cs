@@ -1,5 +1,4 @@
-﻿using System.Data.SqlTypes;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Editors;
@@ -11,11 +10,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
 public class DateTimePropertyEditorTests
 {
-[Test]
-[TestCase("01/01/0001 10:00", true)]
-[TestCase("10/10/1000 10:00", true)]
-[TestCase("01/01/2000 10:00", false)]
-public void Ensure_Correct_DateTime_Conversion(DateTime dateTime, bool shouldConvert)
+    [TestCase("01/01/0001 10:00", "01/01/1753 10:00", "hh:mm")]
+    [TestCase("01/01/0001 10:00", "01/01/1753 10:00", "hh mm")]
+    [TestCase("10/10/1000 10:00", "10/10/1753 10:00", "hh:mm:ss")]
+    [TestCase("10/10/1000 10:00", "10/10/1753 10:00", "hh-mm-ss")]
+    [TestCase("10/10/1000 10:00", "10/10/1753 10:00", "hh/mm/ss")]
+    [TestCase("10/10/1000 10:00", "10/10/1753 10:00", "hh%mm%ss")] // Weird format separators customers potentially might use.
+    [TestCase("01/01/2000 10:00", "01/01/2000 10:00", "HH:mm")]
+    [TestCase("01/01/0001 10:00", "01/01/0001 10:00", "dd:MM:yyyy hh:mm")] // Inconvertible format doesn't get converted.
+    public void Ensure_Correct_DateTime_Conversion(DateTime actualDateTime, DateTime expectedDateTime, string format)
     {
         var dateTimePropertyEditor = new DateTimePropertyEditor.DateTimePropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
@@ -23,22 +26,12 @@ public void Ensure_Correct_DateTime_Conversion(DateTime dateTime, bool shouldCon
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("Alias"));
 
-        Dictionary<string, object> dictionary = new Dictionary<string, object> { { "Format", "HH:mm" } };
-        ContentPropertyData propertyData = new ContentPropertyData(dateTime, dictionary);
+        Dictionary<string, object> dictionary = new Dictionary<string, object> { { "Format", format } };
+        ContentPropertyData propertyData = new ContentPropertyData(actualDateTime, dictionary);
         var value = dateTimePropertyEditor.FromEditor(propertyData, null);
 
         DateTime converted = DateTime.Parse(value as string ?? string.Empty);
         Assert.IsInstanceOf<DateTime>(converted);
-        if (shouldConvert)
-        {
-            Assert.AreEqual(converted.Year, SqlDateTime.MinValue.Value.Year);
-        }
-        else
-        {
-            if (value is DateTime dateTime2)
-            {
-                Assert.AreEqual(converted.Year, dateTime2.Year);
-            }
-        }
+        Assert.AreEqual(expectedDateTime, converted);
     }
 }
