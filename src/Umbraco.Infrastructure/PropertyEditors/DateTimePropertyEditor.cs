@@ -2,12 +2,15 @@
 // See LICENSE for more details.
 
 using System.Data.SqlTypes;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -35,8 +38,19 @@ public class DateTimePropertyEditor : DataEditor
         return editor;
     }
 
+    /// <summary>
+    ///    Provides a value editor for the datetime property editor.
+    /// </summary>
     internal sealed class DateTimePropertyValueEditor : DataValueEditor
     {
+        /// <summary>
+        ///   The key used to retrieve the date format from the data type configuration.
+        /// </summary>
+        internal const string DateTypeConfigurationFormatKey = "format";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DateTimePropertyValueEditor"/> class.
+        /// </summary>
         public DateTimePropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -49,43 +63,61 @@ public class DateTimePropertyEditor : DataEditor
         /// <inheritdoc/>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            if (editorValue.DataTypeConfiguration is Dictionary<string, object> dictionary)
+            if (editorValue.Value is null)
             {
-                KeyValuePair<string, object> keyValuePair = dictionary.FirstOrDefault(kvp => kvp.Key is "Format");
-                string value = keyValuePair.Value as string ?? string.Empty;
-
-                if (!IsTimeOnly(value))
-                {
-                    return base.FromEditor(editorValue, currentValue);
-                }
-
-                if ((editorValue.Value is string stringValue && DateTime.TryParse(stringValue, out DateTime myDate))
-                    || (editorValue.Value is DateTime dateValue && (myDate = dateValue) == dateValue))
-                {
-                    int year = myDate.Year > SqlDateTime.MinValue.Value.Year ? myDate.Year : SqlDateTime.MinValue.Value.Year;
-                    return new DateTime(year, myDate.Month, myDate.Day, myDate.Hour, myDate.Minute, myDate.Second).ToString("yyyy-MM-dd HH:mm:ss");
-                }
+                return base.FromEditor(editorValue, currentValue);
             }
 
-            return base.FromEditor(editorValue, currentValue);
+            if (TryGetConfiguredDateTimeFormat(editorValue, out string? format) is false)
+            {
+                return base.FromEditor(editorValue, currentValue);
+            }
+
+            if (IsTimeOnlyFormat(format) is false)
+            {
+                return base.FromEditor(editorValue, currentValue);
+            }
+
+            // We have a time-only format, so we need to ensure the date part is valid for SQL Server, so we can persist
+            // without error.
+            // If we have a date part that is less than the minimum date, we need to adjust it to be the minimum date.
+            Attempt<object?> dateConvertAttempt = editorValue.Value.TryConvertTo(typeof(DateTime?));
+            if (dateConvertAttempt.Success is false || dateConvertAttempt.Result is null)
+            {
+                return base.FromEditor(editorValue, currentValue);
+            }
+
+            var dateTimeValue = (DateTime)dateConvertAttempt.Result;
+            int yearValue = dateTimeValue.Year > SqlDateTime.MinValue.Value.Year
+                ? dateTimeValue.Year
+                : SqlDateTime.MinValue.Value.Year;
+            return new DateTime(yearValue, dateTimeValue.Month, dateTimeValue.Day, dateTimeValue.Hour, dateTimeValue.Minute, dateTimeValue.Second);
         }
 
-        private bool IsTimeOnly(string value)
+        private static bool TryGetConfiguredDateTimeFormat(ContentPropertyData editorValue, [NotNullWhen(true)] out string? format)
         {
-            HashSet<char> allowedSpecifiers = ['H', 'h', 'm', 's', 'f'];
-            HashSet<char> allowedSeperators = ['/', '\\', '%', '-', ':', ' ', '.', '\'', '"'];
-
-            foreach (char c in value)
+            if (editorValue.DataTypeConfiguration is not Dictionary<string, object> dataTypeConfigurationDictionary)
             {
-                if (allowedSpecifiers.Contains(c) || allowedSeperators.Contains(c))
-                {
-                    continue;
-                }
-
+                format = null;
                 return false;
             }
 
-            return true;
+            KeyValuePair<string, object> keyValuePair = dataTypeConfigurationDictionary
+                .FirstOrDefault(kvp => kvp.Key is "format");
+            format = keyValuePair.Value as string;
+            return string.IsNullOrWhiteSpace(format) is false;
+        }
+
+        private static bool IsTimeOnlyFormat(string format)
+        {
+            DateTime testDate = DateTime.UtcNow;
+            var testDateFormatted = testDate.ToString(format);
+            if (DateTime.TryParseExact(testDateFormatted, format, CultureInfo.InvariantCulture, DateTimeStyles.NoCurrentDateDefault, out DateTime parsedDate) is false)
+            {
+                return false;
+            }
+
+            return parsedDate.Year == 1 && parsedDate.Month == 1 && parsedDate.Day == 1;
         }
     }
 }
