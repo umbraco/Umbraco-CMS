@@ -2,6 +2,7 @@ export interface UmbMemoryModel {
 	clientTimestamp?: string;
 	values?: Array<UmbMemoryValueModel>;
 	unique: string;
+	memories?: Array<UmbMemoryModel>;
 }
 
 export interface UmbMemoryValueModel {
