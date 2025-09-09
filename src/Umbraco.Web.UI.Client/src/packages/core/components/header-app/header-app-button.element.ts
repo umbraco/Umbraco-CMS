@@ -44,6 +44,9 @@ export class UmbHeaderAppButtonElement extends UmbLitElement {
 					var(--uui-color-emphasis)
 				);
 			}
+			uui-button:hover{
+				--uui-button-background-color-hover: transparent;
+			}
 		`,
 	];
 }
