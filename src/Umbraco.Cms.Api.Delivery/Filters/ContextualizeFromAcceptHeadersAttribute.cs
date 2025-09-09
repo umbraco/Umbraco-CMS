@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -16,12 +16,12 @@ internal sealed class ContextualizeFromAcceptHeadersAttribute : TypeFilterAttrib
     private sealed class LocalizeFromAcceptLanguageHeaderAttributeFilter : IActionFilter
     {
         private readonly IRequestCultureService _requestCultureService;
-        private readonly IRequestSegmmentService _requestSegmentService;
+        private readonly IRequestSegmentService _requestSegmentService;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
         public LocalizeFromAcceptLanguageHeaderAttributeFilter(
             IRequestCultureService requestCultureService,
-            IRequestSegmmentService requestSegmentService,
+            IRequestSegmentService requestSegmentService,
             IVariationContextAccessor variationContextAccessor)
         {
             _requestCultureService = requestCultureService;
