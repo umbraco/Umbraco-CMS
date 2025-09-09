@@ -55,7 +55,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         MemberEditingOperationStatus validationStatus = await ValidateMemberDataAsync(createModel, null, createModel.Password);
         if (validationStatus is not MemberEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult() { ValidationErrors = new List<PropertyValidationError>(){ MapStatusToPropertyValidationError(validationStatus)}});
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, new ContentValidationResult() { ValidationErrors = new List<PropertyValidationError>(){ MapStatusToPropertyValidationError(validationStatus)}});
         }
         return await _memberContentEditingService.ValidateAsync(createModel, createModel.ContentTypeKey);
     }
