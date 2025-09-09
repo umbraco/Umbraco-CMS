@@ -10,10 +10,10 @@ test('Log in to Umbraco using Azure AD B2C', async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
 
   // Act
-  await umbracoUi.externalLoginUiHelpers.clickSignInWithAzureADB2CButton();
-  await umbracoUi.externalLoginUiHelpers.enterAzureADB2CEmail(azureEmail);
-  await umbracoUi.externalLoginUiHelpers.enterAzureADB2CPassword(azurePassword);
-  await umbracoUi.externalLoginUiHelpers.clickSignInButton();
+  await umbracoUi.externalLogin.clickSignInWithAzureADB2CButton();
+  await umbracoUi.externalLogin.enterAzureADB2CEmail(azureEmail);
+  await umbracoUi.externalLogin.enterAzureADB2CPassword(azurePassword);
+  await umbracoUi.externalLogin.clickSignInButton();
 
   // Assert
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
