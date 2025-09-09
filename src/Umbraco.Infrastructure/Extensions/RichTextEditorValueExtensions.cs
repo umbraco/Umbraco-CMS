@@ -31,7 +31,25 @@ internal static class RichTextEditorValueExtensions
         {
             foreach (BlockPropertyValue item in dataItem.Values)
             {
-                item.PropertyType = elementTypes.FirstOrDefault(x => x.Key == dataItem.ContentTypeKey)?.PropertyTypes.FirstOrDefault(pt => pt.Alias == item.Alias);
+                IContentType? elementType = elementTypes.FirstOrDefault(x => x.Key == dataItem.ContentTypeKey);
+                if (elementType is null)
+                {
+                    continue;
+                }
+
+                IPropertyType? resovledProperty = elementType?.PropertyTypes.FirstOrDefault(pt => pt.Alias == item.Alias);
+                if (resovledProperty is not null)
+                {
+                    item.PropertyType = resovledProperty;
+                    continue;
+                }
+
+                resovledProperty = elementType?.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == item.Alias);
+                if (resovledProperty is not null)
+                {
+                    item.PropertyType = resovledProperty;
+                    continue;
+                }
             }
         }
     }
