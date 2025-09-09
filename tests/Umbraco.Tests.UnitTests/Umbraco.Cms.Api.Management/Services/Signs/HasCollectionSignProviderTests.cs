@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
@@ -9,57 +9,57 @@ using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Signs;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Flags;
 
 [TestFixture]
-internal class HasCollectionSignProviderTests
+internal class HasCollectionFlagProviderTests
 {
     [Test]
-    public void HasCollectionSignProvider_Can_Provide_Document_Tree_Signs()
+    public void HasCollectionFlagProvider_Can_Provide_Document_Tree_Flags()
     {
-        var sut = new HasCollectionSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<DocumentTreeItemResponseModel>());
+        var sut = new HasCollectionFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<DocumentTreeItemResponseModel>());
     }
 
     [Test]
-    public void HasCollectionSignProvider_Can_Provide_Document_Collection_Signs()
+    public void HasCollectionFlagProvider_Can_Provide_Document_Collection_Flags()
     {
-        var sut = new HasCollectionSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<DocumentCollectionResponseModel>());
+        var sut = new HasCollectionFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<DocumentCollectionResponseModel>());
     }
 
     [Test]
-    public void HasCollectionSignProvider_Can_Provide_Document_Item_Signs()
+    public void HasCollectionFlagProvider_Can_Provide_Document_Item_Flags()
     {
-        var sut = new HasCollectionSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<DocumentItemResponseModel>());
+        var sut = new HasCollectionFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<DocumentItemResponseModel>());
     }
 
     [Test]
-    public void HasCollectionSignProvider_Can_Provide_Media_Tree_Signs()
+    public void HasCollectionFlagProvider_Can_Provide_Media_Tree_Flags()
     {
-        var sut = new HasCollectionSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<MediaTreeItemResponseModel>());
+        var sut = new HasCollectionFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<MediaTreeItemResponseModel>());
     }
 
     [Test]
-    public void HasCollectionSignProvider_Can_Provide_Media_Collection_Signs()
+    public void HasCollectionFlagProvider_Can_Provide_Media_Collection_Flags()
     {
-        var sut = new HasCollectionSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<MediaCollectionResponseModel>());
+        var sut = new HasCollectionFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<MediaCollectionResponseModel>());
     }
 
     [Test]
-    public void HasCollectionSignProvider_Can_Provide_Media_Item_Signs()
+    public void HasCollectionFlagProvider_Can_Provide_Media_Item_Flags()
     {
-        var sut = new HasCollectionSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<MediaItemResponseModel>());
+        var sut = new HasCollectionFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<MediaItemResponseModel>());
     }
 
     [Test]
-    public async Task HasCollectionSignProvider_Should_Populate_Document_Tree_Signs()
+    public async Task HasCollectionFlagProvider_Should_Populate_Document_Tree_Flags()
     {
-        var sut = new HasCollectionSignProvider();
+        var sut = new HasCollectionFlagProvider();
 
         var viewModels = new List<DocumentTreeItemResponseModel>
         {
@@ -70,19 +70,19 @@ internal class HasCollectionSignProviderTests
             new() { Id = Guid.NewGuid() },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Signs.Count(), 1);
-        Assert.AreEqual(viewModels[1].Signs.Count(), 0);
+        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
+        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
 
-        var signModel = viewModels[0].Signs.First();
-        Assert.AreEqual("Umb.HasCollection", signModel.Alias);
+        var flagModel = viewModels[0].Flags.First();
+        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 
     [Test]
-    public async Task HasCollectionSignProvider_Should_Populate_Document_Collection_Signs()
+    public async Task HasCollectionFlagProvider_Should_Populate_Document_Collection_Flags()
     {
-        var sut = new HasCollectionSignProvider();
+        var sut = new HasCollectionFlagProvider();
 
         var viewModels = new List<DocumentCollectionResponseModel>
         {
@@ -93,19 +93,19 @@ internal class HasCollectionSignProviderTests
             new() { Id = Guid.NewGuid() },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Signs.Count(), 1);
-        Assert.AreEqual(viewModels[1].Signs.Count(), 0);
+        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
+        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
 
-        var signModel = viewModels[0].Signs.First();
-        Assert.AreEqual("Umb.HasCollection", signModel.Alias);
+        var flagModel = viewModels[0].Flags.First();
+        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 
     [Test]
-    public async Task HasCollectionSignProvider_Should_Populate_Document_Item_Signs()
+    public async Task HasCollectionFlagProvider_Should_Populate_Document_Item_Flags()
     {
-        var sut = new HasCollectionSignProvider();
+        var sut = new HasCollectionFlagProvider();
 
         var viewModels = new List<DocumentItemResponseModel>
         {
@@ -116,19 +116,19 @@ internal class HasCollectionSignProviderTests
             new() { Id = Guid.NewGuid() },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Signs.Count(), 1);
-        Assert.AreEqual(viewModels[1].Signs.Count(), 0);
+        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
+        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
 
-        var signModel = viewModels[0].Signs.First();
-        Assert.AreEqual("Umb.HasCollection", signModel.Alias);
+        var flagModel = viewModels[0].Flags.First();
+        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 
     [Test]
-    public async Task HasCollectionSignProvider_Should_Populate_Media_Tree_Signs()
+    public async Task HasCollectionFlagProvider_Should_Populate_Media_Tree_Flags()
     {
-        var sut = new HasCollectionSignProvider();
+        var sut = new HasCollectionFlagProvider();
 
         var viewModels = new List<MediaTreeItemResponseModel>
         {
@@ -139,19 +139,19 @@ internal class HasCollectionSignProviderTests
             new() { Id = Guid.NewGuid() },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Signs.Count(), 1);
-        Assert.AreEqual(viewModels[1].Signs.Count(), 0);
+        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
+        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
 
-        var signModel = viewModels[0].Signs.First();
-        Assert.AreEqual("Umb.HasCollection", signModel.Alias);
+        var flagModel = viewModels[0].Flags.First();
+        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 
     [Test]
-    public async Task HasCollectionSignProvider_Should_Populate_Media_Collection_Signs()
+    public async Task HasCollectionFlagProvider_Should_Populate_Media_Collection_Flags()
     {
-        var sut = new HasCollectionSignProvider();
+        var sut = new HasCollectionFlagProvider();
 
         var viewModels = new List<MediaCollectionResponseModel>
         {
@@ -162,19 +162,19 @@ internal class HasCollectionSignProviderTests
             new() { Id = Guid.NewGuid() },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Signs.Count(), 1);
-        Assert.AreEqual(viewModels[1].Signs.Count(), 0);
+        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
+        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
 
-        var signModel = viewModels[0].Signs.First();
-        Assert.AreEqual("Umb.HasCollection", signModel.Alias);
+        var flagModel = viewModels[0].Flags.First();
+        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 
     [Test]
-    public async Task HasCollectionSignProvider_Should_Populate_Media_Item_Signs()
+    public async Task HasCollectionFlagProvider_Should_Populate_Media_Item_Flags()
     {
-        var sut = new HasCollectionSignProvider();
+        var sut = new HasCollectionFlagProvider();
 
         var viewModels = new List<MediaItemResponseModel>
         {
@@ -185,12 +185,12 @@ internal class HasCollectionSignProviderTests
             new() { Id = Guid.NewGuid() },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Signs.Count(), 1);
-        Assert.AreEqual(viewModels[1].Signs.Count(), 0);
+        Assert.AreEqual(viewModels[0].Flags.Count(), 1);
+        Assert.AreEqual(viewModels[1].Flags.Count(), 0);
 
-        var signModel = viewModels[0].Signs.First();
-        Assert.AreEqual("Umb.HasCollection", signModel.Alias);
+        var flagModel = viewModels[0].Flags.First();
+        Assert.AreEqual("Umb.HasCollection", flagModel.Alias);
     }
 }

@@ -1,39 +1,39 @@
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Signs;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Flags;
 
 [TestFixture]
-internal class IsProtectedSignProviderTests
+internal class IsProtectedFlagProviderTests
 {
     [Test]
-    public void IsProtectedSignProvider_Can_Provide_Tree_Signs()
+    public void IsProtectedFlagProvider_Can_Provide_Tree_Flags()
     {
-        var sut = new IsProtectedSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<DocumentTreeItemResponseModel>());
+        var sut = new IsProtectedFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<DocumentTreeItemResponseModel>());
     }
 
     [Test]
-    public void IsProtectedSignProvider_Can_Provide_Collection_Signs()
+    public void IsProtectedFlagProvider_Can_Provide_Collection_Flags()
     {
-        var sut = new IsProtectedSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<DocumentCollectionResponseModel>());
+        var sut = new IsProtectedFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<DocumentCollectionResponseModel>());
     }
 
     [Test]
-    public void IsProtectedSignProvider_Can_Provide_Plain_Signs()
+    public void IsProtectedFlagProvider_Can_Provide_Plain_Flags()
     {
-        var sut = new IsProtectedSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<DocumentItemResponseModel>());
+        var sut = new IsProtectedFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<DocumentItemResponseModel>());
     }
 
     [Test]
-    public async Task IsProtectedSignProvider_Should_Populate_Tree_Signs()
+    public async Task IsProtectedFlagProvider_Should_Populate_Tree_Flags()
     {
-        var sut = new IsProtectedSignProvider();
+        var sut = new IsProtectedFlagProvider();
 
         var viewModels = new List<DocumentTreeItemResponseModel>
         {
@@ -41,19 +41,19 @@ internal class IsProtectedSignProviderTests
             new() { IsProtected = true },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Signs.Count(), 0);
-        Assert.AreEqual(viewModels[1].Signs.Count(), 1);
+        Assert.AreEqual(viewModels[0].Flags.Count(), 0);
+        Assert.AreEqual(viewModels[1].Flags.Count(), 1);
 
-        var signModel = viewModels[1].Signs.First();
-        Assert.AreEqual("Umb.IsProtected", signModel.Alias);
+        var flagModel = viewModels[1].Flags.First();
+        Assert.AreEqual("Umb.IsProtected", flagModel.Alias);
     }
 
     [Test]
-    public async Task IsProtectedSignProvider_Should_Populate_Collection_Signs()
+    public async Task IsProtectedFlagProvider_Should_Populate_Collection_Flags()
     {
-        var sut = new IsProtectedSignProvider();
+        var sut = new IsProtectedFlagProvider();
 
         var viewModels = new List<DocumentCollectionResponseModel>
         {
@@ -61,19 +61,19 @@ internal class IsProtectedSignProviderTests
             new() { IsProtected = true },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Signs.Count(), 0);
-        Assert.AreEqual(viewModels[1].Signs.Count(), 1);
+        Assert.AreEqual(viewModels[0].Flags.Count(), 0);
+        Assert.AreEqual(viewModels[1].Flags.Count(), 1);
 
-        var signModel = viewModels[1].Signs.First();
-        Assert.AreEqual("Umb.IsProtected", signModel.Alias);
+        var flagModel = viewModels[1].Flags.First();
+        Assert.AreEqual("Umb.IsProtected", flagModel.Alias);
     }
 
     [Test]
-    public async Task IsProtectedSignProvider_Should_Populate_Plain_Signs()
+    public async Task IsProtectedFlagProvider_Should_Populate_Plain_Flags()
     {
-        var sut = new IsProtectedSignProvider();
+        var sut = new IsProtectedFlagProvider();
 
         var viewModels = new List<DocumentItemResponseModel>
         {
@@ -81,12 +81,12 @@ internal class IsProtectedSignProviderTests
             new() { IsProtected = true },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Signs.Count(), 0);
-        Assert.AreEqual(viewModels[1].Signs.Count(), 1);
+        Assert.AreEqual(viewModels[0].Flags.Count(), 0);
+        Assert.AreEqual(viewModels[1].Flags.Count(), 1);
 
-        var signModel = viewModels[1].Signs.First();
-        Assert.AreEqual("Umb.IsProtected", signModel.Alias);
+        var flagModel = viewModels[1].Flags.First();
+        Assert.AreEqual("Umb.IsProtected", flagModel.Alias);
     }
 }

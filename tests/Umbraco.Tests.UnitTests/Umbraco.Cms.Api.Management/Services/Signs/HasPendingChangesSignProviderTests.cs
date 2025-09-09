@@ -1,33 +1,30 @@
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
-using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Signs;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Flags;
 
 [TestFixture]
-internal class HasPendingChangesSignProviderTests
+internal class HasPendingChangesFlagProviderTests
 {
     [Test]
-    public void HasPendingChangesSignProvider_Can_Provide_Variant_Item_Signs()
+    public void HasPendingChangesFlagProvider_Can_Provide_Variant_Item_Flags()
     {
-        var sut = new HasPendingChangesSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<DocumentVariantItemResponseModel>());
+        var sut = new HasPendingChangesFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<DocumentVariantItemResponseModel>());
     }
 
     [Test]
-    public void HasPendingChangesSignProvider_Can_Provide_Variant_Signs()
+    public void HasPendingChangesFlagProvider_Can_Provide_Variant_Flags()
     {
-        var sut = new HasPendingChangesSignProvider();
-        Assert.IsTrue(sut.CanProvideSigns<DocumentVariantResponseModel>());
+        var sut = new HasPendingChangesFlagProvider();
+        Assert.IsTrue(sut.CanProvideFlags<DocumentVariantResponseModel>());
     }
 
     [Test]
-    public async Task HasPendingChangesSignProvider_Should_Populate_Variant_Item_Signs()
+    public async Task HasPendingChangesFlagProvider_Should_Populate_Variant_Item_Flags()
     {
-        var sut = new HasPendingChangesSignProvider();
+        var sut = new HasPendingChangesFlagProvider();
 
         var variants = new List<DocumentVariantItemResponseModel>
         {
@@ -45,19 +42,19 @@ internal class HasPendingChangesSignProviderTests
             },
         };
 
-        await sut.PopulateSignsAsync(variants);
+        await sut.PopulateFlagsAsync(variants);
 
-        Assert.AreEqual(variants[0].Signs.Count(), 1);
-        Assert.AreEqual(variants[1].Signs.Count(), 0);
+        Assert.AreEqual(variants[0].Flags.Count(), 1);
+        Assert.AreEqual(variants[1].Flags.Count(), 0);
 
-        var signModel = variants[0].Signs.First();
-        Assert.AreEqual("Umb.PendingChanges", signModel.Alias);
+        var flagModel = variants[0].Flags.First();
+        Assert.AreEqual("Umb.PendingChanges", flagModel.Alias);
     }
 
     [Test]
-    public async Task HasPendingChangesSignProvider_Should_Populate_Variant_Signs()
+    public async Task HasPendingChangesFlagProvider_Should_Populate_Variant_Flags()
     {
-        var sut = new HasPendingChangesSignProvider();
+        var sut = new HasPendingChangesFlagProvider();
 
         var variants = new List<DocumentVariantResponseModel>
         {
@@ -75,12 +72,12 @@ internal class HasPendingChangesSignProviderTests
             },
         };
 
-        await sut.PopulateSignsAsync(variants);
+        await sut.PopulateFlagsAsync(variants);
 
-        Assert.AreEqual(variants[0].Signs.Count(), 1);
-        Assert.AreEqual(variants[1].Signs.Count(), 0);
+        Assert.AreEqual(variants[0].Flags.Count(), 1);
+        Assert.AreEqual(variants[1].Flags.Count(), 0);
 
-        var signModel = variants[0].Signs.First();
-        Assert.AreEqual("Umb.PendingChanges", signModel.Alias);
+        var flagModel = variants[0].Flags.First();
+        Assert.AreEqual("Umb.PendingChanges", flagModel.Alias);
     }
 }
