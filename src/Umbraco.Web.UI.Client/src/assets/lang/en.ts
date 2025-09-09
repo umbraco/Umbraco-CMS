@@ -2792,6 +2792,7 @@ export default {
 		config_statusbar: 'Statusbar',
 		config_toolbar: 'Toolbar',
 		extGroup_formatting: 'Text formatting',
+		extGroup_html: 'HTML',
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
 		extGroup_structure: 'Content structure',

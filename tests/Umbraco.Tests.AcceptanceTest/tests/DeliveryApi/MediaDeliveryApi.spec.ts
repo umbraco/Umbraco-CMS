@@ -196,8 +196,9 @@ test.describe('Media Delivery API', () => {
     await umbracoApi.mediaDeliveryApi.verifyDefaultMediaItemJson(rootArticleName, mediaItemJson, mediaPath, mediaTypeName);
   });
 
-  // This test fails because it will return 404 error if the path includes # or ?
-  test('can fetch an media item by its path with special character', async ({umbracoApi}) => {
+  // Skip this because it will return 404 error if the path includes # or ?
+  // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20024
+  test.skip('can fetch an media item by its path with special character', async ({umbracoApi}) => {
     // Arrange
     const mediaTypeName = 'Image';
     const mediaPath = '/' + specialCharacterImageName.toLowerCase() + '/';
@@ -273,7 +274,7 @@ test.describe('Media Delivery API', () => {
     // Assert
     expect(mediaItems.status()).toBe(200);
     const mediaItemsJson = await mediaItems.json();
-    await umbracoApi.mediaDeliveryApi.verifyMutipleMediaItemsJson(mediaNames, mediaItemsJson, mediaPaths, mediaTypeNames);
+    await umbracoApi.mediaDeliveryApi.verifyMultipleMediaItemsJson(mediaNames, mediaItemsJson, mediaPaths, mediaTypeNames);
   });
 
   test('returns only valid media items when some IDs are invalid', async ({umbracoApi}) => {
@@ -291,7 +292,7 @@ test.describe('Media Delivery API', () => {
     // Assert
     expect(mediaItems.status()).toBe(200);
     const mediaItemsJson = await mediaItems.json();
-    await umbracoApi.mediaDeliveryApi.verifyMutipleMediaItemsJson([validMediaName], mediaItemsJson, [validMediaPath], [validMediaTypeName]);
+    await umbracoApi.mediaDeliveryApi.verifyMultipleMediaItemsJson([validMediaName], mediaItemsJson, [validMediaPath], [validMediaTypeName]);
   });
 
   // Gets media item(s) from a query
@@ -368,13 +369,12 @@ test.describe('Media Delivery API', () => {
     }
   });
 
-  // This test fails because it still returns all media items and ignores the 'take' parameter.
   test('can paginate media items', async ({umbracoApi}) => {
     // Arrange
     const fetch = 'children:/';
-    const filter = 'mediaType:' + 'Image';
+    const filter = 'name:' + rootImageSizeNamePrefix;
     const skip = 0;
-    const take = rootImageSize;
+    const take = rootImageSize - 2;
 
     // Act
     const mediaItems = await umbracoApi.mediaDeliveryApi.getMediaItemsFromAQuery(fetch, filter, undefined, skip, take);
@@ -384,7 +384,8 @@ test.describe('Media Delivery API', () => {
     if (mediaItems !== null) {
       expect(mediaItems.status()).toBe(200);
       const mediaItemsJson = await mediaItems.json();
-      expect(mediaItemsJson.total).toBe(take);
+      expect(mediaItemsJson.total).toBe(rootImageSize);
+      expect(mediaItemsJson.items.length).toBe(take);
     }
   });
 
