@@ -316,8 +316,6 @@ stages:
       UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
       UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
       ASPNETCORE_URLS: https://localhost:44331
-      PlaywrightPassword: UmbracoAcceptance123!
-      PlaywrightUserEmail: playwright@umbraco.com
     jobs:
       # E2E Tests
       - job:
