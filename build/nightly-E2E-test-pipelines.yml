@@ -611,9 +611,9 @@ stages:
 
   - stage: NotifySlackBot
     displayName: Notify Slack on Failure
-    dependsOn: E2E
+    dependsOn: DefaultConfigE2E
     # This stage will only run if the E2E tests fail or succeed with issues
-    condition: or(eq(dependencies.E2E.result, 'failed'),eq(dependencies.E2E.result, 'succeededWithIssues'))
+    condition: or(eq(dependencies.DefaultConfigE2E.result, 'failed'), eq(dependencies.DefaultConfigE2E.result, 'succeededWithIssues'))
     jobs:
       - job: PostToSlack
         displayName: Send Slack Notification
