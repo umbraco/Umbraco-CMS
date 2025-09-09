@@ -1,1 +1,1 @@
-export * from './icon-entity-sign.element.js';
+export * from './entity-sign-icon.element.js';

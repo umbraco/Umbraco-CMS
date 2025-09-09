@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'entitySign',
 			kind: 'icon',
-			element: () => import('./icon-entity-sign.element.js'),
+			element: () => import('./entity-sign-icon.element.js'),
 		},
 	},
 ];
