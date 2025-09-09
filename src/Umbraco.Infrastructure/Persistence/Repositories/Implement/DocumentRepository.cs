@@ -1074,8 +1074,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             ClearEntityTags(entity, _tagRepository);
         }
 
-        PersistRelations(entity);
-
         entity.ResetDirtyProperties();
 
         // troubleshooting
@@ -1324,8 +1322,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
                 ClearEntityTags(entity, _tagRepository);
             }
-
-            PersistRelations(entity);
 
             // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
         }
