@@ -497,19 +497,38 @@ export class UmbContentTypeStructureManager<
 
 	makeEmptyContainerName(
 		containerId: string,
-		containerType: UmbPropertyContainerTypes,
-		parentId: string | null = null,
+		legacyContainerType?: UmbPropertyContainerTypes,
+		legacyParentId?: string | null,
 	): string {
 		return (
-			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', containerType, parentId) ?? 'Unnamed'
+			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', legacyContainerType, legacyParentId) ??
+			'Unnamed'
 		);
 	}
+	/**
+	 *
+	 * @param {string} containerId - The id of the container to make unique
+	 * @param {string} newName - The new name to make unique
+	 * @param {never} _legacyContainerType - do not use, has no effect. Is deprecated and will be removed in v.17
+	 * @param {never} _legacyParentId - do not use, has no effect. Is deprecated and will be removed in v.17
+	 * @returns
+	 */
 	makeContainerNameUniqueForOwnerContentType(
 		containerId: string,
 		newName: string,
-		containerType: UmbPropertyContainerTypes,
-		parentId: string | null = null,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		_legacyContainerType?: UmbPropertyContainerTypes,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		_legacyParentId?: string | null,
 	) {
+		const container = this.getOwnerContainerById(containerId);
+		if (!container) {
+			console.warn(`Container with id ${containerId} not found in owner content type.`);
+			return null;
+		}
+		const containerType = container.type;
+		const parentId = container.parent?.id ?? null;
+
 		const ownerRootContainers = this.getOwnerContainers(containerType, parentId); //getRootContainers() can't differentiates between compositions and locals
 		if (!ownerRootContainers) {
 			return null;
@@ -749,6 +768,26 @@ export class UmbContentTypeStructureManager<
 		});
 	}
 
+	hasPropertyStructuresOfGroupIds(groupIds: Array<string>) {
+		return this.#contentTypes.asObservablePart((docTypes) => {
+			return docTypes.some((docType) => {
+				return docType.properties?.some((property) => {
+					return property.container?.id && groupIds.includes(property.container.id);
+				});
+			});
+		});
+	}
+
+	hasPropertyStructuresOfRoot() {
+		return this.#contentTypes.asObservablePart((docTypes) => {
+			return docTypes.some((docType) => {
+				return docType.properties?.some((property) => {
+					return !property.container;
+				});
+			});
+		});
+	}
+
 	rootContainers(containerType: UmbPropertyContainerTypes) {
 		return createObservablePart(this.#contentTypeContainers, (data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType);
@@ -902,12 +941,13 @@ export class UmbContentTypeStructureManager<
 			for (const container of containers) {
 				const path = getContainerChainKey(container, containerByIdCache, chainCache);
 				const key = path?.join('|') ?? null;
+				const isOwner = this.isOwnerContainer(container.id);
 				if (!mergedMap.has(key)) {
 					// Store the first occurrence
 					mergedMap.set(key, {
 						key: key,
 						ids: [container.id],
-						ownerId: this.isOwnerContainer(container.id) ? container.id : undefined,
+						ownerId: isOwner ? container.id : undefined,
 						parentIds: new Set([container.parent?.id ?? null]),
 						path: path,
 						type: container.type,
@@ -919,7 +959,11 @@ export class UmbContentTypeStructureManager<
 					const existing = mergedMap.get(key)!;
 					existing.ids.push(container.id);
 					existing.parentIds.add(container.parent?.id ?? null);
-					existing.ownerId ??= this.isOwnerContainer(container.id) ? container.id : undefined;
+					existing.ownerId ??= isOwner ? container.id : undefined;
+					if (isOwner) {
+						// If this is the owner container, then we should update the sort order to ensure it is the one from the owner instance: [NL]
+						existing.sortOrder = container.sortOrder;
+					}
 				}
 			}
 

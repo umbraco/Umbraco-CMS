@@ -47,7 +47,7 @@ export class UmbMenuItemExpansionManager extends UmbControllerBase {
 			(itemsForMenuItem) => {
 				this.#manager.setExpansion(itemsForMenuItem);
 			},
-			'observeMenuExpension'
+			'observeMenuExpension',
 		);
 	}
 
