@@ -1,3 +1,5 @@
+import type { UmbPickerMemoryManager } from '../../memory/picker-memory.manager.js';
+import type { UmbPickerMemory } from '../../memory/types.js';
 import type { UmbPickerSearchManagerConfig } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -5,6 +7,17 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import { debounce } from '@umbraco-cms/backoffice/utils';
+
+interface UmbPickerSearchMemory extends UmbPickerMemory {
+	unique: 'umbSearch';
+	data: {
+		requestArgs: UmbSearchRequestArgs;
+	};
+}
+
+export interface UmbPickerSearchManagerArgs {
+	memory?: UmbPickerMemoryManager;
+}
 
 /**
  * A manager for searching items in a picker.
@@ -36,13 +49,24 @@ export class UmbPickerSearchManager<
 	#config?: UmbPickerSearchManagerConfig;
 	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, SearchRequestArgsType>;
 
+	#memory?: UmbPickerMemoryManager;
+	#memoryUnique: string = 'umbSearch';
+
 	/**
 	 * Creates an instance of UmbPickerSearchManager.
 	 * @param {UmbControllerHost} host The controller host for the search manager.
+	 * @param args Optional arguments for the search manager.
+	 * @param {UmbPickerMemoryManager} [args.memory] An optional memory manager to store selected items.
 	 * @memberof UmbPickerSearchManager
 	 */
-	constructor(host: UmbControllerHost) {
+	constructor(host: UmbControllerHost, args?: UmbPickerSearchManagerArgs) {
 		super(host);
+
+		if (args?.memory) {
+			this.#memory = args.memory;
+			const searchMemory = this.#memory?.get(this.#memoryUnique);
+			debugger;
+		}
 	}
 
 	/**
@@ -118,6 +142,7 @@ export class UmbPickerSearchManager<
 		this.#resultItems.setValue([]);
 		this.#searching.setValue(false);
 		this.#resultTotalItems.setValue(0);
+		this.#memory?.delete(this.#memoryUnique);
 	}
 
 	/**
@@ -187,8 +212,18 @@ export class UmbPickerSearchManager<
 			// ensure that config params are always included
 			...this.#config?.queryParams,
 			searchFrom: this.#config?.searchFrom,
+			// TODO: Move this implementation to another place. The generic picker search manager shouldn't be aware of data types.
 			dataTypeUnique: this.#config?.dataTypeUnique,
 		};
+
+		const searchMemory: UmbPickerSearchMemory = {
+			unique: this.#memoryUnique,
+			data: {
+				requestArgs: args,
+			},
+		};
+
+		this.#memory?.append(searchMemory);
 
 		const { data } = await this.#searchProvider.search(args);
 		const items = (data?.items as ResultItemType[]) ?? [];
