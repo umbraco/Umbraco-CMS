@@ -16,18 +16,8 @@ export interface ManifestEntitySign<MetaType extends MetaEntitySign = MetaEntity
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaEntitySign {}
 
-export interface ManifestEntitySignIconKind extends ManifestEntitySign<MetaEntitySignIconKind> {
-	type: 'entitySign';
-	kind: 'icon';
-}
-
-export interface MetaEntitySignIconKind extends MetaEntitySign {
-	iconName: string;
-}
-
 declare global {
 	interface UmbExtensionManifestMap {
 		umbEntitySign: ManifestEntitySign;
-		umbEntitySignIconKind: ManifestEntitySignIconKind;
 	}
 }

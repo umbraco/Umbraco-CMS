@@ -1,19 +1,16 @@
-import type { ManifestWorkspace, MetaWorkspace } from '../../extensions/types.js';
-import type { UmbDefaultWorkspaceContext } from './icon-entity-sign.context.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { ManifestEntitySign, MetaEntitySign } from '../../types.js';
 
-export interface ManifestWorkspaceDefaultKind
-	extends ManifestWorkspace<MetaWorkspaceDefaultKind, UmbControllerHostElement, UmbDefaultWorkspaceContext> {
-	type: 'workspace';
-	kind: 'default';
+export interface ManifestEntitySignIconKind extends ManifestEntitySign<MetaEntitySignIconKind> {
+	type: 'entitySign';
+	kind: 'icon';
 }
 
-export interface MetaWorkspaceDefaultKind extends MetaWorkspace {
-	headline: string;
+export interface MetaEntitySignIconKind extends MetaEntitySign {
+	iconName: string;
 }
 
 declare global {
 	interface UmbExtensionManifestMap {
-		umbManifestWorkspaceDefaultKind: ManifestWorkspaceDefaultKind;
+		umbEntitySignIconKind: ManifestEntitySignIconKind;
 	}
 }
