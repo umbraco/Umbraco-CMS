@@ -307,7 +307,7 @@ public static partial class Constants
         /// <summary>
         ///     Constants for relating to view model signs.
         /// </summary>
-        public static class Signs
+        public static class Flags
         {
             /// <summary>
             ///     Prefix for all sign aliases.
