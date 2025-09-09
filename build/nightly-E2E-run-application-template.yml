@@ -8,14 +8,15 @@
     default: ''
 
   - name: additionalEnvironmentVariables
-    type: boolean
-    default: False
+    type: string
+    default: 'false'
 
   - name: DatabaseType
     type: string
     default: ''
 
 steps:
+  - pwsh: echo ${{ parameters.additionalEnvironmentVariables }}
   # Skips the SQLServer setup if the databaseType does not match
   - ${{ if eq(parameters.DatabaseType, 'SQLServer') }}:
       # Start SQL Server Linux
@@ -29,7 +30,7 @@ steps:
         condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
   # If we want to add additional environment variables to the run step, then we will skip these
-  - ${{ if eq(parameters.additionalEnvironmentVariables, False) }}:
+  - ${{ if eq(parameters.additionalEnvironmentVariables, 'false') }}:
       # Run application for Linux
       - bash: |
           nohup dotnet run --project UmbracoProject --configuration ${{ parameters.buildConfiguration }} --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &

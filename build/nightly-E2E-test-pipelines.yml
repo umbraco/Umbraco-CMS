@@ -547,7 +547,7 @@ stages:
             parameters:
               testFolder: $(testFolder)
               buildConfiguration: ${{ variables.buildConfiguration }}
-              additionalEnvironmentVariables: ${{ eq(variables['additionalEnvironmentVariables'], true) }}
+              additionalEnvironmentVariables: $(additionalEnvironmentVariables)
 
           # Build application for AzureADB2C
           - pwsh: |
@@ -567,7 +567,7 @@ stages:
           - template: nightly-E2E-run-application-template.yml
             parameters:
               SA_PASSWORD: ${{ variables.SA_PASSWORD }}
-              additionalEnvironmentVariables: ${{ eq(variables['additionalEnvironmentVariables'], true ) }}
+              additionalEnvironmentVariables: $(additionalEnvironmentVariables)
               buildConfiguration: ${{ variables.buildConfiguration }}
               DatabaseType: ${{ variables.DatabaseType }}
 
