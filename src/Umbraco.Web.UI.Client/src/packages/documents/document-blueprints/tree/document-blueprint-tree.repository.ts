@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbDocumentBlueprintTreeServerDataSource } from './document-blueprint-tree.server.data-source.js';
+import { UmbDocumentBlueprintTreeServerDataSource } from './server-data-source/document-blueprint-tree.server.data-source.js';
 import { UMB_DOCUMENT_BLUEPRINT_TREE_STORE_CONTEXT } from './document-blueprint-tree.store.context-token.js';
 import type { UmbDocumentBlueprintTreeItemModel, UmbDocumentBlueprintTreeRootModel } from './types.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
