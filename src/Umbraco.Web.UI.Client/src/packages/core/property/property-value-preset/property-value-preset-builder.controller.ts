@@ -32,16 +32,18 @@ export class UmbPropertyValuePresetBuilderController<
 		//
 		// TODO: Clean up warnings in v.17.0 [NL]
 		this.#baseCreateArgs = {
-			entityType: createArgs?.entityType ?? 'document',
+			entityType:
+				createArgs?.entityType ??
+				'needs to be parsed to the UmbPropertyValuePresetBuilderController, this is not present because of a custom legacy implementation',
 			entityUnique:
 				createArgs?.entityUnique ??
-				'needs to be parsed from UmbPropertyValuePresetBuilderController, this is not present because of a custom legacy implementation',
+				'needs to be parsed to the UmbPropertyValuePresetBuilderController, this is not present because of a custom legacy implementation',
 			entityTypeUnique: createArgs?.entityTypeUnique,
 		};
 
-		if (!createArgs?.entityUnique) {
+		if (!createArgs?.entityUnique || !createArgs?.entityType) {
 			console.log(
-				`[UmbPropertyValuePresetBuilderController] - entityUnique was not provided. This will be required in v.17.0 and must be provided when calling create().`,
+				`entityUnique or entityType was not provided for UmbPropertyValuePresetBuilderController.create in the second argument. This will be required in v.17.0 and must be provided when calling create().`,
 			);
 		}
 
