@@ -42,7 +42,7 @@ export class UmbPropertyValuePresetBuilderController<
 		};
 
 		if (!createArgs?.entityUnique || !createArgs?.entityType) {
-			console.log(
+			console.warn(
 				`entityUnique or entityType was not provided for UmbPropertyValuePresetBuilderController.create in the second argument. This will be required in v.17.0 and must be provided when calling create().`,
 			);
 		}
