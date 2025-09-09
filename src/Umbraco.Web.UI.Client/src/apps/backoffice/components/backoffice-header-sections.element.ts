@@ -52,6 +52,10 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		);
 	}
 
+#getSectionName(section:UmbExtensionManifestInitializer<ManifestSection>){
+		return section.manifest?.meta.label? this.localize.string(section.manifest?.meta.label): section.manifest?.name
+	}
+
 	override render() {
 		return html`
 			<uui-tab-group id="tabs" data-mark="section-links">
@@ -63,11 +67,9 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 							?active="${this._currentSectionAlias === section.alias}"
 							href="${`section/${section.manifest?.meta.pathname}`}"
 							label="${ifDefined(
-								section.manifest?.meta.label
-									? this.localize.string(section.manifest?.meta.label)
-									: section.manifest?.name,
+								this.#getSectionName(section)
 							)}"
-							data-mark="section-link:${section.alias}"></uui-tab>
+							data-mark="section-link:${section.alias}">${this.#getSectionName(section)}</uui-tab>
 					`,
 				)}
 			</uui-tab-group>
