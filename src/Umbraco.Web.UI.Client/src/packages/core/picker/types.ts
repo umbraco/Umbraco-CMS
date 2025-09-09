@@ -6,4 +6,3 @@ export interface UmbPickerContextConfig {
 }
 
 export type * from './search/types.js';
-export type * from './memory/types.js';

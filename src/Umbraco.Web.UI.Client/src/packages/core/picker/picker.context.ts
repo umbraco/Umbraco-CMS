@@ -1,13 +1,13 @@
 import { UMB_PICKER_CONTEXT } from './picker.context.token.js';
 import { UmbPickerSearchManager } from './search/manager/picker-search.manager.js';
-import { UmbPickerMemoryManager } from './memory/index.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbMemoryManager } from '@umbraco-cms/backoffice/memory';
 
 export class UmbPickerContext extends UmbContextBase {
-	public readonly memory = new UmbPickerMemoryManager(this);
+	public readonly memory = new UmbMemoryManager(this);
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly search = new UmbPickerSearchManager(this, { memoryManager: this.memory });
 

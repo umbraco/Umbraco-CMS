@@ -69,6 +69,7 @@
 		"./member-type": "./dist-cms/packages/members/member-type/index.js",
 		"./member": "./dist-cms/packages/members/member/index.js",
 		"./member-public-access": "./dist-cms/packages/members/member-public-access/index.js",
+		"./memory": "./dist-cms/packages/core/memory/index.js",
 		"./menu": "./dist-cms/packages/core/menu/index.js",
 		"./modal": "./dist-cms/packages/core/modal/index.js",
 		"./models": "./dist-cms/packages/core/models/index.js",

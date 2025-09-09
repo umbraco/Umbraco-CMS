@@ -4,7 +4,7 @@ import { UmbActionEventContext } from './action/action-event.context.js';
 import { manifests as coreManifests } from './manifests.js';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UmbPickerMemoryContext } from '@umbraco-cms/backoffice/picker';
+import { UmbMemoryContext } from '@umbraco-cms/backoffice/memory';
 import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 import './property-action/components/index.js';
@@ -32,7 +32,7 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbNotificationContext(host);
 	new UmbModalManagerContext(host);
 	new UmbActionEventContext(host);
-	new UmbPickerMemoryContext(host);
+	new UmbMemoryContext(host);
 
 	host.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
 		// Initialize the auth context to let the app context know that the core module is ready
