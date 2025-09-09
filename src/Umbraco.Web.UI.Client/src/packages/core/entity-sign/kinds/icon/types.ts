@@ -7,6 +7,7 @@ export interface ManifestEntitySignIconKind extends ManifestEntitySign<MetaEntit
 
 export interface MetaEntitySignIconKind extends MetaEntitySign {
 	iconName: string;
+	label: string;
 }
 
 declare global {

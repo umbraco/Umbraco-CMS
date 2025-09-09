@@ -1,15 +1,21 @@
-import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbEntitySignElement } from './entity-sign-element.interface';
+import type {
+	ManifestElement,
+	ManifestElementAndApi,
+	ManifestWithDynamicConditions,
+} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbEntitySignElement } from './entity-sign-element.interface.js';
+import type { UmbEntitySignApi } from './entity-sign-api.interface.js';
 
 /**
  * An action to perform on an entity
  * For example for content you may wish to create a new document etc
  */
 export interface ManifestEntitySign<MetaType extends MetaEntitySign = MetaEntitySign>
-	extends ManifestElement<UmbEntitySignElement>,
+	extends ManifestElementAndApi<UmbEntitySignElement, UmbEntitySignApi>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'entitySign';
-	forEntityTypes: Array<string>;
+	forEntityTypes?: Array<string>;
+	forEntityFlags?: Array<string>;
 	meta: MetaType;
 }
 

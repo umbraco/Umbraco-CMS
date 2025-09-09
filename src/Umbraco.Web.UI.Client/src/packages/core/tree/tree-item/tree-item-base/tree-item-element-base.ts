@@ -3,7 +3,6 @@ import type { UmbTreeItemModel } from '../../types.js';
 import { html, ifDefined, nothing, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { ManifestEntitySign } from '@umbraco-cms/backoffice/entity-sign';
 
 export abstract class UmbTreeItemElementBase<
 	TreeItemModelType extends UmbTreeItemModel,
@@ -166,11 +165,9 @@ export abstract class UmbTreeItemElementBase<
 
 	#renderSigns() {
 		return this._item
-			? html`<umb-extension-slot
-					slot="icon"
-					type="entitySign"
-					.filter=${(manifest: ManifestEntitySign) =>
-						manifest.forEntityTypes.includes(this._item!.entityType)}></umb-extension-slot>`
+			? html`<umb-entity-sign-bundle slot="icon" .entityType=${this._item!.entityType}
+					>${this._item!.entityType}</umb-entity-sign-bundle
+				>`
 			: nothing;
 	}
 
