@@ -66,10 +66,9 @@ steps:
     displayName: Update application to use necessary classes
     workingDirectory: $(Agent.BuildDirectory)/app
 
-  - ${{ if eq(parameters.additionalEnvironmentVariables, 'false') }}:
-      - pwsh: |
-          dotnet build UmbracoProject --configuration ${{ parameters.buildConfiguration }} --no-restore
-          dotnet dev-certs https
-        displayName: Build application
-        workingDirectory: $(Agent.BuildDirectory)/app
-        condition: succeeded()
+  - pwsh: |
+      dotnet build UmbracoProject --configuration ${{ parameters.buildConfiguration }} --no-restore
+      dotnet dev-certs https
+    displayName: Build application
+    workingDirectory: $(Agent.BuildDirectory)/app
+    condition: and(succeeded(), eq(variables['additionalEnvironmentVariables'], 'false'))
