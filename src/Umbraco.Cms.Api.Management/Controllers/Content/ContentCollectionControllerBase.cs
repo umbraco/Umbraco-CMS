@@ -121,15 +121,4 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
                 StatusCode = StatusCodes.Status500InternalServerError,
             },
         });
-
-    /// <summary>
-    /// Populates the signs for the collection response models.
-    /// </summary>
-    protected async Task PopulateSigns(IEnumerable<TCollectionResponseModel> itemViewModels)
-    {
-        foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<TCollectionResponseModel>()))
-        {
-            await signProvider.PopulateSignsAsync(itemViewModels);
-        }
-    }
 }
