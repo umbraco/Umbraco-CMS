@@ -397,6 +397,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const cultures = this.#languages.getValue().map((x) => x.unique);
 
 		if (this.structure.variesBySegment) {
+			// TODO: v.17 Engage please note we have not implemented support for segments yet. [NL]
 			console.warn('Segments are not yet implemented for preset');
 		}
 		// TODO: Add Segments for Presets:
