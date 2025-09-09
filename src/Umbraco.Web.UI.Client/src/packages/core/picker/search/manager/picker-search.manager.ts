@@ -9,14 +9,13 @@ import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel 
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
 interface UmbPickerSearchMemory extends UmbPickerMemory {
-	unique: 'umbSearch';
 	data: {
 		requestArgs: UmbSearchRequestArgs;
 	};
 }
 
 export interface UmbPickerSearchManagerArgs {
-	memory?: UmbPickerMemoryManager;
+	memoryManager?: UmbPickerMemoryManager;
 }
 
 /**
@@ -49,8 +48,8 @@ export class UmbPickerSearchManager<
 	#config?: UmbPickerSearchManagerConfig;
 	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, SearchRequestArgsType>;
 
-	#memory?: UmbPickerMemoryManager;
-	#memoryUnique: string = 'umbSearch';
+	#memoryManager?: UmbPickerMemoryManager;
+	#memoryUnique: string = 'UmbPickerSearch';
 
 	/**
 	 * Creates an instance of UmbPickerSearchManager.
@@ -62,10 +61,9 @@ export class UmbPickerSearchManager<
 	constructor(host: UmbControllerHost, args?: UmbPickerSearchManagerArgs) {
 		super(host);
 
-		if (args?.memory) {
-			this.#memory = args.memory;
-			const searchMemory = this.#memory?.get(this.#memoryUnique);
-			debugger;
+		if (args?.memoryManager) {
+			this.#memoryManager = args.memoryManager;
+			this.#getAndApplyMemory();
 		}
 	}
 
@@ -142,7 +140,7 @@ export class UmbPickerSearchManager<
 		this.#resultItems.setValue([]);
 		this.#searching.setValue(false);
 		this.#resultTotalItems.setValue(0);
-		this.#memory?.delete(this.#memoryUnique);
+		this.#memoryManager?.delete(this.#memoryUnique);
 	}
 
 	/**
@@ -216,19 +214,31 @@ export class UmbPickerSearchManager<
 			dataTypeUnique: this.#config?.dataTypeUnique,
 		};
 
-		const searchMemory: UmbPickerSearchMemory = {
-			unique: this.#memoryUnique,
-			data: {
-				requestArgs: args,
-			},
-		};
-
-		this.#memory?.append(searchMemory);
+		this.#addMemory(args);
 
 		const { data } = await this.#searchProvider.search(args);
 		const items = (data?.items as ResultItemType[]) ?? [];
 		this.#resultItems.setValue(items);
 		this.#resultTotalItems.setValue(data?.total ?? 0);
 		this.#searching.setValue(false);
+	}
+
+	#addMemory(args: SearchRequestArgsType) {
+		const memory: UmbPickerSearchMemory = {
+			unique: this.#memoryUnique,
+			data: {
+				requestArgs: args,
+			},
+		};
+
+		this.#memoryManager?.append(memory);
+	}
+
+	#getAndApplyMemory() {
+		const memory = this.#memoryManager?.get(this.#memoryUnique);
+		if (memory?.data?.requestArgs) {
+			this.#query.setValue(memory.data.requestArgs);
+			this.search();
+		}
 	}
 }
