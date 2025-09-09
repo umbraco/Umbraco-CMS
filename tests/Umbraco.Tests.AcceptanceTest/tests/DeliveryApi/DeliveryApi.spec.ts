@@ -32,7 +32,7 @@ test('can get media image from delivery api', async ({umbracoApi}) => {
   const mediaTypeName = 'File';
   await umbracoApi.media.ensureNameNotExists(mediaName);
   const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
-  const mediaUrl = await umbracoApi.media.getMediaUrlById(mediaId);
+  const mediaUrl = await umbracoApi.media.getMediaUrlWithoutBaseUrl(mediaId);
 
   // Assert
   expect(await umbracoApi.mediaDeliveryApi.doesMediaItemWithIdContainValues(mediaId, mediaName, mediaTypeName, mediaUrl)).toBeTruthy();
