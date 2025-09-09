@@ -5,11 +5,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.Server)]
+[TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
 internal sealed class ServerRegistrationDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.Server;
+
     [Column("id")]
     [PrimaryKeyColumn(AutoIncrement = true)]
     public int Id { get; set; }

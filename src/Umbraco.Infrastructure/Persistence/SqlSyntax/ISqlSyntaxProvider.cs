@@ -74,6 +74,8 @@ public interface ISqlSyntaxProvider
 
     string ConvertUniqueIdentifierToString => throw new NotImplementedException();
 
+    string ConvertIntegerToBoolean(int value);
+
     /// <summary>
     ///     Returns the default isolation level for the database
     /// </summary>
@@ -90,17 +92,26 @@ public interface ISqlSyntaxProvider
 
     string GetWildcardPlaceholder();
 
+    /// <summary>
+    /// This ensures that GetWildcardPlaceholder() character is surronded by '' when used inside a LIKE statement. E.g. in WhereLike() extension and the defaultConcat is used.
+    /// </summary>
+    /// <param name="concatDefault">When provided this overides the GetWildcardPlaceholder() default.</param>
+    /// <returns></returns>
+    string GetWildcardConcat(string concatDefault = "");
+
     string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
 
     string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
 
     string GetConcat(params string[] args);
 
-    string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false);
+    string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false);
 
     string GetQuotedTableName(string? tableName);
 
     string GetQuotedColumnName(string? columnName);
+
+    string OrderByGuid(string tableName, string columnName);
 
     string GetQuotedName(string? name);
 
@@ -136,13 +147,27 @@ public interface ISqlSyntaxProvider
 
     string FormatTableRename(string? oldName, string? newName);
 
+    string ColumnWithAlias(string tableNameOrAlias, string columnName, string columnAlias = "");
+
     void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false);
 
     Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
 
     bool SupportsClustered();
 
+    /// <summary>
+    /// SupportsIdentityInsert and SupportsAutoIncrement are both needed because SQLite, SQL Server and e.g PostgreSQl have different behaviour with auto-increment/identity columns.
+    /// </summary>
+    /// <returns></returns>
     bool SupportsIdentityInsert();
+
+    /// <summary>
+    /// SupportsAutoIncrement and SupportsIdentityInsert are both needed because SQLite, SQL Server and e.g PostgreSQl have different behaviour with auto-increment/identity columns.
+    /// All three mentioned databases support auto-increment/identity columns, but for future databases implementation this should be explicitly configurable.
+    /// See <see cref="Migrations.Install.DatabaseDataCreator.CreateLanguageData"/> for an example of why this is needed.
+    /// </summary>
+    /// <returns></returns>
+    bool SupportsAutoIncrement();
 
     IEnumerable<string> GetTablesInSchema(IDatabase db);
 

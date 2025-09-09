@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 public class DocumentDto
 {
-    private const string TableName = Constants.DatabaseSchema.Tables.Document;
+    public const string TableName = Constants.DatabaseSchema.Tables.Document;
 
 
     // Public constants to bind properties between DTOs
