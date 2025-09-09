@@ -18,7 +18,7 @@ public class ContentPropertyData
     /// <summary>
     ///     The value submitted for the property
     /// </summary>
-    public object? Value { get; set; }
+    public object? Value { get; }
 
     /// <summary>
     ///     The data type configuration for the property.
