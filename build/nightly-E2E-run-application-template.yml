@@ -16,7 +16,6 @@
     default: ''
 
 steps:
-  - pwsh: echo ${{ parameters.additionalEnvironmentVariables }}
   # Skips the SQLServer setup if the databaseType does not match
   - ${{ if eq(parameters.DatabaseType, 'SQLServer') }}:
       # Start SQL Server Linux
