@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.PropertyEditors;
 
@@ -40,7 +41,6 @@ public class SingleBlockPropertyEditor : DataEditor
         _blockValuePropertyIndexValueFactory = blockValuePropertyIndexValueFactory;
     }
 
-    // todo
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
     /// <inheritdoc/>
@@ -57,11 +57,30 @@ public class SingleBlockPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<SingleBlockEditorPropertyValueEditor>(Attribute!, CreateBlockEditorDataConverter());
 
-    //todo check CanMergePartialPropertyValues & MergePartialPropertyValueForCulture
+    /// <inheritdoc />
+    public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
+
+    /// <inheritdoc />
+    public override object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)
+    {
+        var valueEditor = (SingleBlockEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergePartialPropertyValueForCulture(sourceValue, targetValue, culture);
+    }
 
     /// <inheritdoc/>
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new SingleBlockConfigurationEditor(_ioHelper);
+
+    /// <inheritdoc/>
+    public override object? MergeVariantInvariantPropertyValue(
+        object? sourceValue,
+        object? targetValue,
+        bool canUpdateInvariantData,
+        HashSet<string> allowedCultures)
+    {
+        var valueEditor = (SingleBlockEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData, allowedCultures);
+    }
 
     internal sealed class SingleBlockEditorPropertyValueEditor : BlockEditorPropertyValueEditor<SingleBlockValue, SingleBlockLayoutItem>
     {
