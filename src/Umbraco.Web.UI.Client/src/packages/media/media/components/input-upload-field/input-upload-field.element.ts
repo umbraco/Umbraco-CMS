@@ -16,19 +16,26 @@ import type {
 } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-upload-field')
-export class UmbInputUploadFieldElement extends UmbLitElement {
+export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValueType, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	@property({ type: Object, attribute: false })
-	set value(value: UmbMediaValueType) {
+	override set value(value: UmbMediaValueType | undefined) {
+		super.value = value;
 		this.#src = value?.src ?? '';
 		this.#setPreviewAlias();
 	}
-	get value(): UmbMediaValueType {
-		return {
-			src: this.#src,
-			temporaryFileId: this.temporaryFile?.temporaryUnique,
-		};
+	override get value(): UmbMediaValueType | undefined {
+		if (this.#src || this.temporaryFile?.temporaryUnique) {
+			return {
+				src: this.#src,
+				temporaryFileId: this.temporaryFile?.temporaryUnique,
+			};
+		}
+		return undefined;
 	}
 	#src = '';
 
