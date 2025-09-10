@@ -1,4 +1,3 @@
-using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -77,11 +76,6 @@ internal sealed class MediaEditingService
             return Attempt.FailWithStatus(validationStatus, new MediaCreateResult { ValidationResult = validationResult });
         }
 
-        if (createModel.Properties.Any(property => ContainsMediaFile(property) is false))
-        {
-            return Attempt.FailWithStatus(validationStatus, new MediaCreateResult { ValidationResult = validationResult });
-        }
-
         IMedia media = result.Result.Content!;
 
         var currentUserId = await GetUserIdAsync(userKey);
@@ -109,11 +103,6 @@ internal sealed class MediaEditingService
         // we'll return the actual property validation status if the entire operation succeeds.
         ContentEditingOperationStatus validationStatus = result.Status;
         ContentValidationResult validationResult = result.Result.ValidationResult;
-
-        if (updateModel.Properties.Any(property => ContainsMediaFile(property) is false))
-        {
-            return Attempt.FailWithStatus(validationStatus, new MediaUpdateResult { ValidationResult = validationResult });
-        }
 
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
@@ -187,19 +176,5 @@ internal sealed class MediaEditingService
             _logger.LogError(ex, "Media save operation failed");
             return ContentEditingOperationStatus.Unknown;
         }
-    }
-
-    private bool ContainsMediaFile(PropertyValueModel property)
-    {
-        if (property.Value is JsonObject jsonObject && jsonObject.TryGetPropertyValue("src", out JsonNode? source))
-        {
-            string sourceString = source!.GetValue<string>();
-            if (string.IsNullOrEmpty(sourceString))
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 }
