@@ -10,6 +10,7 @@ import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbPickerModalBaseElement<
+	TreeItemType,
 	UmbTreePickerModalData<TreeItemType>,
 	UmbTreePickerModalValue
 > {

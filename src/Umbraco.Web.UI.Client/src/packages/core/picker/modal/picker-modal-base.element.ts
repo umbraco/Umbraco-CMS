@@ -1,4 +1,5 @@
 import type { UmbPickerContext } from '../picker.context.js';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import {
@@ -6,10 +7,12 @@ import {
 	type ManifestModal,
 	type UmbModalContext,
 	type UmbModalRejectReason,
+	type UmbPickerModalData,
 } from '@umbraco-cms/backoffice/modal';
 
 export abstract class UmbPickerModalBaseElement<
-	ModalDataType extends object = object,
+	ItemType = UmbEntityModel,
+	ModalDataType extends UmbPickerModalData<ItemType> = UmbPickerModalData<ItemType>,
 	ModalValueType = unknown,
 	ModalManifestType extends ManifestModal = ManifestModal,
 > extends UmbModalBaseElement<ModalDataType, ModalValueType, ModalManifestType> {
