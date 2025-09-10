@@ -58,7 +58,6 @@ export class UmbPickerSearchManager<
 		super(host);
 		if (args?.interactionMemoryManager) {
 			this.#interactionMemoryManager = args.interactionMemoryManager;
-			this.#observeInteractionMemory();
 		}
 	}
 
@@ -186,6 +185,8 @@ export class UmbPickerSearchManager<
 		}
 
 		this.setSearchable(true);
+
+		this.#observeInteractionMemory();
 	}
 
 	#debouncedSearch = debounce(this.#search, 300);
@@ -218,9 +219,11 @@ export class UmbPickerSearchManager<
 		this.#searching.setValue(false);
 	}
 
+	#muteMemoryObservation = false;
+
 	#observeInteractionMemory() {
 		this.observe(this.#interactionMemoryManager?.memory(this.#interactionMemoryUnique), (memory) => {
-			console.log(memory);
+			if (this.#muteMemoryObservation) return;
 
 			if (memory) {
 				this.#applySearchRequestInteractionMemory(memory);
@@ -240,7 +243,9 @@ export class UmbPickerSearchManager<
 			],
 		};
 
+		this.#muteMemoryObservation = true;
 		this.#interactionMemoryManager?.setMemory(memory);
+		this.#muteMemoryObservation = false;
 	}
 
 	#applySearchRequestInteractionMemory(memory: UmbInteractionMemoryModel) {
