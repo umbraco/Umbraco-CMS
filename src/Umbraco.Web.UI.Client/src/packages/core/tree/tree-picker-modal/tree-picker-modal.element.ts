@@ -3,14 +3,13 @@ import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement, type UmbModalRejectReason } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 
 @customElement('umb-tree-picker-modal')
-export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
+export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbPickerModalBaseElement<
 	UmbTreePickerModalData<TreeItemType>,
 	UmbTreePickerModalValue
 > {
@@ -33,12 +32,12 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	private _searchQuery?: string;
 
-	#pickerContext = new UmbTreeItemPickerContext(this);
+	protected _pickerContext = new UmbTreeItemPickerContext(this);
 
 	constructor() {
 		super();
-		this.#pickerContext.selection.setSelectable(true);
-		this.observe(this.#pickerContext.selection.hasSelection, (hasSelection) => {
+		this._pickerContext.selection.setSelectable(true);
+		this.observe(this._pickerContext.selection.hasSelection, (hasSelection) => {
 			this._hasSelection = hasSelection;
 		});
 		this.#observePickerSelection();
@@ -55,29 +54,25 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 		if (_changedProperties.has('data')) {
 			if (this.data?.search) {
-				this.#pickerContext.search.updateConfig({
+				this._pickerContext.search.updateConfig({
 					...this.data.search,
 					searchFrom: this.data.startNode,
-					dataTypeUnique: this.#pickerContext.dataType?.unique,
+					dataTypeUnique: this._pickerContext.dataType?.unique,
 				});
 			}
 
 			const multiple = this.data?.multiple ?? false;
-			this.#pickerContext.selection.setMultiple(multiple);
+			this._pickerContext.selection.setMultiple(multiple);
 
 			this._selectionConfiguration = {
 				...this._selectionConfiguration,
 				multiple,
 			};
-
-			if (this.data?.treeAlias) {
-				this.#observeInteractionMemories();
-			}
 		}
 
 		if (_changedProperties.has('value')) {
 			const selection = this.value?.selection ?? [];
-			this.#pickerContext.selection.setSelection(selection);
+			this._pickerContext.selection.setSelection(selection);
 			this._selectionConfiguration = {
 				...this._selectionConfiguration,
 				selection: [...selection],
@@ -87,7 +82,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#observePickerSelection() {
 		this.observe(
-			this.#pickerContext.selection.selection,
+			this._pickerContext.selection.selection,
 			(selection) => {
 				this.updateValue({ selection });
 				this.requestUpdate();
@@ -98,7 +93,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#observeSearch() {
 		this.observe(
-			this.#pickerContext.search.query,
+			this._pickerContext.search.query,
 			(query) => {
 				this._searchQuery = query?.query;
 			},
@@ -109,13 +104,13 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	// Tree Selection
 	#onTreeItemSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
-		this.#pickerContext.selection.select(event.unique);
+		this._pickerContext.selection.select(event.unique);
 		this.modalContext?.dispatchEvent(new UmbSelectedEvent(event.unique));
 	}
 
 	#onTreeItemDeselected(event: UmbDeselectedEvent) {
 		event.stopPropagation();
-		this.#pickerContext.selection.deselect(event.unique);
+		this._pickerContext.selection.deselect(event.unique);
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
 	}
 
@@ -152,49 +147,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					this.requestUpdate('_createPath', oldPath);
 				});
 		}
-	}
-
-	protected override _submitModal() {
-		this.#setTreeItemPickerModalMemory();
-		super._submitModal();
-	}
-
-	protected override _rejectModal(reason?: UmbModalRejectReason) {
-		this.#setTreeItemPickerModalMemory();
-		super._rejectModal(reason);
-	}
-
-	#getInteractionMemoryUnique(treeAlias: string | undefined) {
-		return `UmbTreeItemPickerModal-${treeAlias}`;
-	}
-
-	#observeInteractionMemories() {
-		const unique = this.#getInteractionMemoryUnique(this.data?.treeAlias);
-		if (!unique) return;
-
-		this.observe(
-			this.modalContext?.interactionMemory.memory(unique),
-			(memory) => {
-				debugger;
-				memory?.memories?.forEach((memory) => this.#pickerContext.interactionMemory.setMemory(memory));
-			},
-			'umbModalInteractionMemoryObserver',
-		);
-	}
-
-	#setTreeItemPickerModalMemory() {
-		// Get all memories from the picker context and set them as on combined memory for the picker modal
-		const pickerMemories = this.#pickerContext.interactionMemory.getAllMemories();
-		if (pickerMemories?.length === 0) return;
-		const unique = this.#getInteractionMemoryUnique(this.data?.treeAlias);
-		if (!unique) return;
-
-		const pickerModalMemory: UmbInteractionMemoryModel = {
-			unique,
-			memories: pickerMemories,
-		};
-
-		this.modalContext?.interactionMemory.setMemory(pickerModalMemory);
 	}
 
 	override render() {
