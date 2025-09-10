@@ -327,6 +327,7 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
           DatabaseType: SQLite
+          additionalEnvironmentVariables: false
         strategy:
           matrix:
             LinuxPart1Of3:
@@ -383,6 +384,7 @@ stages:
             parameters:
               DatabaseType: ${{ variables.DatabaseType }}
               buildConfiguration: ${{ variables.buildConfiguration }}
+              additionalEnvironmentVariables: ${{ variables.additionalEnvironmentVariables }}
 
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
@@ -401,6 +403,7 @@ stages:
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
           DatabaseType: SQLServer
           SA_PASSWORD: UmbracoAcceptance123!
+          additionalEnvironmentVariables: false
         strategy:
           matrix:
             LinuxPart1Of3:
@@ -461,6 +464,7 @@ stages:
               SA_PASSWORD: ${{ variables.SA_PASSWORD }}
               buildConfiguration: ${{ variables.buildConfiguration }}
               DatabaseType: ${{ variables.DatabaseType }}
+              additionalEnvironmentVariables: ${{ variables.additionalEnvironmentVariables }}
 
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
