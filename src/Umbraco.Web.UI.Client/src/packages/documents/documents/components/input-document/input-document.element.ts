@@ -8,7 +8,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
-import type { UmbInteractionMemoryModel } from 'src/packages/core/interaction-memory/index.js';
+import {
+	UmbInteractionMemoryManager,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -123,21 +126,13 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 	#readonly = false;
 
-	@property({ type: Object, attribute: false })
-	public get memory(): UmbInteractionMemoryModel | undefined {
-		return this.#memory;
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#pickerInputContext.interactionMemory.getAllMemories();
 	}
-	public set memory(value: UmbInteractionMemoryModel | undefined) {
-		this.#memory = value;
-
-		// Check if we have a memory for this input, by looking for a memory with the same unique as this input.
-		// If we find one, we set it as the inputDocumentMemory, which is then passed to the picker modal when opened.
-		this.#inputDocumentMemory = value?.memories?.find((memory) => memory.unique === this.#memoryUnique);
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
 	}
-
-	#memoryUnique = 'UmbInputDocument';
-	#memory?: UmbInteractionMemoryModel;
-	#inputDocumentMemory?: UmbInteractionMemoryModel;
 
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
@@ -170,22 +165,6 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			(selectedItems) => (this._items = selectedItems),
 			'_observerItems',
 		);
-
-		this.observe(
-			this.#pickerInputContext.memory,
-			(memory) => {
-				if (!memory) return;
-
-				const inputDocumentMemory: UmbInteractionMemoryModel = {
-					unique: 'UmbInputDocument',
-					memories: [memory],
-				};
-
-				this.#inputDocumentMemory = inputDocumentMemory;
-				console.log('Input Document Memory:', inputDocumentMemory);
-			},
-			'umbObservePickerInputMemory',
-		);
 	}
 
 	#openPicker() {
@@ -193,7 +172,6 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			{
 				hideTreeRoot: true,
 				startNode: this.startNode,
-				memory: this.#inputDocumentMemory,
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({

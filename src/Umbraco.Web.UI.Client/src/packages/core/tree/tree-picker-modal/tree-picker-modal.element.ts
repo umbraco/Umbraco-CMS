@@ -70,14 +70,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				multiple,
 			};
 
-			if (this.data?.memory) {
-				/* Check if the memory has any memories with the same unique as the picker context memories
-				 and if so, apply them to the picker context. */
-				const pickerModalMemory = this.data.memory.memories?.find(
-					(memory) => memory.unique === 'UmbTreeItemPickerModal',
-				);
-
-				pickerModalMemory?.memories?.forEach((memory) => this.#pickerContext.interactionMemory.setMemory(memory));
+			if (this.data?.treeAlias) {
+				this.#observeInteractionMemories();
 			}
 		}
 
@@ -170,17 +164,37 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		super._rejectModal(reason);
 	}
 
+	#getInteractionMemoryUnique(treeAlias: string | undefined) {
+		return `UmbTreeItemPickerModal-${treeAlias}`;
+	}
+
+	#observeInteractionMemories() {
+		const unique = this.#getInteractionMemoryUnique(this.data?.treeAlias);
+		if (!unique) return;
+
+		this.observe(
+			this.modalContext?.interactionMemory.memory(unique),
+			(memory) => {
+				debugger;
+				memory?.memories?.forEach((memory) => this.#pickerContext.interactionMemory.setMemory(memory));
+			},
+			'umbModalInteractionMemoryObserver',
+		);
+	}
+
 	#setTreeItemPickerModalMemory() {
 		// Get all memories from the picker context and set them as on combined memory for the picker modal
 		const pickerMemories = this.#pickerContext.interactionMemory.getAllMemories();
 		if (pickerMemories?.length === 0) return;
+		const unique = this.#getInteractionMemoryUnique(this.data?.treeAlias);
+		if (!unique) return;
 
 		const pickerModalMemory: UmbInteractionMemoryModel = {
-			unique: 'UmbTreeItemPickerModal',
+			unique,
 			memories: pickerMemories,
 		};
 
-		this.modalContext?.setMemory(pickerModalMemory);
+		this.modalContext?.interactionMemory.setMemory(pickerModalMemory);
 	}
 
 	override render() {

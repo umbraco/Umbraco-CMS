@@ -53,6 +53,8 @@ export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 			...pickerData?.search?.queryParams,
 		};
 
+		combinedPickerData.interactionMemories = this.interactionMemory.getAllMemories();
+
 		await super.openPicker(combinedPickerData);
 	}
 

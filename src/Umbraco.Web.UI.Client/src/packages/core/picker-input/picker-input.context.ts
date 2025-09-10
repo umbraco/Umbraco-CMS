@@ -8,7 +8,10 @@ import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbInteractionMemoryModel } from 'src/packages/core/interaction-memory/index.js';
+import {
+	UmbInteractionMemoryManager,
+	type UmbInteractionMemoryModel,
+} from 'src/packages/core/interaction-memory/index.js';
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
@@ -25,9 +28,7 @@ export class UmbPickerInputContext<
 
 	public readonly selection;
 	public readonly selectedItems;
-
-	#memory = new UmbObjectState<UmbInteractionMemoryModel | undefined>(undefined);
-	public readonly memory = this.#memory.asObservable();
+	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
 
 	/**
 	 * Define a minimum amount of selected items in this input, for this input to be valid.
@@ -116,8 +117,8 @@ export class UmbPickerInputContext<
 
 		/* Check if we have any memory from the modal, and if so, 
 		apply it to the picker input context so it can be reached from the input element. */
-		const modalMemory = modalContext?.getMemory();
-		this.#memory.setValue(modalMemory);
+		const modalMemories = modalContext?.interactionMemory.getAllMemories();
+		modalMemories.forEach((memory) => this.interactionMemory.setMemory(memory));
 
 		if (!modalValue) return;
 

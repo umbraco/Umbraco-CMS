@@ -25,4 +25,8 @@ export class UmbInteractionMemoryManager extends UmbControllerBase {
 	getAllMemories() {
 		return this.#memories.getValue();
 	}
+
+	clear() {
+		this.#memories.clear();
+	}
 }
