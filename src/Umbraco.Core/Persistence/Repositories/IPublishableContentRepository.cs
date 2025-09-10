@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
@@ -66,10 +67,10 @@ public interface IPublishableContentRepository<TContent> : IContentRepository<in
     /// <summary>
     ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
     /// </summary>
-    /// <param name="keys">The content keys.</param>
+    /// <param name="contentIds">The IDs of the content items.</param>
     /// <returns>
     ///     The provided collection of content keys filtered for those that are scheduled for publishing.
     /// </returns>
-    IEnumerable<Guid> GetScheduledContentKeys(Guid[] keys) => [];
+    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] contentIds) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
 }
 
