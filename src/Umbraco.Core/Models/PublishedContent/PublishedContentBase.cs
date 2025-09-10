@@ -72,11 +72,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public abstract bool IsPublished(string? culture = null);
 
-        /// <inheritdoc />
-        [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
-        public virtual IEnumerable<IPublishedContent> Children => GetChildren();
-
-
         /// <inheritdoc cref="IPublishedElement.Properties"/>
         public abstract IEnumerable<IPublishedProperty> Properties { get; }
 
