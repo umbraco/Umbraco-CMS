@@ -248,38 +248,6 @@ public static class ClaimsIdentityExtensions
                 identity));
         }
 
-        // NOTE: this can be removed when the obsolete claim type has been deleted
-        if (identity.HasClaim(x => x.Type == Constants.Security.StartContentNodeIdClaimType) == false &&
-            startContentNodes != null)
-        {
-            foreach (var startContentNode in startContentNodes)
-            {
-                identity.AddClaim(new Claim(
-                    Constants.Security.StartContentNodeIdClaimType,
-                    startContentNode.ToInvariantString(),
-                    ClaimValueTypes.Integer32,
-                    AuthenticationType,
-                    AuthenticationType,
-                    identity));
-            }
-        }
-
-        // NOTE: this can be removed when the obsolete claim type has been deleted
-        if (identity.HasClaim(x => x.Type == Constants.Security.StartMediaNodeIdClaimType) == false &&
-            startMediaNodes != null)
-        {
-            foreach (var startMediaNode in startMediaNodes)
-            {
-                identity.AddClaim(new Claim(
-                    Constants.Security.StartMediaNodeIdClaimType,
-                    startMediaNode.ToInvariantString(),
-                    ClaimValueTypes.Integer32,
-                    AuthenticationType,
-                    AuthenticationType,
-                    identity));
-            }
-        }
-
         if (identity.HasClaim(x => x.Type == ClaimTypes.Locality) == false)
         {
             identity.AddClaim(new Claim(
@@ -301,22 +269,6 @@ public static class ClaimsIdentityExtensions
                 AuthenticationType,
                 AuthenticationType,
                 identity));
-        }
-
-        // Add each app as a separate claim
-        // NOTE: this can be removed when the obsolete claim type has been deleted
-        if (identity.HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false && allowedApps != null)
-        {
-            foreach (var application in allowedApps)
-            {
-                identity.AddClaim(new Claim(
-                    Constants.Security.AllowedApplicationsClaimType,
-                    application,
-                    ClaimValueTypes.String,
-                    AuthenticationType,
-                    AuthenticationType,
-                    identity));
-            }
         }
 
         // Claims are added by the ClaimsIdentityFactory because our UserStore supports roles, however this identity might
