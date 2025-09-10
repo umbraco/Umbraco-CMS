@@ -2,7 +2,6 @@ import type { UmbAuthFlow } from '../auth-flow.js';
 import type { UmbAuthContext } from '../auth.context.js';
 import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/umb-auth-timeout-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
@@ -100,7 +99,8 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	async #observeKeepUserLoggedIn() {
 		if (this.#hasCheckedKeepUserLoggedIn) return;
 		this.#hasCheckedKeepUserLoggedIn = true;
-		const { data } = await tryExecute(this, UserService.getUserCurrentConfiguration(), { disableNotifications: true });
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		const { data } = await UserService.getUserCurrentConfiguration();
 		this.#keepUserLoggedIn = data?.keepUserLoggedIn ?? false;
 	}
 
