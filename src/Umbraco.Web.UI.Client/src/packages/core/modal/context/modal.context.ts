@@ -8,7 +8,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbDeepPartialObject, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_ROUTE_CONTEXT, type IRouterSlot } from '@umbraco-cms/backoffice/router';
-import type { UmbMemoryModel } from '@umbraco-cms/backoffice/picker';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/memory';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -60,7 +60,7 @@ export class UmbModalContext<
 	#size = new UmbStringState<UUIModalSidebarSize>('small');
 	public readonly size = this.#size.asObservable();
 
-	#memory = new UmbObjectState<UmbMemoryModel | undefined>(undefined);
+	#memory = new UmbObjectState<UmbInteractionMemoryModel | undefined>(undefined);
 	public readonly memory = this.#memory.asObservable();
 
 	constructor(
@@ -233,11 +233,11 @@ export class UmbModalContext<
 		this.#size.setValue(size);
 	}
 
-	public setMemory(memory: UmbMemoryModel | undefined) {
+	public setMemory(memory: UmbInteractionMemoryModel | undefined) {
 		this.#memory.setValue(memory);
 	}
 
-	public getMemory(): UmbMemoryModel | undefined {
+	public getMemory(): UmbInteractionMemoryModel | undefined {
 		return this.#memory.getValue();
 	}
 

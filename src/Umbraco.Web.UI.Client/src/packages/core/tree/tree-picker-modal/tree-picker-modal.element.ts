@@ -77,7 +77,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					(memory) => memory.unique === 'UmbTreeItemPickerModal',
 				);
 
-				pickerModalMemory?.memories?.forEach((memory) => this.#pickerContext.memory.setMemory(memory));
+				pickerModalMemory?.memories?.forEach((memory) => this.#pickerContext.interactionMemory.setMemory(memory));
 			}
 		}
 
@@ -172,7 +172,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#setTreeItemPickerModalMemory() {
 		// Get all memories from the picker context and set them as on combined memory for the picker modal
-		const pickerMemories = this.#pickerContext.memory.getAll();
+		const pickerMemories = this.#pickerContext.interactionMemory.getAllMemories();
 		if (pickerMemories?.length === 0) return;
 
 		const pickerModalMemory: UmbInteractionMemoryModel = {
