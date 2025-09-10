@@ -2,7 +2,10 @@ import type { UmbPickerSearchManagerConfig } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbInteractionMemoryManager, UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/memory';
+import type {
+	UmbInteractionMemoryManager,
+	UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import { debounce } from '@umbraco-cms/backoffice/utils';

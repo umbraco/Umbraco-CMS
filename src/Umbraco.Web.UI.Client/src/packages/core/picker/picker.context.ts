@@ -3,7 +3,7 @@ import { UmbPickerSearchManager } from './search/manager/picker-search.manager.j
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/memory';
+import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
 export class UmbPickerContext extends UmbContextBase {

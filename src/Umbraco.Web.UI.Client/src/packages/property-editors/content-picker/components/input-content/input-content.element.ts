@@ -6,7 +6,7 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 @customElement('umb-input-content')
 export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(

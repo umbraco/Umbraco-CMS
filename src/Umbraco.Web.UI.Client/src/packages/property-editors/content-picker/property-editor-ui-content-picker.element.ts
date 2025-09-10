@@ -16,7 +16,10 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
-import { UMB_INTERACTION_MEMORY_CONTEXT, type UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/memory';
+import {
+	UMB_INTERACTION_MEMORY_CONTEXT,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
 
 // import of local component
 import './components/input-content/index.js';
