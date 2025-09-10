@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -19,14 +20,18 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
 
     protected IMediaType ImageMediaType { get; set; }
 
+    protected IMediaType ArticleMediaType { get; set; }
+
+
     [SetUp]
     public async Task Setup()
     {
         ImageMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Image);
+        ArticleMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.ArticleAlias);
     }
 
     [Test]
-    public async Task Cannot_Create_Media_With_Mandatory_Property()
+    public async Task Cannot_Create_Media_With_Mandatory_Property_Without_File()
     {
         var imageModel = CreateMediaCreateModel("Image", new Guid(), ImageMediaType.Key);
         var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
@@ -34,6 +39,34 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.IsFalse(imageCreateAttempt.Success);
         Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, imageCreateAttempt.Status);
+    }
+
+    [Test]
+    public async Task Can_Create_Media_With_Mandatory_Property_With_File()
+    {
+        var imageModel = CreateMediaCreateModelWithFile("Image", new Guid(), ArticleMediaType.Key);
+        var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsTrue(imageCreateAttempt.Success);
+    }
+
+    [Test]
+    public async Task Can_Update_Media_With_Mandatory_Property_With_File()
+    {
+        Guid guid = Guid.NewGuid();
+        var imageModel = CreateMediaCreateModelWithFile("Article", guid, ArticleMediaType.Key);
+        var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
+
+        // Assert
+        Assert.IsTrue(imageCreateAttempt.Success);
+
+        var json = new JsonObject();
+        json.Add("src", "");
+        var updateModel = new MediaUpdateModel { Properties = [new PropertyValueModel { Alias = "umbracoFile", Value = json }], Variants = imageModel.Variants };
+        var imageUpdateAttempt = await MediaEditingService.ValidateUpdateAsync(guid, updateModel);
+
+        Assert.IsFalse(imageUpdateAttempt.Success);
     }
 
     [Test]
@@ -57,4 +90,21 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
             Variants = [new () { Name = name }],
             Key = key,
         };
+
+    private MediaCreateModel CreateMediaCreateModelWithFile(string name, Guid key, Guid mediaTypeKey)
+    {
+        var json = new JsonObject();
+        json.Add("src", "file");
+
+        return new MediaCreateModel
+        {
+            ContentTypeKey = mediaTypeKey,
+            ParentKey = Constants.System.RootKey,
+            Variants = [new () { Name = name }],
+            Key = key,
+            Properties = [
+                new PropertyValueModel { Alias = "umbracoFile", Value = json }
+            ],
+        };
+    }
 }
