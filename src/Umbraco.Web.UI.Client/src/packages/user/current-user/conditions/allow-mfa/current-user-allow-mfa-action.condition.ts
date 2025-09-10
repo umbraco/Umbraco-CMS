@@ -1,4 +1,4 @@
-import { UmbCurrentUserConfigRepository } from '../../repository/config/index.js';
+import { UmbCurrentUserConfigRepository } from '../../repository/current-user-config.repository.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbConditionBase, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';

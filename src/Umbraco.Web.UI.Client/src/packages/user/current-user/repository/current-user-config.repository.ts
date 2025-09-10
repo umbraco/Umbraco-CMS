@@ -1,4 +1,4 @@
-import type { UmbCurrentUserConfigurationModel } from '../../types.js';
+import type { UmbCurrentUserConfigurationModel } from '../../user/types.js';
 import { UmbCurrentUserConfigServerDataSource } from './current-user-config.server.data-source.js';
 import { UMB_CURRENT_USER_CONFIG_STORE_CONTEXT } from './current-user-config.store.token.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
