@@ -97,13 +97,6 @@ public interface IPublishedContent : IPublishedElement
     PublishedItemType ItemType { get; }
 
     /// <summary>
-    ///     Gets the parent of the content item.
-    /// </summary>
-    /// <remarks>The parent of root content is <c>null</c>.</remarks>
-    [Obsolete("Please use either the IPublishedContent.Parent<>() extension method in the Umbraco.Extensions namespace, or IDocumentNavigationQueryService if you only need keys. Scheduled for removal in V16.")]
-    IPublishedContent? Parent { get; }
-
-    /// <summary>
     ///     Gets a value indicating whether the content is draft.
     /// </summary>
     /// <remarks>
