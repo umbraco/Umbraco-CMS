@@ -1,4 +1,4 @@
-import type { UmbCurrentUserConfigurationModel } from '../../user/types.js';
+import type { UmbCurrentUserConfigurationModel } from '../../types.js';
 import { UMB_CURRENT_USER_CONFIG_STORE_CONTEXT } from './current-user-config.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStoreObjectBase } from '@umbraco-cms/backoffice/store';
