@@ -338,15 +338,6 @@ public static class ClaimsIdentityExtensions
     }
 
     /// <summary>
-    ///     Get the allowed applications from a ClaimsIdentity
-    /// </summary>
-    /// <param name="identity"></param>
-    /// <returns></returns>
-    [Obsolete("Please use IUser.AllowedSections instead. Will be removed in V15.")]
-    public static string[] GetAllowedApplications(this ClaimsIdentity identity) => identity
-        .FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToArray();
-
-    /// <summary>
     ///     Get the user ID from a ClaimsIdentity
     /// </summary>
     /// <param name="identity"></param>
