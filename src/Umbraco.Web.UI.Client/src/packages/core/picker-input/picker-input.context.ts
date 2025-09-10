@@ -7,11 +7,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import {
-	UmbInteractionMemoryManager,
-	type UmbInteractionMemoryModel,
-} from 'src/packages/core/interaction-memory/index.js';
+import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<

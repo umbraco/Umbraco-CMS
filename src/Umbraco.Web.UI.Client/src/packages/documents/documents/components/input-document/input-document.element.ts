@@ -9,7 +9,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import {
-	UmbInteractionMemoryManager,
+	UmbInteractionMemoryChangeEvent,
 	type UmbInteractionMemoryModel,
 } from '@umbraco-cms/backoffice/interaction-memory';
 
@@ -131,8 +131,11 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		return this.#pickerInputContext.interactionMemory.getAllMemories();
 	}
 	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemories = value;
 		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
 	}
+
+	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
 
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
@@ -164,6 +167,15 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			this.#pickerInputContext.selectedItems,
 			(selectedItems) => (this._items = selectedItems),
 			'_observerItems',
+		);
+
+		this.observe(
+			this.#pickerInputContext.interactionMemory.memories,
+			(memories) => {
+				this.#interactionMemories = memories;
+				this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
+			},
+			'_observeMemories',
 		);
 	}
 
