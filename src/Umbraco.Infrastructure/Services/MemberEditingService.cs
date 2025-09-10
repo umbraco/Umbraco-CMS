@@ -50,54 +50,10 @@ internal sealed class MemberEditingService : IMemberEditingService
         => Task.FromResult(_memberService.GetById(key));
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(
-        MemberCreateModel createModel)
-    {
-        MemberEditingOperationStatus validationStatus = await ValidateMemberDataAsync(createModel, null, createModel.Password);
-        if (validationStatus is not MemberEditingOperationStatus.Success)
-        {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, new ContentValidationResult() { ValidationErrors = new List<PropertyValidationError>(){ MapStatusToPropertyValidationError(validationStatus)}});
-        }
-        return await _memberContentEditingService.ValidateAsync(createModel, createModel.ContentTypeKey);
-    }
+        MemberCreateModel createModel) =>
+        await ValidateMember(createModel, null, createModel.Password, createModel.ContentTypeKey);
 
-    private PropertyValidationError MapStatusToPropertyValidationError(MemberEditingOperationStatus memberEditingOperationStatus)
-    {
-        string alias;
-        string[] errorMessages;
-        switch (memberEditingOperationStatus)
-        {
-            case MemberEditingOperationStatus.InvalidName:
-                alias = "name";
-                errorMessages = ["Invalid or empty name"];
-                break;
-            case MemberEditingOperationStatus.InvalidPassword:
-                alias = "password";
-                errorMessages = ["Invalid password"];
-                break;
-            case MemberEditingOperationStatus.InvalidUsername:
-                alias = "username";
-                errorMessages = ["Invalid username"];
-                break;
-            case MemberEditingOperationStatus.InvalidEmail:
-                alias = "email";
-                errorMessages = ["Invalid email"];
-                break;
-            case MemberEditingOperationStatus.DuplicateUsername:
-                alias = "username";
-                errorMessages = ["Duplicate username"];
-                break;
-            case MemberEditingOperationStatus.DuplicateEmail:
-                alias = "email";
-                errorMessages = ["Duplicate email"];
-                break;
-            default:
-                alias = string.Empty;
-                errorMessages = [];
-                break;
-        }
 
-        return new PropertyValidationError { Alias = alias, Culture = null, Segment = null, ErrorMessages = errorMessages, JsonPath = string.Empty };
-    }
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MemberUpdateModel updateModel)
     {
@@ -106,8 +62,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
         }
-        MemberEditingOperationStatus validationStatus = await ValidateMemberDataAsync(updateModel, member.Key, updateModel.NewPassword);
-        return await _memberContentEditingService.ValidateAsync(updateModel, member.ContentType.Key);
+
+        return await ValidateMember(updateModel, key, updateModel.NewPassword, member.ContentType.Key);
     }
 
     public async Task<Attempt<MemberCreateResult, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user)
@@ -270,6 +226,73 @@ internal sealed class MemberEditingService : IMemberEditingService
                     ContentEditingOperationStatus = contentDeleteResult.Status
                 },
                 contentDeleteResult.Result);
+    }
+
+        private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateMember(MemberEditingModelBase model, Guid? memberKey, string? password, Guid memberTypeKey)
+    {
+        var validationErrors = new List<PropertyValidationError>();
+        MemberEditingOperationStatus validationStatus = await ValidateMemberDataAsync(model, memberKey, password);
+        if (validationStatus is not MemberEditingOperationStatus.Success)
+        {
+            validationErrors.Add(MapStatusToPropertyValidationError(validationStatus));
+        }
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> propertyValidation = await _memberContentEditingService.ValidateAsync(model, memberTypeKey);
+
+        if (propertyValidation.Success is false)
+        {
+            if (propertyValidation.Status is ContentEditingOperationStatus.ContentTypeNotFound)
+            {
+                Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
+            }
+            else
+            {
+                validationErrors.AddRange(propertyValidation.Result.ValidationErrors);
+            }
+        }
+
+        var result = new ContentValidationResult { ValidationErrors = validationErrors };
+        return result.ValidationErrors.Any() is false
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, result)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, result);
+    }
+
+    private PropertyValidationError MapStatusToPropertyValidationError(MemberEditingOperationStatus memberEditingOperationStatus)
+    {
+        string alias;
+        string[] errorMessages;
+        switch (memberEditingOperationStatus)
+        {
+            case MemberEditingOperationStatus.InvalidName:
+                alias = "name";
+                errorMessages = ["Invalid or empty name"];
+                break;
+            case MemberEditingOperationStatus.InvalidPassword:
+                alias = "password";
+                errorMessages = ["Invalid password"];
+                break;
+            case MemberEditingOperationStatus.InvalidUsername:
+                alias = "username";
+                errorMessages = ["Invalid username"];
+                break;
+            case MemberEditingOperationStatus.InvalidEmail:
+                alias = "email";
+                errorMessages = ["Invalid email"];
+                break;
+            case MemberEditingOperationStatus.DuplicateUsername:
+                alias = "username";
+                errorMessages = ["Duplicate username"];
+                break;
+            case MemberEditingOperationStatus.DuplicateEmail:
+                alias = "email";
+                errorMessages = ["Duplicate email"];
+                break;
+            default:
+                alias = string.Empty;
+                errorMessages = [];
+                break;
+        }
+
+        return new PropertyValidationError { Alias = alias, Culture = null, Segment = null, ErrorMessages = errorMessages, JsonPath = string.Empty };
     }
 
     private async Task<MemberEditingOperationStatus> ValidateMemberDataAsync(MemberEditingModelBase model, Guid? memberKey, string? password)
