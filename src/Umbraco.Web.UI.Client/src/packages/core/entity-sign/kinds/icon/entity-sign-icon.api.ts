@@ -10,7 +10,7 @@ export class UmbCreateEntityAction implements UmbEntitySignApi {
 	}
 
 	getLabel(): string {
-		return 'Create';
+		return this.#label;
 	}
 
 	destroy(): void {}

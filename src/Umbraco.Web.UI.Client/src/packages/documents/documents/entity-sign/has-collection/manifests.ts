@@ -9,6 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			iconName: 'icon-grid',
+			label: 'Has collection',
 		},
 	},
 ];

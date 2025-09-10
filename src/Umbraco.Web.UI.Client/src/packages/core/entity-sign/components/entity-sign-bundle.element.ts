@@ -65,6 +65,9 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 							this.requestUpdate('_labels');
 						});
 						this.#signLabelObservations.push(labelObservation);
+					} else if (sign.api?.getLabel) {
+						this._labels.set(sign.alias, sign.api?.getLabel() ?? '');
+						this.requestUpdate('_labels');
 					}
 				});
 				this._signs = signs;
@@ -78,7 +81,9 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			? repeat(
 					this._signs,
 					(c) => c.alias,
-					(c) => c.component,
+					(c) => {
+						return html`${c.component} — ${this._labels.get(c.alias)}<br />`;
+					},
 				)
 			: nothing;
 	}

@@ -1,9 +1,5 @@
-import type {
-	ManifestElement,
-	ManifestElementAndApi,
-	ManifestWithDynamicConditions,
-} from '@umbraco-cms/backoffice/extension-api';
-import type { UmbEntitySignElement } from './entity-sign-element.interface.js';
+import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbEntitySignElement } from './entity-sign-element.interface';
 import type { UmbEntitySignApi } from './entity-sign-api.interface.js';
 
 /**
