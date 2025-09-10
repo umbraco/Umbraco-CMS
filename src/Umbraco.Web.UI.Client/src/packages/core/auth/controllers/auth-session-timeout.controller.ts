@@ -2,7 +2,7 @@ import type { UmbAuthFlow } from '../auth-flow.js';
 import type { UmbAuthContext } from '../auth.context.js';
 import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/umb-auth-timeout-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbCurrentUserConfigRepository } from '@umbraco-cms/backoffice/user';
+import { UmbCurrentUserConfigRepository } from '@umbraco-cms/backoffice/current-user';
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	#tokenCheckWorker?: SharedWorker;
