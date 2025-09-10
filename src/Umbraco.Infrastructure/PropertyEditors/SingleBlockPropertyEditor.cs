@@ -26,19 +26,22 @@ public class SingleBlockPropertyEditor : DataEditor
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IIOHelper _ioHelper;
+    private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
 
     public SingleBlockPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
+        IIOHelper ioHelper,
+        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
         _jsonSerializer = jsonSerializer;
         _ioHelper = ioHelper;
+        _blockValuePropertyIndexValueFactory = blockValuePropertyIndexValueFactory;
     }
 
     // todo
-    // public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
+    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
     /// <inheritdoc/>
     public override bool SupportsConfigurableElements => true;
