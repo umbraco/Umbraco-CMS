@@ -2,10 +2,13 @@ import type { UmbAuthFlow } from '../auth-flow.js';
 import type { UmbAuthContext } from '../auth.context.js';
 import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/umb-auth-timeout-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbCurrentUserConfigRepository } from '@umbraco-cms/backoffice/user';
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	#tokenCheckWorker?: SharedWorker;
 	#host: UmbAuthContext;
+	#currentUserConfig = new UmbCurrentUserConfigRepository(this);
+	#keepUserLoggedIn = false;
 
 	constructor(host: UmbAuthContext, authFlow: UmbAuthFlow) {
 		super(host, 'UmbAuthSessionTimeoutController');
@@ -22,6 +25,15 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		// Listen for messages from the token check worker
 		this.#tokenCheckWorker.port.onmessage = async (event) => {
+			// If the user has chosen to stay logged in, we ignore the logout command and instead request a new token
+			if (this.#keepUserLoggedIn) {
+				console.log(
+					'[Auth Context] User chose to stay logged in, attempting to validate token instead of logging out.',
+				);
+				await this.#tryValidateToken();
+				return;
+			}
+
 			if (event.data?.command === 'logout') {
 				// If the worker signals a logout, we clear the token storage and set the user as unauthorized
 				host.timeOut();
@@ -60,12 +72,27 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			},
 			'_authFlowTimeoutSignal',
 		);
+
+		this.#observeCurrentUser();
 	}
 
 	override destroy(): void {
 		super.destroy();
 		this.#tokenCheckWorker?.port.close();
 		this.#tokenCheckWorker = undefined;
+	}
+
+	async #observeCurrentUser() {
+		await this.#currentUserConfig.initialized;
+
+		// Listen for current user config to see if we should stay logged in
+		this.observe(
+			this.#currentUserConfig.part('keepUserLoggedIn'),
+			(keepUserLoggedIn) => {
+				this.#keepUserLoggedIn = keepUserLoggedIn;
+			},
+			'_authFlowKeepUserLoggedIn',
+		);
 	}
 
 	async #closeTimeoutModal() {
