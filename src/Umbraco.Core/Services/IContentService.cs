@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -267,17 +268,38 @@ public interface IContentService : IPublishableContentService<IContent>
     bool HasChildren(int id);
 
     /// <summary>
-    ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
+    ///     Gets a dictionary of content Ids and their matching content schedules.
     /// </summary>
     /// <param name="keys">The content keys.</param>
     /// <returns>
-    ///     The provided collection of content keys filtered for those that are scheduled for publishing.
+    ///     A dictionary with a nodeId and an IEnumerable of matching ContentSchedules.
     /// </returns>
-    IEnumerable<Guid> GetScheduledContentKeys(IEnumerable<Guid> keys) => [];
+    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
+
 
     #endregion
 
     #region Save, Delete Document
+
+    /// <summary>
+    ///     Saves a document.
+    /// </summary>
+    OperationResult Save(IContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null);
+
+    /// <summary>
+    ///     Saves documents.
+    /// </summary>
+    // TODO: why only 1 result not 1 per content?!
+    OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Deletes a document.
+    /// </summary>
+    /// <remarks>
+    ///     <para>This method will also delete associated media files, child content and possibly associated domains.</para>
+    ///     <para>This method entirely clears the content from the database.</para>
+    /// </remarks>
+    OperationResult Delete(IContent content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes all documents of a given document type.
@@ -361,6 +383,19 @@ public interface IContentService : IPublishableContentService<IContent>
     #endregion
 
     #region Publish Document
+
+    /// <summary>
+    ///     Publishes a document.
+    /// </summary>
+    /// <remarks>
+    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
+    ///     <para>Wildcards (*) can be used as culture identifier to publish all cultures.</para>
+    ///     <para>An empty array (or a wildcard) can be passed for culture invariant content.</para>
+    /// </remarks>
+    /// <param name="content">The document to publish.</param>
+    /// <param name="cultures">The cultures to publish.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Publishes a document branch.
