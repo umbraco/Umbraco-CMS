@@ -8,7 +8,7 @@ import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbMemoryModel } from '@umbraco-cms/backoffice/memory';
+import type { UmbInteractionMemoryModel } from 'src/packages/core/interaction-memory/index.js';
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
@@ -26,7 +26,7 @@ export class UmbPickerInputContext<
 	public readonly selection;
 	public readonly selectedItems;
 
-	#memory = new UmbObjectState<UmbMemoryModel | undefined>(undefined);
+	#memory = new UmbObjectState<UmbInteractionMemoryModel | undefined>(undefined);
 	public readonly memory = this.#memory.asObservable();
 
 	/**

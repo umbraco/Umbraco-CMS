@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
-import type { UmbMemoryModel } from '@umbraco-cms/backoffice/memory';
+import type { UmbInteractionMemoryModel } from 'src/packages/core/interaction-memory/index.js';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -124,10 +124,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	#readonly = false;
 
 	@property({ type: Object, attribute: false })
-	public get memory(): UmbMemoryModel | undefined {
+	public get memory(): UmbInteractionMemoryModel | undefined {
 		return this.#memory;
 	}
-	public set memory(value: UmbMemoryModel | undefined) {
+	public set memory(value: UmbInteractionMemoryModel | undefined) {
 		this.#memory = value;
 
 		// Check if we have a memory for this input, by looking for a memory with the same unique as this input.
@@ -136,8 +136,8 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 
 	#memoryUnique = 'UmbInputDocument';
-	#memory?: UmbMemoryModel;
-	#inputDocumentMemory?: UmbMemoryModel;
+	#memory?: UmbInteractionMemoryModel;
+	#inputDocumentMemory?: UmbInteractionMemoryModel;
 
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
@@ -176,7 +176,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			(memory) => {
 				if (!memory) return;
 
-				const inputDocumentMemory: UmbMemoryModel = {
+				const inputDocumentMemory: UmbInteractionMemoryModel = {
 					unique: 'UmbInputDocument',
 					memories: [memory],
 				};

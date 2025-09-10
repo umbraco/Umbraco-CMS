@@ -1,15 +1,14 @@
-import type { UmbMemoryManager } from '../../../memory/memory.manager.js';
-import type { UmbMemoryModel } from '../../types.js';
 import type { UmbPickerSearchManagerConfig } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbInteractionMemoryManager, UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/memory';
 import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbPickerSearchManagerArgs {
-	memoryManager?: UmbMemoryManager;
+	interactionMemoryManager?: UmbInteractionMemoryManager;
 }
 
 /**
@@ -42,21 +41,21 @@ export class UmbPickerSearchManager<
 	#config?: UmbPickerSearchManagerConfig;
 	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, SearchRequestArgsType>;
 
-	#memoryManager?: UmbMemoryManager;
-	#memoryUnique: string = 'UmbPickerSearch';
+	#interactionMemoryManager?: UmbInteractionMemoryManager;
+	#interactionMemoryUnique: string = 'UmbPickerSearch';
 
 	/**
 	 * Creates an instance of UmbPickerSearchManager.
 	 * @param {UmbControllerHost} host The controller host for the search manager.
 	 * @param args Optional arguments for the search manager.
-	 * @param {UmbMemoryManager} [args.memory] An optional memory manager to store selected items.
+	 * @param {UmbInteractionMemoryManager} [args.interactionMemoryManager] An optional memory manager to store selected items.
 	 * @memberof UmbPickerSearchManager
 	 */
 	constructor(host: UmbControllerHost, args?: UmbPickerSearchManagerArgs) {
 		super(host);
-		if (args?.memoryManager) {
-			this.#memoryManager = args.memoryManager;
-			this.#observeMemory();
+		if (args?.interactionMemoryManager) {
+			this.#interactionMemoryManager = args.interactionMemoryManager;
+			this.#observeInteractionMemory();
 		}
 	}
 
@@ -133,7 +132,7 @@ export class UmbPickerSearchManager<
 		this.#resultItems.setValue([]);
 		this.#searching.setValue(false);
 		this.#resultTotalItems.setValue(0);
-		this.#memoryManager?.delete(this.#memoryUnique);
+		this.#interactionMemoryManager?.deleteMemory(this.#interactionMemoryUnique);
 	}
 
 	/**
@@ -216,37 +215,36 @@ export class UmbPickerSearchManager<
 		this.#searching.setValue(false);
 	}
 
-	#observeMemory() {
-		this.observe(this.#memoryManager?.memory(this.#memoryUnique), (memory) => {
+	#observeInteractionMemory() {
+		this.observe(this.#interactionMemoryManager?.memory(this.#interactionMemoryUnique), (memory) => {
 			console.log(memory);
 
 			if (memory) {
-				this.#getAndApplySearchRequestMemory();
+				this.#applySearchRequestInteractionMemory(memory);
 			}
 		});
 	}
 
 	#setSearchRequestMemory(args: SearchRequestArgsType) {
 		// Add a memory entry with the latest request args
-		const memory: UmbMemoryModel = {
-			unique: this.#memoryUnique,
+		const memory: UmbInteractionMemoryModel = {
+			unique: this.#interactionMemoryUnique,
 			values: [
 				{
-					unique: this.#memoryUnique + 'LatestRequestArgs',
+					unique: this.#interactionMemoryUnique + 'LatestRequestArgs',
 					requestArgs: args,
 				},
 			],
 		};
 
-		this.#memoryManager?.setMemory(memory);
+		this.#interactionMemoryManager?.setMemory(memory);
 	}
 
-	#getAndApplySearchRequestMemory() {
-		const memory = this.#memoryManager?.getMemory(this.#memoryUnique);
-		const memoryData = memory?.values?.find((x) => x.unique === `${this.#memoryUnique}LatestRequestArgs`);
+	#applySearchRequestInteractionMemory(memory: UmbInteractionMemoryModel) {
+		const memoryValue = memory?.values?.find((x) => x.unique === this.#interactionMemoryUnique + 'LatestRequestArgs');
 
-		if (memoryData?.requestArgs) {
-			this.#query.setValue(memoryData.requestArgs);
+		if (memoryValue?.requestArgs) {
+			this.#query.setValue(memoryValue.requestArgs);
 			this.search();
 		}
 	}

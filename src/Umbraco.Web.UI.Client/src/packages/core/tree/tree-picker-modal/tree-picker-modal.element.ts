@@ -7,7 +7,7 @@ import { UmbModalBaseElement, type UmbModalRejectReason } from '@umbraco-cms/bac
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbMemoryModel } from '@umbraco-cms/backoffice/memory';
+import type { UmbInteractionMemoryModel } from 'src/packages/core/interaction-memory/index.js';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
@@ -175,7 +175,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		const pickerMemories = this.#pickerContext.memory.getAll();
 		if (pickerMemories?.length === 0) return;
 
-		const pickerModalMemory: UmbMemoryModel = {
+		const pickerModalMemory: UmbInteractionMemoryModel = {
 			unique: 'UmbTreeItemPickerModal',
 			memories: pickerMemories,
 		};

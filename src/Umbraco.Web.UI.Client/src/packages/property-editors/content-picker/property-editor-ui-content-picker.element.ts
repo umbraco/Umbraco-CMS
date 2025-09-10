@@ -16,7 +16,7 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
-import { UMB_MEMORY_CONTEXT, type UmbMemoryModel } from '@umbraco-cms/backoffice/memory';
+import { UMB_INTERACTION_MEMORY_CONTEXT, type UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/memory';
 
 // import of local component
 import './components/input-content/index.js';
@@ -68,10 +68,10 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _invalidData?: UmbContentPickerValueType;
 
 	@state()
-	private _memory?: UmbMemoryModel;
+	private _memory?: UmbInteractionMemoryModel;
 
 	#dataTypeUnique?: string;
-	#memoryContext?: typeof UMB_MEMORY_CONTEXT.TYPE;
+	#memoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
 
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
 	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
@@ -123,7 +123,7 @@ export class UmbPropertyEditorUIContentPickerElement
 			});
 		});
 
-		this.consumeContext(UMB_MEMORY_CONTEXT, (context) => {
+		this.consumeContext(UMB_INTERACTION_MEMORY_CONTEXT, (context) => {
 			this.#memoryContext = context;
 			this.#getMemory();
 		});
@@ -198,22 +198,22 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (!memoryUnique) return;
 		if (!this.#memoryContext) return;
 
-		this._memory = this.#memoryContext.memory.get(memoryUnique);
+		this._memory = this.#memoryContext.memory.getMemory(memoryUnique);
 		console.log('Memory', memoryUnique, this._memory);
 	}
 
-	#setMemory(memory: UmbMemoryModel) {
+	#setMemory(memory: UmbInteractionMemoryModel) {
 		const memoryUnique = this.#getMemoryUnique();
 		if (!memoryUnique) return;
 		if (!this.#memoryContext) return;
 
 		// Set up memory for this context which includes all memories from the input
-		const inputMemory: UmbMemoryModel = {
+		const inputMemory: UmbInteractionMemoryModel = {
 			unique: memoryUnique,
 			memories: memory.memories,
 		};
 
-		this.#memoryContext.memory.set(inputMemory);
+		this.#memoryContext.memory.setMemory(inputMemory);
 	}
 
 	#getMemoryUnique() {

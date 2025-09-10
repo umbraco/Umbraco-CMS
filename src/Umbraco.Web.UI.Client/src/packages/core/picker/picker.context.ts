@@ -4,7 +4,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UmbMemoryManager } from '@umbraco-cms/backoffice/memory';
+import { UmbMemoryManager } from 'src/packages/core/interaction-memory/index.js';
 
 export class UmbPickerContext extends UmbContextBase {
 	public readonly memory = new UmbMemoryManager(this);
