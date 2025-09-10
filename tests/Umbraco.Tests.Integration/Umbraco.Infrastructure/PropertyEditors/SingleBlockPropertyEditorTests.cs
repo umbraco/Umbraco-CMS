@@ -45,7 +45,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
     [Theory]
     [TestCase(AllTypes)]
     [TestCase(MetaType)]
-    public async Task CanSelectDifferentConfiguredBlock(string elementTypeName)
+    public async Task Can_Select_Different_Configured_Block(string elementTypeName)
     {
         if (elementTypeName != AllTypes && elementTypeName != MetaType)
         {
@@ -149,7 +149,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
     [TestCase(MetaType, true)]
     [TestCase(TextType, false)]
     [Ignore("Reenable when configured block validation is introduced")]
-    public async Task ValidatesConfiguredBlocks(string elementTypeName, bool shouldPass)
+    public async Task Validates_Configured_Blocks(string elementTypeName, bool shouldPass)
     {
         if (elementTypeName != AllTypes && elementTypeName != MetaType && elementTypeName != TextType)
         {
@@ -272,7 +272,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
     /// There should be some validation when publishing through the contentEditingService
     /// </summary>
     [Test]
-    public async Task CanNotSelectMultipleConfiguredBlocks()
+    public async Task Cannot_Select_Multiple_Configured_Blocks()
     {
         var textPageContentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         textPageContentType.AllowedTemplates = [];
@@ -362,7 +362,6 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             Assert.AreEqual("block", validationError.Alias);
             Assert.AreEqual(expectedErrorMessage, validationError.ErrorMessages.Single());
         });
-
     }
 
     [Test]
