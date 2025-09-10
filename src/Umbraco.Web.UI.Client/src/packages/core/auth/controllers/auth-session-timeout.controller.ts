@@ -2,13 +2,14 @@ import type { UmbAuthFlow } from '../auth-flow.js';
 import type { UmbAuthContext } from '../auth.context.js';
 import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/umb-auth-timeout-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbCurrentUserConfigRepository } from '@umbraco-cms/backoffice/current-user';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	#tokenCheckWorker?: SharedWorker;
 	#host: UmbAuthContext;
-	#currentUserConfig = new UmbCurrentUserConfigRepository(this);
 	#keepUserLoggedIn = false;
+	#hasCheckedKeepUserLoggedIn = false;
 
 	constructor(host: UmbAuthContext, authFlow: UmbAuthFlow) {
 		super(host, 'UmbAuthSessionTimeoutController');
@@ -73,7 +74,15 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			'_authFlowTimeoutSignal',
 		);
 
-		this.#observeCurrentUser();
+		this.observe(
+			host.isAuthorized,
+			(isAuthorized) => {
+				if (isAuthorized) {
+					this.#observeKeepUserLoggedIn();
+				}
+			},
+			'_authFlowIsAuthorizedSignal',
+		);
 	}
 
 	override destroy(): void {
@@ -82,17 +91,17 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		this.#tokenCheckWorker = undefined;
 	}
 
-	async #observeCurrentUser() {
-		await this.#currentUserConfig.initialized;
-
-		// Listen for current user config to see if we should stay logged in
-		this.observe(
-			this.#currentUserConfig.part('keepUserLoggedIn'),
-			(keepUserLoggedIn) => {
-				this.#keepUserLoggedIn = keepUserLoggedIn;
-			},
-			'_authFlowKeepUserLoggedIn',
-		);
+	/**
+	 * Observe the user's preference for staying logged in
+	 * and update the internal state accordingly.
+	 * This method fetches the current user configuration from the server to find the value.
+	 * // TODO: We cannot observe the config store directly here yet, as it would create a circular dependency, so maybe we need to move the config option somewhere else?
+	 */
+	async #observeKeepUserLoggedIn() {
+		if (this.#hasCheckedKeepUserLoggedIn) return;
+		this.#hasCheckedKeepUserLoggedIn = true;
+		const { data } = await tryExecute(this, UserService.getUserCurrentConfiguration(), { disableNotifications: true });
+		this.#keepUserLoggedIn = data?.keepUserLoggedIn ?? false;
 	}
 
 	async #closeTimeoutModal() {
