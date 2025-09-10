@@ -2,11 +2,11 @@
  * Creator Name: The Umbraco community
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
- * Language Alias: en
- * Language Int Name: English (UK)
- * Language Local Name: English (UK)
- * Language LCID:
- * Language Culture: en-GB
+ * Language Alias: vi
+ * Language Int Name: Vietnamese (VI)
+ * Language Local Name: Tiếng Việt (VI)
+ * Language LCID: 1066
+ * Language Culture: vi-VN
  */
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
 
