@@ -6,6 +6,7 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import type { UmbMemoryModel } from '@umbraco-cms/backoffice/picker';
 
 @customElement('umb-input-content')
 export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -74,6 +75,9 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	@property({ type: Boolean, reflect: true })
 	readonly = false;
 
+	@property({ type: Object, attribute: false })
+	memory?: UmbMemoryModel;
+
 	#entityTypeLookup = { content: 'document', media: 'media', member: 'member' };
 
 	#selection: Array<string> = [];
@@ -111,6 +115,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.minMessage=${this.minMessage}
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
+				.memory=${this.memory}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}></umb-input-document>
 		`;

@@ -8,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
+import type { UmbMemoryModel } from '@umbraco-cms/backoffice/memory';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -37,10 +38,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
-		this.#pickerContext.min = value;
+		this.#pickerInputContext.min = value;
 	}
 	public get min(): number {
-		return this.#pickerContext.min;
+		return this.#pickerInputContext.min;
 	}
 
 	/**
@@ -60,10 +61,10 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
-		this.#pickerContext.max = value;
+		this.#pickerInputContext.max = value;
 	}
 	public get max(): number {
-		return this.#pickerContext.max;
+		return this.#pickerInputContext.max;
 	}
 
 	/**
@@ -76,11 +77,11 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+		this.#pickerInputContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
 	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
+		return this.#pickerInputContext.getSelection();
 	}
 
 	@property({ type: Object, attribute: false })
@@ -122,10 +123,26 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 	#readonly = false;
 
+	@property({ type: Object, attribute: false })
+	public get memory(): UmbMemoryModel | undefined {
+		return this.#memory;
+	}
+	public set memory(value: UmbMemoryModel | undefined) {
+		this.#memory = value;
+
+		// Check if we have a memory for this input, by looking for a memory with the same unique as this input.
+		// If we find one, we set it as the inputDocumentMemory, which is then passed to the picker modal when opened.
+		this.#inputDocumentMemory = value?.memories?.find((memory) => memory.unique === this.#memoryUnique);
+	}
+
+	#memoryUnique = 'UmbInputDocument';
+	#memory?: UmbMemoryModel;
+	#inputDocumentMemory?: UmbMemoryModel;
+
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
 
-	#pickerContext = new UmbDocumentPickerInputContext(this);
+	#pickerInputContext = new UmbDocumentPickerInputContext(this);
 
 	constructor() {
 		super();
@@ -142,15 +159,41 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			() => !!this.max && this.selection.length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
+		this.observe(
+			this.#pickerInputContext.selection,
+			(selection) => (this.value = selection.join(',')),
+			'_observeSelection',
+		);
+
+		this.observe(
+			this.#pickerInputContext.selectedItems,
+			(selectedItems) => (this._items = selectedItems),
+			'_observerItems',
+		);
+
+		this.observe(
+			this.#pickerInputContext.memory,
+			(memory) => {
+				if (!memory) return;
+
+				const inputDocumentMemory: UmbMemoryModel = {
+					unique: 'UmbInputDocument',
+					memories: [memory],
+				};
+
+				this.#inputDocumentMemory = inputDocumentMemory;
+				console.log('Input Document Memory:', inputDocumentMemory);
+			},
+			'umbObservePickerInputMemory',
+		);
 	}
 
 	#openPicker() {
-		this.#pickerContext.openPicker(
+		this.#pickerInputContext.openPicker(
 			{
 				hideTreeRoot: true,
 				startNode: this.startNode,
+				memory: this.#inputDocumentMemory,
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
@@ -163,7 +206,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 
 	#onRemove(item: UmbDocumentItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+		this.#pickerInputContext.requestRemoveItem(item.unique);
 	}
 
 	override render() {

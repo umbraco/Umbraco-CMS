@@ -3,10 +3,11 @@ import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement, type UmbModalRejectReason } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbMemoryModel } from '@umbraco-cms/backoffice/memory';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
@@ -68,6 +69,16 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				...this._selectionConfiguration,
 				multiple,
 			};
+
+			if (this.data?.memory) {
+				/* Check if the memory has any memories with the same unique as the picker context memories
+				 and if so, apply them to the picker context. */
+				const pickerModalMemory = this.data.memory.memories?.find(
+					(memory) => memory.unique === 'UmbTreeItemPickerModal',
+				);
+
+				pickerModalMemory?.memories?.forEach((memory) => this.#pickerContext.memory.setMemory(memory));
+			}
 		}
 
 		if (_changedProperties.has('value')) {
@@ -147,6 +158,29 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					this.requestUpdate('_createPath', oldPath);
 				});
 		}
+	}
+
+	protected override _submitModal() {
+		this.#setTreeItemPickerModalMemory();
+		super._submitModal();
+	}
+
+	protected override _rejectModal(reason?: UmbModalRejectReason) {
+		this.#setTreeItemPickerModalMemory();
+		super._rejectModal(reason);
+	}
+
+	#setTreeItemPickerModalMemory() {
+		// Get all memories from the picker context and set them as on combined memory for the picker modal
+		const pickerMemories = this.#pickerContext.memory.getAll();
+		if (pickerMemories?.length === 0) return;
+
+		const pickerModalMemory: UmbMemoryModel = {
+			unique: 'UmbTreeItemPickerModal',
+			memories: pickerMemories,
+		};
+
+		this.modalContext?.setMemory(pickerModalMemory);
 	}
 
 	override render() {

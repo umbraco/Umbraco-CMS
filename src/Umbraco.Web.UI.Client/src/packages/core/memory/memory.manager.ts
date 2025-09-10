@@ -1,7 +1,7 @@
 import type { UmbMemoryModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbMemoryManager extends UmbControllerBase {
+export class UmbPickerMemoryManager extends UmbControllerBase {
 	#memories = new Map<string, UmbMemoryModel>();
 
 	get(unique: string): UmbMemoryModel | undefined {

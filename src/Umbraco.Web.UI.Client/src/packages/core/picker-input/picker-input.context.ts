@@ -2,11 +2,13 @@ import { UMB_PICKER_INPUT_CONTEXT } from './picker-input.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbMemoryModel } from '@umbraco-cms/backoffice/memory';
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
@@ -21,8 +23,11 @@ export class UmbPickerInputContext<
 
 	#itemManager;
 
-	selection;
-	selectedItems;
+	public readonly selection;
+	public readonly selectedItems;
+
+	#memory = new UmbObjectState<UmbMemoryModel | undefined>(undefined);
+	public readonly memory = this.#memory.asObservable();
 
 	/**
 	 * Define a minimum amount of selected items in this input, for this input to be valid.
@@ -91,7 +96,13 @@ export class UmbPickerInputContext<
 
 	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
 		await this.#itemManager.init;
-		const modalValue = await umbOpenModal(this, this.modalAlias, {
+
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		if (!modalManagerContext) {
+			throw new Error('Modal manager not found.');
+		}
+
+		const modalContext = modalManagerContext.open(this, this.modalAlias, {
 			data: {
 				multiple: this._max === 1 ? false : true,
 				...pickerData,
@@ -99,7 +110,15 @@ export class UmbPickerInputContext<
 			value: {
 				selection: this.getSelection(),
 			} as PickerModalValueType,
-		}).catch(() => undefined);
+		});
+
+		const modalValue = await modalContext.onSubmit().catch(() => undefined);
+
+		/* Check if we have any memory from the modal, and if so, 
+		apply it to the picker input context so it can be reached from the input element. */
+		const modalMemory = modalContext?.getMemory();
+		this.#memory.setValue(modalMemory);
+
 		if (!modalValue) return;
 
 		this.setSelection(modalValue.selection);

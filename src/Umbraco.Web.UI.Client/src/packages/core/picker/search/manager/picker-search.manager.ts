@@ -1,5 +1,5 @@
-import type { UmbPickerMemoryManager } from '../../memory/picker-memory.manager.js';
-import type { UmbPickerMemory } from '../../memory/types.js';
+import type { UmbMemoryManager } from '../../../memory/memory.manager.js';
+import type { UmbMemoryModel } from '../../types.js';
 import type { UmbPickerSearchManagerConfig } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -8,14 +8,8 @@ import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '
 import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 
-interface UmbPickerSearchMemory extends UmbPickerMemory {
-	data: {
-		requestArgs: UmbSearchRequestArgs;
-	};
-}
-
 export interface UmbPickerSearchManagerArgs {
-	memoryManager?: UmbPickerMemoryManager;
+	memoryManager?: UmbMemoryManager;
 }
 
 /**
@@ -48,22 +42,21 @@ export class UmbPickerSearchManager<
 	#config?: UmbPickerSearchManagerConfig;
 	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, SearchRequestArgsType>;
 
-	#memoryManager?: UmbPickerMemoryManager;
+	#memoryManager?: UmbMemoryManager;
 	#memoryUnique: string = 'UmbPickerSearch';
 
 	/**
 	 * Creates an instance of UmbPickerSearchManager.
 	 * @param {UmbControllerHost} host The controller host for the search manager.
 	 * @param args Optional arguments for the search manager.
-	 * @param {UmbPickerMemoryManager} [args.memory] An optional memory manager to store selected items.
+	 * @param {UmbMemoryManager} [args.memory] An optional memory manager to store selected items.
 	 * @memberof UmbPickerSearchManager
 	 */
 	constructor(host: UmbControllerHost, args?: UmbPickerSearchManagerArgs) {
 		super(host);
-
 		if (args?.memoryManager) {
 			this.#memoryManager = args.memoryManager;
-			this.#getAndApplyMemory();
+			this.#observeMemory();
 		}
 	}
 
@@ -214,7 +207,7 @@ export class UmbPickerSearchManager<
 			dataTypeUnique: this.#config?.dataTypeUnique,
 		};
 
-		this.#addMemory(args);
+		this.#setSearchRequestMemory(args);
 
 		const { data } = await this.#searchProvider.search(args);
 		const items = (data?.items as ResultItemType[]) ?? [];
@@ -223,21 +216,37 @@ export class UmbPickerSearchManager<
 		this.#searching.setValue(false);
 	}
 
-	#addMemory(args: SearchRequestArgsType) {
-		const memory: UmbPickerSearchMemory = {
-			unique: this.#memoryUnique,
-			data: {
-				requestArgs: args,
-			},
-		};
+	#observeMemory() {
+		this.observe(this.#memoryManager?.memory(this.#memoryUnique), (memory) => {
+			console.log(memory);
 
-		this.#memoryManager?.append(memory);
+			if (memory) {
+				this.#getAndApplySearchRequestMemory();
+			}
+		});
 	}
 
-	#getAndApplyMemory() {
-		const memory = this.#memoryManager?.get(this.#memoryUnique);
-		if (memory?.data?.requestArgs) {
-			this.#query.setValue(memory.data.requestArgs);
+	#setSearchRequestMemory(args: SearchRequestArgsType) {
+		// Add a memory entry with the latest request args
+		const memory: UmbMemoryModel = {
+			unique: this.#memoryUnique,
+			values: [
+				{
+					unique: this.#memoryUnique + 'LatestRequestArgs',
+					requestArgs: args,
+				},
+			],
+		};
+
+		this.#memoryManager?.setMemory(memory);
+	}
+
+	#getAndApplySearchRequestMemory() {
+		const memory = this.#memoryManager?.getMemory(this.#memoryUnique);
+		const memoryData = memory?.values?.find((x) => x.unique === `${this.#memoryUnique}LatestRequestArgs`);
+
+		if (memoryData?.requestArgs) {
+			this.#query.setValue(memoryData.requestArgs);
 			this.search();
 		}
 	}
