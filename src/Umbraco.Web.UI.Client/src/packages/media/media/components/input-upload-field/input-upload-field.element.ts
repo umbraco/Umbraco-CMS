@@ -93,7 +93,7 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 	}
 
 	async #getPreviewElementAlias() {
-		if (!this.value.src) return;
+		if (!this.value?.src) return;
 		const manifests = await this.#getManifests();
 		const fallbackAlias = manifests.find((manifest) =>
 			stringOrStringArrayContains(manifest.forMimeTypes, '*/*'),
@@ -165,7 +165,7 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 	}
 
 	override render() {
-		if (!this.temporaryFile && !this.value.src) {
+		if (!this.temporaryFile && !this.value?.src) {
 			return this.#renderDropzone();
 		}
 
