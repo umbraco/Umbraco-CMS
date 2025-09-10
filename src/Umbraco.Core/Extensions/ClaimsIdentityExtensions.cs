@@ -336,19 +336,6 @@ public static class ClaimsIdentityExtensions
             }
         }
     }
-    
-    /// <summary>
-    ///     Get the start media nodes from a ClaimsIdentity
-    /// </summary>
-    /// <param name="identity"></param>
-    /// <returns>Array of start media nodes</returns>
-    [Obsolete("Please use the UserExtensions class to access user start node info. Will be removed in V15.")]
-    public static int[] GetStartMediaNodes(this ClaimsIdentity identity) =>
-        identity.FindAll(x => x.Type == Constants.Security.StartMediaNodeIdClaimType)
-            .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)
-                ? i
-                : default)
-            .Where(x => x != default).ToArray();
 
     /// <summary>
     ///     Get the allowed applications from a ClaimsIdentity
