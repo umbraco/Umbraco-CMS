@@ -7,7 +7,7 @@ import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@um
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DocumentPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 
 export class UmbDocumentUserPermissionCondition
 	extends UmbConditionBase<UmbDocumentUserPermissionConditionConfig>
