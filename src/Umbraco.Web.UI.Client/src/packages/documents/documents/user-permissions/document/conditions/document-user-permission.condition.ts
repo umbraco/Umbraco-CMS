@@ -7,6 +7,7 @@ import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@um
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DocumentPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 
 export class UmbDocumentUserPermissionCondition
 	extends UmbConditionBase<UmbDocumentUserPermissionConditionConfig>
@@ -69,9 +70,9 @@ export class UmbDocumentUserPermissionCondition
 		if (!this.#entityType) return;
 		if (this.#unique === undefined) return;
 
-		const hasDocumentPermissions = this.#documentPermissions.length > 0;
+		const hasDocumentPermissions = this.#entityType === UMB_DOCUMENT_ENTITY_TYPE && this.#documentPermissions.length > 0;
 
-		// if there is no permissions for any documents we use the fallback permissions
+		// If there are no permissions for any documents we use the fallback permissions
 		if (!hasDocumentPermissions) {
 			this.#check(this.#fallbackPermissions);
 			return;
@@ -79,28 +80,28 @@ export class UmbDocumentUserPermissionCondition
 
 		// If there are document permissions, we need to check the full path to see if any permissions are defined for the current document
 		// If we find multiple permissions in the same path, we will apply the closest one
-		if (hasDocumentPermissions) {
-			// Path including the current document and all ancestors
-			const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
-			// Reverse the path to find the closest document permission quickly
-			const reversedPath = [...path].reverse();
-			const documentPermissionsMap = new Map(this.#documentPermissions.map((p) => [p.document.id, p]));
 
-			// Find the closest document permission in the path
-			const closestDocumentPermission = reversedPath.find((id) => documentPermissionsMap.has(id));
+		// Path including the current document and all ancestors
+		const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
 
-			// Retrieve the corresponding permission data
-			const match = closestDocumentPermission ? documentPermissionsMap.get(closestDocumentPermission) : undefined;
+		// Reverse the path to find the closest document permission quickly
+		const reversedPath = [...path].reverse();
+		const documentPermissionsMap = new Map(this.#documentPermissions.map((p) => [p.document.id, p]));
 
-			// no permissions for the current document - use the fallback permissions
-			if (!match) {
-				this.#check(this.#fallbackPermissions);
-				return;
-			}
+		// Find the closest document permission in the path
+		const closestDocumentPermission = reversedPath.find((id) => documentPermissionsMap.has(id));
 
-			// we found permissions - check them
-			this.#check(match.verbs);
+		// Retrieve the corresponding permission data
+		const match = closestDocumentPermission ? documentPermissionsMap.get(closestDocumentPermission) : undefined;
+
+		// No permissions for the current document - use the fallback permissions
+		if (!match) {
+			this.#check(this.#fallbackPermissions);
+			return;
 		}
+
+		// We found permissions - check them
+		this.#check(match.verbs);
 	}
 
 	#check(verbs: Array<string>) {
