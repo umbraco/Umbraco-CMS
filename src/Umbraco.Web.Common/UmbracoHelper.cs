@@ -347,7 +347,7 @@ public class UmbracoHelper
     public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars) =>
         _publishedContentQuery.ContentAtXPath(xpath, vars);
 
-    public IEnumerable<IPublishedContent> ContentAtRoot() => _publishedContentQuery.ContentAtRoot();
+    public IEnumerable<IPublishedContent> ContentAtRoot(string? culture = null) => _publishedContentQuery.ContentAtRoot(culture);
 
     #endregion
 

@@ -150,8 +150,8 @@ public class PublishedContentQuery : IPublishedContentQuery
     public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         => ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
 
-    public IEnumerable<IPublishedContent> ContentAtRoot()
-        => ItemsAtRoot(_publishedSnapshot.Content);
+    public IEnumerable<IPublishedContent> ContentAtRoot(string? culture = null)
+        => ItemsAtRoot(_publishedSnapshot.Content, culture);
 
     #endregion
 
@@ -232,8 +232,8 @@ public class PublishedContentQuery : IPublishedContentQuery
         IPublishedCache? cache)
         => cache?.GetByXPath(xpath, vars) ?? Array.Empty<IPublishedContent>();
 
-    private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache)
-        => cache?.GetAtRoot() ?? Array.Empty<IPublishedContent>();
+    private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache, string? culture = null)
+        => cache?.GetAtRoot(culture) ?? Array.Empty<IPublishedContent>();
 
     #endregion
 
