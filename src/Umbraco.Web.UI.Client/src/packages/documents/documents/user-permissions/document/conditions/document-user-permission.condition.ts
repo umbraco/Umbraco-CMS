@@ -70,7 +70,7 @@ export class UmbDocumentUserPermissionCondition
 		if (!this.#entityType) return;
 		if (this.#unique === undefined) return;
 
-		const hasDocumentPermissions = this.#entityType === UMB_DOCUMENT_ENTITY_TYPE && this.#documentPermissions.length > 0;
+		const hasDocumentPermissions = this.#isDocumentWithPermissions();
 
 		// If there are no permissions for any documents we use the fallback permissions
 		if (!hasDocumentPermissions) {
@@ -102,6 +102,10 @@ export class UmbDocumentUserPermissionCondition
 
 		// We found permissions - check them
 		this.#check(match.verbs);
+	}
+
+	#isDocumentWithPermissions() {
+		return this.#entityType === UMB_DOCUMENT_ENTITY_TYPE && this.#documentPermissions.length > 0;
 	}
 
 	#check(verbs: Array<string>) {
