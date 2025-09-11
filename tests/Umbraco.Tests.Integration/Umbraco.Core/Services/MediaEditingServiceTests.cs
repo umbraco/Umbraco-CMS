@@ -22,7 +22,6 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
 
     protected IMediaType ArticleMediaType { get; set; }
 
-
     [SetUp]
     public async Task Setup()
     {
@@ -31,50 +30,31 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cannot_Create_Media_With_Mandatory_Property_Without_File()
+    public async Task Cannot_Create_Media_With_Mandatory_File_Property_Without_Providing_File()
     {
-        var imageModel = CreateMediaCreateModel("Image", new Guid(), ImageMediaType.Key);
+        var imageModel = CreateMediaCreateModel("Image", Guid.NewGuid(), ImageMediaType.Key);
         var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
 
-        // Assert
         Assert.IsFalse(imageCreateAttempt.Success);
         Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, imageCreateAttempt.Status);
     }
 
     [Test]
-    public async Task Can_Create_Media_With_Mandatory_Property_With_File()
+    public async Task Can_Create_Media_With_Mandatory_File_Property_With_File_Provided()
     {
-        var imageModel = CreateMediaCreateModelWithFile("Image", new Guid(), ArticleMediaType.Key);
+        var imageModel = CreateMediaCreateModelWithFile("Image", Guid.NewGuid(), ArticleMediaType.Key);
         var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
 
-        // Assert
         Assert.IsTrue(imageCreateAttempt.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, imageCreateAttempt.Status);
     }
 
     [Test]
-    public async Task Can_Update_Media_With_Mandatory_Property_With_File()
+    public async Task Can_Create_Media_With_Optional_File_Property_Without_Providing_File()
     {
-        Guid guid = Guid.NewGuid();
-        var imageModel = CreateMediaCreateModelWithFile("Article", guid, ArticleMediaType.Key);
-        var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
-
-        // Assert
-        Assert.IsTrue(imageCreateAttempt.Success);
-
-        var json = new JsonObject();
-        json.Add("src", "");
-        var updateModel = new MediaUpdateModel { Properties = [new PropertyValueModel { Alias = "umbracoFile", Value = json }], Variants = imageModel.Variants };
-        var imageUpdateAttempt = await MediaEditingService.ValidateUpdateAsync(guid, updateModel);
-
-        Assert.IsFalse(imageUpdateAttempt.Success);
-    }
-
-    [Test]
-    public async Task Can_Create_Media_Without_Mandatory_Property()
-    {
-        ImageMediaType.PropertyTypes.First(x => x.Alias == "umbracoFile").Mandatory = false;
+        ImageMediaType.PropertyTypes.First(x => x.Alias == Constants.Conventions.Media.File).Mandatory = false;
         MediaTypeService.Save(ImageMediaType);
-        var imageModel = CreateMediaCreateModel("Image", new Guid(), ImageMediaType.Key);
+        var imageModel = CreateMediaCreateModel("Image", Guid.NewGuid(), ImageMediaType.Key);
         var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
 
         // Assert
@@ -82,29 +62,57 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(ContentEditingOperationStatus.Success, imageCreateAttempt.Status);
     }
 
-    private MediaCreateModel CreateMediaCreateModel(string name, Guid key, Guid mediaTypeKey)
+    [Test]
+    public async Task Can_Update_Media_With_Mandatory_File_Property_With_File_Provided()
+    {
+        Guid articleKey = Guid.NewGuid();
+        var articleModel = CreateMediaCreateModelWithFile("Article", articleKey, ArticleMediaType.Key);
+        var articleCreateAttempt = await MediaEditingService.CreateAsync(articleModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(articleCreateAttempt.Success);
+
+        var updateModel = new MediaUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel
+                {
+                    Alias = Constants.Conventions.Media.File,
+                    Value = new JsonObject
+                    {
+                        { "src", string.Empty },
+                    },
+                }
+            ],
+            Variants = articleModel.Variants,
+        };
+        var articleUpdateAttempt = await MediaEditingService.ValidateUpdateAsync(articleKey, updateModel);
+        Assert.IsFalse(articleUpdateAttempt.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, articleUpdateAttempt.Status);
+    }
+
+    private static MediaCreateModel CreateMediaCreateModel(string name, Guid key, Guid mediaTypeKey)
         => new()
         {
             ContentTypeKey = mediaTypeKey,
             ParentKey = Constants.System.RootKey,
-            Variants = [new () { Name = name }],
+            Variants = [new() { Name = name }],
             Key = key,
         };
 
-    private MediaCreateModel CreateMediaCreateModelWithFile(string name, Guid key, Guid mediaTypeKey)
+    private static MediaCreateModel CreateMediaCreateModelWithFile(string name, Guid key, Guid mediaTypeKey)
     {
-        var json = new JsonObject();
-        json.Add("src", "file");
-
-        return new MediaCreateModel
-        {
-            ContentTypeKey = mediaTypeKey,
-            ParentKey = Constants.System.RootKey,
-            Variants = [new () { Name = name }],
-            Key = key,
-            Properties = [
-                new PropertyValueModel { Alias = "umbracoFile", Value = json }
-            ],
-        };
+        var model = CreateMediaCreateModel(name, key, mediaTypeKey);
+        model.Properties = [
+                new PropertyValueModel
+                {
+                    Alias = Constants.Conventions.Media.File,
+                    Value = new JsonObject
+                    {
+                        { "src", "reference-to-file" },
+                    },
+                }
+            ];
+        return model;
     }
 }

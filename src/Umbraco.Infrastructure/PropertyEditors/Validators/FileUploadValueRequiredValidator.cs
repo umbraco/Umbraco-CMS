@@ -1,13 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Nodes;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 
-public class FileUploadValueRequiredValidator : RequiredValidator
+/// <summary>
+/// Custom validator for block value required validation.
+/// </summary>
+internal sealed class FileUploadValueRequiredValidator : RequiredValidator
 {
-
     /// <inheritdoc/>
     public override IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
     {
