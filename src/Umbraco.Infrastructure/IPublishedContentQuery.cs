@@ -35,6 +35,8 @@ public interface IPublishedContentQuery
 
     IEnumerable<IPublishedContent> ContentAtRoot();
 
+    IEnumerable<IPublishedContent> ContentAtRoot(string? culture = null);
+
     IPublishedContent? Media(int id);
 
     IPublishedContent? Media(Guid id);
