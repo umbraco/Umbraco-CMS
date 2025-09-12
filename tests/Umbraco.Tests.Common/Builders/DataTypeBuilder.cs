@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
@@ -193,6 +194,10 @@ public class DataTypeBuilder
             case Constants.PropertyEditors.Aliases.BlockList:
                 dataTypeBuilder.WithConfigurationEditor(
                     new BlockListConfigurationEditor(ioHelper) { DefaultConfiguration = configuration });
+                break;
+            case Constants.PropertyEditors.Aliases.SingleBlock:
+                dataTypeBuilder.WithConfigurationEditor(
+                    new SingleBlockConfigurationEditor(ioHelper) { DefaultConfiguration = configuration });
                 break;
             case Constants.PropertyEditors.Aliases.RichText:
                 dataTypeBuilder.WithConfigurationEditor(

@@ -1,0 +1,9 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem>
+@{
+    if (Model.ContentKey == Guid.Empty) { return; }
+    var data = Model.Content;
+}
+@await Html.PartialAsync(
+    Html.SingleBlockPartialWithFallback("singleBlock/Components/" + data.ContentType.Alias,
+        "blocklist/Components/" + data.ContentType.Alias )
+    , Model)
