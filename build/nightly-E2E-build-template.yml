@@ -1,0 +1,74 @@
+﻿parameters:
+  - name: testFolder
+    type: string
+    default: ''
+
+  - name: buildConfiguration
+    type: string
+    default: ''
+
+  - name: additionalEnvironmentVariables
+    type: string
+    default: 'false'
+
+steps:
+  - pwsh: |
+      dotnet restore UmbracoProject
+      cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
+    displayName: Restore project
+    workingDirectory: $(Agent.BuildDirectory)/app
+
+  # Update application to use necessary app settings
+  - pwsh: |
+      $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/${{ parameters.testFolder }}/AdditionalSetup"
+      $destinationPath = "UmbracoProject"
+      $jsonFiles = Get-ChildItem -Path $sourcePath -Filter "*.json"
+      if ($jsonFiles) {
+      $jsonFiles | ForEach-Object {
+        Write-Host "Copying: $($_.FullName)"
+        Copy-Item -Path $_.FullName -Destination $destinationPath -Force
+      }
+      } else {
+      Write-Host "No JSON files found."
+      }
+    displayName: Update application to use necessary app settings
+    workingDirectory: $(Agent.BuildDirectory)/app
+
+  # Update application to use necessary App_Plugins
+  - pwsh: |
+      $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/${{ parameters.testFolder }}/AdditionalSetup"
+      $destinationPath = "UmbracoProject"
+      $appPluginsFolders = Get-ChildItem -Path $sourcePath -Directory -Filter "App_Plugins"
+      if ($appPluginsFolders) {
+        foreach ($folder in $appPluginsFolders) {
+          Write-Host "Copying folder: $($folder.FullName)"
+          Copy-Item -Path $folder.FullName -Destination $destinationPath -Recurse -Force
+          }
+      } else {
+        Write-Host "No App_Plugins found."
+      }
+    displayName: Update application to use necessary app plugins
+    workingDirectory: $(Agent.BuildDirectory)/app
+
+  # Update application to use necessary classes
+  - pwsh: |
+      $sourcePath = "$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/tests/${{ parameters.testFolder }}/AdditionalSetup"
+      $destinationPath = "UmbracoProject"
+      $csharpFiles = Get-ChildItem -Path $sourcePath -Filter "*.cs"
+      if ($csharpFiles) {
+        $csharpFiles | ForEach-Object {
+          Write-Host "Copying: $($_.FullName)"
+          Copy-Item -Path $_.FullName -Destination $destinationPath -Force
+        }
+      } else {
+        Write-Host "No C# files found."
+      }
+    displayName: Update application to use necessary classes
+    workingDirectory: $(Agent.BuildDirectory)/app
+
+  - pwsh: |
+      dotnet build UmbracoProject --configuration ${{ parameters.buildConfiguration }} --no-restore
+      dotnet dev-certs https
+    displayName: Build application
+    workingDirectory: $(Agent.BuildDirectory)/app
+    condition: and(succeeded(), eq(variables['additionalEnvironmentVariables'], 'false'))
