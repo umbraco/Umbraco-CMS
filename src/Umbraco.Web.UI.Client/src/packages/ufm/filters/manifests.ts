@@ -57,4 +57,11 @@ export const manifests: Array<ManifestUfmFilter> = [
 		api: () => import('./word-limit.filter.js'),
 		meta: { alias: 'word-limit' },
 	},
+	{
+		type: 'ufmFilter',
+		alias: 'Umb.Filter.Prefix',
+		name: 'Prefix UFM Filter',
+		api: () => import('./prefix.filter.js'),
+		meta: { alias: 'prefix' },
+	}
 ];
