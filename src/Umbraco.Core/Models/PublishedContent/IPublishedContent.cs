@@ -97,13 +97,6 @@ public interface IPublishedContent : IPublishedElement
     PublishedItemType ItemType { get; }
 
     /// <summary>
-    ///     Gets the parent of the content item.
-    /// </summary>
-    /// <remarks>The parent of root content is <c>null</c>.</remarks>
-    [Obsolete("Please use either the IPublishedContent.Parent<>() extension method in the Umbraco.Extensions namespace, or IDocumentNavigationQueryService if you only need keys. Scheduled for removal in V16.")]
-    IPublishedContent? Parent { get; }
-
-    /// <summary>
     ///     Gets a value indicating whether the content is draft.
     /// </summary>
     /// <remarks>
@@ -138,10 +131,4 @@ public interface IPublishedContent : IPublishedElement
     ///     </para>
     /// </remarks>
     bool IsPublished(string? culture = null);
-
-    /// <summary>
-    ///     Gets the children of the content item that are available for the current culture.
-    /// </summary>
-    [Obsolete("Please use either the IPublishedContent.Children() extension method in the Umbraco.Extensions namespace, or IDocumentNavigationQueryService if you only need keys. Scheduled for removal in V16.")]
-    IEnumerable<IPublishedContent> Children { get; }
 }
