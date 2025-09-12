@@ -2,16 +2,8 @@ using Umbraco.Cms.Api.Management.ViewModels.Content;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public class DocumentVariantResponseModel : VariantResponseModelBase, IHasSigns
+public class DocumentVariantResponseModel : PublishableVariantResponseModelBase, IHasSigns
 {
-    public DocumentVariantState State { get; set; }
-
-    public DateTimeOffset? PublishDate { get; set; }
-
-    public DateTimeOffset? ScheduledPublishDate { get; set; }
-
-    public DateTimeOffset? ScheduledUnpublishDate { get; set; }
-
     private readonly List<SignModel> _signs = [];
 
     public Guid Id { get; }

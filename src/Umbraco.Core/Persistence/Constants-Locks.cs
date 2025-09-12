@@ -90,5 +90,10 @@ public static partial class Constants
         ///     All document URLs.
         /// </summary>
         public const int DocumentUrls = -345;
+
+        /// <summary>
+        ///     The entire element tree, i.e. all element items.
+        /// </summary>
+        public const int ElementTree = -346;
     }
 }

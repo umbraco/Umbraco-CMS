@@ -1,6 +1,4 @@
 using System.Collections.Immutable;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -10,7 +8,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the ContentService, which is an easy access to operations involving <see cref="IContent" />
 /// </summary>
-public interface IContentService : IContentServiceBase<IContent>
+public interface IContentService : IPublishableContentService<IContent>
 {
     #region Rollback
 
@@ -111,13 +109,6 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     <see cref="ContentScheduleCollection" />
     /// </returns>
     ContentScheduleCollection GetContentScheduleByContentId(int contentId);
-
-    /// <summary>
-    ///     Persists publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="contentSchedule"></param>
-    void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule);
 
     /// <summary>
     ///     Gets documents.
@@ -438,22 +429,6 @@ public interface IContentService : IContentServiceBase<IContent>
     IEnumerable<PublishResult> PublishBranch(IContent content, PublishBranchFilter publishBranchFilter, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Unpublishes a document.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         By default, unpublishes the document as a whole, but it is possible to specify a culture to be
-    ///         unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
-    ///         the document as a whole may or may not remain published.
-    ///     </para>
-    ///     <para>
-    ///         If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
-    ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
-    ///     </para>
-    /// </remarks>
-    PublishResult Unpublish(IContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Gets a value indicating whether a document is path-publishable.
     /// </summary>
     /// <remarks>A document is path-publishable when all its ancestors are published.</remarks>
@@ -533,7 +508,4 @@ public interface IContentService : IContentServiceBase<IContent>
     #endregion
 
     Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
-
-ContentScheduleCollection GetContentScheduleByContentId(Guid contentId) => StaticServiceProvider.Instance
-    .GetRequiredService<ContentService>().GetContentScheduleByContentId(contentId);
 }
