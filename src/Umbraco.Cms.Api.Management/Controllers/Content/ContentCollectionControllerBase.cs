@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
@@ -21,17 +21,17 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
     where TVariantResponseModel : VariantResponseModelBase
 {
     private readonly IUmbracoMapper _mapper;
-    private readonly SignProviderCollection _signProviders;
+    private readonly FlagProviderCollection _flagProviders;
 
-    protected ContentCollectionControllerBase(IUmbracoMapper mapper, SignProviderCollection signProvider)
+    protected ContentCollectionControllerBase(IUmbracoMapper mapper, FlagProviderCollection flagProvider)
     {
         _mapper = mapper;
-        _signProviders = signProvider;
+        _flagProviders = flagProvider;
     }
 
     [Obsolete("Use the constructer with all parameters. To be removed in Umbraco 18")]
     protected ContentCollectionControllerBase(IUmbracoMapper mapper)
-        : this(mapper, StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+        : this(mapper, StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 

@@ -2,31 +2,31 @@
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Api.Management.Services.Signs;
+namespace Umbraco.Cms.Api.Management.Services.Flags;
 
 /// <summary>
-/// Implements a <see cref="ISignProvider"/> that provides signs for documents that have pending changes.
+/// Implements a <see cref="IFlagProvider"/> that provides flags for documents that have pending changes.
 /// </summary>
-public class HasPendingChangesSignProvider : ISignProvider
+public class HasPendingChangesFlagProvider : IFlagProvider
 {
-    private const string Alias = Constants.Conventions.Signs.Prefix + "PendingChanges";
+    private const string Alias = Constants.Conventions.Flags.Prefix + "PendingChanges";
 
     /// <inheritdoc/>
-    public bool CanProvideSigns<TItem>()
-        where TItem : IHasSigns =>
+    public bool CanProvideFlags<TItem>()
+        where TItem : IHasFlags =>
         typeof(TItem) == typeof(DocumentVariantItemResponseModel) ||
         typeof(TItem) == typeof(DocumentVariantResponseModel);
 
 
     /// <inheritdoc/>
-    public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> items)
-        where TItem : IHasSigns
+    public Task PopulateFlagsAsync<TItem>(IEnumerable<TItem> items)
+        where TItem : IHasFlags
     {
         foreach (TItem item in items)
         {
             if (HasPendingChanges(item))
             {
-                item.AddSign(Alias);
+                item.AddFlag(Alias);
             }
         }
 

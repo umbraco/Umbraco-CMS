@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
@@ -18,8 +18,8 @@ public class AncestorsDictionaryTreeController : DictionaryTreeControllerBase
     }
 
     [ActivatorUtilitiesConstructor]
-    public AncestorsDictionaryTreeController(IEntityService entityService, SignProviderCollection signProviders, IDictionaryItemService dictionaryItemService)
-        : base(entityService, signProviders, dictionaryItemService)
+    public AncestorsDictionaryTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
+        : base(entityService, flagProviders, dictionaryItemService)
     {
     }
 

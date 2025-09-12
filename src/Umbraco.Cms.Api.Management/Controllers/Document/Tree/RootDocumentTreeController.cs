@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Security;
@@ -39,7 +39,7 @@ public class RootDocumentTreeController : DocumentTreeControllerBase
     [ActivatorUtilitiesConstructor]
     public RootDocumentTreeController(
         IEntityService entityService,
-        SignProviderCollection signProviders,
+        FlagProviderCollection flagProviders,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         IPublicAccessService publicAccessService,
@@ -48,7 +48,7 @@ public class RootDocumentTreeController : DocumentTreeControllerBase
         IDocumentPresentationFactory documentPresentationFactory)
         : base(
             entityService,
-            signProviders,
+            flagProviders,
             userStartNodeEntitiesService,
             dataTypeService,
             publicAccessService,

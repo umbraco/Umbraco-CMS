@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -35,12 +35,12 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     protected FolderTreeControllerBase(IEntityService entityService)
         : this(
               entityService,
-              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 
-    protected FolderTreeControllerBase(IEntityService entityService, SignProviderCollection signProviders)
-        : base(entityService, signProviders) =>
+    protected FolderTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders) =>
         _folderObjectTypeId = FolderObjectType.GetGuid();
 
     protected abstract UmbracoObjectTypes FolderObjectType { get; }

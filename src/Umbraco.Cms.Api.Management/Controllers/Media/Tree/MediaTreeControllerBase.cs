@@ -5,7 +5,7 @@ using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Entities;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -37,7 +37,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         IMediaPresentationFactory mediaPresentationFactory)
         : this(
               entityService,
-              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>(),
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
               userStartNodeEntitiesService,
               dataTypeService,
               appCaches,
@@ -49,13 +49,13 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
     [ActivatorUtilitiesConstructor]
     public MediaTreeControllerBase(
         IEntityService entityService,
-        SignProviderCollection signProviders,
+        FlagProviderCollection flagProviders,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, signProviders, userStartNodeEntitiesService, dataTypeService)
+        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
     {
         _appCaches = appCaches;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;

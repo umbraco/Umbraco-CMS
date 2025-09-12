@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
@@ -16,23 +16,23 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     where TValueResponseModelBase : ValueResponseModelBase
     where TVariantResponseModel : VariantResponseModelBase
 {
-    private readonly SignProviderCollection _signProviderCollection;
+    private readonly FlagProviderCollection _flagProviderCollection;
     private readonly IUmbracoMapper _mapper;
 
     [Obsolete("Please use the controller with all parameters, will be removed in Umbraco 18")]
     protected ContentCollectionPresentationFactory(IUmbracoMapper mapper)
         : this(
             mapper,
-            StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 
     protected ContentCollectionPresentationFactory(
         IUmbracoMapper mapper,
-        SignProviderCollection signProviderCollection)
+        FlagProviderCollection flagProviderCollection)
     {
         _mapper = mapper;
-        _signProviderCollection = signProviderCollection;
+        _flagProviderCollection = flagProviderCollection;
     }
 
     public async Task<List<TCollectionResponseModel>> CreateCollectionModelAsync(ListViewPagedModel<TContent> contentCollection)
@@ -55,18 +55,18 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
         await SetUnmappedProperties(contentCollection, collectionResponseModels);
 
 
-        await PopulateSigns(collectionResponseModels);
+        await PopulateFlags(collectionResponseModels);
 
         return collectionResponseModels;
     }
 
     protected virtual Task SetUnmappedProperties(ListViewPagedModel<TContent> contentCollection, List<TCollectionResponseModel> collectionResponseModels) => Task.CompletedTask;
 
-    private async Task PopulateSigns(IEnumerable<TCollectionResponseModel> models)
+    private async Task PopulateFlags(IEnumerable<TCollectionResponseModel> models)
     {
-        foreach (ISignProvider signProvider in _signProviderCollection.Where(x => x.CanProvideSigns<TCollectionResponseModel>()))
+        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<TCollectionResponseModel>()))
         {
-            await signProvider.PopulateSignsAsync(models);
+            await signProvider.PopulateFlagsAsync(models);
         }
     }
 }

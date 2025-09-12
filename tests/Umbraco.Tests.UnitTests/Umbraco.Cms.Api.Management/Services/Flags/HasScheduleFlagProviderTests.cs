@@ -1,6 +1,6 @@
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
@@ -11,43 +11,43 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Signs;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Flags;
 
 [TestFixture]
-internal class HasScheduleSignProviderTests
+internal class HasScheduleFlagProviderTests
 {
     [Test]
-    public void HasScheduleSignProvider_Can_Provide_Document_Tree_Signs()
+    public void HasScheduleFlagProvider_Can_Provide_Document_Tree_Flags()
     {
         var contentServiceMock = new Mock<IContentService>();
         var idKeyMapMock = new Mock<IIdKeyMap>();
 
-        var sut = new HasScheduleSignProvider(contentServiceMock.Object, idKeyMapMock.Object);
-        Assert.IsTrue(sut.CanProvideSigns<DocumentTreeItemResponseModel>());
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        Assert.IsTrue(sut.CanProvideFlags<DocumentTreeItemResponseModel>());
     }
 
     [Test]
-    public void HasScheduleSignProvider_Can_Provide_Document_Collection_Signs()
+    public void HasScheduleFlagProvider_Can_Provide_Document_Collection_Flags()
     {
         var contentServiceMock = new Mock<IContentService>();
         var idKeyMapMock = new Mock<IIdKeyMap>();
 
-        var sut = new HasScheduleSignProvider(contentServiceMock.Object, idKeyMapMock.Object);
-        Assert.IsTrue(sut.CanProvideSigns<DocumentCollectionResponseModel>());
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        Assert.IsTrue(sut.CanProvideFlags<DocumentCollectionResponseModel>());
     }
 
     [Test]
-    public void HasScheduleSignProvider_Can_Provide_Document_Item_Signs()
+    public void HasScheduleFlagProvider_Can_Provide_Document_Item_Flags()
     {
         var contentServiceMock = new Mock<IContentService>();
         var idKeyMapMock = new Mock<IIdKeyMap>();
 
-        var sut = new HasScheduleSignProvider(contentServiceMock.Object, idKeyMapMock.Object);
-        Assert.IsTrue(sut.CanProvideSigns<DocumentItemResponseModel>());
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        Assert.IsTrue(sut.CanProvideFlags<DocumentItemResponseModel>());
     }
 
     [Test]
-    public async Task HasScheduleSignProvider_Should_Populate_Document_Tree_Signs()
+    public async Task HasScheduleFlagProvider_Should_Populate_Document_Tree_Flags()
     {
         var entities = new List<EntitySlim>
         {
@@ -67,7 +67,7 @@ internal class HasScheduleSignProviderTests
             .Returns(CreateContentSchedules());
 
 
-        var sut = new HasScheduleSignProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
 
         var variant1 = new DocumentVariantItemResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "en-EN" };
         var variant2 = new DocumentVariantItemResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "da-DA" };
@@ -78,18 +78,18 @@ internal class HasScheduleSignProviderTests
             new() { Id = entities[0].Key, Variants = [variant1, variant2] }, new() { Id = entities[1].Key, Variants = [variant3] },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "da-DA").Signs.Count(), 0);
-        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "en-EN").Signs.Count(), 1);
-        Assert.AreEqual(viewModels[1].Variants.First().Signs.Count(), 1);
+        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "da-DA").Flags.Count(), 0);
+        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "en-EN").Flags.Count(), 1);
+        Assert.AreEqual(viewModels[1].Variants.First().Flags.Count(), 1);
 
-        var signModel = viewModels[0].Variants.First().Signs.First();
-        Assert.AreEqual("Umb.ScheduledForPublish", signModel.Alias);
+        var flagModel = viewModels[0].Variants.First().Flags.First();
+        Assert.AreEqual("Umb.ScheduledForPublish", flagModel.Alias);
     }
 
     [Test]
-    public async Task HasScheduleSignProvider_Should_Populate_Document_Collection_Signs()
+    public async Task HasScheduleFlagProvider_Should_Populate_Document_Collection_Flags()
     {
         var entities = new List<EntitySlim>
         {
@@ -108,7 +108,7 @@ internal class HasScheduleSignProviderTests
             .Setup(x => x.GetContentSchedulesByIds(keys))
             .Returns(CreateContentSchedules());
 
-        var sut = new HasScheduleSignProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
 
         var variant1 = new DocumentVariantResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "en-EN" };
         var variant2 = new DocumentVariantResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "da-DA" };
@@ -119,18 +119,18 @@ internal class HasScheduleSignProviderTests
             new() { Id = entities[0].Key, Variants = [variant1, variant2] }, new() { Id = entities[1].Key, Variants = [variant3] },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "da-DA").Signs.Count(), 0);
-        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "en-EN").Signs.Count(), 1);
-        Assert.AreEqual(viewModels[1].Variants.First().Signs.Count(), 1);
+        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "da-DA").Flags.Count(), 0);
+        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "en-EN").Flags.Count(), 1);
+        Assert.AreEqual(viewModels[1].Variants.First().Flags.Count(), 1);
 
-        var signModel = viewModels[0].Variants.First().Signs.First();
-        Assert.AreEqual("Umb.ScheduledForPublish", signModel.Alias);
+        var flagModel = viewModels[0].Variants.First().Flags.First();
+        Assert.AreEqual("Umb.ScheduledForPublish", flagModel.Alias);
     }
 
     [Test]
-    public async Task HasScheduleSignProvider_Should_Populate_Document_Item_Signs()
+    public async Task HasScheduleFlagProvider_Should_Populate_Document_Item_Flags()
     {
         var entities = new List<EntitySlim>
         {
@@ -149,7 +149,7 @@ internal class HasScheduleSignProviderTests
             .Setup(x => x.GetContentSchedulesByIds(keys))
             .Returns(CreateContentSchedules());
 
-        var sut = new HasScheduleSignProvider(contentServiceMock.Object, idKeyMapMock.Object);
+        var sut = new HasScheduleFlagProvider(contentServiceMock.Object, idKeyMapMock.Object);
 
         var variant1 = new DocumentVariantItemResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "en-EN" };
         var variant2 = new DocumentVariantItemResponseModel() { State = DocumentVariantState.Published, Name = "Test1", Culture = "da-DA" };
@@ -160,14 +160,14 @@ internal class HasScheduleSignProviderTests
             new() { Id = entities[0].Key, Variants = [variant1, variant2] }, new() { Id = entities[1].Key, Variants = [variant3] },
         };
 
-        await sut.PopulateSignsAsync(viewModels);
+        await sut.PopulateFlagsAsync(viewModels);
 
-        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "da-DA").Signs.Count(), 0);
-        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "en-EN").Signs.Count(), 1);
-        Assert.AreEqual(viewModels[1].Variants.First().Signs.Count(), 1);
+        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "da-DA").Flags.Count(), 0);
+        Assert.AreEqual(viewModels[0].Variants.FirstOrDefault(x => x.Culture == "en-EN").Flags.Count(), 1);
+        Assert.AreEqual(viewModels[1].Variants.First().Flags.Count(), 1);
 
-        var signModel = viewModels[0].Variants.First().Signs.First();
-        Assert.AreEqual("Umb.ScheduledForPublish", signModel.Alias);
+        var flagModel = viewModels[0].Variants.First().Flags.First();
+        Assert.AreEqual("Umb.ScheduledForPublish", flagModel.Alias);
     }
 
     private Dictionary<int, IEnumerable<ContentSchedule>> CreateContentSchedules()

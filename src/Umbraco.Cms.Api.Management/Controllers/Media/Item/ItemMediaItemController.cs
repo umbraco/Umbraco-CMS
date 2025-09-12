@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -19,22 +19,22 @@ public class ItemMediaItemController : MediaItemControllerBase
 {
     private readonly IEntityService _entityService;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
-    private readonly SignProviderCollection _signProviders;
+    private readonly FlagProviderCollection _flagProviders;
 
     [ActivatorUtilitiesConstructor]
     public ItemMediaItemController(
         IEntityService entityService,
         IMediaPresentationFactory mediaPresentationFactory,
-        SignProviderCollection signProvider)
+        FlagProviderCollection flagProviders)
     {
         _entityService = entityService;
         _mediaPresentationFactory = mediaPresentationFactory;
-        _signProviders = signProvider;
+        _flagProviders = flagProviders;
     }
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18")]
     public ItemMediaItemController(IEntityService entityService, IMediaPresentationFactory mediaPresentationFactory)
-        : this(entityService, mediaPresentationFactory, StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+        : this(entityService, mediaPresentationFactory, StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 
@@ -55,16 +55,16 @@ public class ItemMediaItemController : MediaItemControllerBase
             .OfType<IMediaEntitySlim>();
 
         IEnumerable<MediaItemResponseModel> responseModels = media.Select(_mediaPresentationFactory.CreateItemResponseModel);
-        await PopulateSigns(responseModels);
+        await PopulateFlags(responseModels);
 
         return Ok(responseModels);
     }
 
-    private async Task PopulateSigns(IEnumerable<MediaItemResponseModel> itemViewModels)
+    private async Task PopulateFlags(IEnumerable<MediaItemResponseModel> itemViewModels)
     {
-        foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<DocumentItemResponseModel>()))
+        foreach (IFlagProvider signProvider in _flagProviders.Where(x => x.CanProvideFlags<DocumentItemResponseModel>()))
         {
-            await signProvider.PopulateSignsAsync(itemViewModels);
+            await signProvider.PopulateFlagsAsync(itemViewModels);
         }
     }
 }
