@@ -242,7 +242,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         {
             if (propertyValidation.Status is ContentEditingOperationStatus.ContentTypeNotFound)
             {
-                Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
+                return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
             }
             else
             {
