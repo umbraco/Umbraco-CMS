@@ -1,18 +1,13 @@
 import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '../../../index.js';
-import { css, html, customElement, state, nothing, query } from '@umbraco-cms/backoffice/external/lit';
-import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import type { UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import type {
-	UUIBooleanInputEvent,
-	UUIInputEvent,
-	UUIInputLockElement,
-	UUISelectEvent,
-} from '@umbraco-cms/backoffice/external/uui';
+import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-property-type-workspace-view-settings')
 export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -47,39 +42,26 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	private _data?: UmbPropertyTypeScaffoldModel;
 
 	@state()
-	private _aliasLocked = true;
-
-	@state()
-	private _autoGenerateAlias = true;
-
-	@state()
 	private _contentTypeVariesByCulture?: boolean;
 
 	@state()
 	private _contentTypeVariesBySegment?: boolean;
 
-	@query('#alias-input')
-	private _aliasInput!: UUIInputLockElement;
-
 	@state()
 	private _entityType?: string;
+
+	@state()
+	private _isNew?: boolean;
+
+	#workspaceContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#context = instance;
-			this.observe(
-				instance?.data,
-				(data) => {
-					if (!this._data && data?.alias) {
-						// Initial. Loading existing property
-						this._autoGenerateAlias = false;
-					}
-					this._data = data;
-				},
-				'observeData',
-			);
+			this.observe(instance?.data, (data) => (this._data = data), 'observeData');
+			this.observe(instance?.isNew, (isNew) => (this._isNew = isNew), '_observeIsNew');
 		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
@@ -97,19 +79,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	updateValue(partialValue: Partial<UmbPropertyTypeScaffoldModel>) {
 		this.#context?.updateData(partialValue);
-	}
-
-	#onNameChange(event: UUIInputEvent) {
-		this.updateValue({ name: event.target.value.toString() });
-		if (this._aliasLocked && this._autoGenerateAlias) {
-			this.updateValue({ alias: generateAlias(this._data?.name ?? '') });
-		}
-	}
-
-	#onAliasChange() {
-		// TODO: Why can I not get the correct value via event? Is it an issue in uui library too?
-		const alias = generateAlias(this._aliasInput.value.toString());
-		this.updateValue({ alias });
 	}
 
 	#onDescriptionChange(event: UUIInputEvent) {
@@ -166,16 +135,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		this.updateValue({ isSensitive: e.target.checked });
 	}
 
-	#onToggleAliasLock() {
-		this._aliasLocked = !this._aliasLocked;
-		if (this._aliasLocked && !this._data?.alias) {
-			// Reenable auto-generate if alias is empty and locked.
-			this._autoGenerateAlias = true;
-		} else {
-			this._autoGenerateAlias = false;
-		}
-	}
-
 	#onCustomValidationChange(event: UUISelectEvent) {
 		const value = event.target.value.toString();
 		const regEx = value !== '!NOVALIDATION!' ? value : null;
@@ -217,72 +176,65 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		this.updateValue({ variesBySegment: !sharedAcrossSegments });
 	}
 
+	#onNameAndAliasChange(event: InputEvent & { target: UmbInputWithAliasElement }) {
+		this.#workspaceContext?.setName(event.target.value ?? '');
+		this.#workspaceContext?.setAlias(event.target.alias ?? '');
+	}
+
 	override render() {
 		if (!this._data) return;
 		return html`
 			<uui-box class="uui-text">
-				<div class="container">
-					<umb-form-validation-message>
-						<uui-input
-							id="name-input"
-							data-mark="input:entity-name"
-							name="name"
-							label=${this.localize.term('placeholders_entername')}
-							placeholder=${this.localize.term('placeholders_entername')}
-							.value=${this._data?.name}
-							@input=${this.#onNameChange}
-							required
-							${umbBindToValidation(this, '$.name')}
-							${umbFocus()}>
-							<!-- TODO: validation for bad characters -->
-						</uui-input>
-					</umb-form-validation-message>
-					<umb-form-validation-message>
-						<uui-input-lock
-							id="alias-input"
-							name="alias"
-							label=${this.localize.term('placeholders_enterAlias')}
-							placeholder=${this.localize.term('placeholders_enterAlias')}
-							.value=${this._data?.alias}
-							?locked=${this._aliasLocked}
-							required
-							${umbBindToValidation(this, '$.alias')}
-							@input=${this.#onAliasChange}
-							@lock-change=${this.#onToggleAliasLock}>
-						</uui-input-lock>
-					</umb-form-validation-message>
+				<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical" mandatory>
+					<umb-input-with-alias
+						id="name-alias"
+						data-mark="input:entity-name"
+						name="name"
+						slot="editor"
+						required
+						.value=${this._data?.name ?? ''}
+						.alias=${this._data?.alias ?? ''}
+						?auto-generate-alias=${this._isNew}
+						@change=${this.#onNameAndAliasChange}
+						${umbBindToValidation(this, '$.name', this._data?.name)}
+						${umbFocus()}>
+					</umb-input-with-alias>
+				</umb-property-layout>
+
+				<umb-property-layout label=${this.localize.term('general_description')} orientation="vertical">
 					<uui-textarea
 						id="description-input"
+						slot="editor"
 						name="description"
 						@input=${this.#onDescriptionChange}
-						label=${this.localize.term('placeholders_enterDescription')}
-						placeholder=${this.localize.term('placeholders_enterDescription')}
 						.value=${this._data?.description}
 						auto-height></uui-textarea>
-				</div>
-				<umb-form-validation-message>
+				</umb-property-layout>
+
+				<umb-property-layout label=${this.localize.term('general_propertyEditor')} orientation="vertical" mandatory>
 					<umb-data-type-flow-input
+						slot="editor"
+						id="data-type-input"
 						.value=${this._data?.dataType?.unique ?? ''}
 						@change=${this.#onDataTypeIdChange}
 						required
 						${umbBindToValidation(this, '$.dataType.unique')}></umb-data-type-flow-input>
-				</umb-form-validation-message>
-				<hr />
-				<div class="container">
-					<b><umb-localize key="validation_validation">Validation</umb-localize></b>
-					${this.#renderMandatory()}
-					<p style="margin-bottom: 0">
-						<umb-localize key="validation_customValidation">Custom validation</umb-localize>
-					</p>
-					${this.#renderCustomValidation()}
-				</div>
-				${this.#renderVariationControls()}
-				<umb-property-layout label="#contentTypeEditor_displaySettingsHeadline" orientation="vertical">
+				</umb-property-layout>
+			</uui-box>
+
+			<uui-box class="uui-text">
+				<umb-localize key="validation_validation" slot="headline">Validation</umb-localize>
+				${this.#renderMandatory()} ${this.#renderCustomValidation()} ${this.#renderVariationControls()}</uui-box
+			>
+
+			<uui-box class="uui-text">
+				<umb-localize key="contentTypeEditor_displaySettingsHeadline" slot="headline">Appearance</umb-localize>
+				<umb-property-layout orientation="vertical">
 					<div id="appearances" slot="editor">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
 				</umb-property-layout>
 
-				${this.#renderMemberTypeOptions()}
-			</uui-box>
+				${this.#renderMemberTypeOptions()}</uui-box
+			>
 		`;
 	}
 
@@ -328,23 +280,24 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	}
 
 	#renderAlignLeftIcon() {
-		return html`<button
-			type="button"
-			@click=${this.#setAppearanceNormal}
-			class="appearance left ${this._data?.appearance?.labelOnTop ? '' : 'selected'}">
-			<svg width="200" height="48" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<rect width="94" height="14" rx="6" fill="currentColor" />
-				<rect y="22" width="64" height="9" rx="4" fill="currentColor" fill-opacity="0.4" />
-				<rect x="106" width="94" height="60" rx="5" fill="currentColor" fill-opacity="0.4" />
-			</svg>
-			<label class="appearance-label">
+		return html`<div class="appearance-option">
+			<button
+				type="button"
+				@click=${this.#setAppearanceNormal}
+				class="appearance left ${this._data?.appearance?.labelOnTop ? '' : 'selected'}">
+				<svg width="200" height="48" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<rect width="94" height="14" rx="6" fill="currentColor" />
+					<rect y="22" width="64" height="9" rx="4" fill="currentColor" fill-opacity="0.4" />
+					<rect x="106" width="94" height="60" rx="5" stroke="currentColor" fill-opacity="0.4" />
+				</svg></button
+			><label class="appearance-label">
 				<umb-localize key="contentTypeEditor_displaySettingsLabelOnLeft">Label to the left</umb-localize>
 			</label>
-		</button>`;
+		</div>`;
 	}
 
 	#renderAlignTopIcon() {
-		return html`
+		return html`<div class="appearance-option">
 			<button
 				type="button"
 				@click=${this.#setAppearanceTop}
@@ -352,61 +305,68 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<svg width="140" height="48" viewBox="0 0 140 60" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<rect width="90" height="14" rx="6" fill="currentColor" />
 					<rect y="22" width="64" height="9" rx="4" fill="currentColor" fill-opacity="0.4" />
-					<rect y="42" width="140" height="36" rx="5" fill="currentColor" fill-opacity="0.4" />
-				</svg>
-				<label class="appearance-label">
-					<umb-localize key="contentTypeEditor_displaySettingsLabelOnTop">Label above (full-width)</umb-localize>
-				</label>
-			</button>
-		`;
+					<rect y="42" width="140" height="36" rx="5" stroke="currentColor" fill-opacity="0.4" />
+				</svg></button
+			><label class="appearance-label">
+				<umb-localize key="contentTypeEditor_displaySettingsLabelOnTop">Label above (full-width)</umb-localize>
+			</label>
+		</div> `;
 	}
 
 	#renderMandatory() {
-		return html`<div style="display: flex; justify-content: space-between">
-				<label for="mandatory">
-					<umb-localize key="validation_fieldIsMandatory">Field is mandatory</umb-localize>
-				</label>
+		return html`<umb-property-layout orientation="vertical">
 				<uui-toggle
 					@change=${this.#onMandatoryChange}
 					id="mandatory"
 					.checked=${this._data?.validation?.mandatory ?? false}
-					slot="editor"></uui-toggle>
-			</div>
+					slot="editor"
+					><umb-localize key="validation_fieldIsMandatory">Field is mandatory</umb-localize></uui-toggle
+				></umb-property-layout
+			>
+
 			${this._data?.validation?.mandatory
-				? html`<uui-input
-						name="mandatory-message"
-						value=${this._data.validation?.mandatoryMessage ?? ''}
-						@change=${this.#onMandatoryMessageChange}
-						style="margin-top: var(--uui-size-space-1)"
-						id="mandatory-message"
-						placeholder=${this.localize.term('validation_mandatoryMessage')}
-						label=${this.localize.term('validation_mandatoryMessage')}></uui-input>`
-				: ''}`;
+				? html`<umb-property-layout label="#validation_mandatoryMessageLabel" orientation="vertical"
+						><uui-input
+							name="mandatory-message"
+							slot="editor"
+							value=${this._data.validation?.mandatoryMessage ?? ''}
+							@change=${this.#onMandatoryMessageChange}
+							style="margin-top: var(--uui-size-space-1)"
+							id="mandatory-message"
+							placeholder=${this.localize.string(UMB_VALIDATION_EMPTY_LOCALIZATION_KEY)}
+							label=${this.localize.term('validation_mandatoryMessage')}></uui-input
+					></umb-property-layout>`
+				: ''} `;
 	}
 
 	#renderCustomValidation() {
-		return html`<uui-select
-				style="margin-top: var(--uui-size-space-1)"
-				@change=${this.#onCustomValidationChange}
-				.options=${this._customValidationOptions}></uui-select>
+		return html`<umb-property-layout orientation="vertical" label=${this.localize.term('validation_customValidation')}
+				><uui-select
+					slot="editor"
+					@change=${this.#onCustomValidationChange}
+					.options=${this._customValidationOptions}></uui-select
+			></umb-property-layout>
 
 			${this._data?.validation?.regEx !== null
-				? html`
-						<uui-input
-							name="pattern"
-							style="margin-bottom: var(--uui-size-space-1); margin-top: var(--uui-size-space-5);"
-							@change=${this.#onValidationRegExChange}
-							placeholder=${this.localize.term('validation_validationRegExp')}
-							label=${this.localize.term('validation_validationRegExp')}
-							.value=${this._data?.validation?.regEx ?? ''}></uui-input>
-						<uui-textarea
-							name="pattern-message"
-							@change=${this.#onValidationMessageChange}
-							placeholder=${this.localize.term('validation_validationRegExpMessage')}
-							label=${this.localize.term('validation_validationRegExpMessage')}
-							.value=${this._data?.validation?.regExMessage ?? ''}></uui-textarea>
-					`
-				: nothing} `;
+				? html`<umb-property-layout orientation="vertical" label=${this.localize.term('validation_validationPattern')}>
+							<uui-input
+								name="pattern"
+								slot="editor"
+								@change=${this.#onValidationRegExChange}
+								placeholder=${this.localize.term('validation_validationRegExp')}
+								label=${this.localize.term('validation_validationRegExp')}
+								.value=${this._data?.validation?.regEx ?? ''}></uui-input
+						></umb-property-layout>
+						<umb-property-layout label="#validation_mandatoryMessageLabel" orientation="vertical"
+							><uui-textarea
+								name="pattern-message"
+								slot="editor"
+								@change=${this.#onValidationMessageChange}
+								placeholder=${this.localize.term('validation_invalidPattern')}
+								label=${this.localize.term('validation_validationRegExpMessage')}
+								.value=${this._data?.validation?.regExMessage ?? ''}></uui-textarea
+						></umb-property-layout> `
+				: nothing}`;
 	}
 
 	#renderVariationControls() {
@@ -426,7 +386,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<uui-toggle
 					@change=${this.#onShareAcrossCulturesChange}
 					.checked=${!(this._data?.variesByCulture ?? false)}
-					label="Shared across cultures"></uui-toggle>
+					label=${this.localize.term('contentTypeEditor_cultureInvariantLabel')}></uui-toggle>
 			</div>
 		`;
 	}
@@ -437,7 +397,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<uui-toggle
 					@change=${this.#onShareAcrossSegmentsChange}
 					.checked=${!(this._data?.variesBySegment ?? false)}
-					label="Shared across segments"></uui-toggle>
+					label=${this.localize.term('contentTypeEditor_segmentInvariantLabel')}></uui-toggle>
 			</div>
 		`;
 	}
@@ -446,39 +406,15 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		UmbTextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
 			}
-			#alias-input,
-			#label-input,
-			#description-input {
-				width: 100%;
-			}
-
-			#alias-input {
-				border-color: transparent;
-				background: var(--uui-color-surface);
-			}
-
-			#label-input {
-				font-weight: bold; /* TODO: UUI Input does not support bold text yet */
-				--uui-input-border-color: transparent;
-			}
-			#label-input input {
-				font-weight: bold;
-				--uui-input-border-color: transparent;
-			}
-
-			#description-input {
-				--uui-textarea-border-color: transparent;
-				font-weight: 0.5rem; /* TODO: Cant change font size of UUI textarea yet */
-			}
-
 			#appearances {
 				display: flex;
 				gap: var(--uui-size-layout-1);
-				max-width: 350px;
-				margin: 0 auto;
+				justify-content: space-between;
 			}
 			.appearance {
 				position: relative;
@@ -493,17 +429,19 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				justify-content: space-between;
 				gap: var(--uui-size-space-3);
 			}
+			.appearance-option {
+				display: flex;
+				width: 100%;
+				flex-direction: column;
+				align-items: center;
+				gap: var(--uui-size-space-2);
+			}
+
 			.appearance-label {
 				font-size: 0.8rem;
 				line-height: 1;
-				font-weight: bold;
+				text-align: center;
 				pointer-events: none;
-			}
-			.appearance.left {
-				flex-grow: 1;
-			}
-			.appearance.top {
-				flex-shrink: 1;
 			}
 			.appearance svg {
 				display: flex;
@@ -532,29 +470,15 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				opacity: 0.1;
 				background-color: var(--uui-color-selected);
 			}
-			hr {
-				border: none;
-				border-top: 1px solid var(--uui-color-divider);
-				margin-top: var(--uui-size-space-6);
-				margin-bottom: var(--uui-size-space-5);
-			}
 			uui-input {
 				width: 100%;
 			}
 			uui-input:focus-within {
 				z-index: 1;
 			}
-			uui-input-lock:focus-within {
-				z-index: 1;
-			}
 			.container {
 				display: flex;
 				flex-direction: column;
-			}
-			uui-form,
-			form {
-				display: block;
-				height: 100%;
 			}
 		`,
 	];
