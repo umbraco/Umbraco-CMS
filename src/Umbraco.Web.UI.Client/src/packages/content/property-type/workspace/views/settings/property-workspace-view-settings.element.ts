@@ -53,8 +53,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	@state()
 	private _isNew?: boolean;
 
-	#workspaceContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
-
 	constructor() {
 		super();
 
