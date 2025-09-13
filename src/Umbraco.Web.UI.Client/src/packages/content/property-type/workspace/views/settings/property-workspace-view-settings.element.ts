@@ -177,8 +177,9 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	}
 
 	#onNameAndAliasChange(event: InputEvent & { target: UmbInputWithAliasElement }) {
-		this.#workspaceContext?.setName(event.target.value ?? '');
-		this.#workspaceContext?.setAlias(event.target.alias ?? '');
+		const name = event.target.value ?? '';
+		const alias = event.target.alias ?? '';
+		this.updateValue({ name, alias });
 	}
 
 	override render() {
@@ -415,6 +416,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				display: flex;
 				gap: var(--uui-size-layout-1);
 				justify-content: space-between;
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
 			.appearance {
 				position: relative;
