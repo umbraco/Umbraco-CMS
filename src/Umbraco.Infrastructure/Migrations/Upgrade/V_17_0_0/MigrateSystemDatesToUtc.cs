@@ -173,20 +173,20 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         // given these are historical dates in expected non-production environments, that are unlikely to be necessary to be 100% accurate, this is acceptable.
 
         var offsetInMinutes = -timezoneOffset.TotalMinutes;
-        var offSetInMinutesString = offsetInMinutes > 0
+        var offsetInMinutesString = offsetInMinutes > 0
             ? $"+{offsetInMinutes}"
             : $"{offsetInMinutes}";
 
-        Sql sql = Sql($"UPDATE {tableName} SET {columName} = DATETIME({columName}, '{offSetInMinutesString} minutes')");
+        Sql sql = Sql($"UPDATE {tableName} SET {columName} = DATETIME({columName}, '{offsetInMinutesString} minutes')");
 
         scope.Database.Execute(sql);
 
         _logger.LogInformation(
-            "Migrated {TableName}.{ColumnName} from timezone {TimeZoneName} ({OffSetInMinutes}) to UTC.",
+            "Migrated {TableName}.{ColumnName} from timezone {TimeZoneName} ({OffsetInMinutes}) to UTC.",
             tableName,
             columName,
             timezoneName,
-            offSetInMinutesString);
+            offsetInMinutesString);
     }
 
     private void MigrateDateColumnSqlServer(IScope scope, string tableName, string columName, string timeZoneName)
