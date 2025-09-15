@@ -6,10 +6,8 @@ import {
 } from '../../constants.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../block-grid-manager/block-grid-manager.context-token.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/block-grid-entries.context-token.js';
-import {
-	type UmbBlockGridScalableContext,
-	UmbBlockGridScaleManager,
-} from '../../context/block-grid-scale-manager/block-grid-scale-manager.controller.js';
+import { UmbBlockGridScaleManager } from '../../context/block-grid-scale-manager/block-grid-scale-manager.controller.js';
+import type { UmbBlockGridScalableContext } from '../../context/block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import {
 	UmbArrayState,
 	UmbBooleanState,
@@ -18,10 +16,10 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -301,7 +299,7 @@ export class UmbBlockGridEntryContext
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
-		const blockLabel = this.getLabel();
+		const blockLabel = this.getName();
 
 		const entryName = workspaceName
 			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`

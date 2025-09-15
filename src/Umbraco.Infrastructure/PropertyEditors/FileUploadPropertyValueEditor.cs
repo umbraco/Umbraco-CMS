@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.PropertyEditors;
+using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -60,6 +61,9 @@ internal sealed class FileUploadPropertyValueEditor : DataValueEditor
             TryGetTemporaryFile,
             IsAllowedInDataTypeConfiguration));
     }
+
+    /// <inheritdoc/>
+    public override IValueRequiredValidator RequiredValidator => new FileUploadValueRequiredValidator();
 
     /// <inheritdoc/>
     public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
