@@ -1,18 +1,9 @@
 import type { UmbPickerSearchManagerConfig } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import type {
-	UmbInteractionMemoryManager,
-	UmbInteractionMemoryModel,
-} from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbArrayState, UmbBooleanState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbSearchProvider, UmbSearchRequestArgs, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-
-export interface UmbPickerSearchManagerArgs {
-	interactionMemoryManager?: UmbInteractionMemoryManager;
-}
 
 /**
  * A manager for searching items in a picker.
@@ -43,23 +34,6 @@ export class UmbPickerSearchManager<
 
 	#config?: UmbPickerSearchManagerConfig;
 	#searchProvider?: UmbSearchProvider<UmbSearchResultItemModel, SearchRequestArgsType>;
-
-	#interactionMemoryManager?: UmbInteractionMemoryManager;
-	#interactionMemoryUnique: string = 'UmbPickerSearch';
-
-	/**
-	 * Creates an instance of UmbPickerSearchManager.
-	 * @param {UmbControllerHost} host The controller host for the search manager.
-	 * @param args Optional arguments for the search manager.
-	 * @param {UmbInteractionMemoryManager} [args.interactionMemoryManager] An optional memory manager to store selected items.
-	 * @memberof UmbPickerSearchManager
-	 */
-	constructor(host: UmbControllerHost, args?: UmbPickerSearchManagerArgs) {
-		super(host);
-		if (args?.interactionMemoryManager) {
-			this.#interactionMemoryManager = args.interactionMemoryManager;
-		}
-	}
 
 	/**
 	 * Set the configuration for the search manager.
@@ -134,7 +108,6 @@ export class UmbPickerSearchManager<
 		this.#resultItems.setValue([]);
 		this.#searching.setValue(false);
 		this.#resultTotalItems.setValue(0);
-		this.#interactionMemoryManager?.deleteMemory(this.#interactionMemoryUnique);
 	}
 
 	/**
@@ -185,8 +158,6 @@ export class UmbPickerSearchManager<
 		}
 
 		this.setSearchable(true);
-
-		this.#observeInteractionMemory();
 	}
 
 	#debouncedSearch = debounce(this.#search, 300);
@@ -210,51 +181,10 @@ export class UmbPickerSearchManager<
 			dataTypeUnique: this.#config?.dataTypeUnique,
 		};
 
-		this.#setSearchRequestMemory(args);
-
 		const { data } = await this.#searchProvider.search(args);
 		const items = (data?.items as ResultItemType[]) ?? [];
 		this.#resultItems.setValue(items);
 		this.#resultTotalItems.setValue(data?.total ?? 0);
 		this.#searching.setValue(false);
-	}
-
-	#muteMemoryObservation = false;
-
-	#observeInteractionMemory() {
-		this.observe(this.#interactionMemoryManager?.memory(this.#interactionMemoryUnique), (memory) => {
-			if (this.#muteMemoryObservation) return;
-
-			if (memory) {
-				this.#applySearchRequestInteractionMemory(memory);
-			}
-		});
-	}
-
-	#setSearchRequestMemory(args: SearchRequestArgsType) {
-		// Add a memory entry with the latest request args
-		const memory: UmbInteractionMemoryModel = {
-			unique: this.#interactionMemoryUnique,
-			values: [
-				{
-					unique: this.#interactionMemoryUnique + 'LatestRequestArgs',
-					requestArgs: args,
-				},
-			],
-		};
-
-		this.#muteMemoryObservation = true;
-		this.#interactionMemoryManager?.setMemory(memory);
-		this.#muteMemoryObservation = false;
-	}
-
-	#applySearchRequestInteractionMemory(memory: UmbInteractionMemoryModel) {
-		const memoryValue = memory?.values?.find((x) => x.unique === this.#interactionMemoryUnique + 'LatestRequestArgs');
-		const requestArgs = memoryValue?.requestArgs as SearchRequestArgsType | undefined;
-
-		if (requestArgs) {
-			this.#query.setValue(requestArgs);
-			this.search();
-		}
 	}
 }
