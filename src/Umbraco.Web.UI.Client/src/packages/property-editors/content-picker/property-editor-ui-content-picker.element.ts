@@ -236,7 +236,6 @@ export class UmbPropertyEditorUIContentPickerElement
 	#onInteractionMemoriesChange(event: UmbChangeEvent) {
 		const target = event.target as UmbInputContentElement;
 		const interactionMemories = target.interactionMemories;
-		debugger;
 
 		if (interactionMemories && interactionMemories.length > 0) {
 			this.#setInteractionMemory(interactionMemories);
