@@ -6,7 +6,10 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import {
+	UmbInteractionMemoryChangeEvent,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
 
 @customElement('umb-input-content')
 export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -73,10 +76,17 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	public readonly = false;
 
-	@property({ type: Object, attribute: false })
-	memory?: UmbInteractionMemoryModel;
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#interactionMemories;
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemories = value;
+	}
+
+	#interactionMemories: Array<UmbInteractionMemoryModel> | undefined;
 
 	#entityTypeLookup = { content: 'document', media: 'media', member: 'member' };
 
@@ -90,6 +100,15 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		this.#selection = event.target.selection ?? [];
 		this.value = this.#selection.join(',');
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#onInteractionMemoriesChange(event: UmbInteractionMemoryChangeEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbInputContentElement;
+		const interactionMemories = target.interactionMemories;
+		this.#interactionMemories = interactionMemories;
+		// The event is not composed so we need to re-dispatch it from this component.
+		this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
 	}
 
 	override render() {
@@ -115,9 +134,10 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.minMessage=${this.minMessage}
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
-				.memory=${this.memory}
 				?readonly=${this.readonly}
-				@change=${this.#onChange}></umb-input-document>
+				@change=${this.#onChange}
+				.interactionMemories=${this.#interactionMemories}
+				@interaction-memory-change=${this.#onInteractionMemoriesChange}></umb-input-document>
 		`;
 	}
 
