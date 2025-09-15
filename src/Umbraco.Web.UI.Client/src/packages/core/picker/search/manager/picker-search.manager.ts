@@ -250,9 +250,10 @@ export class UmbPickerSearchManager<
 
 	#applySearchRequestInteractionMemory(memory: UmbInteractionMemoryModel) {
 		const memoryValue = memory?.values?.find((x) => x.unique === this.#interactionMemoryUnique + 'LatestRequestArgs');
+		const requestArgs = memoryValue?.requestArgs as SearchRequestArgsType | undefined;
 
-		if (memoryValue?.requestArgs) {
-			this.#query.setValue(memoryValue.requestArgs);
+		if (requestArgs) {
+			this.#query.setValue(requestArgs);
 			this.search();
 		}
 	}
