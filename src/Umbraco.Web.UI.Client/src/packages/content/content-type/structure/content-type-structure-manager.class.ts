@@ -993,11 +993,8 @@ export class UmbContentTypeStructureManager<
 	*/
 
 	/**
-	 *
-	 * Find merged containers that match the provided container ids.
-	 * Notice if you can provide one or more ids matching the same container and it will still only return return the matching container once.
-	 * @param containerIds - An array of container ids to find merged containers for.
-	 * @param id
+	 * Find a merged container that match the provided container id.
+	 * @param {string} id - The id to find the merged container of.
 	 * @returns {UmbPropertyTypeContainerMergedModel | undefined} - The merged containers that match the provided container ids.
 	 */
 	getMergedContainerById(id: string): UmbPropertyTypeContainerMergedModel | undefined {
