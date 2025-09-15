@@ -98,6 +98,10 @@ export class UmbPropertyEditorUIDropdownElement
 		} else {
 			this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-dropdown-list')!);
 		}
+
+		if (!this.mandatory && !this._multiple) {
+			this._options.unshift({ name: '', value: '', selected: false, invalid: false });
+		}
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputDropdownListElement }) {
