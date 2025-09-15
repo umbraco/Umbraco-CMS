@@ -9,7 +9,7 @@ import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 export class UmbPickerContext extends UmbContextBase {
 	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
 	public readonly selection = new UmbSelectionManager(this);
-	public readonly search = new UmbPickerSearchManager(this, { interactionMemoryManager: this.interactionMemory });
+	public readonly search = new UmbPickerSearchManager(this);
 
 	public dataType?: { unique: string };
 
