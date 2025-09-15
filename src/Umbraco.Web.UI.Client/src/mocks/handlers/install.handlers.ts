@@ -45,6 +45,7 @@ export const handlers = [
 						serverPlaceholder: '',
 						requiresCredentials: false,
 						supportsIntegratedAuthentication: false,
+						supportsTrustServerCertificate: false,
 						requiresConnectionTest: false,
 					},
 					{
@@ -58,6 +59,7 @@ export const handlers = [
 						serverPlaceholder: '(local)\\SQLEXPRESS',
 						requiresCredentials: true,
 						supportsIntegratedAuthentication: true,
+						supportsTrustServerCertificate: true,
 						requiresConnectionTest: true,
 					},
 					{
@@ -71,6 +73,7 @@ export const handlers = [
 						serverPlaceholder: 'undefined',
 						requiresCredentials: false,
 						supportsIntegratedAuthentication: false,
+						supportsTrustServerCertificate: false,
 						requiresConnectionTest: true,
 					},
 				],
