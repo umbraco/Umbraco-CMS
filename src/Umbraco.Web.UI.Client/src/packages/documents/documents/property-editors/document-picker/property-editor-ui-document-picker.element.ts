@@ -101,12 +101,12 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		if (!this.#interactionMemoryContext) return;
 
 		// Set up memory for the Property Editor + Data Type context which includes all memories from the input
-		const dataTypeMemory: UmbInteractionMemoryModel = {
+		const propertyEditorMemory: UmbInteractionMemoryModel = {
 			unique: memoryUnique,
 			memories,
 		};
 
-		this.#interactionMemoryContext.memory.setMemory(dataTypeMemory);
+		this.#interactionMemoryContext.memory.setMemory(propertyEditorMemory);
 	}
 
 	#deleteInteractionMemory() {

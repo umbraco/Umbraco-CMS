@@ -208,7 +208,6 @@ export class UmbPropertyEditorUIContentPickerElement
 
 		const memory = this.#interactionMemoryContext.memory.getMemory(memoryUnique);
 		this._interactionMemories = memory?.memories ?? [];
-		debugger;
 	}
 
 	#setInteractionMemory(memories: Array<UmbInteractionMemoryModel>) {
@@ -217,12 +216,12 @@ export class UmbPropertyEditorUIContentPickerElement
 		if (!this.#interactionMemoryContext) return;
 
 		// Set up memory for the Property Editor + Data Type context which includes all memories from the input
-		const dataTypeMemory: UmbInteractionMemoryModel = {
+		const propertyEditorMemory: UmbInteractionMemoryModel = {
 			unique: memoryUnique,
 			memories,
 		};
 
-		this.#interactionMemoryContext.memory.setMemory(dataTypeMemory);
+		this.#interactionMemoryContext.memory.setMemory(propertyEditorMemory);
 	}
 
 	#deleteInteractionMemory() {
