@@ -8,10 +8,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbDeepPartialObject, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_ROUTE_CONTEXT, type IRouterSlot } from '@umbraco-cms/backoffice/router';
-import {
-	UmbInteractionMemoryManager,
-	type UmbInteractionMemoryModel,
-} from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 
 export interface UmbModalRejectReason {
 	type: string;
