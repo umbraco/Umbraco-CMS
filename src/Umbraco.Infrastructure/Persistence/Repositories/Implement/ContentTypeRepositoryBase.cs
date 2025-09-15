@@ -1579,8 +1579,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             .Select<ContentTypeDto>(c => c.Alias)
             .From<ContentTypeDto>()
             .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>((ct, n) => ct.NodeId == n.NodeId)
-            .WhereLike<ContentTypeDto>(c => c.Alias, alias)
-            .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            .WhereLike<ContentTypeDto>(c => c.Alias, $"{alias}{SqlSyntax.GetWildcardPlaceholder()}");
         List<string> aliases = Database.Fetch<string>(sql);
 
         var i = 1;
