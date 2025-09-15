@@ -34,8 +34,13 @@ export class UmbTreeItemPickerExpansionManager extends UmbControllerBase {
 	 */
 	setExpansion(expansion: UmbEntityExpansionModel): void {
 		this.#manager.setExpansion(expansion);
+
 		// Store the latest expansion state in interaction memory
-		this.#setExpansionMemory();
+		if (expansion.length > 0) {
+			this.#setExpansionMemory();
+		} else {
+			this.#removeExpansionMemory();
+		}
 	}
 
 	/**
@@ -58,6 +63,8 @@ export class UmbTreeItemPickerExpansionManager extends UmbControllerBase {
 	}
 
 	#setExpansionMemory() {
+		if (!this.#interactionMemoryManager) return;
+
 		// Add a memory entry with the latest expansion state
 		const memory: UmbInteractionMemoryModel = {
 			unique: this.#interactionMemoryUnique,
@@ -72,6 +79,11 @@ export class UmbTreeItemPickerExpansionManager extends UmbControllerBase {
 		this.#muteMemoryObservation = true;
 		this.#interactionMemoryManager?.setMemory(memory);
 		this.#muteMemoryObservation = false;
+	}
+
+	#removeExpansionMemory() {
+		if (!this.#interactionMemoryManager) return;
+		this.#interactionMemoryManager.deleteMemory(this.#interactionMemoryUnique);
 	}
 
 	#applyExpansionInteractionMemory(memory: UmbInteractionMemoryModel) {
