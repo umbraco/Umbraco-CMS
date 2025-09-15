@@ -12,6 +12,7 @@ import {
 	UmbInteractionMemoryChangeEvent,
 	type UmbInteractionMemoryModel,
 } from '@umbraco-cms/backoffice/interaction-memory';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -172,8 +173,14 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		this.observe(
 			this.#pickerInputContext.interactionMemory.memories,
 			(memories) => {
+				// only dispatch the event if the interaction memories have actually changed
+				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
+
+				if (!isIdentical) {
+					this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
+				}
+
 				this.#interactionMemories = memories;
-				this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
 			},
 			'_observeMemories',
 		);
