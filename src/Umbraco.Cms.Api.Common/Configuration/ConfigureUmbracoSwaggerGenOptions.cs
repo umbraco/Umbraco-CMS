@@ -11,22 +11,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.Configuration;
 
-public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
+public class ConfigureUmbracoSwaggerGenOptions(
+    IOperationIdSelector operationIdSelector,
+    ISchemaIdSelector schemaIdSelector,
+    ISubTypesSelector subTypesSelector) : IConfigureOptions<SwaggerGenOptions>
 {
-    private readonly IOperationIdSelector _operationIdSelector;
-    private readonly ISchemaIdSelector _schemaIdSelector;
-    private readonly ISubTypesSelector _subTypesSelector;
-
-    public ConfigureUmbracoSwaggerGenOptions(
-        IOperationIdSelector operationIdSelector,
-        ISchemaIdSelector schemaIdSelector,
-        ISubTypesSelector subTypesSelector)
-    {
-        _operationIdSelector = operationIdSelector;
-        _schemaIdSelector = schemaIdSelector;
-        _subTypesSelector = subTypesSelector;
-    }
-
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
         swaggerGenOptions.SwaggerDoc(
@@ -38,11 +27,11 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
                 Description = "All endpoints not defined under specific APIs",
             });
 
-        swaggerGenOptions.CustomOperationIds(description => _operationIdSelector.OperationId(description));
+        swaggerGenOptions.CustomOperationIds(operationIdSelector.OperationId);
         swaggerGenOptions.DocInclusionPredicate((name, api) =>
         {
             if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor
-                && controllerActionDescriptor.MethodInfo.HasMapToApiAttribute(name))
+                && controllerActionDescriptor.HasMapToApiAttribute(name))
             {
                 return true;
             }
@@ -51,11 +40,11 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
             return apiVersionMetadata.Name == name
                    || (string.IsNullOrEmpty(apiVersionMetadata.Name) && name == DefaultApiConfiguration.ApiName);
         });
-        swaggerGenOptions.TagActionsBy(api => new[] { api.GroupName });
+        swaggerGenOptions.TagActionsBy(api => [api.GroupName]);
         swaggerGenOptions.OrderActionsBy(ActionOrderBy);
         swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
-        swaggerGenOptions.CustomSchemaIds(_schemaIdSelector.SchemaId);
-        swaggerGenOptions.SelectSubTypesUsing(_subTypesSelector.SubTypes);
+        swaggerGenOptions.CustomSchemaIds(schemaIdSelector.SchemaId);
+        swaggerGenOptions.SelectSubTypesUsing(subTypesSelector.SubTypes);
         swaggerGenOptions.SupportNonNullableReferenceTypes();
     }
 
