@@ -791,8 +791,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
         SetEntityTags(entity, _tagRepository, _jsonSerializer);
 
-        PersistRelations(entity);
-
         OnUowRefreshedEntity(new MemberRefreshNotification(entity, new EventMessages()));
 
         entity.ResetDirtyProperties();
@@ -940,8 +938,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
         SetEntityTags(entity, _tagRepository, _jsonSerializer);
-
-        PersistRelations(entity);
 
         OnUowRefreshedEntity(new MemberRefreshNotification(entity, new EventMessages()));
 

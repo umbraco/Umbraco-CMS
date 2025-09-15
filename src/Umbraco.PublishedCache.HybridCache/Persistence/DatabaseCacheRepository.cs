@@ -14,7 +14,6 @@ using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
@@ -292,7 +291,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             await OnRepositoryRefreshedTyped(serializer, content, preview);
             return;
         }
-
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
 
         string c(string s) => SqlSyntax.GetQuotedColumnName(s);
@@ -333,12 +331,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <summary>
-    /// Rebuilds the content database cache for documents.
+    /// Rebuilds the content database cache for documents by clearing and repopulating the cache with the latest document data.
     /// </summary>
     /// <remarks>
     /// Assumes content tree lock.
     /// </remarks>
-    /// Rebuilds the content database cache by clearing and repopulating the cache with the latest content data.
     private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         if (contentTypeIds is null)
@@ -383,8 +380,12 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         }
         while (processed < total);
     }
-
-    /// Rebuilds the media database cache by clearing and repopulating the cache with the latest media data.
+    /// <summary>
+    /// Rebuilds the content database cache for media by clearing and repopulating the cache with the latest media data.
+    /// </summary>
+    /// <remarks>
+    /// Assumes content tree lock.
+    /// </remarks>
     private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         if (contentTypeIds is null)
@@ -415,7 +416,12 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         while (processed < total);
     }
 
-    /// Rebuilds the member database cache by clearing and repopulating the cache with the latest member data.
+    /// <summary>
+    /// Rebuilds the content database cache for members by clearing and repopulating the cache with the latest member data.
+    /// </summary>
+    /// <remarks>
+    /// Assumes content tree lock.
+    /// </remarks>
     private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         if (contentTypeIds is null)
