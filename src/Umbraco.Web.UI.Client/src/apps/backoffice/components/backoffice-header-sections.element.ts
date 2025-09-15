@@ -79,6 +79,16 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 
 		const clickedSectionAlias = manifest.alias;
 
+		console.log('Clicked section:', clickedSectionAlias);
+		console.log('currentSectionAlias:', this._currentSectionAlias);
+
+		// If the clicked section is the same as the current section, we just load the original section path to load the section root
+		if (this._currentSectionAlias === clickedSectionAlias) {
+			const sectionPath = this.#getSectionPath(manifest);
+			history.pushState(null, '', sectionPath);
+			return;
+		}
+
 		// Check if we have a stored path for the clicked section
 		if (this.#sectionPathMap.has(clickedSectionAlias)) {
 			const storedPath = this.#sectionPathMap.get(clickedSectionAlias);
