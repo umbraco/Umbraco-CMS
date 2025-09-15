@@ -14,6 +14,11 @@ import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umb
 
 import '../../components/input-rich-media/input-rich-media.element.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import {
+	UMB_INTERACTION_MEMORY_CONTEXT,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
+import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 
 const elementName = 'umb-property-editor-ui-media-picker';
 
@@ -26,6 +31,8 @@ export class UmbPropertyEditorUIMediaPickerElement
 	implements UmbPropertyEditorUiElement
 {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.#setConfigHash(config);
+
 		if (!config) return;
 
 		this._allowedMediaTypes = config.getValueByAlias<string>('filter')?.split(',') ?? [];
@@ -39,6 +46,8 @@ export class UmbPropertyEditorUIMediaPickerElement
 		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this._min = minMax?.min ?? 0;
 		this._max = minMax?.max ?? Infinity;
+
+		this.#getInteractionMemory();
 	}
 
 	/**
@@ -87,6 +96,12 @@ export class UmbPropertyEditorUIMediaPickerElement
 	@state()
 	private _variantId?: string;
 
+	@state()
+	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
+
+	#interactionMemoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
+	#configHashCode?: number;
+
 	constructor() {
 		super();
 
@@ -94,6 +109,17 @@ export class UmbPropertyEditorUIMediaPickerElement
 			this.observe(context?.alias, (alias) => (this._alias = alias));
 			this.observe(context?.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
 		});
+
+		this.consumeContext(UMB_INTERACTION_MEMORY_CONTEXT, (context) => {
+			this.#interactionMemoryContext = context;
+			this.#getInteractionMemory();
+		});
+	}
+
+	#setConfigHash(config: UmbPropertyEditorConfigCollection | undefined) {
+		const configString = config ? JSON.stringify(config.toObject()) : '';
+		const hashCode = simpleHashCode(configString);
+		this.#configHashCode = hashCode;
 	}
 
 	override firstUpdated() {
@@ -108,6 +134,50 @@ export class UmbPropertyEditorUIMediaPickerElement
 		const isEmpty = event.target.value?.length === 0;
 		this.value = isEmpty ? undefined : event.target.value;
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#getInteractionMemoryUnique() {
+		return `UmbMediaPickerPropertyEditorUi${this.#configHashCode ? '-' + this.#configHashCode : ''}`;
+	}
+
+	#getInteractionMemory() {
+		const memoryUnique = this.#getInteractionMemoryUnique();
+		if (!memoryUnique) return;
+		if (!this.#interactionMemoryContext) return;
+
+		const memory = this.#interactionMemoryContext.memory.getMemory(memoryUnique);
+		this._interactionMemories = memory?.memories ?? [];
+	}
+
+	#setInteractionMemory(memories: Array<UmbInteractionMemoryModel>) {
+		const memoryUnique = this.#getInteractionMemoryUnique();
+		if (!memoryUnique) return;
+		if (!this.#interactionMemoryContext) return;
+
+		// Set up memory for the Property Editor + Data Type context which includes all memories from the input
+		const propertyEditorMemory: UmbInteractionMemoryModel = {
+			unique: memoryUnique,
+			memories,
+		};
+
+		this.#interactionMemoryContext.memory.setMemory(propertyEditorMemory);
+	}
+
+	#deleteInteractionMemory() {
+		const unique = this.#getInteractionMemoryUnique();
+		if (!unique) return;
+		this.#interactionMemoryContext?.memory.deleteMemory(unique);
+	}
+
+	#onInteractionMemoriesChange(event: UmbChangeEvent) {
+		const target = event.target as UmbInputRichMediaElement;
+		const interactionMemories = target.interactionMemories;
+
+		if (interactionMemories && interactionMemories.length > 0) {
+			this.#setInteractionMemory(interactionMemories);
+		} else {
+			this.#deleteInteractionMemory();
+		}
 	}
 
 	override render() {
@@ -126,7 +196,9 @@ export class UmbPropertyEditorUIMediaPickerElement
 				.requiredMessage=${this.mandatoryMessage}
 				?multiple=${this._multiple}
 				@change=${this.#onChange}
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly}
+				.interactionMemories=${this._interactionMemories}
+				@interaction-memory-change=${this.#onInteractionMemoriesChange}>
 			</umb-input-rich-media>
 		`;
 	}

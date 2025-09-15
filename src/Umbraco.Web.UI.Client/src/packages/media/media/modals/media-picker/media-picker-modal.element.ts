@@ -28,6 +28,10 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 import '@umbraco-cms/backoffice/imaging';
+import {
+	UmbInteractionMemoryManager,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -37,6 +41,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	#mediaTreeRepository = new UmbMediaTreeRepository(this);
 	#mediaItemRepository = new UmbMediaItemRepository(this);
 	#mediaSearchProvider = new UmbMediaSearchProvider(this);
+	#interactionMemoryManager = new UmbInteractionMemoryManager(this);
 
 	#dataType?: { unique: string };
 
@@ -153,6 +158,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this._currentPage = paginationManager.getCurrentPageNumber();
 		this._currentTotalPages = paginationManager.getTotalPages();
 
+		this.#setLocationMemory();
+
 		if (selectedItems?.length) {
 			const selectedItem = this._currentChildren.find((x) => x.unique == selectedItems[0].unique);
 			if (selectedItem) {
@@ -172,7 +179,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this._currentMediaEntity = {
 			name: item.name,
 			unique: item.unique,
-			entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
+			entityType: item.entityType,
 		};
 
 		// If the user has navigated into an item, we default to search only within that item.
@@ -291,6 +298,33 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		} else {
 			this._searchFrom = undefined;
 		}
+	}
+
+	#interactionMemoryUnique: string = 'UmbMediaItemPickerLocation';
+	#muteMemoryObservation = false;
+
+	#setLocationMemory() {
+		if (!this.#interactionMemoryManager) return;
+
+		// Add a memory entry with the latest location
+		const memory: UmbInteractionMemoryModel = {
+			unique: this.#interactionMemoryUnique,
+			values: [
+				{
+					unique: this.#interactionMemoryUnique,
+					location: {
+						entity: {
+							entityType: this._currentMediaEntity.entityType,
+							unique: this._currentMediaEntity.unique,
+						},
+					},
+				},
+			],
+		};
+
+		this.#muteMemoryObservation = true;
+		this.modalContext?.interactionMemory.setMemory(memory);
+		this.#muteMemoryObservation = false;
 	}
 
 	override render() {
