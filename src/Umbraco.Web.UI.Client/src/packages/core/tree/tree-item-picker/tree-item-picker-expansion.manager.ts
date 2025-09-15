@@ -1,0 +1,85 @@
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type {
+	UmbInteractionMemoryManager,
+	UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbEntityExpansionManager, type UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
+
+export interface UmbTreeItemPickerExpansionManagerArgs {
+	interactionMemoryManager?: UmbInteractionMemoryManager;
+}
+
+export class UmbTreeItemPickerExpansionManager extends UmbControllerBase {
+	#manager = new UmbEntityExpansionManager(this);
+	public readonly expansion = this.#manager.expansion;
+
+	#interactionMemoryManager?: UmbInteractionMemoryManager;
+	#interactionMemoryUnique: string = 'UmbTreeItemPickerExpansion';
+	#muteMemoryObservation = false;
+
+	constructor(host: UmbControllerHost, args?: UmbTreeItemPickerExpansionManagerArgs) {
+		super(host);
+		this.#interactionMemoryManager = args?.interactionMemoryManager;
+
+		if (this.#interactionMemoryManager) {
+			this.#observeInteractionMemory();
+		}
+	}
+
+	/**
+	 * Sets the full expansion state
+	 * @param {UmbEntityExpansionModel} expansion - The full expansion state to set
+	 * @memberof UmbTreeItemPickerExpansionManager
+	 */
+	setExpansion(expansion: UmbEntityExpansionModel): void {
+		this.#manager.setExpansion(expansion);
+		// Store the latest expansion state in interaction memory
+		this.#setExpansionMemory();
+	}
+
+	/**
+	 * Gets the current expansion state
+	 * @returns {UmbEntityExpansionModel} The full expansion state
+	 * @memberof UmbTreeItemPickerExpansionManager
+	 */
+	getExpansion(): UmbEntityExpansionModel {
+		return this.#manager.getExpansion();
+	}
+
+	#observeInteractionMemory() {
+		this.observe(this.#interactionMemoryManager?.memory(this.#interactionMemoryUnique), (memory) => {
+			if (this.#muteMemoryObservation) return;
+
+			if (memory) {
+				this.#applyExpansionInteractionMemory(memory);
+			}
+		});
+	}
+
+	#setExpansionMemory() {
+		// Add a memory entry with the latest expansion state
+		const memory: UmbInteractionMemoryModel = {
+			unique: this.#interactionMemoryUnique,
+			values: [
+				{
+					unique: this.#interactionMemoryUnique,
+					expansion: this.getExpansion(),
+				},
+			],
+		};
+
+		this.#muteMemoryObservation = true;
+		this.#interactionMemoryManager?.setMemory(memory);
+		this.#muteMemoryObservation = false;
+	}
+
+	#applyExpansionInteractionMemory(memory: UmbInteractionMemoryModel) {
+		const memoryValue = memory?.values?.find((x) => x.unique === this.#interactionMemoryUnique);
+		const memoryExpansion = memoryValue?.expansion as UmbEntityExpansionModel | undefined;
+
+		if (memoryExpansion) {
+			this.#manager.setExpansion(memoryExpansion);
+		}
+	}
+}

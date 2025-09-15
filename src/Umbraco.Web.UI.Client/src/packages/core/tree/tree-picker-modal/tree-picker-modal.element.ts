@@ -1,5 +1,6 @@
 import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
 import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
+import type { UmbTreeElement } from '../tree.element.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -7,6 +8,7 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
+import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbPickerModalBaseElement<
@@ -33,6 +35,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	private _searchQuery?: string;
 
+	@state()
+	private _treeExpansion: UmbEntityExpansionModel = [];
+
 	protected _pickerContext = new UmbTreeItemPickerContext(this);
 
 	constructor() {
@@ -43,6 +48,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		});
 		this.#observePickerSelection();
 		this.#observeSearch();
+		this.#observeExpansion();
 	}
 
 	override connectedCallback(): void {
@@ -102,6 +108,16 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		);
 	}
 
+	#observeExpansion() {
+		this.observe(
+			this._pickerContext.expansion.expansion,
+			(value) => {
+				this._treeExpansion = value;
+			},
+			'umbTreeItemPickerExpansionObserver',
+		);
+	}
+
 	// Tree Selection
 	#onTreeItemSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
@@ -150,6 +166,12 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		}
 	}
 
+	#onTreeItemExpansionChange(event: UmbExpansionChangeEvent) {
+		const target = event.target as UmbTreeElement;
+		const expansion = target.getExpansion();
+		this._pickerContext.expansion.setExpansion(expansion);
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('general_choose')}>
@@ -182,9 +204,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					selectableFilter: this.data?.pickableFilter,
 					startNode: this.data?.startNode,
 					foldersOnly: this.data?.foldersOnly,
+					expansion: this._treeExpansion,
 				}}
 				@selected=${this.#onTreeItemSelected}
-				@deselected=${this.#onTreeItemDeselected}></umb-tree>
+				@deselected=${this.#onTreeItemDeselected}
+				@expansion-change=${this.#onTreeItemExpansionChange}></umb-tree>
 		`;
 	}
 
