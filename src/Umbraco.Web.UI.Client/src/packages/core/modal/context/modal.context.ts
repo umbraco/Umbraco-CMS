@@ -8,7 +8,10 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbDeepPartialObject, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_ROUTE_CONTEXT, type IRouterSlot } from '@umbraco-cms/backoffice/router';
-import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
+import {
+	UmbInteractionMemoryManager,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -89,7 +92,8 @@ export class UmbModalContext<
 		this.#size.setValue(size);
 
 		// Pass any provided memories to the interaction memory manager
-		args.data?.interactionMemories?.forEach((memory) => this.interactionMemory.setMemory(memory));
+		const memories = ((args.data?.interactionMemories as Array<UmbInteractionMemoryModel>) || undefined) ?? [];
+		memories.forEach((memory) => this.interactionMemory.setMemory(memory));
 
 		const defaultData = this.alias instanceof UmbModalToken ? this.alias.getDefaultData() : undefined;
 		this.data = Object.freeze(
