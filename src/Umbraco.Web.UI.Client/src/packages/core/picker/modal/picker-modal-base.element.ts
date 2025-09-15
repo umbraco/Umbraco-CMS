@@ -6,7 +6,6 @@ import {
 	UmbModalBaseElement,
 	type ManifestModal,
 	type UmbModalContext,
-	type UmbModalRejectReason,
 	type UmbPickerModalData,
 } from '@umbraco-cms/backoffice/modal';
 
@@ -21,27 +20,28 @@ export abstract class UmbPickerModalBaseElement<
 	@property({ attribute: false })
 	public override set modalContext(context: UmbModalContext<ModalDataType, ModalValueType> | undefined) {
 		super.modalContext = context;
-		this.#observeInteractionMemories();
+		this.#observeModalInteractionMemories();
 	}
 	public override get modalContext(): UmbModalContext<ModalDataType, ModalValueType> | undefined {
 		return super.modalContext;
 	}
 
-	protected override _submitModal() {
-		this.#setTreeItemPickerModalMemory();
-		super._submitModal();
+	override connectedCallback(): void {
+		super.connectedCallback();
+		this.#observePickerModalInteractionMemories();
 	}
 
-	protected override _rejectModal(reason?: UmbModalRejectReason) {
-		this.#setTreeItemPickerModalMemory();
-		super._rejectModal(reason);
+	#observePickerModalInteractionMemories() {
+		this.observe(this._pickerContext.interactionMemory.memories, (memories) => {
+			this.#setTreeItemPickerModalMemory(memories);
+		});
 	}
 
 	#getInteractionMemoryUnique() {
 		return 'UmbPickerModalMemory';
 	}
 
-	#observeInteractionMemories() {
+	#observeModalInteractionMemories() {
 		this.observe(
 			this.modalContext?.interactionMemory.memory(this.#getInteractionMemoryUnique()),
 			(memory) => {
@@ -51,10 +51,7 @@ export abstract class UmbPickerModalBaseElement<
 		);
 	}
 
-	#setTreeItemPickerModalMemory() {
-		// Get all memories from the picker context and set them as on combined memory for the picker modal
-		const pickerMemories = this._pickerContext.interactionMemory.getAllMemories();
-
+	#setTreeItemPickerModalMemory(pickerMemories: Array<UmbInteractionMemoryModel>) {
 		if (pickerMemories?.length > 0) {
 			const pickerModalMemory: UmbInteractionMemoryModel = {
 				unique: this.#getInteractionMemoryUnique(),
