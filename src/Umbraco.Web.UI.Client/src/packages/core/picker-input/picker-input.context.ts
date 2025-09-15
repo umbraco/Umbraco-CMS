@@ -105,6 +105,7 @@ export class UmbPickerInputContext<
 		const modalContext = modalManagerContext.open(this, this.modalAlias, {
 			data: {
 				multiple: this._max === 1 ? false : true,
+				interactionMemories: this.interactionMemory.getAllMemories(),
 				...pickerData,
 			},
 			value: {
@@ -114,7 +115,7 @@ export class UmbPickerInputContext<
 
 		const modalValue = await modalContext.onSubmit().catch(() => undefined);
 
-		this.#handleModalMemories(modalContext?.interactionMemory.getAllMemories() ?? []);
+		this.#setMemoriesFromModal(modalContext?.interactionMemory.getAllMemories() ?? []);
 
 		if (!modalValue) return;
 
@@ -142,7 +143,7 @@ export class UmbPickerInputContext<
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 
-	#handleModalMemories(modalMemories: Array<UmbInteractionMemoryModel>) {
+	#setMemoriesFromModal(modalMemories: Array<UmbInteractionMemoryModel>) {
 		/* Check if we have any memories from the modal, and if so, 
 		apply it to the picker input context so it can be reached from the input element. */
 		if (modalMemories.length > 0) {
