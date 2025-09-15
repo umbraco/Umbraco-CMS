@@ -41,7 +41,7 @@ export abstract class UmbPickerModalBaseElement<
 
 	#getInteractionMemoryUnique() {
 		// TODO: consider appending with a picker unique when we have that implemented.
-		return `UmbPickerModalMemory`;
+		return `UmbPickerModal`;
 	}
 
 	#observeModalInteractionMemories() {
