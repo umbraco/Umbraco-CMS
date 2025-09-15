@@ -28,6 +28,8 @@ export abstract class UmbPickerModalBaseElement<
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+		// We need to observe the picker memories to be able to update the modal memory.
+		// We observe the memories to support close with esc key or clicking outside the modal.
 		this.#observePickerModalInteractionMemories();
 	}
 
@@ -38,7 +40,8 @@ export abstract class UmbPickerModalBaseElement<
 	}
 
 	#getInteractionMemoryUnique() {
-		return 'UmbPickerModalMemory';
+		// TODO: consider appending with a picker unique when we have that implemented.
+		return `UmbPickerModalMemory`;
 	}
 
 	#observeModalInteractionMemories() {
