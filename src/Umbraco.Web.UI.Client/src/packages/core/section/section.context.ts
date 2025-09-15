@@ -5,6 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 export class UmbSectionContext extends UmbContextBase {
 	#manifestAlias = new UmbStringState<string | undefined>(undefined);
@@ -14,17 +15,21 @@ export class UmbSectionContext extends UmbContextBase {
 	public readonly pathname = this.#manifestPathname.asObservable();
 	public readonly label = this.#manifestLabel.asObservable();
 
+	#viewContext = new UmbViewContext(this, null);
 	#sectionContextExtensionController?: UmbExtensionsApiInitializer<any>;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SECTION_CONTEXT);
+
 		this.#createSectionContextExtensions();
 	}
 
 	public setManifest(manifest?: ManifestSection) {
 		this.#manifestAlias.setValue(manifest?.alias);
 		this.#manifestPathname.setValue(manifest?.meta?.pathname);
-		this.#manifestLabel.setValue(manifest ? manifest.meta?.label || manifest.name : undefined);
+		const sectionLabel = manifest ? manifest.meta?.label || manifest.name : undefined;
+		this.#manifestLabel.setValue(sectionLabel);
+		this.#viewContext.setBrowserTitle(sectionLabel);
 	}
 
 	getPathname() {
