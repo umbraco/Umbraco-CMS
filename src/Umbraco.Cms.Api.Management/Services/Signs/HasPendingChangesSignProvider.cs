@@ -1,8 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
-using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Services.Signs;
@@ -17,15 +14,15 @@ public class HasPendingChangesSignProvider : ISignProvider
     /// <inheritdoc/>
     public bool CanProvideSigns<TItem>()
         where TItem : IHasSigns =>
-        typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
-        typeof(TItem) == typeof(DocumentCollectionResponseModel) ||
-        typeof(TItem) == typeof(DocumentItemResponseModel);
+        typeof(TItem) == typeof(DocumentVariantItemResponseModel) ||
+        typeof(TItem) == typeof(DocumentVariantResponseModel);
+
 
     /// <inheritdoc/>
-    public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
+    public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> items)
         where TItem : IHasSigns
     {
-        foreach (TItem item in itemViewModels)
+        foreach (TItem item in items)
         {
             if (HasPendingChanges(item))
             {
@@ -39,11 +36,10 @@ public class HasPendingChangesSignProvider : ISignProvider
     /// <summary>
     /// Determines if the given item has any variant that has pending changes.
     /// </summary>
-    private bool HasPendingChanges(object item) => item switch
+    private static bool HasPendingChanges(object item) => item switch
     {
-        DocumentTreeItemResponseModel { Variants: var v } when v.Any(x => x.State == DocumentVariantState.PublishedPendingChanges) => true,
-        DocumentCollectionResponseModel { Variants: var v } when v.Any(x => x.State == DocumentVariantState.PublishedPendingChanges) => true,
-        DocumentItemResponseModel { Variants: var v } when v.Any(x => x.State == DocumentVariantState.PublishedPendingChanges) => true,
+        DocumentVariantItemResponseModel variant => variant.State == DocumentVariantState.PublishedPendingChanges,
+        DocumentVariantResponseModel variant => variant.State == DocumentVariantState.PublishedPendingChanges,
         _ => false,
     };
 }

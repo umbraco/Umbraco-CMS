@@ -10,6 +10,7 @@ function camelCaseToKebabCase(str: string): string {
 	return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, ($, ofs) => (ofs ? '-' : '') + $.toLowerCase());
 }
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export interface HtmlGlobalAttributesOptions {
 	/**
 	 * The types where the text align attribute can be applied.
@@ -19,6 +20,7 @@ export interface HtmlGlobalAttributesOptions {
 	types: Array<string>;
 }
 
+/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export const HtmlGlobalAttributes = Extension.create<HtmlGlobalAttributesOptions>({
 	name: 'htmlGlobalAttributes',
 

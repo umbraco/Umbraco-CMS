@@ -32,9 +32,9 @@ internal sealed class PublishedContentFactoryTests : UmbracoIntegrationTestWithC
     {
         var requestCache = new DictionaryAppCache();
         var appCaches = new AppCaches(
-                NoAppCache.Instance,
-                requestCache,
-                new IsolatedCaches(type => NoAppCache.Instance));
+            NoAppCache.Instance,
+            requestCache,
+            new IsolatedCaches(type => NoAppCache.Instance));
         builder.Services.AddUnique(appCaches);
     }
 

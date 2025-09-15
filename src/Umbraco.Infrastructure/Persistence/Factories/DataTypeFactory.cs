@@ -10,17 +10,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class DataTypeFactory
 {
-    public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors, ILogger<IDataType> logger, IConfigurationEditorJsonSerializer serializer)
+    public static IDataType BuildEntity(
+        DataTypeDto dto,
+        PropertyEditorCollection editors,
+        ILogger<IDataType> logger,
+        IConfigurationEditorJsonSerializer serializer,
+        IDataValueEditorFactory dataValueEditorFactory)
     {
         // Check we have an editor for the data type.
         if (!editors.TryGet(dto.EditorAlias, out IDataEditor? editor))
         {
             logger.LogWarning(
-                "Could not find an editor with alias {EditorAlias}, treating as Label. " + "The site may fail to boot and/or load data types and run.", dto.EditorAlias);
-
-            // Create as special type, which downstream can be handled by converting to a LabelPropertyEditor to make clear
-            // the situation to the user.
-            editor = new MissingPropertyEditor();
+                "Could not find an editor with alias {EditorAlias}, treating as Missing. " + "The site may fail to boot and/or load data types and run.",
+                dto.EditorAlias);
+            editor =
+                new MissingPropertyEditor(
+                    dto.EditorAlias,
+                    dataValueEditorFactory);
         }
 
         var dataType = new DataType(editor, serializer);
@@ -41,7 +47,7 @@ internal static class DataTypeFactory
             dataType.SortOrder = dto.NodeDto.SortOrder;
             dataType.Trashed = dto.NodeDto.Trashed;
             dataType.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
-            dataType.EditorUiAlias = dto.EditorUiAlias;
+            dataType.EditorUiAlias = editor is MissingPropertyEditor ? "Umb.PropertyEditorUi.Missing" : dto.EditorUiAlias;
 
             dataType.SetConfigurationData(editor.GetConfigurationEditor().FromDatabase(dto.Configuration, serializer));
 
