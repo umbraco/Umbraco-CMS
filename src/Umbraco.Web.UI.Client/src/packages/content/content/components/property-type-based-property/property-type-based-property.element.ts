@@ -16,7 +16,6 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	public set property(value: UmbPropertyTypeModel | undefined) {
 		const oldProperty = this._property;
 		this._property = value;
-
 		if (this._property?.dataType.unique !== oldProperty?.dataType.unique) {
 			this._observeDataType(this._property?.dataType.unique);
 		}
