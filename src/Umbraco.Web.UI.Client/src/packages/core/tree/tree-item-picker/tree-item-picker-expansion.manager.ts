@@ -68,12 +68,9 @@ export class UmbTreeItemPickerExpansionManager extends UmbControllerBase {
 		// Add a memory entry with the latest expansion state
 		const memory: UmbInteractionMemoryModel = {
 			unique: this.#interactionMemoryUnique,
-			values: [
-				{
-					unique: this.#interactionMemoryUnique,
-					expansion: this.getExpansion(),
-				},
-			],
+			value: {
+				expansion: this.getExpansion(),
+			},
 		};
 
 		this.#muteMemoryObservation = true;
@@ -87,8 +84,7 @@ export class UmbTreeItemPickerExpansionManager extends UmbControllerBase {
 	}
 
 	#applyExpansionInteractionMemory(memory: UmbInteractionMemoryModel) {
-		const memoryValue = memory?.values?.find((x) => x.unique === this.#interactionMemoryUnique);
-		const memoryExpansion = memoryValue?.expansion as UmbEntityExpansionModel | undefined;
+		const memoryExpansion = memory?.value?.expansion as UmbEntityExpansionModel | undefined;
 
 		if (memoryExpansion) {
 			this.#manager.setExpansion(memoryExpansion);

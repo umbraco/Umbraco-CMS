@@ -309,17 +309,14 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		// Add a memory entry with the latest location
 		const memory: UmbInteractionMemoryModel = {
 			unique: this.#interactionMemoryUnique,
-			values: [
-				{
-					unique: this.#interactionMemoryUnique,
-					location: {
-						entity: {
-							entityType: this._currentMediaEntity.entityType,
-							unique: this._currentMediaEntity.unique,
-						},
+			value: {
+				location: {
+					entity: {
+						entityType: this._currentMediaEntity.entityType,
+						unique: this._currentMediaEntity.unique,
 					},
 				},
-			],
+			},
 		};
 
 		this.#muteMemoryObservation = true;
