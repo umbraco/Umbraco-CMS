@@ -38,7 +38,6 @@ export abstract class UmbPickerModalBaseElement<
 	}
 
 	#getInteractionMemoryUnique() {
-		// TODO: we need a unique key (id/label) from the element to append to the memory unique key
 		return 'UmbPickerModalMemory';
 	}
 
