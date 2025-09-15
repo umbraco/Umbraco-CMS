@@ -1,5 +1,6 @@
 import type { ManifestCollection } from './extensions/types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export type * from './action/create/types.js';
@@ -17,7 +18,7 @@ export interface UmbCollectionBulkActionPermissions {
 }
 
 export interface UmbCollectionConfiguration {
-	unique?: string;
+	unique?: UmbEntityUnique;
 	dataTypeId?: string;
 	/** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 	allowedEntityBulkActions?: UmbCollectionBulkActionPermissions;
