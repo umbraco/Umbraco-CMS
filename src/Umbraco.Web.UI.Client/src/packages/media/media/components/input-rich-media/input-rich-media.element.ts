@@ -287,11 +287,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
 
 				if (!isIdentical) {
-					debugger;
+					this.#interactionMemories = memories;
 					this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
 				}
-
-				this.#interactionMemories = memories;
 			},
 			'_observeMemories',
 		);

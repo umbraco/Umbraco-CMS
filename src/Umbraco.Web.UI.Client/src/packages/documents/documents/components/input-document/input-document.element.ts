@@ -177,10 +177,9 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
 
 				if (!isIdentical) {
+					this.#interactionMemories = memories;
 					this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
 				}
-
-				this.#interactionMemories = memories;
 			},
 			'_observeMemories',
 		);
