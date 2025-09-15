@@ -54,13 +54,16 @@ export abstract class UmbPickerModalBaseElement<
 	#setTreeItemPickerModalMemory() {
 		// Get all memories from the picker context and set them as on combined memory for the picker modal
 		const pickerMemories = this._pickerContext.interactionMemory.getAllMemories();
-		if (pickerMemories?.length === 0) return;
 
-		const pickerModalMemory: UmbInteractionMemoryModel = {
-			unique: this.#getInteractionMemoryUnique(),
-			memories: pickerMemories,
-		};
+		if (pickerMemories?.length > 0) {
+			const pickerModalMemory: UmbInteractionMemoryModel = {
+				unique: this.#getInteractionMemoryUnique(),
+				memories: pickerMemories,
+			};
 
-		this.modalContext?.interactionMemory.setMemory(pickerModalMemory);
+			this.modalContext?.interactionMemory.setMemory(pickerModalMemory);
+		} else {
+			this.modalContext?.interactionMemory.deleteMemory(this.#getInteractionMemoryUnique());
+		}
 	}
 }
