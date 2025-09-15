@@ -1579,9 +1579,9 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             .Select<ContentTypeDto>(c => c.Alias)
             .From<ContentTypeDto>()
             .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>((ct, n) => ct.NodeId == n.NodeId)
-            .WhereLike<ContentTypeDto>(c => c.Alias, alias)
-            .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            .WhereLike<ContentTypeDto>(c => c.Alias, $"{alias}{SqlSyntax.GetWildcardPlaceholder()}");
         List<string> aliases = Database.Fetch<string>(sql);
+
 
         var i = 1;
         string test;
@@ -1630,18 +1630,18 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         // is included here just to be 100% sure since it has a FK on cmsPropertyType.
         var list = new List<string>
         {
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(User2NodeNotifyDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
-            $@"DELETE FROM {SqlSyntax.GetQuotedTableName(UserGroup2GranularPermissionDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("uniqueId")} IN
+            $"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
+            $@"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.UserGroup2GranularPermission)} WHERE {SqlSyntax.GetQuotedColumnName("uniqueId")} IN
                 (SELECT {SqlSyntax.GetQuotedColumnName("uniqueId")} FROM {SqlSyntax.GetQuotedTableName(NodeDto.TableName)} WHERE id = @id)",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(TagRelationshipDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("Id")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(ContentTypeAllowedContentTypeDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("AllowedId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(ContentType2ContentTypeDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("parentContentTypeId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(ContentType2ContentTypeDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("childContentTypeId")} = @id",
+            $"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
+            $"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentChildType)} WHERE {SqlSyntax.GetQuotedColumnName("Id")} = @id",
+            $"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentChildType)} WHERE {SqlSyntax.GetQuotedColumnName("AllowedId")} = @id",
+            $"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentTypeTree)} WHERE {SqlSyntax.GetQuotedColumnName("parentContentTypeId")} = @id",
+            $"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentTypeTree)} WHERE {SqlSyntax.GetQuotedColumnName("childContentTypeId")} = @id",
             $@"DELETE FROM {SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("propertyTypeId")} IN
-                (SELECT id FROM {SqlSyntax.GetQuotedTableName(PropertyTypeDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("contentTypeId")} = @id)",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(PropertyTypeDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("contentTypeId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(PropertyTypeGroupDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("contenttypeNodeId")} = @id",
+                (SELECT id FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.PropertyType)} WHERE {SqlSyntax.GetQuotedColumnName("contentTypeId")} = @id)",
+            $"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.PropertyType)} WHERE {SqlSyntax.GetQuotedColumnName("contentTypeId")} = @id",
+            $"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.PropertyTypeGroup)} WHERE {SqlSyntax.GetQuotedColumnName("contenttypeNodeId")} = @id",
         };
         return list;
     }

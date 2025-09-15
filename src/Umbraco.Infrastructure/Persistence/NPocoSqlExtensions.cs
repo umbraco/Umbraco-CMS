@@ -1296,6 +1296,11 @@ namespace Umbraco.Extensions
             return string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: false, tableAlias: alias));
         }
 
+        /// <summary>
+        /// Adds a SELECT clause to the SQL query based on the specified predicate and optional alias, and prepends an
+        /// opening parenthesis to the query. This is used for selects within "WHERE [column] IN (SELECT ...)" statements.
+        /// </summary>
+        /// <returns>The modified SQL query with the prepended SELECT clause and opening parenthesis.</returns>
         public static Sql<ISqlContext> SelectClosure<TDto>(this Sql<ISqlContext> sql, Func<SqlConvert<TDto>, SqlConvert<TDto>> converts)
         {
             sql.Append($"(SELECT ");

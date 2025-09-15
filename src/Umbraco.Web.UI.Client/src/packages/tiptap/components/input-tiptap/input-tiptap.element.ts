@@ -21,8 +21,8 @@ import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { Extensions } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-import './tiptap-toolbar.element.js';
-import './tiptap-statusbar.element.js';
+import '../toolbar/tiptap-toolbar.element.js';
+import '../statusbar/tiptap-statusbar.element.js';
 
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 
@@ -55,6 +55,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
+
+	@property()
+	label?: string;
 
 	/**
 	 * Sets the input to required, meaning validation will fail if the value is empty.
@@ -114,7 +117,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 		// Ensures that the "Rich Text Essentials" extension is always enabled. [LK]
 		if (!enabledExtensions.includes(TIPTAP_CORE_EXTENSION_ALIAS)) {
-			const { api } = await import('../../extensions/core/rich-text-essentials.tiptap-api.js');
+			const { default: api } = await import('../../extensions/core/rich-text-essentials.tiptap-api.js');
 			this._extensions.push(new api(this));
 		}
 
@@ -124,7 +127,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					if (manifest.api) {
 						const extension = await loadManifestApi(manifest.api);
 						if (extension) {
-							this._extensions.push(new extension(this));
+							const ext = new extension(this);
+							ext.manifest = manifest;
+							this._extensions.push(ext);
 						}
 					}
 				}
@@ -168,6 +173,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
+			editorProps: { attributes: { 'aria-label': this.label ?? 'Rich Text Editor' } },
 			extensions: tiptapExtensions,
 			content: this.#value,
 			injectCSS: false, // Prevents injecting CSS into `window.document`, as it never applies to the shadow DOM. [LK]
@@ -204,7 +210,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			${repeat(
 				this.#stylesheets,
 				(stylesheet) => stylesheet,
-				(stylesheet) => html`<link rel="stylesheet" href="${stylesheet}" />`,
+				(stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`,
 			)}
 			<style>
 				${this._styles.map((style) => unsafeCSS(style))}
@@ -236,6 +242,11 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				?readonly=${this.readonly}>
 			</umb-tiptap-statusbar>
 		`;
+	}
+
+	override destroy(): void {
+		this._editor?.destroy();
+		this._editor = undefined;
 	}
 
 	static override readonly styles = [

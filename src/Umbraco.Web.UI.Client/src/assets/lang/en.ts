@@ -177,6 +177,9 @@ export default {
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
 		viewSystemDetails: 'View Umbraco CMS system information and version number',
+		openInSplitView: 'Open in split view',
+		openVersionSelector: 'Open version selector',
+		closeVersionSelector: 'Close version selector',
 	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',
@@ -353,6 +356,7 @@ export default {
 		saveModalTitle: 'Save',
 		saveAndPublishModalTitle: 'Save and publish',
 		publishModalTitle: 'Publish',
+		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
@@ -2788,6 +2792,7 @@ export default {
 		config_statusbar: 'Statusbar',
 		config_toolbar: 'Toolbar',
 		extGroup_formatting: 'Text formatting',
+		extGroup_html: 'HTML',
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
 		extGroup_structure: 'Content structure',
