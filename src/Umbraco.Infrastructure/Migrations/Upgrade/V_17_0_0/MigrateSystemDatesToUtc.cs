@@ -57,7 +57,7 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
         (string TimeZoneName, Lazy<TimeSpan> TimeZoneOffset, Lazy<string> WindowsTimeZoneName) timeZone;
 
         var configuredTimeZoneName = _migrationSettings.Value.LocalServerTimeZone;
-        if (!configuredTimeZoneName.IsNullOrWhiteSpace())
+        if (configuredTimeZoneName.IsNullOrWhiteSpace() is false)
         {
             timeZone = (
                 configuredTimeZoneName,
@@ -132,15 +132,15 @@ public class MigrateSystemDatesToUtc : UnscopedMigrationBase
 
     private static string GetWindowsTimeZoneId(TimeZoneInfo timeZone)
     {
-        if (!timeZone.HasIanaId)
+        if (timeZone.HasIanaId is false)
         {
             return timeZone.Id;
         }
 
-        if (!TimeZoneInfo.TryConvertIanaIdToWindowsId(timeZone.Id, out var windowsId))
+        if (TimeZoneInfo.TryConvertIanaIdToWindowsId(timeZone.Id, out var windowsId) is false)
         {
             throw new InvalidOperationException(
-                $"Failed to convert local time zone IANA id '{timeZone.Id}' to a Windows id. Please manually configure the 'Umbraco:CMS:SystemDateMigration:LocalServerTimeZone' app setting with a valid Windows time zone name.");
+                $"Could not update system dates to UTC as it was not possible to convert the detected local time zone IANA id '{timeZone.Id}' to a Windows Id necessary for updates with SQL Server. Please manually configure the 'Umbraco:CMS:SystemDateMigration:LocalServerTimeZone' app setting with a valid Windows time zone name.");
         }
 
         return windowsId;
