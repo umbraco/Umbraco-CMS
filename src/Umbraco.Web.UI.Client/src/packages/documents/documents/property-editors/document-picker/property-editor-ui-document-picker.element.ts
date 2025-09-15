@@ -1,6 +1,5 @@
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -112,9 +111,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 
 	#deleteInteractionMemory() {
 		const unique = this.#getInteractionMemoryUnique();
-		if (!unique) {
-			throw new Error('Memory is unique is missing');
-		}
+		if (!unique) return;
 		this.#interactionMemoryContext?.memory.deleteMemory(unique);
 	}
 
