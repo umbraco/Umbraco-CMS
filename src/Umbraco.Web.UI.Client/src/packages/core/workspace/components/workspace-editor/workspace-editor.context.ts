@@ -41,7 +41,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 						const context = new UmbWorkspaceViewContext(this, manifest);
 						context.setVariantId(this.#variantId);
 						context.setBrowserTitle(manifest.meta.label);
-						context.hints.inheritFrom(this.#hints);
+						context.inherit();
 						contexts.push(context);
 					});
 			}
@@ -83,12 +83,9 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 	#contexts = new Array<UmbWorkspaceViewContext>();
 
 	#variantId?: UmbVariantId;
-	#hints = new UmbHintController<UmbVariantHint>(this, {});
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_WORKSPACE_EDITOR_CONTEXT);
-
-		this.#hints.inherit();
 
 		this.#init = new UmbExtensionsManifestInitializer(
 			this,
@@ -103,7 +100,6 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 
 	setVariantId(variantId: UmbVariantId | undefined): void {
 		this.#variantId = variantId;
-		this.#hints.updateScaffold({ variantId });
 		this.#contexts.forEach((view) => {
 			view.hints.updateScaffold({ variantId });
 		});

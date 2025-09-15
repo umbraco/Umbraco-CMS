@@ -7,7 +7,7 @@ import { UmbArrayState, UmbObjectState, type Observable } from '@umbraco-cms/bac
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
 export interface UmbHintControllerArgs<HintType extends UmbHint = UmbHint> {
-	viewAlias?: string;
+	viewAlias?: string | null;
 	scaffold?: Partial<HintType>;
 }
 
@@ -93,6 +93,9 @@ export class UmbHintController<
 	}
 
 	inherit(): void {
+		if (this.#viewAlias === null) {
+			throw new Error('A Hint Controller needs a view alias to be able to inherit from a parent.');
+		}
 		this.consumeContext(UMB_HINT_CONTEXT, (parent) => {
 			this.inheritFrom(parent);
 		}).skipHost();

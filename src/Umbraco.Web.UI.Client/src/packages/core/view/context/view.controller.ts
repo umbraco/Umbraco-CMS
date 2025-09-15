@@ -15,6 +15,7 @@ import type { UmbContextConsumerController, UmbContextProviderController } from 
  */
 export class UmbViewController extends UmbControllerBase {
 	//
+	#attached = false;
 	#providerCtrl?: UmbContextProviderController;
 	#consumeParentCtrl?: UmbContextConsumerController<typeof UMB_VIEW_CONTEXT.TYPE>;
 	#currentProvideHost?: UmbClassInterface;
@@ -39,14 +40,9 @@ export class UmbViewController extends UmbControllerBase {
 	constructor(host: UmbControllerHost, viewAlias: string | null) {
 		super(host);
 		this.viewAlias = viewAlias;
-		this.hints = new UmbHintController<UmbVariantHint>(
-			this,
-			viewAlias
-				? {
-						viewAlias: viewAlias,
-					}
-				: undefined,
-		);
+		this.hints = new UmbHintController<UmbVariantHint>(this, {
+			viewAlias: viewAlias,
+		});
 		this.firstHintOfVariant = mergeObservables([this.variantId, this.hints.hints], ([variantId, hints]) => {
 			// Notice, because we in UI have invariant fields on Variants, then we will accept invariant hints on variants.
 			if (variantId) {
@@ -61,8 +57,13 @@ export class UmbViewController extends UmbControllerBase {
 		this.#consumeParentCtrl = this.consumeContext(UMB_VIEW_CONTEXT, (parentView) => {
 			// In case of explicit inheritance we do not want to overview the parent view.
 			if (this.#explicitInheritance) return;
-			this.#parentView = parentView;
-			if (this.#active) {
+			if (parentView) {
+				this.#parentView = parentView;
+			}
+			if (this.#inherit) {
+				this.#inheritFromParent();
+			}
+			if (this.#attached && this.#active) {
 				this.activate();
 			}
 		}).skipHost();
@@ -90,7 +91,7 @@ export class UmbViewController extends UmbControllerBase {
 		this.#providerCtrl = controllerHost.provideContext(UMB_VIEW_CONTEXT, this);
 		this.hints.provideAt(controllerHost);
 
-		if (!this.#deactivatedFromOutside) {
+		if (this.#attached && !this.#deactivatedFromOutside) {
 			this.activate();
 		}
 	}
@@ -102,10 +103,11 @@ export class UmbViewController extends UmbControllerBase {
 		}
 		this.hints.unprovide();
 
-		// TODO: should be call deactivate?
+		// TODO: should we call deactivate? currently deactive does nothing so lets await. [NL]
 	}
 
 	override hostConnected(): void {
+		this.#attached = true;
 		super.hostConnected();
 		// CHeck that we have a providerController, otherwise this is not provided. [NL]
 		if (this.#providerCtrl && !this.#deactivatedFromOutside) {
@@ -114,19 +116,25 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	override hostDisconnected(): void {
-		// CHeck that we have a providerController, otherwise this is not provided. [NL]
-		if (this.#providerCtrl && this.#parentView) {
-			this.#parentView.activate();
-		}
+		const wasAttached = this.#attached;
+		const wasActive = this.#active;
+		this.#attached = false;
+		this.#active = false;
 		super.hostDisconnected();
+		if (wasAttached === true && wasActive) {
+			// CHeck that we have a providerController, otherwise this is not provided. [NL]
+			if (this.#parentView) {
+				this.#parentView.activate();
+			}
+		}
 	}
 
 	public inherit() {
 		this.#inherit = true;
-		this.#updateTitle();
 	}
 
 	public inheritFrom(context?: UmbViewController): void {
+		this.#inherit = true;
 		this.#explicitInheritance = true;
 		this.#consumeParentCtrl?.destroy();
 		this.#consumeParentCtrl = undefined;
@@ -149,28 +157,21 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	public activate() {
-		this.#active = true;
-		if (this.#parentView) {
-			// Missing option to deactivate the parent not part of this inheritance chain.
-			this.#parentView.deactivate();
+		if (this.#attached === false) {
+			if (this.#parentView) {
+				this.#parentView.activate();
+				return;
+			} else {
+				throw new Error('Cannot activate a view that is not attached to the DOM.');
+			}
+		} else {
+			this.#active = true;
+			if (this.#parentView) {
+				// Missing option to deactivate the parent not part of this inheritance chain.
+				this.#parentView.deactivate();
+			}
+			this.#updateTitle();
 		}
-		this.#updateTitle();
-	}
-
-	#updateTitle() {
-		const localTitle = this.getComputedTitle();
-		document.title = (localTitle ? localTitle + ' | ' : '') + 'Umbraco';
-	}
-
-	public getComputedTitle(): string | undefined {
-		const titles = [];
-		if (this.#parentView) {
-			titles.push(this.#parentView.getComputedTitle());
-		}
-		if (this.#title) {
-			titles.push(this.#localize.string(this.#title));
-		}
-		return titles.length > 0 ? titles.join(' | ') : undefined;
 	}
 
 	/**
@@ -180,5 +181,27 @@ export class UmbViewController extends UmbControllerBase {
 	public deactivate() {
 		if (!this.#active) return;
 		this.#deactivatedFromOutside = true;
+	}
+
+	#updateTitle() {
+		const localTitle = this.getComputedTitle();
+		document.title = (localTitle ? localTitle + ' | ' : '') + 'Umbraco';
+	}
+
+	public getComputedTitle(): string | undefined {
+		const titles = [];
+		if (this.#inherit && this.#parentView) {
+			titles.push(this.#parentView.getComputedTitle());
+		}
+		if (this.#title) {
+			titles.push(this.#localize.string(this.#title));
+		}
+		return titles.length > 0 ? titles.join(' | ') : undefined;
+	}
+
+	override destroy(): void {
+		this.unprovide();
+		super.destroy();
+		this.#consumeParentCtrl = undefined;
 	}
 }
