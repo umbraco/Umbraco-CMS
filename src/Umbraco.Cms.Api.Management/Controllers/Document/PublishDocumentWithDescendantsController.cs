@@ -58,11 +58,12 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
             true);
 
         return attempt.Success && attempt.Result.AcceptedTaskId.HasValue
-            ? Ok(new PublishWithDescendantsResultModel
-            {
-                TaskId = attempt.Result.AcceptedTaskId.Value,
-                IsComplete = false
-            })
+            ? Ok(
+                new PublishWithDescendantsResultModel
+                {
+                    TaskId = attempt.Result.AcceptedTaskId.Value,
+                    IsComplete = false,
+                })
             : DocumentPublishingOperationStatusResult(attempt.Status, failedBranchItems: attempt.Result.FailedItems);
     }
 

@@ -1,4 +1,4 @@
-import type { MediaValueType } from '../../property-editors/upload-field/types.js';
+import type { UmbMediaValueType } from '../../property-editors/upload-field/types.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
 import { getMimeTypeFromExtension } from './utils.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -20,11 +20,11 @@ import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	set value(value: MediaValueType) {
+	set value(value: UmbMediaValueType) {
 		this.#src = value?.src ?? '';
 		this.#setPreviewAlias();
 	}
-	get value(): MediaValueType {
+	get value(): UmbMediaValueType {
 		return {
 			src: this.#src,
 			temporaryFileId: this.temporaryFile?.temporaryUnique,
@@ -201,7 +201,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	#renderButtonRemove() {
 		return html`
 			<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
-				<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
+				<uui-icon name="icon-trash"></uui-icon>
+				<umb-localize key="content_uploadClear">Clear file(s)</umb-localize>
 			</uui-button>
 		`;
 	}

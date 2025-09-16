@@ -31,7 +31,7 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 	}
 
 	@state()
-	private sourceType: string = 'content';
+	private _sourceType: string = 'content';
 
 	#initialized: boolean = false;
 
@@ -55,11 +55,11 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 				if (startNode?.type) {
 					// If we had a sourceType before, we can see this as a change and not the initial value,
 					// so let's reset the value, so we don't carry over content-types to the new source type.
-					if (this.#initialized && this.sourceType !== startNode.type) {
+					if (this.#initialized && this._sourceType !== startNode.type) {
 						this.#setValue([]);
 					}
 
-					this.sourceType = startNode.type;
+					this._sourceType = startNode.type;
 
 					if (!this.#initialized) {
 						this.#initialized = true;
@@ -71,7 +71,7 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 	}
 
 	#onChange(event: CustomEvent) {
-		switch (this.sourceType) {
+		switch (this._sourceType) {
 			case 'content':
 				this.#setValue((<UmbInputDocumentTypeElement>event.target).selection);
 				break;
@@ -98,7 +98,7 @@ export class UmbPropertyEditorUIContentPickerSourceTypeElement
 	}
 
 	#renderType() {
-		switch (this.sourceType) {
+		switch (this._sourceType) {
 			case 'content':
 				return this.#renderTypeContent();
 			case 'media':

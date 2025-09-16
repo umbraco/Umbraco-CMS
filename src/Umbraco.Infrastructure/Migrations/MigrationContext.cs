@@ -8,10 +8,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /// <summary>
 ///     Implements <see cref="IMigrationContext" />.
 /// </summary>
-internal class MigrationContext : IMigrationContext
+internal sealed class MigrationContext : IMigrationContext
 {
     private readonly Action? _onCompleteAction;
-    private readonly List<Type> _postMigrations = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MigrationContext" /> class.

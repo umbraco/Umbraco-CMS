@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-internal class PublishedProperty : PublishedPropertyBase
+internal sealed class PublishedProperty : PublishedPropertyBase
 {
     private readonly PublishedContent _content;
     private readonly bool _isPreviewing;
@@ -20,6 +20,8 @@ internal class PublishedProperty : PublishedPropertyBase
     private readonly object? _sourceValue;
     private readonly ContentVariation _variations;
     private readonly ContentVariation _sourceVariations;
+
+    private readonly string _propertyTypeAlias;
 
     // the variant and non-variant object values
     private bool _interInitialized;
@@ -71,12 +73,14 @@ internal class PublishedProperty : PublishedPropertyBase
         // it must be set to the union of variance (the combination of content type and property type variance).
         _variations = propertyType.Variations | content.ContentType.Variations;
         _sourceVariations = propertyType.Variations;
+
+        _propertyTypeAlias = propertyType.Alias;
     }
 
     // used to cache the CacheValues of this property
     internal string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValues(_content.Key, Alias, _isPreviewing);
 
-    private string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
+    private static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
     {
         if (previewing)
         {
@@ -89,21 +93,31 @@ internal class PublishedProperty : PublishedPropertyBase
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         var value = GetSourceValue(culture, segment);
-        var hasValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
-        if (hasValue.HasValue)
+        var isValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
+        if (isValue.HasValue)
         {
-            return hasValue.Value;
+            return isValue.Value;
         }
 
-        return PropertyType.IsValue(GetInterValue(culture, segment), PropertyValueLevel.Object) ?? false;
+        value = GetInterValue(culture, segment);
+        isValue = PropertyType.IsValue(value, PropertyValueLevel.Inter);
+        if (isValue.HasValue)
+        {
+            return isValue.Value;
+        }
+
+        value = GetValue(culture, segment);
+        isValue = PropertyType.IsValue(value, PropertyValueLevel.Object);
+
+        return isValue ?? false;
     }
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_sourceVariations, _content.Id, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_sourceVariations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         // source values are tightly bound to the property/schema culture and segment configurations, so we need to
         // sanitize the contextualized culture/segment states before using them to access the source values.
@@ -146,7 +160,7 @@ internal class PublishedProperty : PublishedPropertyBase
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
@@ -209,7 +223,7 @@ internal class PublishedProperty : PublishedPropertyBase
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);
@@ -226,7 +240,7 @@ internal class PublishedProperty : PublishedPropertyBase
         return value;
     }
 
-    private object? GetDeliveryApiDefaultObject(CacheValue cacheValues, Func<object?> getValue)
+    private static object? GetDeliveryApiDefaultObject(CacheValue cacheValues, Func<object?> getValue)
     {
         if (cacheValues.DeliveryApiDefaultObjectInitialized == false)
         {
@@ -237,7 +251,7 @@ internal class PublishedProperty : PublishedPropertyBase
         return cacheValues.DeliveryApiDefaultObjectValue;
     }
 
-    private object? GetDeliveryApiExpandedObject(CacheValue cacheValues, Func<object?> getValue)
+    private static object? GetDeliveryApiExpandedObject(CacheValue cacheValues, Func<object?> getValue)
     {
         if (cacheValues.DeliveryApiExpandedObjectInitialized == false)
         {
@@ -248,7 +262,7 @@ internal class PublishedProperty : PublishedPropertyBase
         return cacheValues.DeliveryApiExpandedObjectValue;
     }
 
-    private class SourceInterValue
+    private sealed class SourceInterValue
     {
         private string? _culture;
         private string? _segment;
@@ -268,7 +282,7 @@ internal class PublishedProperty : PublishedPropertyBase
         public object? SourceValue { get; set; }
     }
 
-    private class CacheValues : CacheValue
+    private sealed class CacheValues : CacheValue
     {
         private readonly Lock _locko = new();
         private ConcurrentDictionary<CompositeStringStringKey, CacheValue>? _values;

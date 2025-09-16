@@ -48,10 +48,10 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	settings?: UmbBlockDataType;
 
 	@state()
-	_inlineProperty?: UmbPropertyTypeModel;
+	private _inlineProperty?: UmbPropertyTypeModel;
 
 	@state()
-	_inlinePropertyDataPath?: string;
+	private _inlinePropertyDataPath?: string;
 
 	@state()
 	private _ownerContentTypeName?: string;

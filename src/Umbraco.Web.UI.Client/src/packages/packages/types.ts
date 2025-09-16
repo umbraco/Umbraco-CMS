@@ -2,7 +2,18 @@ import type { ManifestResponseModel } from '@umbraco-cms/backoffice/external/bac
 
 export type UmbPackage = ManifestResponseModel;
 
-export type PackageManifestResponse = UmbPackage[];
+/**
+ * Represents the response from the package manifest endpoint.
+ * This type is used to define the structure of the package manifest response.
+ */
+export type UmbPackageManifestResponse = UmbPackage[];
+
+/**
+ * Represents the response from the package manifest endpoint.
+ * @deprecated Use `UmbPackageManifestResponse` instead. This will be removed in Umbraco 18.
+ */
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export type PackageManifestResponse = UmbPackageManifestResponse;
 
 export type UmbPackageWithMigrationStatus = UmbPackage & {
 	hasPendingMigrations: boolean;

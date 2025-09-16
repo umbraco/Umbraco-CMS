@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
 const documentFolderName = 'TestFolder';
@@ -25,7 +25,7 @@ test('can create a empty document type folder', {tag: '@smoke'}, async ({umbraco
   await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
   expect(await umbracoApi.documentType.doesNameExist(documentFolderName)).toBeTruthy();
   // Checks if the folder is in the root
-  await umbracoUi.documentType.clickCaretButtonForName('Document Types');
+  await umbracoUi.documentType.openCaretButtonForName('Document Types');
   await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName);
 });
 
@@ -105,7 +105,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   // Act
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.documentType.clickRootFolderCaretButton();
-  await umbracoUi.documentType.clickCaretButtonForName(grandParentFolderName);
+  await umbracoUi.documentType.openCaretButtonForName(grandParentFolderName);
   await umbracoUi.documentType.clickActionsMenuForName(parentFolderName);
   await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();

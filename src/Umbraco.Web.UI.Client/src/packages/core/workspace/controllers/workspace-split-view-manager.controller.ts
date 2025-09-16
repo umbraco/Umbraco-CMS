@@ -1,18 +1,26 @@
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-export type ActiveVariant = {
+export type UmbActiveVariant = {
 	index: number;
 	culture: string | null;
 	segment: string | null;
 };
 
 /**
+ * @deprecated Use {@link UmbActiveVariant} instead. This will be removed in Umbraco 18.
+ */
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export type ActiveVariant = UmbActiveVariant;
+
+const UBM_VARIANT_DELIMITER = '_&_';
+
+/**
  * @class UmbWorkspaceSplitViewManager
  * @description - Class managing the split view state for a workspace context.
  */
 export class UmbWorkspaceSplitViewManager {
-	#activeVariantsInfo = new UmbArrayState<ActiveVariant>([], (x) => x.index).sortBy(
+	#activeVariantsInfo = new UmbArrayState<UmbActiveVariant>([], (x) => x.index).sortBy(
 		(a, b) => (a.index || 0) - (b.index || 0),
 	);
 	public readonly activeVariantsInfo = this.#activeVariantsInfo.asObservable();
@@ -55,7 +63,9 @@ export class UmbWorkspaceSplitViewManager {
 				const newVariants = [...activeVariants];
 				newVariants[index] = { index, culture: variantId.culture, segment: variantId.segment };
 
-				const variantPart: string = newVariants.map((v) => UmbVariantId.Create(v).toString()).join('_&_');
+				const variantPart: string = newVariants
+					.map((v) => UmbVariantId.Create(v).toString())
+					.join(UBM_VARIANT_DELIMITER);
 
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}`);
 				return true;
@@ -72,7 +82,11 @@ export class UmbWorkspaceSplitViewManager {
 		const currentVariant = this.getActiveVariants()[0];
 		const workspaceRoute = this.getWorkspaceRoute();
 		if (currentVariant && workspaceRoute) {
-			history.pushState(null, '', `${workspaceRoute}/${UmbVariantId.Create(currentVariant)}_&_${newVariant}`);
+			history.pushState(
+				null,
+				'',
+				`${workspaceRoute}/${UmbVariantId.Create(currentVariant)}${UBM_VARIANT_DELIMITER}${newVariant}`,
+			);
 			return true;
 		}
 		return false;
@@ -85,12 +99,24 @@ export class UmbWorkspaceSplitViewManager {
 			if (activeVariants && index < activeVariants.length) {
 				const newVariants = activeVariants.filter((x) => x.index !== index);
 
-				const variantPart: string = newVariants.map((v) => UmbVariantId.Create(v)).join('_&_');
+				const variantPart: string = newVariants.map((v) => UmbVariantId.Create(v)).join(UBM_VARIANT_DELIMITER);
 
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}`);
 				return true;
 			}
 		}
 		return false;
+	}
+
+	public setVariantParts(routeFragment: string) {
+		const variantSplit = routeFragment.split(UBM_VARIANT_DELIMITER);
+		variantSplit.forEach((part, index) => {
+			this.handleVariantFolderPart(index, part);
+		});
+	}
+
+	public handleVariantFolderPart(index: number, folderPart: string) {
+		const variantId = UmbVariantId.FromString(folderPart);
+		this.setActiveVariant(index, variantId.culture, variantId.segment);
 	}
 }

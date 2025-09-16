@@ -576,14 +576,14 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
     }
 
-    private class ContentVariation
+    private sealed class ContentVariation
     {
         public string? Culture { get; set; }
         public string? Name { get; set; }
         public DateTime Date { get; set; }
     }
 
-    private class DocumentVariation
+    private sealed class DocumentVariation
     {
         public string? Culture { get; set; }
         public bool Edited { get; set; }
@@ -1074,8 +1074,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             ClearEntityTags(entity, _tagRepository);
         }
 
-        PersistRelations(entity);
-
         entity.ResetDirtyProperties();
 
         // troubleshooting
@@ -1325,8 +1323,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 ClearEntityTags(entity, _tagRepository);
             }
 
-            PersistRelations(entity);
-
             // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
         }
 
@@ -1553,7 +1549,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     // reading repository purely for looking up by GUID
     // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
     // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
-    private class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
+    private sealed class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
     {
         private readonly DocumentRepository _outerRepo;
 
@@ -1669,6 +1665,33 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         AddGetByQueryOrderBy(sql);
 
         return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+    }
+
+    /// <inheritdoc />
+    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(int[] documentIds)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<ContentScheduleDto>()
+            .From<ContentScheduleDto>()
+            .WhereIn<ContentScheduleDto>(contentScheduleDto => contentScheduleDto.NodeId, documentIds);
+
+        List<ContentScheduleDto>? contentScheduleDtos = Database.Fetch<ContentScheduleDto>(sql);
+
+        IDictionary<int, IEnumerable<ContentSchedule>> dictionary = contentScheduleDtos
+            .GroupBy(contentSchedule => contentSchedule.NodeId)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(scheduleDto => new ContentSchedule(
+                    scheduleDto.Id,
+                    LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? Constants.System.InvariantCulture,
+                    scheduleDto.Date,
+                    scheduleDto.Action == ContentScheduleAction.Release.ToString()
+                        ? ContentScheduleAction.Release
+                        : ContentScheduleAction.Expire))
+                    .ToList().AsEnumerable()); // We have to materialize it here,
+                                               // to avoid this being used after the scope is disposed.
+
+        return dictionary;
     }
 
     /// <inheritdoc />
@@ -1821,7 +1844,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
-    private class CultureNodeName
+    private sealed class CultureNodeName
     {
         public int Id { get; set; }
         public string? Name { get; set; }

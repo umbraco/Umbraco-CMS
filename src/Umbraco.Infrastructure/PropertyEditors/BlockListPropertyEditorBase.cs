@@ -49,7 +49,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
     /// <summary>
     /// Defines the value editor for the block list property editors.
     /// </summary>
-    internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockListValue, BlockListLayoutItem>
+    internal sealed class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockListValue, BlockListLayoutItem>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BlockListEditorPropertyValueEditor"/> class.
@@ -69,7 +69,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             BlockEditorVarianceHandler blockEditorVarianceHandler,
             ILanguageService languageService,
             IIOHelper ioHelper)
-            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute)
+            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute, logger)
         {
             BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, elementTypeCache, logger);
             Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));
@@ -85,7 +85,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
         /// <summary>
         /// Validates the min/max configuration for block list property editors.
         /// </summary>
-        private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockListValue, BlockListLayoutItem>
+        private sealed class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockListValue, BlockListLayoutItem>
         {
             private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockEditorValues;
 

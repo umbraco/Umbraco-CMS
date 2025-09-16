@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(Constants.DatabaseSchema.Tables.Server)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class ServerRegistrationDto
+internal sealed class ServerRegistrationDto
 {
     [Column("id")]
     [PrimaryKeyColumn(AutoIncrement = true)]

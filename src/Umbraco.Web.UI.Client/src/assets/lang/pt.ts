@@ -2789,7 +2789,7 @@ export default {
 		anchor: 'Âncora',
 		anchor_input: 'Introduza um ID de âncora',
 		config_dimensions_description:
-			'Defina a largura e altura máximas do editor. Isto exclui a altura da barra de ferramentas.',
+			'Definir uma largura e altura fixas para o editor. Isso exclui as alturas da barra de ferramentas e da barra de estado.',
 		config_extensions: 'Capacidades',
 		config_statusbar: 'Barra de estado',
 		config_toolbar: 'Barra de ferramentas',
@@ -2829,5 +2829,11 @@ export default {
 		resetUrlHeadline: 'Redefinir URL?',
 		resetUrlMessage: 'Tem a certeza que quer redefinir este URL?',
 		resetUrlLabel: 'Redefinir',
+	},
+	missingEditor: {
+		description:
+			'<p><strong>Erro!</strong> Este tipo de propriedade já não se encontra disponível. Por favor, contacte o administrador.</p>',
+		detailsDescription:
+			'<p>Este tipo de propriedade já não se encontra disponível.<br/>Por favor, contacte o administrador para que ele possa apagar a propriedade ou restaurar o tipo de propriedade.</p><p><strong>Dados:</strong></p>',
 	},
 } as UmbLocalizationDictionary;

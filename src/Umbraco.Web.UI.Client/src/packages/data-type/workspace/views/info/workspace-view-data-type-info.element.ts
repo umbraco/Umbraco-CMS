@@ -7,13 +7,13 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
 @customElement('umb-workspace-view-data-type-info')
 export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
-	_unique: string = '';
+	private _unique: string = '';
 
 	@state()
-	_schemaAlias?: string;
+	private _schemaAlias?: string;
 
 	@state()
-	_uiAlias?: string | null;
+	private _uiAlias?: string | null;
 
 	private _workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
