@@ -1,6 +1,5 @@
 export interface UmbInteractionMemoryModel {
-	clientTimestamp?: string;
-	value?: any;
 	unique: string;
+	value?: any;
 	memories?: Array<UmbInteractionMemoryModel>;
 }
