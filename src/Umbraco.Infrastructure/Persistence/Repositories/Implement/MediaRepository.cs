@@ -416,8 +416,6 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         // set tags
         SetEntityTags(entity, _tagRepository, _serializer);
 
-        PersistRelations(entity);
-
         OnUowRefreshedEntity(new MediaRefreshNotification(entity, new EventMessages()));
 
         entity.ResetDirtyProperties();
@@ -477,8 +475,6 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
             SetEntityTags(entity, _tagRepository, _serializer);
-
-            PersistRelations(entity);
         }
 
         OnUowRefreshedEntity(new MediaRefreshNotification(entity, new EventMessages()));

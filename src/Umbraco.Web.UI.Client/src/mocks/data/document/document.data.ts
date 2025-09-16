@@ -968,7 +968,7 @@ export const data: Array<UmbMockDocumentModel> = [
 <p>Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo</p>
 
 <p>The following tests the embed plugin:</p>
-<p><div class="umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false" data-embed-url="https://www.youtube.com/watch?v=QRIWz9SotY4"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Deep dive into Rich Text Editor"></iframe></div></p>
+<p><span class="umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false" data-embed-url="https://www.youtube.com/watch?v=QRIWz9SotY4"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Deep dive into Rich Text Editor"></iframe></span></p>
 
 <p><span id="foo">Some</span> value for the RTE with an <a target="" data-router-slot="disabled" href="https://google.com" type="external">external link</a> and an <a target="" data-router-slot="disabled" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}" type="document">internal link</a>.</p>
 

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -35,15 +35,39 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
     protected FolderTreeControllerBase(IEntityService entityService)
         : this(
               entityService,
-              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 
-    protected FolderTreeControllerBase(IEntityService entityService, SignProviderCollection signProviders)
-        : base(entityService, signProviders) =>
+    protected FolderTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders) =>
         _folderObjectTypeId = FolderObjectType.GetGuid();
 
     protected abstract UmbracoObjectTypes FolderObjectType { get; }
+
+    /// <inheritdoc/>
+    protected override Guid? GetParentKey(IEntitySlim? entity)
+    {
+        if (entity is null || entity.ParentId <= 0)
+        {
+            return Constants.System.RootKey;
+        }
+
+        Attempt<Guid> getKeyAttempt = EntityService.GetKey(entity.ParentId, ItemObjectType);
+        if (getKeyAttempt.Success)
+        {
+            return getKeyAttempt.Result;
+        }
+
+        // Parent could be a folder, so try that too.
+        getKeyAttempt = EntityService.GetKey(entity.ParentId, FolderObjectType);
+        if (getKeyAttempt.Success)
+        {
+            return getKeyAttempt.Result;
+        }
+
+        return Constants.System.RootKey;
+    }
 
     protected void RenderFoldersOnly(bool foldersOnly) => _foldersOnly = foldersOnly;
 

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup.Tree;
@@ -19,8 +19,8 @@ public class RootMemberGroupTreeController : MemberGroupTreeControllerBase
     }
 
     [ActivatorUtilitiesConstructor]
-    public RootMemberGroupTreeController(IEntityService entityService, SignProviderCollection signProviders)
-        : base(entityService, signProviders)
+    public RootMemberGroupTreeController(IEntityService entityService, FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders)
     {
     }
 

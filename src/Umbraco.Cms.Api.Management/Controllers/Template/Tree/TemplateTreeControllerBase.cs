@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -22,8 +22,8 @@ public class TemplateTreeControllerBase : NamedEntityTreeControllerBase<NamedEnt
     {
     }
 
-    public TemplateTreeControllerBase(IEntityService entityService, SignProviderCollection signProviders)
-        : base(entityService, signProviders)
+    public TemplateTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders)
     {
     }
 

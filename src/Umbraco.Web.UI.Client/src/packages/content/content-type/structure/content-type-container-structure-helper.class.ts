@@ -55,6 +55,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			this.#initRejector = reject;
 		});
 
+		this.#childContainersMerged.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 		this.#legacyMergedChildContainers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 	}
 

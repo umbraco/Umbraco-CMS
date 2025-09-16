@@ -1,4 +1,4 @@
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Extensions
@@ -11,17 +11,17 @@ namespace Umbraco.Extensions
         internal static void AddCollectionBuilders(this IUmbracoBuilder builder)
         {
             builder.SignProviders()
-                .Append<HasScheduleSignProvider>()
-                .Append<IsProtectedSignProvider>()
-                .Append<HasPendingChangesSignProvider>()
-                .Append<HasCollectionSignProvider>();
+                .Append<HasScheduleFlagProvider>()
+                .Append<IsProtectedFlagProvider>()
+                .Append<HasPendingChangesFlagProvider>()
+                .Append<HasCollectionFlagProvider>();
         }
 
         /// <summary>
         /// Gets the sign providers collection builder.
         /// </summary>
         /// <param name="builder">The builder.</param>
-        public static SignProviderCollectionBuilder SignProviders(this IUmbracoBuilder builder)
-            => builder.WithCollectionBuilder<SignProviderCollectionBuilder>();
+        public static FlagProviderCollectionBuilder SignProviders(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<FlagProviderCollectionBuilder>();
     }
 }

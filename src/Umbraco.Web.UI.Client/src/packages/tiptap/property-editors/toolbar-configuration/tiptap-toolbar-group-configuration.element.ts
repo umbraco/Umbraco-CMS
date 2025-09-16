@@ -153,6 +153,7 @@ export class UmbTiptapToolbarGroupConfigurationElement<
 					div {
 						display: flex;
 						gap: var(--uui-size-1);
+						align-items: flex-end;
 					}
 
 					uui-symbol-expand {

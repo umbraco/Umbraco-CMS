@@ -94,7 +94,6 @@ export class UmbMemberValidationServerDataSource {
 				path: { id: model.unique },
 				body,
 			}),
-			{ disableNotifications: true },
 		);
 
 		if (data && typeof data === 'string') {

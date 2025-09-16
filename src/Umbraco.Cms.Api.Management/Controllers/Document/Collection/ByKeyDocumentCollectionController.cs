@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -29,8 +29,8 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUmbracoMapper mapper,
         IDocumentCollectionPresentationFactory documentCollectionPresentationFactory,
-        SignProviderCollection signProviders)
-        : base(mapper, signProviders)
+        FlagProviderCollection flagProviders)
+        : base(mapper, flagProviders)
     {
         _contentListViewService = contentListViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -48,7 +48,7 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
             backOfficeSecurityAccessor,
             mapper,
             documentCollectionPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 
@@ -85,7 +85,6 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
         }
 
         List<DocumentCollectionResponseModel> collectionResponseModels = await _documentCollectionPresentationFactory.CreateCollectionModelAsync(collectionAttempt.Result!);
-        await PopulateSigns(collectionResponseModels);
         return CollectionResult(collectionResponseModels, collectionAttempt.Result!.Items.Total);
     }
 }

@@ -201,7 +201,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			fullPath === this._activePath ||
 			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath);
 		return html`<uui-tab
-			.label=${this.localize.string(name ?? '#general_unnamed')}
+			label=${this.localize.string(name ?? '#general_unnamed')}
 			.active=${active}
 			href=${fullPath}
 			data-mark="content-tab:${path}"

@@ -6,18 +6,18 @@ using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Api.Management.Services.Signs;
+namespace Umbraco.Cms.Api.Management.Services.Flags;
 
 /// <summary>
-/// Implements a <see cref="ISignProvider"/> that provides signs for entities that have a collection.
+/// Implements a <see cref="IFlagProvider"/> that provides flags for entities that have a collection.
 /// </summary>
-public class HasCollectionSignProvider : ISignProvider
+public class HasCollectionFlagProvider : IFlagProvider
 {
-    private const string Alias = Constants.Conventions.Signs.Prefix + "HasCollection";
+    private const string Alias = Constants.Conventions.Flags.Prefix + "HasCollection";
 
     /// <inheritdoc/>
-    public bool CanProvideSigns<TItem>()
-        where TItem : IHasSigns =>
+    public bool CanProvideFlags<TItem>()
+        where TItem : IHasFlags =>
         typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
         typeof(TItem) == typeof(DocumentCollectionResponseModel) ||
         typeof(TItem) == typeof(DocumentItemResponseModel) ||
@@ -26,14 +26,14 @@ public class HasCollectionSignProvider : ISignProvider
         typeof(TItem) == typeof(MediaItemResponseModel);
 
     /// <inheritdoc/>
-    public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> itemViewModels)
-        where TItem : IHasSigns
+    public Task PopulateFlagsAsync<TItem>(IEnumerable<TItem> itemViewModels)
+        where TItem : IHasFlags
     {
         foreach (TItem item in itemViewModels)
         {
             if (HasCollection(item))
             {
-                item.AddSign(Alias);
+                item.AddFlag(Alias);
             }
         }
 

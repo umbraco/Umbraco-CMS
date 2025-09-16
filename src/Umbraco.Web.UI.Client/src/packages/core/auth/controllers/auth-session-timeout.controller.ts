@@ -2,10 +2,13 @@ import type { UmbAuthFlow } from '../auth-flow.js';
 import type { UmbAuthContext } from '../auth.context.js';
 import { UMB_MODAL_AUTH_TIMEOUT } from '../modals/umb-auth-timeout-modal.token.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 	#tokenCheckWorker?: SharedWorker;
 	#host: UmbAuthContext;
+	#keepUserLoggedIn = false;
+	#hasCheckedKeepUserLoggedIn = false;
 
 	constructor(host: UmbAuthContext, authFlow: UmbAuthFlow) {
 		super(host, 'UmbAuthSessionTimeoutController');
@@ -22,6 +25,15 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 
 		// Listen for messages from the token check worker
 		this.#tokenCheckWorker.port.onmessage = async (event) => {
+			// If the user has chosen to stay logged in, we ignore the logout command and instead request a new token
+			if (this.#keepUserLoggedIn) {
+				console.log(
+					'[Auth Context] User chose to stay logged in, attempting to validate token instead of logging out.',
+				);
+				await this.#tryValidateToken();
+				return;
+			}
+
 			if (event.data?.command === 'logout') {
 				// If the worker signals a logout, we clear the token storage and set the user as unauthorized
 				host.timeOut();
@@ -60,12 +72,36 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			},
 			'_authFlowTimeoutSignal',
 		);
+
+		this.observe(
+			host.isAuthorized,
+			(isAuthorized) => {
+				if (isAuthorized) {
+					this.#observeKeepUserLoggedIn();
+				}
+			},
+			'_authFlowIsAuthorizedSignal',
+		);
 	}
 
 	override destroy(): void {
 		super.destroy();
 		this.#tokenCheckWorker?.port.close();
 		this.#tokenCheckWorker = undefined;
+	}
+
+	/**
+	 * Observe the user's preference for staying logged in
+	 * and update the internal state accordingly.
+	 * This method fetches the current user configuration from the server to find the value.
+	 * // TODO: We cannot observe the config store directly here yet, as it would create a circular dependency, so maybe we need to move the config option somewhere else?
+	 */
+	async #observeKeepUserLoggedIn() {
+		if (this.#hasCheckedKeepUserLoggedIn) return;
+		this.#hasCheckedKeepUserLoggedIn = true;
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		const { data } = await UserService.getUserCurrentConfiguration();
+		this.#keepUserLoggedIn = data?.keepUserLoggedIn ?? false;
 	}
 
 	async #closeTimeoutModal() {

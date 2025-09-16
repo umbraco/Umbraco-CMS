@@ -1,5 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -10,19 +15,73 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [HideFromTypeFinder]
 public class MissingPropertyEditor : IDataEditor
 {
-    public string Alias => "Umbraco.Missing";
+    private const string EditorAlias = "Umbraco.Missing";
+    private readonly IDataValueEditorFactory _dataValueEditorFactory;
+    private IDataValueEditor? _valueEditor;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MissingPropertyEditor"/> class.
+    /// </summary>
+    public MissingPropertyEditor(
+        string missingEditorAlias,
+        IDataValueEditorFactory dataValueEditorFactory)
+    {
+        _dataValueEditorFactory = dataValueEditorFactory;
+        Alias = missingEditorAlias;
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
+    public MissingPropertyEditor()
+        : this(
+            EditorAlias,
+            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
+    {
+    }
+
+    /// <inheritdoc />
+    public string Alias { get; }
+
+    /// <summary>
+    /// Gets the name of the editor.
+    /// </summary>
     public string Name => "Missing property editor";
 
+    /// <inheritdoc />
     public bool IsDeprecated => false;
 
-    public IDictionary<string, object> DefaultConfiguration => throw new NotImplementedException();
+    /// <inheritdoc />
+    public bool SupportsReadOnly => true;
 
-    public IPropertyIndexValueFactory PropertyIndexValueFactory => throw new NotImplementedException();
+    /// <inheritdoc />
+    public IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>();
 
+    /// <inheritdoc />
+    public IPropertyIndexValueFactory PropertyIndexValueFactory => new DefaultPropertyIndexValueFactory();
+
+    /// <inheritdoc />
+    public IDataValueEditor GetValueEditor() => _valueEditor
+        ??= _dataValueEditorFactory.Create<MissingPropertyValueEditor>(
+            new DataEditorAttribute(EditorAlias));
+
+    /// <inheritdoc />
+    public IDataValueEditor GetValueEditor(object? configurationObject) => GetValueEditor();
+
+    /// <inheritdoc />
     public IConfigurationEditor GetConfigurationEditor() => new ConfigurationEditor();
 
-    public IDataValueEditor GetValueEditor() => throw new NotImplementedException();
+    // provides the property value editor
+    internal sealed class MissingPropertyValueEditor : DataValueEditor
+    {
+        public MissingPropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+        {
+        }
 
-    public IDataValueEditor GetValueEditor(object? configurationObject) => throw new NotImplementedException();
+        /// <inheritdoc />
+        public override bool IsReadOnly => true;
+    }
 }

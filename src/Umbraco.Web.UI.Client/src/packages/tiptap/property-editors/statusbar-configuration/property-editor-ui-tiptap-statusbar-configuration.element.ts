@@ -310,6 +310,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 					div {
 						display: flex;
 						gap: var(--uui-size-1);
+						align-items: flex-end;
 					}
 				}
 			}
@@ -369,6 +370,7 @@ export class UmbPropertyEditorUiTiptapStatusbarConfigurationElement
 							div {
 								display: flex;
 								gap: var(--uui-size-1);
+								align-items: flex-end;
 							}
 						}
 					}

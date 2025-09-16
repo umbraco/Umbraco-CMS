@@ -440,7 +440,7 @@ public class EntityService : RepositoryService, IEntityService
 
         if (take == 0)
         {
-            totalRecords = CountChildren(parentId, childObjectType, filter);
+            totalRecords = CountChildren(parentId, childObjectType, filter: filter);
             return Enumerable.Empty<IEntitySlim>();
         }
 
@@ -484,6 +484,12 @@ public class EntityService : RepositoryService, IEntityService
         if (ResolveKey(key, objectType, out int parentId) is false)
         {
             totalRecords = 0;
+            return Enumerable.Empty<IEntitySlim>();
+        }
+
+        if (take == 0)
+        {
+            totalRecords = CountChildren(parentId, objectType, true, filter);
             return Enumerable.Empty<IEntitySlim>();
         }
 
@@ -693,17 +699,18 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
-    private int CountChildren(int id, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null) =>
-        CountChildren(id, new HashSet<UmbracoObjectTypes>() { objectType }, filter);
+    private int CountChildren(int id, UmbracoObjectTypes objectType, bool trashed = false, IQuery<IUmbracoEntity>? filter = null) =>
+        CountChildren(id, new HashSet<UmbracoObjectTypes>() { objectType }, trashed, filter);
 
     private int CountChildren(
         int id,
         IEnumerable<UmbracoObjectTypes> objectTypes,
+        bool trashed = false,
         IQuery<IUmbracoEntity>? filter = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == false);
+            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == trashed);
 
             var objectTypeGuids = objectTypes.Select(x => x.GetGuid()).ToHashSet();
             return _entityRepository.CountByQuery(query, objectTypeGuids, filter);
@@ -782,7 +789,7 @@ public class EntityService : RepositoryService, IEntityService
 
             if (take == 0)
             {
-                totalRecords = CountChildren(parentId, childObjectTypes, filter);
+                totalRecords = CountChildren(parentId, childObjectTypes, filter: filter);
                 return Array.Empty<IEntitySlim>();
             }
 
