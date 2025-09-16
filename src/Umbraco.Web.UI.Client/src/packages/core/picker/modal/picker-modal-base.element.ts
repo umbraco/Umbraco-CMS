@@ -35,7 +35,7 @@ export abstract class UmbPickerModalBaseElement<
 
 	#observePickerModalInteractionMemories() {
 		this.observe(this._pickerContext.interactionMemory.memories, (memories) => {
-			this.#setTreeItemPickerModalMemory(memories);
+			this.#setPickerModalMemory(memories);
 		});
 	}
 
@@ -54,7 +54,7 @@ export abstract class UmbPickerModalBaseElement<
 		);
 	}
 
-	#setTreeItemPickerModalMemory(pickerMemories: Array<UmbInteractionMemoryModel>) {
+	#setPickerModalMemory(pickerMemories: Array<UmbInteractionMemoryModel>) {
 		if (pickerMemories?.length > 0) {
 			const pickerModalMemory: UmbInteractionMemoryModel = {
 				unique: this.#getInteractionMemoryUnique(),
