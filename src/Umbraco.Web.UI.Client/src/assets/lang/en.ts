@@ -177,6 +177,9 @@ export default {
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
 		viewSystemDetails: 'View Umbraco CMS system information and version number',
+		openInSplitView: 'Open in split view',
+		openVersionSelector: 'Open version selector',
+		closeVersionSelector: 'Close version selector',
 	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',
@@ -353,6 +356,7 @@ export default {
 		saveModalTitle: 'Save',
 		saveAndPublishModalTitle: 'Save and publish',
 		publishModalTitle: 'Publish',
+		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
@@ -2788,6 +2792,7 @@ export default {
 		config_statusbar: 'Statusbar',
 		config_toolbar: 'Toolbar',
 		extGroup_formatting: 'Text formatting',
+		extGroup_html: 'HTML',
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
 		extGroup_structure: 'Content structure',
@@ -2826,6 +2831,12 @@ export default {
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
 	},
+	missingEditor: {
+		description:
+			'<p><strong>Error!</strong> This property type is no longer available. Please reach out to your administrator.</p>',
+		detailsDescription:
+			'<p>This property type is no longer available.<br/>Please contact your administrator so they can either delete this property or restore the property type.</p><p><strong>Data:</strong></p>',
+	},
 	uiCulture: {
 		ar: 'العربية',
 		bs: 'Bosanski',
@@ -2854,5 +2865,6 @@ export default {
 		uk: 'Українська',
 		zh: '中文',
 		'zh-tw': '中文（正體，台灣）',
+		vi: 'Tiếng Việt',
 	},
 } as UmbLocalizationDictionary;

@@ -69,8 +69,7 @@ test('can create a partial view in a folder', async ({umbracoApi, umbracoUi}) =>
   const childrenData = await umbracoApi.partialView.getChildren(folderPath);
   expect(childrenData[0].name).toEqual(partialViewFileName);
   // Verify the partial view is displayed in the folder under the Partial Views section
-  await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName, false, false);
-  await umbracoUi.partialView.clickCaretButtonForName(folderName);
+  await umbracoUi.partialView.openCaretButtonForName(folderName);
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(partialViewFileName, true, false);
 
   // Clean
@@ -86,7 +85,7 @@ test('can create a partial view in a folder in a folder', async ({umbracoApi, um
 
   //Act
   await umbracoUi.partialView.reloadPartialViewTree();
-  await umbracoUi.partialView.clickCaretButtonForName(folderName);
+  await umbracoUi.partialView.openCaretButtonForName(folderName);
   await umbracoUi.partialView.clickActionsMenuForPartialView(childFolderName);
   await umbracoUi.partialView.clickCreateOptionsActionMenuOption();
   await umbracoUi.partialView.clickNewEmptyPartialViewButton();
@@ -118,7 +117,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.partialView.doesNameExist(childFolderName)).toBeTruthy();
   const partialViewChildren = await umbracoApi.partialView.getChildren('/' + folderName);
   expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName);
-  await umbracoUi.partialView.clickCaretButtonForName(folderName);
+  await umbracoUi.partialView.openCaretButtonForName(folderName);
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(childFolderName, true, false);
 });
 
@@ -132,7 +131,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
 
   // Act
   await umbracoUi.partialView.reloadPartialViewTree();
-  await umbracoUi.partialView.clickCaretButtonForName(folderName);
+  await umbracoUi.partialView.openCaretButtonForName(folderName);
   await umbracoUi.partialView.clickActionsMenuForPartialView(childFolderName);
   await umbracoUi.partialView.createPartialViewFolder(childOfChildFolderName);
 
@@ -141,7 +140,7 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   expect(await umbracoApi.partialView.doesNameExist(childOfChildFolderName)).toBeTruthy();
   const partialViewChildren = await umbracoApi.partialView.getChildren('/' + folderName + '/' + childFolderName);
   expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName + '/' + childOfChildFolderName);
-  await umbracoUi.partialView.clickCaretButtonForName(childFolderName);
+  await umbracoUi.partialView.openCaretButtonForName(childFolderName);
   await umbracoUi.partialView.isPartialViewRootTreeItemVisible(childOfChildFolderName, true, false);
 });
 
