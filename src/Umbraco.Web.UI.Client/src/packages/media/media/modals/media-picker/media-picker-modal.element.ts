@@ -7,6 +7,7 @@ import type { UmbDropzoneMediaElement } from '../../dropzone/index.js';
 import type { UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
+import { UmbMediaPickerContext } from './media-picker.context.js';
 import type { UmbDropzoneChangeEvent, UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
 import {
 	css,
@@ -20,28 +21,30 @@ import {
 	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type { UUIInputEvent, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 
 import '@umbraco-cms/backoffice/imaging';
-import {
-	UmbInteractionMemoryManager,
-	type UmbInteractionMemoryModel,
-} from '@umbraco-cms/backoffice/interaction-memory';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
 // TODO: investigate how we can reuse the picker-search-field element, picker context etc.
 @customElement('umb-media-picker-modal')
-export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
+export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
+	UmbMediaItemModel,
+	UmbMediaPickerModalData,
+	UmbMediaPickerModalValue
+> {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this);
 	#mediaItemRepository = new UmbMediaItemRepository(this);
 	#mediaSearchProvider = new UmbMediaSearchProvider(this);
-	#interactionMemoryManager = new UmbInteractionMemoryManager(this);
+
+	protected override _pickerContext = new UmbMediaPickerContext(this);
 
 	#dataType?: { unique: string };
 
@@ -83,6 +86,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 	#pagingMap = new Map<string, UmbPaginationManager>();
 	#contextCulture?: string | null;
+	#locationInteractionMemoryUnique: string = 'UmbMediaItemPickerLocation';
 
 	constructor() {
 		super();
@@ -127,9 +131,28 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			}
 		}
 
+		const locationFromMemory = this.#getLocationFromInteractionMemory();
+		const locationEntityUnique = locationFromMemory?.entity.unique;
+
+		if (locationEntityUnique) {
+			const { data } = await this.#mediaItemRepository.requestItems([locationEntityUnique]);
+			const mediaItem = data?.[0];
+
+			if (mediaItem) {
+				this._currentMediaEntity = {
+					name: mediaItem.name,
+					unique: mediaItem.unique,
+					entityType: mediaItem.entityType,
+				};
+
+				this._searchFrom = { unique: mediaItem.unique, entityType: mediaItem.entityType };
+			}
+		}
+
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
+	// TODO: move to location manager in context
 	async #loadChildrenOfCurrentMediaItem(selectedItems?: Array<UmbUploadableItem>) {
 		const key = this._currentMediaEntity.entityType + this._currentMediaEntity.unique;
 		let paginationManager = this.#pagingMap.get(key);
@@ -158,8 +181,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this._currentPage = paginationManager.getCurrentPageNumber();
 		this._currentTotalPages = paginationManager.getTotalPages();
 
-		this.#setLocationMemory();
-
 		if (selectedItems?.length) {
 			const selectedItem = this._currentChildren.find((x) => x.unique == selectedItems[0].unique);
 			if (selectedItem) {
@@ -173,6 +194,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this.#loadChildrenOfCurrentMediaItem(target.value);
 	}
 
+	// TODO: move to location manager in context
 	#onOpen(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		this.#clearSearch();
 
@@ -188,6 +210,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			: undefined;
 
 		this.#loadChildrenOfCurrentMediaItem();
+
+		this.#setLocationInInteractionMemory();
 	}
 
 	#onSelected(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
@@ -202,11 +226,13 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this.modalContext?.setValue({ selection });
 	}
 
+	// TODO: move to search manager in context
 	#clearSearch() {
 		this._searchQuery = '';
 		this._searchResult = [];
 	}
 
+	// TODO: move to search manager in context
 	async #searchMedia() {
 		if (!this._searchQuery) {
 			this.#clearSearch();
@@ -236,10 +262,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this._searching = false;
 	}
 
+	// TODO: move to search manager in context
 	#debouncedSearch = debounce(() => {
 		this.#searchMedia();
 	}, 500);
 
+	// TODO: move to search manager in context
 	#onSearch(e: UUIInputEvent) {
 		this._searchQuery = (e.target.value as string).toLocaleLowerCase();
 		this._searching = true;
@@ -290,6 +318,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		return isUmbracoFolder(item.mediaType.unique) || item.hasChildren;
 	}
 
+	// TODO: move to search manager in context
 	#onSearchFromChange(e: CustomEvent) {
 		const checked = (e.target as HTMLInputElement).checked;
 
@@ -300,15 +329,11 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		}
 	}
 
-	#interactionMemoryUnique: string = 'UmbMediaItemPickerLocation';
-	#muteMemoryObservation = false;
-
-	#setLocationMemory() {
-		if (!this.#interactionMemoryManager) return;
-
+	// TODO: move to location manager in context
+	#setLocationInInteractionMemory() {
 		// Add a memory entry with the latest location
 		const memory: UmbInteractionMemoryModel = {
-			unique: this.#interactionMemoryUnique,
+			unique: this.#locationInteractionMemoryUnique,
 			value: {
 				location: {
 					entity: {
@@ -319,9 +344,13 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			},
 		};
 
-		this.#muteMemoryObservation = true;
-		this.modalContext?.interactionMemory.setMemory(memory);
-		this.#muteMemoryObservation = false;
+		this._pickerContext?.interactionMemory.setMemory(memory);
+	}
+
+	// TODO: move to location manager in context
+	#getLocationFromInteractionMemory(): { entity: UmbEntityModel } | undefined {
+		const memory = this._pickerContext.interactionMemory.getMemory(this.#locationInteractionMemoryUnique);
+		return memory?.value?.location;
 	}
 
 	override render() {
