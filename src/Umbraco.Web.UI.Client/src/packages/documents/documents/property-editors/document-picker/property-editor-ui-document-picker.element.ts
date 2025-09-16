@@ -71,14 +71,14 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onInputInteractionMemoriesChange(event: UmbChangeEvent) {
+	async #onInputInteractionMemoriesChange(event: UmbChangeEvent) {
 		const target = event.target as UmbInputDocumentElement;
 		const interactionMemories = target.interactionMemories;
 
 		if (interactionMemories && interactionMemories.length > 0) {
-			this.#interactionMemoryManager.setMemory(interactionMemories);
+			await this.#interactionMemoryManager.saveMemoriesForPropertyEditor(interactionMemories);
 		} else {
-			this.#interactionMemoryManager.deleteMemory();
+			await this.#interactionMemoryManager.deleteMemoriesForPropertyEditor();
 		}
 	}
 

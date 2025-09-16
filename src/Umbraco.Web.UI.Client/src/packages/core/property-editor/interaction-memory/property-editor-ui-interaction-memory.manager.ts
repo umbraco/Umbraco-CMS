@@ -18,16 +18,18 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 	#interactionMemoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
 	#configHashCode?: number;
 	#memoryUniquePrefix: string;
+	#init?: Promise<unknown>;
 
 	constructor(host: UmbControllerHost, args: UmbPropertyEditorUiInteractionMemoryManagerArgs) {
 		super(host);
 
 		this.#memoryUniquePrefix = args.memoryUniquePrefix;
 
-		this.consumeContext(UMB_INTERACTION_MEMORY_CONTEXT, (context) => {
-			this.#interactionMemoryContext = context;
-			this.#getInteractionMemory();
-		});
+		this.#init = Promise.all([
+			this.consumeContext(UMB_INTERACTION_MEMORY_CONTEXT, (context) => {
+				this.#interactionMemoryContext = context;
+			}).asPromise(),
+		]);
 	}
 
 	/**
@@ -43,12 +45,12 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 	/**
 	 * Creates or updates an interaction memory for this property editor based on the provided memories.
 	 * @param {Array<UmbInteractionMemoryModel>} memories - The memories to include for this property editor.
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 * @memberof UmbPropertyEditorUiInteractionMemoryManager
 	 */
-	setMemory(memories: Array<UmbInteractionMemoryModel>): void {
+	async saveMemoriesForPropertyEditor(memories: Array<UmbInteractionMemoryModel>): Promise<void> {
+		await this.#init;
 		const memoryUnique = this.#getInteractionMemoryUnique();
-		if (!memoryUnique) return;
 		if (!this.#interactionMemoryContext) return;
 
 		const propertyEditorMemory: UmbInteractionMemoryModel = {
@@ -57,25 +59,26 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 		};
 
 		this.#interactionMemoryContext.memory.setMemory(propertyEditorMemory);
+		this.#memories.setValue(memories);
 	}
 
 	/**
 	 * Deletes the interaction memory for this property editor.
 	 * @memberof UmbPropertyEditorUiInteractionMemoryManager
 	 */
-	deleteMemory() {
+	async deleteMemoriesForPropertyEditor(): Promise<void> {
+		await this.#init;
 		const unique = this.#getInteractionMemoryUnique();
-		if (!unique) {
-			throw new Error('Memory unique is missing');
-		}
 		this.#interactionMemoryContext?.memory.deleteMemory(unique);
+		this.#memories.setValue([]);
 	}
 
 	#getInteractionMemoryUnique() {
 		return `${this.#memoryUniquePrefix}PropertyEditorUi${this.#configHashCode ? '-' + this.#configHashCode : ''}`;
 	}
 
-	#getInteractionMemory() {
+	async #getInteractionMemory() {
+		await this.#init;
 		const memoryUnique = this.#getInteractionMemoryUnique();
 		if (!memoryUnique) return;
 		if (!this.#interactionMemoryContext) return;

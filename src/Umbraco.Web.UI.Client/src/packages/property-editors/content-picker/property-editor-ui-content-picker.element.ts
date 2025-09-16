@@ -179,14 +179,14 @@ export class UmbPropertyEditorUIContentPickerElement
 		this.readonly = false;
 	}
 
-	#onInputInteractionMemoriesChange(event: UmbChangeEvent) {
+	async #onInputInteractionMemoriesChange(event: UmbChangeEvent) {
 		const target = event.target as UmbInputContentElement;
 		const interactionMemories = target.interactionMemories;
 
 		if (interactionMemories && interactionMemories.length > 0) {
-			this.#interactionMemoryManager.setMemory(interactionMemories);
+			await this.#interactionMemoryManager.saveMemoriesForPropertyEditor(interactionMemories);
 		} else {
-			this.#interactionMemoryManager.deleteMemory();
+			await this.#interactionMemoryManager.deleteMemoriesForPropertyEditor();
 		}
 	}
 
