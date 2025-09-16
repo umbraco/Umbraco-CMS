@@ -26,7 +26,7 @@ internal class BlockEditorValues
         _logger = logger;
     }
 
-    public BlockEditorData? DeserializeAndClean(object? propertyValue, bool throwOnError = true)
+    public BlockEditorData? DeserializeAndClean(object? propertyValue)
     {
         var propertyValueAsString = propertyValue?.ToString();
         if (string.IsNullOrWhiteSpace(propertyValueAsString))
@@ -34,27 +34,7 @@ internal class BlockEditorValues
             return null;
         }
 
-        BlockEditorData blockEditorData;
-        try
-        {
-            blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
-        }
-        catch (JsonSerializationException ex)
-        {
-            if (throwOnError)
-            {
-                throw;
-            }
-            else
-            {
-                _logger.LogWarning(
-                    "Could not deserialize the provided property value into a block editor value: {PropertyValue}. Error: {ErrorMessage}.",
-                    propertyValueAsString,
-                    ex.Message);
-                return null;
-            }
-        }
-
+        BlockEditorData blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
         return Clean(blockEditorData);
     }
 
