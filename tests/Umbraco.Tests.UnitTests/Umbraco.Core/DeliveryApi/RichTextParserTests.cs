@@ -480,6 +480,17 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextMarkupParser();
 
+        var result = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}\" type=\"document\"></a></p>");
+        Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
+        Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
+        Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+    }
+
+    [Test]
+    public void ParseMarkup_CanParseLegacyContentLink()
+    {
+        var parser = CreateRichTextMarkupParser();
+
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
@@ -488,7 +499,23 @@ public class RichTextParserTests : PropertyValueConverterTests
 
     [TestCase("#some-anchor")]
     [TestCase("?something=true")]
+    [TestCase("#!some-hashbang")]
+    [TestCase("?something=true#some-anchor")]
     public void ParseMarkup_CanParseContentLink_WithPostfix(string postfix)
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        var result = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}{postfix}\" type=\"document\"></a></p>");
+        Assert.IsTrue(result.Contains($"href=\"/some-content-path{postfix}\""));
+        Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
+        Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+    }
+
+    [TestCase("#some-anchor")]
+    [TestCase("?something=true")]
+    [TestCase("#!some-hashbang")]
+    [TestCase("?something=true#some-anchor")]
+    public void ParseMarkup_CanParseLegacyContentLink_WithPostfix(string postfix)
     {
         var parser = CreateRichTextMarkupParser();
 
