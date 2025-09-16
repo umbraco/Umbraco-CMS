@@ -227,7 +227,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	#deleteInteractionMemory() {
 		const unique = this.#getInteractionMemoryUnique();
 		if (!unique) {
-			throw new Error('Memory is unique is missing');
+			throw new Error('Memory unique is missing');
 		}
 		this.#interactionMemoryContext?.memory.deleteMemory(unique);
 	}
