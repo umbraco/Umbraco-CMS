@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
@@ -41,6 +42,7 @@ internal abstract partial class ApiRichTextParserBase
                     : null;
                 if (route != null)
                 {
+                    route.QueryString = match.Groups["query"].Value.NullOrWhiteSpaceAsNull();
                     handled = true;
                     handleContentRoute(route);
                 }
@@ -79,6 +81,6 @@ internal abstract partial class ApiRichTextParserBase
         handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
     }
 
-    [GeneratedRegex("{localLink:(?<udi>umb:.+)}")]
+    [GeneratedRegex("{localLink:(?<udi>umb:.+)}(?<query>[^\"]*)")]
     private static partial Regex LocalLinkRegex();
 }
