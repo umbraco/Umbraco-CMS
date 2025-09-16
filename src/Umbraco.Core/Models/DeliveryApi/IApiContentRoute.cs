@@ -4,7 +4,10 @@ public interface IApiContentRoute
 {
     string Path { get; }
 
-    public string? QueryString { get; set; } = null;
+    public string? QueryString
+    {
+        get => null; set { }
+    }
 
     IApiContentStartItem StartItem { get; }
 }
