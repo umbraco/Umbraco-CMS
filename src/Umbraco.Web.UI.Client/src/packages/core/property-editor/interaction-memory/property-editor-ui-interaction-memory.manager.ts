@@ -72,7 +72,7 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBa
 	}
 
 	#getInteractionMemoryUnique() {
-		return `${this.#memoryUniquePrefix + this.#configHashCode ? '-' + this.#configHashCode : ''}`;
+		return `${this.#memoryUniquePrefix}PropertyEditorUi${this.#configHashCode ? '-' + this.#configHashCode : ''}`;
 	}
 
 	#getInteractionMemory() {

@@ -80,7 +80,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	};
 
 	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
-		memoryUniquePrefix: 'UmbContentPickerPropertyEditorUi',
+		memoryUniquePrefix: 'UmbContentPicker',
 	});
 
 	constructor() {

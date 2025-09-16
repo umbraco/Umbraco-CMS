@@ -4,16 +4,13 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import type {
-	UmbPropertyEditorConfigCollection,
-	UmbPropertyEditorUiElement,
+import {
+	UmbPropertyEditorUiInteractionMemoryManager,
+	type UmbPropertyEditorConfigCollection,
+	type UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import {
-	UMB_INTERACTION_MEMORY_CONTEXT,
-	type UmbInteractionMemoryModel,
-} from '@umbraco-cms/backoffice/interaction-memory';
-import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -21,7 +18,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	public value?: string;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.#setConfigHash(config);
+		this.#interactionMemoryManager.setPropertyEditorConfig(config);
 
 		if (!config) return;
 
@@ -32,8 +29,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		}
 
 		this._startNodeId = config.getValueByAlias('startNodeId');
-
-		this.#getInteractionMemory();
 	}
 
 	/**
@@ -59,22 +54,16 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	@state()
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
-	#interactionMemoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
-	#configHashCode?: number;
+	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
+		memoryUniquePrefix: 'UmbDocumentPicker',
+	});
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_INTERACTION_MEMORY_CONTEXT, (context) => {
-			this.#interactionMemoryContext = context;
-			this.#getInteractionMemory();
+		this.observe(this.#interactionMemoryManager.memories, (interactionMemories) => {
+			this._interactionMemories = interactionMemories ?? [];
 		});
-	}
-
-	#setConfigHash(config: UmbPropertyEditorConfigCollection | undefined) {
-		const configString = config ? JSON.stringify(config.toObject()) : '';
-		const hashCode = simpleHashCode(configString);
-		this.#configHashCode = hashCode;
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputDocumentElement }) {
@@ -82,47 +71,14 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#getInteractionMemoryUnique() {
-		return `UmbDocumentPickerPropertyEditorUi${this.#configHashCode ? '-' + this.#configHashCode : ''}`;
-	}
-
-	#getInteractionMemory() {
-		const memoryUnique = this.#getInteractionMemoryUnique();
-		if (!memoryUnique) return;
-		if (!this.#interactionMemoryContext) return;
-
-		const memory = this.#interactionMemoryContext.memory.getMemory(memoryUnique);
-		this._interactionMemories = memory?.memories ?? [];
-	}
-
-	#setInteractionMemory(memories: Array<UmbInteractionMemoryModel>) {
-		const memoryUnique = this.#getInteractionMemoryUnique();
-		if (!memoryUnique) return;
-		if (!this.#interactionMemoryContext) return;
-
-		// Set up memory for the Property Editor + Data Type context which includes all memories from the input
-		const propertyEditorMemory: UmbInteractionMemoryModel = {
-			unique: memoryUnique,
-			memories,
-		};
-
-		this.#interactionMemoryContext.memory.setMemory(propertyEditorMemory);
-	}
-
-	#deleteInteractionMemory() {
-		const unique = this.#getInteractionMemoryUnique();
-		if (!unique) return;
-		this.#interactionMemoryContext?.memory.deleteMemory(unique);
-	}
-
-	#onInteractionMemoriesChange(event: UmbChangeEvent) {
+	#onInputInteractionMemoriesChange(event: UmbChangeEvent) {
 		const target = event.target as UmbInputDocumentElement;
 		const interactionMemories = target.interactionMemories;
 
 		if (interactionMemories && interactionMemories.length > 0) {
-			this.#setInteractionMemory(interactionMemories);
+			this.#interactionMemoryManager.setMemory(interactionMemories);
 		} else {
-			this.#deleteInteractionMemory();
+			this.#interactionMemoryManager.deleteMemory();
 		}
 	}
 
@@ -140,7 +96,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 				@change=${this.#onChange}
 				?readonly=${this.readonly}
 				.interactionMemories=${this._interactionMemories}
-				@interaction-memory-change=${this.#onInteractionMemoriesChange}>
+				@interaction-memory-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-document>
 		`;
 	}
