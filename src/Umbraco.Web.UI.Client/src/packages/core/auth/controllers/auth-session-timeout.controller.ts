@@ -48,7 +48,6 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			authFlow.token$,
 			(tokenResponse) => {
 				// Inform the token check worker about the new token response
-				console.log('[Auth Context] Informing token check worker about new token response.');
 				// Post the new
 				this.#tokenCheckWorker?.port.postMessage({
 					command: 'init',
