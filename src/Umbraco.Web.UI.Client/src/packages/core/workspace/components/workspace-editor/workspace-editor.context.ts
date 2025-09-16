@@ -5,10 +5,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbBasicState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbHintController } from '@umbraco-cms/backoffice/hint';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbWorkspaceEditorContext extends UmbContextBase {

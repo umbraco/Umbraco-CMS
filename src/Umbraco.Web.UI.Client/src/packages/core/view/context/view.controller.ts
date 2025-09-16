@@ -190,6 +190,7 @@ export class UmbViewController extends UmbControllerBase {
 	 * @internal
 	 * Notify that a view context has been activated.
 	 */
+	// eslint-disable-next-line
 	public _activate() {
 		this.#autoActivate = true;
 		if (this.#active === true) {
@@ -213,6 +214,7 @@ export class UmbViewController extends UmbControllerBase {
 	 * @internal
 	 * Notify that a child has been activated.
 	 */
+	// eslint-disable-next-line
 	public _childActivated() {
 		if (this.#hasActiveChild) return;
 		this.#hasActiveChild = true;
@@ -223,6 +225,7 @@ export class UmbViewController extends UmbControllerBase {
 	 * @internal
 	 * Notify that a child is no longer activated.
 	 */
+	// eslint-disable-next-line
 	public _childDeactivated() {
 		this.#hasActiveChild = false;
 		if (this.#attached === false) {
@@ -244,6 +247,7 @@ export class UmbViewController extends UmbControllerBase {
 	 * Deactivate the view context.
 	 * We cannot conclude that this means the parent should be activated, it can be because of a child being activated.
 	 */
+	// eslint-disable-next-line
 	public _deactivate() {
 		this.#autoActivate = false;
 		if (!this.#active) return;
