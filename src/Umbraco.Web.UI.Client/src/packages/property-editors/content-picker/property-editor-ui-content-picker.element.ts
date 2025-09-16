@@ -19,10 +19,10 @@ import {
 	UMB_INTERACTION_MEMORY_CONTEXT,
 	type UmbInteractionMemoryModel,
 } from '@umbraco-cms/backoffice/interaction-memory';
+import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 
 // import of local component
 import './components/input-content/index.js';
-import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbContentPickerValueType = UmbInputContentElement['selection'];
 
@@ -186,15 +186,6 @@ export class UmbPropertyEditorUIContentPickerElement
 		this.value = this.value?.filter((x) => x.type === this._rootEntityType);
 		this._invalidData = undefined;
 		this.readonly = false;
-	}
-
-	#onInputContentMemoryChange(event: UmbChangeEvent) {
-		const target = event.target as UmbInputContentElement;
-		const memory = target?.memory;
-
-		if (memory) {
-			this.#setInteractionMemory(memory);
-		}
 	}
 
 	#getInteractionMemoryUnique() {
