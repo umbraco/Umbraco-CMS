@@ -138,11 +138,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		});
 	}
 
-	#getLabel(suffix?: string) {
-		const base = this.label ? this.label + (this.required ? ' *' : '') : 'Rich Text Editor';
-		return suffix ? `${base} ${suffix}` : base;
-	}
-
 	async #loadEditor() {
 		const element = this.shadowRoot?.querySelector('#editor');
 		if (!element) return;
@@ -178,10 +173,11 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
-			editorProps: { attributes: { 'aria-label': this.#getLabel() } },
+			editorProps: { attributes: { 'aria-label': this.label ?? 'Rich Text Editor' } },
 			extensions: tiptapExtensions,
 			content: this.#value,
 			injectCSS: false, // Prevents injecting CSS into `window.document`, as it never applies to the shadow DOM. [LK]
+			//enableContentCheck: true,
 			onBeforeCreate: ({ editor }) => {
 				this._extensions.forEach((ext) => ext.setEditor(editor));
 			},
@@ -203,11 +199,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return html`
 			${when(loading, () => html`<div id="loader"><uui-loader></uui-loader></div>`)}
 			${when(!loading, () => html`${this.#renderStyles()}${this.#renderToolbar()}`)}
-			<div id="editor" 
-				aria-label=${this.#getLabel('editor')}
-				data-mark="input:tiptap-rte" 
-				?data-loaded=${!loading}>
-			</div>
+			<div id="editor" aria-label=${this.label ? this.label + ' textbox' : 'Editor Textbox'} data-mark="input:tiptap-rte" ?data-loaded=${!loading}></div>
 			${when(!loading, () => this.#renderStatusbar())}
 		`;
 	}
@@ -231,7 +223,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return html`
 			<umb-tiptap-toolbar
 				data-mark="tiptap-toolbar"
-				aria-label=${this.#getLabel('toolbar')}
+				aria-label=${this.label ? this.label + ' toolbar' : 'Editor toolbar'}
 				.toolbar=${this._toolbar}
 				.editor=${this._editor}
 				.configuration=${this.configuration}
@@ -245,7 +237,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return html`
 			<umb-tiptap-statusbar
 				data-mark="tiptap-statusbar"
-				aria-label=${this.#getLabel('status bar')}
+				aria-label=${this.label ? this.label + ' status bar' : 'Editor status bar'}
 				.statusbar=${this._statusbar}
 				.editor=${this._editor}
 				.configuration=${this.configuration}
