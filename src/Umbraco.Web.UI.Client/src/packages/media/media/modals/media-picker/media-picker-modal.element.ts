@@ -27,6 +27,7 @@ import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 
 import '@umbraco-cms/backoffice/imaging';
@@ -44,7 +45,9 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#mediaItemRepository = new UmbMediaItemRepository(this);
 	#mediaSearchProvider = new UmbMediaSearchProvider(this);
 
-	protected override _pickerContext = new UmbMediaPickerContext(this);
+	/* TODO: We currently only rely on the interactionMemory manager in the picker interface which is correctly implemented in the Media Picker
+	Remove this type cast when MediaPicker has implemented the full PickerContext interface */
+	protected override _pickerContext = new UmbMediaPickerContext(this) as unknown as UmbPickerContext;
 
 	#dataType?: { unique: string };
 
