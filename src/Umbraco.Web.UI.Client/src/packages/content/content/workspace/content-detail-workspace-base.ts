@@ -56,7 +56,6 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
-import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 export interface UmbContentDetailWorkspaceContextArgs<
