@@ -90,6 +90,13 @@ public interface ISqlSyntaxProvider
 
     string GetWildcardPlaceholder();
 
+    /// <summary>
+    /// This ensures that GetWildcardPlaceholder() character is surronded by '' when used inside a LIKE statement. E.g. in WhereLike() extension and the defaultConcat is used.
+    /// </summary>
+    /// <param name="concatDefault">When provided this overides the GetWildcardPlaceholder() default.</param>
+    /// <returns></returns>
+    string GetWildcardConcat(string concatDefault = "");
+
     string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
 
     string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);

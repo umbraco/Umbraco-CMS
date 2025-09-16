@@ -1,5 +1,6 @@
 export * from './avatar/index.js';
 export * from './change-password/index.js';
+export * from './config/index.js';
 export * from './detail/index.js';
 export * from './disable/index.js';
 export * from './enable/index.js';

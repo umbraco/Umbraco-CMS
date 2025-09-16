@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -276,13 +277,14 @@ public interface IContentService : IContentServiceBase<IContent>
     bool HasChildren(int id);
 
     /// <summary>
-    ///     Gets the content keys from the provided collection of keys that are scheduled for publishing.
+    ///     Gets a dictionary of content Ids and their matching content schedules.
     /// </summary>
     /// <param name="keys">The content keys.</param>
     /// <returns>
-    ///     The provided collection of content keys filtered for those that are scheduled for publishing.
+    ///     A dictionary with a nodeId and an IEnumerable of matching ContentSchedules.
     /// </returns>
-    IEnumerable<Guid> GetScheduledContentKeys(IEnumerable<Guid> keys) => [];
+    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
+
 
     #endregion
 
