@@ -298,6 +298,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			this._searchFrom = undefined;
 		}
 
+		this.#setLocationInInteractionMemory();
+
 		this.#loadChildrenOfCurrentMediaItem();
 	}
 
