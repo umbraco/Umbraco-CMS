@@ -7,7 +7,7 @@ changelog:
       - duplicate
       - wontfix
   categories:
-    - title: '🙌 Notable Changes — We would love for you to test them!' 
+    - title: '🙌 Notable Changes' 
       labels:
         - category/notable
     - title: '💥 Breaking Changes'
