@@ -160,6 +160,13 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             .Where<NodeDto>(x => x.UniqueId == targetKey);
         var parentId = Database.ExecuteScalar<int>(parentIdQuery);
 
+        // We need to know if the target is trashed, so that we can get the siblings in the recycle bin.
+        Sql<ISqlContext> itemQuery = Sql()
+            .Select<NodeDto>(x => x.Trashed)
+            .From<NodeDto>()
+            .Where<NodeDto>(x => x.UniqueId == targetKey);
+        bool isTrashed = Database.FirstOrDefault<bool>(itemQuery);
+
         Sql<ISqlContext> orderingSql = Sql();
         ApplyOrdering(ref orderingSql, ordering);
 
@@ -170,7 +177,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             .Select($"ROW_NUMBER() OVER ({orderingSql.SQL}) AS rn")
             .AndSelect<NodeDto>(n => n.UniqueId)
             .From<NodeDto>()
-            .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == false)
+            .Where<NodeDto>(x => x.ParentId == parentId && x.Trashed == isTrashed)
             .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
 
         // Apply the filter if provided.
