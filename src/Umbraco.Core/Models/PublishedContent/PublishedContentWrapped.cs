@@ -95,18 +95,10 @@ public abstract class PublishedContentWrapped : IPublishedContent
     public virtual PublishedItemType ItemType => _content.ItemType;
 
     /// <inheritdoc />
-    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
-    public virtual IPublishedContent? Parent => _content.Parent;
-
-    /// <inheritdoc />
     public virtual bool IsDraft(string? culture = null) => _content.IsDraft(culture);
 
     /// <inheritdoc />
     public virtual bool IsPublished(string? culture = null) => _content.IsPublished(culture);
-
-    /// <inheritdoc />
-    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
-    public virtual IEnumerable<IPublishedContent> Children => _content.Children;
 
     /// <inheritdoc cref="IPublishedElement.Properties" />
     public virtual IEnumerable<IPublishedProperty> Properties => _content.Properties;

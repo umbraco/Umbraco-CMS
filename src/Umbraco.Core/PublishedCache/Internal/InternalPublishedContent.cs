@@ -69,19 +69,9 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     public PublishedItemType ItemType => PublishedItemType.Content;
 
-    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
-    public IPublishedContent? Parent => this.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(), StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
-
     public bool IsDraft(string? culture = null) => false;
 
     public bool IsPublished(string? culture = null) => true;
-
-    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
-    public IEnumerable<IPublishedContent> Children => this.Children(
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
-
-    public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
     public IPublishedContentType ContentType { get; set; }
 

@@ -163,9 +163,6 @@ internal class PublishedContent : PublishedContentBase
         }
     }
 
-    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in V16.")]
-    public override IPublishedContent? Parent => GetParent();
-
     /// <inheritdoc />
     public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
     {
