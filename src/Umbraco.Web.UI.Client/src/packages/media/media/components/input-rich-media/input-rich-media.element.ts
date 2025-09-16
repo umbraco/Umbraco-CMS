@@ -254,6 +254,20 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 			this.#addItems(selection);
 		});
 
+		this.observe(
+			this.#pickerInputContext.interactionMemory.memories,
+			(memories) => {
+				// only dispatch the event if the interaction memories have actually changed
+				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
+
+				if (!isIdentical) {
+					this.#interactionMemories = memories;
+					this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
+				}
+			},
+			'_observeMemories',
+		);
+
 		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
@@ -278,20 +292,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 			'rangeOverflow',
 			() => this.maxMessage,
 			() => !this.readonly && !!this.value && !!this.max && this.value?.length > this.max,
-		);
-
-		this.observe(
-			this.#pickerInputContext.interactionMemory.memories,
-			(memories) => {
-				// only dispatch the event if the interaction memories have actually changed
-				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
-
-				if (!isIdentical) {
-					this.#interactionMemories = memories;
-					this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
-				}
-			},
-			'_observeMemories',
 		);
 	}
 

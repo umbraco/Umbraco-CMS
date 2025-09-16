@@ -151,7 +151,9 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
 				?readonly=${this.readonly}
-				@change=${this.#onChange}></umb-input-media>
+				@change=${this.#onChange}
+				.interactionMemories=${this.#interactionMemories}
+				@interaction-memory-change=${this.#onInteractionMemoriesChange}></umb-input-media>
 		`;
 	}
 
