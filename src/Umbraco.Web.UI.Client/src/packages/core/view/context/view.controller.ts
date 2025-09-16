@@ -12,6 +12,11 @@ import type { UmbContextConsumerController, UmbContextProviderController } from 
  * TODO:
  * Include Shortcuts
  *
+ * The View Context handles the aspects of three Features:
+ * Browser Titles — Provide a title for this view and it will be set or joint with parent views depending on the inheritance setting.
+ * Hints — Holds Hints for this view, depending on the inheritance setting it will propagate the hints to be displayed at parent views.
+ * Shortcuts — Not implemented yet.
+ *
  */
 export class UmbViewController extends UmbControllerBase {
 	//
@@ -21,8 +26,10 @@ export class UmbViewController extends UmbControllerBase {
 	#currentProvideHost?: UmbClassInterface;
 	#localize = new UmbLocalizationController(this);
 
+	// State used to know if the context can be auto activated when attached.
+	#autoActivate = true;
 	#active = false;
-	#deactivatedFromOutside = false;
+	#hasActiveChild = false;
 	#inherit?: boolean;
 	#explicitInheritance?: boolean;
 	#parentView?: UmbViewController;
@@ -57,14 +64,20 @@ export class UmbViewController extends UmbControllerBase {
 		this.#consumeParentCtrl = this.consumeContext(UMB_VIEW_CONTEXT, (parentView) => {
 			// In case of explicit inheritance we do not want to overview the parent view.
 			if (this.#explicitInheritance) return;
+			if (this.#active && !this.#hasActiveChild) {
+				// If we were active we will react as if we got deactivated and then activated again below if state allows. [NL]
+				this.#propagateActivation();
+			}
+			this.#active = false;
 			if (parentView) {
 				this.#parentView = parentView;
 			}
 			if (this.#inherit) {
 				this.#inheritFromParent();
 			}
-			if (this.#attached && this.#active) {
-				this.activate();
+			// only activate if we had an incoming parentView, cause if not we are in a disassembling state. [NL]
+			if (parentView && this.#attached && this.#autoActivate) {
+				this._activate();
 			}
 		}).skipHost();
 	}
@@ -75,11 +88,10 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	public setBrowserTitle(title: string | undefined): void {
+		if (this.#title === title) return;
 		this.#title = title;
 		// TODO: This check should be if its the most child being active, but again think about how the parents in the active chain should work.
-		if (this.#active) {
-			this.#updateTitle();
-		}
+		this.#updateTitle();
 	}
 
 	public provideAt(controllerHost: UmbClassInterface): void {
@@ -87,12 +99,13 @@ export class UmbViewController extends UmbControllerBase {
 
 		this.unprovide();
 
+		this.#autoActivate = true;
 		this.#currentProvideHost = controllerHost;
 		this.#providerCtrl = controllerHost.provideContext(UMB_VIEW_CONTEXT, this);
 		this.hints.provideAt(controllerHost);
 
-		if (this.#attached && !this.#deactivatedFromOutside) {
-			this.activate();
+		if (this.#attached && this.#autoActivate) {
+			this._activate();
 		}
 	}
 
@@ -103,15 +116,15 @@ export class UmbViewController extends UmbControllerBase {
 		}
 		this.hints.unprovide();
 
-		// TODO: should we call deactivate? currently deactive does nothing so lets await. [NL]
+		this._deactivate();
 	}
 
 	override hostConnected(): void {
 		this.#attached = true;
 		super.hostConnected();
 		// CHeck that we have a providerController, otherwise this is not provided. [NL]
-		if (this.#providerCtrl && !this.#deactivatedFromOutside) {
-			this.activate();
+		if (this.#providerCtrl && this.#autoActivate) {
+			this._activate();
 		}
 	}
 
@@ -123,9 +136,7 @@ export class UmbViewController extends UmbControllerBase {
 		super.hostDisconnected();
 		if (wasAttached === true && wasActive) {
 			// CHeck that we have a providerController, otherwise this is not provided. [NL]
-			if (this.#parentView) {
-				this.#parentView.activate();
-			}
+			this.#propagateActivation();
 		}
 	}
 
@@ -140,12 +151,10 @@ export class UmbViewController extends UmbControllerBase {
 		this.#consumeParentCtrl = undefined;
 		this.#parentView = context;
 		this.#inheritFromParent();
+		this.#propagateActivation();
 	}
 
 	#inheritFromParent(): void {
-		if (this.#parentView && this.#active) {
-			this.#parentView.deactivate();
-		}
 		this.observe(
 			this.#parentView?.variantId,
 			(variantId) => {
@@ -154,36 +163,100 @@ export class UmbViewController extends UmbControllerBase {
 			'observeParentVariantId',
 		);
 		this.hints.inheritFrom(this.#parentView?.hints);
-	}
-
-	public activate() {
-		if (this.#attached === false) {
-			if (this.#parentView) {
-				this.#parentView.activate();
-				return;
-			} else {
-				throw new Error('Cannot activate a view that is not attached to the DOM.');
-			}
-		} else {
-			this.#active = true;
-			if (this.#parentView) {
-				// Missing option to deactivate the parent not part of this inheritance chain.
-				this.#parentView.deactivate();
-			}
+		// Check for parent view as it is undefined in a disassembling state and we do not want to update the title in that situation. [NL]
+		if (this.#parentView && this.#active) {
 			this.#updateTitle();
 		}
 	}
 
+	#propagateActivation() {
+		if (!this.#parentView) return;
+		if (this.#inherit) {
+			if (this.#active) {
+				this.#parentView._childActivated();
+			} else {
+				this.#parentView._childDeactivated();
+			}
+		} else {
+			if (this.#active) {
+				this.#parentView._deactivate();
+			} else {
+				this.#parentView._activate();
+			}
+		}
+	}
+
 	/**
+	 * @internal
+	 * Notify that a view context has been activated.
+	 */
+	public _activate() {
+		this.#autoActivate = true;
+		if (this.#active === true) {
+			return;
+		}
+		// If not attached then propagate the activation to the parent. [NL]
+		if (this.#attached === false) {
+			if (!this.#parentView) {
+				throw new Error('Cannot activate a view that is not attached to the DOM.');
+			}
+			this.#propagateActivation();
+		} else {
+			this.#active = true;
+			this.#propagateActivation();
+			this.#updateTitle();
+			// TODO: Start shortcuts. [NL]
+		}
+	}
+
+	/**
+	 * @internal
+	 * Notify that a child has been activated.
+	 */
+	public _childActivated() {
+		if (this.#hasActiveChild) return;
+		this.#hasActiveChild = true;
+		this._activate();
+	}
+
+	/**
+	 * @internal
+	 * Notify that a child is no longer activated.
+	 */
+	public _childDeactivated() {
+		this.#hasActiveChild = false;
+		if (this.#attached === false) {
+			if (this.#parentView) {
+				return;
+			} else {
+				throw new Error('Cannot re-activate(_childDeactivated) a view that is not attached to the DOM.');
+			}
+		}
+		if (this.#autoActivate) {
+			this._activate();
+		} else {
+			this.#propagateActivation();
+		}
+	}
+
+	/**
+	 * @internal
 	 * Deactivate the view context.
 	 * We cannot conclude that this means the parent should be activated, it can be because of a child being activated.
 	 */
-	public deactivate() {
+	public _deactivate() {
+		this.#autoActivate = false;
 		if (!this.#active) return;
-		this.#deactivatedFromOutside = true;
+		this.#active = false;
+		// TODO: Stop shortcuts. [NL]
+		// Deactivate parents:
+		this.#propagateActivation();
 	}
 
 	#updateTitle() {
+		if (!this.#active || this.#hasActiveChild) {
+			return;
+		}
 		const localTitle = this.getComputedTitle();
 		document.title = (localTitle ? localTitle + ' | ' : '') + 'Umbraco';
 	}
