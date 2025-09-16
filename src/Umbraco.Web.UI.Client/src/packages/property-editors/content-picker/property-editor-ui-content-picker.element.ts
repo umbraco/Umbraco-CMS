@@ -10,16 +10,13 @@ import { UMB_ANCESTORS_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
-import type {
-	UmbPropertyEditorConfigCollection,
-	UmbPropertyEditorUiElement,
+import {
+	UmbPropertyEditorUiInteractionMemoryManager,
+	type UmbPropertyEditorConfigCollection,
+	type UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import {
-	UMB_INTERACTION_MEMORY_CONTEXT,
-	type UmbInteractionMemoryModel,
-} from '@umbraco-cms/backoffice/interaction-memory';
-import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 // import of local component
 import './components/input-content/index.js';
@@ -73,9 +70,6 @@ export class UmbPropertyEditorUIContentPickerElement
 	@state()
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
-	#interactionMemoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
-	#configHashCode?: number;
-
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
 	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
 
@@ -85,8 +79,20 @@ export class UmbPropertyEditorUIContentPickerElement
 		member: UMB_MEMBER_ENTITY_TYPE,
 	};
 
+	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
+		memoryUniquePrefix: 'UmbContentPickerPropertyEditorUi',
+	});
+
+	constructor() {
+		super();
+
+		this.observe(this.#interactionMemoryManager.memories, (interactionMemories) => {
+			this._interactionMemories = interactionMemories ?? [];
+		});
+	}
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.#setConfigHash(config);
+		this.#interactionMemoryManager.setPropertyEditorConfig(config);
 
 		if (!config) return;
 
@@ -118,15 +124,6 @@ export class UmbPropertyEditorUIContentPickerElement
 		}
 	}
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_INTERACTION_MEMORY_CONTEXT, (context) => {
-			this.#interactionMemoryContext = context;
-			this.#getInteractionMemory();
-		});
-	}
-
 	#parseInt(value: unknown, fallback: number): number {
 		const num = Number(value);
 		return !isNaN(num) && num > 0 ? num : fallback;
@@ -147,12 +144,6 @@ export class UmbPropertyEditorUIContentPickerElement
 
 	override focus() {
 		return this.shadowRoot?.querySelector<UmbInputContentElement>('umb-input-content')?.focus();
-	}
-
-	#setConfigHash(config: UmbPropertyEditorConfigCollection | undefined) {
-		const configString = config ? JSON.stringify(config.toObject()) : '';
-		const hashCode = simpleHashCode(configString);
-		this.#configHashCode = hashCode;
 	}
 
 	async #setPickerRootUnique() {
@@ -188,49 +179,14 @@ export class UmbPropertyEditorUIContentPickerElement
 		this.readonly = false;
 	}
 
-	#getInteractionMemoryUnique() {
-		return `UmbContentPickerPropertyEditorUi${this.#configHashCode ? '-' + this.#configHashCode : ''}`;
-	}
-
-	#getInteractionMemory() {
-		const memoryUnique = this.#getInteractionMemoryUnique();
-		if (!memoryUnique) return;
-		if (!this.#interactionMemoryContext) return;
-
-		const memory = this.#interactionMemoryContext.memory.getMemory(memoryUnique);
-		this._interactionMemories = memory?.memories ?? [];
-	}
-
-	#setInteractionMemory(memories: Array<UmbInteractionMemoryModel>) {
-		const memoryUnique = this.#getInteractionMemoryUnique();
-		if (!memoryUnique) return;
-		if (!this.#interactionMemoryContext) return;
-
-		// Set up memory for the Property Editor + Data Type context which includes all memories from the input
-		const propertyEditorMemory: UmbInteractionMemoryModel = {
-			unique: memoryUnique,
-			memories,
-		};
-
-		this.#interactionMemoryContext.memory.setMemory(propertyEditorMemory);
-	}
-
-	#deleteInteractionMemory() {
-		const unique = this.#getInteractionMemoryUnique();
-		if (!unique) {
-			throw new Error('Memory unique is missing');
-		}
-		this.#interactionMemoryContext?.memory.deleteMemory(unique);
-	}
-
-	#onInteractionMemoriesChange(event: UmbChangeEvent) {
+	#onInputInteractionMemoriesChange(event: UmbChangeEvent) {
 		const target = event.target as UmbInputContentElement;
 		const interactionMemories = target.interactionMemories;
 
 		if (interactionMemories && interactionMemories.length > 0) {
-			this.#setInteractionMemory(interactionMemories);
+			this.#interactionMemoryManager.setMemory(interactionMemories);
 		} else {
-			this.#deleteInteractionMemory();
+			this.#interactionMemoryManager.deleteMemory();
 		}
 	}
 
@@ -253,7 +209,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				?readonly=${this.readonly}
 				@change=${this.#onChange}
 				.interactionMemories=${this._interactionMemories}
-				@interaction-memory-change=${this.#onInteractionMemoriesChange}>
+				@interaction-memory-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-content>
 			${this.#renderInvalidData()}
 		`;
