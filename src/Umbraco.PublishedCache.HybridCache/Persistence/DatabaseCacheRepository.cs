@@ -282,15 +282,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .Select(x => CreateMediaNodeKit(x, serializer));
     }
 
-    [Obsolete("Use the typed version OnRepositoryRefreshedTyped instead")]
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
-        bool useTyped = true; // Todo: Check this withs all databases and all scenarios. Then remove the flag and the obsolete method.
-        if (useTyped)
-        {
-            await OnRepositoryRefreshedTyped(serializer, content, preview);
-            return;
-        }
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
 
         string c(string s) => SqlSyntax.GetQuotedColumnName(s);
@@ -305,29 +298,6 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 id = dto.NodeId,
                 published = dto.Published,
             });
-    }
-
-    private async Task OnRepositoryRefreshedTyped(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
-    {
-        ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
-
-        dto.RawData ??= [];
-        dto.Rv++;
-        ContentNuDto? existing = await Database.FirstOrDefaultAsync<ContentNuDto>(
-            Sql()
-                .SelectAll()
-                .From<ContentNuDto>()
-                .Where<ContentNuDto>(x => x.NodeId == dto.NodeId && x.Published == dto.Published));
-        if (existing is null)
-        {
-            await Database.InsertAsync(dto);
-        }
-        else
-        {
-            Sql<ISqlContext> updateSql = Sql().Update<ContentNuDto>(u => u.Set(d => d.Data, dto.Data).Set(rd => rd.RawData, dto.RawData).Set(v => v.Rv, dto.Rv))
-                .Where<ContentNuDto>(x => x.NodeId == dto.NodeId && x.Published == dto.Published);
-            await Database.ExecuteAsync(updateSql);
-        }
     }
 
     /// <summary>

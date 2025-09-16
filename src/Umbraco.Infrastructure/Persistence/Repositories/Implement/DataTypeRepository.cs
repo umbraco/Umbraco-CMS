@@ -354,7 +354,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
 
         // Create the (base) node data - umbracoNode
         NodeDto nodeDto = dto.NodeDto;
-        nodeDto.Path = parent?.Path ?? "-1";
+        nodeDto.Path = parent?.Path ?? Constants.System.RootString;
         nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
         nodeDto.SortOrder = sortOrder;
         var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);

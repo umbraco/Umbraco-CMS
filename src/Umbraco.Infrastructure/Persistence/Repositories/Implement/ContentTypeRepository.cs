@@ -53,12 +53,6 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         Sql<ISqlContext> sql = Sql()
             .SelectDistinct<PropertyTypeDto>(c => c.Alias)
             .From<PropertyTypeDto>()
-            .InnerJoin<PropertyTypeGroupDto>()
-            .On<PropertyTypeDto, PropertyTypeGroupDto>(left => left.PropertyTypeGroupId, right => right.Id)
-            .InnerJoin<DataTypeDto>()
-            .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId)
-            .InnerJoin<ContentTypeDto>()
-            .On<ContentTypeDto, PropertyTypeDto>(left => left.NodeId, right => right.ContentTypeId)
             .OrderBy<PropertyTypeDto>(c => c.Alias);
         return Database.Fetch<string>(sql);
     }

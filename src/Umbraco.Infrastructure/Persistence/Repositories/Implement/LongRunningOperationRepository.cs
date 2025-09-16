@@ -17,31 +17,16 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly TimeProvider _timeProvider;
-    private readonly ILogger<LongRunningOperationRepository>? _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LongRunningOperationRepository"/> class.
     /// </summary>
     public LongRunningOperationRepository(
-        ILogger<LongRunningOperationRepository> logger,
         IJsonSerializer jsonSerializer,
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
         TimeProvider timeProvider)
         : base(scopeAccessor, appCaches)
-    {
-        _jsonSerializer = jsonSerializer;
-        _timeProvider = timeProvider;
-        _logger = logger;
-    }
-
-    [Obsolete("Use constructor with ILogger<LongRunningOperationRepository> instead. Remove after testing!")]
-    public LongRunningOperationRepository(
-            IJsonSerializer jsonSerializer,
-            IScopeAccessor scopeAccessor,
-            AppCaches appCaches,
-            TimeProvider timeProvider)
-            : base(scopeAccessor, appCaches)
     {
         _jsonSerializer = jsonSerializer;
         _timeProvider = timeProvider;
@@ -125,23 +110,14 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     /// <inheritdoc/>
     public async Task UpdateStatusAsync(Guid id, LongRunningOperationStatus status, DateTimeOffset expirationTime)
     {
-        Sql<ISqlContext> sql;
-        try
-        {
-            sql = Sql()
-                .Update<LongRunningOperationDto>(x => x
-                    .Set(y => y.Status, status.ToString())
-                    .Set(y => y.UpdateDate, DateTime.UtcNow)
-                    .Set(y => y.ExpirationDate, expirationTime.DateTime))
-                .Where<LongRunningOperationDto>(x => x.Id == id);
+        Sql<ISqlContext> sql = Sql()
+            .Update<LongRunningOperationDto>(x => x
+                .Set(y => y.Status, status.ToString())
+                .Set(y => y.UpdateDate, DateTime.UtcNow)
+                .Set(y => y.ExpirationDate, expirationTime.DateTime))
+            .Where<LongRunningOperationDto>(x => x.Id == id);
 
-            _ = await Database.ExecuteAsync(sql);
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogError(ex, "Error updating status for long-running operation with ID {Id} to {Status}", id, status);
-            throw new InvalidOperationException($"Failed to update status for long-running operation with ID {id}.", ex);
-        }
+        await Database.ExecuteAsync(sql);
     }
 
     /// <inheritdoc/>
