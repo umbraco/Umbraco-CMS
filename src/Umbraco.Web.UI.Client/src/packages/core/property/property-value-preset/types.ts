@@ -33,7 +33,17 @@ export interface UmbPropertyTypePresetModelTypeModel {
 	variesByCulture?: boolean;
 	variesBySegment?: boolean;
 }
-export interface UmbPropertyValuePresetApiCallArgs {
+
+export interface UmbPropertyValuePresetApiCallArgsEntityBase {
+	entityType: string;
+	entityUnique: string;
+	entityTypeUnique?: string;
+}
+
+export interface UmbPropertyValuePresetApiCallArgs extends UmbPropertyValuePresetApiCallArgsEntityBase {
+	alias: string;
+	propertyEditorUiAlias: string;
+	propertyEditorSchemaAlias?: string;
 	variantId?: UmbVariantId;
 }
 
