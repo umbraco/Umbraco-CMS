@@ -2368,7 +2368,7 @@ export default {
 		checkFailed: 'Check failed',
 		openBackofficeSearch: 'Open backoffice search',
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
-		BackofficeProfileOptions: 'Profile options',
+		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',

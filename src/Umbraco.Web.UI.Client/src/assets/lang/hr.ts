@@ -2053,7 +2053,7 @@ export default {
 		checkFailed: 'Provjera nije uspjela',
 		openBackofficeSearch: 'Otvorite backoffice pretragu',
 		openCloseBackofficeHelp: 'Otvori/Zatvori pomoć za backoffice',
-		BackofficeProfileOptions: 'Opcije profila',
+		openCloseBackofficeProfileOptions: 'Opcije otvaranja/zatvaranja profila',
 		assignDomainDescription: 'Postavite kulturu i imena hostova za %0%',
 		createDescription: 'Kreirajte novi čvor ispod %0%',
 		protectDescription: 'Postavite ograničenja pristupa uključena %0%',

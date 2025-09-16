@@ -2198,7 +2198,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="checkFailed">Vérifier les échecs</key>
 		<key alias="openBackofficeSearch">Ouvrir la recherche backoffice</key>
 		<key alias="openCloseBackofficeHelp">Ouvrir/Fermer l'aide backoffice</key>
-		<key alias="BackofficeProfileOptions">Options de profil</key>
+		<key alias="openCloseBackofficeProfileOptions">Ouvrir/Fermer vos options de profil</key>
 		<key alias="openContextMenu">Ouvrir le menu de contexte pour</key>
 		<key alias="currentLanguage">Langue actuelle</key>
 		<key alias="switchLanguage">Changer la langue vers</key>

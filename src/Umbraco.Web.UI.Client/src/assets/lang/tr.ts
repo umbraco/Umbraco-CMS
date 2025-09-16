@@ -1816,7 +1816,7 @@ export default {
 		checkFailed: 'Kontrol başarısız oldu',
 		openBackofficeSearch: 'Arka ofis aramasını aç',
 		openCloseBackofficeHelp: 'Backoffice yardımını Aç / Kapat',
-		BackofficeProfileOptions: 'Profil seçenekleri',
+		openCloseBackofficeProfileOptions: 'Profil seçeneklerinizi açın / kapatın',
 		assignDomainDescription: '%0% için Kurulum Kültürü ve Ana Bilgisayar Adları',
 		createDescription: '%0% altında yeni düğüm oluştur',
 		protectDescription: '%0% üzerinde genel erişim kurun',
