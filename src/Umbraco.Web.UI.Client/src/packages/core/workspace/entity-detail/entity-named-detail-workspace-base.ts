@@ -5,6 +5,7 @@ import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceConte
 import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 		NamedDetailModelType extends UmbNamedEntityModel = UmbNamedEntityModel,
@@ -23,9 +24,18 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 
 	public readonly nameWriteGuard = new UmbNameWriteGuardManager(this);
 
+	public readonly view = new UmbViewContext(this, null);
+
 	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
 		super(host, args);
 		this.nameWriteGuard.fallbackToPermitted();
+		this.observe(
+			this.name,
+			(name) => {
+				this.view.setBrowserTitle(name);
+			},
+			null,
+		);
 	}
 
 	getName() {

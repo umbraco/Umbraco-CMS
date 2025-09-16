@@ -22,6 +22,7 @@ import type {
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbContentTypeWorkspaceContextArgs extends UmbEntityDetailWorkspaceContextArgs {}
@@ -52,6 +53,8 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 	public readonly structure: UmbContentTypeStructureManager<DetailModelType>;
 
+	public readonly view = new UmbViewContext(this, null);
+
 	constructor(host: UmbControllerHost, args: UmbContentTypeWorkspaceContextArgs) {
 		super(host, args);
 
@@ -70,7 +73,9 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
 
 		// Keep current data in sync with the owner content type - This is used for the discard changes feature
-		this.observe(this.structure.ownerContentType, (data) => this._data.setCurrent(data));
+		this.observe(this.structure.ownerContentType, (data) => this._data.setCurrent(data), null);
+		this.observe(this.name, (name) => this.view.setBrowserTitle(name), null);
+		// TODO: sometimes the browserTitle for a parent view is set later than the child is updating. We need to fix this as well enable a parent browser title to be updating on the go. [NL]
 	}
 
 	/**
