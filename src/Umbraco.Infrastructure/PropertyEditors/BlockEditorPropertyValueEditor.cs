@@ -49,7 +49,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
     /// <inheritdoc />
     public override IEnumerable<UmbracoEntityReference> GetReferences(object? value)
     {
-        // Group by property editor alias to avoid duplicate lookups and optimize value parsing.
+        // Group by property editor alias to avoid duplicate lookups and optimize value parsing
         foreach (var valuesByPropertyEditorAlias in GetAllPropertyValues(value).GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Value))
         {
             if (!_propertyEditors.TryGet(valuesByPropertyEditorAlias.Key, out IDataEditor? dataEditor))
