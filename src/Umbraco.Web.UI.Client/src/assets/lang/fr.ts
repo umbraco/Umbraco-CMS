@@ -1861,7 +1861,7 @@ export default {
 		checkFailed: 'Vérifier les échecs',
 		openBackofficeSearch: 'Ouvrir la recherche backoffice',
 		openCloseBackofficeHelp: "Ouvrir/Fermer l'aide backoffice",
-		openCloseBackofficeProfileOptions: 'Ouvrir/Fermer vos options de profil',
+		BackofficeProfileOptions: 'Options de profil',
 		openContextMenu: 'Ouvrir le menu de contexte pour',
 		currentLanguage: 'Langue actuelle',
 		switchLanguage: 'Changer la langue vers',

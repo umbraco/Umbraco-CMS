@@ -2386,7 +2386,7 @@
 		<key alias="checkFailed">Prüfung fehlgeschlagen</key>
 		<key alias="openBackofficeSearch">Back-Office Suche öffnen</key>
 		<key alias="openCloseBackofficeHelp">Back-Office Hilfe öffnen / schliessen</key>
-		<key alias="openCloseBackofficeProfileOptions">Ihre Profil-Einstellungen öffnen / schliessen</key>
+		<key alias="BackofficeProfileOptions">Profil-Einstellungen</key>
 	</area>
 	<area alias="logViewer">
 		<key alias="selectAllLogLevelFilters">Wählen Sie Alle</key>
