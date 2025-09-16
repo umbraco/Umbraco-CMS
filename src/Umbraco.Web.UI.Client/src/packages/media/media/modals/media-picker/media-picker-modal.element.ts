@@ -118,37 +118,29 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		super.firstUpdated(_changedProperties);
 
 		const startNode = this.data?.startNode;
-
-		if (startNode) {
-			const { data } = await this.#mediaItemRepository.requestItems([startNode.unique]);
-			this._startNode = data?.[0];
-
-			if (this._startNode) {
-				this._currentMediaEntity = {
-					name: this._startNode.name,
-					unique: this._startNode.unique,
-					entityType: this._startNode.entityType,
-				};
-
-				this._searchFrom = { unique: this._startNode.unique, entityType: this._startNode.entityType };
-			}
-		}
-
 		const locationFromMemory = this.#getLocationFromInteractionMemory();
-		const locationEntityUnique = locationFromMemory?.entity.unique;
 
-		if (locationEntityUnique) {
-			const { data } = await this.#mediaItemRepository.requestItems([locationEntityUnique]);
-			const mediaItem = data?.[0];
+		const uniquesToRequest = [startNode?.unique, locationFromMemory?.entity.unique].filter(
+			(x) => x !== null && x !== undefined,
+		);
 
-			if (mediaItem) {
+		if (uniquesToRequest.length > 0) {
+			const { data } = await this.#mediaItemRepository.requestItems(uniquesToRequest);
+
+			this._startNode = data?.find((x) => x.unique === startNode?.unique);
+			const locationMemoryItem = data?.find((x) => x.unique === locationFromMemory?.entity.unique);
+
+			// TODO: We probably need to check if the location item is within the start node. If not then fall back to start node.
+			const source = locationMemoryItem || this._startNode;
+
+			if (source) {
 				this._currentMediaEntity = {
-					name: mediaItem.name,
-					unique: mediaItem.unique,
-					entityType: mediaItem.entityType,
+					name: source.name,
+					unique: source.unique,
+					entityType: source.entityType,
 				};
 
-				this._searchFrom = { unique: mediaItem.unique, entityType: mediaItem.entityType };
+				this._searchFrom = { unique: source.unique, entityType: source.entityType };
 			}
 		}
 
