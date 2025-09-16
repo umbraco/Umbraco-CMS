@@ -10,6 +10,8 @@ import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
+import type { UmbHint, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 @customElement('umb-workspace-split-view-variant-selector')
 export class UmbWorkspaceSplitViewVariantSelectorElement<
@@ -96,7 +98,30 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			this.#observeDatasetContext();
 			this.#observeCurrentVariant();
 		});
+
+		this.consumeContext(UMB_HINT_CONTEXT, (context) => {
+			this.observe(
+				context?.descendingHints(),
+				(hints) => {
+					this._hintMap.clear();
+					hints?.forEach((hint) => {
+						if (this.#isVariantHint(hint) && hint.variantId) {
+							this._hintMap.set(hint.variantId.toString(), hint);
+						}
+					});
+					this.requestUpdate('_hintMap');
+				},
+				'umbObserveHints',
+			);
+		});
 	}
+
+	#isVariantHint(hint: UmbHint): hint is UmbVariantHint {
+		return hint && 'variantId' in hint;
+	}
+
+	@state()
+	private _hintMap = new Map<string, UmbVariantHint>();
 
 	async #observeVariants(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
 		this.observe(
@@ -105,6 +130,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				this._variantOptions = ((variantOptions ?? []) as VariantOptionModelType[]).sort(this._variantSorter);
 				this._cultureVariantOptions = this._variantOptions.filter((variant) => variant.segment === null);
 				this.#setReadOnlyCultures(workspaceContext);
+				// this.#createViewContexts();
 			},
 			'_observeVariantOptions',
 		);
@@ -302,6 +328,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	override render() {
 		if (!this._variantId) return nothing;
 
+		const variantsWithHints = this._variantOptions.filter((variant) => {
+			const variantId = UmbVariantId.Create(variant);
+			// Exclude the active variant
+			if (this._activeVariant && variantId.compare(this._activeVariant)) return false;
+			return this._hintMap.has(variantId.toString());
+		});
+
 		return html`
 			<uui-input
 				id="name-input"
@@ -330,6 +363,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								${this.#getVariantSpecInfo(this._activeVariant)}
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
+								${variantsWithHints.length > 0
+									? html`<div class="hint">
+											<uui-badge color="danger">${variantsWithHints.length}</uui-badge>
+										</div>`
+									: nothing}
 							</uui-button>
 							${this._activeVariants.length > 1
 								? html`
@@ -360,8 +398,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		const variantId = UmbVariantId.Create(variantOption);
 		const notCreated = this.#isCreateMode(variantOption, variantId);
 		const subVariantOptions = this.#getSegmentVariantOptionsForCulture(variantOption, variantId);
+		const hint = this._hintMap.get(variantId.toString());
+		const active = this.#isVariantActive(variantId);
+
 		return html`
-			<div class="variant culture-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
+			<div class="variant culture-variant ${active ? 'selected' : ''}">
 				${this._variesBySegment && this.#isCreated(variantOption) && subVariantOptions.length > 0
 					? html`<div class="expand-area">${this.#renderExpandToggle(variantId)}</div>`
 					: nothing}
@@ -381,6 +422,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 						</div>
 					</div>
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
+					${hint && !active
+						? html`<div class="hint">
+								<uui-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+									>${hint.text}</uui-badge
+								>
+							</div>`
+						: nothing}
 				</button>
 				${this.#renderSplitViewButton(variantOption)}
 			</div>
