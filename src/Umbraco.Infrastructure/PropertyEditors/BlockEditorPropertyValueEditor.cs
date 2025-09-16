@@ -171,5 +171,10 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
                 ex.Message);
             return null;
         }
+        catch
+        {
+            // If this occurs it means the data is invalid. It shouldn't happen could if we change the data format.
+            return null;
+        }
     }
 }
