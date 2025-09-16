@@ -81,10 +81,10 @@ export class UmbMemberWorkspaceContext
 			{
 				path: 'edit/:unique',
 				component: () => new UmbMemberWorkspaceEditorElement(),
-				setup: (_component, info) => {
+				setup: async (_component, info) => {
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
-					this.load(unique);
+					await this.load(unique);
 				},
 			},
 		]);
