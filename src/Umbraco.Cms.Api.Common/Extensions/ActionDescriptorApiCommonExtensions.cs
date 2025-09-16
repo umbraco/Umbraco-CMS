@@ -6,7 +6,6 @@ namespace Umbraco.Extensions;
 
 public static class ActionDescriptorApiCommonExtensions
 {
-
     private static string? GetMapToApiAttributeValue(this ActionDescriptor actionDescriptor)
     {
         IEnumerable<MapToApiAttribute> mapToApiAttributes = actionDescriptor?.EndpointMetadata?.OfType<MapToApiAttribute>() ?? [];
