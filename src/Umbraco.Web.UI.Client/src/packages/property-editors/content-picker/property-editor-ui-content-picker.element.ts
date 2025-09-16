@@ -86,7 +86,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	constructor() {
 		super();
 
-		this.observe(this.#interactionMemoryManager.memories, (interactionMemories) => {
+		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
 			this._interactionMemories = interactionMemories ?? [];
 		});
 	}

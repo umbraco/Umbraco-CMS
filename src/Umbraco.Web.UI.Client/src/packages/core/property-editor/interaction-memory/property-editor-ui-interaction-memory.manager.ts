@@ -13,7 +13,7 @@ export interface UmbPropertyEditorUiInteractionMemoryManagerArgs {
 
 export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBase {
 	#memories = new UmbArrayState<UmbInteractionMemoryModel>([], (x) => x.unique);
-	memories = this.#memories.asObservable();
+	memoriesForPropertyEditor = this.#memories.asObservable();
 
 	#interactionMemoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
 	#configHashCode?: number;

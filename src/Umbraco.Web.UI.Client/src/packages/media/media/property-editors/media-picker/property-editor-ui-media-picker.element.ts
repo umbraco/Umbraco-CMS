@@ -103,7 +103,7 @@ export class UmbPropertyEditorUIMediaPickerElement
 			this.observe(context?.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
 		});
 
-		this.observe(this.#interactionMemoryManager.memories, (interactionMemories) => {
+		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
 			this._interactionMemories = interactionMemories ?? [];
 		});
 	}

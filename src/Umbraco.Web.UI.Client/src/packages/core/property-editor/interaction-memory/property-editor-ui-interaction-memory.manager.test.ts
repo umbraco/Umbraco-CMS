@@ -42,8 +42,8 @@ describe('UmbPropertyEditorUiInteractionMemoryManager', () => {
 
 	describe('Public API', () => {
 		describe('properties', () => {
-			it('has a memories property', () => {
-				expect(manager).to.have.property('memories').to.be.an.instanceOf(Observable);
+			it('has a memoriesForPropertyEditor property', () => {
+				expect(manager).to.have.property('memoriesForPropertyEditor').to.be.an.instanceOf(Observable);
 			});
 		});
 
@@ -63,7 +63,7 @@ describe('UmbPropertyEditorUiInteractionMemoryManager', () => {
 
 		describe('saveMemoriesForPropertyEditor', () => {
 			it('creates a property editor memory based on the provided data', (done) => {
-				manager.memories.subscribe((memories) => {
+				manager.memoriesForPropertyEditor.subscribe((memories) => {
 					if (memories.length > 0) {
 						expect(memories).to.have.lengthOf(2);
 						expect(memories).to.deep.equal(childMemories);
@@ -83,7 +83,7 @@ describe('UmbPropertyEditorUiInteractionMemoryManager', () => {
 
 				// We start at -1 because the first call is the initial empty array
 				let callCount = -1;
-				manager.memories.subscribe((memories) => {
+				manager.memoriesForPropertyEditor.subscribe((memories) => {
 					callCount++;
 					if (callCount === 1) {
 						// First call, after initial save
@@ -106,7 +106,7 @@ describe('UmbPropertyEditorUiInteractionMemoryManager', () => {
 			it('deletes all memories for this property editor', (done) => {
 				// We start at -1 because the first call is the initial empty array
 				let callCount = -1;
-				manager.memories.subscribe((memories) => {
+				manager.memoriesForPropertyEditor.subscribe((memories) => {
 					callCount++;
 					if (callCount === 1) {
 						// First call, after initial save
