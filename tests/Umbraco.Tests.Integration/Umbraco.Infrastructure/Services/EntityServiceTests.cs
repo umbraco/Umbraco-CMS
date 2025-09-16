@@ -973,6 +973,26 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void EntityService_Siblings_Includes_Trashed_Entities_If_Target_Is_Trashed()
+    {
+        var children = CreateDocumentSiblingsTestData();
+
+        for (int i = 0; i <= 3; i++)
+        {
+            ContentService.MoveToRecycleBin(children[i]);
+        }
+
+        var result = EntityService.GetSiblings(children[1].Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(1, totalBefore);
+        Assert.AreEqual(1, totalAfter);
+        Assert.AreEqual(3, result.Length);
+        Assert.IsTrue(result[0].Key == children[0].Key);
+        Assert.IsTrue(result[1].Key == children[1].Key);
+        Assert.IsTrue(result[2].Key == children[2].Key);
+        Assert.IsFalse(result.Any(x => x.Key == children[3].Key));
+    }
+
+    [Test]
     public void EntityService_Siblings_SkipsFilteredEntities_UsingFilterWithSet()
     {
         var children = CreateDocumentSiblingsTestData();
