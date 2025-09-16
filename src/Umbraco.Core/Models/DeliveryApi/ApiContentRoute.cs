@@ -10,7 +10,7 @@ public sealed class ApiContentRoute : IApiContentRoute
 
     public string Path { get; }
 
-    public string? QueryString { get; set; }
+    public string? QueryString { get; set; } = null;
 
     public IApiContentStartItem StartItem { get; }
 }
