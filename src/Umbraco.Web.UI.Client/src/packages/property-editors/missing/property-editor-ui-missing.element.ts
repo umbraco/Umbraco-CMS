@@ -1,29 +1,16 @@
 import { UMB_MISSING_PROPERTY_EDITOR_MODAL } from './modal/missing-editor-modal.token.js';
-import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-property-editor-ui-missing
  */
 @customElement('umb-property-editor-ui-missing')
-export class UmbPropertyEditorUIMissingElement
-	extends UmbFormControlMixin<unknown, typeof UmbLitElement>(UmbLitElement, undefined)
-	implements UmbPropertyEditorUiElement
-{
-	constructor() {
-		super();
-
-		this.addValidator(
-			'customError',
-			() => this.localize.term('errors_propertyHasErrors'),
-			() => true,
-		);
-
-		this.pristine = false;
-	}
+export class UmbPropertyEditorUIMissingElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	@property()
+	value = '';
 
 	async #onDetails(event: Event) {
 		event.stopPropagation();
