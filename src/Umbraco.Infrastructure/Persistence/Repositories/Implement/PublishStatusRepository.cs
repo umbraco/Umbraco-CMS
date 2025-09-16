@@ -36,7 +36,7 @@ public class PublishStatusRepository : IPublishStatusRepository
                 $"l.{syntax.GetQuotedColumnName(LanguageDto.IsoCodeColumnName)}",
                 $"ct.{syntax.GetQuotedColumnName(ContentTypeDto.VariationsColumnName)}",
                 $"d.{syntax.GetQuotedColumnName(DocumentDto.PublishedColumnName)}",
-                $"dcv.{syntax.GetQuotedColumnName(DocumentCultureVariationDto.PublishedColumnName)} as {syntax.GetQuotedColumnName(PublishStatusDto.DocumentVariantPublishStatusColumnName)}")// COALESCE is not necessary as the column is not nullable
+                $"dcv.{syntax.GetQuotedColumnName(DocumentCultureVariationDto.PublishedColumnName)} as {syntax.GetQuotedColumnName(PublishStatusDto.DocumentVariantPublishStatusColumnName)}") // COALESCE is not necessary as the column is not nullable
             .From<DocumentDto>("d")
             .InnerJoin<ContentDto>("c").On<DocumentDto, ContentDto>((d, c) => d.NodeId == c.NodeId, "c", "d")
             .InnerJoin<ContentTypeDto>("ct").On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")

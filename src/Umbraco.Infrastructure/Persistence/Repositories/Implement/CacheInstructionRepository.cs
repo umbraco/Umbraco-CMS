@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis.CSharp;
 using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;

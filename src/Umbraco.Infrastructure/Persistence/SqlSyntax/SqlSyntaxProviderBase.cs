@@ -437,12 +437,12 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string ColumnWithAlias(string tableNameOrAlias, string columnName, string columnAlias = "")
     {
         var quotedColumnName = GetQuotedColumnName(columnName);
-        var coulumnPrefix = GetColumnPrefix(tableNameOrAlias);
+        var columnPrefix = GetColumnPrefix(tableNameOrAlias);
         var asAppendix = string.IsNullOrEmpty(columnAlias)
             ? string.Empty
             : $" AS {GetQuotedName(columnAlias)}";
 
-        return $"{coulumnPrefix}{quotedColumnName}{asAppendix}";
+        return $"{columnPrefix}{quotedColumnName}{asAppendix}";
     }
 
     private string GetColumnPrefix(string? tableNameOrAlias)

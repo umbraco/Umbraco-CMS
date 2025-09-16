@@ -175,14 +175,6 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             .From<NodeDto>()
             .Where<NodeDto>(c => c.ParentId == entity.Id && (c.NodeObjectType == entity.ContainedObjectType || c.NodeObjectType == entity.ContainerObjectType)));
 
-        // "parentID=@parentID AND (nodeObjectType=@containedObjectType OR nodeObjectType=@containerObjectType)",
-        // new
-        // {
-        //    parentID = entity.Id,
-        //    containedObjectType = entity.ContainedObjectType,
-        //    containerObjectType = entity.ContainerObjectType,
-        // }));
-
         foreach (NodeDto childDto in childDtos)
         {
             childDto.ParentId = nodeDto.ParentId;

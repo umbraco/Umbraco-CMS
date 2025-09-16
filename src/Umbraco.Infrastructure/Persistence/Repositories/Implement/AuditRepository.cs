@@ -37,15 +37,12 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
     {
         DateTime oldestPermittedLogEntry = DateTime.UtcNow.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
 
-        // var sqlString = $"Delete from {SqlSyntax.GetQuotedTableName(LogDto.TableName)} where datestamp < @oldestPermittedLogEntry and {SqlSyntax.GetQuotedColumnName("logHeader")} in ('open','system')"; // "delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')"
-        // Database.Execute(sqlString, new { oldestPermittedLogEntry });
-
         var headers = new[] { "open", "system" };
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Delete<LogDto>()
             .Where<LogDto>(c => c.Datestamp < oldestPermittedLogEntry)
             .WhereIn<LogDto>(c => c.Header, headers);
-        _ = Database.Execute(sql);
+        Database.Execute(sql);
     }
 
     /// <summary>

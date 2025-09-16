@@ -67,8 +67,8 @@ internal sealed class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepos
     {
         var list = new List<string>
         {
-            $"DELETE FROM {QuoteTab("cmsTagRelationship")} WHERE {QuoteCol("tagId")} = @id",
-            $"DELETE FROM {QuoteTab("cmsTags")} WHERE id = @id"
+            $"DELETE FROM {QuoteTableName("cmsTagRelationship")} WHERE {QuoteColumnName("tagId")} = @id",
+            $"DELETE FROM {QuoteTableName("cmsTags")} WHERE id = @id"
         };
         return list;
     }
@@ -126,11 +126,11 @@ internal sealed class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepos
         // must coalesce languageId because equality of NULLs does not exist
 
         var tagSetSql = GetTagSet(tagsA);
-        var cmsTags = QuoteTab("cmsTags");
-        var group = QuoteCol("group");
-        var nodeId = QuoteCol("nodeId");
-        var languageIdCol = QuoteCol("languageId");
-        var cmsTagsLanguageIdCol = $"{QuoteTab("cmsTags")}.{QuoteCol("languageId")}";
+        var cmsTags = QuoteTableName("cmsTags");
+        var group = QuoteColumnName("group");
+        var nodeId = QuoteColumnName("nodeId");
+        var languageIdCol = QuoteColumnName("languageId");
+        var cmsTagsLanguageIdCol = $"{QuoteTableName("cmsTags")}.{QuoteColumnName("languageId")}";
         // insert tags
         // - Note we are checking in the subquery for the existence of the tag, so we don't insert duplicates, using a case-insensitive comparison (the
         //   LOWER keyword is consistent across SQLite and SQLServer). This ensures consistent behavior across databases as by default, SQLServer will
@@ -145,16 +145,16 @@ WHERE {cmsTags}.id IS NULL"; // cmsTags.id is never null
         Database.Execute(sql1);
 
         // insert relations
-        var sql2 = $@"INSERT INTO {QuoteTab(TagRelationshipDto.TableName)} ({nodeId}, {QuoteCol("propertyTypeId")}, {QuoteCol("tagId")})
+        var sql2 = $@"INSERT INTO {QuoteTableName(TagRelationshipDto.TableName)} ({nodeId}, {QuoteColumnName("propertyTypeId")}, {QuoteColumnName("tagId")})
 SELECT {contentId}, {propertyTypeId}, tagset2.Id
 FROM (
-    SELECT t.{QuoteCol("Id")}
+    SELECT t.{QuoteColumnName("Id")}
     FROM {tagSetSql}
     INNER JOIN {cmsTags} as t ON (LOWER(tagset.tag) = LOWER(t.tag) AND LOWER(tagset.{group}) = LOWER(t.{group}) AND COALESCE(tagset.languageid, -1) = COALESCE(t.{languageIdCol}, -1))
 ) AS tagset2
-LEFT OUTER JOIN {QuoteTab(TagRelationshipDto.TableName)} r
-ON (tagset2.id = r.{QuoteCol("tagId")} AND r.{nodeId} = {contentId} AND r.{QuoteCol("propertyTypeID")} = {propertyTypeId})
-WHERE r.{QuoteCol("tagId")} IS NULL"; // cmsTagRelationship.tagId is never null
+LEFT OUTER JOIN {QuoteTableName(TagRelationshipDto.TableName)} r
+ON (tagset2.id = r.{QuoteColumnName("tagId")} AND r.{nodeId} = {contentId} AND r.{QuoteColumnName("propertyTypeID")} = {propertyTypeId})
+WHERE r.{QuoteColumnName("tagId")} IS NULL"; // cmsTagRelationship.tagId is never null
 
         Database.Execute(sql2);
     }
@@ -164,17 +164,17 @@ WHERE r.{QuoteCol("tagId")} IS NULL"; // cmsTagRelationship.tagId is never null
     public void Remove(int contentId, int propertyTypeId, IEnumerable<ITag> tags)
     {
         var tagSetSql = GetTagSet(tags);
-        var group = QuoteCol("group");
-        var nodeId = QuoteCol("nodeId");
-        var cmsTags = QuoteTab("cmsTags");
-        var cmsTagsLanguageIdCol = $"{QuoteTab("cmsTags")}.{QuoteCol("languageId")}";
+        var group = QuoteColumnName("group");
+        var nodeId = QuoteColumnName("nodeId");
+        var cmsTags = QuoteTableName("cmsTags");
+        var cmsTagsLanguageIdCol = $"{QuoteTableName("cmsTags")}.{QuoteColumnName("languageId")}";
 
         var deleteSql =
-$@"DELETE FROM {QuoteTab(TagRelationshipDto.TableName)} WHERE {nodeId} = {contentId} AND {QuoteCol("propertyTypeId")} = {propertyTypeId} AND {QuoteCol("tagId")} IN
+$@"DELETE FROM {QuoteTableName(TagRelationshipDto.TableName)} WHERE {nodeId} = {contentId} AND {QuoteColumnName("propertyTypeId")} = {propertyTypeId} AND {QuoteColumnName("tagId")} IN
 (SELECT id FROM {cmsTags} INNER JOIN {tagSetSql}
 ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALESCE(tagset.languageid, -1) = COALESCE({cmsTagsLanguageIdCol}, -1))
 )";
-        _ = Database.Execute(deleteSql);
+        Database.Execute(deleteSql);
     }
 
     /// <inheritdoc />
@@ -182,7 +182,7 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     {
         Sql<ISqlContext> sql = Sql().Delete<TagRelationshipDto>()
             .Where<TagRelationshipDto>(x => x.NodeId == contentId && x.PropertyTypeId == propertyTypeId);
-        _ = Database.Execute(sql);
+        Database.Execute(sql);
     }
 
     /// <inheritdoc />
@@ -190,7 +190,7 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     {
         Sql<ISqlContext> sql = Sql().Delete<TagRelationshipDto>()
             .Where<TagRelationshipDto>(x => x.NodeId == contentId);
-        _ = Database.Execute(sql);
+        Database.Execute(sql);
     }
 
     // this is a clever way to produce an SQL statement like this:
@@ -584,9 +584,7 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
 
     #endregion
 
-    private string QuoteTab(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
+    private string QuoteTableName(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
 
-    private string QuoteCol(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
-
-    private string QuoteName(string name) => SqlSyntax.GetQuotedName(name);
+    private string QuoteColumnName(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
 }

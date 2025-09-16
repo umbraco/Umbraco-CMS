@@ -337,10 +337,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     /// <summary>
     /// Nothing to do here, media has only one version which must not be deleted.
-    /// Base calls is abstarct so this must be implemented.
+    /// Base calls is abstract so this must be implemented.
     /// </summary>
-    /// <param name="id">not used</param>
-    /// <param name="versionId">not used</param>
     protected override void PerformDeleteVersion(int id, int versionId)
     {
         // Nothing to do here, media has only one version which must not be deleted.

@@ -435,20 +435,20 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.DefaultPermissions)
             .AndBy<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId);
 
-    protected override string GetBaseWhereClause() => $"{QuoteTab(UserGroupDto.TableName)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(UserGroupDto.TableName)}.id = @id";
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var userGroupId = QuoteCol("userGroupId");
-        var userGroupKey = QuoteCol("userGroupKey");
-        var key = QuoteCol("Key");
-        var umbracoUserGroup = QuoteTab(UserGroupDto.TableName);
+        var userGroupId = QuoteColumnName("userGroupId");
+        var userGroupKey = QuoteColumnName("userGroupKey");
+        var key = QuoteColumnName("Key");
+        var umbracoUserGroup = QuoteTableName(UserGroupDto.TableName);
         var list = new List<string>
         {
-            $"DELETE FROM {QuoteTab("umbracoUser2UserGroup")} WHERE {userGroupId} = @id",
-            $"DELETE FROM {QuoteTab("umbracoUserGroup2App")} WHERE {userGroupId} = @id",
-            $@"DELETE FROM {QuoteTab("umbracoUserGroup2Permission")} WHERE {userGroupKey} IN
+            $"DELETE FROM {QuoteTableName("umbracoUser2UserGroup")} WHERE {userGroupId} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoUserGroup2App")} WHERE {userGroupId} = @id",
+            $@"DELETE FROM {QuoteTableName("umbracoUserGroup2Permission")} WHERE {userGroupKey} IN
                 (SELECT {umbracoUserGroup}.{key} FROM {umbracoUserGroup} WHERE id = @id)",
-            $@"DELETE FROM {QuoteTab("umbracoUserGroup2GranularPermission")} WHERE {userGroupKey} IN
+            $@"DELETE FROM {QuoteTableName("umbracoUserGroup2GranularPermission")} WHERE {userGroupKey} IN
                 (SELECT {umbracoUserGroup}.{key} FROM {umbracoUserGroup} WHERE id = @id)",
             $"DELETE FROM {umbracoUserGroup} WHERE id = @id",
         };
@@ -627,7 +627,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     }
     #endregion
 
-    private string QuoteTab(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
+    private string QuoteTableName(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
 
-    private string QuoteCol(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
+    private string QuoteColumnName(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
 }

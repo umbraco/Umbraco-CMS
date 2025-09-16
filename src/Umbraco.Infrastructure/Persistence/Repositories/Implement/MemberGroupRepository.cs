@@ -250,7 +250,7 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
             Sql<ISqlContext> delSql = Sql()
                 .Delete<Member2MemberGroupDto>()
                 .WhereIn<Member2MemberGroupDto>(x => x.Member, memberIds);
-            _ = Database.Execute(delSql);
+            Database.Execute(delSql);
 
             currentlyAssigned = [];
         }
@@ -301,16 +301,7 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
             .Delete<Member2MemberGroupDto>()
             .WhereIn<Member2MemberGroupDto>(x => x.Member, memberIds)
             .WhereIn<Member2MemberGroupDto>(x => x.MemberGroup, existingRolesIds);
-        _ = Database.Execute(delSql);
-
-        // Database.Execute(
-        //    "DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds) AND MemberGroup IN (@memberGroups)",
-        //    new
-        //    {
-        //        /*memberIds =*/
-        //        memberIds,
-        //        memberGroups = existingRolesIds,
-        //    });
+        Database.Execute(delSql);
     }
 
     private sealed class AssignedRolesDto

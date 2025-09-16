@@ -268,7 +268,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         Sql<ISqlContext> sql = Sql()
             .Delete<ContentTypeTemplateDto>()
             .Where<ContentTypeTemplateDto>(x => x.ContentTypeNodeId == entity.Id);
-        _ = Database.Execute(sql);
+        Database.Execute(sql);
 
         // we could do it all in foreach if we assume that the default template is an allowed template??
         var defaultTemplateId = entity.DefaultTemplateId;

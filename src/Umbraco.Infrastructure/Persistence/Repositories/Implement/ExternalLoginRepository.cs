@@ -58,7 +58,7 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Delete<ExternalLoginDto>()
             .Where<ExternalLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
-        _ = Database.Execute(sql);
+        Database.Execute(sql);
     }
 
     /// <inheritdoc />

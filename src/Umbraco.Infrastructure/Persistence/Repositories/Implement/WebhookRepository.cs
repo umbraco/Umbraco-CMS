@@ -124,17 +124,17 @@ public class WebhookRepository : IWebhookRepository
         Sql<ISqlContext> sql = database.SqlContext.Sql()
             .Delete<Webhook2ContentTypeKeysDto>()
             .Where<Webhook2ContentTypeKeysDto>(x => x.WebhookId == webhookId);
-        _ = database.Execute(sql);
+        database.Execute(sql);
 
         sql = database.SqlContext.Sql()
             .Delete<Webhook2EventsDto>()
             .Where<Webhook2EventsDto>(x => x.WebhookId == webhookId);
-        _ = database.Execute(sql);
+        database.Execute(sql);
 
         sql = database.SqlContext.Sql()
             .Delete<Webhook2HeadersDto>()
             .Where<Webhook2HeadersDto>(x => x.WebhookId == webhookId);
-        _ = database.Execute(sql);
+        database.Execute(sql);
     }
 
     private void InsertManyToOneReferences(IWebhook webhook)

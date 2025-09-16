@@ -22,8 +22,9 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILanguageRepository _languageRepository;
 
-    private string QuotedtTableName => SqlSyntax.GetQuotedTableName(DictionaryDto.TableName);
-    private string QuotedColumn(string columnName) => $"{QuotedtTableName}.{SqlSyntax.GetQuotedColumnName(columnName)}";
+    private string QuotedTableName => SqlSyntax.GetQuotedTableName(DictionaryDto.TableName);
+
+    private string QuotedColumn(string columnName) => $"{QuotedTableName}.{SqlSyntax.GetQuotedColumnName(columnName)}";
 
     public DictionaryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<DictionaryRepository> logger,
         ILoggerFactory loggerFactory, ILanguageRepository languageRepository)
@@ -63,7 +64,6 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()
     {
-        // var columns = new[] { "key", "id" }.Select(x => (object)SqlSyntax.GetQuotedColumnName(x)).ToArray();
         var columns = new[] { "key", "id" }.Select(x => (object)QuotedColumn(x)).ToArray();
         Sql<ISqlContext> sql = Sql().Select(columns).From<DictionaryDto>();
         return Database.Fetch<DictionaryItemKeyIdDto>(sql).ToDictionary(x => x.Key, x => x.Id);
@@ -190,8 +190,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         private readonly DictionaryRepository _dictionaryRepository;
         private readonly IDictionary<int, ILanguage> _languagesById;
 
-        private string QuotedtTableName => SqlSyntax.GetQuotedTableName(DictionaryDto.TableName);
-        private string QuotedColumn(string columnName) => $"{QuotedtTableName}.{SqlSyntax.GetQuotedColumnName(columnName)}";
+        private string QuotedTableName => SqlSyntax.GetQuotedTableName(DictionaryDto.TableName);
+        private string QuotedColumn(string columnName) => $"{QuotedTableName}.{SqlSyntax.GetQuotedColumnName(columnName)}";
 
         public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
             AppCaches cache, ILogger<DictionaryByUniqueIdRepository> logger)
@@ -248,8 +248,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         private readonly DictionaryRepository _dictionaryRepository;
         private readonly IDictionary<int, ILanguage> _languagesById;
 
-        private string QuotedtTableName => SqlSyntax.GetQuotedTableName(DictionaryDto.TableName);
-        private string QuotedColumn(string columnName) => $"{QuotedtTableName}.{SqlSyntax.GetQuotedColumnName(columnName)}";
+        private string QuotedTableName => SqlSyntax.GetQuotedTableName(DictionaryDto.TableName);
+        private string QuotedColumn(string columnName) => $"{QuotedTableName}.{SqlSyntax.GetQuotedColumnName(columnName)}";
 
         public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
             AppCaches cache, ILogger<DictionaryByKeyRepository> logger)
@@ -465,12 +465,12 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Delete<LanguageTextDto>()
             .Where<LanguageTextDto>(c => c.UniqueId == key);
-        _ = Database.Execute(sql);
+        Database.Execute(sql);
 
         sql = SqlContext.Sql()
             .Delete<DictionaryDto>()
             .Where<DictionaryDto>(c => c.UniqueId == key);
-        _ = Database.Execute(sql);
+        Database.Execute(sql);
     }
 
     private IDictionary<int, ILanguage> GetLanguagesById() => _languageRepository

@@ -30,13 +30,8 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
                 .Set(x => x.IsActive, false)
                 .Set(x => x.IsSchedulingPublisher, false))
             .Where<ServerRegistrationDto>(x => x.DateAccessed < timeoutDate);
+        Database.Execute(sql);
 
-        // Database.Update<ServerRegistrationDto>(
-        //    $"SET {SqlSyntax.GetQuotedColumnName("isActive")}=0, {SqlSyntax.GetQuotedColumnName("isSchedulingPublisher")}=0 WHERE {SqlSyntax.GetQuotedColumnName("lastNotifiedDate")} < @timeoutDate", new
-        //    {
-        //        /*timeoutDate =*/
-        //        timeoutDate,
-        //    });
         ClearCache();
     }
 

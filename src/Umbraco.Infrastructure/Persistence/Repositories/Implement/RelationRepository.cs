@@ -1,3 +1,4 @@
+
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -172,7 +173,7 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
     public void DeleteByParent(int parentId, params string[] relationTypeAliases)
     {
         // HACK: SQLite - hard to replace this without provider specific repositories/another ORM.
-        if (!Database.DatabaseType.IsSqlServer()) // Database.DatabaseType.IsSqlite())
+        if (Database.DatabaseType.IsSqlServer() is false)
         {
             Sql<ISqlContext>? query = Sql().Append($"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoRelation")}");
 

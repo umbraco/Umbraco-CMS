@@ -42,10 +42,10 @@ public class NotificationsRepository : INotificationsRepository
             .Where<User2NodeNotifyDto>(x => x.Action == action); // on the specified action
         if (nodeIdsA.Length > 0)
         {
-            _ = sql.WhereIn<NodeDto>(x => x.NodeId, nodeIdsA); // for the specified nodes
+            sql.WhereIn<NodeDto>(x => x.NodeId, nodeIdsA); // for the specified nodes
         }
 
-        _ = sql
+        sql
             .OrderBy<UserDto>(x => x.Id)
             .OrderBy<NodeDto>(dto => dto.NodeId);
         return AmbientScope.Database.Fetch<UserNotificationDto>(sql)

@@ -35,7 +35,7 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
 
         ISqlSyntaxProvider syntax = ambientScope.SqlContext.SqlSyntax;
         Sql<ISqlContext> query = ambientScope.SqlContext.Sql()
-            .Select(GetQuotedSelectCoumns(syntax))
+            .Select(GetQuotedSelectColumns(syntax))
             .From<DocumentDto>()
             .InnerJoin<ContentDto>()
             .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
@@ -54,36 +54,18 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
         return results;
     }
 
-    private string GetQuotedSelectCoumns(ISqlSyntaxProvider syntax) =>
+    private string GetQuotedSelectColumns(ISqlSyntaxProvider syntax) =>
         $@"
-{syntax.ColumnWithAlias(ContentVersionDto.TableName,"id", "versionId")},
+{syntax.ColumnWithAlias(ContentVersionDto.TableName, "id", "versionId")},
 {syntax.ColumnWithAlias(DocumentDto.TableName, "nodeId", "contentId")},
 {syntax.ColumnWithAlias(ContentDto.TableName, "contentTypeId", "contentTypeId")},
-{syntax.ColumnWithAlias(ContentVersionDto.TableName,"userId", "userId")},
-{syntax.ColumnWithAlias(ContentVersionDto.TableName,"versionDate", "versionDate")},
-{syntax.ColumnWithAlias(DocumentVersionDto.TableName,"published", "currentPublishedVersion")},
-{syntax.ColumnWithAlias(ContentVersionDto.TableName,"current", "currentDraftVersion")},
-{syntax.ColumnWithAlias(ContentVersionDto.TableName,"preventCleanup", "preventCleanup")},
-{syntax.ColumnWithAlias(UserDto.TableName,"userName", "username")}
+{syntax.ColumnWithAlias(ContentVersionDto.TableName, "userId", "userId")},
+{syntax.ColumnWithAlias(ContentVersionDto.TableName, "versionDate", "versionDate")},
+{syntax.ColumnWithAlias(DocumentVersionDto.TableName ,"published", "currentPublishedVersion")},
+{syntax.ColumnWithAlias(ContentVersionDto.TableName, "current", "currentDraftVersion")},
+{syntax.ColumnWithAlias(ContentVersionDto.TableName, "preventCleanup", "preventCleanup")},
+{syntax.ColumnWithAlias(UserDto.TableName, "userName", "username")}
 ";
-
-    private static string GetQuotedSelectCoumn(ISqlSyntaxProvider syntax, string columnName, string? alias = null, string? tableName = null)
-    {
-        var sb = new StringBuilder();
-        if (tableName is not null)
-        {
-            _ = sb.Append($"{syntax.GetQuotedTableName(tableName)}.");
-        }
-
-        _ = sb.Append(syntax.GetQuotedColumnName(columnName));
-
-        if (alias is not null)
-        {
-            _ = sb.Append($" AS {syntax.GetQuotedName(alias)}");
-        }
-
-        return sb.ToString();
-    }
 
     /// <inheritdoc />
     public IReadOnlyCollection<ContentVersionCleanupPolicySettings>? GetCleanupPolicies()
@@ -108,7 +90,7 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
 
         ISqlSyntaxProvider syntax = ambientScope.SqlContext.SqlSyntax;
         Sql<ISqlContext> query = ambientScope.SqlContext.Sql()
-            .Select(GetQuotedSelectCoumns(syntax))
+            .Select(GetQuotedSelectColumns(syntax))
             .From<DocumentDto>()
             .InnerJoin<ContentDto>()
             .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
@@ -197,7 +179,7 @@ internal sealed class DocumentVersionRepository : IDocumentVersionRepository
 
         ISqlSyntaxProvider syntax = ambientScope.SqlContext.SqlSyntax;
         Sql<ISqlContext> query = ambientScope.SqlContext.Sql()
-            .Select(GetQuotedSelectCoumns(syntax))
+            .Select(GetQuotedSelectColumns(syntax))
             .From<DocumentDto>()
             .InnerJoin<ContentDto>()
             .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
