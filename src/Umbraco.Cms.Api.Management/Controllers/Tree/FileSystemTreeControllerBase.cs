@@ -28,6 +28,23 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
         return Task.FromResult<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>>(Ok(result));
     }
 
+    /// <summary>
+    /// Gets the sibling of the targeted item based on its path.
+    /// </summary>
+    /// <param name="path">The path to the item.</param>
+    /// <param name="before">The amount of siblings you want to fetch from before the items position in the array.</param>
+    /// <param name="after">The amount of siblings you want to fetch after the items position in the array.</param>
+    /// <returns>A SubsetViewModel of the siblings of the item and the item itself.</returns>
+    protected Task<ActionResult<SubsetViewModel<FileSystemTreeItemPresentationModel>>> GetSiblings(string path, int before, int after)
+    {
+        FileSystemTreeItemPresentationModel[] viewModels = GetSiblingsViewModel(path, before, after, out var totalBefore, out var totalAfter);
+
+        SubsetViewModel<FileSystemTreeItemPresentationModel> result = new() { TotalBefore = totalBefore, TotalAfter = totalAfter, Items = viewModels };
+
+
+        return Task.FromResult<ActionResult<SubsetViewModel<FileSystemTreeItemPresentationModel>>>(Ok(result));
+    }
+
     protected virtual Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> GetAncestors(string path, bool includeSelf = true)
     {
         path = path.VirtualPathToSystemPath();
@@ -85,6 +102,26 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
             .Skip(skip)
             .Take(take)
             .Select(item => ViewModel(item.Path, item.IsFolder))
+            .ToArray();
+    }
+
+    private FileSystemTreeItemPresentationModel[] GetSiblingsViewModel(string path, int before, int after, out long totalBefore, out long totalAfter)
+    {
+        var filePath = Path.GetDirectoryName(path);
+        var fileName = Path.GetFileName(path);
+
+        FileSystemTreeItemPresentationModel[] viewModels = GetPathViewModels(filePath!, 0, int.MaxValue, out totalBefore);
+        FileSystemTreeItemPresentationModel? target = viewModels.FirstOrDefault(item => item.Name == fileName);
+        var position = Array.IndexOf(viewModels, target);
+
+        // Calculating totalBefore & totalAfter
+        totalBefore = position - before < 0 ? 0 : position - before;
+        totalAfter = (viewModels.Length - 1) - (position + after) < 0 ? 0 : (viewModels.Length - 1) - (position + after);
+
+        return viewModels
+            .Select((item, index) => new { item, index })
+            .Where(item => item.index >= position - before && item.index <= position + after)
+            .Select(item => item.item)
             .ToArray();
     }
 

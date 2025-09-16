@@ -19,7 +19,7 @@ public class SiblingMemberTypeTreeController : MemberTypeTreeControllerBase
 
     [HttpGet("siblings")]
     [ProducesResponseType(typeof(SubsetViewModel<MemberTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<SubsetViewModel<MemberTypeTreeItemResponseModel>>> GetSiblingMemberTypes(
+    public async Task<ActionResult<SubsetViewModel<MemberTypeTreeItemResponseModel>>> Siblings(
         CancellationToken cancellationToken,
         Guid target,
         int before,
