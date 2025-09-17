@@ -1,8 +1,9 @@
 import type { UmbTreeItemContext } from '../index.js';
 import type { UmbTreeItemModel } from '../../types.js';
-import { html, ifDefined, nothing, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, ifDefined, nothing, state, repeat, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 export abstract class UmbTreeItemElementBase<
 	TreeItemModelType extends UmbTreeItemModel,
@@ -137,9 +138,9 @@ export abstract class UmbTreeItemElementBase<
 				.hasChildren=${this._hasChildren}
 				.showChildren=${this._isOpen}
 				.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
-				label=${this._label}
+				label=${this._label ?? ''}
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
-				${this.renderIconContainer()} ${this.#renderSigns()} ${this.renderLabel()} ${this.#renderActions()}
+				${this.renderIconContainer()}${this.#renderSigns()} ${this.renderLabel()} ${this.#renderActions()}
 				${this.#renderChildItems()}
 				<slot></slot>
 				${this.#renderPaging()}
@@ -231,4 +232,6 @@ export abstract class UmbTreeItemElementBase<
 
 		return html` <umb-tree-load-more-button @click=${this.#onLoadMoreClick}></umb-tree-load-more-button> `;
 	}
+
+	static override styles = [UmbTextStyles, css``];
 }

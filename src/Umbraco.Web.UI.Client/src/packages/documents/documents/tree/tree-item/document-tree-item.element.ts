@@ -10,6 +10,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	UmbDocumentTreeItemContext
 > {
 	#api: UmbDocumentTreeItemContext | undefined;
+
 	@property({ type: Object, attribute: false })
 	public override get api(): UmbDocumentTreeItemContext | undefined {
 		return this.#api;
@@ -26,26 +27,16 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		super.api = value;
 	}
 
-	@state()
-	private _name = '';
-
-	@state()
-	private _isDraft = false;
-
-	@state()
-	private _icon = '';
+	@state() private _name = '';
+	@state() private _isDraft = false;
+	@state() private _icon = '';
 
 	override renderIconContainer() {
 		const icon = this._icon;
 
 		return html`
 			<span id="icon-container" slot="icon" class=${classMap({ draft: this._isDraft })}>
-				${icon
-					? html`
-							<umb-icon id="icon" slot="icon" name="${this._getIconToRender(icon)}"></umb-icon>
-							${this.#renderStateIcon()}
-						`
-					: nothing}
+				${icon ? html`<umb-icon id="icon" name="${this._getIconToRender(icon)}"></umb-icon>` : nothing}
 			</span>
 		`;
 	}
@@ -83,6 +74,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 			#icon {
 				vertical-align: middle;
+				font-size: 16px;
 			}
 
 			#label {
