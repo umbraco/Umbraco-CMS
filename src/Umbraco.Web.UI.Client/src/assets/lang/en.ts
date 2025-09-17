@@ -817,6 +817,7 @@ export default {
 		add: 'Add',
 		alias: 'Alias',
 		all: 'All',
+
 		areyousure: 'Are you sure?',
 		back: 'Back',
 		backToOverview: 'Back to overview',
@@ -2773,6 +2774,7 @@ export default {
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
 	rte: {
+		label: 'Rich Text Editor',
 		config_blocks: 'Available Blocks',
 		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
