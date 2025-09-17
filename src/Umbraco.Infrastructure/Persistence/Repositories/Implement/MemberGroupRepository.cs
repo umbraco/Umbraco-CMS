@@ -170,7 +170,7 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
         Sql<ISqlContext> sql = Sql();
 
         var inClause = $" IN (SELECT {SqlSyntax.GetQuotedTableName("umbracoUserGroup")}.{SqlSyntax.GetQuotedColumnName("key")} FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup")} WHERE id = @id)";
-        var list = new[]
+        return new List<string>
         {
             $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoUser2NodeNotify")} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
             $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup2Permission")} WHERE {SqlSyntax.GetQuotedColumnName("userGroupKey")}{inClause}",
@@ -181,7 +181,6 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
             $"DELETE FROM {SqlSyntax.GetQuotedTableName("cmsMember2MemberGroup")} WHERE {SqlSyntax.GetQuotedColumnName("MemberGroup")} = @id",
             $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoNode")} WHERE id = @id",
         };
-        return list;
     }
 
     protected override void PersistNewItem(IMemberGroup entity)

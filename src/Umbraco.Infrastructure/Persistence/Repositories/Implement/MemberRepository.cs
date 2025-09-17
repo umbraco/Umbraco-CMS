@@ -640,10 +640,10 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var inClause = $"IN (SELECT {SqlSyntax.GetQuotedTableName("umbracoUserGroup")}.key FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup")} WHERE id = @id)";
+        var inClause = $"IN (SELECT {SqlSyntax.GetQuotedTableName("umbracoUserGroup")}.{SqlSyntax.GetQuotedColumnName("key")} FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup")} WHERE id = @id)";
         Sql<ISqlContext> lineSql = SqlContext.Sql().Delete().From<NodeDto>().WhereParam<NodeDto>(x => x.NodeId, "@id");
-        // var line = lineSql.SQL;
-        var list = new List<string>
+
+        return new List<string>
         {
             $"DELETE FROM {SqlSyntax.GetQuotedTableName(User2NodeNotifyDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
             $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup2Permission")} WHERE {SqlSyntax.GetQuotedColumnName("userGroupKey")} {inClause}",
@@ -664,7 +664,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             $"DELETE FROM {SqlSyntax.GetQuotedTableName(ContentDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
             $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoNode")} WHERE id = @id"
         };
-        return list;
     }
 
     #endregion
