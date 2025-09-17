@@ -135,7 +135,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         // We don't want to cache removed items, this may cause issues if the L2 serializer changes.
         if (contentCacheNode is null)
         {
-            await _hybridCache.RemoveAsync(cacheKey);
+            // We don't have to remove if it's published, we'll clear this node again if deleted/published
+            if (preview)
+            {
+                await _hybridCache.RemoveAsync(cacheKey);
+            }
             return null;
         }
 
@@ -340,12 +344,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         foreach (ContentCacheNode content in contentByContentTypeKey)
         {
-            _hybridCache.RemoveAsync(GetCacheKey(content.Key, true)).GetAwaiter().GetResult();
-
-            if (content.IsDraft is false)
-            {
-                _hybridCache.RemoveAsync(GetCacheKey(content.Key, false)).GetAwaiter().GetResult();
-            }
+            // Always remove both types of nodes regardless of published status, as we might have cached null values..
+            await _hybridCache.RemoveAsync(GetCacheKey(content.Key, true));
+            await _hybridCache.RemoveAsync(GetCacheKey(content.Key, false));
         }
     }
 }
