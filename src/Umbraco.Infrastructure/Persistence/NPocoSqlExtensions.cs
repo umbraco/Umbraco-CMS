@@ -43,12 +43,6 @@ namespace Umbraco.Extensions
             return sql.Where<TDto>(predicate, alias).Append(")");
         }
 
-        public static Sql<ISqlContext> WhereParam<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string param)
-        {
-            string s = $"{sql.GetColumns(columnExpressions: [field], withAlias: false).FirstOrDefault()} = {param}";
-            return sql.Where(s, []);
-        }
-
         /// <summary>
         /// Appends a WHERE clause to the Sql statement.
         /// </summary>
