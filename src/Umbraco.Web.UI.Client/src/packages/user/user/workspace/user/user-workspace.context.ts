@@ -7,7 +7,7 @@ import { UmbUserConfigRepository } from '../../repository/config/index.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbEntityDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityNamedDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
@@ -15,13 +15,12 @@ import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoff
 type EntityType = UmbUserDetailModel;
 
 export class UmbUserWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<EntityType, UmbUserDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<EntityType, UmbUserDetailRepository>
 	implements UmbSubmittableWorkspaceContext
 {
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
 	public readonly configRepository = new UmbUserConfigRepository(this);
 
-	readonly name = this._data.createObservablePartOfCurrent((x) => x?.name);
 	readonly state = this._data.createObservablePartOfCurrent((x) => x?.state);
 	readonly kind = this._data.createObservablePartOfCurrent((x) => x?.kind);
 	readonly userGroupUniques = this._data.createObservablePartOfCurrent((x) => x?.userGroupUniques || []);
@@ -114,14 +113,6 @@ export class UmbUserWorkspaceContext
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Id is missing');
 		return this.avatarRepository.deleteAvatar(unique);
-	}
-
-	getName(): string {
-		return this._data.getCurrent()?.name || '';
-	}
-
-	setName(name: string) {
-		this._data.updateCurrent({ name });
 	}
 
 	override destroy(): void {

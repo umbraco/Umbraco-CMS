@@ -6,16 +6,15 @@ import { UMB_USER_GROUP_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEntityDetailWorkspaceContextBase,
+	UmbEntityNamedDetailWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbEntityDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
+	extends UmbEntityNamedDetailWorkspaceContextBase<UmbUserGroupDetailModel, UmbUserGroupDetailRepository>
 	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
-	readonly name = this._data.createObservablePartOfCurrent((data) => data?.name || '');
 	readonly alias = this._data.createObservablePartOfCurrent((data) => data?.alias || '');
 	readonly aliasCanBeChanged = this._data.createObservablePartOfCurrent((data) => data?.aliasCanBeChanged);
 	readonly icon = this._data.createObservablePartOfCurrent((data) => data?.icon || null);
