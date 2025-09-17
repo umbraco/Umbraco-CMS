@@ -156,7 +156,15 @@ export abstract class UmbTreeItemElementBase<
 	};
 
 	renderIconContainer() {
-		return html`${this.#renderIcon()} `;
+		return html`
+			<slot
+				name="icon"
+				slot="icon"
+				@slotchange=${(e: Event) => {
+					this._iconSlotHasChildren = this.#hasNodes(e);
+				}}></slot>
+			${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}
+		`;
 	}
 
 	#renderSigns() {
