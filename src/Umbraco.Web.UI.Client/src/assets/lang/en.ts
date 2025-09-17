@@ -817,7 +817,6 @@ export default {
 		add: 'Add',
 		alias: 'Alias',
 		all: 'All',
-
 		areyousure: 'Are you sure?',
 		back: 'Back',
 		backToOverview: 'Back to overview',
