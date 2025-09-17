@@ -328,11 +328,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	override render() {
 		if (!this._variantId) return nothing;
 
-		const variantsWithHints = this._variantOptions.filter((variant) => {
-			const variantId = UmbVariantId.Create(variant);
-			// Exclude the active variant
-			if (this._activeVariant && variantId.compare(this._activeVariant)) return false;
-			return this._hintMap.has(variantId.toString());
+		const hintsOrderedByWeight = Array.from(this._hintMap.values()).sort((a, b) => (b.weight || 0) - (a.weight || 0));
+		const firstHintOnInactiveVariant = hintsOrderedByWeight.find((hint) => {
+			if (!hint.variantId) return false;
+			return hint.variantId.compare(this._activeVariant!) === false;
 		});
 
 		return html`
@@ -363,9 +362,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								${this.#getVariantSpecInfo(this._activeVariant)}
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
-								${variantsWithHints.length > 0
+								${firstHintOnInactiveVariant
 									? html`<div class="hint">
-											<uui-badge color="danger">${variantsWithHints.length}</uui-badge>
+											<uui-badge
+												.color=${firstHintOnInactiveVariant.color ?? 'default'}
+												?attention=${firstHintOnInactiveVariant.color === 'invalid'}
+												>${firstHintOnInactiveVariant.text}</uui-badge
+											>
 										</div>`
 									: nothing}
 							</uui-button>
