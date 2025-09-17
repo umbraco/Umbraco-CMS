@@ -67,7 +67,8 @@ export class UmbWorkspaceSplitViewManager {
 					.map((v) => UmbVariantId.Create(v).toString())
 					.join(UBM_VARIANT_DELIMITER);
 
-				history.pushState(null, '', `${workspaceRoute}/${variantPart}`);
+				const additionalPathname = this.#getAdditionalPathname();
+				history.pushState(null, '', `${workspaceRoute}/${variantPart}${additionalPathname}`);
 				return true;
 			}
 		}
@@ -118,5 +119,22 @@ export class UmbWorkspaceSplitViewManager {
 	public handleVariantFolderPart(index: number, folderPart: string) {
 		const variantId = UmbVariantId.FromString(folderPart);
 		this.setActiveVariant(index, variantId.culture, variantId.segment);
+	}
+
+	#getCurrentVariantPathname() {
+		const workspaceRoute = this.getWorkspaceRoute();
+		const activeVariants = this.getActiveVariants();
+		const currentVariantPart: string = activeVariants
+			.map((v) => UmbVariantId.Create(v).toString())
+			.join(UBM_VARIANT_DELIMITER);
+
+		return `${workspaceRoute}/${currentVariantPart}`;
+	}
+
+	#getAdditionalPathname() {
+		const currentUrl = new URL(window.location.href);
+		const currentFullPathname = currentUrl.pathname;
+		const currentVariantPathname = this.#getCurrentVariantPathname();
+		return currentFullPathname.substring(currentVariantPathname ? currentVariantPathname.length : 0);
 	}
 }
