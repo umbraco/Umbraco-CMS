@@ -1,4 +1,3 @@
-
 import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapStatusbarValue, UmbTiptapToolbarValue } from '../types.js';
@@ -173,13 +172,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 		this._editor = new Editor({
 			element: element,
-			editable: !this.readonly,
-			editorProps: {
-				attributes: {
-					'aria-label': this.label || this.localize.term('rte_label'),
-					'aria-required': this.required ? 'true' : 'false',
-				},
-			},
+			editorProps: { attributes: { 'aria-label': this.label ?? 'Rich Text Editor' } },
 			extensions: tiptapExtensions,
 			content: this.#value,
 			injectCSS: false, // Prevents injecting CSS into `window.document`, as it never applies to the shadow DOM. [LK]
