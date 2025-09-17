@@ -28,6 +28,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	@state() private _name = '';
 	@state() private _isDraft = false;
+	@state() private _icon = '';
 
 	override renderLabel() {
 		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;

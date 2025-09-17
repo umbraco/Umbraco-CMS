@@ -15,7 +15,6 @@ export abstract class UmbTreeItemElementBase<
 
 		if (this._item) {
 			this._label = this.localize.string(this._item?.name ?? '');
-			this._icon = this._item?.icon;
 			this.#initTreeItem();
 		}
 	}
@@ -89,9 +88,6 @@ export abstract class UmbTreeItemElementBase<
 
 	@state()
 	private _currentPage = 1;
-
-	@state()
-	protected _icon?: string | null;
 
 	#initTreeItem() {
 		if (!this.#api) return;
@@ -176,7 +172,7 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	#renderIcon() {
-		const icon = this._icon;
+		const icon = this.item?.icon;
 		const isFolder = this._item?.isFolder;
 
 		if (icon) {
