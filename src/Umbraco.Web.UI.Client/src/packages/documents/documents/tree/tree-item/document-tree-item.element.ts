@@ -20,7 +20,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		if (this.#api) {
 			this.observe(this.#api.name, (name) => (this._name = name || ''));
 			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
-			this.observe(this.#api.icon, (icon) => (this._icon = icon || ''));
+			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
 		}
 
 		super.api = value;
@@ -28,7 +28,12 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	@state() private _name = '';
 	@state() private _isDraft = false;
-	@state() private _icon = '';
+
+	#icon: string | null | undefined;
+
+	protected override _getIconName(): string | null | undefined {
+		return this.#icon;
+	}
 
 	override renderLabel() {
 		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;

@@ -173,11 +173,11 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	#renderIcon() {
-		const icon = this.item?.icon;
+		const iconName = this._getIconName();
 		const isFolder = this._item?.isFolder;
 
-		if (icon) {
-			return html`<umb-icon name="${this._getIconToRender(icon)}"></umb-icon>`;
+		if (iconName) {
+			return html`<umb-icon name="${this._getIconToRender(iconName)}"></umb-icon>`;
 		}
 
 		if (isFolder) {
@@ -190,6 +190,10 @@ export abstract class UmbTreeItemElementBase<
 	protected _getIconToRender(icon: string) {
 		const iconWithoutColor = icon.split(' ')[0];
 		return this._isActive || this._isSelected ? iconWithoutColor : icon;
+	}
+
+	protected _getIconName(): string | null | undefined {
+		return this._item?.icon;
 	}
 
 	renderLabel() {
