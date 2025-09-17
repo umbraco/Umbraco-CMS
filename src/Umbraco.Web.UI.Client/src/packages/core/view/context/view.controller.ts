@@ -77,7 +77,7 @@ export class UmbViewController extends UmbControllerBase {
 			}
 			// only activate if we had an incoming parentView, cause if not we are in a disassembling state. [NL]
 			if (parentView && this.#attached && this.#autoActivate) {
-				this._activate();
+				this._internal_activate();
 			}
 		}).skipHost();
 	}
@@ -105,7 +105,7 @@ export class UmbViewController extends UmbControllerBase {
 		this.hints.provideAt(controllerHost);
 
 		if (this.#attached && this.#autoActivate) {
-			this._activate();
+			this._internal_activate();
 		}
 	}
 
@@ -116,7 +116,7 @@ export class UmbViewController extends UmbControllerBase {
 		}
 		this.hints.unprovide();
 
-		this._deactivate();
+		this._internal_deactivate();
 	}
 
 	override hostConnected(): void {
@@ -124,7 +124,7 @@ export class UmbViewController extends UmbControllerBase {
 		super.hostConnected();
 		// CHeck that we have a providerController, otherwise this is not provided. [NL]
 		if (this.#providerCtrl && this.#autoActivate) {
-			this._activate();
+			this._internal_activate();
 		}
 	}
 
@@ -173,15 +173,15 @@ export class UmbViewController extends UmbControllerBase {
 		if (!this.#parentView) return;
 		if (this.#inherit) {
 			if (this.#active) {
-				this.#parentView._childActivated();
+				this.#parentView._internal_childActivated();
 			} else {
-				this.#parentView._childDeactivated();
+				this.#parentView._internal_childDeactivated();
 			}
 		} else {
 			if (this.#active) {
-				this.#parentView._deactivate();
+				this.#parentView._internal_deactivate();
 			} else {
-				this.#parentView._activate();
+				this.#parentView._internal_activate();
 			}
 		}
 	}
@@ -190,8 +190,8 @@ export class UmbViewController extends UmbControllerBase {
 	 * @internal
 	 * Notify that a view context has been activated.
 	 */
-	// eslint-disable-next-line
-	public _activate() {
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	public _internal_activate() {
 		this.#autoActivate = true;
 		if (this.#active === true) {
 			return;
@@ -214,19 +214,19 @@ export class UmbViewController extends UmbControllerBase {
 	 * @internal
 	 * Notify that a child has been activated.
 	 */
-	// eslint-disable-next-line
-	public _childActivated() {
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	public _internal_childActivated() {
 		if (this.#hasActiveChild) return;
 		this.#hasActiveChild = true;
-		this._activate();
+		this._internal_activate();
 	}
 
 	/**
 	 * @internal
 	 * Notify that a child is no longer activated.
 	 */
-	// eslint-disable-next-line
-	public _childDeactivated() {
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	public _internal_childDeactivated() {
 		this.#hasActiveChild = false;
 		if (this.#attached === false) {
 			if (this.#parentView) {
@@ -236,7 +236,7 @@ export class UmbViewController extends UmbControllerBase {
 			}
 		}
 		if (this.#autoActivate) {
-			this._activate();
+			this._internal_activate();
 		} else {
 			this.#propagateActivation();
 		}
@@ -247,8 +247,8 @@ export class UmbViewController extends UmbControllerBase {
 	 * Deactivate the view context.
 	 * We cannot conclude that this means the parent should be activated, it can be because of a child being activated.
 	 */
-	// eslint-disable-next-line
-	public _deactivate() {
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	public _internal_deactivate() {
 		this.#autoActivate = false;
 		if (!this.#active) return;
 		this.#active = false;
