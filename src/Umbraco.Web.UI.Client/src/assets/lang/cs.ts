@@ -1814,6 +1814,7 @@ export default {
 		openBackofficeSearch: 'Otevřít hledání v backoffice',
 		openCloseBackofficeHelp: 'Otevřít/zavřít nápovědu backoffice',
 		openCloseBackofficeProfileOptions: 'Otevřít/zavřít možnosti vašeho profilu',
+		profileOptions: 'Opcije profila',
 		openContextMenu: 'Otevřít kontextové menu pro',
 		currentLanguage: 'Aktuální jazyk',
 		switchLanguage: 'Přepnout jazyk na',
