@@ -14,6 +14,8 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 	// Always declare the default segment (null)
 	#segments: Array<null | string> = [null];
 
+	// TODO: We properly need to break this, as Engage needs to control which Segments are available for each culture, maybe investigate the option to go about a new option to just parse options.? Break in v.17.0 [NL]
+
 	setCultures(cultures: Array<string>): void {
 		this.#cultures = cultures;
 	}

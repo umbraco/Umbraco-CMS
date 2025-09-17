@@ -23,6 +23,6 @@ public interface IContentTypeFilter
     /// <param name="parentContentTypeKey">The parent content type key.</param>
     /// <param name="parentContentKey">The parent content key (provided to allow for custom filtering of the returned list of children based on the content context).</param>
     /// <returns>Filtered collection of content types.</returns>
-    Task<IEnumerable<ContentTypeSort>> FilterAllowedChildrenAsync(IEnumerable<ContentTypeSort> contentTypes,
-        Guid parentContentTypeKey, Guid? parentContentKey);
+    Task<IEnumerable<ContentTypeSort>> FilterAllowedChildrenAsync(IEnumerable<ContentTypeSort> contentTypes, Guid parentContentTypeKey, Guid? parentContentKey)
+        => Task.FromResult(contentTypes);
 }

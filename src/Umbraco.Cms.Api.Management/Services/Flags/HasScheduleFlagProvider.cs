@@ -8,14 +8,14 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Api.Management.Services.Signs;
+namespace Umbraco.Cms.Api.Management.Services.Flags;
 
 /// <summary>
-/// Implements a <see cref="ISignProvider"/> that provides signs for documents that are scheduled for publication.
+/// Implements a <see cref="IFlagProvider"/> that provides flags for documents that are scheduled for publication.
 /// </summary>
-internal class HasScheduleSignProvider : ISignProvider
+internal class HasScheduleFlagProvider : IFlagProvider
 {
-    private const string Alias = Constants.Conventions.Signs.Prefix + "ScheduledForPublish";
+    private const string Alias = Constants.Conventions.Flags.Prefix + "ScheduledForPublish";
 
     private readonly IContentService _contentService;
     private readonly IIdKeyMap _keyMap;
@@ -23,22 +23,22 @@ internal class HasScheduleSignProvider : ISignProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="HasScheduleSignProvider"/> class.
     /// </summary>
-    public HasScheduleSignProvider(IContentService contentService, IIdKeyMap keyMap)
+    public HasScheduleFlagProvider(IContentService contentService, IIdKeyMap keyMap)
     {
         _contentService = contentService;
         _keyMap = keyMap;
     }
 
     /// <inheritdoc/>
-    public bool CanProvideSigns<TItem>()
-        where TItem : IHasSigns =>
+    public bool CanProvideFlags<TItem>()
+        where TItem : IHasFlags =>
         typeof(TItem) == typeof(DocumentTreeItemResponseModel) ||
         typeof(TItem) == typeof(DocumentCollectionResponseModel) ||
         typeof(TItem) == typeof(DocumentItemResponseModel);
 
     /// <inheritdoc/>
-    public Task PopulateSignsAsync<TItem>(IEnumerable<TItem> items)
-        where TItem : IHasSigns
+    public Task PopulateFlagsAsync<TItem>(IEnumerable<TItem> items)
+        where TItem : IHasFlags
     {
         IDictionary<int, IEnumerable<ContentSchedule>> schedules = _contentService.GetContentSchedulesByIds(items.Select(x => x.Id).ToArray());
         foreach (TItem item in items)
@@ -80,7 +80,7 @@ internal class HasScheduleSignProvider : ISignProvider
         if (variantsArray.Length == 1)
         {
             DocumentVariantItemResponseModel variant = variantsArray[0];
-            variant.AddSign(Alias);
+            variant.AddFlag(Alias);
             return variantsArray;
         }
 
@@ -91,7 +91,7 @@ internal class HasScheduleSignProvider : ISignProvider
 
             if (isScheduled)
             {
-                variant.AddSign(Alias);
+                variant.AddFlag(Alias);
             }
         }
 
@@ -105,7 +105,7 @@ internal class HasScheduleSignProvider : ISignProvider
         if (variantsArray.Length == 1)
         {
             DocumentVariantResponseModel variant = variantsArray[0];
-            variant.AddSign(Alias);
+            variant.AddFlag(Alias);
             return variantsArray;
         }
 
@@ -116,7 +116,7 @@ internal class HasScheduleSignProvider : ISignProvider
 
             if (isScheduled)
             {
-                variant.AddSign(Alias);
+                variant.AddFlag(Alias);
             }
         }
 
