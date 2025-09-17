@@ -210,7 +210,7 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where(GetBaseWhereClause(), new { id });
 
-        ExternalLoginDto? dto = Database.Fetch<ExternalLoginDto>(sql.SelectTop(1)).FirstOrDefault();
+        ExternalLoginDto? dto = Database.FirstOrDefault<ExternalLoginDto>(sql);
         if (dto == null)
         {
             return null;

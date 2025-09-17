@@ -302,7 +302,7 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
                 .SelectAll()
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeId == entity.ParentId);
-            NodeDto? parent = Database.Fetch<NodeDto>(sql.SelectTop(1)).First();
+            NodeDto? parent = Database.FirstOrDefault<NodeDto>(sql);
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
             sql = Sql()

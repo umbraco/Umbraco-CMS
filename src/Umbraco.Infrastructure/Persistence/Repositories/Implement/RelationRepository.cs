@@ -336,7 +336,7 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where(GetBaseWhereClause(), new { id });
 
-        RelationDto? dto = Database.Fetch<RelationDto>(sql.SelectTop(1)).FirstOrDefault();
+        RelationDto? dto = Database.FirstOrDefault<RelationDto>(sql);
         if (dto == null)
         {
             return null;

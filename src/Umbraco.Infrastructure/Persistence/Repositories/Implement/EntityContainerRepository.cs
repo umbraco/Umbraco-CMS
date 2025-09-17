@@ -59,7 +59,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         Sql<ISqlContext> sql = GetBaseQuery(false)
             .Where(GetBaseWhereClause(), new { id, NodeObjectType = NodeObjectTypeId });
 
-        NodeDto? nodeDto = Database.Fetch<NodeDto>(sql.SelectTop(1)).FirstOrDefault();
+        NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(sql);
         return nodeDto == null ? null : CreateEntity(nodeDto);
     }
 

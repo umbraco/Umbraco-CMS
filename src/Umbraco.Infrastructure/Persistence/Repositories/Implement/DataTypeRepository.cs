@@ -344,7 +344,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
             .SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(x => x.NodeId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
-        NodeDto? parent = Database.Fetch<NodeDto>(sql.SelectTop(1)).FirstOrDefault();
+        NodeDto? parent = Database.FirstOrDefault<NodeDto>(sql);
         var level = (parent?.Level ?? 0) + 1;
         sql = Sql()
             .SelectCount()
@@ -401,7 +401,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
                 .SelectAll()
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeId == entity.ParentId);
-            NodeDto? parent = Database.Fetch<NodeDto>(sql.SelectTop(1)).FirstOrDefault();
+            NodeDto? parent = Database.FirstOrDefault<NodeDto>(sql);
             entity.Path = string.Concat(parent?.Path ?? "-1", ",", entity.Id);
             entity.Level = (parent?.Level ?? 0) + 1;
 

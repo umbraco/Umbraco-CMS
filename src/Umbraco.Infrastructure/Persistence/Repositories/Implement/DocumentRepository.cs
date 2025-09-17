@@ -597,7 +597,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
             .Where<NodeDto>(x => x.NodeId == id);
 
-        DocumentDto? dto = Database.Fetch<DocumentDto>(sql.SelectTop(1)).FirstOrDefault();
+        DocumentDto? dto = Database.FirstOrDefault<DocumentDto>(sql);
         return dto == null
             ? null
             : MapDtoToContent(dto);
@@ -1570,7 +1570,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             Sql<ISqlContext> sql = _outerRepo.GetBaseQuery(QueryType.Single)
                 .Where<NodeDto>(x => x.UniqueId == id);
 
-            DocumentDto? dto = Database.Fetch<DocumentDto>(sql.SelectTop(1)).FirstOrDefault();
+            DocumentDto? dto = Database.FirstOrDefault<DocumentDto>(sql);
 
             if (dto == null)
             {

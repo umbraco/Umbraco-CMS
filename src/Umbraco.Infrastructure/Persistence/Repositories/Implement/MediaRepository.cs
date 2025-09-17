@@ -175,7 +175,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
             .Where<NodeDto>(x => x.NodeId == id);
 
-        ContentDto? dto = Database.Fetch<ContentDto>(sql.SelectTop(1)).FirstOrDefault();
+        ContentDto? dto = Database.FirstOrDefault<ContentDto>(sql);
         return dto == null
             ? null
             : MapDtoToContent(dto);
@@ -329,7 +329,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single, joinMediaVersion: true)
             .Where<MediaVersionDto>(x => x.Path == umbracoFileValue);
 
-        ContentDto? dto = Database.Fetch<ContentDto>(sql.SelectTop(1)).FirstOrDefault();
+        ContentDto? dto = Database.FirstOrDefault<ContentDto>(sql);
         return dto == null
             ? null
             : MapDtoToContent(dto);
@@ -538,7 +538,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             Sql<ISqlContext> sql = _outerRepo.GetBaseQuery(QueryType.Single)
                 .Where<NodeDto>(x => x.UniqueId == id);
 
-            ContentDto? dto = Database.Fetch<ContentDto>(sql.SelectTop(1)).FirstOrDefault();
+            ContentDto? dto = Database.FirstOrDefault<ContentDto>(sql);
 
             if (dto == null)
             {

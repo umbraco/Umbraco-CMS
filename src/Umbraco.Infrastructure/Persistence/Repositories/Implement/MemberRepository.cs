@@ -506,7 +506,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
             .Where<NodeDto>(x => x.NodeId == id);
 
-        MemberDto? dto = Database.Fetch<MemberDto>(sql.SelectTop(1)).FirstOrDefault();
+        MemberDto? dto = Database.FirstOrDefault<MemberDto>(sql);
         return dto == null
             ? null
             : MapDtoToContent(dto);

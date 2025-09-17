@@ -28,7 +28,7 @@ internal sealed class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepos
     protected override ITag? PerformGet(int id)
     {
         Sql<ISqlContext> sql = Sql().Select<TagDto>().From<TagDto>().Where<TagDto>(x => x.Id == id);
-        TagDto? dto = Database.Fetch<TagDto>(sql.SelectTop(1)).FirstOrDefault();
+        TagDto? dto = Database.FirstOrDefault<TagDto>(sql);
         return dto == null ? null : TagFactory.BuildEntity(dto);
     }
 

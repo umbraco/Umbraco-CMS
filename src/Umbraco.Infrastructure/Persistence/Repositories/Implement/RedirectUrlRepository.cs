@@ -166,7 +166,7 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
     protected override IRedirectUrl? PerformGet(Guid id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Id == id);
-        RedirectUrlDto? dto = Database.Fetch<RedirectUrlDto>(sql.SelectTop(1)).FirstOrDefault();
+        RedirectUrlDto? dto = Database.FirstOrDefault<RedirectUrlDto>(sql);
         return dto == null ? null : Map(dto);
     }
 

@@ -31,7 +31,7 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where<NodeDto>(x => x.UniqueId == uniqueId);
 
-        NodeDto? dto = Database.Fetch<NodeDto>(sql.SelectTop(1)).FirstOrDefault();
+        NodeDto? dto = Database.FirstOrDefault<NodeDto>(sql);
 
         return dto == null ? null : MemberGroupFactory.BuildEntity(dto);
     }
@@ -119,7 +119,7 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where(GetBaseWhereClause(), new { id });
 
-        NodeDto? dto = Database.Fetch<NodeDto>(sql.SelectTop(1)).FirstOrDefault();
+        NodeDto? dto = Database.FirstOrDefault<NodeDto>(sql);
 
         return dto == null ? null : MemberGroupFactory.BuildEntity(dto);
     }
