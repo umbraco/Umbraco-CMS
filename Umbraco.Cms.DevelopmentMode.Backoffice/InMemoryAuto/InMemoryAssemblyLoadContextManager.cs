@@ -1,8 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.Loader;
-using Umbraco.Cms.Infrastructure.ModelsBuilder;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
+namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 
 internal sealed class InMemoryAssemblyLoadContextManager
 {

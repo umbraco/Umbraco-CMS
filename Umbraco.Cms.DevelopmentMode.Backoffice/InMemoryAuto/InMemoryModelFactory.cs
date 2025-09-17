@@ -20,7 +20,7 @@ using Umbraco.Extensions;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
+namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto
 {
     internal sealed partial class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
     {

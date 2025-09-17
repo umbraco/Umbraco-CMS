@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
+namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 
 internal sealed class RuntimeCompilationCacheBuster
 {
