@@ -15,6 +15,7 @@ public class RootStylesheetTreeController : StylesheetTreeControllerBase
 {
     private readonly IStyleSheetTreeService _styleSheetTreeService;
 
+    // TODO Remove the static service provider, and replace with base when the other constructors are obsoleted.
     public RootStylesheetTreeController(IStyleSheetTreeService styleSheetTreeService)
         : this(styleSheetTreeService, StaticServiceProvider.Instance.GetRequiredService<FileSystems>())
         => _styleSheetTreeService = styleSheetTreeService;
