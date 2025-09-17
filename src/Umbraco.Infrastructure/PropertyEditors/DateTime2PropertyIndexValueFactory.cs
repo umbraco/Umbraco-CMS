@@ -1,23 +1,18 @@
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-/// <inheritdoc />
-public class DateTime2PropertyIndexValueFactory : IDateTime2PropertyIndexValueFactory
+public class DateTime2PropertyIndexValueFactory : IDateTimeUnspecifiedPropertyIndexValueFactory,
+    IDateTimeWithTimeZonePropertyIndexValueFactory,
+    IDateOnlyPropertyIndexValueFactory,
+    ITimeOnlyPropertyIndexValueFactory
 {
-    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
-    private readonly IJsonSerializer _jsonSerializer;
+    private readonly DateTime2ValueConverterBase _valueConverter;
 
     public DateTime2PropertyIndexValueFactory(
-        IDataTypeConfigurationCache dataTypeConfigurationCache,
-        IJsonSerializer jsonSerializer)
-    {
-        _dataTypeConfigurationCache = dataTypeConfigurationCache;
-        _jsonSerializer = jsonSerializer;
-    }
+        DateTime2ValueConverterBase valueConverter) =>
+        _valueConverter = valueConverter;
 
     /// <inheritdoc />
     public IEnumerable<IndexValue> GetIndexValues(
@@ -41,8 +36,7 @@ public class DateTime2PropertyIndexValueFactory : IDateTime2PropertyIndexValueFa
             return [indexValue];
         }
 
-        DateTime2Configuration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<DateTime2Configuration>(property.PropertyType.DataTypeKey);
-        var value = DateTime2ValueConverter.GetObjectFromSource(propertyValue, configuration, _jsonSerializer);
+        var value = GetValueFromSource(propertyValue);
         if (value is null)
         {
             return [indexValue];
@@ -51,11 +45,22 @@ public class DateTime2PropertyIndexValueFactory : IDateTime2PropertyIndexValueFa
         if (value is DateTimeOffset dateTimeOffset)
         {
             // Index the DateTimeOffset as UTC, so it's easier to query.
-            value = dateTimeOffset.UtcDateTime;
+            value = DateTime.SpecifyKind(dateTimeOffset.UtcDateTime, DateTimeKind.Unspecified);
         }
 
         indexValue.Values = [$"{value:O}"];
 
         return [indexValue];
+    }
+
+    /// <summary>
+    /// Gets the value from the source using the value converter.
+    /// </summary>
+    /// <param name="source">The source value.</param>
+    /// <returns>The converted value.</returns>
+    protected object? GetValueFromSource(object? source)
+    {
+        DateTime2ValueConverterBase.DateTime2Dto? inter = _valueConverter.GetIntermediateFromSource(source);
+        return inter is null ? null : _valueConverter.ConvertToObject(inter);
     }
 }

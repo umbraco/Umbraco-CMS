@@ -1,40 +1,33 @@
 using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 /// <summary>
-/// The date time with timezone property value converter.
+/// The base DateTime2 property value converter.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class DateTime2ValueConverter : PropertyValueConverterBase
+public abstract class DateTime2ValueConverterBase : PropertyValueConverterBase
 {
     private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DateTime2ValueConverter"/> class.
+    /// Initializes a new instance of the <see cref="DateTime2ValueConverterBase"/> class.
     /// </summary>
     /// <param name="jsonSerializer">The JSON serializer.</param>
-    public DateTime2ValueConverter(IJsonSerializer jsonSerializer)
+    protected DateTime2ValueConverterBase(IJsonSerializer jsonSerializer)
         => _jsonSerializer = jsonSerializer;
 
     /// <inheritdoc />
-    public override bool IsConverter(IPublishedPropertyType propertyType)
-        => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.DateTime2);
-
-    /// <inheritdoc />
-    public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-    {
-        DateTime2Configuration? config =
-            ConfigurationEditor.ConfigurationAs<DateTime2Configuration>(propertyType.DataType.ConfigurationObject);
-        return GetPropertyValueType(config);
-    }
+    public abstract override bool IsConverter(IPublishedPropertyType propertyType);
 
     /// <inheritdoc />
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
+
+    /// <inheritdoc />
+    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => GetPropertyValueType();
 
     /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(
@@ -42,7 +35,7 @@ public class DateTime2ValueConverter : PropertyValueConverterBase
         IPublishedPropertyType propertyType,
         object? source,
         bool preview)
-        => GetIntermediateFromSource(source, _jsonSerializer);
+        => GetIntermediateFromSource(source);
 
     /// <inheritdoc />
     public override object? ConvertIntermediateToObject(
@@ -50,12 +43,17 @@ public class DateTime2ValueConverter : PropertyValueConverterBase
         IPublishedPropertyType propertyType,
         PropertyCacheLevel referenceCacheLevel,
         object? inter,
-        bool preview)
-    {
-        DateTime2Configuration? config =
-            ConfigurationEditor.ConfigurationAs<DateTime2Configuration>(propertyType.DataType.ConfigurationObject);
-        return GetObjectFromIntermediate(inter, config);
-    }
+        bool preview) =>
+        inter is not DateTime2Dto dateTime2
+            ? null
+            : ConvertToObject(dateTime2);
+
+    /// <summary>
+    /// Convert the intermediate representation to the final object.
+    /// </summary>
+    /// <param name="dateTimeDto">The intermediate representation.</param>
+    /// <returns>The final object.</returns>
+    internal abstract object ConvertToObject(DateTime2Dto dateTimeDto);
 
     /// <summary>
     /// Converts the source value to an intermediate representation.
@@ -63,71 +61,26 @@ public class DateTime2ValueConverter : PropertyValueConverterBase
     /// <param name="source">The source value.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <returns>The intermediate representation.</returns>
-    internal static DateTime2Dto? GetIntermediateFromSource(object? source, IJsonSerializer jsonSerializer) =>
+    internal DateTime2Dto? GetIntermediateFromSource(object? source) =>
         source switch
         {
             // This DateTime check is for compatibility with the "deprecated" `Umbraco.DateTime`.
             // Once that is removed, this can be removed too.
             DateTime dateTime => new DateTime2Dto { Date = new DateTimeOffset(dateTime, TimeSpan.Zero) },
-            string sourceStr => jsonSerializer.TryDeserialize(sourceStr, out DateTime2Dto? dateTime2) ? dateTime2 : null,
+            string sourceStr => _jsonSerializer.TryDeserialize(sourceStr, out DateTime2Dto? dateTime2) ? dateTime2 : null,
             _ => null,
         };
 
     /// <summary>
-    /// Converts the intermediate value to the appropriate type based on the configuration.
+    ///    Gets the property value type for this value converter.
     /// </summary>
-    /// <param name="inter">The intermediate value.</param>
-    /// <param name="configuration">The configuration.</param>
-    /// <returns>The converted value.</returns>
-    internal static object? GetObjectFromIntermediate(object? inter, DateTime2Configuration? configuration)
-    {
-        Type propertyValueType = GetPropertyValueType(configuration);
-        if (inter is not DateTime2Dto dateTime2)
-        {
-            return propertyValueType.GetDefaultValue();
-        }
-
-        return propertyValueType switch
-        {
-            _ when propertyValueType == typeof(DateOnly?)
-                => DateOnly.FromDateTime(dateTime2.Date.UtcDateTime),
-            _ when propertyValueType == typeof(TimeOnly?)
-                => TimeOnly.FromDateTime(dateTime2.Date.UtcDateTime),
-            _ when propertyValueType == typeof(DateTime?)
-                => DateTime.SpecifyKind(dateTime2.Date.UtcDateTime, DateTimeKind.Unspecified),
-            _ => dateTime2.Date,
-        };
-    }
-
-    /// <summary>
-    /// Gets the object value from the source based on the configuration.
-    /// </summary>
-    /// <param name="source">The source value.</param>
-    /// <param name="configuration">The configuration.</param>
-    /// <param name="jsonSerializer">The JSON serializer.</param>
-    /// <returns>The object value.</returns>
-    internal static object? GetObjectFromSource(
-        object? source,
-        DateTime2Configuration? configuration,
-        IJsonSerializer jsonSerializer)
-    {
-        DateTime2Dto? intermediateValue = GetIntermediateFromSource(source, jsonSerializer);
-        return GetObjectFromIntermediate(intermediateValue, configuration);
-    }
-
-    private static Type GetPropertyValueType(DateTime2Configuration? config) =>
-        config?.Format switch
-        {
-            DateTime2Configuration.DateTimeFormat.DateOnly => typeof(DateOnly?),
-            DateTime2Configuration.DateTimeFormat.TimeOnly => typeof(TimeOnly?),
-            DateTime2Configuration.DateTimeFormat.DateTime when config.TimeZones?.Mode is not { } mode || mode == DateTime2Configuration.TimeZoneMode.None => typeof(DateTime?),
-            _ => typeof(DateTimeOffset?),
-        };
+    /// <returns>The property value type.</returns>
+    protected abstract Type GetPropertyValueType();
 
     /// <summary>
     ///     Model/DTO that represents the JSON that DateTime2 stores.
     /// </summary>
-    internal class DateTime2Dto
+    protected internal class DateTime2Dto
     {
         [JsonPropertyName("date")]
         public DateTimeOffset Date { get; init; }

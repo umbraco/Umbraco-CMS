@@ -135,18 +135,18 @@ public class DateTime2PropertyEditorTests
         [null, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.None, null],
         [null, null, DateTime2Configuration.DateTimeFormat.TimeOnly, DateTime2Configuration.TimeZoneMode.None, null],
         [null, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, null],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.Local, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.Custom, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.TimeOnly, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "16:30:00.0000000", TimeZone = null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000", TimeZone = null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.Local, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
-        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.Custom, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
-        [-5, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T21:30:00.0000000", TimeZone = null }],
-        [-5, "Europe/Copenhagen", DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T21:30:00.0000000", TimeZone = "Europe/Copenhagen" }],
-        [-5, "Europe/Copenhagen", DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditor.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000-05:00", TimeZone = "Europe/Copenhagen" }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.Local, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.Custom, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.TimeOnly, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "16:30:00.0000000", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.Local, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
+        [0, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.Custom, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
+        [-5, null, DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T21:30:00.0000000", TimeZone = null }],
+        [-5, "Europe/Copenhagen", DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T21:30:00.0000000", TimeZone = "Europe/Copenhagen" }],
+        [-5, "Europe/Copenhagen", DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000-05:00", TimeZone = "Europe/Copenhagen" }],
     ];
 
     [TestCaseSource(nameof(_sourceList4))]
@@ -188,13 +188,13 @@ public class DateTime2PropertyEditorTests
         }
 
         Assert.IsNotNull(result);
-        Assert.IsInstanceOf<DateTime2PropertyEditor.DateTime2ApiModel>(result);
-        var apiModel = (DateTime2PropertyEditor.DateTime2ApiModel)result;
-        Assert.AreEqual(((DateTime2PropertyEditor.DateTime2ApiModel)expectedResult).Date, apiModel.Date);
-        Assert.AreEqual(((DateTime2PropertyEditor.DateTime2ApiModel)expectedResult).TimeZone, apiModel.TimeZone);
+        Assert.IsInstanceOf<DateTime2PropertyEditorBase.DateTime2ApiModel>(result);
+        var apiModel = (DateTime2PropertyEditorBase.DateTime2ApiModel)result;
+        Assert.AreEqual(((DateTime2PropertyEditorBase.DateTime2ApiModel)expectedResult).Date, apiModel.Date);
+        Assert.AreEqual(((DateTime2PropertyEditorBase.DateTime2ApiModel)expectedResult).TimeZone, apiModel.TimeZone);
     }
 
-    private DateTime2PropertyEditor.DateTime2DataValueEditor CreateValueEditor(
+    private DateTime2PropertyEditorBase.DateTime2DataValueEditor CreateValueEditor(
         DateTime2Configuration.DateTimeFormat format = DateTime2Configuration.DateTimeFormat.DateTime,
         DateTime2Configuration.TimeZoneMode timeZoneMode = DateTime2Configuration.TimeZoneMode.All,
         string[]? timeZones = null)
@@ -206,7 +206,7 @@ public class DateTime2PropertyEditorTests
                 It.IsAny<CultureInfo>(),
                 It.IsAny<IDictionary<string, string>>()))
             .Returns((string key, string alias, CultureInfo _, IDictionary<string, string> _) => $"{key}_{alias}");
-        var valueEditor = new DateTime2PropertyEditor.DateTime2DataValueEditor(
+        var valueEditor = new DateTime2PropertyEditorBase.DateTime2DataValueEditor(
             Mock.Of<IShortStringHelper>(),
             _jsonSerializer,
             Mock.Of<IIOHelper>(),

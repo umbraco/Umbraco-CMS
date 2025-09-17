@@ -535,7 +535,7 @@ public class ContentTypeBuilder
             .WithAlias("dateTimeWithTimeZone")
             .WithName("Date Time (with time zone)")
             .WithDataTypeId(1055)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTime2)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone)
             .WithValueStorageType(ValueStorageType.Ntext)
             .WithSortOrder(21)
             .Done()

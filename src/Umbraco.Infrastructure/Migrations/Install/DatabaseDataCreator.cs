@@ -2329,8 +2329,8 @@ internal sealed class DatabaseDataCreator
                 new DataTypeDto
                 {
                     NodeId = 1055,
-                    EditorAlias = Constants.PropertyEditors.Aliases.DateTime2,
-                    EditorUiAlias = "Umb.PropertyEditorUi.DateTimePicker",
+                    EditorAlias = Constants.PropertyEditors.Aliases.DateTimeWithTimeZone,
+                    EditorUiAlias = "Umb.PropertyEditorUi.DateTimeWithTimeZonePicker",
                     DbType = "Ntext",
                     Configuration = "{\"format\": \"date-time\", \"timeFormat\": \"HH:mm\", \"timeZones\": {\"mode\": \"all\"}}",
                 });

@@ -4,7 +4,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text.Json.Serialization;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -18,19 +17,15 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-[DataEditor(
-    Constants.PropertyEditors.Aliases.DateTime2,
-    ValueType = ValueTypes.Json,
-    ValueEditorIsReusable = true)]
-public class DateTime2PropertyEditor : DataEditor
+public abstract class DateTime2PropertyEditorBase : DataEditor
 {
     private readonly IIOHelper _ioHelper;
-    private readonly IDateTime2PropertyIndexValueFactory _propertyIndexValueFactory;
+    private readonly IPropertyIndexValueFactory _propertyIndexValueFactory;
 
-    public DateTime2PropertyEditor(
+    protected DateTime2PropertyEditorBase(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        IDateTime2PropertyIndexValueFactory propertyIndexValueFactory)
+        IPropertyIndexValueFactory propertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
@@ -43,16 +38,16 @@ public class DateTime2PropertyEditor : DataEditor
         new DateTime2ConfigurationEditor(_ioHelper);
 
     /// <inheritdoc />
-    protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<DateTime2DataValueEditor>(Attribute!);
+    protected abstract override IDataValueEditor CreateValueEditor();
 
     /// <inheritdoc/>
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _propertyIndexValueFactory;
 
-    internal class DateTime2DataValueEditor : DataValueEditor
+    internal class DateTime2DataValueEditor<T> : DataValueEditor where T : DateTime2ValueConverterBase
     {
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
+        private readonly T _valueConverter;
+        private readonly string _editorAlias;
 
         public DateTime2DataValueEditor(
             IShortStringHelper shortStringHelper,
@@ -60,11 +55,12 @@ public class DateTime2PropertyEditor : DataEditor
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
             ILocalizedTextService localizedTextService,
-            IDataTypeConfigurationCache dataTypeConfigurationCache)
+            T valueConverter)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
-            _dataTypeConfigurationCache = dataTypeConfigurationCache;
+            _valueConverter = valueConverter;
+            _editorAlias = attribute.Alias;
             var validators = new TypedJsonValidatorRunner<DateTime2ApiModel, DateTime2Configuration>(
                 jsonSerializer,
                 new DateTime2Validator(localizedTextService));
@@ -88,15 +84,14 @@ public class DateTime2PropertyEditor : DataEditor
                 return null;
             }
 
-            var configuration = editorValue.DataTypeConfiguration as DateTime2Configuration;
-            if (configuration?.Format == DateTime2Configuration.DateTimeFormat.TimeOnly)
+            if (_editorAlias == Constants.PropertyEditors.Aliases.TimeOnly)
             {
                 // Clear the date part if the format is TimeOnly.
                 // This is needed because `DateTimeOffset.TryParse` does not support `DateTimeStyles.NoCurrentDateDefault`.
                 dateTimeOffset = new DateTimeOffset(DateOnly.MinValue, TimeOnly.FromTimeSpan(dateTimeOffset.TimeOfDay), dateTimeOffset.Offset);
             }
 
-            var value = new DateTime2ValueConverter.DateTime2Dto
+            var value = new DateTime2ValueConverterBase.DateTime2Dto
             {
                 Date = dateTimeOffset,
                 TimeZone = dateTime2ApiModel.TimeZone,
@@ -110,24 +105,20 @@ public class DateTime2PropertyEditor : DataEditor
         {
             var value = property.GetValue(culture, segment);
 
-            DateTime2ValueConverter.DateTime2Dto? interValue = DateTime2ValueConverter.GetIntermediateFromSource(value, _jsonSerializer);
+            DateTime2ValueConverterBase.DateTime2Dto? interValue = _valueConverter.GetIntermediateFromSource(value);
             if (interValue is null)
             {
                 return null;
             }
 
-            DateTime2Configuration? configuration = GetConfiguration(property.PropertyType.DataTypeKey);
-            var objectValue = DateTime2ValueConverter.GetObjectFromIntermediate(interValue, configuration);
+            var objectValue = _valueConverter.ConvertToObject(interValue);
 
             return new DateTime2ApiModel
             {
-                Date = objectValue is null ? null : $"{objectValue:O}",
+                Date = $"{objectValue:O}",
                 TimeZone = interValue.TimeZone,
             };
         }
-
-        private DateTime2Configuration? GetConfiguration(Guid dataTypeKey) =>
-            _dataTypeConfigurationCache.GetConfigurationAs<DateTime2Configuration>(dataTypeKey);
 
         /// <summary>
         /// Validates the date time selection for the DateTime2 property editor.

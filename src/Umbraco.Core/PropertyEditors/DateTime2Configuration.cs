@@ -8,12 +8,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class DateTime2Configuration
 {
     /// <summary>
-    /// Gets or sets the format of the date and time value.
-    /// </summary>
-    [ConfigurationField("format")]
-    public DateTimeFormat Format { get; set; } = DateTimeFormat.DateTime;
-
-    /// <summary>
     /// Gets or sets the time zones configuration.
     /// </summary>
     [ConfigurationField("timeZones")]
@@ -57,26 +51,5 @@ public class DateTime2Configuration
         /// </summary>
         [JsonStringEnumMemberName("custom")]
         Custom,
-    }
-
-    public enum DateTimeFormat
-    {
-        /// <summary>
-        /// Display the date only, without time.
-        /// </summary>
-        [JsonStringEnumMemberName("date-only")]
-        DateOnly,
-
-        /// <summary>
-        /// Display the time only, without date.
-        /// </summary>
-        [JsonStringEnumMemberName("time-only")]
-        TimeOnly,
-
-        /// <summary>
-        /// Display both date and time.
-        /// </summary>
-        [JsonStringEnumMemberName("date-time")]
-        DateTime,
     }
 }

@@ -263,7 +263,14 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
         builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
-        builder.Services.AddSingleton<IDateTime2PropertyIndexValueFactory, DateTime2PropertyIndexValueFactory>();
+        builder.Services.AddSingleton<IDateTimeUnspecifiedPropertyIndexValueFactory, DateTime2PropertyIndexValueFactory>(sp =>
+                new DateTime2PropertyIndexValueFactory(sp.GetRequiredService<DateTimeUnspecifiedValueConverter>()));
+        builder.Services.AddSingleton<IDateTimeWithTimeZonePropertyIndexValueFactory, DateTime2PropertyIndexValueFactory>(sp =>
+            new DateTime2PropertyIndexValueFactory(sp.GetRequiredService<DateTimeWithTimeZoneValueConverter>()));
+        builder.Services.AddSingleton<IDateOnlyPropertyIndexValueFactory, DateTime2PropertyIndexValueFactory>(sp =>
+            new DateTime2PropertyIndexValueFactory(sp.GetRequiredService<DateOnlyValueConverter>()));
+        builder.Services.AddSingleton<ITimeOnlyPropertyIndexValueFactory, DateTime2PropertyIndexValueFactory>(sp =>
+            new DateTime2PropertyIndexValueFactory(sp.GetRequiredService<TimeOnlyValueConverter>()));
 
         return builder;
     }

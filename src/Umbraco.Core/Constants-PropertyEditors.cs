@@ -71,9 +71,24 @@ public static partial class Constants
             public const string DateTime = "Umbraco.DateTime";
 
             /// <summary>
-            ///     UTC DateTime.
+            ///     Date Time Unspecified (DateTime2).
             /// </summary>
-            public const string DateTime2 = "Umbraco.DateTime2";
+            public const string DateTimeUnspecified = "Umbraco.DateTime2.DateTime";
+
+            /// <summary>
+            ///     Date Time with Time Zone (DateTime2).
+            /// </summary>
+            public const string DateTimeWithTimeZone = "Umbraco.DateTime2.DateTimeWithTimeZone";
+
+            /// <summary>
+            ///     Date Only (DateTime2).
+            /// </summary>
+            public const string DateOnly = "Umbraco.DateTime2.DateOnly";
+
+            /// <summary>
+            ///     Time Only (DateTime2).
+            /// </summary>
+            public const string TimeOnly = "Umbraco.DateTime2.TimeOnly";
 
             /// <summary>
             ///     DropDown List.

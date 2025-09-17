@@ -1,4 +1,12 @@
 import type { UmbTimeZonePickerValue } from '../time-zone-picker/property-editor-ui-time-zone-picker.element.js';
+import type { InputDateType, UmbInputDateElement } from '@umbraco-cms/backoffice/components';
+import { css, html, nothing, property, repeat, state, until } from '@umbraco-cms/backoffice/external/lit';
+import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
+} from '@umbraco-cms/backoffice/property-editor';
 import {
 	getClientTimeZone,
 	getTimeZoneList,
@@ -6,26 +14,9 @@ import {
 	isEquivalentTimeZone,
 	type UmbTimeZone,
 } from '@umbraco-cms/backoffice/utils';
-import type {
-	UmbPropertyEditorConfigCollection,
-	UmbPropertyEditorUiElement,
-} from '@umbraco-cms/backoffice/property-editor';
-import {
-	css,
-	html,
-	customElement,
-	property,
-	state,
-	nothing,
-	repeat,
-	until,
-} from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { InputDateType, UmbInputDateElement } from '@umbraco-cms/backoffice/components';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
-import { DateTime } from '@umbraco-cms/backoffice/external/luxon';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 interface UmbDateTime2 {
 	date: string | undefined;
@@ -37,11 +28,7 @@ interface UmbTimeZonePickerOption extends UmbTimeZone {
 	invalid: boolean;
 }
 
-/**
- * @element umb-property-editor-ui-date-time-picker
- */
-@customElement('umb-property-editor-ui-date-time-picker')
-export class UmbPropertyEditorUIDateTimePickerElement
+export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 	extends UmbFormControlMixin<UmbDateTime2, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
@@ -58,10 +45,10 @@ export class UmbPropertyEditorUIDateTimePickerElement
 	mandatoryMessage?: string | undefined;
 
 	@state()
-	private _dateInputType: InputDateType = 'datetime-local';
+	protected _dateInputType: InputDateType = 'datetime-local';
 
 	@state()
-	private _dateInputFormat: string = 'yyyy-MM-dd HH:mm:ss';
+	protected _dateInputFormat: string = 'yyyy-MM-dd HH:mm:ss';
 
 	@state()
 	private _dateInputStep: number = 1;
@@ -76,10 +63,25 @@ export class UmbPropertyEditorUIDateTimePickerElement
 	private _filteredTimeZoneOptions: Array<UmbTimeZonePickerOption> = [];
 
 	@state()
-	private _displayTimeZone: boolean = true;
+	protected _displayTimeZone: boolean = true;
 
 	@state()
 	private _selectedTimeZone: string | undefined;
+
+	constructor(dateInputType: InputDateType, displayTimeZone: boolean) {
+		super();
+
+		this._dateInputType = dateInputType;
+		switch (dateInputType) {
+			case 'date':
+				this._dateInputFormat = 'yyyy-MM-dd';
+				break;
+			case 'time':
+				this._dateInputFormat = 'HH:mm:ss';
+				break;
+		}
+		this._displayTimeZone = displayTimeZone;
+	}
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -88,9 +90,7 @@ export class UmbPropertyEditorUIDateTimePickerElement
 			'customError',
 			() => this.localize.term('dateTimePicker_emptyDate'),
 			() => {
-				return (
-					!!this.mandatory && !this.value?.date
-				);
+				return !!this.mandatory && !this.value?.date;
 			},
 		);
 
@@ -98,9 +98,7 @@ export class UmbPropertyEditorUIDateTimePickerElement
 			'customError',
 			() => this.localize.term('dateTimePicker_emptyTimeZone'),
 			() => {
-				return (
-					!!(this.value?.date) && this._displayTimeZone && !this.value.timeZone
-				);
+				return !!this.value?.date && this._displayTimeZone && !this.value.timeZone;
 			},
 		);
 
@@ -120,29 +118,13 @@ export class UmbPropertyEditorUIDateTimePickerElement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const dateFormat = config.getValueByAlias<string>('format');
 		const timeFormat = config.getValueByAlias<string>('timeFormat');
-		let timeZonePickerConfig : UmbTimeZonePickerValue | undefined = undefined;
-		switch (dateFormat) {
-			case 'date-only':
-				this._dateInputType = 'date';
-				this._dateInputFormat = 'yyyy-MM-dd';
-				this._displayTimeZone = false;
-				break;
-			case 'time-only':
-				this._dateInputType = 'time';
-				this._dateInputFormat = 'HH:mm:ss';
-				this.#setTimeInputStep(timeFormat);
-				this._displayTimeZone = false;
-				break;
-			default:
-				this._dateInputType = 'datetime-local';
-				this.#setTimeInputStep(timeFormat);
-				timeZonePickerConfig = config.getValueByAlias<UmbTimeZonePickerValue>('timeZones');
-				this._displayTimeZone = !!timeZonePickerConfig;
-				break;
-		}
+		let timeZonePickerConfig: UmbTimeZonePickerValue | undefined = undefined;
 
+		if (this._displayTimeZone) {
+			timeZonePickerConfig = config.getValueByAlias<UmbTimeZonePickerValue>('timeZones');
+		}
+		this.#setTimeInputStep(timeFormat);
 		this.#prefillValue(timeZonePickerConfig);
 	}
 
@@ -200,13 +182,11 @@ export class UmbPropertyEditorUIDateTimePickerElement
 				break;
 			}
 			case 'custom': {
-				this._timeZoneOptions = this._filteredTimeZoneOptions = getTimeZoneList(config.timeZones).map(
-					(tz) => ({
-						...tz,
-						offset: getTimeZoneOffset(tz.value, dateToCalculateOffset),
-						invalid: false,
-					}),
-				);
+				this._timeZoneOptions = this._filteredTimeZoneOptions = getTimeZoneList(config.timeZones).map((tz) => ({
+					...tz,
+					offset: getTimeZoneOffset(tz.value, dateToCalculateOffset),
+					invalid: false,
+				}));
 				const selectedTimeZone = this.value?.timeZone;
 				if (
 					selectedTimeZone &&
@@ -467,12 +447,4 @@ export class UmbPropertyEditorUIDateTimePickerElement
 			}
 		`,
 	];
-}
-
-export default UmbPropertyEditorUIDateTimePickerElement;
-
-declare global {
-	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-date-time-picker': UmbPropertyEditorUIDateTimePickerElement;
-	}
 }
