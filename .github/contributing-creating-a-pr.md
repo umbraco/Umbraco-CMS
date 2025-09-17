@@ -10,6 +10,17 @@ GitHub will have picked up on the new branch you've pushed and will offer to cre
 We like to use [git flow][git flow] as much as possible, but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to `contrib`. This is the branch you should be targeting.
 
 Please note: we are no longer accepting features for v8 and below but will continue to merge security fixes as and when they arise.
+
+We don't have a set rule for naming pull request, so feel free to name it as you would like. In HQ we do however have a best practice guide on how to write clear and concise PR's, and you are free to use this format when naming your pull requests.
+Our convention of doing it is:
+**Area: Description (closes #IssueID)**
+1.Start by specifying the area of the pull request. This can be a feature name(UFM, Tiptap etc) or specific area(migrations, relations, segmentation).
+2. In your description where applicable mention type of PR(Build,Bump, Fix, Refactor).
+3. Good practise is to make sure you describe specifically what the change and/or impact of change.
+Example: A PR that is named "Fixed issue" makes it quite hard to see what was fixed. 
+4. Add (closes #IssueID) behind description, if your PR resolves an issue. 
+
+That's it! 
   
 ## The review process
 [review process]: #the-review-process
