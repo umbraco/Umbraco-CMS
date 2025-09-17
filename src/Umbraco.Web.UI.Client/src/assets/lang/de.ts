@@ -1975,6 +1975,7 @@ export default {
 		checkFailed: 'Prüfung fehlgeschlagen',
 		openBackofficeSearch: 'Back-Office Suche öffnen',
 		openCloseBackofficeHelp: 'Back-Office Hilfe öffnen / schliessen',
+		openCloseBackofficeProfileOptions: 'Ihre Profil-Einstellungen öffnen / schliessen',
 		profileOptions: 'Profil-Einstellungen',
 	},
 	logViewer: {

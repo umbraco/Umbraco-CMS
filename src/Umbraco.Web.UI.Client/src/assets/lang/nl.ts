@@ -1934,6 +1934,7 @@ export default {
 		checkFailed: 'Controle mislukt',
 		openBackofficeSearch: 'Backoffice zoeken openen',
 		openCloseBackofficeHelp: 'Backoffice help openen/sluiten',
+		openCloseBackofficeProfileOptions: 'Jouw profiel opties openen/sluiten',
 		profileOptions: 'Profiel opties',
 		assignDomainDescription: 'Cultuur en Hostnamen instellen voor %0%',
 		createDescription: 'Nieuwe node aanmaken onder %0%',

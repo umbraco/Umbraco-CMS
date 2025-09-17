@@ -2063,6 +2063,7 @@ export default {
 		checkFailed: 'Check fallito',
 		openBackofficeSearch: 'Apri la ricerca nel backoffice',
 		openCloseBackofficeHelp: "Apri/chiudi l'aiuto del backoffice",
+		openCloseBackofficeProfileOptions: 'Apri/chiudi le opzioni del tuo profilo',
 		profileOptions: 'Opzioni del profilo',
 		assignDomainDescription: 'Imposta le Culture e gli Hostnames per %0%',
 		createDescription: 'Crea nuovo nodo sotto %0%',
