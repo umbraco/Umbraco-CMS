@@ -220,7 +220,6 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			#btn-add {
 				display: block;
 			}
-
 		`,
 	];
 }
