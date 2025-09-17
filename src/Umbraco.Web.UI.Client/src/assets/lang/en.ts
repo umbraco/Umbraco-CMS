@@ -2369,6 +2369,7 @@ export default {
 		openBackofficeSearch: 'Open backoffice search',
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
 		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
+		profileOptions: 'Profile options',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',
@@ -2773,6 +2774,7 @@ export default {
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
 	rte: {
+		label: 'Rich Text Editor',
 		config_blocks: 'Available Blocks',
 		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',

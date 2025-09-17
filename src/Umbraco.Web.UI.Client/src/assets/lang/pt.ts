@@ -2368,6 +2368,7 @@ export default {
 		openBackofficeSearch: 'Abrir pesquisa do backoffice',
 		openCloseBackofficeHelp: 'Abrir/Fechar ajuda do backoffice',
 		openCloseBackofficeProfileOptions: 'Abrir/Fechar as opções do seu perfil',
+		profileOptions: 'Opções perfil',
 		assignDomainDescription: 'Configurar Cultura e Domínios para %0%',
 		createDescription: 'Criar novo nó em %0%',
 		protectDescription: 'Configurar restrições de acesso em %0%',
