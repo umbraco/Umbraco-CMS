@@ -20,6 +20,11 @@ export class UmbHintController<
 	getViewAlias(): string | null {
 		return this.#viewAlias;
 	}
+	#pathFilter?: (path: Array<string>) => boolean;
+	setPathFilter(filter: (path: Array<string>) => boolean) {
+		this.#pathFilter = filter;
+	}
+
 	#scaffold = new UmbObjectState<Partial<HintType>>({});
 	readonly scaffold = this.#scaffold.asObservable();
 	#inUnprovidingState?: boolean;
@@ -92,9 +97,20 @@ export class UmbHintController<
 		}
 	}
 
+	/**
+	 * @internal
+	 * @param {(path: Array<string>) => boolean} filter - A filter function to filter the hints by their path.
+	 * @returns {Observable<Array<UmbHint> | undefined>} An observable of an array of hints that match the filter.
+	 */
+	_internal_descendingHintsByFilter(filter: (path: Array<string>) => boolean): Observable<Array<UmbHint> | undefined> {
+		return this.#hints.asObservablePart((hints) => {
+			return hints.filter((hint) => filter(hint.path));
+		});
+	}
+
 	inherit(): void {
-		if (this.#viewAlias === null) {
-			throw new Error('A Hint Controller needs a view alias to be able to inherit from a parent.');
+		if (this.#viewAlias === null && this.#pathFilter === undefined) {
+			throw new Error('A Hint Controller needs a view alias or pathFilter to be able to inherit from a parent.');
 		}
 		this.consumeContext(UMB_HINT_CONTEXT, (parent) => {
 			this.inheritFrom(parent);
@@ -104,8 +120,8 @@ export class UmbHintController<
 
 	inheritFrom(parent: UmbHintController | undefined): void {
 		if (this.#parent === parent) return;
-		if (this.#viewAlias === null) {
-			throw new Error('A Hint Controller needs a view alias to be able to inherit from a parent.');
+		if (this.#viewAlias === null && this.#pathFilter === undefined) {
+			throw new Error('A Hint Controller needs a view alias or pathFilter to be able to inherit from a parent.');
 		}
 		this.#parent = parent;
 		this.observe(this.#parent?.scaffold, (scaffold) => {
@@ -113,7 +129,15 @@ export class UmbHintController<
 				this.#scaffold.update(scaffold as any);
 			}
 		});
-		this.observe(parent?.descendingHints(this.#viewAlias), this.#receiveHints, 'observeParentHints');
+		if (this.#viewAlias) {
+			this.observe(parent?.descendingHints(this.#viewAlias), this.#receiveHints, 'observeParentHints');
+		} else if (this.#pathFilter) {
+			this.observe(
+				parent?._internal_descendingHintsByFilter(this.#pathFilter),
+				this.#receiveHints,
+				'observeParentHints',
+			);
+		}
 		this.observe(this.hints, this.#propagateHints, 'observeLocalMessages');
 	}
 
@@ -147,9 +171,6 @@ export class UmbHintController<
 		this.#parent!.initiateChange();
 
 		const viewAlias = this.getViewAlias();
-		if (!viewAlias) {
-			throw new Error('A Hint Controller needs a view alias to be able to propagate to a parent.');
-		}
 
 		hints.forEach((hint) => {
 			let newPath = hint.path;

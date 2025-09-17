@@ -48,7 +48,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	private _activePath = '';
 
 	@state()
-	private _hintMap: Map<string, UmbVariantHint> = new Map();
+	private _hintMap: Map<string | null, UmbVariantHint> = new Map();
 
 	#tabViewContexts: Array<UmbViewContext> = [];
 
@@ -109,10 +109,10 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 				component: () => import('./content-editor-tab.element.js'),
 				setup: (component) => {
 					(component as UmbContentWorkspaceViewEditTabElement).containerId = null;
-					this.#provideViewContext('root', component);
+					this.#provideViewContext(null, component);
 				},
 			});
-			this.#createViewContext('root', '#general_generic');
+			this.#createViewContext(null, '#general_generic');
 		}
 
 		if (this._tabs.length > 0) {
@@ -147,10 +147,15 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		this._routes = routes;
 	}
 
-	#createViewContext(viewAlias: string, tabName: string) {
+	#createViewContext(viewAlias: string | null, tabName: string) {
 		if (!this.#tabViewContexts.find((context) => context.viewAlias === viewAlias)) {
 			const view = new UmbViewContext(this, viewAlias);
 			this.#tabViewContexts.push(view);
+
+			if (viewAlias === null) {
+				// for the root tab, we need to filter hints, so in this case we do accept everything that is not in a tab: [NL]
+				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
+			}
 
 			view.setBrowserTitle(tabName);
 			view.inheritFrom(this.#viewContext);
@@ -170,7 +175,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		}
 	}
 	#currentProvidedView?: UmbViewContext;
-	#provideViewContext(viewAlias: string, component: PageComponent) {
+	#provideViewContext(viewAlias: string | null, component: PageComponent) {
 		const view = this.#tabViewContexts.find((context) => context.viewAlias === viewAlias);
 		if (this.#currentProvidedView !== view) {
 			this.#currentProvidedView?.unprovide();
@@ -188,7 +193,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			<umb-body-layout header-fit-height>
 				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups))
 					? html` <uui-tab-group slot="header">
-							${this._hasRootGroups && this._tabs.length > 0 ? this.#renderTab('root', '#general_generic') : nothing}
+							${this._hasRootGroups && this._tabs.length > 0 ? this.#renderTab(null, '#general_generic') : nothing}
 							${repeat(
 								this._tabs,
 								(tab) => tab.name,
@@ -214,17 +219,18 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		`;
 	}
 
-	#renderTab(path: string, name: string, index = 0) {
+	#renderTab(path: string | null, name: string, index = 0) {
 		const hint = this._hintMap.get(path);
-		const fullPath = this._routerPath + '/' + path;
+		const fullPath = this._routerPath + '/' + (path ? path : 'root');
 		const active =
 			fullPath === this._activePath ||
-			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath);
+			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath) ||
+			(this._hasRootGroups && index === 0 && path === null && this._routerPath + '/' === this._activePath);
 		return html`<uui-tab
 			label=${this.localize.string(name ?? '#general_unnamed')}
 			.active=${active}
 			href=${fullPath}
-			data-mark="content-tab:${path}"
+			data-mark="content-tab:${path ?? 'root'}"
 			>${hint && !active
 				? html`<uui-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
 						>${hint.text}</uui-badge
