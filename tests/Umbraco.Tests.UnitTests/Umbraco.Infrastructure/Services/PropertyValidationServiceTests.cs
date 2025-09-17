@@ -286,11 +286,11 @@ public class PropertyValidationServiceTests
         Assert.AreEqual(4, invalid.Length);
     }
 
-    [TestCase(null, true)]
-    [TestCase(24, true)]
-    [TestCase("test", true)]
-    [TestCase("{\"test\": true}", true)]
-    public void ValidatePropertyValue_Returns_Expected_Result_For_Missing_Editor(object? value, bool expectedResult)
+    [TestCase(null)]
+    [TestCase(24)]
+    [TestCase("test")]
+    [TestCase("{\"test\": true}")]
+    public void ValidatePropertyValue_Always_Returns_No_Validation_Errors_For_Missing_Editor(object? value)
     {
         MockObjects(out var validationService, out _);
 
@@ -300,14 +300,7 @@ public class PropertyValidationServiceTests
         };
 
         var result = validationService.ValidatePropertyValue(p1, value, PropertyValidationContext.Empty());
-        if (expectedResult)
-        {
-            Assert.AreEqual(0, result.Count());
-        }
-        else
-        {
-            Assert.AreNotEqual(0, result.Count());
-        }
+        Assert.AreEqual(0, result.Count());
     }
 
     // used so we can inject a mock - we should fix the base class DataValueEditor to be able to have the ILocalizedTextField passed
