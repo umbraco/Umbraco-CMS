@@ -55,7 +55,6 @@ internal sealed class DocumentTypeSiblingControllerTests : ManagementApiTest<Sib
     {
         var url = GetManagementApiUrl<SiblingsDocumentTypeTreeController>(x =>
             x.Siblings(CancellationToken.None, target, 10, 10, false));
-        var response = await Client.GetAsync(url);
-        return response;
+        return await Client.GetAsync(url);
     }
 }
