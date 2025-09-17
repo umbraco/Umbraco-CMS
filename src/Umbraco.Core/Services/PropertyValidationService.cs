@@ -21,7 +21,6 @@ public class PropertyValidationService : IPropertyValidationService
     private readonly ICultureDictionary _cultureDictionary;
     private readonly ILanguageService _languageService;
     private readonly ContentSettings _contentSettings;
-    private readonly IDataValueEditorFactory _dataValueEditorFactory;
 
     [Obsolete("Use the non-obsolete constructor. Will be removed in V17.")]
     public PropertyValidationService(
@@ -37,12 +36,10 @@ public class PropertyValidationService : IPropertyValidationService
             valueEditorCache,
             cultureDictionary,
             StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
     {
     }
 
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V18.")]
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
@@ -51,27 +48,6 @@ public class PropertyValidationService : IPropertyValidationService
         ICultureDictionary cultureDictionary,
         ILanguageService languageService,
         IOptions<ContentSettings> contentSettings)
-        : this(
-            propertyEditors,
-            dataTypeService,
-            textService,
-            valueEditorCache,
-            cultureDictionary,
-            languageService,
-            contentSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
-    }
-
-    public PropertyValidationService(
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        ILocalizedTextService textService,
-        IValueEditorCache valueEditorCache,
-        ICultureDictionary cultureDictionary,
-        ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings,
-        IDataValueEditorFactory dataValueEditorFactory)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
@@ -79,7 +55,6 @@ public class PropertyValidationService : IPropertyValidationService
         _valueEditorCache = valueEditorCache;
         _cultureDictionary = cultureDictionary;
         _languageService = languageService;
-        _dataValueEditorFactory = dataValueEditorFactory;
         _contentSettings = contentSettings.Value;
     }
 
@@ -100,7 +75,11 @@ public class PropertyValidationService : IPropertyValidationService
             throw new InvalidOperationException("No data type found by id " + propertyType.DataTypeId);
         }
 
-        IDataEditor dataEditor = GetDataEditor(propertyType);
+        IDataEditor? dataEditor = GetDataEditor(propertyType);
+        if (dataEditor is null)
+        {
+            return [];
+        }
 
         // only validate culture invariant properties if
         // - AllowEditInvariantFromNonDefault is true, or
@@ -294,7 +273,14 @@ public class PropertyValidationService : IPropertyValidationService
     /// </summary>
     private bool IsPropertyValueValid(IPropertyType propertyType, object? value, PropertyValidationContext validationContext)
     {
-        IDataEditor editor = GetDataEditor(propertyType);
+        IDataEditor? editor = GetDataEditor(propertyType);
+        if (editor == null)
+        {
+            // nothing much we can do validation wise if the property editor has been removed.
+            // the property will be displayed as a label, so flagging it as invalid would be pointless.
+            return true;
+        }
+
         var configuration = GetDataType(propertyType)?.ConfigurationObject;
         IDataValueEditor valueEditor = editor.GetValueEditor(configuration);
 
@@ -304,9 +290,6 @@ public class PropertyValidationService : IPropertyValidationService
     private IDataType? GetDataType(IPropertyType propertyType)
         => _dataTypeService.GetDataType(propertyType.DataTypeId);
 
-    private IDataEditor GetDataEditor(IPropertyType propertyType)
-        => _propertyEditors[propertyType.PropertyEditorAlias]
-           ?? new MissingPropertyEditor(
-               propertyType.PropertyEditorAlias,
-               _dataValueEditorFactory);
+    private IDataEditor? GetDataEditor(IPropertyType propertyType)
+        => _propertyEditors[propertyType.PropertyEditorAlias];
 }

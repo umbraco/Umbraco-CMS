@@ -60,8 +60,7 @@ public class PropertyValidationServiceTests
             new ValueEditorCache(),
             Mock.Of<ICultureDictionary>(),
             languageService.Object,
-            contentSettings.Object,
-            Mock.Of<IDataValueEditorFactory>());
+            contentSettings.Object);
     }
 
     [Test]

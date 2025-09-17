@@ -659,7 +659,6 @@ public class VariationTests
             new ValueEditorCache(),
             Mock.Of<ICultureDictionary>(),
             Mock.Of<ILanguageService>(),
-            Mock.Of<IOptions<ContentSettings>>(),
-            Mock.Of<IDataValueEditorFactory>());
+            Mock.Of<IOptions<ContentSettings>>());
     }
 }
