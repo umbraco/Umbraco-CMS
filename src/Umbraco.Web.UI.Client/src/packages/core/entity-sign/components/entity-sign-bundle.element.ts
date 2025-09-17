@@ -69,13 +69,17 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	}
 
 	#openDropdown() {
-		const dd = this.renderRoot.querySelector<UmbDropdownElement>('#myDropdown');
-		dd?.openDropdown();
+		const dd = this.renderRoot.querySelector<UmbDropdownElement>('#popover');
+		dd?.showPopover();
 	}
 
 	#closeDropdown() {
-		const dd = this.renderRoot.querySelector<UmbDropdownElement>('#myDropdown');
-		dd?.closeDropdown();
+		const dd = this.renderRoot.querySelector<UmbDropdownElement>('#popover');
+		dd?.hidePopover();
+	}
+
+	#onToggle(event: ToggleEvent) {
+		debugger;
 	}
 
 	override render() {
@@ -86,21 +90,19 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		if (!first) return nothing;
 
 		return html`
-			<umb-dropdown id="myDropdown" hide-expand compact look="placeholder" placement="right">
-				<span
-					id="sign-icon"
-					slot="label"
-					@mouseenter=${this.#openDropdown}
-					@mouseleave=${this.#closeDropdown}
-					@click=${(e: MouseEvent) => {
-						e.preventDefault();
-						e.stopPropagation();
-						console.log('click stopped');
-					}}
-					>${first.component}</span
-				>
-				<div class="labels-pop">${this.#renderOptions()}</div>
-			</umb-dropdown>
+			<button
+				id="sign-icon"
+				popovertarget="popover"
+				type="button"
+				@mouseenter=${this.#openDropdown}
+				@mouseleave=${this.#closeDropdown}>
+				${first.component}
+			</button>
+			<uui-popover-container id="popover">
+				<umb-popover-layout>
+					<div class="labels-pop">${this.#renderOptions()}</div>
+				</umb-popover-layout>
+			</uui-popover-container>
 		`;
 	}
 	#renderOptions() {
@@ -117,21 +119,19 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			umb-dropdown::part(dropdown-button) {
-				pointer-events: none;
-			}
 			#sign-icon {
 				right: -5px;
 				width: 14px;
 				height: 14px;
 				font-size: 10px;
 				border-radius: 50%;
-				background: var(--uui-color-surface);
+				background: red;
 				line-height: 14px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				cursor: pointer;
+				border: none;
 			}
 
 			#sign-icon:hover {
