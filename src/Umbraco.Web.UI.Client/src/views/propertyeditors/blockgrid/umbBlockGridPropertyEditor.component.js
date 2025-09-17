@@ -369,7 +369,7 @@
                 let i = layoutEntry.areas.length;
                 while(i--) {
                     const layoutEntryArea = layoutEntry.areas[i];
-                    const areaConfigIndex = block.config.areas.findIndex(x => x.key === layoutEntryArea.key);
+                    const areaConfigIndex = block.config.unsupported ? -1 : block.config.areas.findIndex(x => x.key === layoutEntryArea.key);
                     if(areaConfigIndex === -1) {
                         layoutEntry.areas.splice(i, 1);
                     }

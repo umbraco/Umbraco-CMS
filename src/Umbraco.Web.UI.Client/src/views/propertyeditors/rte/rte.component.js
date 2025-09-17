@@ -83,6 +83,7 @@
           }
       }));
 
+
       vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
       vm.availableBlockTypes = []; // Available block entries of this property editor.
       vm.labels = {};
@@ -190,6 +191,9 @@
           vm.containerHeight = "auto";
           vm.containerOverflow = "inherit"
 
+          // Add client validation for the markup part.
+          unsubscribe.push($scope.$watch(() => vm.model?.value?.markup, validate));
+
           //queue file loading
           tinyMceAssets.forEach(function (tinyJsAsset) {
               assetPromises.push(assetsService.loadJs(tinyJsAsset, $scope));
@@ -256,7 +260,7 @@
                         toolbar: editorConfig.toolbar,
                         model: vm.model,
                         getValue: function () {
-                          return vm.model.value.markup;
+                          return vm.model.value.markup ?? "";
                         },
                         setValue: function (newVal) {
                           vm.model.value.markup = newVal;
@@ -264,7 +268,7 @@
                         },
                         culture: vm.umbProperty?.culture ?? null,
                         segment: vm.umbProperty?.segment ?? null,
-                      blockEditorApi: vm.noBlocksMode ? undefined : vm.blockEditorApi,
+                        blockEditorApi: vm.noBlocksMode ? undefined : vm.blockEditorApi,
                         parentForm: vm.propertyForm,
                         valFormManager: vm.valFormManager,
                         currentFormInput: $scope.rteForm.modelValue
@@ -276,7 +280,7 @@
 
                 // Readonly mode
                 baseLineConfigObj.toolbar = vm.readonly ? false : baseLineConfigObj.toolbar;
-                baseLineConfigObj.readonly = vm.readonly ? 1 : baseLineConfigObj.readonly;
+                baseLineConfigObj.readonly = vm.readonly ? true : baseLineConfigObj.readonly;
 
                 // We need to wait for DOM to have rendered before we can find the element by ID.
                 $timeout(function () {
@@ -337,16 +341,34 @@
         }
       }
 
+      function validate() {
+        var isValid = !vm.model.validation.mandatory || (
+            vm.model.value != null
+            && vm.model.value.markup != null
+            && vm.model.value.markup != ""
+        );
+        vm.propertyForm.$setValidity("required", isValid);
+        if (vm.umbProperty) {
+          vm.umbProperty.setPropertyError(vm.model.validation.mandatoryMessage || "Value cannot be empty");
+        }
+    };
+
       // Called when we save the value, the server may return an updated data and our value is re-synced
       // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
       function onServerValueChanged(newVal, oldVal) {
 
+
           ensurePropertyValue(newVal);
 
+          // updating the modelObject with the new value cause a angular compile issue.
+          // But I'm not sure it's needed, as this does not trigger the RTE
           if(modelObject) {
             modelObject.update(vm.model.value.blocks, $scope);
+            if (vm.tinyMceEditor) {
+              vm.tinyMceEditor.fire('updateBlocks');
+            }
+            onLoaded();
           }
-          onLoaded();
       }
 
       function ensurePropertyValue(newVal) {
@@ -944,7 +966,19 @@
           return undefined;
         }
 
-        return vm.layout[layoutIndex].$block;
+        var layoutEntry = vm.layout[layoutIndex];
+        if(layoutEntry.$block === undefined || layoutEntry.$block.config === undefined) {
+           // make block model
+           var blockObject = getBlockObject(layoutEntry);
+           if (blockObject === null) {
+               // Initialization of the Block Object didn't go well, therefor we will fail the paste action.
+               return false;
+           }
+
+           // set the BlockObject on our layout entry.
+           layoutEntry.$block = blockObject;
+        }
+        return layoutEntry.$block;
     }
 
       vm.blockEditorApi = {

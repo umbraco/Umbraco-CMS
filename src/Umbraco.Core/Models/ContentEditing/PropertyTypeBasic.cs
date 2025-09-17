@@ -25,6 +25,7 @@ public class PropertyTypeBasic
 
     [Required]
     [RegularExpression(@"^([a-zA-Z]\w.*)$", ErrorMessage = "Invalid alias")]
+    [MaxLength(255, ErrorMessage = "Alias is too long")]
     [DataMember(Name = "alias")]
     public string Alias { get; set; } = null!;
 

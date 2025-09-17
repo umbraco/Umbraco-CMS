@@ -111,6 +111,7 @@
         $scope.$on('$destroy', function () {
             vm.variants.forEach(variant => {
                 variant.save = false;
+                variant.publish = false;
                 variant.notAllowed = false;
             });
         });

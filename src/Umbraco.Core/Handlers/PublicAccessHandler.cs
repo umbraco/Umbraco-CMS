@@ -21,16 +21,17 @@ public sealed class PublicAccessHandler :
 
     private void Handle(IEnumerable<IMemberGroup> affectedEntities)
     {
+        var keyName = Constants.Entities.AdditionalDataKeys.MemberGroupPreviousName;
         foreach (IMemberGroup grp in affectedEntities)
         {
             // check if the name has changed
-            if ((grp.AdditionalData?.ContainsKey("previousName") ?? false)
-                && grp.AdditionalData["previousName"] != null
-                && grp.AdditionalData["previousName"]?.ToString().IsNullOrWhiteSpace() == false
-                && grp.AdditionalData["previousName"]?.ToString() != grp.Name)
+            if ((grp.AdditionalData?.ContainsKey(keyName) ?? false)
+                && grp.AdditionalData[keyName] != null
+                && grp.AdditionalData[keyName]?.ToString().IsNullOrWhiteSpace() == false
+                && grp.AdditionalData[keyName]?.ToString() != grp.Name)
             {
                 _publicAccessService.RenameMemberGroupRoleRules(
-                    grp.AdditionalData["previousName"]?.ToString(),
+                    grp.AdditionalData[keyName]?.ToString(),
                     grp.Name);
             }
         }

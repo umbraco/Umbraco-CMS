@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="SixLabors.ImageSharp" />
-    <PackageReference Include="SixLabors.ImageSharp.Web"  />
+    <PackageReference Include="SixLabors.ImageSharp.Web" />
   </ItemGroup>
 
   <ItemGroup>

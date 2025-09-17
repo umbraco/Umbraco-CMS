@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -25,6 +27,7 @@ internal sealed class MemberSaveValidationAttribute : TypeFilterAttribute
         private readonly IMemberTypeService _memberTypeService;
         private readonly IPropertyValidationService _propertyValidationService;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly SecuritySettings _securitySettings;
 
         public MemberSaveValidationFilter(
             ILoggerFactory loggerFactory,
@@ -32,16 +35,16 @@ internal sealed class MemberSaveValidationAttribute : TypeFilterAttribute
             IMemberTypeService memberTypeService,
             IMemberService memberService,
             IShortStringHelper shortStringHelper,
-            IPropertyValidationService propertyValidationService)
+            IPropertyValidationService propertyValidationService,
+            IOptions<SecuritySettings> securitySettings)
         {
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _backofficeSecurityAccessor = backofficeSecurityAccessor ??
-                                          throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
-            _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
-            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
-            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-            _propertyValidationService = propertyValidationService ??
-                                         throw new ArgumentNullException(nameof(propertyValidationService));
+            _loggerFactory = loggerFactory;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
+            _memberTypeService = memberTypeService;
+            _memberService = memberService;
+            _shortStringHelper = shortStringHelper;
+            _propertyValidationService = propertyValidationService;
+            _securitySettings = securitySettings.Value;
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
@@ -53,7 +56,8 @@ internal sealed class MemberSaveValidationAttribute : TypeFilterAttribute
                 _memberTypeService,
                 _memberService,
                 _shortStringHelper,
-                _propertyValidationService);
+                _propertyValidationService,
+                _securitySettings);
             //now do each validation step
             if (contentItemValidator.ValidateExistingContent(model, context))
             {

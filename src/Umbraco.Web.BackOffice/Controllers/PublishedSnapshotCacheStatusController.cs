@@ -37,13 +37,32 @@ public class PublishedSnapshotCacheStatusController : UmbracoAuthorizedApiContro
     [HttpPost]
     public string RebuildDbCache()
     {
-        //Rebuild All
+        if (_publishedSnapshotService.IsRebuilding())
+        {
+            return "Rebuild already in progress.";
+        }
+
         _publishedSnapshotService.RebuildAll();
         return _publishedSnapshotStatus.GetStatus();
     }
 
     /// <summary>
-    ///     Gets a status report
+    ///     Rebuilds the Database cache on a background thread.
+    /// </summary>
+    [HttpPost]
+    public IActionResult RebuildDbCacheInBackground()
+    {
+        if (_publishedSnapshotService.IsRebuilding())
+        {
+            return BadRequest("Rebuild already in progress.");
+        }
+
+        _publishedSnapshotService.RebuildAll(true);
+        return Ok();
+    }
+
+    /// <summary>
+    ///     Gets a status report.
     /// </summary>
     [HttpGet]
     public string GetStatus() => _publishedSnapshotStatus.GetStatus();

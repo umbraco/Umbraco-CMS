@@ -3,6 +3,7 @@ angular.module('umbraco.services')
 
         var currentUser = null;
         var lastUserId = null;
+        var countdownCounter = null;
 
         //this tracks the last date/time that the user's remainingAuthSeconds was updated from the server
         // this is used so that we know when to go and get the user's remaining seconds directly.
@@ -43,6 +44,10 @@ angular.module('umbraco.services')
             }
             currentUser = usr;
             lastServerTimeoutSet = new Date();
+            //don't start the timer if it is already going
+            if (countdownCounter) {
+                return;
+            }
             //start the timer
             countdownUserTimeout();
         }
@@ -54,23 +59,23 @@ angular.module('umbraco.services')
         */
         function countdownUserTimeout() {
 
-            $timeout(function () {
+            countdownCounter = $timeout(function () {
 
                 if (currentUser) {
                     //countdown by 5 seconds since that is how long our timer is for.
                     currentUser.remainingAuthSeconds -= 5;
 
-                    //if there are more than 30 remaining seconds, recurse!
-                    if (currentUser.remainingAuthSeconds > 30) {
+                    //if there are more than 20 remaining seconds, recurse!
+                    if (currentUser.remainingAuthSeconds > 20) {
 
                         //we need to check when the last time the timeout was set from the server, if
-                        // it has been more than 30 seconds then we'll manually go and retrieve it from the
+                        // it has been more than 20 seconds then we'll manually go and retrieve it from the
                         // server - this helps to keep our local countdown in check with the true timeout.
                         if (lastServerTimeoutSet != null) {
                             var now = new Date();
                             var seconds = (now.getTime() - lastServerTimeoutSet.getTime()) / 1000;
 
-                            if (seconds > 30) {
+                            if (seconds > 20) {
 
                                 //first we'll set the lastServerTimeoutSet to null - this is so we don't get back in to this loop while we
                                 // wait for a response from the server otherwise we'll be making double/triple/etc... calls while we wait.
@@ -95,18 +100,23 @@ angular.module('umbraco.services')
                         if (Umbraco.Sys.ServerVariables.umbracoSettings.keepUserLoggedIn !== true) {
                             //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
                             angularHelper.safeApply($rootScope, function () {
-                                try {
-                                    //NOTE: We are calling this again so that the server can create a log that the timeout has expired, we
-                                    // don't actually care about this result.
-                                    authResource.getRemainingTimeoutSeconds();
-                                }
-                                finally {
-                                    userAuthExpired();
-                                }
+                                //NOTE: We are calling this again so that the server can create a log that the timeout has expired
+                                //and we will show the login screen as close to the server's timout time as possible
+                                authResource.getRemainingTimeoutSeconds().then(function (result) {
+                                    setUserTimeoutInternal(result);
+
+                                    //the client auth can expire a second earlier as the client internal clock is behind
+                                    if (result < 1) {
+                                        userAuthExpired();
+                                    }
+                                });
                             });
+
+                            //recurse the countdown!
+                            countdownUserTimeout();
                         }
                         else {
-                            //we've got less than 30 seconds remaining so let's check the server
+                            //we've got less than 20 seconds remaining so let's check the server
 
                             if (lastServerTimeoutSet != null) {
                                 //first we'll set the lastServerTimeoutSet to null - this is so we don't get back in to this loop while we
@@ -155,6 +165,7 @@ angular.module('umbraco.services')
 
             lastServerTimeoutSet = null;
             currentUser = null;
+            countdownCounter = null;
 
             if (!isLogout) {
               openLoginDialog(true);

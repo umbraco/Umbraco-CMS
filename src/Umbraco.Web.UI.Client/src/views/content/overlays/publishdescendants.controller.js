@@ -28,11 +28,6 @@
                     vm.labels.includeUnpublished = value;
                 });
             }
-            if (!vm.labels.includeUnpublished) {
-                localizationService.localize("content_includeUnpublished").then(value => {
-                    vm.labels.includeUnpublished = value;
-                });
-            }
 
             vm.variants.forEach(variant => {
                 variant.isMandatory = isMandatoryFilter(variant);
@@ -69,7 +64,6 @@
 
         function toggleIncludeUnpublished() {
             vm.includeUnpublished = !vm.includeUnpublished;
-            // make sure this value is pushed back to the scope
             $scope.model.includeUnpublished = vm.includeUnpublished;
         }
 

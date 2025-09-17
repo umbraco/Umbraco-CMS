@@ -611,6 +611,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       } else {
         editor.selection.setNode(wrapper);
       }
+
+
+      angularHelper.safeApply($rootScope, function () {
+        editor.dispatch("Change");
+      });
     },
 
 
@@ -1051,6 +1056,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 editor.undoManager.clear();
               }
             }
+
+            angularHelper.safeApply($rootScope, function () {
+              editor.dispatch("Change");
+            });
           });
       });
 
@@ -1207,10 +1216,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             target: anchor.attr("target")
           };
 
-          // drop the lead char from the anchor text, if it has a value
           var anchorVal = anchor[0].dataset.anchor;
           if (anchorVal) {
-            currentTarget.anchor = anchorVal.substring(1);
+            currentTarget.anchor = anchorVal;
           }
 
           //locallink detection, we do this here, to avoid poluting the editorService
@@ -1457,11 +1465,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function syncContent() {
 
-        const content = args.editor.getContent()
+        const content = args.editor.getContent();
 
         if (getPropertyValue() === content) {
           return;
         }
+
 
         //stop watching before we update the value
         stopWatch();
@@ -1493,8 +1502,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block, umb-rte-block-inline');
         for (var blockEl of blockEls) {
           if(!blockEl._isInitializedUmbBlock) {
+            // First time we initialize this block element
             const blockContentUdi = blockEl.getAttribute('data-content-udi');
-            if(blockContentUdi && !blockEl.$block) {
+            if(blockContentUdi) {
               const block = args.blockEditorApi.getBlockByContentUdi(blockContentUdi);
               if(block) {
                 blockEl.removeAttribute('contenteditable');
@@ -1533,9 +1543,23 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             } else {
               args.editor.dom.remove(blockEl);
             }
+          } else {
+            // Second time we initialize this block element, cause by a new Block Model Object has been initiated. (Mainly cause we re initiate all blocks when there is a value update)
+            const blockContentUdi = blockEl.getAttribute('data-content-udi');
+            const block = args.blockEditorApi.getBlockByContentUdi(blockContentUdi);
+            if(block) {
+              blockEl.$index = block.index;
+              blockEl.$block = block;
+              blockEl.update();
+            } else {
+              console.error('Could not find block with content udi: ' + blockContentUdi);
+            }
           }
         }
       }
+      args.editor.on('updateBlocks', function () {
+        initBlocks();
+      });
 
       // If we can not find the insert image/media toolbar button
       // Then we need to add an event listener to the editor

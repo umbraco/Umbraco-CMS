@@ -15,12 +15,13 @@
                     property="property"
                     node="contentNodeModel"
                     show-inherit="contentNodeModel.variants.length > 1 && property.variation !== 'CultureAndSegment'"
-                    inherits-from="defaultVariant.displayName">
+                    inherits-from="defaultVariant.displayName"
+                    preview="isPreview(property)">
 
                     <umb-property-editor
                         model="property"
                         node="contentNodeModel"
-                        preview="((property.readonly || !allowUpdate) && !property.supportsReadOnly) || (propertyEditorDisabled(property) && allowUpdate)"
+                        preview="isPreview(property)"
                         allow-unlock="!property.readonly && allowUpdate && allowEditInvariantFromNonDefault"
                         on-unlock="unlockInvariantValue(property)"
                         ng-attr-readonly="{{property.readonly || !allowUpdate || undefined}}">
@@ -49,12 +50,13 @@
                     property="property"
                     node="contentNodeModel"
                     show-inherit="contentNodeModel.variants.length > 1 && property.variation !== 'CultureAndSegment'"
-                    inherits-from="defaultVariant.displayName">
+                    inherits-from="defaultVariant.displayName"
+                    preview="isPreview(property)">
 
                     <umb-property-editor
                         model="property"
                         node="contentNodeModel"
-                        preview="((property.readonly || !allowUpdate) && !property.supportsReadOnly) || (propertyEditorDisabled(property) && allowUpdate)"
+                        preview="isPreview(property)"
                         allow-unlock="!property.readonly && allowUpdate && allowEditInvariantFromNonDefault"
                         on-unlock="unlockInvariantValue(property)"
                         ng-attr-readonly="{{property.readonly || !allowUpdate || undefined}}">

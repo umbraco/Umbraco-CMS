@@ -18,8 +18,8 @@ test.describe('Login', () => {
     await expect(error).toBeHidden();
 
     // Action
-    await page.fill('#username-input input', process.env.UMBRACO_USER_LOGIN);
-    await page.fill('#password-input input', process.env.UMBRACO_USER_PASSWORD);
+    await page.fill('#username-input', process.env.UMBRACO_USER_LOGIN);
+    await page.fill('#password-input', process.env.UMBRACO_USER_PASSWORD);
     await page.locator('#umb-login-button').click();
     await page.waitForURL(process.env.URL + '/umbraco#/content');
 
@@ -37,8 +37,8 @@ test.describe('Login', () => {
     await expect(error).toBeHidden();
 
     // Action
-    await page.fill('#username-input input', username);
-    await page.fill('#password-input input', password);
+    await page.fill('#username-input', username);
+    await page.fill('#password-input', password);
     await page.locator('#umb-login-button').click();
 
     // Assert
@@ -58,8 +58,8 @@ test.describe('Login', () => {
     await expect(error).toBeHidden();
 
     // Action
-    await page.fill('#username-input input', username);
-    await page.fill('#password-input input', password);
+    await page.fill('#username-input', username);
+    await page.fill('#password-input', password);
     await page.locator('#umb-login-button').click();
 
     // Assert

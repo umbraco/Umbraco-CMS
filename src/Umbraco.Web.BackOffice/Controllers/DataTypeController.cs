@@ -1,20 +1,17 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
@@ -37,6 +34,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
     [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
+    [ParameterSwapControllerActionSelector(nameof(GetReferences), "id", typeof(int), typeof(Guid))]
     public class DataTypeController : BackOfficeNotificationsController
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -51,6 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IDataTypeUsageService _dataTypeUsageService;
+        private readonly IIdKeyMap _idKeyMap;
 
         [Obsolete("Use constructor that takes IDataTypeUsageService, scheduled for removal in V12")]
         public DataTypeController(
@@ -77,9 +76,41 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             localizedTextService,
             backOfficeSecurityAccessor,
             serializer,
-            StaticServiceProvider.Instance.GetRequiredService<IDataTypeUsageService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeUsageService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
          {
          }
+
+        [Obsolete("Use constructor that takes IDataTypeUsageService, scheduled for removal in V17")]
+        public DataTypeController(
+            PropertyEditorCollection propertyEditors,
+            IDataTypeService dataTypeService,
+            IOptionsSnapshot<ContentSettings> contentSettings,
+            IUmbracoMapper umbracoMapper,
+            PropertyEditorCollection propertyEditorCollection,
+            IContentTypeService contentTypeService,
+            IMediaTypeService mediaTypeService,
+            IMemberTypeService memberTypeService,
+            ILocalizedTextService localizedTextService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IConfigurationEditorJsonSerializer serializer,
+            IDataTypeUsageService dataTypeUsageService)
+            : this(
+                propertyEditors,
+                dataTypeService,
+                contentSettings,
+                umbracoMapper,
+                propertyEditorCollection,
+                contentTypeService,
+                mediaTypeService,
+                memberTypeService,
+                localizedTextService,
+                backOfficeSecurityAccessor,
+                serializer,
+                dataTypeUsageService,
+                StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+        {
+        }
 
         [ActivatorUtilitiesConstructor]
         public DataTypeController(
@@ -94,7 +125,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILocalizedTextService localizedTextService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IConfigurationEditorJsonSerializer serializer,
-            IDataTypeUsageService dataTypeUsageService)
+            IDataTypeUsageService dataTypeUsageService,
+            IIdKeyMap entityService)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
@@ -108,6 +140,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _dataTypeUsageService = dataTypeUsageService ?? throw new ArgumentNullException(nameof(dataTypeUsageService));
+            _idKeyMap = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
         /// <summary>
@@ -421,10 +454,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Returns the references (usages) for the data type
+        /// Returns the references (usages) for the data type.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">Data type's integer Id.</param>
+        [HttpGet]
         public DataTypeReferences GetReferences(int id)
         {
             var result = new DataTypeReferences();
@@ -460,6 +493,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Returns the references (usages) for the data type.
+        /// </summary>
+        /// <param name="id">Data type's key.</param>
+        [HttpGet]
+        public DataTypeReferences GetReferences(Guid id)
+        {
+            Attempt<int> dataType = _idKeyMap.GetIdForKey(id, UmbracoObjectTypes.DataType);
+            return dataType.Success
+                ? GetReferences(dataType.Result)
+                : new DataTypeReferences();
         }
 
         [HttpGet]

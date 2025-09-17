@@ -37,6 +37,12 @@
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Map" />
+
+    <!-- Both Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer,NPoco.SqlServer, and more bring in a vulnerable version of System.Text.Json -->
+    <PackageReference Include="System.Text.Json" />
+
+    <!-- Both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc bring in a vulnerable version of System.Text.RegularExpressions -->
+    <PackageReference Include="System.Text.RegularExpressions" />
   </ItemGroup>
 
   <ItemGroup>

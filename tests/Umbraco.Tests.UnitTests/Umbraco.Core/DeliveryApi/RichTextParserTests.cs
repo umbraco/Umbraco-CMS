@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -9,8 +9,8 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -128,12 +128,16 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual("the original something", span.Attributes.First().Value);
     }
 
-    [Test]
-    public void ParseElement_CanParseContentLink()
+
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("#some-anchor")]
+    [TestCase("?something=true")]
+    public void ParseElement_CanParseContentLink(string? postfix)
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>") as RichTextRootElement;
+        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}{postfix}\"></a></p>") as RichTextRootElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -143,6 +147,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var route = link.Attributes.First().Value as IApiContentRoute;
         Assert.IsNotNull(route);
         Assert.AreEqual("/some-content-path", route.Path);
+        Assert.AreEqual(postfix.NullOrWhiteSpaceAsNull(), route.QueryString);
         Assert.AreEqual(_contentRootKey, route.StartItem.Id);
         Assert.AreEqual("the-root-path", route.StartItem.Path);
     }
@@ -175,6 +180,22 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(1, link.Attributes.Count);
         Assert.AreEqual("href", link.Attributes.First().Key);
         Assert.AreEqual("https://some.where/else/", link.Attributes.First().Value);
+    }
+
+    [TestCase("#some-anchor")]
+    [TestCase("?something=true")]
+    public void ParseElement_CanHandleNonLocalLink_WithPostfix(string postfix)
+    {
+        var parser = CreateRichTextElementParser();
+
+        var element = parser.Parse($"<p><a href=\"https://some.where/else/{postfix}\"></a></p>") as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(link);
+        Assert.AreEqual("a", link.Tag);
+        Assert.AreEqual(1, link.Attributes.Count);
+        Assert.AreEqual("href", link.Attributes.First().Key);
+        Assert.AreEqual($"https://some.where/else/{postfix}", link.Attributes.First().Value);
     }
 
     [Test]
@@ -358,6 +379,103 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.IsEmpty(blockLevelBlock.Elements);
     }
 
+    private const string TestParagraph = "What follows from <strong>here</strong> <em>is</em> <a href=\"#\">just</a> a bunch of text.";
+
+    [Test]
+    public void ParseElement_CanHandleWhitespaceAroundInlineElemements()
+    {
+        var parser = CreateRichTextElementParser();
+
+        var element = parser.Parse($"<p>{TestParagraph}</p>") as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var paragraphElement = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(paragraphElement);
+
+        AssertTestParagraph(paragraphElement);
+    }
+
+    [TestCase(1, "\n")]
+    [TestCase(2, "\n")]
+    [TestCase(1, "\r")]
+    [TestCase(2, "\r")]
+    [TestCase(1, "\r\n")]
+    [TestCase(2, "\r\n")]
+    public void ParseElement_RemovesNewLinesAroundHtmlStructuralElements(int numberOfNewLineCharacters, string newlineCharacter)
+    {
+        var parser = CreateRichTextElementParser();
+
+        var newLineSeparator = string.Concat(Enumerable.Repeat(newlineCharacter, numberOfNewLineCharacters));
+        var element = parser.Parse($"<table>{newLineSeparator}<tr>{newLineSeparator}<td>{TestParagraph}</td>{newLineSeparator}</tr>{newLineSeparator}</table>") as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var tableElement = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(tableElement);
+
+        var rowElement = tableElement.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(rowElement);
+
+        var cellElement = rowElement.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(cellElement);
+
+        AssertTestParagraph(cellElement);
+    }
+
+    [TestCase(1, "\n")]
+    [TestCase(2, "\n")]
+    [TestCase(1, "\r")]
+    [TestCase(2, "\r")]
+    [TestCase(1, "\r\n")]
+    [TestCase(2, "\r\n")]
+    public void ParseElement_RemovesNewLinesAroundHtmlContentElements(int numberOfNewLineCharacters, string newlineCharacter)
+    {
+        var parser = CreateRichTextElementParser();
+
+        var newLineSeparator = string.Concat(Enumerable.Repeat(newlineCharacter, numberOfNewLineCharacters));
+        var element = parser.Parse($"<div><p>{TestParagraph}</p>{newLineSeparator}<p></p>{newLineSeparator}<p>&nbsp;</p>{newLineSeparator}<p>{TestParagraph}</p></div>") as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var divElement = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(divElement);
+
+        var paragraphELements = divElement.Elements;
+        Assert.AreEqual(4, paragraphELements.Count());
+
+        AssertTestParagraph(paragraphELements.First() as RichTextGenericElement);
+        AssertTestParagraph(paragraphELements.Last() as RichTextGenericElement);
+    }
+
+    private static void AssertTestParagraph(RichTextGenericElement paragraphElement)
+    {
+        var childElements = paragraphElement.Elements.ToArray();
+        Assert.AreEqual(7, childElements.Length);
+
+        var childElementCounter = 0;
+
+        void AssertNextChildElementIsText(string expectedText)
+        {
+            var textElement = childElements[childElementCounter++] as RichTextTextElement;
+            Assert.IsNotNull(textElement);
+            Assert.AreEqual(expectedText, textElement.Text);
+        }
+
+        void AssertNextChildElementIsGeneric(string expectedTag, string expectedInnerText)
+        {
+            var genericElement = childElements[childElementCounter++] as RichTextGenericElement;
+            Assert.IsNotNull(genericElement);
+            Assert.AreEqual(expectedTag, genericElement.Tag);
+            Assert.AreEqual(1, genericElement.Elements.Count());
+            var textElement = genericElement.Elements.First() as RichTextTextElement;
+            Assert.IsNotNull(textElement);
+            Assert.AreEqual(expectedInnerText, textElement.Text);
+        }
+
+        AssertNextChildElementIsText("What follows from ");
+        AssertNextChildElementIsGeneric("strong", "here");
+        AssertNextChildElementIsText(" ");
+        AssertNextChildElementIsGeneric("em", "is");
+        AssertNextChildElementIsText(" ");
+        AssertNextChildElementIsGeneric("a", "just");
+        AssertNextChildElementIsText(" a bunch of text.");
+    }
+
     [Test]
     public void ParseMarkup_CanParseContentLink()
     {
@@ -365,6 +483,18 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
+        Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
+        Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+    }
+
+    [TestCase("#some-anchor")]
+    [TestCase("?something=true")]
+    public void ParseMarkup_CanParseContentLink_WithPostfix(string postfix)
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}{postfix}\"></a></p>");
+        Assert.IsTrue(result.Contains($"href=\"/some-content-path{postfix}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
     }
@@ -389,6 +519,8 @@ public class RichTextParserTests : PropertyValueConverterTests
     }
 
     [TestCase("<p><a href=\"https://some.where/else/\"></a></p>")]
+    [TestCase("<p><a href=\"https://some.where/else/#some-anchor\"></a></p>")]
+    [TestCase("<p><a href=\"https://some.where/else/?something=true\"></a></p>")]
     [TestCase("<p><img src=\"https://some.where/something.png?rmode=max&amp;width=500\"></p>")]
     public void ParseMarkup_CanHandleNonLocalReferences(string html)
     {
@@ -474,7 +606,7 @@ public class RichTextParserTests : PropertyValueConverterTests
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 
-    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out IPublishedSnapshotAccessor snapshotAccessor, out IPublishedUrlProvider urlProvider)
+    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out IPublishedSnapshotAccessor snapshotAccessor, out IApiMediaUrlProvider apiMediaUrlProvider)
     {
         var contentMock = new Mock<IPublishedContent>();
         contentMock.SetupGet(m => m.Key).Returns(_contentKey);
@@ -502,14 +634,14 @@ public class RichTextParserTests : PropertyValueConverterTests
             .Setup(m => m.Build(contentMock.Object, null))
             .Returns(new ApiContentRoute("/some-content-path", new ApiContentStartItem(_contentRootKey, "the-root-path")));
 
-        var urlProviderMock = new Mock<IPublishedUrlProvider>();
-        urlProviderMock
-            .Setup(m => m.GetMediaUrl(mediaMock.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string>(), It.IsAny<Uri?>()))
+        var apiMediaUrlProviderMock = new Mock<IApiMediaUrlProvider>();
+        apiMediaUrlProviderMock
+            .Setup(m => m.GetUrl(mediaMock.Object))
             .Returns("/some-media-url");
 
         routeBuilder = routeBuilderMock.Object;
         snapshotAccessor = snapshotAccessorMock.Object;
-        urlProvider = urlProviderMock.Object;
+        apiMediaUrlProvider = apiMediaUrlProviderMock.Object;
     }
 
     private IPublishedElement CreateElement(Guid id, int propertyValue)

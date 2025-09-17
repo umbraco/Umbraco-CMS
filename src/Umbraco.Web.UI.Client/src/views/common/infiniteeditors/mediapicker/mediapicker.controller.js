@@ -271,6 +271,8 @@ angular.module("umbraco")
                     $scope.path = [];
                     performGotoFolder(folder);
                 }
+
+              return getChildren(folder.id);
             }
 
             function performGotoFolder(folder) {
@@ -280,8 +282,6 @@ angular.module("umbraco")
                 $scope.currentFolder = folder;
 
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
-
-                getChildren(folder.id);
             }
 
             function toggleListView() {

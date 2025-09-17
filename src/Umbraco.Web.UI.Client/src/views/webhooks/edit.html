@@ -5,7 +5,7 @@
     <form name="editWebhookForm" novalidate val-form-manager>
 
         <umb-editor-view ng-if="!vm.loading">
-    
+
             <umb-editor-header
                 name="vm.webhook.name"
                 name-locked="true"
@@ -15,7 +15,7 @@
                 hide-alias="true"
                 hide-description="true">
             </umb-editor-header>
-    
+
             <umb-editor-container class="form-horizontal">
 
                 <div class="umb-package-details">
@@ -49,6 +49,8 @@
                               description="@webhooks_eventDescription"
                               alias="webhookEvents"
                               required="true">
+
+                            <input type="hidden" name="eventsValidator" ng-model="eventsValidator" ng-required="!vm.webhook.events.length" />
 
                             <umb-node-preview
                                 ng-repeat="event in vm.webhook.events"
@@ -198,9 +200,9 @@
                 </umb-editor-footer-content-right>
 
             </umb-editor-footer>
-    
+
         </umb-editor-view>
 
     </form>
-    
+
 </div>

@@ -401,8 +401,9 @@
                   // If we are in the document type editor, we need to use -20 as the current page id.
                   // If we are in the content editor, we need to use the current page id or parent id if the current page is new.
                   // We can recognize a content editor context by checking if the current editor state has a contentTypeKey.
+                  // If no current is represented, we will use null.
                   const currentEditorState = editorState.getCurrent();
-                  const currentPageId = currentEditorState.contentTypeKey ? currentEditorState.id || currentEditorState.parentId || -20 : -20;
+                  const currentPageId = currentEditorState ? currentEditorState.contentTypeKey ? currentEditorState.id || currentEditorState.parentId || -20 : -20 : null;
 
                   // Load all scaffolds for the block types.
                   // The currentPageId is used to determine the access level for the current user.
@@ -636,21 +637,26 @@
                 }
 
                 blockObject.retrieveValuesFrom = function (content, settings) {
-                    if (this.content !== null) {
+                    if (this.content) {
                         mapElementValues(content, this.content);
+                        if (this.config.settingsElementTypeKey !== null) {
+                          mapElementValues(settings, this.settings);
+                      }
+                    } else {
+                      console.error("This data cannot be edited at the given movement. Maybe due to publishing while editing.");
                     }
-                    if (this.config.settingsElementTypeKey !== null) {
-                        mapElementValues(settings, this.settings);
-                    }
+
 
                 };
 
                 blockObject.sync = function () {
-                    if (this.content !== null) {
+                    if (this.content) {
                         mapToPropertyModel(this.content, this.data);
-                    }
-                    if (this.config.settingsElementTypeKey !== null) {
-                        mapToPropertyModel(this.settings, this.settingsData);
+                        if (this.config.settingsElementTypeKey !== null) {
+                            mapToPropertyModel(this.settings, this.settingsData);
+                        }
+                    } else {
+                      console.error("This data cannot be edited at the given movement. Maybe due to publishing while editing.");
                     }
                 };
                 // first time instant update of label.

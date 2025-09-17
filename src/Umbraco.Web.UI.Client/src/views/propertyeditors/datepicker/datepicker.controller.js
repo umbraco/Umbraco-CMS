@@ -111,7 +111,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
       // $scope.hasDatetimePickerValue indicates that we had a value before the input was changed,
       // but now the input is empty.
       $scope.clearDate();
-    } else if ($scope.model.datetimePickerValue) {
+    } else if ($scope.model.datetimePickerInputValue) {
       var momentDate = moment($scope.model.datetimePickerInputValue, $scope.model.config.format, true);
       if (!momentDate || !momentDate.isValid()) {
         momentDate = moment(new Date($scope.model.datetimePickerInputValue));
@@ -120,7 +120,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
         setDate(momentDate);
       }
       setDatePickerVal();
-      flatPickr.setDate($scope.model.datetimePickerValue, false);
+      flatPickr.setDate($scope.model.datetimePickerInputValue, false);
     }
   }
 

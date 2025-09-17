@@ -1,9 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -34,7 +32,7 @@ public class ContentPermissionsQueryStringHandlerTests
     public async Task Node_Id_From_Requirement_With_Permission_Is_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
-        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValue();
         var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
@@ -46,7 +44,7 @@ public class ContentPermissionsQueryStringHandlerTests
     public async Task Node_Id_From_Requirement_Without_Permission_Is_Not_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
-        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValue();
         var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "B" });
 
         await sut.HandleAsync(authHandlerContext);
@@ -59,7 +57,7 @@ public class ContentPermissionsQueryStringHandlerTests
     public async Task Node_Id_Missing_From_Requirement_And_QueryString_Is_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockHttpContextAccessor = CreateMockHttpContextAccessor("xxx");
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValue("xxx");
         var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
@@ -71,7 +69,7 @@ public class ContentPermissionsQueryStringHandlerTests
     public async Task Node_Integer_Id_From_QueryString_With_Permission_Is_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeId.ToString());
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValue(queryStringValue: NodeId.ToString());
         var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
@@ -84,7 +82,21 @@ public class ContentPermissionsQueryStringHandlerTests
     public async Task Node_Integer_Id_From_QueryString_Without_Permission_Is_Not_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeId.ToString());
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValue(queryStringValue: NodeId.ToString());
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "B" });
+
+        await sut.HandleAsync(authHandlerContext);
+
+        Assert.IsFalse(authHandlerContext.HasSucceeded);
+        AssertContentCached(mockHttpContextAccessor);
+    }
+
+    [Test]
+    public async Task Node_Integer_Id_From_QueryString_Without_Permission_Is_Not_Authorized_Even_When_Additional_Parameter_For_Id_With_Permission_Is_Provided()
+    {
+        // Provides initially failing test and verifies fix for advisory https://github.com/umbraco/Umbraco-CMS/security/advisories/GHSA-wx5h-wqfq-v698
+        var authHandlerContext = CreateAuthorizationHandlerContext();
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValues(queryStringValues: [NodeId.ToString(), 1001.ToString()]);
         var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "B" });
 
         await sut.HandleAsync(authHandlerContext);
@@ -97,7 +109,7 @@ public class ContentPermissionsQueryStringHandlerTests
     public async Task Node_Udi_Id_From_QueryString_With_Permission_Is_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeUdi.ToString());
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValue(queryStringValue: s_nodeUdi.ToString());
         var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
@@ -110,7 +122,7 @@ public class ContentPermissionsQueryStringHandlerTests
     public async Task Node_Udi_Id_From_QueryString_Without_Permission_Is_Not_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeUdi.ToString());
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValue(queryStringValue: s_nodeUdi.ToString());
         var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "B" });
 
         await sut.HandleAsync(authHandlerContext);
@@ -123,7 +135,7 @@ public class ContentPermissionsQueryStringHandlerTests
     public async Task Node_Guid_Id_From_QueryString_With_Permission_Is_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeGuid.ToString());
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValue(queryStringValue: s_nodeGuid.ToString());
         var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
@@ -136,7 +148,7 @@ public class ContentPermissionsQueryStringHandlerTests
     public async Task Node_Guid_Id_From_QueryString_Without_Permission_Is_Not_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeGuid.ToString());
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValue(queryStringValue: s_nodeGuid.ToString());
         var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "B" });
 
         await sut.HandleAsync(authHandlerContext);
@@ -149,7 +161,7 @@ public class ContentPermissionsQueryStringHandlerTests
     public async Task Node_Invalid_Id_From_QueryString_Is_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: "invalid");
+        var mockHttpContextAccessor = CreateMockHttpContextAccessorWithQueryStringValue(queryStringValue: "invalid");
         var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
@@ -168,14 +180,20 @@ public class ContentPermissionsQueryStringHandlerTests
         return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
-    private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessor(
+    private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessorWithQueryStringValue(
         string queryStringName = QueryStringName,
         string queryStringValue = "")
+        => CreateMockHttpContextAccessorWithQueryStringValues(queryStringName, [queryStringValue]);
+
+    private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessorWithQueryStringValues(
+        string queryStringName = QueryStringName,
+        string[]? queryStringValues = null)
     {
+        queryStringValues ??= [];
         var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         var mockHttpContext = new Mock<HttpContext>();
         var mockHttpRequest = new Mock<HttpRequest>();
-        var queryParams = new Dictionary<string, StringValues> { { queryStringName, queryStringValue } };
+        var queryParams = new Dictionary<string, StringValues> { { queryStringName, new StringValues(queryStringValues) } };
         mockHttpRequest.SetupGet(x => x.Query).Returns(new QueryCollection(queryParams));
         mockHttpContext.SetupGet(x => x.Request).Returns(mockHttpRequest.Object);
         mockHttpContext.SetupGet(x => x.Items).Returns(new Dictionary<object, object>());

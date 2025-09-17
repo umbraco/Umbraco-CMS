@@ -712,11 +712,31 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
+    /// <inheritdoc/>
     public IEnumerable<IUser> GetNextUsers(int id, int count)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userRepository.GetNextUsers(id, count);
+        }
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<IUser> GetNextApprovedUsers(int id, int count)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _userRepository.GetNextApprovedUsers(id, count);
+        }
+    }
+
+    /// <inheritdoc />
+    public void InvalidateSessionsForRemovedProviders(IEnumerable<string> currentLoginProviders)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            _userRepository.InvalidateSessionsForRemovedProviders(currentLoginProviders);
+            scope.Complete();
         }
     }
 

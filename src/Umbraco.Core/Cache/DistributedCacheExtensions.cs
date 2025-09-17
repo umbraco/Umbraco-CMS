@@ -142,7 +142,9 @@ public static class DistributedCacheExtensions
             Id = x.Item.Id,
             Key = x.Item.Key,
             ChangeTypes = x.ChangeTypes,
-            Blueprint = x.Item.Blueprint
+            Blueprint = x.Item.Blueprint,
+            PublishedCultures = x.PublishedCultures?.ToArray(),
+            UnpublishedCultures = x.UnpublishedCultures?.ToArray()
         });
 
         dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
@@ -157,15 +159,30 @@ public static class DistributedCacheExtensions
         => dc.RefreshMemberCache(members.AsEnumerable());
 
     public static void RefreshMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
-        => dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.DistinctBy(x => (x.Id, x.Username)).Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, false)));
-
+        => dc.RefreshByPayload(
+            MemberCacheRefresher.UniqueId,
+            GetPayloads(members, false));
 
     [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
     public static void RemoveMemberCache(this DistributedCache dc, params IMember[] members)
         => dc.RemoveMemberCache(members.AsEnumerable());
 
     public static void RemoveMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
-        => dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.DistinctBy(x => (x.Id, x.Username)).Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, true)));
+        => dc.RefreshByPayload(
+            MemberCacheRefresher.UniqueId,
+            GetPayloads(members, true));
+
+    // Internal for unit test.
+    internal static IEnumerable<MemberCacheRefresher.JsonPayload> GetPayloads(IEnumerable<IMember> members, bool removed)
+        => members
+            .DistinctBy(x => (x.Id, x.Username))
+            .Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, removed)
+            {
+                PreviousUsername = x.HasAdditionalData &&
+                    x.AdditionalData!.TryGetValue(Cms.Core.Constants.Entities.AdditionalDataKeys.MemberPreviousUserName, out var previousUsername)
+                    ? previousUsername?.ToString()
+                    : null,
+            });
 
     #endregion
 

@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Cms.Web.BackOffice.Middleware;
+using Umbraco.Cms.Web.BackOffice.NotificationHandlers;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
@@ -64,6 +65,8 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationHandler<UserForgotPasswordChangedNotification, BackOfficeUserManagerAuditer>();
         builder.AddNotificationHandler<UserPasswordChangedNotification, BackOfficeUserManagerAuditer>();
         builder.AddNotificationHandler<UserPasswordResetNotification, BackOfficeUserManagerAuditer>();
+
+        builder.AddNotificationHandler<UmbracoApplicationStartingNotification, ExternalLoginProviderStartupHandler>();
 
         return builder;
     }
@@ -202,6 +205,7 @@ public static partial class UmbracoBuilderExtensions
         {
             policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
             policy.Requirements.Add(new AdminUsersRequirement());
+            policy.Requirements.Add(new AdminUsersRequirement("ids"));
             policy.Requirements.Add(new AdminUsersRequirement("userIds"));
         });
 

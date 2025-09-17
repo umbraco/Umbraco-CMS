@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Web.BackOffice.Authorization;
@@ -34,15 +35,21 @@ public class ContentPermissionsResourceHandler : MustSatisfyRequirementAuthoriza
     protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context,
         ContentPermissionsResourceRequirement requirement, ContentPermissionsResource resource)
     {
+        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        if (currentUser is null)
+        {
+            return Task.FromResult(false);
+        }
+
         ContentPermissions.ContentAccess permissionResult = resource.NodeId.HasValue
             ? _contentPermissions.CheckPermissions(
                 resource.NodeId.Value,
-                _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
+                currentUser,
                 out IContent? _,
                 resource.PermissionsToCheck)
             : _contentPermissions.CheckPermissions(
                 resource.Content,
-                _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
+                currentUser,
                 resource.PermissionsToCheck);
 
         return Task.FromResult(permissionResult != ContentPermissions.ContentAccess.Denied);

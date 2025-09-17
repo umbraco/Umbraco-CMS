@@ -5,7 +5,7 @@
         appState, contentResource, entityResource, navigationService, notificationsService, contentAppHelper,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
         editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
-        $exceptionHandler, uploadTracker) {        
+        $exceptionHandler, uploadTracker) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -311,10 +311,12 @@
             // create the save button
             if (_.contains($scope.content.allowedActions, "A")) {
                 $scope.page.showSaveButton = true;
+                $scope.page.showPreviewButton = true;
                 // add ellipsis to the save button if it opens the variant overlay
                 $scope.page.saveButtonEllipsis = content.variants && content.variants.length > 1 ? "true" : "false";
             } else {
                 $scope.page.showSaveButton = false;
+                $scope.page.showPreviewButton = false;
             }
 
             // create the pubish combo button
@@ -365,8 +367,6 @@
                     handler: () => $scope.preview(content, additionalPreviewUrl.url, '_blank')
                 }
             });
-
-            $scope.page.showPreviewButton = true;
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
@@ -497,6 +497,7 @@
             //Set them all to be invalid
             var fieldsToRollback = checkValidility();
             eventsService.emit("content.saving", { content: $scope.content, action: args.action });
+            eventsService.emit("form.lock");
 
             return contentEditingHelper.contentEditorPerformSave({
                 saveMethod: args.saveMethod,
@@ -512,11 +513,12 @@
                 init();
 
                 //needs to be manually set for infinite editing mode
-                $scope.page.isNew = false;
+                $scope.isNew = false;
 
                 syncTreeNode($scope.content, data.path, false, args.reloadChildren);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: true });
+                eventsService.emit("form.unlock");
 
                 if($scope.contentForm.$invalid !== true) {
                     resetNestedFieldValiation(fieldsToRollback);
@@ -536,6 +538,7 @@
                         eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: false });
                     }
 
+                    eventsService.emit("form.unlock");
                     return $q.reject(err);
                 });
         }
@@ -756,9 +759,9 @@
                                 //ensure error messages are displayed
                                 formHelper.showNotifications(err.data);
                                 clearNotifications($scope.content);
-                                
-                                handleHttpException(err);
-                                deferred.reject(err);
+
+                              handleHttpException(err);
+                              deferred.reject(err);
                             });
                         },
                         close: function () {
@@ -787,6 +790,7 @@
                 }, function (err) {
                     $scope.page.buttonGroupState = "error";
                     handleHttpException(err);
+                    $scope.$broadcast("formSubmittedValidationFailed")
                     deferred.reject(err);
                 });
             }
@@ -920,8 +924,6 @@
                                 formHelper.showNotifications(err.data);
                             }
                             model.submitButtonState = "error";
-                            //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = Utilities.copy($scope.content.variants);
                             handleHttpException(err);
                         });
 
@@ -1001,7 +1003,7 @@
             const openPreviewWindow = (url, target) => {
                 // Chromes popup blocker will kick in if a window is opened
                 // without the initial scoped request. This trick will fix that.
-              
+
               const previewWindow = $window.open(url, target);
 
               previewWindow.addEventListener('load', () => {
@@ -1031,9 +1033,12 @@
                 $scope.content.variants.forEach(variant => variant.save = false);
                 //ensure the save flag is set for the active variant
                 selectedVariant.save = true;
+                $scope.page.previewButtonState = "busy";
                 performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
+                    $scope.page.previewButtonState = "success";
                     openPreviewWindow(url, urlTarget);
                 }, function (err) {
+                    $scope.page.previewButtonState = "error";
                     //validation issues ....
                 });
             }
