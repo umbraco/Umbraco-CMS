@@ -335,7 +335,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				}
 			}
 
-				umb-tiptap-toolbar + #editor {
+			umb-tiptap-toolbar + #editor {
 				border-top: 0;
 				border-top-left-radius: 0;
 				border-top-right-radius: 0;
