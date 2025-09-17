@@ -253,8 +253,6 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual bool SupportsIdentityInsert() => true;
 
-    public virtual bool SupportsAutoIncrement() => true;
-
     /// <summary>
     ///     This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
     /// </summary>

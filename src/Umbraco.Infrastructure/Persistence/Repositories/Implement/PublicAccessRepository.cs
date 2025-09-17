@@ -60,15 +60,15 @@ internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, Public
             .LeftJoin<AccessRuleDto>()
             .On<AccessDto, AccessRuleDto>(left => left.Id, right => right.AccessId);
 
-    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Access)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Access)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var list = new List<string>
         {
-            $@"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoAccessRule")}
-                WHERE {SqlSyntax.GetQuotedColumnName("accessId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoAccess")} WHERE id = @id",
+            $@"DELETE FROM {QuoteTableName("umbracoAccessRule")}
+                WHERE {QuoteColumnName("accessId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoAccess")} WHERE id = @id",
         };
         return list;
     }

@@ -49,11 +49,11 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.LogViewerQuery)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.LogViewerQuery)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> { $"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.LogViewerQuery)} WHERE id = @id" };
+        var list = new List<string> { $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.LogViewerQuery)} WHERE id = @id" };
         return list;
     }
 

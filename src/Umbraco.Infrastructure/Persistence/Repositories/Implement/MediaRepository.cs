@@ -259,31 +259,31 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
 
     // ah maybe not, that what's used for eg Exists in base repo
-    protected override string GetBaseWhereClause() => $"{QuoteTab(NodeDto.TableName)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(NodeDto.TableName)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var nodeId = QuoteCol("nodeId");
-        var uniqueId = QuoteCol("uniqueId");
-        var umbracoNode = QuoteTab(NodeDto.TableName);
+        var nodeId = QuoteColumnName("nodeId");
+        var uniqueId = QuoteColumnName("uniqueId");
+        var umbracoNode = QuoteTableName(NodeDto.TableName);
         var list = new List<string>
         {
-            $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {nodeId} = @id",
-            $@"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.UserGroup2GranularPermission)} WHERE {uniqueId} IN
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {nodeId} = @id",
+            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup2GranularPermission)} WHERE {uniqueId} IN
                 (SELECT {uniqueId} FROM {umbracoNode} WHERE id = @id)",
-            $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.UserStartNode)} WHERE {QuoteCol("startNode")} = @id",
-            $@"UPDATE {QuoteTab(Constants.DatabaseSchema.Tables.UserGroup)}
-                SET {QuoteCol("startContentId")} = NULL WHERE {QuoteCol("startContentId")} = @id",
-            $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteCol("parentId")} = @id",
-            $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteCol("childId")} = @id",
-            $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {nodeId} = @id",
-            $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Document)} WHERE {nodeId} = @id",
-            $@"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.MediaVersion)} WHERE id IN
-                (SELECT id FROM {QuoteTab(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
-            $@"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.PropertyData)} WHERE versionId IN
-                (SELECT id FROM {QuoteTab(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
-            $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id",
-            $"DELETE FROM {QuoteTab(Constants.DatabaseSchema.Tables.Content)} WHERE {nodeId} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.UserStartNode)} WHERE {QuoteColumnName("startNode")} = @id",
+            $@"UPDATE {QuoteTableName(Constants.DatabaseSchema.Tables.UserGroup)}
+                SET {QuoteColumnName("startContentId")} = NULL WHERE {QuoteColumnName("startContentId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteColumnName("parentId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE {QuoteColumnName("childId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {nodeId} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Document)} WHERE {nodeId} = @id",
+            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.MediaVersion)} WHERE id IN
+                (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
+            $@"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.PropertyData)} WHERE versionId IN
+                (SELECT id FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id)",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.ContentVersion)} WHERE {nodeId} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Content)} WHERE {nodeId} = @id",
             $"DELETE FROM {umbracoNode} WHERE id = @id",
         };
         return list;
@@ -519,8 +519,6 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         _mediaByGuidReadRepository.GetMany(ids);
 
     public bool Exists(Guid id) => _mediaByGuidReadRepository.Exists(id);
-    private string QuoteTab(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
-    private string QuoteCol(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
 
     // A reading repository purely for looking up by GUID
     // TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!

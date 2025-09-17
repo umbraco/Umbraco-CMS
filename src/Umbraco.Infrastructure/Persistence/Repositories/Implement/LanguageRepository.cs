@@ -241,11 +241,11 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Language)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Language)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var lIdWhere = $"WHERE {SqlSyntax.GetQuotedColumnName("languageId")} = @id";
+        var lIdWhere = $"WHERE {QuoteColumnName("languageId")} = @id";
         var list = new List<string>
         {
             // NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
@@ -254,7 +254,7 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.PropertyData)} {lIdWhere}",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation)} {lIdWhere}",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DocumentCultureVariation)} {lIdWhere}",
-            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {SqlSyntax.GetQuotedColumnName("tagId")} IN (SELECT id FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere})",
+            $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.TagRelationship)} WHERE {QuoteColumnName("tagId")} IN (SELECT id FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere})",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Tag)} {lIdWhere}",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.DocumentUrl)} {lIdWhere}",
             $"DELETE FROM {SqlSyntax.GetQuotedName(Constants.DatabaseSchema.Tables.Language)} WHERE id = @id",

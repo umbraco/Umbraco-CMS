@@ -94,7 +94,7 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
     public IEnumerable<IMemberGroup> GetMemberGroupsForMember(string? username)
     {
         Sql<ISqlContext>? sql = Sql()
-            .Select($"{SqlSyntax.GetQuotedTableName(NodeDto.TableName)}.*")
+            .Select($"{QuoteTableName(NodeDto.TableName)}.*")
             .From<NodeDto>()
             .InnerJoin<Member2MemberGroupDto>()
             .On<Member2MemberGroupDto, NodeDto>((g, n) => g.MemberGroup == n.NodeId)
@@ -163,23 +163,23 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         Sql<ISqlContext> sql = Sql();
 
-        var inClause = $" IN (SELECT {SqlSyntax.GetQuotedTableName("umbracoUserGroup")}.{SqlSyntax.GetQuotedColumnName("key")} FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup")} WHERE id = @id)";
+        var inClause = $" IN (SELECT {QuoteTableName("umbracoUserGroup")}.{QuoteColumnName("key")} FROM {QuoteTableName("umbracoUserGroup")} WHERE id = @id)";
         return new List<string>
         {
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoUser2NodeNotify")} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup2Permission")} WHERE {SqlSyntax.GetQuotedColumnName("userGroupKey")}{inClause}",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup2GranularPermission")} WHERE {SqlSyntax.GetQuotedColumnName("userGroupKey")}{inClause}",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoRelation")} WHERE {SqlSyntax.GetQuotedColumnName("parentId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoRelation")} WHERE {SqlSyntax.GetQuotedColumnName("childId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("cmsTagRelationship")} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("cmsMember2MemberGroup")} WHERE {SqlSyntax.GetQuotedColumnName("MemberGroup")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoNode")} WHERE id = @id",
+            $"DELETE FROM {QuoteTableName("umbracoUser2NodeNotify")} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoUserGroup2Permission")} WHERE {QuoteColumnName("userGroupKey")}{inClause}",
+            $"DELETE FROM {QuoteTableName("umbracoUserGroup2GranularPermission")} WHERE {QuoteColumnName("userGroupKey")}{inClause}",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("parentId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("childId")} = @id",
+            $"DELETE FROM {QuoteTableName("cmsTagRelationship")} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName("cmsMember2MemberGroup")} WHERE {QuoteColumnName("MemberGroup")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id",
         };
     }
 
@@ -257,7 +257,7 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
         {
             // get the groups that are currently assigned to any of these members
             Sql<ISqlContext> assignedSql = Sql()
-                .Select($"{SqlSyntax.GetQuotedColumnName("text")},{SqlSyntax.GetQuotedColumnName("Member")},{SqlSyntax.GetQuotedColumnName("MemberGroup")}")
+                .Select($"{QuoteColumnName("text")},{QuoteColumnName("Member")},{QuoteColumnName("MemberGroup")}")
                 .From<NodeDto>()
                 .InnerJoin<Member2MemberGroupDto>()
                 .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)

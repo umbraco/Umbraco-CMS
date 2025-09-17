@@ -626,8 +626,4 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         return userGroupGranularPermissions.GroupBy(x => x.UserGroupKey).ToDictionary(x => x.Key, x => x.ToList());
     }
     #endregion
-
-    private string QuoteTableName(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
-
-    private string QuoteColumnName(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
 }

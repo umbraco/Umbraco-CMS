@@ -184,15 +184,15 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName(NodeDto.TableName)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(NodeDto.TableName)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add($"DELETE FROM {SqlSyntax.GetQuotedTableName(ContentVersionCleanupPolicyDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("contentTypeId")} = @id");
-        l.Add($"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DocumentType)} WHERE {SqlSyntax.GetQuotedColumnName("contentTypeNodeId")} = @id");
-        l.Add($"DELETE FROM {SqlSyntax.GetQuotedTableName(ContentTypeDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id");
-        l.Add($"DELETE FROM {SqlSyntax.GetQuotedTableName(NodeDto.TableName)} WHERE id = @id");
+        l.Add($"DELETE FROM {QuoteTableName(ContentVersionCleanupPolicyDto.TableName)} WHERE {QuoteColumnName("contentTypeId")} = @id");
+        l.Add($"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentType)} WHERE {QuoteColumnName("contentTypeNodeId")} = @id");
+        l.Add($"DELETE FROM {QuoteTableName(ContentTypeDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id");
+        l.Add($"DELETE FROM {QuoteTableName(NodeDto.TableName)} WHERE id = @id");
         return l;
     }
 

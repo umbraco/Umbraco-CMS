@@ -126,7 +126,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         return entity;
     }
 
-    protected override string GetBaseWhereClause() => $"id = @id and {SqlSyntax.GetQuotedColumnName("nodeObjectType")} = @NodeObjectType";
+    protected override string GetBaseWhereClause() => $"id = @id and {QuoteColumnName("nodeObjectType")} = @NodeObjectType";
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 

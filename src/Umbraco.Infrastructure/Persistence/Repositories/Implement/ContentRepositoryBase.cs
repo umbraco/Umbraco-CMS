@@ -529,12 +529,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // needs to be an outer join since there's no guarantee that any of the nodes have values for this property
             Sql<ISqlContext> innerSql = Sql().Select($@"CASE
-                            WHEN {SqlSyntax.GetQuotedColumnName("intValue")} IS NOT NULL THEN {sortedInt}
-                            WHEN {SqlSyntax.GetQuotedColumnName("decimalValue")} IS NOT NULL THEN {sortedDecimal}
-                            WHEN {SqlSyntax.GetQuotedColumnName("dateValue")} IS NOT NULL THEN {sortedDate}
+                            WHEN {QuoteColumnName("intValue")} IS NOT NULL THEN {sortedInt}
+                            WHEN {QuoteColumnName("decimalValue")} IS NOT NULL THEN {sortedDecimal}
+                            WHEN {QuoteColumnName("dateValue")} IS NOT NULL THEN {sortedDate}
                             ELSE {sortedString}
                         END AS {SqlSyntax.GetQuotedName("customPropVal")},
-                        cver.{SqlSyntax.GetQuotedColumnName("nodeId")} AS {SqlSyntax.GetQuotedName("customPropNodeId")}")
+                        cver.{QuoteColumnName("nodeId")} AS {SqlSyntax.GetQuotedName("customPropNodeId")}")
                 .From<ContentVersionDto>("cver")
                 .InnerJoin<PropertyDataDto>("opdata")
                     .On<ContentVersionDto, PropertyDataDto>((version, pdata) => version.Id == pdata.VersionId, "cver", "opdata")
@@ -550,13 +550,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // create the outer join complete sql fragment
             var outerJoinTempTable = $@"LEFT OUTER JOIN ({innerSqlString}) AS {SqlSyntax.GetQuotedName("customPropData")}
-                ON {SqlSyntax.GetQuotedName("customPropData")}.{SqlSyntax.GetQuotedColumnName("customPropNodeId")} = {SqlSyntax.GetQuotedTableName(NodeDto.TableName)}.id "; // trailing space is important!
+                ON {SqlSyntax.GetQuotedName("customPropData")}.{QuoteColumnName("customPropNodeId")} = {QuoteTableName(NodeDto.TableName)}.id "; // trailing space is important!
 
             // insert this just above the first WHERE
             var newSql = InsertBefore(sql.SQL, "WHERE", outerJoinTempTable);
 
             // see notes in ApplyOrdering: the field MUST be selected + aliased
-            newSql = InsertBefore(newSql, "FROM", $", {SqlSyntax.GetQuotedName("customPropData")}.{SqlSyntax.GetQuotedColumnName("customPropVal")} AS ordering "); // trailing space is important!
+            newSql = InsertBefore(newSql, "FROM", $", {SqlSyntax.GetQuotedName("customPropData")}.{QuoteColumnName("customPropVal")} AS ordering "); // trailing space is important!
 
             // create the new sql
             sql = Sql(newSql, argsList.ToArray());
@@ -906,7 +906,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected string GetQuotedFieldName(string tableName, string fieldName)
         {
-            return SqlContext.SqlSyntax.GetQuotedTableName(tableName) + "." + SqlContext.SqlSyntax.GetQuotedColumnName(fieldName);
+            return QuoteTableName(tableName) + "." + QuoteColumnName(fieldName);
         }
 
         #region UnitOfWork Notification

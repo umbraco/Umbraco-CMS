@@ -295,7 +295,7 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
         return sql;
     }
 
-    private string QuotedTableName => SqlSyntax.GetQuotedTableName(ExternalLoginDto.TableName);
+    private string QuotedTableName => QuoteTableName(ExternalLoginDto.TableName);
 
     protected override string GetBaseWhereClause() => $"{QuotedTableName}.id = @id";
 

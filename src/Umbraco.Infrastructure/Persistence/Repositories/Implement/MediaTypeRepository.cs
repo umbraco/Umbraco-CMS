@@ -90,13 +90,13 @@ internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add($"DELETE FROM {SqlSyntax.GetQuotedTableName("cmsContentType")} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id");
-        l.Add($"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoNode")} WHERE id = @id");
+        l.Add($"DELETE FROM {QuoteTableName("cmsContentType")} WHERE {QuoteColumnName("nodeId")} = @id");
+        l.Add($"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id");
         return l;
     }
 

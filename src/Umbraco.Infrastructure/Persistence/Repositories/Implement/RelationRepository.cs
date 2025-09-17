@@ -175,7 +175,7 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         // HACK: SQLite - hard to replace this without provider specific repositories/another ORM.
         if (Database.DatabaseType.IsSqlServer() is false)
         {
-            Sql<ISqlContext>? query = Sql().Append($"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoRelation")}");
+            Sql<ISqlContext>? query = Sql().Append($"DELETE FROM {QuoteTableName("umbracoRelation")}");
 
             Sql<ISqlContext> subQuery = Sql().Select<RelationDto>(x => x.Id)
                 .From<RelationDto>()
@@ -417,12 +417,12 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Relation)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Relation)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var list = new List<string> {
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE id = @id"
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE id = @id"
         };
         return list;
     }

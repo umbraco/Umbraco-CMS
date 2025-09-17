@@ -350,6 +350,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         }
         while (processed < total);
     }
+
     /// <summary>
     /// Rebuilds the content database cache for media by clearing and repopulating the cache with the latest media data.
     /// </summary>
@@ -398,6 +399,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         {
             return;
         }
+
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
         // Remove all - if anything fails the transaction will rollback.

@@ -1317,8 +1317,4 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
     }
 
     #endregion
-
-    private string QuoteTableName(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
-
-    private string QuoteColumnName(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
 }

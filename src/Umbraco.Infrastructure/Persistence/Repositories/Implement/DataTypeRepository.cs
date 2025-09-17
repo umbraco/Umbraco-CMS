@@ -309,7 +309,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName("umbracoNode")}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName("umbracoNode")}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => Array.Empty<string>();
 
@@ -343,9 +343,9 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         Sql<ISqlContext> sql = Sql()
             .SelectAll()
             .From<NodeDto>()
-            .Where<NodeDto>(x => x.NodeId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
-        NodeDto? parent = Database.FirstOrDefault<NodeDto>(sql);
-        var level = (parent?.Level ?? 0) + 1;
+            .Where<NodeDto>(x => x.NodeId == entity.ParentId);
+        NodeDto parent = Database.First<NodeDto>(sql);
+        var level = parent.Level + 1;
         sql = Sql()
             .SelectCount()
             .From<NodeDto>()
@@ -354,7 +354,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
 
         // Create the (base) node data - umbracoNode
         NodeDto nodeDto = dto.NodeDto;
-        nodeDto.Path = parent?.Path ?? Constants.System.RootString;
+        nodeDto.Path = parent.Path;
         nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
         nodeDto.SortOrder = sortOrder;
         var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);

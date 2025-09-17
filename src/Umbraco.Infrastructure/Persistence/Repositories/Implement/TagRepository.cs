@@ -206,7 +206,7 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     private string GetTagSet(IEnumerable<ITag> tags)
     {
         var sql = new StringBuilder();
-        var group = SqlSyntax.GetQuotedColumnName("group");
+        var group = QuoteColumnName("group");
         var first = true;
 
         sql.Append("(");
@@ -583,8 +583,4 @@ ON (tagset.tag = {cmsTags}.tag AND tagset.{group} = {cmsTags}.{group} AND COALES
     }
 
     #endregion
-
-    private string QuoteTableName(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
-
-    private string QuoteColumnName(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
 }

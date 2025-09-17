@@ -643,8 +643,4 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     }
 
     #endregion
-
-    private string QuoteTableName(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
-
-    private string QuoteColumnName(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
 }

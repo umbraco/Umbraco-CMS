@@ -107,7 +107,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
     }
 
     /// <inheritdoc />
-    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName(AuditEntryDto.TableName)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(AuditEntryDto.TableName)}.id = @id";
 
     /// <inheritdoc />
     protected override IEnumerable<string> GetDeleteClauses() =>
@@ -160,7 +160,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
                 }
             }
 
-            Sql<ISqlContext> sqlInsert = Sql($"INSERT INTO {SqlSyntax.GetQuotedTableName(AuditEntryDto.TableName)} ({cols})")
+            Sql<ISqlContext> sqlInsert = Sql($"INSERT INTO {QuoteTableName(AuditEntryDto.TableName)} ({cols})")
                 .Append("VALUES (")
                 .Append(sqlValues)
                 .Append(")");

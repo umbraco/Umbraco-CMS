@@ -1858,9 +1858,5 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         public int LanguageId { get; set; }
     }
 
-    private string QuoteTableName(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
-
-    private string QuoteColumnName(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
-
     #endregion
 }

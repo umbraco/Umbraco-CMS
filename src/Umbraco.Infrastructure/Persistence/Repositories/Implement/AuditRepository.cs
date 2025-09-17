@@ -160,7 +160,7 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
     }
 
     protected override string GetBaseWhereClause() =>
-        $"{SqlSyntax.GetQuotedTableName(LogDto.TableName)}.{SqlSyntax.GetQuotedColumnName("id")} = @id";
+        $"{QuoteTableName(LogDto.TableName)}.{QuoteColumnName("id")} = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 }

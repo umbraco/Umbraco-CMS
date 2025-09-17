@@ -109,7 +109,7 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
     protected Sql<ISqlContext> GetSubquery()
     {
         Sql<ISqlContext> sql = Sql()
-            .Select($"DISTINCT({SqlSyntax.GetQuotedTableName("umbracoNode")}.id)")
+            .Select($"DISTINCT({QuoteTableName("umbracoNode")}.id)")
             .From<NodeDto>()
             .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
             .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
@@ -122,14 +122,14 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add($"DELETE FROM {SqlSyntax.GetQuotedTableName("cmsMemberType")} WHERE NodeId = @id");
-        l.Add($"DELETE FROM {SqlSyntax.GetQuotedTableName("cmsContentType")} WHERE nodeId = @id");
-        l.Add($"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoNode")} WHERE id = @id");
+        l.Add($"DELETE FROM {QuoteTableName("cmsMemberType")} WHERE NodeId = @id");
+        l.Add($"DELETE FROM {QuoteTableName("cmsContentType")} WHERE nodeId = @id");
+        l.Add($"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id");
         return l;
     }
 

@@ -875,7 +875,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                     orderingIncludesNodeId = true;
                     break;
                 default:
-                    orderBy = SqlSyntax.GetQuotedColumnName(runner.OrderBy) ?? string.Empty;
+                    orderBy = QuoteColumnName(runner.OrderBy) ?? string.Empty;
                     break;
             }
 

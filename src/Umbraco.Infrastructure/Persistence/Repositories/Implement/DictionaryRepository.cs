@@ -22,9 +22,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILanguageRepository _languageRepository;
 
-    private string QuotedTableName => SqlSyntax.GetQuotedTableName(DictionaryDto.TableName);
-
-    private string QuotedColumn(string columnName) => $"{QuotedTableName}.{SqlSyntax.GetQuotedColumnName(columnName)}";
+    private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
 
     public DictionaryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<DictionaryRepository> logger,
         ILoggerFactory loggerFactory, ILanguageRepository languageRepository)
@@ -190,8 +188,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         private readonly DictionaryRepository _dictionaryRepository;
         private readonly IDictionary<int, ILanguage> _languagesById;
 
-        private string QuotedTableName => SqlSyntax.GetQuotedTableName(DictionaryDto.TableName);
-        private string QuotedColumn(string columnName) => $"{QuotedTableName}.{SqlSyntax.GetQuotedColumnName(columnName)}";
+        private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
 
         public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
             AppCaches cache, ILogger<DictionaryByUniqueIdRepository> logger)
@@ -248,8 +245,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         private readonly DictionaryRepository _dictionaryRepository;
         private readonly IDictionary<int, ILanguage> _languagesById;
 
-        private string QuotedTableName => SqlSyntax.GetQuotedTableName(DictionaryDto.TableName);
-        private string QuotedColumn(string columnName) => $"{QuotedTableName}.{SqlSyntax.GetQuotedColumnName(columnName)}";
+        private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
 
         public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
             AppCaches cache, ILogger<DictionaryByKeyRepository> logger)

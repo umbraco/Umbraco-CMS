@@ -616,7 +616,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
 
     protected override string GetBaseWhereClause() // TODO: can we kill / refactor this?
-        => $"{SqlSyntax.GetQuotedTableName("umbracoNode")}.id = @id";
+        => $"{QuoteTableName("umbracoNode")}.id = @id";
 
     // TODO: document/understand that one
     protected Sql<ISqlContext> GetNodeIdQueryWithPropertyData() =>
@@ -640,29 +640,28 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var inClause = $"IN (SELECT {SqlSyntax.GetQuotedTableName("umbracoUserGroup")}.{SqlSyntax.GetQuotedColumnName("key")} FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup")} WHERE id = @id)";
-        Sql<ISqlContext> lineSql = SqlContext.Sql().Delete().From<NodeDto>().WhereParam<NodeDto>(x => x.NodeId, "@id");
+        var inClause = $"IN (SELECT {QuoteTableName("umbracoUserGroup")}.{QuoteColumnName("key")} FROM {QuoteTableName("umbracoUserGroup")} WHERE id = @id)";
 
         return new List<string>
         {
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(User2NodeNotifyDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup2Permission")} WHERE {SqlSyntax.GetQuotedColumnName("userGroupKey")} {inClause}",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoUserGroup2GranularPermission")} WHERE {SqlSyntax.GetQuotedColumnName("userGroupKey")} {inClause}",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoRelation")} WHERE {SqlSyntax.GetQuotedColumnName("parentId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoRelation")} WHERE {SqlSyntax.GetQuotedColumnName("childId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("cmsTagRelationship")} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(PropertyDataDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("versionId")}" +
-                $" IN (SELECT id FROM {SqlSyntax.GetQuotedTableName(ContentVersionDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id)",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(ExternalLoginToken.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("externalLoginId")} =" +
-                $" (SELECT id FROM {SqlSyntax.GetQuotedTableName(ExternalLoginDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("userOrMemberKey")} =" +
-                $" (SELECT {SqlSyntax.GetQuotedColumnName("uniqueId")} from {SqlSyntax.GetQuotedTableName(NodeDto.TableName)} where id = @id))",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(ExternalLoginDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("userOrMemberKey")} =" +
-                $" (SELECT {SqlSyntax.GetQuotedColumnName("uniqueId")} from {SqlSyntax.GetQuotedTableName(NodeDto.TableName)} where id = @id)",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("cmsMember2MemberGroup")} WHERE {SqlSyntax.GetQuotedColumnName("Member")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("cmsMember")} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(ContentVersionDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName(ContentDto.TableName)} WHERE {SqlSyntax.GetQuotedColumnName("nodeId")} = @id",
-            $"DELETE FROM {SqlSyntax.GetQuotedTableName("umbracoNode")} WHERE id = @id"
+            $"DELETE FROM {QuoteTableName(User2NodeNotifyDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoUserGroup2Permission")} WHERE {QuoteColumnName("userGroupKey")} {inClause}",
+            $"DELETE FROM {QuoteTableName("umbracoUserGroup2GranularPermission")} WHERE {QuoteColumnName("userGroupKey")} {inClause}",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("parentId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoRelation")} WHERE {QuoteColumnName("childId")} = @id",
+            $"DELETE FROM {QuoteTableName("cmsTagRelationship")} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(PropertyDataDto.TableName)} WHERE {QuoteColumnName("versionId")}" +
+                $" IN (SELECT id FROM {QuoteTableName(ContentVersionDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id)",
+            $"DELETE FROM {QuoteTableName(ExternalLoginToken.TableName)} WHERE {QuoteColumnName("externalLoginId")} =" +
+                $" (SELECT id FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} =" +
+                $" (SELECT {QuoteColumnName("uniqueId")} from {QuoteTableName(NodeDto.TableName)} where id = @id))",
+            $"DELETE FROM {QuoteTableName(ExternalLoginDto.TableName)} WHERE {QuoteColumnName("userOrMemberKey")} =" +
+                $" (SELECT {QuoteColumnName("uniqueId")} from {QuoteTableName(NodeDto.TableName)} where id = @id)",
+            $"DELETE FROM {QuoteTableName("cmsMember2MemberGroup")} WHERE {QuoteColumnName("Member")} = @id",
+            $"DELETE FROM {QuoteTableName("cmsMember")} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(ContentVersionDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(ContentDto.TableName)} WHERE {QuoteColumnName("nodeId")} = @id",
+            $"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id"
         };
     }
 
