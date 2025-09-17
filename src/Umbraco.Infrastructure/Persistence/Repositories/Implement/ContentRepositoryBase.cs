@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -1080,81 +1079,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #endregion
 
+        [Obsolete("This method is no longer used as the persistance of relations has been moved to the ContentRelationsUpdate notification handler. Scheduled for removal in Umbraco 18.")]
         protected void PersistRelations(TEntity entity)
-        {
-            // Get all references and automatic relation type aliases
-            ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors);
-            ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAllAutomaticRelationTypesAliases(PropertyEditors);
-
-            if (references.Count == 0)
-            {
-                // Delete all relations using the automatic relation type aliases
-                 RelationRepository.DeleteByParent(entity.Id, automaticRelationTypeAliases.ToArray());
-
-                // No need to add new references/relations
-                return;
-            }
-
-            // Lookup all relation type IDs
-            var relationTypeLookup = RelationTypeRepository.GetMany(Array.Empty<int>())
-                .Where(x => automaticRelationTypeAliases.Contains(x.Alias))
-                .ToDictionary(x => x.Alias, x => x.Id);
-
-            // Lookup node IDs for all GUID based UDIs
-            IEnumerable<Guid> keys = references.Select(x => x.Udi).OfType<GuidUdi>().Select(x => x.Guid);
-            var keysLookup = Database.FetchByGroups<NodeIdKey, Guid>(keys, Constants.Sql.MaxParameterCount, guids =>
-            {
-                return Sql()
-                    .Select<NodeDto>(x => x.NodeId, x => x.UniqueId)
-                    .From<NodeDto>()
-                    .WhereIn<NodeDto>(x => x.UniqueId, guids);
-            }).ToDictionary(x => x.UniqueId, x => x.NodeId);
-
-            // Get all valid relations
-            var relations = new List<(int ChildId, int RelationTypeId)>(references.Count);
-            foreach (UmbracoEntityReference reference in references)
-            {
-                if (string.IsNullOrEmpty(reference.RelationTypeAlias))
-                {
-                    // Reference does not specify a relation type alias, so skip adding a relation
-                    Logger.LogDebug("The reference to {Udi} does not specify a relation type alias, so it will not be saved as relation.", reference.Udi);
-                }
-                else if (!automaticRelationTypeAliases.Contains(reference.RelationTypeAlias))
-            {
-                    // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code
-                    Logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
-                }
-                else if (!relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out int relationTypeId))
-                {
-                    // A non-existent relation type could be caused by an environment issue (e.g. it was manually removed)
-                    Logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that does not exist.", reference.Udi, reference.RelationTypeAlias);
-                }
-                else if (reference.Udi is not GuidUdi udi || !keysLookup.TryGetValue(udi.Guid, out var id))
-                {
-                    // Relations only support references to items that are stored in the NodeDto table (because of foreign key constraints)
-                    Logger.LogInformation("The reference to {Udi} can not be saved as relation, because doesn't have a node ID.", reference.Udi);
-                }
-                else
-                {
-                    relations.Add((id, relationTypeId));
-                }
-            }
-
-            // Get all existing relations (optimize for adding new and keeping existing relations)
-            var query = Query<IRelation>().Where(x => x.ParentId == entity.Id).WhereIn(x => x.RelationTypeId, relationTypeLookup.Values);
-            var existingRelations = RelationRepository.GetPagedRelationsByQuery(query, 0, int.MaxValue, out _, null)
-                .ToDictionary(x => (x.ChildId, x.RelationTypeId)); // Relations are unique by parent ID, child ID and relation type ID
-
-            // Add relations that don't exist yet
-            var relationsToAdd = relations.Except(existingRelations.Keys).Select(x => new ReadOnlyRelation(entity.Id, x.ChildId, x.RelationTypeId));
-            RelationRepository.SaveBulk(relationsToAdd);
-
-            // Delete relations that don't exist anymore
-            foreach (IRelation relation in existingRelations.Where(x => !relations.Contains(x.Key)).Select(x => x.Value))
-            {
-                RelationRepository.Delete(relation);
-            }
-        }
+            => Logger.LogWarning("ContentRepositoryBase.PersistRelations was called but this is now an obsolete, no-op method that is unused in Umbraco. No relations were persisted. Relations persistence has moved to the ContentRelationsUpdate notification handler.");
 
         /// <summary>
         /// Inserts property values for the content entity
@@ -1229,15 +1156,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.Id, existingPropDataIds));
             }
-        }
-
-        private sealed class NodeIdKey
-        {
-            [Column("id")]
-            public int NodeId { get; set; }
-
-            [Column("uniqueId")]
-            public Guid UniqueId { get; set; }
         }
     }
 }

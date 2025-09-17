@@ -173,4 +173,3 @@ test('can remove content picker in the content', async ({umbracoApi, umbracoUi})
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
 });
-
