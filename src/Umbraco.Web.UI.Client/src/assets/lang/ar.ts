@@ -2108,7 +2108,7 @@ export default {
 		checkFailed: 'التحقق فشل',
 		openBackofficeSearch: 'فتح بحث المكتب الخلفي',
 		openCloseBackofficeHelp: 'فتح/إغلاق مساعدة المكتب الخلفي',
-		BackofficeProfileOptions: 'خيارات الملف الشخصي',
+		profileOptions: 'خيارات الملف الشخصي',
 		assignDomainDescription: 'إعداد الثقافة وأسماء النطاقات لـ %0%',
 		createDescription: 'إنشاء عقدة جديدة تحت %0%',
 		protectDescription: 'إعداد قيود الوصول على %0%',

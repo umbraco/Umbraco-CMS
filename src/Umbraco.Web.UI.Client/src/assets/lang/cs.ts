@@ -1813,7 +1813,7 @@ export default {
 		checkFailed: 'Kontrola selhala',
 		openBackofficeSearch: 'Otevřít hledání v backoffice',
 		openCloseBackofficeHelp: 'Otevřít/zavřít nápovědu backoffice',
-		BackofficeProfileOptions: 'Opcije profila',
+		profileOptions: 'Opcije profila',
 		openContextMenu: 'Otevřít kontextové menu pro',
 		currentLanguage: 'Aktuální jazyk',
 		switchLanguage: 'Přepnout jazyk na',

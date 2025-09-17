@@ -2824,7 +2824,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="checkFailed">Check fallito</key>
 		<key alias="openBackofficeSearch">Apri la ricerca nel backoffice</key>
 		<key alias="openCloseBackofficeHelp">Apri/chiudi l'aiuto del backoffice</key>
-		<key alias="BackofficeProfileOptions">Opzioni del profilo</key>
+		<key alias="openCloseBackofficeProfileOptions">Apri/chiudi le opzioni del tuo profilo</key>
 		<key alias="assignDomainDescription">Imposta le Culture e gli Hostnames per %0%</key>
 		<key alias="createDescription">Crea nuovo nodo sotto %0%</key>
 		<key alias="protectDescription">Imposta le restrizioni di accesso per %0%</key>

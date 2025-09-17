@@ -2370,7 +2370,7 @@ export default {
 		checkFailed: 'Kiểm tra thất bại',
 		openBackofficeSearch: 'Mở tìm kiếm backoffice',
 		openCloseBackofficeHelp: 'Mở/Đóng trợ giúp backoffice',
-		BackofficeProfileOptions: 'Tùy chọn hồ sơ',
+		profileOptions: 'Tùy chọn hồ sơ',
 		assignDomainDescription: 'Thiết lập Ngôn ngữ và Tên miền cho %0%',
 		createDescription: 'Tạo nút mới dưới %0%',
 		protectDescription: 'Thiết lập hạn chế truy cập trên %0%',
