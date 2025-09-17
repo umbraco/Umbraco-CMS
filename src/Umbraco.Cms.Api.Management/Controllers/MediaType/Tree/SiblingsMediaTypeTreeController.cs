@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
@@ -17,8 +17,8 @@ public class SiblingsMediaTypeTreeController : MediaTypeTreeControllerBase
     }
 
     [ActivatorUtilitiesConstructor]
-    public SiblingsMediaTypeTreeController(IEntityService entityService, SignProviderCollection signProviders, IMediaTypeService mediaTypeService)
-        : base(entityService, signProviders, mediaTypeService)
+    public SiblingsMediaTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMediaTypeService mediaTypeService)
+        : base(entityService, flagProviders, mediaTypeService)
     {
     }
 
