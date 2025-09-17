@@ -1,13 +1,13 @@
-import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
 import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
 import type { UmbTreeElement } from '../tree.element.js';
+import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-tree-picker-modal')

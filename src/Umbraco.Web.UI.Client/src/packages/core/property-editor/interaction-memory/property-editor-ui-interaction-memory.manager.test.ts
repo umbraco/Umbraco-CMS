@@ -1,10 +1,10 @@
+import { UmbPropertyEditorUiInteractionMemoryManager } from './property-editor-ui-interaction-memory.manager.js';
+import { UmbPropertyEditorConfigCollection } from '../config/index.js';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbPropertyEditorUiInteractionMemoryManager } from './property-editor-ui-interaction-memory.manager.js';
 import { UmbInteractionMemoryContext } from '@umbraco-cms/backoffice/interaction-memory';
-import { UmbPropertyEditorConfigCollection } from '../config/index.js';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {

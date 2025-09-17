@@ -1,16 +1,16 @@
-import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import {
-	UmbPropertyEditorUiInteractionMemoryManager,
-	type UmbPropertyEditorConfigCollection,
-	type UmbPropertyEditorUiElement,
+import type {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {

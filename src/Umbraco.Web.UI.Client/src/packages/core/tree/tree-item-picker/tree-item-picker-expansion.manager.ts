@@ -1,10 +1,11 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbEntityExpansionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
 import type {
 	UmbInteractionMemoryManager,
 	UmbInteractionMemoryModel,
 } from '@umbraco-cms/backoffice/interaction-memory';
-import { UmbEntityExpansionManager, type UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbTreeItemPickerExpansionManagerArgs {
 	interactionMemoryManager?: UmbInteractionMemoryManager;

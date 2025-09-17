@@ -1,6 +1,7 @@
 import type { UmbInteractionMemoryModel } from './types.js';
-import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * A manager for handling interaction memory items.

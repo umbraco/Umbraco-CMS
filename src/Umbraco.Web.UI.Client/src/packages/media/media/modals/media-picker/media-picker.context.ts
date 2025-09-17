@@ -1,7 +1,7 @@
 import { UMB_MEDIA_PICKER_CONTEXT } from './media-picker.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: extend UmbTreeItemPickerContext
 export class UmbMediaPickerContext extends UmbContextBase {

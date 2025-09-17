@@ -1,11 +1,9 @@
 import type { UmbPropertyEditorConfigCollection } from '../config/index.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UMB_INTERACTION_MEMORY_CONTEXT,
-	type UmbInteractionMemoryModel,
-} from '@umbraco-cms/backoffice/interaction-memory';
 import { simpleHashCode, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 export interface UmbPropertyEditorUiInteractionMemoryManagerArgs {
 	memoryUniquePrefix: string;

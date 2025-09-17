@@ -1,13 +1,9 @@
 import type { UmbPickerContext } from '../picker.context.js';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
-import {
-	UmbModalBaseElement,
-	type ManifestModal,
-	type UmbModalContext,
-	type UmbPickerModalData,
-} from '@umbraco-cms/backoffice/modal';
+import type { ManifestModal, UmbModalContext, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
 
 export abstract class UmbPickerModalBaseElement<
 	ItemType = UmbEntityModel,

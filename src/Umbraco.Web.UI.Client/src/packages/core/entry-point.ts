@@ -1,11 +1,12 @@
-import { UMB_AUTH_CONTEXT } from './auth/auth.context.token.js';
-import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerElement } from './components/index.js';
-import { UmbActionEventContext } from './action/action-event.context.js';
 import { manifests as coreManifests } from './manifests.js';
+import { UMB_AUTH_CONTEXT } from './auth/auth.context.token.js';
+import { UmbActionEventContext } from './action/action-event.context.js';
+import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerElement } from './components/index.js';
 import { UmbInteractionMemoryContext } from './interaction-memory/index.js';
-import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
+import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 import './property-action/components/index.js';
 import './menu/components/index.js';

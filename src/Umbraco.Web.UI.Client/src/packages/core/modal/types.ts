@@ -1,6 +1,6 @@
-import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export type * from './extensions/types.js';
 

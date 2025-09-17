@@ -1,7 +1,7 @@
 import { UmbInteractionMemoryManager } from './interaction-memory.manager.js';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
 @customElement('test-my-controller-host')

@@ -10,22 +10,20 @@ import {
 	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
+import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbInteractionMemoryChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 import '@umbraco-cms/backoffice/imaging';
-import {
-	UmbInteractionMemoryChangeEvent,
-	type UmbInteractionMemoryModel,
-} from '@umbraco-cms/backoffice/interaction-memory';
-import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 
 const elementName = 'umb-input-media';
 @customElement(elementName)
