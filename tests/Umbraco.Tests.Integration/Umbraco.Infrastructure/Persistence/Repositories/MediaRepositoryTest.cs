@@ -275,7 +275,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(initialCount == 1);
             Assert.That(initialDeleteCount == initialCount);
-            Assert.That(updatedCount == 1); // media has no unpublished state and therefor only one Version
+            Assert.That(updatedCount == 1); // media has no unpublished state and therefore only one Version
             Assert.That(updatedDeleteCount == initialCount);
         }
     }

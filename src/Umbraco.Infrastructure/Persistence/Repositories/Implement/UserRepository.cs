@@ -216,7 +216,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
         // These keys in this query map to the `Umbraco.Core.Models.Membership.UserState` enum
         var keyAlias = SqlSyntax.GetQuotedName("Key");
         var valueAlias = SqlSyntax.GetQuotedName("Value");
-        var userTableName = QuoteTableName("userName");
+        var userTableName = QuoteTableName("umbracoUser");
         var sql = @$"SELECT -1 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 UNION
 SELECT 0 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}

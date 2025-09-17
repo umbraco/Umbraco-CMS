@@ -769,7 +769,6 @@ namespace Umbraco.Extensions
         /// Adds a SQL SELECT statement to retrieve the sum of the values of the specified field from the table associated
         /// with the specified DTO type.
         /// </summary>
-        /// </summary>
         /// <typeparam name="TDto">The type of the Data Transfer Object (DTO) that represents the table from which the maximum value will be
         /// selected.</typeparam>
         /// <param name="sql">The SQL query builder to which the SELECT statement will be appended. Cannot be <see langword="null"/>.</param>
@@ -1332,7 +1331,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Deletes records from a table based on a predicate.
         /// </summary>
-        /// <typeparam name="TDto">Table definitio.</typeparam>
+        /// <typeparam name="TDto">Table definition.</typeparam>
         /// <param name="sql">SqlConext</param>
         /// <param name="predicate">A predicate to transform and append to the Sql statement (WHERE clause).</param>
         /// <returns></returns>
