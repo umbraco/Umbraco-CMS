@@ -31,38 +31,8 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	@state() private _isDraft = false;
 	@state() private _icon = '';
 
-	override renderIconContainer() {
-		const icon = this._icon;
-
-		return html`
-			<span id="icon-container" slot="icon" class=${classMap({ draft: this._isDraft })}>
-				${icon ? html`<umb-icon id="icon" name="${this._getIconToRender(icon)}"></umb-icon>` : nothing}
-			</span>
-		`;
-	}
-
 	override renderLabel() {
 		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft })}>${this._name}</span> `;
-	}
-
-	#renderStateIcon() {
-		if (this.item?.isProtected) {
-			return this.#renderIsProtectedIcon();
-		}
-
-		if (this.item?.documentType.collection) {
-			return this.#renderIsCollectionIcon();
-		}
-
-		return nothing;
-	}
-
-	#renderIsCollectionIcon() {
-		return html`<umb-icon id="state-icon" slot="icon" name="icon-grid" title="Collection"></umb-icon>`;
-	}
-
-	#renderIsProtectedIcon() {
-		return html`<umb-icon id="state-icon" slot="icon" name="icon-lock" title="Protected"></umb-icon>`;
 	}
 
 	static override styles = [

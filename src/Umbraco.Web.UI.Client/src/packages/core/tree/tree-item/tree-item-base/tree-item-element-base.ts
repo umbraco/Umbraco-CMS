@@ -140,8 +140,7 @@ export abstract class UmbTreeItemElementBase<
 				.caretLabel=${this.localize.term('visuallyHiddenTexts_expandChildItems') + ' ' + this._label}
 				label=${this._label ?? ''}
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
-				${this.renderIconContainer()}${this.#renderSigns()} ${this.renderLabel()} ${this.#renderActions()}
-				${this.#renderChildItems()}
+				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
 				${this.#renderPaging()}
 			</uui-menu-item>
@@ -153,20 +152,12 @@ export abstract class UmbTreeItemElementBase<
 	};
 
 	renderIconContainer() {
-		return html`
-			<slot
-				name="icon"
-				slot="icon"
-				@slotchange=${(e: Event) => {
-					this._iconSlotHasChildren = this.#hasNodes(e);
-				}}></slot>
-			${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}
-		`;
+		return html`${this.#renderIcon()} `;
 	}
 
 	#renderSigns() {
 		return this._item
-			? html`<umb-entity-sign-bundle slot="icon" .entityType=${this._item!.entityType}
+			? html`<umb-entity-sign-bundle id="sign-bundle" .entityType=${this._item!.entityType}
 					>${this._item!.entityType}</umb-entity-sign-bundle
 				>`
 			: nothing;
@@ -177,14 +168,20 @@ export abstract class UmbTreeItemElementBase<
 		const isFolder = this._item?.isFolder;
 
 		if (icon) {
-			return html`<umb-icon slot="icon" name="${this._getIconToRender(icon)}"></umb-icon>`;
+			return html`<div id="icon-container" slot="icon">
+				<umb-icon name="${this._getIconToRender(icon)}"></umb-icon>${this.#renderSigns()}
+			</div>`;
 		}
 
 		if (isFolder) {
-			return html`<umb-icon slot="icon" name="icon-folder"></umb-icon>`;
+			return html`<div id="icon-container" slot="icon">
+				<umb-icon name="icon-folder"></umb-icon>${this.#renderSigns()}
+			</div>`;
 		}
 
-		return html`<umb-icon slot="icon" name="icon-circle-dotted"></umb-icon>`;
+		return html`<div id="icon-container" slot="icon">
+			<umb-icon name="icon-circle-dotted"></umb-icon>${this.#renderSigns()}
+		</div>`;
 	}
 
 	protected _getIconToRender(icon: string) {
@@ -233,5 +230,25 @@ export abstract class UmbTreeItemElementBase<
 		return html` <umb-tree-load-more-button @click=${this.#onLoadMoreClick}></umb-tree-load-more-button> `;
 	}
 
-	static override styles = [UmbTextStyles, css``];
+	static override styles = [
+		UmbTextStyles,
+		css`
+			#icon-container {
+				position: relative;
+				background: red;
+			}
+
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			#sign-bundle {
+				position: absolute;
+				bottom: -5px;
+				right: -5px;
+			}
+		`,
+	];
 }

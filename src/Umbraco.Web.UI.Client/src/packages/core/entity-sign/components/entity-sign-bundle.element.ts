@@ -85,7 +85,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	override render() {
 		if (!this._signs || this._signs.length === 0) return nothing;
 
-		const first = this._signs[0];
+		const first = this._signs?.[0];
 		console.log(first);
 		if (!first) return nothing;
 
@@ -96,7 +96,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				type="button"
 				@mouseenter=${this.#openDropdown}
 				@mouseleave=${this.#closeDropdown}>
-				${first.component}
+				+
 			</button>
 			<uui-popover-container id="popover">
 				<umb-popover-layout>
@@ -120,25 +120,17 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	static override styles = [
 		css`
 			#sign-icon {
-				right: -5px;
 				width: 14px;
 				height: 14px;
 				font-size: 10px;
 				border-radius: 50%;
 				background: red;
-				line-height: 14px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
 				cursor: pointer;
 				border: none;
 			}
 
 			#sign-icon:hover {
 				background: red;
-			}
-			umb-dropdown {
-				position: relative;
 			}
 			.labels-pop {
 				position: absolute;
