@@ -153,13 +153,14 @@ export abstract class UmbTreeItemElementBase<
 
 	renderIconContainer() {
 		return html`
-			<slot
-				name="icon"
-				slot="icon"
-				@slotchange=${(e: Event) => {
-					this._iconSlotHasChildren = this.#hasNodes(e);
-				}}></slot>
-			${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}
+			<div id="icon-container" slot="icon">
+				<slot
+					name="icon"
+					@slotchange=${(e: Event) => {
+						this._iconSlotHasChildren = this.#hasNodes(e);
+					}}></slot>
+				${!this._iconSlotHasChildren ? this.#renderIcon() : nothing} ${this.#renderSigns()}
+			</div>
 		`;
 	}
 
@@ -176,20 +177,14 @@ export abstract class UmbTreeItemElementBase<
 		const isFolder = this._item?.isFolder;
 
 		if (icon) {
-			return html`<div id="icon-container" slot="icon">
-				<umb-icon name="${this._getIconToRender(icon)}"></umb-icon>${this.#renderSigns()}
-			</div>`;
+			return html`<umb-icon name="${this._getIconToRender(icon)}"></umb-icon>`;
 		}
 
 		if (isFolder) {
-			return html`<div id="icon-container" slot="icon">
-				<umb-icon name="icon-folder"></umb-icon>${this.#renderSigns()}
-			</div>`;
+			return html`<umb-icon name="icon-folder"></umb-icon>`;
 		}
 
-		return html`<div id="icon-container" slot="icon">
-			<umb-icon name="icon-circle-dotted"></umb-icon>${this.#renderSigns()}
-		</div>`;
+		return html`<umb-icon name="icon-circle-dotted"></umb-icon>`;
 	}
 
 	protected _getIconToRender(icon: string) {
