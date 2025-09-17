@@ -36,13 +36,8 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	static override styles = [
 		UmbTextStyles,
+		UmbTreeItemElementBase.styles,
 		css`
-			#label {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-			}
-
 			.draft {
 				opacity: 0.6;
 			}

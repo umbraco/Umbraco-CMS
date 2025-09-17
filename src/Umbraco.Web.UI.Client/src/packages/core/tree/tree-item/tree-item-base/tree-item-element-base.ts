@@ -247,19 +247,18 @@ export abstract class UmbTreeItemElementBase<
 		css`
 			#icon-container {
 				position: relative;
-				background: red;
-			}
-
-			#label {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
 			}
 
 			#sign-bundle {
 				position: absolute;
 				bottom: -5px;
 				right: -5px;
+			}
+
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 		`,
 	];
