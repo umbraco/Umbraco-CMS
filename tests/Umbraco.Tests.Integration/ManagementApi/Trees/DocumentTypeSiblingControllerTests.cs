@@ -23,7 +23,7 @@ internal sealed class DocumentTypeSiblingControllerTests : ManagementApiTest<Sib
         x => x.Siblings(CancellationToken.None, Guid.Empty, 0, 0, false);
 
     [Test]
-    public async Task ReadonlyUserCannotCreateDocument()
+    public async Task Document_Type_Siblings_Under_Folder_Have_Correct_Parent()
     {
         // create folder
         Attempt<EntityContainer, EntityContainerOperationStatus> folderResult =
