@@ -135,6 +135,13 @@ export class UmbWorkspaceSplitViewManager {
 		const currentUrl = new URL(window.location.href);
 		const currentFullPathname = currentUrl.pathname;
 		const currentVariantPathname = this.#getCurrentVariantPathname();
-		return currentFullPathname.substring(currentVariantPathname ? currentVariantPathname.length : 0);
+		if (
+			currentVariantPathname &&
+			currentFullPathname.startsWith(currentVariantPathname)
+		) {
+			return currentFullPathname.substring(currentVariantPathname.length);
+		}
+		// If the currentVariantPathname is not a prefix, return empty string (or handle as needed)
+		return '';
 	}
 }
