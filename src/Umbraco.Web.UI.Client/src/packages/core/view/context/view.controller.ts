@@ -1,7 +1,7 @@
 import { UMB_VIEW_CONTEXT } from './view.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
-import { UmbClassState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { UmbClassState, UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -34,6 +34,8 @@ export class UmbViewController extends UmbControllerBase {
 	#explicitInheritance?: boolean;
 	#parentView?: UmbViewController;
 	#title?: string;
+	#computedTitle = new UmbStringState(undefined);
+	readonly computedTitle = this.#computedTitle.asObservable();
 
 	public readonly viewAlias: string | null;
 
@@ -91,6 +93,7 @@ export class UmbViewController extends UmbControllerBase {
 		if (this.#title === title) return;
 		this.#title = title;
 		// TODO: This check should be if its the most child being active, but again think about how the parents in the active chain should work.
+		this.#computeTitle();
 		this.#updateTitle();
 	}
 
@@ -162,11 +165,18 @@ export class UmbViewController extends UmbControllerBase {
 			},
 			'observeParentVariantId',
 		);
+		this.observe(
+			this.#parentView?.computedTitle,
+			() => {
+				this.#computeTitle();
+				// Check for parent view as it is undefined in a disassembling state and we do not want to update the title in that situation. [NL]
+				if (this.#parentView && this.#active) {
+					this.#updateTitle();
+				}
+			},
+			'observeParentTitle',
+		);
 		this.hints.inheritFrom(this.#parentView?.hints);
-		// Check for parent view as it is undefined in a disassembling state and we do not want to update the title in that situation. [NL]
-		if (this.#parentView && this.#active) {
-			this.#updateTitle();
-		}
 	}
 
 	#propagateActivation() {
@@ -265,7 +275,7 @@ export class UmbViewController extends UmbControllerBase {
 		document.title = (localTitle ? localTitle + ' | ' : '') + 'Umbraco';
 	}
 
-	public getComputedTitle(): string | undefined {
+	#computeTitle() {
 		const titles = [];
 		if (this.#inherit && this.#parentView) {
 			titles.push(this.#parentView.getComputedTitle());
@@ -273,7 +283,11 @@ export class UmbViewController extends UmbControllerBase {
 		if (this.#title) {
 			titles.push(this.#localize.string(this.#title));
 		}
-		return titles.length > 0 ? titles.join(' | ') : undefined;
+		this.#computedTitle.setValue(titles.length > 0 ? titles.join(' | ') : undefined);
+	}
+
+	public getComputedTitle(): string | undefined {
+		return this.#computedTitle.getValue();
 	}
 
 	override destroy(): void {
