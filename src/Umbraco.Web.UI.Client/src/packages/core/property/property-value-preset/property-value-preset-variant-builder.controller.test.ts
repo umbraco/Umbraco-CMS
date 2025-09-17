@@ -63,7 +63,10 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityType: 'test',
+				entityUnique: 'some-unique',
+			});
 
 			expect(result.length).to.be.equal(2);
 			expect(result[0]?.value).to.be.equal('value for culture cultureA');
@@ -86,7 +89,10 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 			];
 
 			try {
-				await ctrl.create(propertyTypes);
+				await ctrl.create(propertyTypes, {
+					entityType: 'test',
+					entityUnique: 'some-unique',
+				});
 				expect.fail('Expected to fail');
 			} catch (e) {}
 		});
@@ -105,7 +111,10 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityType: 'test',
+				entityUnique: 'some-unique',
+			});
 
 			expect(result.length).to.be.equal(3);
 			expect(result[0]?.value).to.be.equal('value for culture invariant');
@@ -132,7 +141,10 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityType: 'test',
+				entityUnique: 'some-unique',
+			});
 
 			expect(result.length).to.be.equal(1);
 			expect(result[0]?.value).to.be.equal('value for culture invariant');
@@ -155,7 +167,10 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 				},
 			];
 
-			const result = await ctrl.create(propertyTypes);
+			const result = await ctrl.create(propertyTypes, {
+				entityType: 'test',
+				entityUnique: 'some-unique',
+			});
 
 			expect(result.length).to.be.equal(6);
 

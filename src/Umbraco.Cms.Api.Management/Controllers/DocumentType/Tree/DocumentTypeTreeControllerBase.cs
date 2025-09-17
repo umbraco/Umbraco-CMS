@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -25,13 +25,13 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
     public DocumentTypeTreeControllerBase(IEntityService entityService, IContentTypeService contentTypeService)
         : this(
               entityService,
-              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>(),
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
               contentTypeService)
     {
     }
 
-    public DocumentTypeTreeControllerBase(IEntityService entityService, SignProviderCollection signProviders, IContentTypeService contentTypeService)
-        : base(entityService, signProviders) =>
+    public DocumentTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
+        : base(entityService, flagProviders) =>
         _contentTypeService = contentTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DocumentType;
