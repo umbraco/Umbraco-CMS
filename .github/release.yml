@@ -7,32 +7,32 @@ changelog:
       - duplicate
       - wontfix
   categories:
-    - title: '🙌 Notable Changes' 
+    - title: 🙌 Notable Changes 
       labels:
         - category/notable
-    - title: '💥 Breaking Changes'
+    - title: 💥 Breaking Changes
       labels:
         - category/breaking
-    - title: '📄 Documentation'
+    - title: 📄 Documentation
       labels:
         - documentation
         - category/documentation
-    - title: '🏠 Internal'
+    - title: 🏠 Internal
       labels:
         - internal
-    - title: '📦 Dependencies'
+    - title: 📦 Dependencies
       labels:
         - dependencies
-    - title: '🌈 Accessibility Improvements'
+    - title: 🌈 Accessibility Improvements
       labels:
         - accessibility
         - category/accessibility
-    - title: '🚀 New Features'
+    - title: 🚀 New Features
       labels:
         - type/feature
         - category/feature
         - type/enhancement
         - category/enhancement
-    - title: '🐛 Bug Fixes'
+    - title: 🐛 Bug Fixes
       labels:
         - '*'
