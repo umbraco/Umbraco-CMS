@@ -172,6 +172,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 		this._editor = new Editor({
 			element: element,
+			editable: !this.readonly,
 			editorProps: { attributes: { 'aria-label': this.label ?? 'Rich Text Editor' } },
 			extensions: tiptapExtensions,
 			content: this.#value,
