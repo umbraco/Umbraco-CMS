@@ -177,9 +177,10 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	#currentProvidedView?: UmbViewContext;
 	#provideViewContext(viewAlias: string | null, component: PageComponent) {
 		const view = this.#tabViewContexts.find((context) => context.viewAlias === viewAlias);
-		if (this.#currentProvidedView !== view) {
-			this.#currentProvidedView?.unprovide();
+		if (this.#currentProvidedView === view) {
+			return;
 		}
+		this.#currentProvidedView?.unprovide();
 		if (!view) {
 			throw new Error(`View context with alias ${viewAlias} not found`);
 		}

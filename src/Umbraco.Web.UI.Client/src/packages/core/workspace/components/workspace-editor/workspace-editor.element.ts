@@ -121,12 +121,12 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 					path: UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname }),
 					component: () => createExtensionElement(manifest),
 					setup: (component?: any) => {
+						if (this.#currentProvidedView !== context) {
+							this.#currentProvidedView?.unprovide();
+						}
 						if (component) {
-							if (this.#currentProvidedView !== context) {
-								this.#currentProvidedView?.unprovide();
-							}
-							context.provideAt(component);
 							this.#currentProvidedView = context;
+							context.provideAt(component);
 							component.manifest = manifest;
 						}
 					},

@@ -126,7 +126,7 @@ export class UmbViewController extends UmbControllerBase {
 		this.#attached = true;
 		super.hostConnected();
 		// CHeck that we have a providerController, otherwise this is not provided. [NL]
-		if (this.#providerCtrl && this.#autoActivate) {
+		if (this.#autoActivate) {
 			this._internal_activate();
 		}
 	}
@@ -170,7 +170,8 @@ export class UmbViewController extends UmbControllerBase {
 			() => {
 				this.#computeTitle();
 				// Check for parent view as it is undefined in a disassembling state and we do not want to update the title in that situation. [NL]
-				if (this.#parentView && this.#active) {
+				if (this.#providerCtrl && this.#parentView && this.#active) {
+					console.log('ttt', this.viewAlias, this);
 					this.#updateTitle();
 				}
 			},
@@ -202,6 +203,10 @@ export class UmbViewController extends UmbControllerBase {
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_activate() {
+		if (!this.#providerCtrl) {
+			// If we are not provided we should not be activated. [NL]
+			return;
+		}
 		this.#autoActivate = true;
 		if (this.#active === true) {
 			return;
@@ -291,6 +296,10 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	override destroy(): void {
+		this.#inherit = false;
+		this.#active = false;
+		this.#autoActivate = false;
+		(this as any).provideAt = undefined;
 		this.unprovide();
 		super.destroy();
 		this.#consumeParentCtrl = undefined;

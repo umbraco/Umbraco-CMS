@@ -24,9 +24,13 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 			let contexts = this.#contexts;
 
 			// remove ones that are no longer contained in the workspaceViews (And thereby make the new array):
-			const contextsToKeep = contexts.filter(
-				(view) => !manifests.some((manifest) => manifest.alias === view.manifest.alias),
-			);
+			const contextsToKeep = contexts.filter((view) => {
+				const keep = manifests.some((manifest) => manifest.alias === view.manifest.alias);
+				if (!keep) {
+					view.destroy();
+				}
+				return keep;
+			});
 
 			const hasDiff = contextsToKeep.length !== manifests.length;
 			if (hasDiff) {
