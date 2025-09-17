@@ -334,7 +334,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			const hintsOrderedByWeight = Array.from(this._hintMap.values()).sort((a, b) => (b.weight || 0) - (a.weight || 0));
 			firstHintOnInactiveVariant = hintsOrderedByWeight.find((hint) => {
 				if (!hint.variantId) return false;
-				return hint.variantId.compare(this._activeVariant!) === false;
+				return !hint.variantId.isInvariant() && hint.variantId.compare(this._activeVariant!) === false;
 			});
 		}
 
