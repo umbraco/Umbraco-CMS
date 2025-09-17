@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Routing;
 /// <summary>
 ///     Provides urls.
 /// </summary>
-[Obsolete("Use NewDefaultUrlProvider insteadl. Scheduled for removal in V18.")]
+[Obsolete("Use NewDefaultUrlProvider instead. Scheduled for removal in V18.")]
 public class DefaultUrlProvider : IUrlProvider
 {
     private readonly ILocalizationService _localizationService;
