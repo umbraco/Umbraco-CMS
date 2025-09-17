@@ -1,7 +1,6 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
 import type { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
 import { css, html, customElement, classMap, state, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-tree-item')
@@ -35,8 +34,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	}
 
 	static override styles = [
-		UmbTextStyles,
-		UmbTreeItemElementBase.styles,
+		...UmbTreeItemElementBase.styles,
 		css`
 			.draft {
 				opacity: 0.6;
