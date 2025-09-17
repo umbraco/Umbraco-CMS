@@ -328,11 +328,15 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	override render() {
 		if (!this._variantId) return nothing;
 
-		const hintsOrderedByWeight = Array.from(this._hintMap.values()).sort((a, b) => (b.weight || 0) - (a.weight || 0));
-		const firstHintOnInactiveVariant = hintsOrderedByWeight.find((hint) => {
-			if (!hint.variantId) return false;
-			return hint.variantId.compare(this._activeVariant!) === false;
-		});
+		let firstHintOnInactiveVariant: UmbVariantHint | undefined;
+
+		if (this._activeVariant) {
+			const hintsOrderedByWeight = Array.from(this._hintMap.values()).sort((a, b) => (b.weight || 0) - (a.weight || 0));
+			firstHintOnInactiveVariant = hintsOrderedByWeight.find((hint) => {
+				if (!hint.variantId) return false;
+				return hint.variantId.compare(this._activeVariant!) === false;
+			});
+		}
 
 		return html`
 			<uui-input
