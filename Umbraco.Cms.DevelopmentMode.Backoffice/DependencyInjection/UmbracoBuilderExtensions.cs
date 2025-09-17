@@ -24,6 +24,8 @@ public static class UmbracoBuilderExtensions
             mvcBuilder.AddRazorRuntimeCompilation();
         });
         builder.AddInMemoryModelsRazorEngine();
+        builder.RuntimeModeValidators()
+            .Add<InMemoryModelsBuilderModeValidator>();
         builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderBindingErrorHandler>();
 
         return builder;
