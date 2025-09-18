@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Net.Mime;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -315,7 +316,10 @@ namespace Umbraco.Cms.Core.Services.Implement
             IQuery<IDataType> query = Query<IDataType>();
             if (keys.Length > 0)
             {
-                query = query.Where(x => keys.Contains(x.Key));
+                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+                // See ExpressionTests.Sql_In().
+                List<Guid> keysAsList = [.. keys];
+                query = query.Where(x => keysAsList.Contains(x.Key));
             }
 
             IDataType[] dataTypes = _dataTypeRepository.Get(query).ToArray();
@@ -398,7 +402,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAlias.Contains(x.EditorAlias));
+
+            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            List<string> propertyEditorAliasesAsList = [.. propertyEditorAlias];
+            IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAliasesAsList.Contains(x.EditorAlias));
+
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
             return Task.FromResult(dataTypes);
         }

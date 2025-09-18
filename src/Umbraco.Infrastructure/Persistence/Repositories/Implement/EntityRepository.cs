@@ -1,3 +1,4 @@
+using System.Collections;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -238,10 +239,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
             {
                 // We need to offset by one for each non-array parameter in the filter clause.
-                // If a query is created using Contains or some other set based operation, we'll get both the array and the
-                // items in the array provided in the where clauses. It's only the latter that count for applying parameters
+                // If a query is created using Contains or some other set based operation, we'll get both the collection and the
+                // items in the collection provided in the where clauses. It's only the latter that count for applying parameters
                 // to the SQL statement, and hence we should only offset by them.
-                beforeAfterParameterIndexOffset += filterClause.Item2.Count(x => !x.GetType().IsArray);
+                beforeAfterParameterIndexOffset += filterClause.Item2.Count(x => x.GetType().GetInterface(nameof(IEnumerable)) is null);
             }
         }
 

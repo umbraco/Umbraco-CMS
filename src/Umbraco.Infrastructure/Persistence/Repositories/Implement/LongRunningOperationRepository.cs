@@ -79,9 +79,12 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
         if (statuses.Length > 0)
         {
             var includeStale = statuses.Contains(LongRunningOperationStatus.Stale);
-            string[] possibleStaleStatuses =
-                [nameof(LongRunningOperationStatus.Enqueued), nameof(LongRunningOperationStatus.Running)];
-            IEnumerable<string> statusList = statuses.Except([LongRunningOperationStatus.Stale]).Select(s => s.ToString());
+            var possibleStaleStatuses = new List<string>
+            {
+                nameof(LongRunningOperationStatus.Enqueued),
+                nameof(LongRunningOperationStatus.Running)
+            };
+            var statusList = statuses.Except([LongRunningOperationStatus.Stale]).Select(s => s.ToString()).ToList();
 
             DateTime now = _timeProvider.GetUtcNow().UtcDateTime;
             sql = sql.Where<LongRunningOperationDto>(x =>
