@@ -106,7 +106,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 					this._hintMap.clear();
 					hints?.forEach((hint) => {
 						if (this.#isVariantHint(hint) && hint.variantId) {
-							this._hintMap.set(hint.variantId.toString(), hint);
+							// Add the hint if there is no existing hint for this variantId or if the existing hint has a lower weight
+							const existingHint = this._hintMap.get(hint.variantId.toString());
+							if (!existingHint || existingHint.weight < hint.weight) {
+								this._hintMap.set(hint.variantId.toString(), hint);
+							}
 						}
 					});
 					this.requestUpdate('_hintMap');
