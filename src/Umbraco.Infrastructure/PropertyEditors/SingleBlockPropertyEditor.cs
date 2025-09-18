@@ -99,7 +99,7 @@ public class SingleBlockPropertyEditor : DataEditor
             ILogger<SingleBlockEditorPropertyValueEditor> logger,
             ILocalizedTextService textService,
             IPropertyValidationService propertyValidationService)
-            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute)
+            : base(propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, shortStringHelper, jsonSerializer, blockEditorVarianceHandler, languageService, ioHelper, attribute, logger)
         {
             BlockEditorValues = new BlockEditorValues<SingleBlockValue, SingleBlockLayoutItem>(blockEditorDataConverter, elementTypeCache, logger);
             Validators.Add(new BlockEditorValidator<SingleBlockValue, SingleBlockLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));
