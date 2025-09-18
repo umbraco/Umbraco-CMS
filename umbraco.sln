@@ -189,6 +189,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Api.Management"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.PublishedCache.HybridCache", "src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj", "{CB0B9817-EDBC-4D6D-B4D2-969019C4606D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nightly-e2e-templates", "nightly-e2e-templates", "{E90531F6-E32D-40DA-BCB2-55FA94D5AB19}"
+	ProjectSection(SolutionItems) = preProject
+		build\nightly-E2E-build-template.yml = build\nightly-E2E-build-template.yml
+		build\nightly-E2E-run-application-template.yml = build\nightly-E2E-run-application-template.yml
+		build\nightly-E2E-run-tests-template.yml = build\nightly-E2E-run-tests-template.yml
+		build\nightly-E2E-setup-template.yml = build\nightly-E2E-setup-template.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -382,6 +390,7 @@ Global
 		{25AECCB5-B187-4406-844B-91B8FF0FCB37} = {2B47AD9F-FFF1-448A-88F1-D4F568811738}
 		{EA628ABD-624E-4AF3-B548-6710D4D66531} = {2B47AD9F-FFF1-448A-88F1-D4F568811738}
 		{A13FF0A0-69FA-468A-9F79-565401D5C341} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{E90531F6-E32D-40DA-BCB2-55FA94D5AB19} = {20CE9C97-9314-4A19-BCF1-D12CF49B7205}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}

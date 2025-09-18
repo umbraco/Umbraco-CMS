@@ -1,0 +1,70 @@
+parameters:
+  - name: nodeVersion
+    type: string
+    default: ''
+
+  - name: PlaywrightUserEmail
+    type: string
+    default: ''
+
+  - name: PlaywrightPassword
+    type: string
+    default: ''
+
+  - name: ASPNETCORE_URLS
+    type: string
+    default: ''
+
+  - name: npm_config_cache
+    type: string
+    default: ''
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: Download NuGet artifacts
+    inputs:
+      artifact: nupkg
+      path: $(Agent.BuildDirectory)/app/nupkg
+
+  - task: NodeTool@0
+    displayName: Use Node.js $(nodeVersion)
+    inputs:
+      versionSpec: $(nodeVersion)
+
+  - task: UseDotNet@2
+    displayName: Use .NET SDK from global.json
+    inputs:
+      useGlobalJson: true
+
+  - pwsh: |
+      "UMBRACO_USER_LOGIN=${{ parameters.PlaywrightUserEmail }}
+      UMBRACO_USER_PASSWORD=${{ parameters.PlaywrightPassword }}
+      URL=${{ parameters.ASPNETCORE_URLS }}
+      STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
+      CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
+    displayName: Generate .env
+    workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
+
+  # Cache and restore NPM packages
+  - task: Cache@2
+    displayName: Cache NPM packages
+    inputs:
+      key: 'npm_e2e | "$(Agent.OS)" | $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/package-lock.json'
+      restoreKeys: |
+        npm_e2e | "$(Agent.OS)"
+        npm_e2e
+      path: ${{ parameters.npm_config_cache }}
+
+  - script: npm ci --no-fund --no-audit --prefer-offline
+    workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
+    displayName: Restore NPM packages
+
+  # Install Template
+  - pwsh: |
+      $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
+      dotnet new nugetconfig
+      dotnet nuget add source ./nupkg --name Local
+      dotnet new install Umbraco.Templates::$cmsVersion
+      dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
+    displayName: Install Template
+    workingDirectory: $(Agent.BuildDirectory)/app
