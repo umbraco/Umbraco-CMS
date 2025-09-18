@@ -26,7 +26,6 @@ public partial class DateTime2ValueConverterTests
         Assert.AreEqual(expected, result);
     }
 
-    [TestCase(DateTime2Configuration.TimeZoneMode.None)]
     [TestCase(DateTime2Configuration.TimeZoneMode.All)]
     [TestCase(DateTime2Configuration.TimeZoneMode.Custom)]
     [TestCase(DateTime2Configuration.TimeZoneMode.Local)]
@@ -69,7 +68,9 @@ public partial class DateTime2ValueConverterTests
     private static object[] _dateTimeWithTimeZoneConvertToObjectCases =
     [
         new object[] { null, DateTime2Configuration.TimeZoneMode.All, null },
-        new object[] { _convertToObjectInputDate, DateTime2Configuration.TimeZoneMode.None, DateTimeOffset.Parse("2025-08-20T16:30:00-01:00") },
+        new object[] { _convertToObjectInputDate, DateTime2Configuration.TimeZoneMode.All, _convertToObjectInputDate.Date },
+        new object[] { _convertToObjectInputDate, DateTime2Configuration.TimeZoneMode.Local, _convertToObjectInputDate.Date },
+        new object[] { _convertToObjectInputDate, DateTime2Configuration.TimeZoneMode.Custom, _convertToObjectInputDate.Date },
     ];
 
     [TestCaseSource(nameof(_dateTimeWithTimeZoneConvertToObjectCases))]

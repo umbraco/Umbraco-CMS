@@ -26,11 +26,8 @@ public partial class DateTime2ValueConverterTests
         Assert.AreEqual(expected, result);
     }
 
-    [TestCase(DateTime2Configuration.TimeZoneMode.None)]
-    [TestCase(DateTime2Configuration.TimeZoneMode.All)]
-    [TestCase(DateTime2Configuration.TimeZoneMode.Custom)]
-    [TestCase(DateTime2Configuration.TimeZoneMode.Local)]
-    public void DateTimeUnspecified_GetPropertyValueType_ReturnsExpectedType(DateTime2Configuration.TimeZoneMode timeZoneMode)
+    [Test]
+    public void DateTimeUnspecified_GetPropertyValueType_ReturnsExpectedType()
     {
         var converter = new DateTimeUnspecifiedValueConverter(Mock.Of<IJsonSerializer>(MockBehavior.Strict));
         var dataType = new PublishedDataType(
@@ -40,7 +37,7 @@ public partial class DateTime2ValueConverterTests
             new Lazy<object?>(() =>
                 new DateTime2Configuration
                 {
-                    TimeZones = new DateTime2Configuration.TimeZonesConfiguration { Mode = timeZoneMode },
+                    TimeZones = null,
                 }));
         var propertyType = Mock.Of<IPublishedPropertyType>(x => x.DataType == dataType);
 
@@ -69,14 +66,13 @@ public partial class DateTime2ValueConverterTests
 
     private static object[] _dateTimeUnspecifiedConvertToObjectCases =
     [
-        new object[] { null, DateTime2Configuration.TimeZoneMode.All, null },
-        new object[] { _convertToObjectInputDate, DateTime2Configuration.TimeZoneMode.None, DateTime.Parse("2025-08-20T17:30:00") },
+        new object[] { null, null },
+        new object[] { _convertToObjectInputDate, DateTime.Parse("2025-08-20T17:30:00") },
     ];
 
     [TestCaseSource(nameof(_dateTimeUnspecifiedConvertToObjectCases))]
     public void DateTimeUnspecified_Can_Convert_To_Object(
         object? input,
-        DateTime2Configuration.TimeZoneMode timeZoneMode,
         object? expected)
     {
         var dataType = new PublishedDataType(
@@ -86,7 +82,7 @@ public partial class DateTime2ValueConverterTests
             new Lazy<object?>(() =>
                 new DateTime2Configuration
                 {
-                    TimeZones = new DateTime2Configuration.TimeZonesConfiguration { Mode = timeZoneMode },
+                    TimeZones = null,
                 }));
 
         var propertyType = new Mock<IPublishedPropertyType>(MockBehavior.Strict);

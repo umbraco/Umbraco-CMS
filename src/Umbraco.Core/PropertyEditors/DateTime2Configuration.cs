@@ -18,7 +18,7 @@ public class DateTime2Configuration
         /// <summary>
         /// The mode for time zones.
         /// </summary>
-        public TimeZoneMode? Mode { get; set; } = TimeZoneMode.None;
+        public TimeZoneMode Mode { get; set; }
 
         /// <summary>
         /// A list of time zones to use when the mode is set to Custom.
@@ -28,12 +28,6 @@ public class DateTime2Configuration
 
     public enum TimeZoneMode
     {
-        /// <summary>
-        /// Do not display any time zones.
-        /// </summary>
-        [JsonStringEnumMemberName("none")]
-        None,
-
         /// <summary>
         /// Display all time zones.
         /// </summary>

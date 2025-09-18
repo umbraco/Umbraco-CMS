@@ -63,11 +63,7 @@ public partial class DateTime2PropertyEditorTests
                 value,
                 new DateTime2Configuration
                 {
-                    TimeZones = new DateTime2Configuration.TimeZonesConfiguration
-                    {
-                        Mode = DateTime2Configuration.TimeZoneMode.None,
-                        TimeZones = [],
-                    },
+                    TimeZones = null,
                 }),
             null);
         Assert.AreEqual(expectedJson, result);
@@ -75,17 +71,14 @@ public partial class DateTime2PropertyEditorTests
 
     private static readonly object[][] _dateTimeUnspecifiedParseValuesToEditorTestCases =
     [
-        [null, null, DateTime2Configuration.TimeZoneMode.None, null],
-        [0, null, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000", TimeZone = null }],
-        [0, null, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000", TimeZone = null }],
-        [-5, null, DateTime2Configuration.TimeZoneMode.None, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T21:30:00.0000000", TimeZone = null }],
+        [null, null, null],
+        [0, null, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000", TimeZone = null }],
     ];
 
     [TestCaseSource(nameof(_dateTimeUnspecifiedParseValuesToEditorTestCases))]
     public void DateTimeUnspecified_Can_Parse_Values_To_Editor(
         int? offset,
         string? timeZone,
-        DateTime2Configuration.TimeZoneMode timeZoneMode,
         object? expectedResult)
     {
         var storedValue = offset is null
@@ -95,7 +88,7 @@ public partial class DateTime2PropertyEditorTests
                 Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.FromHours(offset.Value)),
                 TimeZone = timeZone,
             };
-        var valueEditor = CreateDateTimeUnspecifiedValueEditor(timeZoneMode: timeZoneMode);
+        var valueEditor = CreateDateTimeUnspecifiedValueEditor(timeZoneMode: null);
         var storedValueJson = storedValue is null ? null : _jsonSerializer.Serialize(storedValue);
         var result = valueEditor.ToEditor(
             new Property(new PropertyType(Mock.Of<IShortStringHelper>(), "dataType", ValueStorageType.Ntext))
@@ -124,7 +117,7 @@ public partial class DateTime2PropertyEditorTests
     }
 
     private DateTime2PropertyEditorBase.DateTime2DataValueEditor<DateTimeUnspecifiedValueConverter> CreateDateTimeUnspecifiedValueEditor(
-        DateTime2Configuration.TimeZoneMode timeZoneMode = DateTime2Configuration.TimeZoneMode.All,
+        DateTime2Configuration.TimeZoneMode? timeZoneMode = null,
         string[]? timeZones = null)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
@@ -144,11 +137,13 @@ public partial class DateTime2PropertyEditorTests
         {
             ConfigurationObject = new DateTime2Configuration
             {
-                TimeZones = new DateTime2Configuration.TimeZonesConfiguration
-                {
-                    Mode = timeZoneMode,
-                    TimeZones = timeZones?.ToList() ?? [],
-                },
+                TimeZones = timeZoneMode is null
+                    ? null
+                    : new DateTime2Configuration.TimeZonesConfiguration
+                    {
+                        Mode = timeZoneMode.Value,
+                        TimeZones = timeZones?.ToList() ?? [],
+                    },
             },
         };
         return valueEditor;

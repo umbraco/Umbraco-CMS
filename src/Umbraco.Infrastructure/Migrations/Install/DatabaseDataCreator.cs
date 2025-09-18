@@ -876,7 +876,7 @@ internal sealed class DatabaseDataCreator
                 UniqueId = Constants.DataTypes.Guids.DateTimePickerWithTimeZoneGuid,
                 Text = "Date Time Picker (with time zone)",
                 NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");

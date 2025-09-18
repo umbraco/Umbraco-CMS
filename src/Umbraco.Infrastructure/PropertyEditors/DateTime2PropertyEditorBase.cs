@@ -148,7 +148,7 @@ public abstract class DateTime2PropertyEditorBase : DataEditor
                         ["value"]);
                 }
 
-                if (configuration?.TimeZones?.Mode is not { } mode || mode == DateTime2Configuration.TimeZoneMode.None)
+                if (configuration?.TimeZones?.Mode is not { } mode)
                 {
                     yield break;
                 }

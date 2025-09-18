@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-public class DateTime2PropertyIndexValueFactory : IDateTimeUnspecifiedPropertyIndexValueFactory,
+internal class DateTime2PropertyIndexValueFactory : IDateTimeUnspecifiedPropertyIndexValueFactory,
     IDateTimeWithTimeZonePropertyIndexValueFactory,
     IDateOnlyPropertyIndexValueFactory,
     ITimeOnlyPropertyIndexValueFactory

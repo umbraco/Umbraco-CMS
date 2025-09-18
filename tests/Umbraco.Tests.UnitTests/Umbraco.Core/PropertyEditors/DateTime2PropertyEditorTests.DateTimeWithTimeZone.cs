@@ -20,11 +20,9 @@ public partial class DateTime2PropertyEditorTests
 
     private static readonly object[] _sourceList2 =
     [
-        new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\"}"), DateTime2Configuration.TimeZoneMode.None, Array.Empty<string>(), true },
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\"}"), DateTime2Configuration.TimeZoneMode.All, Array.Empty<string>(), true },
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\"}"), DateTime2Configuration.TimeZoneMode.Local, Array.Empty<string>(), true },
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\"}"), DateTime2Configuration.TimeZoneMode.Custom, new[] { "Europe/Copenhagen" }, false },
-        new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\", \"timeZone\": \"Europe/Copenhagen\"}"), DateTime2Configuration.TimeZoneMode.None, Array.Empty<string>(), true },
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\", \"timeZone\": \"Europe/Copenhagen\"}"), DateTime2Configuration.TimeZoneMode.All, Array.Empty<string>(), true },
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\", \"timeZone\": \"Europe/Copenhagen\"}"), DateTime2Configuration.TimeZoneMode.Local, Array.Empty<string>(), true },
         new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\", \"timeZone\": \"Europe/Copenhagen\"}"), DateTime2Configuration.TimeZoneMode.Custom, Array.Empty<string>(), false },
@@ -100,11 +98,7 @@ public partial class DateTime2PropertyEditorTests
                 value,
                 new DateTime2Configuration
                 {
-                    TimeZones = new DateTime2Configuration.TimeZonesConfiguration
-                    {
-                        Mode = DateTime2Configuration.TimeZoneMode.None,
-                        TimeZones = [],
-                    },
+                    TimeZones = null,
                 }),
             null);
         Assert.AreEqual(expectedJson, result);
@@ -112,7 +106,7 @@ public partial class DateTime2PropertyEditorTests
 
     private static readonly object[][] _dateTimeWithTimeZoneParseValuesToEditorTestCases =
     [
-        [null, null, DateTime2Configuration.TimeZoneMode.None, null],
+        [null, null, DateTime2Configuration.TimeZoneMode.All, null],
         [0, null, DateTime2Configuration.TimeZoneMode.All, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
         [0, null, DateTime2Configuration.TimeZoneMode.Local, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
         [0, null, DateTime2Configuration.TimeZoneMode.Custom, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000+00:00", TimeZone = null }],
