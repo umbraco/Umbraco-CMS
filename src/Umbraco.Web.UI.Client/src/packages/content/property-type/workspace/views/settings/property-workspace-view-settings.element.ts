@@ -203,6 +203,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<umb-property-layout label=${this.localize.term('general_description')} orientation="vertical">
 					<uui-textarea
 						id="description-input"
+						data-mark="input:entity-description"
 						slot="editor"
 						name="description"
 						@input=${this.#onDescriptionChange}
