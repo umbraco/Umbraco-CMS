@@ -973,8 +973,9 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Siblings_Includes_Trashed_Entities_If_Target_Is_Trashed()
+    public void EntityService_Siblings_Returns_Trashed_Siblings()
     {
+        ContentService.EmptyRecycleBin();
         var children = CreateDocumentSiblingsTestData();
 
         for (int i = 0; i <= 3; i++)
@@ -982,8 +983,8 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             ContentService.MoveToRecycleBin(children[i]);
         }
 
-        var result = EntityService.GetSiblings(children[1].Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
-        Assert.AreEqual(1, totalBefore);
+        var result = EntityService.GetTrashedSiblings(children[1].Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(0, totalBefore);
         Assert.AreEqual(1, totalAfter);
         Assert.AreEqual(3, result.Length);
         Assert.IsTrue(result[0].Key == children[0].Key);
