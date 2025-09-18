@@ -411,12 +411,18 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
 			}
+
+			uui-select {
+				width: 100%;
+			}
+
 			#appearances {
 				display: flex;
 				gap: var(--uui-size-layout-1);
 				justify-content: space-between;
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
 			}
+
 			.appearance {
 				position: relative;
 				display: flex;
@@ -430,6 +436,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				justify-content: space-between;
 				gap: var(--uui-size-space-3);
 			}
+
 			.appearance-option {
 				display: flex;
 				width: 100%;
@@ -444,25 +451,30 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				text-align: center;
 				pointer-events: none;
 			}
+
 			.appearance svg {
 				display: flex;
 				width: 100%;
 				color: var(--uui-color-text);
 			}
+
 			.appearance:not(.selected):hover {
 				border-color: var(--uui-color-border-emphasis);
 				cursor: pointer;
 				opacity: 1;
 			}
+
 			.appearance.selected {
 				background-color: var(--uui-color-surface);
 				border-color: var(--uui-color-selected);
 				color: var(--uui-color-selected);
 				opacity: 1;
 			}
+
 			.appearance.selected svg {
 				color: var(--uui-color-selected);
 			}
+
 			.appearance.selected::after {
 				content: '';
 				position: absolute;
@@ -471,12 +483,15 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				opacity: 0.1;
 				background-color: var(--uui-color-selected);
 			}
+
 			uui-input {
 				width: 100%;
 			}
+
 			uui-input:focus-within {
 				z-index: 1;
 			}
+
 			.container {
 				display: flex;
 				flex-direction: column;
