@@ -2373,6 +2373,7 @@ export default {
 		openBackofficeSearch: 'Open backoffice search',
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
 		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
+		profileOptions: 'Profile options',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',
@@ -2777,6 +2778,7 @@ export default {
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
 	rte: {
+		label: 'Rich Text Editor',
 		config_blocks: 'Available Blocks',
 		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
@@ -2836,10 +2838,17 @@ export default {
 		resetUrlLabel: 'Reset',
 	},
 	missingEditor: {
+		title: 'This property type is no longer available.',
 		description:
-			'<p><strong>Error!</strong> This property type is no longer available. Please reach out to your administrator.</p>',
+			"Don't worry, your content is safe and publishing this document won't overwrite it or remove it.<br/>Please contact your site administrator to resolve this issue.",
+		detailsTitle: 'Additional details',
 		detailsDescription:
-			'<p>This property type is no longer available.<br/>Please contact your administrator so they can either delete this property or restore the property type.</p><p><strong>Data:</strong></p>',
+			"To resolve this you should either restore the property editor, change the property to use a supported data type or remove the property if it's no longer needed.",
+		detailsDataType: 'Data type',
+		detailsPropertyEditor: 'Property editor',
+		detailsData: 'Data',
+		detailsHide: 'Hide details',
+		detailsShow: 'Show details',
 	},
 	uiCulture: {
 		ar: 'العربية',
