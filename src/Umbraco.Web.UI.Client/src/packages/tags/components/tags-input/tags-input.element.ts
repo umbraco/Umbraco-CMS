@@ -132,7 +132,8 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				this.#focusTag(idx - 1);
 			}
 		}
-		if (e.key === 'Backspace') {
+
+		if (e.key === 'Backspace' || e.key === 'Delete') {
 			e.preventDefault();
 			if (this.#items.length - 1 === idx) {
 				this.#focusTag(idx - 1);
