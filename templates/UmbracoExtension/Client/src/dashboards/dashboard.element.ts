@@ -60,7 +60,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
       return;
     }
 
-    if (data !== undefined) {
+    if (data !== undefined && data !== null) {
       this._serverUserData = data as UserModel;
       buttonElement.state = "success";
     }
