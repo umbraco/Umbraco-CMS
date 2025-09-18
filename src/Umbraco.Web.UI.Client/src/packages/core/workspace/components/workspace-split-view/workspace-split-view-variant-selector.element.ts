@@ -130,7 +130,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				this._variantOptions = ((variantOptions ?? []) as VariantOptionModelType[]).sort(this._variantSorter);
 				this._cultureVariantOptions = this._variantOptions.filter((variant) => variant.segment === null);
 				this.#setReadOnlyCultures(workspaceContext);
-				// this.#createViewContexts();
 			},
 			'_observeVariantOptions',
 		);
