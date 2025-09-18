@@ -277,7 +277,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 					matchfilter.slice(0, 5),
 					(tag: TagResponseModel) => tag.id,
 					(tag: TagResponseModel, index: number) => {
-						return html` <input
+						return html`<input
 								class="options"
 								id="tag-${tag.id}"
 								type="radio"
@@ -301,6 +301,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				<input
 					id="tag-input"
 					aria-label="tag input"
+					autocomplete="off"
 					placeholder="Enter tag"
 					.value="${this._currentInput ?? undefined}"
 					@keydown="${this.#onInputKeydown}"
@@ -314,7 +315,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	#renderRemoveButton(tag: string) {
 		if (this.readonly) return nothing;
-		return html` <uui-icon name="icon-wrong" @click="${() => this.#delete(tag)}"></uui-icon> `;
+		return html`<uui-icon name="icon-wrong" @click="${() => this.#delete(tag)}"></uui-icon>`;
 	}
 
 	static override styles = [
