@@ -83,12 +83,12 @@ public interface INotificationService : IService
     IEnumerable<Notification>? SetNotifications(IUser? user, IEntity entity, string[] actions);
 
     /// <summary>
-    /// Tries to ccreate a new notification.
+    /// Tries to create a new notification.
     /// </summary>
     /// <param name="user">The user.</param>
     /// <param name="entity">The entity.</param>
     /// <param name="action">The action letter - note: this is a string for future compatibility</param>
-    /// <param name="notification">The created notfication.</param>
+    /// <param name="notification">The created notification.</param>
     /// <inheritdoc/>
     bool TryCreateNotification(IUser user, IEntity entity, string action, [NotNullWhen(true)] out Notification? notification);
 }
