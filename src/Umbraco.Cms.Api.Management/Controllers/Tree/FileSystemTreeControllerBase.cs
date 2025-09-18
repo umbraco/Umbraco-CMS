@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Extensions;
 
@@ -16,7 +18,15 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
     [Obsolete("Has been moved to the individual services. Scheduled to be removed in Umbraco 19")]
     protected abstract IFileSystem FileSystem { get; }
 
+    [ActivatorUtilitiesConstructor]
     protected FileSystemTreeControllerBase(IFileSystemTreeService fileSystemTreeService) => _fileSystemTreeService = fileSystemTreeService;
+
+    [Obsolete("Use the other constructor. Scheduled for removal in Umbraco 19")]
+    protected FileSystemTreeControllerBase()
+        : this(StaticServiceProvider.Instance.GetRequiredService<IFileSystemTreeService>())
+    {
+    }
+
 
     protected Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetRoot(int skip, int take)
     {
@@ -49,7 +59,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
         return Task.FromResult<ActionResult<SubsetViewModel<FileSystemTreeItemPresentationModel>>>(Ok(result));
     }
 
-    protected Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> GetAncestors(string path, bool includeSelf = true)
+    protected virtual Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> GetAncestors(string path, bool includeSelf = true)
     {
         path = path.VirtualPathToSystemPath();
         FileSystemTreeItemPresentationModel[] models = _fileSystemTreeService.GetAncestorModels(path, includeSelf);
