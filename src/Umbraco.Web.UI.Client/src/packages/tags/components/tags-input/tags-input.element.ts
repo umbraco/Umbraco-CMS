@@ -61,8 +61,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	@queryAll('.options')
 	private _optionCollection?: HTMLCollectionOf<HTMLInputElement>;
 
-	@query('#enteredTagsWrapper') private _enteredTagsWrapper!: HTMLElement;
-
 	@queryAll('.tag')
 	private _tagEls?: NodeListOf<HTMLElement>;
 
@@ -118,13 +116,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		const tag = this._tagEls?.[index];
 		if (!tag) return;
 		tag.focus();
-	}
-
-	#onTagsWrapperKeydown(e: KeyboardEvent) {
-		if ((e.key === 'Enter' || e.key === 'ArrowDown') && this.items.length) {
-			e.preventDefault();
-			this.#focusTag(0);
-		}
 	}
 
 	#onTagKeydown(e: KeyboardEvent, idx: number) {
@@ -249,7 +240,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	override render() {
 		return html`
 			<div id="wrapper">
-				<div id="enteredTagsWrapper" tabindex="0" @keydown="${this.#onTagsWrapperKeydown}">${this.#enteredTags()}</div>
+				${this.#renderTags()}
 				<span id="main-tag-wrapper">
 					<uui-tag id="input-width-tracker" aria-hidden="true" style="visibility:hidden;opacity:0;position:absolute;">
 						${this._currentInput}
@@ -260,7 +251,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		`;
 	}
 
-	#enteredTags() {
+	#renderTags() {
 		return html`
 			${repeat(
 				this.items,
@@ -346,12 +337,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			}
 
 			/** Tags */
-			#enteredTagsWrapper {
-				display: flex;
-				gap: var(--uui-size-space-2);
-				flex-wrap: wrap;
-			}
-
 			uui-tag {
 				position: relative;
 				max-width: 200px;
