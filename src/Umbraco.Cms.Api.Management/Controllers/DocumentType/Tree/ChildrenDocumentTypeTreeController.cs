@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
@@ -19,8 +19,8 @@ public class ChildrenDocumentTypeTreeController : DocumentTypeTreeControllerBase
     }
 
     [ActivatorUtilitiesConstructor]
-    public ChildrenDocumentTypeTreeController(IEntityService entityService, SignProviderCollection signProviders, IContentTypeService contentTypeService)
-        : base(entityService, signProviders, contentTypeService)
+    public ChildrenDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
+        : base(entityService, flagProviders, contentTypeService)
     {
     }
 
