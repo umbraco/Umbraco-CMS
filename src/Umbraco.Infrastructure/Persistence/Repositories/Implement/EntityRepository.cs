@@ -152,20 +152,79 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         out long totalBefore,
         out long totalAfter)
     {
-        // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
+        Sql<ISqlContext>? mainSql = SiblingsSql(
+            false,
+            objectTypes,
+            targetKey,
+            before,
+            after,
+            filter,
+            ordering,
+            out totalBefore,
+            out totalAfter);
+
+        List<Guid>? keys = Database.Fetch<Guid>(mainSql);
+
+        if (keys is null || keys.Count == 0)
+        {
+            return [];
+        }
+
+        // To re-use this method we need to provide a single object type. By convention for folder based trees, we provide the primary object type last.
+        return PerformGetAll(objectTypes.ToArray(), ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<IEntitySlim> GetTrashedSiblings(
+        ISet<Guid> objectTypes,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
+    {
+        Sql<ISqlContext>? mainSql = SiblingsSql(
+            true,
+            objectTypes,
+            targetKey,
+            before,
+            after,
+            filter,
+            ordering,
+            out totalBefore,
+            out totalAfter);
+
+        List<Guid>? keys = Database.Fetch<Guid>(mainSql);
+
+        if (keys is null || keys.Count == 0)
+        {
+            return [];
+        }
+
+        // To re-use this method we need to provide a single object type. By convention for folder based trees, we provide the primary object type last.
+        return PerformGetAll(objectTypes.ToArray(), ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
+    }
+
+    private Sql<ISqlContext>? SiblingsSql(
+        bool isTrashed,
+        ISet<Guid> objectTypes,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
+    {
+                // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
         // without us also having to do a nested query for the parent ID too.
         Sql<ISqlContext> parentIdQuery = Sql()
             .Select<NodeDto>(x => x.ParentId)
             .From<NodeDto>()
             .Where<NodeDto>(x => x.UniqueId == targetKey);
         var parentId = Database.ExecuteScalar<int>(parentIdQuery);
-
-        // We need to know if the target is trashed, so that we can get the siblings in the recycle bin.
-        Sql<ISqlContext> itemQuery = Sql()
-            .Select<NodeDto>(x => x.Trashed)
-            .From<NodeDto>()
-            .Where<NodeDto>(x => x.UniqueId == targetKey);
-        bool isTrashed = Database.FirstOrDefault<bool>(itemQuery);
 
         Sql<ISqlContext> orderingSql = Sql();
         ApplyOrdering(ref orderingSql, ordering);
@@ -210,25 +269,16 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         var beforeAfterParameterIndex = BeforeAfterParameterIndex + beforeAfterParameterIndexOffset;
         var beforeArgumentsArray = beforeArguments.ToArray();
         var afterArgumentsArray = afterArguments.ToArray();
-        Sql<ISqlContext>? mainSql = Sql()
+
+        totalBefore = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, beforeArgumentsArray, true);
+        totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
+
+        return Sql()
             .Select("UniqueId")
             .From().AppendSubQuery(rowNumberSql, "NumberedNodes")
             .Where($"rn >= ({targetRowSql.SQL}) - @{beforeAfterParameterIndex}", beforeArgumentsArray)
             .Where($"rn <= ({targetRowSql.SQL}) + @{beforeAfterParameterIndex}", afterArgumentsArray)
             .OrderBy("rn");
-
-        List<Guid>? keys = Database.Fetch<Guid>(mainSql);
-
-        totalBefore = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, beforeArgumentsArray, true);
-        totalAfter = GetNumberOfSiblingsOutsideSiblingRange(rowNumberSql, targetRowSql, beforeAfterParameterIndex, afterArgumentsArray, false);
-
-        if (keys is null || keys.Count == 0)
-        {
-            return [];
-        }
-
-        // To re-use this method we need to provide a single object type. By convention for folder based trees, we provide the primary object type last.
-        return PerformGetAll(objectTypes.ToArray(), ordering, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys));
     }
 
     private static int GetBeforeAfterParameterOffset(ISet<Guid> objectTypes, IQuery<IUmbracoEntity>? filter)
