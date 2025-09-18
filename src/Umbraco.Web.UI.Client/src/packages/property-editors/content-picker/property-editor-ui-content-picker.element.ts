@@ -209,7 +209,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				?readonly=${this.readonly}
 				@change=${this.#onChange}
 				.interactionMemories=${this._interactionMemories}
-				@interaction-memory-change=${this.#onInputInteractionMemoriesChange}>
+				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-content>
 			${this.#renderInvalidData()}
 		`;

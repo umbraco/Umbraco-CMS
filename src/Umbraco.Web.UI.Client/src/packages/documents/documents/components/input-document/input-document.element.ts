@@ -5,7 +5,7 @@ import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbInteractionMemoryChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
@@ -176,7 +176,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 
 				if (!isIdentical) {
 					this.#interactionMemories = memories;
-					this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
+					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
 				}
 			},
 			'_observeMemories',

@@ -151,7 +151,7 @@ export class UmbPropertyEditorUIMediaPickerElement
 				@change=${this.#onChange}
 				?readonly=${this.readonly}
 				.interactionMemories=${this._interactionMemories}
-				@interaction-memory-change=${this.#onInputInteractionMemoriesChange}>
+				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-rich-media>
 		`;
 	}

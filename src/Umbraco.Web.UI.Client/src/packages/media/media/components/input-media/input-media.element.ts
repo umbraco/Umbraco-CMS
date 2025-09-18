@@ -14,7 +14,7 @@ import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbInteractionMemoryChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
@@ -197,7 +197,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 				if (!isIdentical) {
 					this.#interactionMemories = memories;
-					this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
+					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
 				}
 			},
 			'_observeMemories',

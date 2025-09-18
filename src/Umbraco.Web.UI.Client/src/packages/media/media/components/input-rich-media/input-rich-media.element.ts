@@ -19,7 +19,7 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 
 import '@umbraco-cms/backoffice/imaging';
 import {
-	UmbInteractionMemoryChangeEvent,
+	UmbInteractionMemoriesChangeEvent,
 	type UmbInteractionMemoryModel,
 } from '@umbraco-cms/backoffice/interaction-memory';
 import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
@@ -262,7 +262,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 				if (!isIdentical) {
 					this.#interactionMemories = memories;
-					this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
+					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
 				}
 			},
 			'_observeMemories',

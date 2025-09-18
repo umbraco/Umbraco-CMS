@@ -3,7 +3,7 @@ import { css, customElement, html, property } from '@umbraco-cms/backoffice/exte
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbInteractionMemoryChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
@@ -100,13 +100,13 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onInteractionMemoriesChange(event: UmbInteractionMemoryChangeEvent) {
+	#onInteractionMemoriesChange(event: UmbInteractionMemoriesChangeEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputContentElement;
 		const interactionMemories = target.interactionMemories;
 		this.#interactionMemories = interactionMemories;
 		// The event is not composed so we need to re-dispatch it from this component.
-		this.dispatchEvent(new UmbInteractionMemoryChangeEvent());
+		this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
 	}
 
 	override render() {
@@ -135,7 +135,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				?readonly=${this.readonly}
 				@change=${this.#onChange}
 				.interactionMemories=${this.#interactionMemories}
-				@interaction-memory-change=${this.#onInteractionMemoriesChange}></umb-input-document>
+				@interaction-memories-change=${this.#onInteractionMemoriesChange}></umb-input-document>
 		`;
 	}
 
@@ -151,7 +151,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				?readonly=${this.readonly}
 				@change=${this.#onChange}
 				.interactionMemories=${this.#interactionMemories}
-				@interaction-memory-change=${this.#onInteractionMemoriesChange}></umb-input-media>
+				@interaction-memories-change=${this.#onInteractionMemoriesChange}></umb-input-media>
 		`;
 	}
 
