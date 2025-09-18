@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
@@ -11,9 +11,9 @@ public class SiblingMemberTypeTreeController : MemberTypeTreeControllerBase
 {
     public SiblingMemberTypeTreeController(
         IEntityService entityService,
-        SignProviderCollection signProviders,
+        FlagProviderCollection flagProviders,
         IMemberTypeService memberTypeService)
-        : base(entityService, signProviders, memberTypeService)
+        : base(entityService, flagProviders, memberTypeService)
     {
     }
 

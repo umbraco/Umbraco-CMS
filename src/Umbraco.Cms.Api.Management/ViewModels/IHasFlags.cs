@@ -1,10 +1,10 @@
 namespace Umbraco.Cms.Api.Management.ViewModels;
 
 /// <summary>
-/// Marker interface that indicates the type has support for backoffice signs (presented as icons
+/// Marker interface that indicates the type has support for backoffice flags (presented as icons
 /// overlaying the main icon for the entity).
 /// </summary>
-public interface IHasSigns
+public interface IHasFlags
 {
     /// <summary>
     /// Gets the unique identifier for the entity.
@@ -12,19 +12,19 @@ public interface IHasSigns
     Guid Id { get; }
 
     /// <summary>
-    /// Gets the collection of signs for the entity.
+    /// Gets the collection of flag for the entity.
     /// </summary>
-    IEnumerable<SignModel> Signs { get; }
+    IEnumerable<FlagModel> Flags { get; }
 
     /// <summary>
-    /// Adds a sign to the entity with the specified alias.
+    /// Adds a flag to the entity with the specified alias.
     /// </summary>
     /// <param name="alias"></param>
-    void AddSign(string alias);
+    void AddFlag(string alias);
 
     /// <summary>
-    /// Removes a sign from the entity with the specified alias.
+    /// Removes a flag from the entity with the specified alias.
     /// </summary>
     /// <param name="alias"></param>
-    void RemoveSign(string alias);
+    void RemoveFlag(string alias);
 }
