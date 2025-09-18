@@ -5,25 +5,21 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors.ValueConverters;
 
 [TestFixture]
-public class DateOnlyValueConverterTests
+public partial class DateTime2ValueConverterTests
 {
-    private readonly IJsonSerializer _jsonSerializer =
-        new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
-
-    [TestCase(Constants.PropertyEditors.Aliases.DateOnly, true)]
+    [TestCase(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone, true)]
     [TestCase(Constants.PropertyEditors.Aliases.DateTimeUnspecified, false)]
-    [TestCase(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone, false)]
+    [TestCase(Constants.PropertyEditors.Aliases.DateOnly, false)]
     [TestCase(Constants.PropertyEditors.Aliases.TimeOnly, false)]
     [TestCase(Constants.PropertyEditors.Aliases.DateTime, false)]
-    public void IsConverter_For(string propertyEditorAlias, bool expected)
+    public void DateTimeWithTimeZone_IsConverter_For(string propertyEditorAlias, bool expected)
     {
         var propertyType = Mock.Of<IPublishedPropertyType>(x => x.EditorAlias == propertyEditorAlias);
-        var converter = new DateOnlyValueConverter(Mock.Of<IJsonSerializer>(MockBehavior.Strict));
+        var converter = new DateTimeWithTimeZoneValueConverter(Mock.Of<IJsonSerializer>(MockBehavior.Strict));
 
         var result = converter.IsConverter(propertyType);
 
@@ -34,9 +30,9 @@ public class DateOnlyValueConverterTests
     [TestCase(DateTime2Configuration.TimeZoneMode.All)]
     [TestCase(DateTime2Configuration.TimeZoneMode.Custom)]
     [TestCase(DateTime2Configuration.TimeZoneMode.Local)]
-    public void GetPropertyValueType_ReturnsExpectedType(DateTime2Configuration.TimeZoneMode timeZoneMode)
+    public void DateTimeWithTimeZone_GetPropertyValueType_ReturnsExpectedType(DateTime2Configuration.TimeZoneMode timeZoneMode)
     {
-        var converter = new DateOnlyValueConverter(Mock.Of<IJsonSerializer>(MockBehavior.Strict));
+        var converter = new DateTimeWithTimeZoneValueConverter(Mock.Of<IJsonSerializer>(MockBehavior.Strict));
         var dataType = new PublishedDataType(
             0,
             "test",
@@ -50,21 +46,12 @@ public class DateOnlyValueConverterTests
 
         var result = converter.GetPropertyValueType(propertyType);
 
-        Assert.AreEqual(typeof(DateOnly?), result);
+        Assert.AreEqual(typeof(DateTimeOffset?), result);
     }
-
-    private static object[] _convertToIntermediateCases =
-    [
-        new object[] { null, null },
-        new object[] { """{"date":"2025-08-20T16:30:00.0000000Z","timeZone":null}""", new DateTime2ValueConverterBase.DateTime2Dto { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.Zero), TimeZone = null } },
-        new object[] { """{"date":"2025-08-20T16:30:00.0000000Z","timeZone":"Europe/Copenhagen"}""", new DateTime2ValueConverterBase.DateTime2Dto { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.Zero), TimeZone = "Europe/Copenhagen" } },
-        new object[] { """{"date":"2025-08-20T16:30:00.0000000-05:00","timeZone":"Europe/Copenhagen"}""", new DateTime2ValueConverterBase.DateTime2Dto { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.FromHours(-5)), TimeZone = "Europe/Copenhagen" } },
-    ];
-
     [TestCaseSource(nameof(_convertToIntermediateCases))]
-    public void Can_Convert_To_Intermediate_Value(string? input, object? expected)
+    public void DateTimeWithTimeZone_Can_Convert_To_Intermediate_Value(string? input, object? expected)
     {
-        var result = new DateOnlyValueConverter(_jsonSerializer).ConvertSourceToIntermediate(null!, null!, input, false);
+        var result = new DateTimeWithTimeZoneValueConverter(_jsonSerializer).ConvertSourceToIntermediate(null!, null!, input, false);
         if (expected is null)
         {
             Assert.IsNull(result);
@@ -79,20 +66,14 @@ public class DateOnlyValueConverterTests
         Assert.AreEqual(((DateTime2ValueConverterBase.DateTime2Dto)expected).TimeZone, dateTime.TimeZone);
     }
 
-    private static readonly DateTime2ValueConverterBase.DateTime2Dto _convertToObjectInputDate = new()
-    {
-        Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.FromHours(-1)),
-        TimeZone = "Europe/Copenhagen",
-    };
-
-    private static object[] _convertToObjectCases =
+    private static object[] _dateTimeWithTimeZoneConvertToObjectCases =
     [
         new object[] { null, DateTime2Configuration.TimeZoneMode.All, null },
-        new object[] { _convertToObjectInputDate, DateTime2Configuration.TimeZoneMode.None, DateOnly.Parse("2025-08-20") },
+        new object[] { _convertToObjectInputDate, DateTime2Configuration.TimeZoneMode.None, DateTimeOffset.Parse("2025-08-20T16:30:00-01:00") },
     ];
 
-    [TestCaseSource(nameof(_convertToObjectCases))]
-    public void Can_Convert_To_Object(
+    [TestCaseSource(nameof(_dateTimeWithTimeZoneConvertToObjectCases))]
+    public void DateTimeWithTimeZone_Can_Convert_To_Object(
         object? input,
         DateTime2Configuration.TimeZoneMode timeZoneMode,
         object? expected)
@@ -111,7 +92,7 @@ public class DateOnlyValueConverterTests
         propertyType.SetupGet(x => x.DataType)
             .Returns(dataType);
 
-        var result = new DateOnlyValueConverter(_jsonSerializer)
+        var result = new DateTimeWithTimeZoneValueConverter(_jsonSerializer)
             .ConvertIntermediateToObject(null!, propertyType.Object, PropertyCacheLevel.Unknown, input, false);
         if (expected is null)
         {

@@ -5,22 +5,18 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors.ValueConverters;
 
 [TestFixture]
-public class TimeOnlyValueConverterTests
+public partial class DateTime2ValueConverterTests
 {
-    private readonly IJsonSerializer _jsonSerializer =
-        new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
-
     [TestCase(Constants.PropertyEditors.Aliases.TimeOnly, true)]
     [TestCase(Constants.PropertyEditors.Aliases.DateTimeUnspecified, false)]
     [TestCase(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone, false)]
     [TestCase(Constants.PropertyEditors.Aliases.DateOnly, false)]
     [TestCase(Constants.PropertyEditors.Aliases.DateTime, false)]
-    public void IsConverter_For(string propertyEditorAlias, bool expected)
+    public void TimeOnly_IsConverter_For(string propertyEditorAlias, bool expected)
     {
         var propertyType = Mock.Of<IPublishedPropertyType>(x => x.EditorAlias == propertyEditorAlias);
         var converter = new TimeOnlyValueConverter(Mock.Of<IJsonSerializer>(MockBehavior.Strict));
@@ -34,7 +30,7 @@ public class TimeOnlyValueConverterTests
     [TestCase(DateTime2Configuration.TimeZoneMode.All)]
     [TestCase(DateTime2Configuration.TimeZoneMode.Custom)]
     [TestCase(DateTime2Configuration.TimeZoneMode.Local)]
-    public void GetPropertyValueType_ReturnsExpectedType(DateTime2Configuration.TimeZoneMode timeZoneMode)
+    public void TimeOnly_GetPropertyValueType_ReturnsExpectedType(DateTime2Configuration.TimeZoneMode timeZoneMode)
     {
         var converter = new TimeOnlyValueConverter(Mock.Of<IJsonSerializer>(MockBehavior.Strict));
         var dataType = new PublishedDataType(
@@ -53,16 +49,8 @@ public class TimeOnlyValueConverterTests
         Assert.AreEqual(typeof(TimeOnly?), result);
     }
 
-    private static object[] _convertToIntermediateCases =
-    [
-        new object[] { null, null },
-        new object[] { """{"date":"2025-08-20T16:30:00.0000000Z","timeZone":null}""", new DateTime2ValueConverterBase.DateTime2Dto { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.Zero), TimeZone = null } },
-        new object[] { """{"date":"2025-08-20T16:30:00.0000000Z","timeZone":"Europe/Copenhagen"}""", new DateTime2ValueConverterBase.DateTime2Dto { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.Zero), TimeZone = "Europe/Copenhagen" } },
-        new object[] { """{"date":"2025-08-20T16:30:00.0000000-05:00","timeZone":"Europe/Copenhagen"}""", new DateTime2ValueConverterBase.DateTime2Dto { Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.FromHours(-5)), TimeZone = "Europe/Copenhagen" } },
-    ];
-
     [TestCaseSource(nameof(_convertToIntermediateCases))]
-    public void Can_Convert_To_Intermediate_Value(string? input, object? expected)
+    public void TimeOnly_Can_Convert_To_Intermediate_Value(string? input, object? expected)
     {
         var result = new TimeOnlyValueConverter(_jsonSerializer).ConvertSourceToIntermediate(null!, null!, input, false);
         if (expected is null)
@@ -79,20 +67,14 @@ public class TimeOnlyValueConverterTests
         Assert.AreEqual(((DateTime2ValueConverterBase.DateTime2Dto)expected).TimeZone, dateTime.TimeZone);
     }
 
-    private static readonly DateTime2ValueConverterBase.DateTime2Dto _convertToObjectInputDate = new()
-    {
-        Date = new DateTimeOffset(2025, 08, 20, 16, 30, 0, TimeSpan.FromHours(-1)),
-        TimeZone = "Europe/Copenhagen",
-    };
-
-    private static object[] _convertToObjectCases =
+    private static object[] _timeOnlyConvertToObjectCases =
     [
         new object[] { null, DateTime2Configuration.TimeZoneMode.All, null },
         new object[] { _convertToObjectInputDate, DateTime2Configuration.TimeZoneMode.None, TimeOnly.Parse("17:30") },
     ];
 
-    [TestCaseSource(nameof(_convertToObjectCases))]
-    public void Can_Convert_To_Object(
+    [TestCaseSource(nameof(_timeOnlyConvertToObjectCases))]
+    public void TimeOnly_Can_Convert_To_Object(
         object? input,
         DateTime2Configuration.TimeZoneMode timeZoneMode,
         object? expected)
