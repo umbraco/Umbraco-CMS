@@ -4,10 +4,15 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
-import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
+import {
+	umbConfirmModal,
+	umbOpenModal,
+	type UmbModalToken,
+	type UmbPickerModalData,
+	type UmbPickerModalValue,
+} from '@umbraco-cms/backoffice/modal';
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
@@ -93,24 +98,16 @@ export class UmbPickerInputContext<
 
 	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
 		await this.#itemManager.init;
-
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		if (!modalManagerContext) {
-			throw new Error('Modal manager not found.');
-		}
-
-		const modalContext = modalManagerContext.open(this, this.modalAlias, {
+		const modalValue = await umbOpenModal(this, this.modalAlias, {
 			data: {
 				multiple: this._max === 1 ? false : true,
-				interactionMemories: this.interactionMemory.getAllMemories(),
 				...pickerData,
 			},
 			value: {
 				selection: this.getSelection(),
 			} as PickerModalValueType,
-		});
+		}).catch(() => undefined);
 
-		const modalValue = await modalContext.onSubmit().catch(() => undefined);
 		if (!modalValue) return;
 
 		this.setSelection(modalValue.selection);
