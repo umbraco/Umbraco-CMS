@@ -357,8 +357,8 @@ export default {
 		saveAndPublishModalTitle: 'Save and publish',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
-		sharedACrossCultures: 'Shared across cultures',
-		sharedACrossSegments: 'Shared across segments',
+		sharedAcrossCultures: 'Shared across cultures',
+		sharedAcrossSegments: 'Shared across segments',
 		shared: 'Shared',
 	},
 	blueprints: {

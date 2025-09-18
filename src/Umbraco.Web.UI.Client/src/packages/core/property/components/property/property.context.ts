@@ -181,11 +181,12 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 		if (contextVariantId && propertyVariantId) {
 			// If on a Segment viewing a segment-shared property:
 			// TODO: Do not use the content variant id, but know wether the property is configured to vary by segment.
+			// Because we can view a default segment, then we do not know if the property is shared or not. [NL]
 			if (contextVariantId.segment !== null && propertyVariantId.segment === null) {
 				if (contextVariantId.culture !== null) {
-					shareMessage = 'content_sharedACrossCultures';
+					shareMessage = 'content_sharedAcrossCultures';
 				} else {
-					shareMessage = 'content_shared';
+					shareMessage = 'content_sharedAcrossSegments';
 				}
 			}
 			// TODO: Do not use the content variant id, but know wether the property is configured to vary by culture. (this is first a problem when we introduce the invariant-variant)
