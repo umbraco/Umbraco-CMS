@@ -22,6 +22,8 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	@state() private _entityType?: string;
 	@state() private _signs?: Array<any>;
 	@state() private _labels: Map<string, string> = new Map();
+	private _hoverTimer: number | undefined;
+	private static readonly HOVER_OPEN_DELAY = 1000; // 1s; tweak as you like
 
 	#signLabelObservations: Array<UmbObserverController<string>> = [];
 
@@ -68,19 +70,27 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		);
 	}
 
-	#openDropdown() {
-		const dd = this.renderRoot.querySelector<UmbDropdownElement>('#popover');
-		dd?.showPopover();
-	}
+	#openDropdown = () => {
+		if (this._hoverTimer) {
+			clearTimeout(this._hoverTimer);
+			this._hoverTimer = undefined;
+		}
 
-	#closeDropdown() {
-		const dd = this.renderRoot.querySelector<UmbDropdownElement>('#popover');
-		dd?.hidePopover();
-	}
+		this._hoverTimer = window.setTimeout(() => {
+			const pop = this.renderRoot.querySelector<HTMLElement>('#popover');
+			pop?.showPopover?.();
+			this._hoverTimer = undefined;
+		}, UmbEntitySignBundleElement.HOVER_OPEN_DELAY);
+	};
 
-	#onToggle(event: ToggleEvent) {
-		debugger;
-	}
+	#closeDropdown = () => {
+		if (this._hoverTimer) {
+			clearTimeout(this._hoverTimer);
+			this._hoverTimer = undefined;
+		}
+		const pop = this.renderRoot.querySelector<HTMLElement>('#popover');
+		pop?.hidePopover?.();
+	};
 
 	override render() {
 		if (!this._signs || this._signs.length === 0) return nothing;
@@ -96,7 +106,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				type="button"
 				@mouseenter=${this.#openDropdown}
 				@mouseleave=${this.#closeDropdown}>
-				+
+				<umb-icon name="icon-info"></umb-icon>
 			</button>
 			<uui-popover-container id="popover">
 				<umb-popover-layout>
@@ -120,27 +130,25 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	static override styles = [
 		css`
 			#sign-icon {
+				position: absolute;
+				right: -5px;
+				bottom: -10px;
 				width: 14px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 				height: 14px;
 				font-size: 10px;
 				border-radius: 50%;
-				background: red;
 				cursor: pointer;
 				border: none;
 			}
 
-			#sign-icon:hover {
-				background: red;
+			umb-icon {
+				font-size: 12px;
 			}
 			.labels-pop {
-				position: absolute;
-				left: -10px;
-				background: var(--uui-color-surface);
-				border: 1px solid black;
-				padding: 10px;
-				display: flex;
-				flex-direction: column;
-				gap: 3px;
+				padding: 5px;
 			}
 			.label {
 				display: flex;

@@ -235,7 +235,6 @@ export abstract class UmbTreeItemElementBase<
 		css`
 			#icon-container {
 				position: relative;
-				background: red;
 			}
 
 			#label {
