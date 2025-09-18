@@ -39,15 +39,15 @@ public class DateTime2PropertyEditorTests : UmbracoIntegrationTest
 
     private static readonly object[] _sourceList1 =
     [
-        new object[] { "date-only", false, new DateOnly(2025, 1, 22) },
-        new object[] { "time-only", false, new TimeOnly(18, 33, 1) },
-        new object[] { "date-time", false, new DateTime(2025, 1, 22, 18, 33, 1) },
-        new object[] { "date-time", true, new DateTimeOffset(2025, 1, 22, 18, 33, 1, TimeSpan.Zero) },
+        new object[] { Constants.PropertyEditors.Aliases.DateOnly, false, new DateOnly(2025, 1, 22) },
+        new object[] { Constants.PropertyEditors.Aliases.TimeOnly, false, new TimeOnly(18, 33, 1) },
+        new object[] { Constants.PropertyEditors.Aliases.DateTimeUnspecified, false, new DateTime(2025, 1, 22, 18, 33, 1) },
+        new object[] { Constants.PropertyEditors.Aliases.DateTimeWithTimeZone, true, new DateTimeOffset(2025, 1, 22, 18, 33, 1, TimeSpan.Zero) },
     ];
 
     [TestCaseSource(nameof(_sourceList1))]
     public async Task Returns_Correct_Type_Based_On_Configuration(
-        string configuredFormat,
+        string editorAlias,
         bool timeZone,
         object expectedValue)
     {
@@ -55,13 +55,12 @@ public class DateTime2PropertyEditorTests : UmbracoIntegrationTest
             .WithId(0)
             .WithDatabaseType(ValueStorageType.Ntext)
             .AddEditor()
-            .WithAlias(Constants.PropertyEditors.Aliases.DateTime2)
+            .WithAlias(editorAlias)
             .WithConfigurationEditor(
                 new DateTime2ConfigurationEditor(IOHelper)
                 {
                     DefaultConfiguration = new Dictionary<string, object>
                     {
-                        ["format"] = configuredFormat,
                         ["timeFormat"] = "HH:mm",
                         ["timeZones"] = timeZone ? new { mode = "all" } : null,
                     },
@@ -69,7 +68,6 @@ public class DateTime2PropertyEditorTests : UmbracoIntegrationTest
             .WithDefaultConfiguration(
                 new Dictionary<string, object>
                 {
-                    ["format"] = configuredFormat,
                     ["timeFormat"] = "HH:mm",
                     ["timeZones"] = timeZone ? new { mode = "all" } : null,
                 })
