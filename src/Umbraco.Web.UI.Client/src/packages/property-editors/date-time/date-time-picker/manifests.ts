@@ -7,8 +7,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Date Time Picker Property Editor UI',
 		element: () => import('./property-editor-ui-date-time-picker.element.js'),
 		meta: {
-			label: 'Date Time',
-			propertyEditorSchemaAlias: 'Umbraco.DateTime2.DateTime',
+			label: 'Date Time (unspecified)',
+			propertyEditorSchemaAlias: 'Umbraco.DateTimeUnspecified',
 			icon: 'icon-calendar-alt',
 			group: 'date',
 			supportsReadOnly: true,

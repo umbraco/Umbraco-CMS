@@ -3,7 +3,7 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
 	name: 'Time Only',
-	alias: 'Umbraco.DateTime2.TimeOnly',
+	alias: 'Umbraco.TimeOnly',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TimeOnlyPicker',
 	},

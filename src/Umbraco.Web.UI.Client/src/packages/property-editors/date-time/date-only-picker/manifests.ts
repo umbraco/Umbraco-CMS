@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./property-editor-ui-date-only-picker.element.js'),
 		meta: {
 			label: 'Date Only',
-			propertyEditorSchemaAlias: 'Umbraco.DateTime2.DateOnly',
+			propertyEditorSchemaAlias: 'Umbraco.DateOnly',
 			icon: 'icon-calendar-alt',
 			group: 'date',
 			supportsReadOnly: true,

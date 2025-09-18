@@ -2,8 +2,8 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Date Time Unspecified',
-	alias: 'Umbraco.DateTime2.DateTime',
+	name: 'Date Time (unspecified)',
+	alias: 'Umbraco.DateTimeUnspecified',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.DateTimePicker',
 	},

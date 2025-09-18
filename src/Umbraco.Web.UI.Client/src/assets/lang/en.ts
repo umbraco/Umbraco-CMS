@@ -2849,9 +2849,7 @@ export default {
 		config_format_timeOnly: 'Time only',
 		config_timeFormat: 'Time format',
 		config_timeZones: 'Time zones',
-		config_timeZones_description:
-			"Select the time zones that the editor should be able to pick from. Only applicable when the format is set to 'Date and time'.",
-		config_timeZones_disabled: 'Disabled',
+		config_timeZones_description: 'Select the time zones that the editor should be able to pick from.',
 		config_timeZones_all: 'All - Display all available time zones',
 		config_timeZones_local: 'Local - Display only the local time zone',
 		config_timeZones_custom: 'Custom - Display a pre-defined list of time zones',

@@ -2847,9 +2847,7 @@ export default {
 		config_format_timeOnly: 'Apenas hora',
 		config_timeFormat: 'Formato da hora',
 		config_timeZones: 'Fusos horários',
-		config_timeZones_description:
-			"Selecione os fusos horários que o editor deve poder escolher. Aplicável apenas quando o formato estiver definido como 'Data e hora'.",
-		config_timeZones_disabled: 'Desativado',
+		config_timeZones_description: 'Selecione os fusos horários que o editor deve poder escolher.',
 		config_timeZones_all: 'Todos - Mostrar todos os fusos horários disponíveis',
 		config_timeZones_local: 'Local - Mostrar apenas o fuso horário local',
 		config_timeZones_custom: 'Personalizado - Mostrar uma lista pré-definida de fusos horários',
