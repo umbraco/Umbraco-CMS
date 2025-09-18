@@ -115,7 +115,24 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	#focusTag(index: number) {
 		const tag = this._tagEls?.[index];
 		if (!tag) return;
+
+		// Find the current element with the class .tab and tabindex=0 (will be the previous tag)
+		const active = this.renderRoot.querySelector<HTMLElement>('.tag[tabindex="0"]');
+
+		// Return it is tabindex to -1
+		active?.setAttribute('tabindex', '-1');
+
+		// Set the tabindex to 0 in the current target
+		tag.setAttribute('tabindex', '0');
+
 		tag.focus();
+	}
+
+	#onTagsWrapperKeydown(e: KeyboardEvent) {
+		if ((e.key === 'Enter' || e.key === 'ArrowDown') && this.items.length) {
+			e.preventDefault();
+			this.#focusTag(0);
+		}
 	}
 
 	#onTagKeydown(e: KeyboardEvent, idx: number) {
@@ -254,16 +271,18 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	#renderTags() {
 		return html`
-			${repeat(
-				this.items,
-				(tag) => tag,
-				(tag, index) => html`
-					<uui-tag class="tag" tabindex="0" @keydown=${(e: KeyboardEvent) => this.#onTagKeydown(e, index)}>
-						<span>${tag}</span>
-						${this.#renderRemoveButton(tag)}
-					</uui-tag>
-				`,
-			)}
+			<div id="tags" tabindex="0" @keydown=${this.#onTagsWrapperKeydown}>
+				${repeat(
+					this.items,
+					(tag) => tag,
+					(tag, index) => html`
+						<uui-tag class="tag" @keydown=${(e: KeyboardEvent) => this.#onTagKeydown(e, index)}>
+							<span>${tag}</span>
+							${this.#renderRemoveButton(tag)}
+						</uui-tag>
+					`,
+				)}
+			</div>
 		`;
 	}
 
@@ -295,7 +314,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	#renderAddButton() {
 		if (this.readonly) return nothing;
-
 		return html`
 			<uui-tag look="outline" id="main-tag" @click="${this.focus}" slot="trigger">
 				<input
@@ -339,6 +357,18 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			}
 
 			/** Tags */
+			#tags {
+				display: flex;
+				gap: var(--uui-size-space-2);
+				flex-wrap: wrap;
+				border-radius: var(--uui-size-1);
+
+				&:focus {
+					outline: var(--uui-size-1) solid var(--uui-color-focus);
+					outline-offset: var(--uui-size-1);
+				}
+			}
+
 			uui-tag {
 				position: relative;
 				max-width: 200px;
@@ -355,19 +385,20 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				white-space: nowrap;
 			}
 
-			/** Created tags */
+			/** Existing tags */
+			.tag {
+				&:focus {
+					outline: var(--uui-size-1) solid var(--uui-color-focus);
+				}
 
-			.tag:focus {
-				outline: var(--uui-size-1) solid var(--uui-color-focus);
-			}
+				uui-icon {
+					margin-left: var(--uui-size-space-2);
 
-			.tag uui-icon {
-				margin-left: var(--uui-size-space-2);
-			}
-
-			.tag uui-icon:hover,
-			.tag uui-icon:active {
-				color: var(--uui-color-selected-contrast);
+					&:hover,
+					&:active {
+						color: var(--uui-color-selected-contrast);
+					}
+				}
 			}
 
 			/** Main tag */
