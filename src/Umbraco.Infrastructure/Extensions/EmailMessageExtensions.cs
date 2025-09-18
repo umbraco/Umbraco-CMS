@@ -23,7 +23,7 @@ internal static class EmailMessageExtensions
         AddAddresses(messageToSend, mailMessage.Bcc, x => x.Bcc);
         AddAddresses(messageToSend, mailMessage.ReplyTo, x => x.ReplyTo);
 
-        if (mailMessage.HasAttachments)
+        if (mailMessage.HasAttachments || mailMessage.HasLinkedResources)
         {
             var builder = new BodyBuilder();
             if (mailMessage.IsBodyHtml)
@@ -35,9 +35,15 @@ internal static class EmailMessageExtensions
                 builder.TextBody = mailMessage.Body;
             }
 
-            foreach (EmailMessageAttachment attachment in mailMessage.Attachments!)
+            foreach (EmailMessageAttachment attachment in mailMessage.Attachments ?? [])
             {
                 builder.Attachments.Add(attachment.FileName, attachment.Stream);
+            }
+
+            foreach (EmailMessageLinkedResource linkedResource in mailMessage.LinkedResources ?? [])
+            {
+                MimeEntity lr = builder.LinkedResources.Add(linkedResource.FileName, linkedResource.Stream);
+                lr.ContentId = linkedResource.ContentId;
             }
 
             messageToSend.Body = builder.ToMessageBody();
