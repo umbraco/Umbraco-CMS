@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
+using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
@@ -58,5 +60,57 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
     private PagedViewModel<FileSystemTreeItemPresentationModel> PagedViewModel(IEnumerable<FileSystemTreeItemPresentationModel> viewModels, long totalItems)
         => new() { Total = totalItems, Items = viewModels };
 
+    [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19")]
+    protected virtual FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
+    {
+        var directories = path.Split(Path.DirectorySeparatorChar).Take(Range.EndAt(Index.FromEnd(1))).ToArray();
+        var result = directories
+            .Select((directory, index) => MapViewModel(string.Join(Path.DirectorySeparatorChar, directories.Take(index + 1)), directory, true))
+            .ToList();
 
+        if (includeSelf)
+        {
+            var selfIsFolder = FileSystem.FileExists(path) is false;
+            result.Add(MapViewModel(path, GetFileSystemItemName(selfIsFolder, path), selfIsFolder));
+        }
+
+        return result.ToArray();
+    }
+
+    [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19")]
+    protected virtual string[] GetDirectories(string path) => FileSystem
+        .GetDirectories(path)
+        .OrderBy(directory => directory)
+        .ToArray();
+
+    [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19")]
+    protected virtual string[] GetFiles(string path) => FileSystem
+        .GetFiles(path)
+        .OrderBy(file => file)
+        .ToArray();
+
+    [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19")]
+    protected virtual bool DirectoryHasChildren(string path)
+        => FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
+
+    [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19")]
+    private string GetFileSystemItemName(bool isFolder, string itemPath) => isFolder
+        ? Path.GetFileName(itemPath)
+        : FileSystem.GetFileName(itemPath);
+
+    [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19")]
+    private FileSystemTreeItemPresentationModel MapViewModel(string path, string name, bool isFolder)
+    {
+        var parentPath = Path.GetDirectoryName(path);
+        return new FileSystemTreeItemPresentationModel
+        {
+            Path = path.SystemPathToVirtualPath(),
+            Name = name,
+            HasChildren = isFolder && DirectoryHasChildren(path),
+            IsFolder = isFolder,
+            Parent = parentPath.IsNullOrWhiteSpace()
+                ? null
+                : new FileSystemFolderModel { Path = parentPath.SystemPathToVirtualPath() }
+        };
+    }
 }
