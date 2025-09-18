@@ -244,12 +244,6 @@ export abstract class UmbTreeItemElementBase<
 				position: relative;
 			}
 
-			#label {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-			}
-
 			#sign-bundle {
 				position: absolute;
 				bottom: -5px;

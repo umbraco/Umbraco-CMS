@@ -4,8 +4,6 @@ import type { ManifestEntitySign } from '../types';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-entity-sign-bundle')
 export class UmbEntitySignBundleElement extends UmbLitElement {
@@ -22,8 +20,10 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	@state() private _entityType?: string;
 	@state() private _signs?: Array<any>;
 	@state() private _labels: Map<string, string> = new Map();
-	private _hoverTimer: number | undefined;
-	private static readonly HOVER_OPEN_DELAY = 1000; // 1s; tweak as you like
+
+	private _hoverTimer?: number;
+	private _closeTimer?: number;
+	private _overPanel = false;
 
 	#signLabelObservations: Array<UmbObserverController<string>> = [];
 
@@ -70,17 +70,35 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		);
 	}
 
+	#animateOpen() {
+		const panel = this.renderRoot.querySelector<HTMLElement>('.panel');
+		if (!panel) return;
+		panel.getAnimations().forEach((a) => a.cancel());
+		panel.animate(
+			[
+				{ opacity: 0, transform: 'translateY(-10px)' },
+				{ opacity: 1, transform: 'translateY(0)' },
+			],
+			{ duration: 300, easing: 'ease', fill: 'forwards' },
+		);
+	}
+
 	#openDropdown = () => {
+		console.log('hover timer', this._hoverTimer);
+		if (this._closeTimer) {
+			clearTimeout(this._closeTimer);
+			this._closeTimer = undefined;
+		}
 		if (this._hoverTimer) {
 			clearTimeout(this._hoverTimer);
-			this._hoverTimer = undefined;
 		}
-
 		this._hoverTimer = window.setTimeout(() => {
 			const pop = this.renderRoot.querySelector<HTMLElement>('#popover');
-			pop?.showPopover?.();
+			if (!pop || pop.matches(':popover-open')) return;
+			(pop as any).showPopover?.();
+			this.#animateOpen();
 			this._hoverTimer = undefined;
-		}, UmbEntitySignBundleElement.HOVER_OPEN_DELAY);
+		}, 1000);
 	};
 
 	#closeDropdown = () => {
@@ -88,8 +106,27 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			clearTimeout(this._hoverTimer);
 			this._hoverTimer = undefined;
 		}
-		const pop = this.renderRoot.querySelector<HTMLElement>('#popover');
-		pop?.hidePopover?.();
+
+		if (this._closeTimer) {
+			clearTimeout(this._closeTimer);
+		}
+
+		this._closeTimer = window.setTimeout(() => {
+			if (this._overPanel) return;
+			const pop = this.renderRoot.querySelector<HTMLElement>('#popover');
+			if (pop && pop.matches(':popover-open')) {
+				(pop as any).hidePopover?.();
+			}
+			this._closeTimer = undefined;
+		}, 120);
+	};
+
+	#onPanelEnter = () => {
+		this._overPanel = true;
+	};
+	#onPanelLeave = () => {
+		this._overPanel = false;
+		this.#closeDropdown();
 	};
 
 	override render() {
@@ -108,8 +145,13 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				@mouseleave=${this.#closeDropdown}>
 				<umb-icon name="icon-info"></umb-icon>
 			</button>
-			<uui-popover-container id="popover">
-				<umb-popover-layout>
+			<uui-popover-container
+				id="popover"
+				popover
+				placement="bottom-start"
+				@mouseenter=${this.#onPanelEnter}
+				@mouseleave=${this.#onPanelLeave}>
+				<umb-popover-layout class="panel">
 					<div class="labels-pop">${this.#renderOptions()}</div>
 				</umb-popover-layout>
 			</uui-popover-container>
@@ -130,9 +172,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	static override styles = [
 		css`
 			#sign-icon {
-				position: absolute;
-				right: -5px;
-				bottom: -10px;
 				width: 14px;
 				display: flex;
 				align-items: center;
@@ -145,7 +184,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			}
 
 			umb-icon {
-				font-size: 12px;
+				font-size: 10px;
 			}
 			.labels-pop {
 				padding: 5px;
@@ -154,6 +193,15 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				gap: 5px;
+			}
+
+			.panel {
+				opacity: 0;
+				transform: translateY(-10px);
+				transition:
+					opacity 300ms ease,
+					transform 300ms ease;
+				will-change: opacity, transform;
 			}
 		`,
 	];
