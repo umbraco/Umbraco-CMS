@@ -1,9 +1,9 @@
 import type { UmbPickerContext } from '../picker.context.js';
-import { property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
-import type { ManifestModal, UmbModalContext, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
+import type { ManifestModal, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
+import { UMB_PICKER_INPUT_CONTEXT } from '@umbraco-cms/backoffice/picker-input';
 
 export abstract class UmbPickerModalBaseElement<
 	ItemType = UmbEntityModel,
@@ -13,36 +13,35 @@ export abstract class UmbPickerModalBaseElement<
 > extends UmbModalBaseElement<ModalDataType, ModalValueType, ModalManifestType> {
 	protected abstract _pickerContext: UmbPickerContext;
 
-	@property({ attribute: false })
-	public override set modalContext(context: UmbModalContext<ModalDataType, ModalValueType> | undefined) {
-		super.modalContext = context;
-		this.#observeModalInteractionMemories();
-	}
-	public override get modalContext(): UmbModalContext<ModalDataType, ModalValueType> | undefined {
-		return super.modalContext;
+	#pickerInputContext?: typeof UMB_PICKER_INPUT_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_PICKER_INPUT_CONTEXT, (pickerInputContext) => {
+			this.#pickerInputContext = pickerInputContext;
+			this.#observeMemoriesFromInputContext();
+		});
 	}
 
 	override connectedCallback(): void {
 		super.connectedCallback();
-		// We need to observe the picker memories to be able to update the modal memory.
-		// We observe the memories to support close with esc key or clicking outside the modal.
-		this.#observePickerModalInteractionMemories();
+		this.#observeMemoriesFromPicker();
 	}
 
-	#observePickerModalInteractionMemories() {
+	#observeMemoriesFromPicker() {
 		this.observe(this._pickerContext.interactionMemory.memories, (memories) => {
-			this.#setPickerModalMemory(memories);
+			this.#setMemoriesOnInputContext(memories);
 		});
 	}
 
 	#getInteractionMemoryUnique() {
-		// TODO: consider appending with a picker unique when we have that implemented.
+		// TODO: consider appending with a unique when we have that implemented.
 		return `UmbPickerModal`;
 	}
 
-	#observeModalInteractionMemories() {
+	#observeMemoriesFromInputContext() {
 		this.observe(
-			this.modalContext?.interactionMemory.memory(this.#getInteractionMemoryUnique()),
+			this.#pickerInputContext?.interactionMemory.memory(this.#getInteractionMemoryUnique()),
 			(memory) => {
 				memory?.memories?.forEach((memory) => this._pickerContext.interactionMemory.setMemory(memory));
 			},
@@ -50,16 +49,16 @@ export abstract class UmbPickerModalBaseElement<
 		);
 	}
 
-	#setPickerModalMemory(pickerMemories: Array<UmbInteractionMemoryModel>) {
+	#setMemoriesOnInputContext(pickerMemories: Array<UmbInteractionMemoryModel>) {
 		if (pickerMemories?.length > 0) {
 			const pickerModalMemory: UmbInteractionMemoryModel = {
 				unique: this.#getInteractionMemoryUnique(),
 				memories: pickerMemories,
 			};
 
-			this.modalContext?.interactionMemory.setMemory(pickerModalMemory);
+			this.#pickerInputContext?.interactionMemory.setMemory(pickerModalMemory);
 		} else {
-			this.modalContext?.interactionMemory.deleteMemory(this.#getInteractionMemoryUnique());
+			this.#pickerInputContext?.interactionMemory.deleteMemory(this.#getInteractionMemoryUnique());
 		}
 	}
 }

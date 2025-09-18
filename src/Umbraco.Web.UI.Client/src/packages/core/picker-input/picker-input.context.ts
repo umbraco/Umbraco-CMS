@@ -6,7 +6,6 @@ import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
@@ -112,9 +111,6 @@ export class UmbPickerInputContext<
 		});
 
 		const modalValue = await modalContext.onSubmit().catch(() => undefined);
-
-		this.#setMemoriesFromModal(modalContext?.interactionMemory.getAllMemories() ?? []);
-
 		if (!modalValue) return;
 
 		this.setSelection(modalValue.selection);
@@ -139,15 +135,5 @@ export class UmbPickerInputContext<
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
-	}
-
-	#setMemoriesFromModal(modalMemories: Array<UmbInteractionMemoryModel>) {
-		/* Check if we have any memories from the modal, and if so,
-		apply it to the picker input context so it can be reached from the input element. */
-		if (modalMemories.length > 0) {
-			modalMemories.forEach((memory) => this.interactionMemory.setMemory(memory));
-		} else {
-			this.interactionMemory.clear();
-		}
 	}
 }

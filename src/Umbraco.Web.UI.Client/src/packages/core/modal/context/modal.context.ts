@@ -5,13 +5,11 @@ import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffi
 import { umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/router';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -63,8 +61,6 @@ export class UmbModalContext<
 	#size = new UmbStringState<UUIModalSidebarSize>('small');
 	public readonly size = this.#size.asObservable();
 
-	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
-
 	constructor(
 		host: UmbControllerHost,
 		modalAlias: string | UmbModalToken<ModalData, ModalValue>,
@@ -90,10 +86,6 @@ export class UmbModalContext<
 		this.backdropBackground = args.modal?.backdropBackground || this.backdropBackground;
 
 		this.#size.setValue(size);
-
-		// Pass any provided memories to the interaction memory manager
-		const memories = ((args.data?.interactionMemories as Array<UmbInteractionMemoryModel>) || undefined) ?? [];
-		memories.forEach((memory) => this.interactionMemory.setMemory(memory));
 
 		const defaultData = this.alias instanceof UmbModalToken ? this.alias.getDefaultData() : undefined;
 		this.data = Object.freeze(
