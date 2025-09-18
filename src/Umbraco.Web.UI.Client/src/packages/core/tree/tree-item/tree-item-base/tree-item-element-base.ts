@@ -152,7 +152,16 @@ export abstract class UmbTreeItemElementBase<
 	};
 
 	renderIconContainer() {
-		return html`${this.#renderIcon()} `;
+		return html`
+			<div id="icon-container" slot="icon">
+				<slot
+					name="icon"
+					@slotchange=${(e: Event) => {
+						this._iconSlotHasChildren = this.#hasNodes(e);
+					}}></slot>
+				${!this._iconSlotHasChildren ? this.#renderIcon() : nothing} ${this.#renderSigns()}
+			</div>
+		`;
 	}
 
 	#renderSigns() {
@@ -164,29 +173,27 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	#renderIcon() {
-		const icon = this._item?.icon;
+		const iconName = this._getIconName();
 		const isFolder = this._item?.isFolder;
 
-		if (icon) {
-			return html`<div id="icon-container" slot="icon">
-				<umb-icon name="${this._getIconToRender(icon)}"></umb-icon>${this.#renderSigns()}
-			</div>`;
+		if (iconName) {
+			return html`<umb-icon name="${this._getIconToRender(iconName)}"></umb-icon>`;
 		}
 
 		if (isFolder) {
-			return html`<div id="icon-container" slot="icon">
-				<umb-icon name="icon-folder"></umb-icon>${this.#renderSigns()}
-			</div>`;
+			return html`<umb-icon name="icon-folder"></umb-icon>`;
 		}
 
-		return html`<div id="icon-container" slot="icon">
-			<umb-icon name="icon-circle-dotted"></umb-icon>${this.#renderSigns()}
-		</div>`;
+		return html`<umb-icon name="icon-circle-dotted"></umb-icon>`;
 	}
 
 	protected _getIconToRender(icon: string) {
 		const iconWithoutColor = icon.split(' ')[0];
 		return this._isActive || this._isSelected ? iconWithoutColor : icon;
+	}
+
+	protected _getIconName(): string | null | undefined {
+		return this._item?.icon;
 	}
 
 	renderLabel() {
@@ -247,6 +254,12 @@ export abstract class UmbTreeItemElementBase<
 				position: absolute;
 				bottom: -5px;
 				right: -5px;
+			}
+
+			#label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 		`,
 	];
