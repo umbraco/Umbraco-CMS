@@ -1,19 +1,19 @@
 import { UmbTagRepository } from '../../repository/tag.repository.js';
 import {
 	css,
+	customElement,
 	html,
 	nothing,
-	customElement,
 	property,
 	query,
 	queryAll,
-	state,
 	repeat,
+	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-tags-input')
 export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -63,7 +63,8 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	@query('#enteredTagsWrapper') private _enteredTagsWrapper!: HTMLElement;
 
-	@queryAll('.tag') private _tagEls?: NodeListOf<HTMLElement>;
+	@queryAll('.tag')
+	private _tagEls?: NodeListOf<HTMLElement>;
 
 	#repository = new UmbTagRepository(this);
 
@@ -142,6 +143,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				this.#focusTag(idx + 1);
 			}
 		}
+
 		if (e.key === 'ArrowLeft') {
 			e.preventDefault();
 			if (idx > 0) {
