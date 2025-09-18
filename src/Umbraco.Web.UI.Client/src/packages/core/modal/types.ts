@@ -1,5 +1,4 @@
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export type * from './extensions/types.js';
@@ -9,7 +8,6 @@ export interface UmbPickerModalData<ItemType> {
 	filter?: (item: ItemType) => boolean;
 	pickableFilter?: (item: ItemType) => boolean;
 	search?: UmbPickerModalSearchConfig;
-	interactionMemories?: Array<UmbInteractionMemoryModel>;
 }
 
 export interface UmbPickerModalSearchConfig<QueryParamsType = Record<string, unknown>> {
