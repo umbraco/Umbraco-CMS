@@ -6,9 +6,9 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"luxon": "^3.7.1"
+		"luxon": "^3.7.2"
 	},
 	"devDependencies": {
-		"@types/luxon": "^3.6.2"
+		"@types/luxon": "^3.7.1"
 	}
 }
