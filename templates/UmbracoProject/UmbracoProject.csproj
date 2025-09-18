@@ -14,9 +14,7 @@
     <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     #endif-->
     <!--#if (ModelsBuilderMode == "InMemoryAuto" || (DevelopmentMode == "BackofficeDevelopment" && ModelsBuilderMode == "Default")) -->
-    <PropertyGroup>
-      <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-    </PropertyGroup>
+    <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="UMBRACO_VERSION_FROM_TEMPLATE" />rm l
     <!--#endif -->
     <!--#if (StarterKit != "None") -->
     <PackageReference Include="STARTER_KIT_NAME" Version="STARTER_KIT_VERSION"/>
