@@ -2332,7 +2332,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.DateTimeWithTimeZone,
                     EditorUiAlias = "Umb.PropertyEditorUi.DateTimeWithTimeZonePicker",
                     DbType = "Ntext",
-                    Configuration = "{\"format\": \"date-time\", \"timeFormat\": \"HH:mm\", \"timeZones\": {\"mode\": \"all\"}}",
+                    Configuration = "{\"timeFormat\": \"HH:mm\", \"timeZones\": {\"mode\": \"all\"}}",
                 });
         }
     }

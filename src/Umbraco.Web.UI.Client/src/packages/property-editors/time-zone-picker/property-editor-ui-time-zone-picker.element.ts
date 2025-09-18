@@ -49,9 +49,6 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 
 	#onModeInput(event: UUIRadioEvent) {
 		switch (event.target.value) {
-			case 'none':
-				this.value = undefined;
-				break;
 			case 'all':
 				this.value = { mode: 'all', timeZones: [] };
 				break;
@@ -91,11 +88,7 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 				required
 				?readonly=${this.readonly}
 				@input=${this.#onModeInput}
-				.value=${this.value?.mode ?? 'none'}>
-				<uui-radio
-					name="order"
-					label=${this.localize.term('dateTimePicker_config_timeZones_disabled')}
-					value="none"></uui-radio>
+				.value=${this.value?.mode ?? 'all'}>
 				<uui-radio
 					name="order"
 					label=${this.localize.term('dateTimePicker_config_timeZones_all')}
