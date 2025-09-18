@@ -2,10 +2,10 @@ import type { UmbNamableWorkspaceContext } from '../types.js';
 import { UmbNameWriteGuardManager } from '../namable/index.js';
 import { UmbEntityDetailWorkspaceContextBase } from './entity-detail-workspace-base.js';
 import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
-import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 		NamedDetailModelType extends UmbNamedEntityModel = UmbNamedEntityModel,

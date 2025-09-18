@@ -1,6 +1,7 @@
 import type { ManifestWorkspaceView } from '../../types.js';
-import type { UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import type { UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
+
 export class UmbWorkspaceViewContext extends UmbViewContext {
 	public readonly IS_WORKSPACE_VIEW_CONTEXT = true as const;
 

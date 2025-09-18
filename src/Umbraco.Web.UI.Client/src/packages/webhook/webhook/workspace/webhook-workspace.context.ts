@@ -5,13 +5,12 @@ import type { UmbWebhookDetailModel } from '../types.js';
 import type { UmbWebhookEventModel } from '../../webhook-event/types.js';
 import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
 import {
-	type UmbSubmittableWorkspaceContext,
-	UmbWorkspaceIsNewRedirectController,
-	type UmbRoutableWorkspaceContext,
 	UmbEntityNamedDetailWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbWebhookWorkspaceContext
 	extends UmbEntityNamedDetailWorkspaceContextBase<UmbWebhookDetailModel, UmbWebhookDetailRepository>

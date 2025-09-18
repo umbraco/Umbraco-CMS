@@ -1,16 +1,16 @@
 import type { UmbUserDetailModel, UmbUserStartNodesModel, UmbUserStateEnum } from '../../types.js';
-import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserDetailRepository } from '../../repository/index.js';
 import { UMB_USER_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
+import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbUserAvatarRepository } from '../../repository/avatar/index.js';
 import { UmbUserConfigRepository } from '../../repository/config/index.js';
-import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
-import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UMB_USER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbEntityNamedDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbRepositoryResponseWithAsObservable } from '@umbraco-cms/backoffice/repository';
+import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 type EntityType = UmbUserDetailModel;
 

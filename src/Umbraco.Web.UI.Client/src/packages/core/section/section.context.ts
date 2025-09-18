@@ -1,11 +1,11 @@
 import type { ManifestSection } from './extensions/section.extension.js';
 import { UMB_SECTION_CONTEXT } from './section.context.token.js';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbSectionContext extends UmbContextBase {
 	#manifestAlias = new UmbStringState<string | undefined>(undefined);

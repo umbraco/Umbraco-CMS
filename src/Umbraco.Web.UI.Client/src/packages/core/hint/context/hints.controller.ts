@@ -102,6 +102,7 @@ export class UmbHintController<
 	 * @param {(path: Array<string>) => boolean} filter - A filter function to filter the hints by their path.
 	 * @returns {Observable<Array<UmbHint> | undefined>} An observable of an array of hints that match the filter.
 	 */
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_internal_descendingHintsByFilter(filter: (path: Array<string>) => boolean): Observable<Array<UmbHint> | undefined> {
 		return this.#hints.asObservablePart((hints) => {
 			return hints.filter((hint) => filter(hint.path));

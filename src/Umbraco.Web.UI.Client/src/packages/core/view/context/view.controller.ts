@@ -1,11 +1,13 @@
 import { UMB_VIEW_CONTEXT } from './view.context-token.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import { UmbClassState, UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbHintController, type UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbHintController } from '@umbraco-cms/backoffice/hint';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import type { UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  *

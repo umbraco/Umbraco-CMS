@@ -1,27 +1,28 @@
 import type { UmbContentWorkspaceViewEditTabElement } from './content-editor-tab.element.js';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type {
-	UmbContentTypeModel,
-	UmbContentTypeStructureManager,
-	UmbPropertyTypeContainerMergedModel,
-} from '@umbraco-cms/backoffice/content-type';
+import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import {
 	UmbContentTypeContainerStructureHelper,
 	UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/content-type';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_VIEW_CONTEXT, UmbViewContext } from '@umbraco-cms/backoffice/view';
 import type {
 	PageComponent,
 	UmbRoute,
 	UmbRouterSlotChangeEvent,
 	UmbRouterSlotInitEvent,
 } from '@umbraco-cms/backoffice/router';
-import { encodeFolderName } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import './content-editor-tab.element.js';
+import type {
+	UmbContentTypeModel,
+	UmbContentTypeStructureManager,
+	UmbPropertyTypeContainerMergedModel,
+} from '@umbraco-cms/backoffice/content-type';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import { UMB_VIEW_CONTEXT, UmbViewContext } from '@umbraco-cms/backoffice/view';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+
+import './content-editor-tab.element.js';
 
 @customElement('umb-content-workspace-view-edit')
 export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -174,7 +175,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			);
 		}
 	}
+
 	#currentProvidedView?: UmbViewContext;
+
 	#provideViewContext(viewAlias: string | null, component: PageComponent) {
 		const view = this.#tabViewContexts.find((context) => context.viewAlias === viewAlias);
 		if (this.#currentProvidedView === view) {
