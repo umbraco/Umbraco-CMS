@@ -21,6 +21,13 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	@state() private _signs?: Array<any>;
 	@state() private _labels: Map<string, string> = new Map();
 
+	public open() {
+		this.#openDropdown();
+	}
+	public close() {
+		this.#closeDropdown();
+	}
+
 	private _hoverTimer?: number;
 	private _closeTimer?: number;
 	private _overPanel = false;
@@ -84,7 +91,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	}
 
 	#openDropdown = () => {
-		console.log('hover timer', this._hoverTimer);
 		if (this._closeTimer) {
 			clearTimeout(this._closeTimer);
 			this._closeTimer = undefined;
@@ -143,7 +149,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				type="button"
 				@mouseenter=${this.#openDropdown}
 				@mouseleave=${this.#closeDropdown}>
-				<umb-icon name="icon-info"></umb-icon>
+				<umb-icon name="icon-grid"></umb-icon>
 			</button>
 			<uui-popover-container
 				id="popover"
@@ -172,15 +178,16 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	static override styles = [
 		css`
 			#sign-icon {
-				width: 14px;
+				width: 10px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				height: 14px;
+				height: 10px;
 				font-size: 10px;
 				border-radius: 50%;
 				cursor: pointer;
 				border: none;
+				padding: 1px;
 			}
 
 			umb-icon {
