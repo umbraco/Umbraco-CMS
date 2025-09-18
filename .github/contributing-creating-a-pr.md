@@ -11,14 +11,20 @@ We like to use [git flow][git flow] as much as possible, but don't worry if you 
 
 Please note: we are no longer accepting features for v8 and below but will continue to merge security fixes as and when they arise.
 
-We don't have a set rule for naming pull request, so feel free to name it as you would like. In HQ we do however have a best practice guide on how to write clear and concise PR's, and you are free to use this format when naming your pull requests.
+We don't have rules for naming pull request, so feel free to name it as you would like. In HQ we do, however, have a best practice on writing clear and concise PR's, and you are free to use this format when naming your pull requests.
+
 Our convention of doing it is:
-**Area: Description (closes #IssueID)**
-1.Start by specifying the area of the pull request. This can be a feature name(UFM, Tiptap etc) or specific area(migrations, relations, segmentation).
-2. In your description where applicable mention type of PR(Build,Bump, Fix, Refactor).
-3. Good practise is to make sure you describe specifically what the change and/or impact of change.
-Example: A PR that is named "Fixed issue" makes it quite hard to see what was fixed. 
-4. Add (closes #IssueID) behind description, if your PR resolves an issue. 
+
+_Area: Description (closes #IssueID)_
+
+1.Start by specifying the area. Fx the feature name(UFM, Tiptap etc) or specific section (migrations, relations, segmentation).
+
+2. In your description, where applicable, mention type of PR (Build, Bump, Fix, Refactor etc.).
+   
+4. Good practise is to make sure you describe specifically what the change and/or impact of change.<br>
+   Example: Writing "Extension Insights: Fixes CSS alignment" instead of "Fixed issue".
+
+6. Add (closes #IssueID) behind description, if your PR resolves an issue. 
 
 That's it! 
   
