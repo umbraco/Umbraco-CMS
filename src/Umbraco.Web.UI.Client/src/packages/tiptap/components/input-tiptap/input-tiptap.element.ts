@@ -173,7 +173,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
-			editorProps: { attributes: { 'aria-label': this.label ?? 'Rich Text Editor' } },
+			editorProps: {
+				attributes: {
+					'aria-label': this.label || this.localize.term('rte_label'),
+					'aria-required': this.required ? 'true' : 'false',
+				},
+			},
 			extensions: tiptapExtensions,
 			content: this.#value,
 			injectCSS: false, // Prevents injecting CSS into `window.document`, as it never applies to the shadow DOM. [LK]

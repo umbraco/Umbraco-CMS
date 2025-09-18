@@ -1935,6 +1935,7 @@ export default {
 		openBackofficeSearch: 'Backoffice zoeken openen',
 		openCloseBackofficeHelp: 'Backoffice help openen/sluiten',
 		openCloseBackofficeProfileOptions: 'Jouw profiel opties openen/sluiten',
+		profileOptions: 'Profiel opties',
 		assignDomainDescription: 'Cultuur en Hostnamen instellen voor %0%',
 		createDescription: 'Nieuwe node aanmaken onder %0%',
 		protectDescription: 'Openbare toegang instellen op %0%',

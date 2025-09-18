@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
@@ -21,8 +21,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Collection;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 public abstract class MediaCollectionControllerBase : ContentCollectionControllerBase<IMedia, MediaCollectionResponseModel, MediaValueResponseModel, MediaVariantResponseModel>
 {
-    protected MediaCollectionControllerBase(IUmbracoMapper mapper, SignProviderCollection signProviders)
-        : base(mapper, signProviders)
+    protected MediaCollectionControllerBase(IUmbracoMapper mapper, FlagProviderCollection flagProviders)
+        : base(mapper, flagProviders)
     {
     }
 

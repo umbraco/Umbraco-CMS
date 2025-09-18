@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Services;
 
@@ -17,8 +17,8 @@ public class SiblingsTemplateTreeController : TemplateTreeControllerBase
     }
 
     [ActivatorUtilitiesConstructor]
-    public SiblingsTemplateTreeController(IEntityService entityService, SignProviderCollection signProviders)
-        : base(entityService, signProviders)
+    public SiblingsTemplateTreeController(IEntityService entityService, FlagProviderCollection flagProviders)
+        : base(entityService, flagProviders)
     {
     }
 
