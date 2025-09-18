@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
