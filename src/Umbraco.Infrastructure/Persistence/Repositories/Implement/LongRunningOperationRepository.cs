@@ -48,7 +48,7 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             .From<LongRunningOperationDto>()
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
-        LongRunningOperationDto dto = await Database.FirstOrDefaultAsync<LongRunningOperationDto>(sql);
+        LongRunningOperationDto? dto = await Database.FirstOrDefaultAsync<LongRunningOperationDto>(sql);
         return dto == null ? null : MapDtoToEntity(dto);
     }
 
@@ -60,7 +60,7 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
             .From<LongRunningOperationDto>()
             .Where<LongRunningOperationDto>(x => x.Id == id);
 
-        LongRunningOperationDto dto = await Database.FirstOrDefaultAsync<LongRunningOperationDto>(sql);
+        LongRunningOperationDto? dto = await Database.FirstOrDefaultAsync<LongRunningOperationDto>(sql);
         return dto == null ? null : MapDtoToEntity<T>(dto);
     }
 

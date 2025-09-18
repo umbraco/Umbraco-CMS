@@ -409,7 +409,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
 
     public int ReserveId(Guid key)
     {
-        NodeDto node;
+        NodeDto? node;
 
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Select<NodeDto>()
@@ -417,7 +417,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == Constants.ObjectTypes.IdReservation);
 
         node = Database.SingleOrDefault<NodeDto>(sql);
-        if (node != null)
+        if (node is not null)
         {
             throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
         }

@@ -21,7 +21,7 @@ internal abstract class ExpressionVisitorBase
     /// <summary>
     ///     Gets the list of SQL parameters.
     /// </summary>
-    protected readonly List<object> SqlParameters = new();
+    protected List<object> SqlParameters { get; } = [];
 
     protected ExpressionVisitorBase(ISqlSyntaxProvider sqlSyntax) => SqlSyntax = sqlSyntax;
 

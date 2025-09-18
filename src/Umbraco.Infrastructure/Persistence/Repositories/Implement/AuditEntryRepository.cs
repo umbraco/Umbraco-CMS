@@ -57,7 +57,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
             .From<AuditEntryDto>()
             .Where<AuditEntryDto>(x => x.Id == id);
 
-        AuditEntryDto dto = Database.FirstOrDefault<AuditEntryDto>(sql);
+        AuditEntryDto? dto = Database.FirstOrDefault<AuditEntryDto>(sql);
         return dto == null ? null : AuditEntryFactory.BuildEntity(dto);
     }
 

@@ -60,7 +60,7 @@
     <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
     <PackageVersion Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageVersion Include="ncrontab" Version="3.3.3" />
-    <PackageVersion Include="NPoco" Version="5.7.1" />
+    <PackageVersion Include="NPoco" Version="6.1.0" />
     <PackageVersion Include="NPoco.SqlServer" Version="5.7.1" />
     <PackageVersion Include="OpenIddict.Abstractions" Version="6.2.1" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="6.2.1" />

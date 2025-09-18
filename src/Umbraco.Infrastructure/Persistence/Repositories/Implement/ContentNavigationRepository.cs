@@ -26,7 +26,12 @@ public class ContentNavigationRepository : INavigationRepository
 
     private IEnumerable<INavigationModel> FetchNavigationDtos(Guid objectTypeKey, bool trashed)
     {
-        Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql()
+        if (AmbientScope is null)
+        {
+            return Enumerable.Empty<NavigationDto>();
+        }
+
+        Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
             .Select(
                 $"n.{NodeDto.IdColumnName} as {NodeDto.IdColumnName}",
                 $"n.{NodeDto.KeyColumnName} as {NodeDto.KeyColumnName}",
@@ -40,6 +45,6 @@ public class ContentNavigationRepository : INavigationRepository
             .Where<NodeDto>(n => n.NodeObjectType == objectTypeKey && n.Trashed == trashed, "n")
             .OrderBy<NodeDto>(n => n.Path, "n"); // make sure that we get the parent items first
 
-        return AmbientScope?.Database.Fetch<NavigationDto>(sql) ?? Enumerable.Empty<NavigationDto>();
+        return AmbientScope.Database.Fetch<NavigationDto>(sql);
     }
 }
