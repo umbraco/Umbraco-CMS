@@ -661,8 +661,20 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			// TODO: fix type error
 			this._data.updateCurrent({ values });
 
-			// TODO: Ideally we should move this type of logic to the act of saving [NL]
-			this._data.ensureVariantData(variantId);
+			// TODO: I think ideally we should move this type of logic to the act of saving, by looping over the variant combinations of data-value [NL]
+			// if the document varies by culture & property not by segment, we need to update this segment variants for all culture [NL]
+			if (this.getVariesByCulture() && property.variesByCulture === false && property.variesBySegment === true) {
+				// get all culture options:
+				const cultureOptions = await firstValueFrom(this.variantOptions);
+				for (const cultureOption of cultureOptions) {
+					if (cultureOption.segment === variantId.segment) {
+						this._data.ensureVariantData(UmbVariantId.Create(cultureOption));
+					}
+				}
+			} else {
+				// otherwise we know the property variant-id will be matching with a variant:
+				this._data.ensureVariantData(variantId);
+			}
 		}
 		this.finishPropertyValueChange();
 	}
