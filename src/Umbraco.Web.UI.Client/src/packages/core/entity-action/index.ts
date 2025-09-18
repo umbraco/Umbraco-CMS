@@ -8,6 +8,8 @@ export * from './entity-action.event.js';
 export * from './has-children/index.js';
 export * from './entity-updated.event.js';
 export * from './entity-deleted.event.js';
+export * from './entity.event.js';
+export * from './event/index.js';
 
 export type * from './types.js';
 
