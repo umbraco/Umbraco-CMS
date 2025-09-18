@@ -117,14 +117,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	#focusTag(index: number) {
 		const tag = this._tagEls?.[index];
 		if (!tag) return;
-
-		//Find the current element with the class .tab and tabindex=0(will be the previous tag)
-		const active = this.renderRoot.querySelector<HTMLElement>('.tag[tabindex="0"]');
-		//Return it is tabindex to -1
-		active?.setAttribute('tabindex', '-1');
-
-		// Set the tabindex to 0 in the current target
-		tag.setAttribute('tabindex', '0');
 		tag.focus();
 	}
 
@@ -136,7 +128,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#onTagKeydown(e: KeyboardEvent, idx: number) {
-		const current = e.currentTarget as HTMLElement;
 		if (e.key === 'ArrowRight') {
 			e.preventDefault();
 			if (idx < this.items.length - 1) {
@@ -157,11 +148,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			}
 			this.#delete(this.#items[idx]);
 			this.#focusTag(idx + 1);
-		}
-		if (e.key === 'Tab') {
-			e.preventDefault();
-			current.tabIndex = -1;
-			this._enteredTagsWrapper.focus();
 		}
 	}
 
@@ -280,7 +266,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				this.items,
 				(tag) => tag,
 				(tag, index) => html`
-					<uui-tag class="tag" tabindex="-1" @keydown="${(e: KeyboardEvent) => this.#onTagKeydown(e, index)}">
+					<uui-tag class="tag" tabindex="0" @keydown=${(e: KeyboardEvent) => this.#onTagKeydown(e, index)}>
 						<span>${tag}</span>
 						${this.#renderRemoveButton(tag)}
 					</uui-tag>
@@ -383,6 +369,10 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			}
 
 			/** Created tags */
+
+			.tag:focus {
+				outline: var(--uui-size-1) solid var(--uui-color-focus);
+			}
 
 			.tag uui-icon {
 				margin-left: var(--uui-size-space-2);
