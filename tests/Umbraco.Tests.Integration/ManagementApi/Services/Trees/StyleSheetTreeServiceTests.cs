@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -13,18 +14,19 @@ using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees;
 
-public class ScriptTreeServiceTests : UmbracoIntegrationTest
+public class StyleSheetTreeServiceTests : UmbracoIntegrationTest
 {
     private FileSystems _fileSystems;
     private IFileSystem _fileSystem;
 
     protected virtual T GetRequiredService<T>() => Services.GetRequiredService<T>();
+
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
     [SetUp]
     public void SetUpFileSystem()
     {
-        var path = GlobalSettings.UmbracoScriptsPath;
+        var path = GlobalSettings.UmbracoCssPath;
         _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(path), HostingEnvironment.ToAbsolute(path));
 
         _fileSystems = FileSystemsCreator.CreateTestFileSystems(
@@ -33,14 +35,14 @@ public class ScriptTreeServiceTests : UmbracoIntegrationTest
             GetRequiredService<IOptions<GlobalSettings>>(),
             HostingEnvironment,
             null,
-            null,
             _fileSystem,
+            null,
             null);
         for (int i = 0; i < 10; i++)
         {
-            using (var stream = CreateStream("/scriptTreeServiceTests/"))
+            using (var stream = CreateStream("/styleSheetTreeServiceTests/"))
             {
-                _fileSystem.AddFile($"file{i}.js", stream);
+                _fileSystem.AddFile($"file{i}.css", stream);
             }
         }
     }
@@ -49,22 +51,22 @@ public class ScriptTreeServiceTests : UmbracoIntegrationTest
     public void TearDownFileSystem()
     {
         // Delete all files
-        Purge(_fileSystems.ScriptsFileSystem, string.Empty);
+        Purge(_fileSystems.StylesheetsFileSystem, string.Empty);
 
         _fileSystems = null;
     }
 
     [Test]
-    public void Can_Get_Siblings_From_Script_Tree_Service()
+    public void Can_Get_Siblings_From_StyleSheet_Tree_Service()
     {
-        var service = new ScriptTreeService(_fileSystems);
+        var service = new StyleSheetTreeService(_fileSystems);
 
-        FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModel("file5.js", 1, 1, out long before, out var after);
-        int index = Array.FindIndex(treeModel, item => item.Name == "file5.js");
+        FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModel("file5.css", 1, 1, out long before, out var after);
+        int index = Array.FindIndex(treeModel, item => item.Name == "file5.css");
 
-        Assert.AreEqual(treeModel[index].Name, "file5.js");
-        Assert.AreEqual(treeModel[index - 1].Name, "file4.js");
-        Assert.AreEqual(treeModel[index + 1].Name, "file6.js");
+        Assert.AreEqual(treeModel[index].Name, "file5.css");
+        Assert.AreEqual(treeModel[index - 1].Name, "file4.css");
+        Assert.AreEqual(treeModel[index + 1].Name, "file6.css");
         Assert.That(treeModel.Length == 3);
         Assert.AreEqual(after, 3);
         Assert.AreEqual(before, 4);
