@@ -124,7 +124,7 @@ internal sealed class ModelsBuilderNotificationHandler :
 
     private Dictionary<string, object> GetModelsBuilderSettings()
     {
-        var settings = new Dictionary<string, object> { { "mode", _config.ModelsMode.ToString() } };
+        var settings = new Dictionary<string, object> { { "mode", _config.ModelsMode } };
 
         return settings;
     }
