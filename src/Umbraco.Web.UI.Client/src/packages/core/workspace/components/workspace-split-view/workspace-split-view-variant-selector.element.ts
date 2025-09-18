@@ -10,6 +10,7 @@ import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-workspace-split-view-variant-selector')
 export class UmbWorkspaceSplitViewVariantSelectorElement<
@@ -108,6 +109,24 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			},
 			'_observeVariantOptions',
 		);
+
+		if (workspaceContext) {
+			this.observe(
+				observeMultiple([
+					workspaceContext.variesByCulture,
+					workspaceContext.variesBySegment,
+					workspaceContext.variantOptions,
+				]),
+				([variesByCulture, variesBySegment, variantOptions]) => {
+					if (variesByCulture === false && variesBySegment === true && variantOptions.length > 1) {
+						this.#expandVariant(UmbVariantId.Create(variantOptions[0]));
+					}
+				},
+				'_observeExpendFirstVariantIfSegmentOnly',
+			);
+		} else {
+			this.removeUmbControllerByAlias('_observeExpendFirstVariantIfSegmentOnly');
+		}
 	}
 
 	async #observeActiveVariants(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
@@ -237,12 +256,12 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 		// If the active variant is a segment then we expend the culture variant when the selector is opened.
 		if (this.#isSegmentVariantOption(this._activeVariant)) {
-			const culture = this._cultureVariantOptions.find((variant) => {
+			const option = this._cultureVariantOptions.find((variant) => {
 				return variant.culture === this._activeVariant?.culture && variant.segment === null;
 			});
 
-			if (!culture) return;
-			const variantId = UmbVariantId.Create(culture);
+			if (!option) return;
+			const variantId = UmbVariantId.Create(option);
 			this.#expandVariant(variantId);
 		}
 	}
