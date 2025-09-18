@@ -14,6 +14,7 @@ internal static class TreeBuilderExtensions
         builder.Services.AddUnique<IPartialViewTreeService, PartialViewTreeService>();
         builder.Services.AddUnique<IScriptTreeService, ScriptTreeService>();
         builder.Services.AddUnique<IStyleSheetTreeService, StyleSheetTreeService>();
+        builder.Services.AddUnique<IFileSystemTreeService, FileSystemTreeServiceBase>();
 
         return builder;
     }
