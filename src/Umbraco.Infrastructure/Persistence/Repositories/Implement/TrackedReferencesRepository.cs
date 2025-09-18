@@ -217,7 +217,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             if (_scopeAccessor.AmbientScope is null)
             {
-                throw new InvalidOperationException("Cannot execute without a valid AmbientScope.");
+                throw new InvalidOperationException("Cannot execute without a valid AmbientScope");
             }
 
             Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
