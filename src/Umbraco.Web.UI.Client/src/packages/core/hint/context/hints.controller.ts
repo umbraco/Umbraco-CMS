@@ -7,7 +7,7 @@ import { UmbArrayState, UmbObjectState, type Observable } from '@umbraco-cms/bac
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
 export interface UmbHintControllerArgs<HintType extends UmbHint = UmbHint> {
-	viewAlias?: string;
+	viewAlias?: string | null;
 	scaffold?: Partial<HintType>;
 }
 
@@ -16,10 +16,15 @@ export class UmbHintController<
 	IncomingHintType extends UmbIncomingHintBase = UmbPartialSome<HintType, 'unique' | 'weight' | 'path'>,
 > extends UmbControllerBase {
 	//
-	#viewAlias?: string;
-	getViewAlias(): string | undefined {
+	#viewAlias: string | null;
+	getViewAlias(): string | null {
 		return this.#viewAlias;
 	}
+	#pathFilter?: (path: Array<string>) => boolean;
+	setPathFilter(filter: (path: Array<string>) => boolean) {
+		this.#pathFilter = filter;
+	}
+
 	#scaffold = new UmbObjectState<Partial<HintType>>({});
 	readonly scaffold = this.#scaffold.asObservable();
 	#inUnprovidingState?: boolean;
@@ -43,7 +48,7 @@ export class UmbHintController<
 	constructor(host: UmbControllerHost, args?: UmbHintControllerArgs<HintType>) {
 		super(host);
 
-		this.#viewAlias = args?.viewAlias;
+		this.#viewAlias = args?.viewAlias ?? null;
 		if (args?.scaffold) {
 			this.#scaffold.setValue(args?.scaffold);
 		}
@@ -82,7 +87,7 @@ export class UmbHintController<
 		return this.#hints.asObservablePart(fn);
 	}
 
-	descendingHints(viewAlias?: string): Observable<Array<UmbHint> | undefined> {
+	descendingHints(viewAlias?: string | null): Observable<Array<UmbHint> | undefined> {
 		if (viewAlias) {
 			return this.#hints.asObservablePart((hints) => {
 				return hints.filter((hint) => hint.path[0] === viewAlias);
@@ -92,7 +97,22 @@ export class UmbHintController<
 		}
 	}
 
+	/**
+	 * @internal
+	 * @param {(path: Array<string>) => boolean} filter - A filter function to filter the hints by their path.
+	 * @returns {Observable<Array<UmbHint> | undefined>} An observable of an array of hints that match the filter.
+	 */
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	_internal_descendingHintsByFilter(filter: (path: Array<string>) => boolean): Observable<Array<UmbHint> | undefined> {
+		return this.#hints.asObservablePart((hints) => {
+			return hints.filter((hint) => filter(hint.path));
+		});
+	}
+
 	inherit(): void {
+		if (this.#viewAlias === null && this.#pathFilter === undefined) {
+			throw new Error('A Hint Controller needs a view alias or pathFilter to be able to inherit from a parent.');
+		}
 		this.consumeContext(UMB_HINT_CONTEXT, (parent) => {
 			this.inheritFrom(parent);
 		}).skipHost();
@@ -101,13 +121,24 @@ export class UmbHintController<
 
 	inheritFrom(parent: UmbHintController | undefined): void {
 		if (this.#parent === parent) return;
+		if (this.#viewAlias === null && this.#pathFilter === undefined) {
+			throw new Error('A Hint Controller needs a view alias or pathFilter to be able to inherit from a parent.');
+		}
 		this.#parent = parent;
 		this.observe(this.#parent?.scaffold, (scaffold) => {
 			if (scaffold) {
 				this.#scaffold.update(scaffold as any);
 			}
 		});
-		this.observe(parent?.descendingHints(this.#viewAlias), this.#receiveHints, 'observeParentHints');
+		if (this.#viewAlias) {
+			this.observe(parent?.descendingHints(this.#viewAlias), this.#receiveHints, 'observeParentHints');
+		} else if (this.#pathFilter) {
+			this.observe(
+				parent?._internal_descendingHintsByFilter(this.#pathFilter),
+				this.#receiveHints,
+				'observeParentHints',
+			);
+		}
 		this.observe(this.hints, this.#propagateHints, 'observeLocalMessages');
 	}
 
