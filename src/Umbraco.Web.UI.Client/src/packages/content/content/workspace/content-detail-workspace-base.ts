@@ -661,8 +661,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			// TODO: fix type error
 			this._data.updateCurrent({ values });
 
-			// TODO: I think ideally we should move this type of logic to the act of saving, by looping over the variant combinations of data-value [NL]
-			// if the document varies by culture & property not by segment, we need to update this segment variants for all culture [NL]
+			/**
+			 * Handling of Not-Culture but Segment variant properties: [NL]
+			 * We need to ensure variant-entries across all culture variants for the given segment variant, when er property is configured to vary by segment but not culture.
+			 * This is the only different case, in all other cases its fine to just target the given variant.
+			 */
 			if (this.getVariesByCulture() && property.variesByCulture === false && property.variesBySegment === true) {
 				// get all culture options:
 				const cultureOptions = await firstValueFrom(this.variantOptions);
