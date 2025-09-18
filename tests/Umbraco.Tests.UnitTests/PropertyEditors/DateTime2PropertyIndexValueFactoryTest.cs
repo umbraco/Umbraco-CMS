@@ -1,8 +1,8 @@
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -12,10 +12,8 @@ namespace Umbraco.Cms.Tests.UnitTests.PropertyEditors;
 [TestOf(typeof(DateTime2PropertyIndexValueFactory))]
 public class DateTime2PropertyIndexValueFactoryTest
 {
-    private readonly IJsonSerializer _jsonSerializer =
-        new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
-
-    private readonly Mock<IDataTypeConfigurationCache> _dataTypeConfigurationCache = new(MockBehavior.Strict);
+    private static readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+    private static readonly Mock<DateTime2ValueConverterBase> _valueConverter = new(MockBehavior.Strict, _jsonSerializer);
 
     [Test]
     public void GetIndexValues_ReturnsEmptyValues_ForNullPropertyValue()
@@ -25,7 +23,7 @@ public class DateTime2PropertyIndexValueFactoryTest
             .Returns("testAlias");
         propertyMock.Setup(x => x.GetValue("en-US", null, true))
             .Returns(null);
-        var factory = new DateTime2PropertyIndexValueFactory(_dataTypeConfigurationCache.Object, _jsonSerializer);
+        var factory = new DateTime2PropertyIndexValueFactory(_valueConverter.Object);
 
         var result = factory.GetIndexValues(
             propertyMock.Object,
@@ -42,11 +40,8 @@ public class DateTime2PropertyIndexValueFactoryTest
         Assert.IsEmpty(indexValue.Values);
     }
 
-    [TestCase(DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.All, "{\"date\":\"2023-01-18T12:00:00+01:00\",\"timeZone\":\"Europe/Copenhagen\"}", "2023-01-18T11:00:00.0000000Z")]
-    [TestCase(DateTime2Configuration.DateTimeFormat.DateTime, DateTime2Configuration.TimeZoneMode.None, "{\"date\":\"2023-01-18T12:00:00Z\",\"timeZone\":\"Europe/Copenhagen\"}", "2023-01-18T12:00:00.0000000")]
-    [TestCase(DateTime2Configuration.DateTimeFormat.DateOnly, DateTime2Configuration.TimeZoneMode.None, "{\"date\":\"2023-01-18T00:00:00Z\",\"timeZone\":null}", "2023-01-18")]
-    [TestCase(DateTime2Configuration.DateTimeFormat.TimeOnly, DateTime2Configuration.TimeZoneMode.None, "{\"date\":\"0001-01-01T12:00:00Z\",\"timeZone\":null}", "12:00:00.0000000")]
-    public void GetIndexValues_ReturnsFormattedUtcDateTime(DateTime2Configuration.DateTimeFormat format, DateTime2Configuration.TimeZoneMode mode, string propertyValue, string expectedIndexValue)
+    [Test]
+    public void GetIndexValues_ReturnsFormattedUtcDateTime()
     {
         var dataTypeKey = Guid.NewGuid();
         var propertyMock = new Mock<IProperty>(MockBehavior.Strict);
@@ -55,17 +50,18 @@ public class DateTime2PropertyIndexValueFactoryTest
         propertyMock.SetupGet(x => x.PropertyType)
             .Returns(Mock.Of<IPropertyType>(x => x.DataTypeKey == dataTypeKey));
         propertyMock.Setup(x => x.GetValue("en-US", null, true))
-            .Returns(propertyValue);
+            .Returns("{\"date\":\"2023-01-18T12:00:00+01:00\",\"timeZone\":\"Europe/Copenhagen\"}");
 
-        var configuration = new DateTime2Configuration
+        var dto = new DateTime2ValueConverterBase.DateTime2Dto
         {
-            Format = format,
-            TimeZones = new DateTime2Configuration.TimeZonesConfiguration { Mode = mode },
+            Date = DateTimeOffset.Parse("2023-01-18T12:00:00+01:00"), TimeZone = "Europe/Copenhagen"
         };
-        _dataTypeConfigurationCache.Setup(x => x.GetConfigurationAs<DateTime2Configuration>(dataTypeKey))
-            .Returns(configuration);
 
-        var factory = new DateTime2PropertyIndexValueFactory(_dataTypeConfigurationCache.Object, _jsonSerializer);
+        _valueConverter.Setup(x => x.ConvertToObject(It.IsAny<DateTime2ValueConverterBase.DateTime2Dto>()))
+            .Returns(dto.Date)
+            .Verifiable(Times.Once);
+
+        var factory = new DateTime2PropertyIndexValueFactory(_valueConverter.Object);
 
         var result = factory.GetIndexValues(
             propertyMock.Object,
@@ -76,11 +72,13 @@ public class DateTime2PropertyIndexValueFactoryTest
             new Dictionary<Guid, IContentType>())
             .ToList();
 
+        _valueConverter.VerifyAll();
+
         Assert.AreEqual(1, result.Count);
         var indexValue = result.First();
         Assert.AreEqual(indexValue.FieldName, "testAlias");
         Assert.AreEqual(1, indexValue.Values.Count());
         var value = indexValue.Values.First();
-        Assert.AreEqual(expectedIndexValue, value);
+        Assert.AreEqual("2023-01-18T11:00:00.0000000", value);
     }
 }
