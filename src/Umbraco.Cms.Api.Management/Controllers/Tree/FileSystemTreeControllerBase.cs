@@ -23,7 +23,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 
     [Obsolete("Use the other constructor. Scheduled for removal in Umbraco 19")]
     protected FileSystemTreeControllerBase()
-        : this(StaticServiceProvider.Instance.GetRequiredService<IFileSystemTreeService>())
+        : this(StaticServiceProvider.Instance.GetRequiredService<IScriptTreeService>())
     {
     }
 
