@@ -418,9 +418,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 			#appearances {
 				display: flex;
-				gap: var(--uui-size-layout-1);
-				justify-content: space-between;
-				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				gap: var(--uui-size-space-4);
 			}
 
 			.appearance {
@@ -441,7 +439,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				display: flex;
 				width: 100%;
 				flex-direction: column;
-				align-items: center;
 				gap: var(--uui-size-space-2);
 			}
 
