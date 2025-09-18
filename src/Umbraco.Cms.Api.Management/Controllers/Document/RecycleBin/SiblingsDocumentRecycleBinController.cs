@@ -20,7 +20,5 @@ public class SiblingsDocumentRecycleBinController : DocumentRecycleBinController
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SubsetViewModel<DocumentRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<SubsetViewModel<DocumentRecycleBinItemResponseModel>>> Siblings(CancellationToken cancellationToken, Guid target, int before, int after, Guid? dataTypeId = null)
-    {
-        return await GetSiblings(target, before, after);
-    }
+        => await GetSiblings(target, before, after);
 }
