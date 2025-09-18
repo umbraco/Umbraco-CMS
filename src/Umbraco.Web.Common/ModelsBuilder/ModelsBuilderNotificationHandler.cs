@@ -78,7 +78,7 @@ internal sealed class ModelsBuilderNotificationHandler :
     /// </summary>
     public void Handle(TemplateSavingNotification notification)
     {
-        if (_config.ModelsMode == ModelsMode.Nothing)
+        if (_config.ModelsMode == Core.Constants.ModelsBuilder.ModelsModes.Nothing)
         {
             return;
         }

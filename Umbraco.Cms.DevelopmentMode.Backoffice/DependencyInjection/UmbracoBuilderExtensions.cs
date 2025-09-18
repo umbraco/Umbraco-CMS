@@ -37,7 +37,7 @@ public static class UmbracoBuilderExtensions
     {
         // We should only add/replace these services when models builder is InMemory, otherwise we'll cause issues.
         // Since these services expect the ModelsMode to be InMemoryAuto
-        if (builder.Config.GetModelsMode() is ModelsMode.InMemoryAuto)
+        if (builder.Config.GetModelsMode() == ModelsModeConstants.InMemoryAuto)
         {
             builder.Services.AddSingleton<UmbracoRazorReferenceManager>();
             builder.Services.AddSingleton<CompilationOptionsProvider>();

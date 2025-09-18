@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Extensions;
@@ -5,6 +6,7 @@ namespace Umbraco.Extensions;
 /// <summary>
 ///     Provides extensions for the <see cref="ModelsMode" /> enumeration.
 /// </summary>
+[Obsolete("This class will be removed in future versions, as ModelsMode enum will be removed, use modelsmode string instead. Scheduled for removal in V18.")]
 public static class ModelsModeExtensions
 {
     /// <summary>
