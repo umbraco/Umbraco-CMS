@@ -27,14 +27,19 @@ public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapReposit
     /// <returns>The unique identifier (ID) of the object if found; otherwise, <see langword="null"/>.</returns>
     public int? GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
     {
-        ISqlContext? sqlContext = scopeAccessor.AmbientScope?.SqlContext;
-        IUmbracoDatabase? database = scopeAccessor.AmbientScope?.Database;
+        if (scopeAccessor.AmbientScope is null)
+        {
+            return null;
+        }
+
+        ISqlContext sqlContext = scopeAccessor.AmbientScope.SqlContext;
+        IUmbracoDatabase database = scopeAccessor.AmbientScope.Database;
         Sql<ISqlContext>? sql;
 
         // if it's unknown don't include the nodeObjectType in the query
         if (umbracoObjectType == UmbracoObjectTypes.Unknown)
         {
-            sql = sqlContext?.Sql()
+            sql = sqlContext.Sql()
                 .Select<NodeDto>(c => c.NodeId)
                 .From<NodeDto>()
                 .Where<NodeDto>(n => n.UniqueId == key);
@@ -42,14 +47,14 @@ public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapReposit
         }
 
         Guid type = GetNodeObjectTypeGuid(umbracoObjectType);
-        sql = sqlContext?.Sql()
+        sql = sqlContext.Sql()
             .Select<NodeDto>(c => c.NodeId)
             .From<NodeDto>()
             .Where<NodeDto>(n =>
                 n.UniqueId == key
                 && (n.NodeObjectType == type
                     || n.NodeObjectType == Constants.ObjectTypes.IdReservation));
-        return database?.ExecuteScalar<int?>(sql);
+        return database.ExecuteScalar<int?>(sql);
     }
 
     /// <summary>
@@ -64,14 +69,19 @@ public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapReposit
     /// <returns>The unique identifier (GUID) of the node if found; otherwise, <see langword="null"/>.</returns>
     public Guid? GetIdForKey(int id, UmbracoObjectTypes umbracoObjectType)
     {
-        ISqlContext? sqlContext = scopeAccessor.AmbientScope?.SqlContext;
-        IUmbracoDatabase? database = scopeAccessor.AmbientScope?.Database;
-        Sql<ISqlContext>? sql;
+        if (scopeAccessor.AmbientScope is null)
+        {
+            return null;
+        }
+
+        ISqlContext sqlContext = scopeAccessor.AmbientScope.SqlContext;
+        IUmbracoDatabase database = scopeAccessor.AmbientScope.Database;
+        Sql<ISqlContext> sql;
 
         // if it's unknown don't include the nodeObjectType in the query
         if (umbracoObjectType == UmbracoObjectTypes.Unknown)
         {
-            sql = sqlContext?.Sql()
+            sql = sqlContext.Sql()
                 .Select<NodeDto>(c => c.UniqueId)
                 .From<NodeDto>()
                 .Where<NodeDto>(n => n.NodeId == id);
@@ -79,7 +89,7 @@ public class IdKeyMapRepository(IScopeAccessor scopeAccessor) : IIdKeyMapReposit
         }
 
         Guid type = GetNodeObjectTypeGuid(umbracoObjectType);
-        sql = sqlContext?.Sql()
+        sql = sqlContext.Sql()
             .Select<NodeDto>(c => c.UniqueId)
             .From<NodeDto>()
             .Where<NodeDto>(n =>

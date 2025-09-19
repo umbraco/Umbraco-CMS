@@ -62,13 +62,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             bool filterMustBeIsDependency,
             out long totalRecords)
         {
-            ISqlSyntaxProvider? sx = _scopeAccessor.AmbientScope?.Database.SqlContext.SqlSyntax;
-            string[] columns = sx == null
-                ? []
-                : [
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                totalRecords = 0;
+                return [];
+            }
+
+            ISqlSyntaxProvider? sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
+            string[] columns = [
                     sx.ColumnWithAlias("x", "otherId", "nodeId"),
                     sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
-                    sx.ColumnWithAlias("n", "text", "nodeName"),
                     sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
                     sx.ColumnWithAlias("d", "published", "nodePublished"),
                     sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
@@ -81,7 +84,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
                 ];
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
-            Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+            Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
                 .SelectDistinct(columns)
                 .From<NodeDto>("n")
                 .InnerJoinNested(innerUnionSql, "x")
@@ -111,7 +114,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             if (filterMustBeIsDependency)
             {
-                sql = sql?.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
+                sql = sql.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
             }
 
             // find the count before ordering
@@ -123,7 +126,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (totalRecords > 0)
             {
                 // Ordering is required for paging
-                sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
+                sql = sql.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
                 pagedResult =
                     _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ??
@@ -145,10 +148,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
            bool filterMustBeIsDependency,
            out long totalRecords)
         {
-            ISqlSyntaxProvider? sx = _scopeAccessor.AmbientScope?.Database.SqlContext.SqlSyntax;
-            string[] columns = sx == null
-                ? []
-                : [
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                totalRecords = 0;
+                return [];
+            }
+
+            ISqlSyntaxProvider sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
+            string[] columns = [
                     sx.ColumnWithAlias("x", "id", "nodeId"),
                     sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
                     sx.ColumnWithAlias("n", "text", "nodeName"),
@@ -163,7 +170,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
                 ];
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
-            Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+            Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
                 .SelectDistinct(columns)
                 .From<NodeDto>("n")
                 .InnerJoinNested(innerUnionSql, "x")
@@ -176,12 +183,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ct", aliasRight: "ctn");
             if (keys.Any())
             {
-                sql = sql?.Where<NodeDto>(x => keys.Contains(x.UniqueId), "n");
+                sql = sql.Where<NodeDto>(x => keys.Contains(x.UniqueId), "n");
             }
 
             if (filterMustBeIsDependency)
             {
-                sql = sql?.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
+                sql = sql.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
             }
 
             // find the count before ordering
@@ -193,7 +200,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (totalRecords > 0)
             {
                 // Ordering is required for paging
-                sql = sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
+                sql = sql.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
                 pagedResult =
                     _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ??
@@ -216,10 +223,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             if (_scopeAccessor.AmbientScope is null)
             {
-                throw new InvalidOperationException("Can not execute without a valid AmbientScope");
+                throw new InvalidOperationException("Cannot execute without a valid AmbientScope");
             }
 
-            Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
+            Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
                 .SelectDistinct<NodeDto>(node => node.UniqueId)
                 .From<NodeDto>()
                 .InnerJoin<RelationDto>()
@@ -258,25 +265,31 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             bool filterMustBeIsDependency,
             out long totalRecords)
         {
-            IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
-            ISqlContext? sqlContext = database?.SqlContext;
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                totalRecords = 0;
+                return [];
+            }
+
+            IUmbracoDatabase database = _scopeAccessor.AmbientScope.Database;
+            ISqlContext sqlContext = database.SqlContext;
+
+            SqlSyntax.ISqlSyntaxProvider syntax = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
 
             // Gets the path of the parent with ",%" added
-            Sql<ISqlContext>? subsubQuery = sqlContext?.Sql()
+            Sql<ISqlContext> subsubQuery = sqlContext.Sql()
                 .Select<NodeDto>(c => c.Path)
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.UniqueId == parentKey);
 
             // Gets the descendants of the parent node
-            Sql<ISqlContext>? subQuery = sqlContext?.Sql()
+            Sql<ISqlContext> subQuery = sqlContext.Sql()
                 .Select<NodeDto>(x => x.NodeId)
                 .From<NodeDto>()
                 .WhereLike<NodeDto>(x => x.Path, subsubQuery);
 
-            ISqlSyntaxProvider? sx = sqlContext?.SqlSyntax;
-            string[] columns = sx == null
-                ? []
-                : [
+            ISqlSyntaxProvider sx = sqlContext.SqlSyntax;
+            string[] columns = [
                     sx.ColumnWithAlias("x", "id", "nodeId"),
                     sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
                     sx.ColumnWithAlias("n", "text", "nodeName"),
@@ -292,7 +305,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
                 ];
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
-            Sql<ISqlContext>? sql = sqlContext?.Sql()
+            Sql<ISqlContext> sql = sqlContext.Sql()
                 .SelectDistinct(columns)
                 .From<NodeDto>("n")
                 .InnerJoinNested(innerUnionSql, "x")
@@ -321,7 +334,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             if (filterMustBeIsDependency)
             {
-                sql?.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
+                sql.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
             }
 
             totalRecords = database?.Count(sql!) ?? 0;
@@ -332,7 +345,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (totalRecords > 0)
             {
                 // Ordering is required for paging
-                sql?.OrderBy<RelationTypeDto>(x => x.Alias, "x");
+                sql.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
                 pagedResult =
                     _scopeAccessor.AmbientScope?.Database.SkipTake<RelationItemDto>(skip, take, sql).ToArray() ??

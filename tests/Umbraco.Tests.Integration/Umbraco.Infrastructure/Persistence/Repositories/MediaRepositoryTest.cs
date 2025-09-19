@@ -341,7 +341,7 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
                 repository.Save(folder);
             }
 
-            int[] types = { 1031 };
+            var types = new List<int> { 1031 };
             var query = provider.CreateQuery<IMedia>().Where(x => types.Contains(x.ContentTypeId));
             var result = repository.Get(query);
 

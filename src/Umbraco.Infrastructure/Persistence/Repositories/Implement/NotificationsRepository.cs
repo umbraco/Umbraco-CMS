@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -18,14 +19,15 @@ public class NotificationsRepository : INotificationsRepository
 
     private IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
-    public IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
+    public IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
     {
+        if (AmbientScope is null)
+        {
+            return [];
+        }
+
         var nodeIdsA = nodeIds.ToArray();
 
-        if (AmbientScope == null)
-        {
-            return null;
-        }
 
         ISqlSyntaxProvider syntax = AmbientScope.SqlContext.SqlSyntax;
         Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
@@ -52,11 +54,11 @@ public class NotificationsRepository : INotificationsRepository
             .Select(x => new Notification(x.NodeId, x.UserId, x.Action, objectType));
     }
 
-    public IEnumerable<Notification>? GetUserNotifications(IUser user)
+    public IEnumerable<Notification> GetUserNotifications(IUser user)
     {
-        if (AmbientScope == null)
+        if (AmbientScope is null)
         {
-            return null;
+            return [];
         }
 
         ISqlSyntaxProvider syntax = AmbientScope.SqlContext.SqlSyntax;
@@ -81,14 +83,21 @@ public class NotificationsRepository : INotificationsRepository
     public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
     {
         DeleteNotifications(user, entity);
-        return actions.Select(action => CreateNotification(user, entity, action)).ToList();
+        return actions
+            .Select(action =>
+            {
+                TryCreateNotification(user, entity, action, out Notification? n);
+                return n;
+            })
+            .WhereNotNull()
+            .ToList();
     }
 
-    public IEnumerable<Notification>? GetEntityNotifications(IEntity entity)
+    public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
     {
-        if (AmbientScope == null)
+        if (AmbientScope is null)
         {
-            return null;
+            return [];
         }
 
         ISqlSyntaxProvider syntax = AmbientScope.SqlContext.SqlSyntax;
@@ -150,22 +159,23 @@ public class NotificationsRepository : INotificationsRepository
         return AmbientScope.Database.Execute(sql);
     }
 
-    public Notification CreateNotification(IUser user, IEntity entity, string action)
+    public bool TryCreateNotification(IUser user, IEntity entity, string action, [NotNullWhen(true)] out Notification? notification)
     {
-        if (AmbientScope == null)
+        if (AmbientScope is null)
         {
-            return new Notification(0, 0, string.Empty, null);
+            notification = null;
+            return false;
         }
 
-        ISqlSyntaxProvider syntax = AmbientScope.SqlContext.SqlSyntax;
         Sql<ISqlContext>? sql = AmbientScope.SqlContext.Sql()
             .SelectDistinct<NodeDto>(c => c.NodeObjectType)
             .From<NodeDto>()
             .Where<NodeDto>(nodeDto => nodeDto.NodeId == entity.Id);
-        Guid? nodeType = AmbientScope.Database.ExecuteScalar<Guid>(sql);
+        Guid nodeType = AmbientScope.Database.ExecuteScalar<Guid>(sql);
 
         var dto = new User2NodeNotifyDto { Action = action, NodeId = entity.Id, UserId = user.Id };
-        _ = AmbientScope.Database.Insert(dto);
-        return new Notification(dto.NodeId, dto.UserId, dto.Action, nodeType);
+        AmbientScope.Database.Insert(dto);
+        notification = new Notification(dto.NodeId, dto.UserId, dto.Action, nodeType);
+        return true;
     }
 }

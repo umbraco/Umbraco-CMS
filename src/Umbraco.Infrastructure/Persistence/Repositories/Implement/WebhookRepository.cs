@@ -17,11 +17,20 @@ public class WebhookRepository : IWebhookRepository
 
     public async Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take)
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return new PagedModel<IWebhook>
+            {
+                Items = Enumerable.Empty<IWebhook>(),
+                Total = 0,
+            };
+        }
+
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
             .Select<WebhookDto>()
             .From<WebhookDto>();
 
-        List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
+        List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope.Database.FetchAsync<WebhookDto>(sql);
 
         return new PagedModel<IWebhook>
         {
@@ -49,19 +58,33 @@ public class WebhookRepository : IWebhookRepository
 
     public async Task<IWebhook?> GetAsync(Guid key)
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return null;
+        }
+
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
             .Select<WebhookDto>()
             .From<WebhookDto>()
             .Where<WebhookDto>(x => x.Key == key);
 
-        WebhookDto? webhookDto = await _scopeAccessor.AmbientScope?.Database.FirstOrDefaultAsync<WebhookDto>(sql)!;
+        WebhookDto? webhookDto = await _scopeAccessor.AmbientScope.Database.FirstOrDefaultAsync<WebhookDto>(sql);
 
         return webhookDto is null ? null : await DtoToEntity(webhookDto);
     }
 
     public async Task<PagedModel<IWebhook>> GetByIdsAsync(IEnumerable<Guid> keys)
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return new PagedModel<IWebhook>
+            {
+                Items = Enumerable.Empty<IWebhook>(),
+                Total = 0,
+            };
+        }
+
+        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
             .Select<WebhookDto>()
             .From<WebhookDto>()
             .WhereIn<WebhookDto>(x => x.Key, keys);
@@ -77,7 +100,16 @@ public class WebhookRepository : IWebhookRepository
 
     public async Task<PagedModel<IWebhook>> GetByAliasAsync(string alias)
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return new PagedModel<IWebhook>
+            {
+                Items = Enumerable.Empty<IWebhook>(),
+                Total = 0,
+            };
+        }
+
+        Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
             .SelectAll()
             .From<WebhookDto>()
             .InnerJoin<Webhook2EventsDto>()

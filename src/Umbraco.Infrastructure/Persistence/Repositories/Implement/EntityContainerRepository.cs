@@ -132,7 +132,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
     public bool HasDuplicateName(Guid parentKey, string name)
     {
-        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+        NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
             .InnerJoin<NodeDto>("parent")
             .On<NodeDto, NodeDto>(
@@ -145,7 +145,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
     public bool HasDuplicateName(int parentId, string name)
     {
-        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+        NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto => dto.Text == name && dto.NodeObjectType == NodeObjectTypeId && dto.ParentId == parentId));
 
@@ -161,7 +161,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
         EnsureContainerType(entity);
 
-        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+        NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
 
@@ -210,7 +210,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         entity.Name = entity.Name.Trim();
 
         // guard against duplicates
-        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+        NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto =>
                 dto.ParentId == entity.ParentId && dto.Text == entity.Name &&
@@ -293,7 +293,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             ?? throw new InvalidOperationException("Could not find container with id " + entity.Id);
 
         // guard against duplicates
-        NodeDto dupNodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+        NodeDto? dupNodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto =>
                 dto.ParentId == entity.ParentId && dto.Text == entity.Name &&

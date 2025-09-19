@@ -35,7 +35,7 @@ public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
 
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            var policyOverrides = _documentVersionRepository.GetCleanupPolicies()?
+            var policyOverrides = _documentVersionRepository.GetCleanupPolicies()
                 .ToDictionary(x => x.ContentTypeId);
 
             foreach (ContentVersionMeta version in items)

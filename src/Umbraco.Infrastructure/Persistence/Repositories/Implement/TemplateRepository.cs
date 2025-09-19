@@ -475,7 +475,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         }
 
         //Get TemplateDto from db to get the Primary key of the entity
-        TemplateDto templateDto = Database.SingleOrDefault<TemplateDto>($"WHERE {QuoteColumnName("nodeId")} = @Id", new { entity.Id });
+        TemplateDto templateDto = Database.Single<TemplateDto>($"WHERE {QuoteColumnName("nodeId")} = @Id", new { entity.Id });
 
         //Save updated entity to db
         template.UpdateDate = DateTime.UtcNow;
