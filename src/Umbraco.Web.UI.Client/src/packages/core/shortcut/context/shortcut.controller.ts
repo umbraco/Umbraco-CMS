@@ -1,10 +1,11 @@
 import { UMB_SHORTCUT_CONTEXT } from './shortcut.context-token.js';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
-import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbPartialSome } from '@umbraco-cms/backoffice/utils';
+import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbShortcut } from '../types.js';
+import type { UmbPartialSome } from '@umbraco-cms/backoffice/utils';
+import { a } from 'node_modules/msw/lib/glossary-2792c6da.js';
 
 type IncomingShortcutType = UmbPartialSome<UmbShortcut, 'unique' | 'weight' | 'modifier' | 'shift' | 'alt'>;
 
@@ -19,7 +20,7 @@ export class UmbShortcutController extends UmbControllerBase {
 	#parent?: UmbShortcutController;
 
 	readonly #shortcuts = new UmbArrayState<UmbShortcut>([], (x) => x.unique);
-	public readonly all = this.#shortcuts.asObservable();
+	public readonly shortcuts = this.#shortcuts.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host);
