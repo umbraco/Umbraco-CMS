@@ -138,7 +138,6 @@ export class UmbShortcutController extends UmbControllerBase {
 			return;
 		}
 		this.unprovide();
-		this.#parentHints = undefined;
 		this.#parent = undefined;
 
 		this.#shortcuts.destroy();
