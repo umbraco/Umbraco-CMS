@@ -1,6 +1,6 @@
 import type { UmbHint, UmbIncomingHintBase } from '../types.js';
 import { UMB_HINT_CONTEXT } from './hint.context-token.js';
-import { UmbHintController, type UmbHintControllerArgs } from './hints.controller.js';
+import { UmbHintController, type UmbHintControllerArgs } from './hint.controller.js';
 import type { UmbPartialSome } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

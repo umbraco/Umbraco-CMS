@@ -9,7 +9,12 @@ import type { UmbContentCollectionWorkspaceContext } from '../collection/content
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
-import { appendToFrozenArray, mergeObservables, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	appendToFrozenArray,
+	mergeObservables,
+	observeMultiple,
+	UmbArrayState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -21,7 +26,6 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbHintContext } from '@umbraco-cms/backoffice/hint';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
@@ -29,6 +33,7 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UmbSegmentCollectionRepository } from '@umbraco-cms/backoffice/segment';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UMB_VALIDATION_CONTEXT,
@@ -52,7 +57,6 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
-import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -141,8 +145,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	readonly collection: UmbContentCollectionManager;
 
-	/* Hints */
-	readonly hints = new UmbHintContext<UmbVariantHint>(this);
+	/* View */
+	readonly view = new UmbViewContext(this, null);
 
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]
@@ -221,7 +225,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			this,
 			this.structure,
 			this.validationContext,
-			this.hints,
+			this.view.hints,
 		);
 
 		this.variantOptions = mergeObservables(
@@ -330,6 +334,17 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 						this.#variantValidationContexts.push(context);
 					}
 				});
+			},
+			null,
+		);
+
+		this.observe(
+			observeMultiple([this.splitView.activeVariantByIndex(0), this.variants]),
+			([activeVariant, variants]) => {
+				const variantName = variants.find(
+					(v) => v.culture === activeVariant?.culture && v.segment === activeVariant?.segment,
+				)?.name;
+				this.view.setBrowserTitle(variantName);
 			},
 			null,
 		);
