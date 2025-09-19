@@ -88,7 +88,9 @@ angular.module("umbraco")
                 totalItems: 0,
                 totalPages: 0,
                 filter: '',
-                dataTypeKey: dataTypeKey
+                dataTypeKey: dataTypeKey,
+                orderBy: "VersionDate",          // NEW
+                orderDirection: "Descending"     // NEW
             };
             vm.layout = {
                 layouts: [{ name: "Grid", icon: "icon-thumbnails-small", path: "gridpath", selected: true },
@@ -272,7 +274,12 @@ angular.module("umbraco")
                     performGotoFolder(folder);
                 }
 
-              return getChildren(folder.id);
+                // --- MOD: reset pagination when entering a folder ---
+                vm.searchOptions.pageNumber = 1;
+                vm.searchOptions.totalItems = 0;
+                vm.searchOptions.totalPages = 0;
+
+                return getChildren(folder.id);
             }
 
             function performGotoFolder(folder) {
@@ -484,8 +491,14 @@ angular.module("umbraco")
             function changePagination(pageNumber) {
                 vm.loading = true;
                 vm.searchOptions.pageNumber = pageNumber;
-                searchMedia();
-            };
+
+                if (vm.searchOptions.filter) {
+                    // paginazione della ricerca (già presente)
+                    searchMedia();
+                } else {
+                    // paginazione nella vista cartella
+                    getChildren($scope.currentFolder.id);
+            }
 
             function searchMedia() {
                 vm.loading = true;
@@ -559,20 +572,34 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 vm.loading = true;
-                return entityResource.getChildren(id, "Media", vm.searchOptions).then(function (data) {
+
+                return entityResource.getPagedChildren(id, "Media", vm.searchOptions).then(function (data) {
 
                     var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
 
-                    for (var i = 0; i < data.length; i++) {
-                        setDefaultData(data[i]);
-                        data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
+                    var items = (data && data.items) ? data.items : [];
+                    for (var i = 0; i < items.length; i++) {
+                    setDefaultData(items[i]);
+                    items[i].filtered = allowedTypes && allowedTypes.indexOf(items[i].metaData.ContentTypeAlias) < 0;
                     }
 
-                    vm.searchOptions.filter = "";
-                    $scope.images = data ? data : [];
+                    // update images (page)
+                    $scope.images = items;
 
-                    // set already selected medias to selected
+                    // update pagination (mirror di searchMedia)
+                    if (data.pageNumber > 0) vm.searchOptions.pageNumber = data.pageNumber;
+                    if (data.pageSize > 0)   vm.searchOptions.pageSize   = data.pageSize;
+
+                    vm.searchOptions.totalItems = data.totalItems || 0;
+                    vm.searchOptions.totalPages = data.totalPages || 0;
+
+                    // reset filtro come prima
+                    vm.searchOptions.filter = "";
+
+                    // set già selezionati
                     preSelectMedia();
+
+                }).finally(function () {
                     vm.loading = false;
                 });
             }
