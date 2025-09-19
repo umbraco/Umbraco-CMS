@@ -5,8 +5,13 @@ import { UmbArrayState, type Observable } from '@umbraco-cms/backoffice/observab
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbShortcut } from '../types.js';
 import type { UmbPartialSome } from '@umbraco-cms/backoffice/utils';
+import { a } from 'node_modules/msw/lib/glossary-2792c6da.js';
 
-type IncomingShortcutType = UmbPartialSome<UmbShortcut, 'unique' | 'weight'>;
+type IncomingShortcutType = UmbPartialSome<UmbShortcut, 'unique' | 'weight' | 'modifier' | 'shift' | 'alt'>;
+
+const ObserveShortcutsCtrlAlias = Symbol();
+
+const IsMac = navigator.userAgent ? /Mac/i.test(navigator.userAgent) : navigator.platform.toUpperCase().includes('MAC');
 
 export class UmbShortcutController extends UmbControllerBase {
 	//
@@ -126,11 +131,45 @@ export class UmbShortcutController extends UmbControllerBase {
 	}
 
 	/**
+	 * Get all hints
+	 * @returns {UmbShortcut[]} Array of hints
+	 */
+	findShortcut(key: string, modifier: boolean, shift: boolean = false, alt: boolean = false): UmbShortcut | undefined {
+		const shortcuts = this.#shortcuts.getValue();
+		for (const s of shortcuts) {
+			if (s.key.toLowerCase() === key.toLowerCase() && s.modifier === modifier && s.shift === shift && s.alt === alt) {
+				return s;
+			}
+		}
+
+		return undefined;
+	}
+
+	/**
 	 * Clear all hints
 	 */
 	clear(): void {
 		this.#shortcuts.setValue([]);
 	}
+
+	activate() {
+		window.addEventListener('keyup', this.#onKeyDown);
+	}
+
+	deactivate() {
+		window.removeEventListener('keyup', this.#onKeyDown);
+	}
+
+	#onKeyDown = (e: KeyboardEvent) => {
+		const keyDown = e.key.toLowerCase();
+		const modifierDown = IsMac ? e.metaKey : e.ctrlKey;
+
+		const shortcut = this.findShortcut(keyDown, modifierDown, e.shiftKey, e.altKey);
+		if (shortcut) {
+			e.preventDefault();
+			shortcut.callback();
+		}
+	};
 
 	override destroy(): void {
 		super.destroy();

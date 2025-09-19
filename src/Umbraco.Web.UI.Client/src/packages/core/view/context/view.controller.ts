@@ -8,11 +8,9 @@ import type { UmbContextConsumerController, UmbContextProviderController } from 
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbShortcutController } from '../../shortcut/context/shortcut.controller.js';
 
 /**
- *
- * TODO:
- * Include Shortcuts
  *
  * The View Context handles the aspects of three Features:
  * Browser Titles — Provide a title for this view and it will be set or joint with parent views depending on the inheritance setting.
@@ -44,9 +42,11 @@ export class UmbViewController extends UmbControllerBase {
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	protected readonly variantId = this.#variantId.asObservable();
 
-	public hints;
+	public readonly hints;
 
-	readonly firstHintOfVariant;
+	public readonly shortcuts = new UmbShortcutController(this);
+
+	public readonly firstHintOfVariant;
 
 	constructor(host: UmbControllerHost, viewAlias: string | null) {
 		super(host);
@@ -94,7 +94,6 @@ export class UmbViewController extends UmbControllerBase {
 	public setBrowserTitle(title: string | undefined): void {
 		if (this.#title === title) return;
 		this.#title = title;
-		// TODO: This check should be if its the most child being active, but again think about how the parents in the active chain should work.
 		this.#computeTitle();
 		this.#updateTitle();
 	}
@@ -108,6 +107,7 @@ export class UmbViewController extends UmbControllerBase {
 		this.#currentProvideHost = controllerHost;
 		this.#providerCtrl = controllerHost.provideContext(UMB_VIEW_CONTEXT, this);
 		this.hints.provideAt(controllerHost);
+		this.shortcuts.provideAt(controllerHost);
 
 		if (this.#attached && this.#autoActivate) {
 			this._internal_activate();
@@ -120,6 +120,7 @@ export class UmbViewController extends UmbControllerBase {
 			this.#providerCtrl = undefined;
 		}
 		this.hints.unprovide();
+		this.shortcuts.unprovide();
 
 		this._internal_deactivate();
 	}
@@ -222,7 +223,7 @@ export class UmbViewController extends UmbControllerBase {
 			this.#active = true;
 			this.#propagateActivation();
 			this.#updateTitle();
-			// TODO: Start shortcuts. [NL]
+			this.shortcuts.activate();
 		}
 	}
 
@@ -268,7 +269,7 @@ export class UmbViewController extends UmbControllerBase {
 		this.#autoActivate = false;
 		if (!this.#active) return;
 		this.#active = false;
-		// TODO: Stop shortcuts. [NL]
+		this.shortcuts.deactivate();
 		// Deactivate parents:
 		this.#propagateActivation();
 	}
