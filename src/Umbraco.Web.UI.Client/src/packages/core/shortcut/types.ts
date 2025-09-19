@@ -6,5 +6,5 @@ export interface UmbShortcut {
 	alt: boolean;
 	label?: string;
 	weight?: number;
-	callback: () => void | Promise<void>;
+	action: () => void | Promise<void>;
 }
