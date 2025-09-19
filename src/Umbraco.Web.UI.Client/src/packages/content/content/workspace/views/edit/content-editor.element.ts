@@ -236,8 +236,8 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			href=${fullPath}
 			data-mark="content-tab:${path ?? 'root'}"
 			>${hint && !active
-				? html`<uui-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
-						>${hint.text}</uui-badge
+				? html`<umb-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+						>${hint.text}</umb-badge
 					>`
 				: nothing}</uui-tab
 		>`;
