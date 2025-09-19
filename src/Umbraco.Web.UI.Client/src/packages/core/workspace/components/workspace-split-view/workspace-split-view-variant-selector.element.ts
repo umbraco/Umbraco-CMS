@@ -337,7 +337,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			const hintsOrderedByWeight = Array.from(this._hintMap.values()).sort((a, b) => (b.weight || 0) - (a.weight || 0));
 			firstHintOnInactiveVariant = hintsOrderedByWeight.find((hint) => {
 				if (!hint.variantId) return false;
-				return !hint.variantId.isInvariant() && hint.variantId.compare(this._activeVariant!) === false;
+				return !hint.variantId.isInvariant() && this.#isVariantActive(hint.variantId) === false;
 			});
 		}
 
@@ -370,7 +370,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 							</uui-button>
-							${this._variantSelectorOpen ? this.#renderHintBadge(firstHintOnInactiveVariant) : nothing}
+							${!this._variantSelectorOpen ? this.#renderHintBadge(firstHintOnInactiveVariant) : nothing}
 							${this._activeVariants.length > 1
 								? html`
 										<uui-button slot="append" compact id="variant-close" @click=${this.#closeSplitView}>
