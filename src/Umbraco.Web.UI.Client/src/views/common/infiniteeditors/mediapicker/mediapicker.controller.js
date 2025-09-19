@@ -498,6 +498,7 @@ angular.module("umbraco")
                 } else {
                     // paginazione nella vista cartella
                     getChildren($scope.currentFolder.id);
+                }
             }
 
             function searchMedia() {
