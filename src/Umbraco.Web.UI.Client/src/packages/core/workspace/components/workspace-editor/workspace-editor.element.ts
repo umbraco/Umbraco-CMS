@@ -110,6 +110,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
+	#currentProvidedView?: UmbWorkspaceViewContext;
 	#createRoutes() {
 		let newRoutes: UmbRoute[] = [];
 
@@ -120,7 +121,11 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 					path: UMB_WORKSPACE_VIEW_PATH_PATTERN.generateLocal({ viewPathname: manifest.meta.pathname }),
 					component: () => createExtensionElement(manifest),
 					setup: (component?: any) => {
+						if (this.#currentProvidedView !== context) {
+							this.#currentProvidedView?.unprovide();
+						}
 						if (component) {
+							this.#currentProvidedView = context;
 							context.provideAt(component);
 							component.manifest = manifest;
 						}

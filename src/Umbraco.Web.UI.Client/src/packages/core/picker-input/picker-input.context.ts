@@ -1,12 +1,18 @@
 import { UMB_PICKER_INPUT_CONTEXT } from './picker-input.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
-import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import {
+	umbConfirmModal,
+	umbOpenModal,
+	type UmbModalToken,
+	type UmbPickerModalData,
+	type UmbPickerModalValue,
+} from '@umbraco-cms/backoffice/modal';
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
@@ -21,8 +27,9 @@ export class UmbPickerInputContext<
 
 	#itemManager;
 
-	selection;
-	selectedItems;
+	public readonly selection;
+	public readonly selectedItems;
+	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
 
 	/**
 	 * Define a minimum amount of selected items in this input, for this input to be valid.
@@ -100,6 +107,7 @@ export class UmbPickerInputContext<
 				selection: this.getSelection(),
 			} as PickerModalValueType,
 		}).catch(() => undefined);
+
 		if (!modalValue) return;
 
 		this.setSelection(modalValue.selection);

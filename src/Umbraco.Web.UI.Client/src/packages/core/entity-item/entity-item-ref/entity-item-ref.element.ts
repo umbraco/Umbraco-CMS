@@ -211,7 +211,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 			}
 
 			:host([drag-placeholder]) {
-				--uui-color-focus:transparent;
+				--uui-color-focus: transparent;
 			}
 
 			:host([drag-placeholder])::after {
@@ -233,7 +233,6 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 				transition: opacity 50ms 16ms;
 				opacity: 0;
 			}
-
 		`,
 	];
 }
