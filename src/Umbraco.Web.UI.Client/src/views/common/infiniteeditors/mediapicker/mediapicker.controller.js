@@ -572,36 +572,38 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 vm.loading = true;
+                return entityResource
+                   .getPagedChildren(id, "Media", vm.searchOptions)
+                    .then(handlePagedChildren)
+                    .finally(function () { vm.loading = false; });
+            }
 
-                return entityResource.getPagedChildren(id, "Media", vm.searchOptions).then(function (data) {
+            // --- helpers to reduce cyclomatic complexity ---
+            function handlePagedChildren(data) {
+                var items = transformItems(data && data.items ? data.items : [], getAllowedTypes());
+                $scope.images = items;
+                syncPagination(vm.searchOptions, data);
+                vm.searchOptions.filter = ""; // keep legacy behaviour
+                preSelectMedia();
+            }
 
-                    var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
+            function getAllowedTypes() {
+                return dialogOptions.filter ? dialogOptions.filter.split(",") : null;
+            }
 
-                    var items = (data && data.items) ? data.items : [];
-                    for (var i = 0; i < items.length; i++) {
+            function transformItems(items, allowedTypes) {
+                for (var i = 0; i < items.length; i++) {
                     setDefaultData(items[i]);
-                    items[i].filtered = allowedTypes && allowedTypes.indexOf(items[i].metaData.ContentTypeAlias) < 0;
-                    }
+                   items[i].filtered = !!(allowedTypes && allowedTypes.indexOf(items[i].metaData.ContentTypeAlias) < 0);
+                }
+                return items;
+            }
 
-                    // update images (page)
-                    $scope.images = items;
-
-                    // update pagination (mirror di searchMedia)
-                    if (data.pageNumber > 0) vm.searchOptions.pageNumber = data.pageNumber;
-                    if (data.pageSize > 0)   vm.searchOptions.pageSize   = data.pageSize;
-
-                    vm.searchOptions.totalItems = data.totalItems || 0;
-                    vm.searchOptions.totalPages = data.totalPages || 0;
-
-                    // reset filtro come prima
-                    vm.searchOptions.filter = "";
-
-                    // set già selezionati
-                    preSelectMedia();
-
-                }).finally(function () {
-                    vm.loading = false;
-                });
+            function syncPagination(opts, data) {
+                if (data && data.pageNumber > 0) { opts.pageNumber = data.pageNumber; }
+                if (data && data.pageSize > 0)   { opts.pageSize   = data.pageSize;   }
+                opts.totalItems = (data && data.totalItems) ? data.totalItems : 0;
+                opts.totalPages = (data && data.totalPages) ? data.totalPages : 0;
             }
 
             function setDefaultData(item) {
