@@ -10,7 +10,7 @@ import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffic
 @customElement('umb-badge')
 export class UmbBadgeElement extends LitElement {
 	/**
-	 * Changes the look of the button to one of the predefined, symbolic looks. For example - set this to positive if you want nice, green "confirm" button.
+	 * Changes the look of the button to one of the predefined, symbolic looks.
 	 * @type {"default" | "positive" | "warning" | "danger"}
 	 * @attr
 	 * @default "default"
@@ -19,7 +19,7 @@ export class UmbBadgeElement extends LitElement {
 	color?: UUIInterfaceColor;
 
 	/**
-	 * Changes the look of the button to one of the predefined, symbolic looks. For example - set this to positive if you want nice, green "confirm" button.
+	 * Changes the look of the button to one of the predefined, symbolic looks.
 	 * @type {"default" | "primary" | "secondary" | "outline" | "placeholder"}
 	 * @attr
 	 * @default "default"
