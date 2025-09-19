@@ -74,8 +74,7 @@ export class UmbModalContext<
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
 
-		this.view.setBrowserTitle(args.modal?.title);
-
+		let title: string | undefined = undefined;
 		let size = 'small';
 
 		if (this.alias instanceof UmbModalToken) {
@@ -83,7 +82,10 @@ export class UmbModalContext<
 			size = this.alias.getDefaultModal()?.size ?? size;
 			this.element = this.alias.getDefaultModal()?.element || this.element;
 			this.backdropBackground = this.alias.getDefaultModal()?.backdropBackground || this.backdropBackground;
+			title = this.alias.getDefaultModal()?.title ?? undefined;
 		}
+
+		this.view.setBrowserTitle(title);
 
 		this.type = args.modal?.type || this.type;
 		size = args.modal?.size ?? size;
