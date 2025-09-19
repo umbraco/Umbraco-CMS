@@ -599,12 +599,22 @@ angular.module("umbraco")
                 return items;
             }
 
-            function syncPagination(opts, data) {
-                if (data && data.pageNumber > 0) { opts.pageNumber = data.pageNumber; }
-                if (data && data.pageSize > 0)   { opts.pageSize   = data.pageSize;   }
-                opts.totalItems = (data && data.totalItems) ? data.totalItems : 0;
-                opts.totalPages = (data && data.totalPages) ? data.totalPages : 0;
+            // Helpers to avoid conditionals in syncPagination (lower cyclomatic complexity)
+            function pickPositive(value, fallback) {
+                return (typeof value === "number" && value > 0) ? value : fallback;
             }
+
+            function pickNonNegative(value, fallback) {
+                return (typeof value === "number" && value >= 0) ? value : fallback;
+            }
+
+            function syncPagination(opts, data) {
+                var d = data || {};
+                opts.pageNumber = pickPositive(d.pageNumber, opts.pageNumber);
+                opts.pageSize   = pickPositive(d.pageSize,   opts.pageSize);
+                opts.totalItems = pickNonNegative(d.totalItems, 0);
+                opts.totalPages = pickNonNegative(d.totalPages, 0);
+           }
 
             function setDefaultData(item) {
                 if (item.metaData.MediaPath !== null) {
