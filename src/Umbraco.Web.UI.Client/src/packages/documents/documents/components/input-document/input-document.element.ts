@@ -11,6 +11,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -139,6 +140,9 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	@state()
 	private _items?: Array<UmbDocumentItemModel>;
 
+	@state()
+	private _statuses?: Array<UmbRepositoryItemsStatus>;
+
 	#pickerInputContext = new UmbDocumentPickerInputContext(this);
 
 	constructor() {
@@ -167,6 +171,8 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 			(selectedItems) => (this._items = selectedItems),
 			'_observerItems',
 		);
+
+		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), '_observerStatuses');
 
 		this.observe(
 			this.#pickerInputContext.interactionMemory.memories,
@@ -199,8 +205,8 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 		);
 	}
 
-	#onRemove(item: UmbDocumentItemModel) {
-		this.#pickerInputContext.requestRemoveItem(item.unique);
+	#onRemove(unique: string) {
+		this.#pickerInputContext.requestRemoveItem(unique);
 	}
 
 	override render() {
@@ -224,16 +230,20 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._statuses) return;
 		return html`
 			<uui-ref-list>
 				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) =>
-						html`<umb-entity-item-ref
-							id=${item.unique}
+					this._statuses,
+					(status) => status.unique,
+					(status) => {
+						const unique = status.unique;
+						const item = this._items?.find((x) => x.unique === unique);
+						return html`<umb-entity-item-ref
+							id=${unique}
 							.item=${item}
+							?error=${status.state.type === 'error'}
+							.errorMessage=${status.state.error}
 							?readonly=${this.readonly}
 							?standalone=${this.max === 1}>
 							${when(
@@ -242,11 +252,12 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefi
 									<uui-action-bar slot="actions">
 										<uui-button
 											label=${this.localize.term('general_remove')}
-											@click=${() => this.#onRemove(item)}></uui-button>
+											@click=${() => this.#onRemove(unique)}></uui-button>
 									</uui-action-bar>
 								`,
 							)}
-						</umb-entity-item-ref>`,
+						</umb-entity-item-ref>`;
+					},
 				)}
 			</uui-ref-list>
 		`;

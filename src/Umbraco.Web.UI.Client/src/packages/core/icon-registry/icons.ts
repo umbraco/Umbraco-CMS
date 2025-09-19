@@ -74,6 +74,9 @@ path: () => import("./icons/icon-axis-rotation.js"),
 name: "icon-backspace",
 path: () => import("./icons/icon-backspace.js"),
 },{
+name: "icon-badge",
+path: () => import("./icons/icon-badge.js"),
+},{
 name: "icon-badge-add",
 path: () => import("./icons/icon-badge-add.js"),
 },{
