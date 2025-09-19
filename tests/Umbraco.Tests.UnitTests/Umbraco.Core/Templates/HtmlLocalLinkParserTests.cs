@@ -133,4 +133,197 @@ public class HtmlLocalLinkParserTests
             Assert.AreEqual(result, output);
         }
     }
+
+    [Test]
+    public void ParseLocalLinks_WithUrlMode_RespectsUrlMode()
+    {
+        // Arrange
+        var input = "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world";
+
+        // Setup content URL provider that returns different URLs based on UrlMode
+        var contentUrlProvider = new Mock<IUrlProvider>();
+        contentUrlProvider
+            .Setup(x => x.GetUrl(
+                It.IsAny<IPublishedContent>(),
+                UrlMode.Relative,
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.Url("/relative-url"));
+        contentUrlProvider
+            .Setup(x => x.GetUrl(
+                It.IsAny<IPublishedContent>(),
+                UrlMode.Absolute,
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.Url("http://example.com/absolute-url"));
+
+        var contentType = new PublishedContentType(
+            Guid.NewGuid(),
+            666,
+            "alias",
+            PublishedItemType.Content,
+            Enumerable.Empty<string>(),
+            Enumerable.Empty<PublishedPropertyType>(),
+            ContentVariation.Nothing);
+        var publishedContent = new Mock<IPublishedContent>();
+        publishedContent.Setup(x => x.Id).Returns(1234);
+        publishedContent.Setup(x => x.ContentType).Returns(contentType);
+
+        var umbracoContextAccessor = new TestUmbracoContextAccessor();
+        var umbracoContextFactory = TestUmbracoContextFactory.Create(
+            umbracoContextAccessor: umbracoContextAccessor);
+
+        var webRoutingSettings = new WebRoutingSettings();
+        var publishedUrlProvider = new UrlProvider(
+            umbracoContextAccessor,
+            Options.Create(webRoutingSettings),
+            new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
+            new MediaUrlProviderCollection(() => Array.Empty<IMediaUrlProvider>()),
+            Mock.Of<IVariationContextAccessor>());
+
+        using (var reference = umbracoContextFactory.EnsureUmbracoContext())
+        {
+            var contentCache = Mock.Get(reference.UmbracoContext.Content);
+            contentCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(publishedContent.Object);
+
+            var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
+
+            // Act
+            var relativeOutput = linkParser.EnsureInternalLinks(input, UrlMode.Relative);
+            var absoluteOutput = linkParser.EnsureInternalLinks(input, UrlMode.Absolute);
+
+            // Assert
+            Assert.AreEqual("hello href=\"/relative-url\" world", relativeOutput);
+            Assert.AreEqual("hello href=\"http://example.com/absolute-url\" world", absoluteOutput);
+        }
+    }
+
+    [TestCase(UrlMode.Default, "hello href=\"{localLink:1234}\" world ", "hello href=\"/default-url\" world ")]
+    [TestCase(UrlMode.Relative, "hello href=\"{localLink:1234}\" world ", "hello href=\"/relative-url\" world ")]
+    [TestCase(UrlMode.Absolute, "hello href=\"{localLink:1234}\" world ", "hello href=\"https://example.com/absolute-url\" world ")]
+    [TestCase(UrlMode.Auto, "hello href=\"{localLink:1234}\" world ", "hello href=\"/relative-url\" world ")]
+    [TestCase(UrlMode.Default, "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/default-url\" world ")]
+    [TestCase(UrlMode.Relative, "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/relative-url\" world ")]
+    [TestCase(UrlMode.Absolute, "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"https://example.com/absolute-url\" world ")]
+    [TestCase(UrlMode.Auto, "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/relative-url\" world ")]
+    [TestCase(UrlMode.Default, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/default/image.jpg\" world ")]
+    [TestCase(UrlMode.Relative, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/relative/image.jpg\" world ")]
+    [TestCase(UrlMode.Absolute, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"https://example.com/media/absolute/image.jpg\" world ")]
+    [TestCase(UrlMode.Auto, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/relative/image.jpg\" world ")]
+    public void ParseLocalLinks_WithVariousUrlModes_ReturnsCorrectUrls(UrlMode urlMode, string input, string expectedResult)
+    {
+        // setup content URL provider that returns different URLs based on UrlMode
+        var contentUrlProvider = new Mock<IUrlProvider>();
+        contentUrlProvider
+            .Setup(x => x.GetUrl(
+                It.IsAny<IPublishedContent>(),
+                UrlMode.Default,
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.Url("/default-url"));
+        contentUrlProvider
+            .Setup(x => x.GetUrl(
+                It.IsAny<IPublishedContent>(),
+                UrlMode.Relative,
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.Url("/relative-url"));
+        contentUrlProvider
+            .Setup(x => x.GetUrl(
+                It.IsAny<IPublishedContent>(),
+                UrlMode.Absolute,
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.Url("https://example.com/absolute-url"));
+        contentUrlProvider
+            .Setup(x => x.GetUrl(
+                It.IsAny<IPublishedContent>(),
+                UrlMode.Auto,
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.Url("/default-url"));
+
+        var contentType = new PublishedContentType(
+            Guid.NewGuid(),
+            666,
+            "alias",
+            PublishedItemType.Content,
+            Enumerable.Empty<string>(),
+            Enumerable.Empty<PublishedPropertyType>(),
+            ContentVariation.Nothing);
+        var publishedContent = new Mock<IPublishedContent>();
+        publishedContent.Setup(x => x.Id).Returns(1234);
+        publishedContent.Setup(x => x.ContentType).Returns(contentType);
+
+        // setup media URL provider that returns different URLs based on UrlMode
+        var mediaUrlProvider = new Mock<IMediaUrlProvider>();
+        mediaUrlProvider.Setup(x => x.GetMediaUrl(
+                It.IsAny<IPublishedContent>(),
+                It.IsAny<string>(),
+                UrlMode.Default,
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.Url("/media/default/image.jpg"));
+        mediaUrlProvider.Setup(x => x.GetMediaUrl(
+                It.IsAny<IPublishedContent>(),
+                It.IsAny<string>(),
+                UrlMode.Relative,
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.Url("/media/relative/image.jpg"));
+        mediaUrlProvider.Setup(x => x.GetMediaUrl(
+                It.IsAny<IPublishedContent>(),
+                It.IsAny<string>(),
+                UrlMode.Absolute,
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.Url("https://example.com/media/absolute/image.jpg"));
+        mediaUrlProvider.Setup(x => x.GetMediaUrl(
+                It.IsAny<IPublishedContent>(),
+                It.IsAny<string>(),
+                UrlMode.Auto,
+                It.IsAny<string>(),
+                It.IsAny<Uri>()))
+            .Returns(UrlInfo.Url("/media/default/image.jpg"));
+
+        var mediaType = new PublishedContentType(
+            Guid.NewGuid(),
+            777,
+            "image",
+            PublishedItemType.Media,
+            Enumerable.Empty<string>(),
+            Enumerable.Empty<PublishedPropertyType>(),
+            ContentVariation.Nothing);
+        var media = new Mock<IPublishedContent>();
+        media.Setup(x => x.ContentType).Returns(mediaType);
+
+        var umbracoContextAccessor = new TestUmbracoContextAccessor();
+        var umbracoContextFactory = TestUmbracoContextFactory.Create(
+            umbracoContextAccessor: umbracoContextAccessor);
+
+        var webRoutingSettings = new WebRoutingSettings();
+        var publishedUrlProvider = new UrlProvider(
+            umbracoContextAccessor,
+            Options.Create(webRoutingSettings),
+            new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
+            new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
+            Mock.Of<IVariationContextAccessor>());
+
+        using (var reference = umbracoContextFactory.EnsureUmbracoContext())
+        {
+            var contentCache = Mock.Get(reference.UmbracoContext.Content);
+            contentCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(publishedContent.Object);
+            contentCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(publishedContent.Object);
+
+            var mediaCache = Mock.Get(reference.UmbracoContext.Media);
+            mediaCache.Setup(x => x.GetById(It.IsAny<int>())).Returns(media.Object);
+            mediaCache.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(media.Object);
+
+            var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
+
+            var output = linkParser.EnsureInternalLinks(input, urlMode);
+
+            Assert.AreEqual(expectedResult, output);
+        }
+    }
 }

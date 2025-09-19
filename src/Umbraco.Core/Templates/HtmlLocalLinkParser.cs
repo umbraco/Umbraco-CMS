@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 
@@ -43,7 +44,17 @@ public sealed class HtmlLocalLinkParser
     /// <param name="text"></param>
     /// <param name="preview"></param>
     /// <returns></returns>
-    public string EnsureInternalLinks(string text, bool preview)
+    public string EnsureInternalLinks(string text, bool preview) =>
+        EnsureInternalLinks(text, preview, UrlMode.Default);
+
+    /// <summary>
+    ///     Parses the string looking for the {localLink} syntax and updates them to their correct links.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="preview"></param>
+    /// <param name="urlMode"></param>
+    /// <returns></returns>
+    public string EnsureInternalLinks(string text, bool preview, UrlMode urlMode)
     {
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
@@ -52,12 +63,12 @@ public sealed class HtmlLocalLinkParser
 
         if (!preview)
         {
-            return EnsureInternalLinks(text);
+            return EnsureInternalLinks(text, urlMode);
         }
 
         using (umbracoContext.ForcedPreview(preview)) // force for URL provider
         {
-            return EnsureInternalLinks(text);
+            return EnsureInternalLinks(text, urlMode);
         }
     }
 
@@ -66,7 +77,16 @@ public sealed class HtmlLocalLinkParser
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
-    public string EnsureInternalLinks(string text)
+    public string EnsureInternalLinks(string text) =>
+        EnsureInternalLinks(text, UrlMode.Default);
+
+    /// <summary>
+    ///     Parses the string looking for the {localLink} syntax and updates them to their correct links.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="urlMode"></param>
+    /// <returns></returns>
+    public string EnsureInternalLinks(string text, UrlMode urlMode)
     {
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out _))
         {
@@ -80,11 +100,11 @@ public sealed class HtmlLocalLinkParser
                 var newLink = "#";
                 if (udi?.EntityType == Constants.UdiEntityType.Document)
                 {
-                    newLink = _publishedUrlProvider.GetUrl(udi.Guid);
+                    newLink = _publishedUrlProvider.GetUrl(udi.Guid, urlMode);
                 }
                 else if (udi?.EntityType == Constants.UdiEntityType.Media)
                 {
-                    newLink = _publishedUrlProvider.GetMediaUrl(udi.Guid);
+                    newLink = _publishedUrlProvider.GetMediaUrl(udi.Guid, urlMode);
                 }
 
                 if (newLink == null)
@@ -96,7 +116,7 @@ public sealed class HtmlLocalLinkParser
             }
             else if (intId.HasValue)
             {
-                var newLink = _publishedUrlProvider.GetUrl(intId.Value);
+                var newLink = _publishedUrlProvider.GetUrl(intId.Value, urlMode);
                 text = text.Replace(tagValue, "href=\"" + newLink);
             }
         }
