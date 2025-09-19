@@ -120,6 +120,12 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 		}
 	}
 
+	@property({ type: Boolean })
+	error?: boolean;
+
+	@property({ type: String, attribute: 'error-message', reflect: false })
+	errorMessage?: string;
+
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
 	#onSelected(event: UmbSelectedEvent) {
@@ -155,6 +161,7 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 				this._component?.remove();
 				const component = extensionControllers[0]?.component || document.createElement('umb-default-item-ref');
 
+				// TODO: I would say this code can use feature of the UmbExtensionsElementInitializer, to set properties and get a fallback element. [NL]
 				// assign the properties to the component
 				component.item = this.#item;
 				component.readonly = this.readonly;
@@ -182,7 +189,25 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`${this._component}`;
+		if (this._component) {
+			return html`${this._component}`;
+		}
+		// Error:
+		if (this.error) {
+			return html`<uui-ref-node
+				style="color: var(--uui-color-danger);"
+				.name=${this.localize.string(this.errorMessage ?? '#general_notFound')}
+				.readonly=${this.readonly}
+				.standalone=${this.standalone}
+				.selectOnly=${this.selectOnly}
+				.selected=${this.selected}
+				.disabled=${this.disabled}>
+				<uui-icon slot="icon" name="icon-alert" style="color: var(--uui-color-danger);"></uui-icon>
+				<slot name="actions"></slot>
+			</uui-ref-node>`;
+		}
+		// Loading:
+		return html`<uui-loader-bar style="margin-top:10px;"></uui-loader-bar>`;
 	}
 
 	override destroy(): void {
