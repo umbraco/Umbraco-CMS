@@ -9,7 +9,7 @@
             </button>
         </div>
 
-        <div class="flex items-center" style="flex: 1;">
+        <div class="flex items-center" style="flex: 1; width: 100%;">
 
             <ng-form data-element="editor-icon" name="iconForm">
                 <button
@@ -25,7 +25,7 @@
                 </button>
             </ng-form>
 
-            <div id="nameField" class="umb-editor-header__name-and-description" style="flex: 1 1 auto;">
+            <div id="nameField" class="umb-editor-header__name-and-description" style="flex: 1; width: calc(100% - 75px);">
                 <div>
                     <p tabindex="0" class="sr-only" ng-show="accessibility.a11yMessageVisible">
                         {{accessibility.a11yMessage}}
@@ -78,7 +78,7 @@
                        ng-if="!hideDescription && !descriptionLocked"
                        ng-model="$parent.description"/>
 
-                <p class="umb-panel-header-locked-description" id="editor-description-{{$id}}" ng-if="descriptionLocked">{{ description }}</p>
+                <p class="umb-panel-header-locked-description" id="editor-description-{{$id}}" ng-if="descriptionLocked" title="{{description}}">{{ description }}</p>
 
             </div>
 
