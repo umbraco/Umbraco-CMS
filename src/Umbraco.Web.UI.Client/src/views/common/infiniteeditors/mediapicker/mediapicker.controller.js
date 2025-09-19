@@ -493,10 +493,10 @@ angular.module("umbraco")
                 vm.searchOptions.pageNumber = pageNumber;
 
                 if (vm.searchOptions.filter) {
-                    // paginazione della ricerca (già presente)
+                    // search pagination (already present)
                     searchMedia();
                 } else {
-                    // paginazione nella vista cartella
+                    // pagination in folder view
                     getChildren($scope.currentFolder.id);
                 }
             }
