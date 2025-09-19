@@ -1,5 +1,10 @@
 import { UMB_VIEW_CONTEXT } from './view.context-token.js';
-import { UmbClassState, UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbBooleanState,
+	UmbClassState,
+	UmbStringState,
+	mergeObservables,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbHintController } from '@umbraco-cms/backoffice/hint';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -9,6 +14,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbShortcutController } from '../../shortcut/context/shortcut.controller.js';
+
+const ObserveParentActiveCtrlAlias = Symbol();
 
 /**
  *
@@ -28,7 +35,11 @@ export class UmbViewController extends UmbControllerBase {
 
 	// State used to know if the context can be auto activated when attached.
 	#autoActivate = true;
-	#active = false;
+	#active = new UmbBooleanState(false);
+	public readonly active = this.#active.asObservable();
+	get isActive() {
+		return this.#active.getValue();
+	}
 	#hasActiveChild = false;
 	#inherit?: boolean;
 	#explicitInheritance?: boolean;
@@ -68,11 +79,11 @@ export class UmbViewController extends UmbControllerBase {
 		this.#consumeParentCtrl = this.consumeContext(UMB_VIEW_CONTEXT, (parentView) => {
 			// In case of explicit inheritance we do not want to overview the parent view.
 			if (this.#explicitInheritance) return;
-			if (this.#active && !this.#hasActiveChild) {
+			if (this.isActive && !this.#hasActiveChild) {
 				// If we were active we will react as if we got deactivated and then activated again below if state allows. [NL]
 				this.#propagateActivation();
 			}
-			this.#active = false;
+			this.#active.setValue(false);
 			if (parentView) {
 				this.#parentView = parentView;
 			}
@@ -126,22 +137,23 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	override hostConnected(): void {
+		const wasActive = this.isActive;
 		this.#attached = true;
 		super.hostConnected();
-		// CHeck that we have a providerController, otherwise this is not provided. [NL]
-		if (this.#autoActivate) {
+		// Check that we have a providerController, otherwise this is not provided. [NL]
+		if (this.#autoActivate && !wasActive) {
 			this._internal_activate();
 		}
 	}
 
 	override hostDisconnected(): void {
 		const wasAttached = this.#attached;
-		const wasActive = this.#active;
+		const wasActive = this.isActive;
 		this.#attached = false;
-		this.#active = false;
+		this.#active.setValue(false);
 		super.hostDisconnected();
 		if (wasAttached === true && wasActive) {
-			// CHeck that we have a providerController, otherwise this is not provided. [NL]
+			// Check that we have a providerController, otherwise this is not provided. [NL]
 			this.#propagateActivation();
 		}
 	}
@@ -156,6 +168,18 @@ export class UmbViewController extends UmbControllerBase {
 		this.#consumeParentCtrl?.destroy();
 		this.#consumeParentCtrl = undefined;
 		this.#parentView = context;
+		// Notice because we cannot break the inheritance, we do not need to stop this observation in any of the logic. [NL]
+		this.observe(
+			this.#parentView?.active,
+			(isActive) => {
+				if (isActive) {
+					this._internal_activate();
+				} else {
+					this._internal_deactivate();
+				}
+			},
+			ObserveParentActiveCtrlAlias,
+		);
 		this.#inheritFromParent();
 		this.#propagateActivation();
 	}
@@ -173,7 +197,7 @@ export class UmbViewController extends UmbControllerBase {
 			() => {
 				this.#computeTitle();
 				// Check for parent view as it is undefined in a disassembling state and we do not want to update the title in that situation. [NL]
-				if (this.#providerCtrl && this.#parentView && this.#active) {
+				if (this.#providerCtrl && this.#parentView && this.isActive) {
 					this.#updateTitle();
 				}
 			},
@@ -185,13 +209,13 @@ export class UmbViewController extends UmbControllerBase {
 	#propagateActivation() {
 		if (!this.#parentView) return;
 		if (this.#inherit) {
-			if (this.#active) {
+			if (this.isActive) {
 				this.#parentView._internal_childActivated();
 			} else {
 				this.#parentView._internal_childDeactivated();
 			}
 		} else {
-			if (this.#active) {
+			if (this.isActive) {
 				this.#parentView._internal_deactivate();
 			} else {
 				this.#parentView._internal_activate();
@@ -210,7 +234,7 @@ export class UmbViewController extends UmbControllerBase {
 			return;
 		}
 		this.#autoActivate = true;
-		if (this.#active === true) {
+		if (this.isActive) {
 			return;
 		}
 		// If not attached then propagate the activation to the parent. [NL]
@@ -220,7 +244,7 @@ export class UmbViewController extends UmbControllerBase {
 			}
 			this.#propagateActivation();
 		} else {
-			this.#active = true;
+			this.#active.setValue(true);
 			this.#propagateActivation();
 			this.#updateTitle();
 			this.shortcuts.activate();
@@ -267,8 +291,8 @@ export class UmbViewController extends UmbControllerBase {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_deactivate() {
 		this.#autoActivate = false;
-		if (!this.#active) return;
-		this.#active = false;
+		if (!this.isActive) return;
+		this.#active.setValue(false);
 		this.shortcuts.deactivate();
 		// Deactivate parents:
 		this.#propagateActivation();
@@ -299,7 +323,7 @@ export class UmbViewController extends UmbControllerBase {
 
 	override destroy(): void {
 		this.#inherit = false;
-		this.#active = false;
+		this.#active.setValue(false);
 		this.#autoActivate = false;
 		(this as any).provideAt = undefined;
 		this.unprovide();
