@@ -139,7 +139,7 @@ export class UmbViewController extends UmbControllerBase {
 		const wasActive = this.isActive;
 		this.#attached = true;
 		super.hostConnected();
-		// CHeck that we have a providerController, otherwise this is not provided. [NL]
+		// Check that we have a providerController, otherwise this is not provided. [NL]
 		if (this.#autoActivate && !wasActive) {
 			this._internal_activate();
 		}
@@ -152,7 +152,7 @@ export class UmbViewController extends UmbControllerBase {
 		this.#active.setValue(false);
 		super.hostDisconnected();
 		if (wasAttached === true && wasActive) {
-			// CHeck that we have a providerController, otherwise this is not provided. [NL]
+			// Check that we have a providerController, otherwise this is not provided. [NL]
 			this.#propagateActivation();
 		}
 	}
