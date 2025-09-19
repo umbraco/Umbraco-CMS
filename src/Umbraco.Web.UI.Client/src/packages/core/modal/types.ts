@@ -35,4 +35,9 @@ export interface UmbModalConfig {
 	 * Set the background property of the modal backdrop
 	 */
 	backdropBackground?: string;
+
+	/**
+	 * Set the title of the modal, this is used as Browser Title
+	 */
+	title?: string;
 }
