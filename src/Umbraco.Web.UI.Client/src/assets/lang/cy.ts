@@ -2210,6 +2210,7 @@ export default {
 		searchContentTree: "Chwilio'r coeden cynnwys",
 		maxAmount: 'Uchafswm',
 		expandChildItems: 'Ehangu eitemau plentyn ar gyfer',
+		collapseChildItems: 'Cuddio eitemau plant ar gyfer',
 		openContextNode: 'Agor nod cyd-destun ar gyfer',
 	},
 	references: {

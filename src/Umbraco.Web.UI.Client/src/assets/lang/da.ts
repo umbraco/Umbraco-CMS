@@ -2349,6 +2349,7 @@ export default {
 		maxAmount: 'Maximum antal',
 		contextDialogDescription: 'Perform action %0% on the %1% node',
 		expandChildItems: 'Udvid underordnede elementer for',
+		collapseChildItems: 'Skjul underordnede elementer for',
 		openContextNode: 'Åbn kontekstnode for',
 	},
 	references: {

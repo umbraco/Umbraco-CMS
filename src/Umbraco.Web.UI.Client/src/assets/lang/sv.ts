@@ -317,6 +317,7 @@ export default {
 		searchContentTree: 'Sök i innehållsträdet',
 		maxAmount: 'Maximalt värde',
 		expandChildItems: 'Visa underliggande noder för',
+		collapseChildItems: 'Dölj underliggande noder för',
 		openContextNode: 'Öppna kontext för',
 	},
 	prompt: {

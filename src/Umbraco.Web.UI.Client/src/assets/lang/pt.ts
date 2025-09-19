@@ -2406,6 +2406,7 @@ export default {
 		searchContentTree: 'Pesquisar Árvore de Conteúdo',
 		maxAmount: 'Quantidade máxima',
 		expandChildItems: 'Expandir itens filhos para',
+		collapseChildItems: 'Fechar itens filhos para',
 		openContextNode: 'Abrir nó de contexto para',
 	},
 	references: {
