@@ -369,8 +369,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 								${this.#getVariantSpecInfo(this._activeVariant)}
 								${this.#renderReadOnlyTag(this._activeVariant?.culture)}
 								<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
-								${this.#renderHintBadge(firstHintOnInactiveVariant)}
 							</uui-button>
+							${this._variantSelectorOpen ? this.#renderHintBadge(firstHintOnInactiveVariant) : nothing}
 							${this._activeVariants.length > 1
 								? html`
 										<uui-button slot="append" compact id="variant-close" @click=${this.#closeSplitView}>
@@ -424,9 +424,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 						</div>
 					</div>
 					<div class="specs-info">${this.#getVariantSpecInfo(variantOption)}</div>
-					${this.#renderHintBadge(!active ? hint : undefined)}
 				</button>
-				${this.#renderSplitViewButton(variantOption)}
+				${this.#renderHintBadge(!active ? hint : undefined)} ${this.#renderSplitViewButton(variantOption)}
 			</div>
 			${this.#isVariantExpanded(variantId)
 				? html` ${subVariantOptions.map((option) => this.#renderSegmentVariantOption(option))} `
@@ -436,9 +435,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#renderHintBadge(hint?: UmbVariantHint) {
 		if (!hint) return nothing;
-		return html`<div class="hint">
-			<uui-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}>${hint.text}</uui-badge>
-		</div>`;
+		return html` <umb-badge slot="append" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+			>${hint.text}</umb-badge
+		>`;
 	}
 
 	#isCreated(variantOption: VariantOptionModelType) {
