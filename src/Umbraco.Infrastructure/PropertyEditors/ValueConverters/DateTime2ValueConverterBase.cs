@@ -59,7 +59,6 @@ public abstract class DateTime2ValueConverterBase : PropertyValueConverterBase
     /// Converts the source value to an intermediate representation.
     /// </summary>
     /// <param name="source">The source value.</param>
-    /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <returns>The intermediate representation.</returns>
     internal DateTime2Dto? GetIntermediateFromSource(object? source) =>
         source switch
@@ -70,6 +69,17 @@ public abstract class DateTime2ValueConverterBase : PropertyValueConverterBase
             string sourceStr => _jsonSerializer.TryDeserialize(sourceStr, out DateTime2Dto? dateTime2) ? dateTime2 : null,
             _ => null,
         };
+
+    /// <summary>
+    /// Gets the value from the source using the value converter.
+    /// </summary>
+    /// <param name="source">The source value.</param>
+    /// <returns>The converted value.</returns>
+    internal object? GetValueFromSource(object? source)
+    {
+        DateTime2Dto? inter = GetIntermediateFromSource(source);
+        return inter is null ? null : ConvertToObject(inter);
+    }
 
     /// <summary>
     ///    Gets the property value type for this value converter.

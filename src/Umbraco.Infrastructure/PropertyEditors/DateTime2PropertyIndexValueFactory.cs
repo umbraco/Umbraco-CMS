@@ -36,7 +36,7 @@ internal class DateTime2PropertyIndexValueFactory : IDateTimeUnspecifiedProperty
             return [indexValue];
         }
 
-        var value = GetValueFromSource(propertyValue);
+        var value = _valueConverter.GetValueFromSource(propertyValue);
         if (value is null)
         {
             return [indexValue];
@@ -51,16 +51,5 @@ internal class DateTime2PropertyIndexValueFactory : IDateTimeUnspecifiedProperty
         indexValue.Values = [$"{value:O}"];
 
         return [indexValue];
-    }
-
-    /// <summary>
-    /// Gets the value from the source using the value converter.
-    /// </summary>
-    /// <param name="source">The source value.</param>
-    /// <returns>The converted value.</returns>
-    protected object? GetValueFromSource(object? source)
-    {
-        DateTime2ValueConverterBase.DateTime2Dto? inter = _valueConverter.GetIntermediateFromSource(source);
-        return inter is null ? null : _valueConverter.ConvertToObject(inter);
     }
 }
