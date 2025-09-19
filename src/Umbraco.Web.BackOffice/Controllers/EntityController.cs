@@ -732,8 +732,7 @@ public class EntityController : UmbracoAuthorizedJsonController
 
             // else proceed as usual
 
-            return _entityService.GetPagedChildren(id, objectType.Value, 0, 100, out _, null,
-            Ordering.By("VersionDate", Direction.Descending))
+            return _entityService.GetChildren(id, objectType.Value)
                 .Select(_umbracoMapper.Map<EntityBasic>)
                 .WhereNotNull();
         }
