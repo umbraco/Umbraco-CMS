@@ -173,6 +173,7 @@ export class UmbShortcutController extends UmbControllerBase {
 	override destroy(): void {
 		super.destroy();
 		if (this.#inUnprovidingState === true) {
+			// TODO: What is it i'm doing here, check if it actually makes sense, if so add a comment on why [NL]
 			return;
 		}
 		this.unprovide();
