@@ -198,15 +198,15 @@ public class HtmlLocalLinkParserTests
         }
     }
 
-    [TestCase(UrlMode.Default, "hello href=\"{localLink:1234}\" world ", "hello href=\"/default-url\" world ")]
+    [TestCase(UrlMode.Default, "hello href=\"{localLink:1234}\" world ", "hello href=\"/relative-url\" world ")]
     [TestCase(UrlMode.Relative, "hello href=\"{localLink:1234}\" world ", "hello href=\"/relative-url\" world ")]
     [TestCase(UrlMode.Absolute, "hello href=\"{localLink:1234}\" world ", "hello href=\"https://example.com/absolute-url\" world ")]
     [TestCase(UrlMode.Auto, "hello href=\"{localLink:1234}\" world ", "hello href=\"/relative-url\" world ")]
-    [TestCase(UrlMode.Default, "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/default-url\" world ")]
+    [TestCase(UrlMode.Default, "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/relative-url\" world ")]
     [TestCase(UrlMode.Relative, "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/relative-url\" world ")]
     [TestCase(UrlMode.Absolute, "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"https://example.com/absolute-url\" world ")]
     [TestCase(UrlMode.Auto, "hello href=\"{localLink:umb://document/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/relative-url\" world ")]
-    [TestCase(UrlMode.Default, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/default/image.jpg\" world ")]
+    [TestCase(UrlMode.Default, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/relative/image.jpg\" world ")]
     [TestCase(UrlMode.Relative, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/relative/image.jpg\" world ")]
     [TestCase(UrlMode.Absolute, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"https://example.com/media/absolute/image.jpg\" world ")]
     [TestCase(UrlMode.Auto, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/relative/image.jpg\" world ")]
@@ -220,7 +220,7 @@ public class HtmlLocalLinkParserTests
                 UrlMode.Default,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/default-url"));
+            .Returns(UrlInfo.Url("/relative-url"));
         contentUrlProvider
             .Setup(x => x.GetUrl(
                 It.IsAny<IPublishedContent>(),
@@ -241,7 +241,7 @@ public class HtmlLocalLinkParserTests
                 UrlMode.Auto,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/default-url"));
+            .Returns(UrlInfo.Url("/relative-url"));
 
         var contentType = new PublishedContentType(
             Guid.NewGuid(),
@@ -263,7 +263,7 @@ public class HtmlLocalLinkParserTests
                 UrlMode.Default,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/media/default/image.jpg"));
+            .Returns(UrlInfo.Url("/media/relative/image.jpg"));
         mediaUrlProvider.Setup(x => x.GetMediaUrl(
                 It.IsAny<IPublishedContent>(),
                 It.IsAny<string>(),
@@ -284,7 +284,7 @@ public class HtmlLocalLinkParserTests
                 UrlMode.Auto,
                 It.IsAny<string>(),
                 It.IsAny<Uri>()))
-            .Returns(UrlInfo.Url("/media/default/image.jpg"));
+            .Returns(UrlInfo.Url("/media/relative/image.jpg"));
 
         var mediaType = new PublishedContentType(
             Guid.NewGuid(),
