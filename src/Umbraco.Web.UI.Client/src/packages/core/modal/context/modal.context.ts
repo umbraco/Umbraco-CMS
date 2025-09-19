@@ -10,7 +10,7 @@ import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/router';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import { UmbViewController } from '../../view/context/view.controller.js';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -62,7 +62,7 @@ export class UmbModalContext<
 	#size = new UmbStringState<UUIModalSidebarSize>('small');
 	public readonly size = this.#size.asObservable();
 
-	public readonly view = new UmbViewContext(this, null);
+	public readonly view;
 
 	constructor(
 		host: UmbControllerHost,
@@ -73,6 +73,8 @@ export class UmbModalContext<
 		this.key = args.modal?.key || UmbId.new();
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
+
+		this.view = new UmbViewController(this, modalAlias.toString());
 
 		let title: string | undefined = undefined;
 		let size = 'small';
