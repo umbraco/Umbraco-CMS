@@ -12,7 +12,6 @@ import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
-import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
