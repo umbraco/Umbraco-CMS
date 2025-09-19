@@ -68,8 +68,7 @@ const toolbarDefaultValue = [
     ],
     [
       "Umb.Tiptap.Toolbar.MediaPicker",
-      "Umb.Tiptap.Toolbar.EmbeddedMedia",
-      "Umb.Tiptap.Toolbar.StyleSelect"
+      "Umb.Tiptap.Toolbar.EmbeddedMedia"
     ]
   ]
 ];
