@@ -7,7 +7,6 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -52,8 +51,6 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 	public readonly collection: Observable<UmbReferenceByUnique | null | undefined>;
 
 	public readonly structure: UmbContentTypeStructureManager<DetailModelType>;
-
-	public readonly view = new UmbViewContext(this, null);
 
 	constructor(host: UmbControllerHost, args: UmbContentTypeWorkspaceContextArgs) {
 		super(host, args);

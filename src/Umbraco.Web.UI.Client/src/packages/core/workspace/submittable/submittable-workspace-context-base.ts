@@ -8,6 +8,7 @@ import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	extends UmbContextBase
@@ -19,6 +20,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
 	#validationContexts: Array<UmbValidationController> = [];
+
+	public readonly view = new UmbViewContext(this, null);
 
 	/**
 	 * Appends a validation context to the workspace.
@@ -53,6 +56,13 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		// TODO: Consider if we can move this consumption to #resolveSubmit, just as a getContext, but it depends if others use the modalContext prop.. [NL]
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			(this.modalContext as UmbModalContext | undefined) = context;
+		});
+
+		this.view.shortcuts.addOne({
+			key: 's',
+			modifier: true,
+			action: () => this.requestSubmit(),
+			label: '#general_submit',
 		});
 	}
 

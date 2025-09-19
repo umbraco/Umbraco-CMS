@@ -33,7 +33,6 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UmbSegmentCollectionRepository } from '@umbraco-cms/backoffice/segment';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UMB_VALIDATION_CONTEXT,
@@ -144,9 +143,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly collection: UmbContentCollectionManager;
-
-	/* View */
-	readonly view = new UmbViewContext(this, null);
 
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]

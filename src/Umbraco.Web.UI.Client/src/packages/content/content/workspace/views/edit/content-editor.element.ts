@@ -21,6 +21,7 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
+import { UmbViewController } from 'src/packages/core/view/context/view.controller.js';
 
 import './content-editor-tab.element.js';
 
@@ -51,7 +52,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	@state()
 	private _hintMap: Map<string | null, UmbVariantHint> = new Map();
 
-	#tabViewContexts: Array<UmbViewContext> = [];
+	#tabViewContexts: Array<UmbViewController> = [];
 
 	#structureManager?: UmbContentTypeStructureManager<UmbContentTypeModel>;
 
@@ -150,7 +151,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 
 	#createViewContext(viewAlias: string | null, tabName: string) {
 		if (!this.#tabViewContexts.find((context) => context.viewAlias === viewAlias)) {
-			const view = new UmbViewContext(this, viewAlias);
+			const view = new UmbViewController(this, viewAlias);
 			this.#tabViewContexts.push(view);
 
 			if (viewAlias === null) {
@@ -176,7 +177,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		}
 	}
 
-	#currentProvidedView?: UmbViewContext;
+	#currentProvidedView?: UmbViewController;
 
 	#provideViewContext(viewAlias: string | null, component: PageComponent) {
 		const view = this.#tabViewContexts.find((context) => context.viewAlias === viewAlias);
