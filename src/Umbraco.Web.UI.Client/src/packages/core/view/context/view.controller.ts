@@ -173,7 +173,6 @@ export class UmbViewController extends UmbControllerBase {
 				this.#computeTitle();
 				// Check for parent view as it is undefined in a disassembling state and we do not want to update the title in that situation. [NL]
 				if (this.#providerCtrl && this.#parentView && this.#active) {
-					console.log('ttt', this.viewAlias, this);
 					this.#updateTitle();
 				}
 			},
