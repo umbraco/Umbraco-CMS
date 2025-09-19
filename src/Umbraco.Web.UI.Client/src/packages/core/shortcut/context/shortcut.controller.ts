@@ -8,8 +8,6 @@ import type { UmbShortcut } from '../types.js';
 
 type IncomingShortcutType = UmbPartialSome<UmbShortcut, 'unique' | 'weight' | 'modifier' | 'shift' | 'alt'>;
 
-const ObserveShortcutsCtrlAlias = Symbol();
-
 const IsMac = navigator.userAgent ? /Mac/i.test(navigator.userAgent) : navigator.platform.toUpperCase().includes('MAC');
 
 export class UmbShortcutController extends UmbControllerBase {
@@ -82,6 +80,9 @@ export class UmbShortcutController extends UmbControllerBase {
 		const newShortcut = { ...shortcut } as unknown as UmbShortcut;
 		newShortcut.unique ??= Symbol();
 		newShortcut.weight ??= 0;
+		newShortcut.modifier ??= false;
+		newShortcut.shift ??= false;
+		newShortcut.alt ??= false;
 		this.#shortcuts.appendOne(newShortcut);
 		return shortcut.unique!;
 	}
@@ -152,11 +153,11 @@ export class UmbShortcutController extends UmbControllerBase {
 	}
 
 	activate() {
-		window.addEventListener('keyup', this.#onKeyDown);
+		window.addEventListener('keydown', this.#onKeyDown);
 	}
 
 	deactivate() {
-		window.removeEventListener('keyup', this.#onKeyDown);
+		window.removeEventListener('keydown', this.#onKeyDown);
 	}
 
 	#onKeyDown = (e: KeyboardEvent) => {
@@ -166,7 +167,7 @@ export class UmbShortcutController extends UmbControllerBase {
 		const shortcut = this.findShortcut(keyDown, modifierDown, e.shiftKey, e.altKey);
 		if (shortcut) {
 			e.preventDefault();
-			shortcut.callback();
+			shortcut.action();
 		}
 	};
 

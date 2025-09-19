@@ -57,6 +57,13 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			(this.modalContext as UmbModalContext | undefined) = context;
 		});
+
+		this.view.shortcuts.addOne({
+			key: 's',
+			modifier: true,
+			action: () => this.requestSubmit(),
+			label: '#general_submit',
+		});
 	}
 
 	protected resetState() {
