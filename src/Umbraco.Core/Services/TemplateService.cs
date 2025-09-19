@@ -182,7 +182,8 @@ public class TemplateService : RepositoryService, ITemplateService
         IQuery<ITemplate> query = Query<ITemplate>();
         if (keys.Any())
         {
-            query = query.Where(x => keys.Contains(x.Key));
+            var keysList = keys.ToList();
+            query = query.Where(x => keysList.Contains(x.Key));
         }
 
         IEnumerable<ITemplate> templates = _templateRepository.Get(query).OrderBy(x => x.Name);

@@ -22,7 +22,12 @@ internal sealed class CacheInstructionRepository : ICacheInstructionRepository
     /// <inheritdoc />
     public int CountAll()
     {
-        Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql().Select("COUNT(*)")
+        if (AmbientScope is null)
+        {
+            return 0;
+        }
+
+        Sql<ISqlContext>? sql = AmbientScope.SqlContext.Sql().Select("COUNT(*)")
             .From<CacheInstructionDto>();
 
         return AmbientScope?.Database.ExecuteScalar<int>(sql) ?? 0;
@@ -50,13 +55,17 @@ internal sealed class CacheInstructionRepository : ICacheInstructionRepository
     /// <inheritdoc />
     public IEnumerable<CacheInstruction> GetPendingInstructions(int lastId, int maxNumberToRetrieve)
     {
-        Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql().SelectAll()
+        if (AmbientScope is null)
+        {
+            return [];
+        }
+
+        Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql().SelectAll()
             .From<CacheInstructionDto>()
             .Where<CacheInstructionDto>(dto => dto.Id > lastId)
             .OrderBy<CacheInstructionDto>(dto => dto.Id);
-        Sql<ISqlContext>? topSql = sql?.SelectTop(maxNumberToRetrieve);
-        return AmbientScope?.Database.Fetch<CacheInstructionDto>(topSql).Select(CacheInstructionFactory.BuildEntity) ??
-               Array.Empty<CacheInstruction>();
+        Sql<ISqlContext> topSql = sql.SelectTop(maxNumberToRetrieve);
+        return AmbientScope.Database.Fetch<CacheInstructionDto>(topSql).Select(CacheInstructionFactory.BuildEntity);
     }
 
     /// <inheritdoc />

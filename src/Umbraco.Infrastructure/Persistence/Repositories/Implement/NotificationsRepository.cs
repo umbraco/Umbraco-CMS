@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -17,10 +18,15 @@ public class NotificationsRepository : INotificationsRepository
 
     private IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
-    public IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
+    public IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
     {
+        if (AmbientScope is null)
+        {
+            return [];
+        }
+
         var nodeIdsA = nodeIds.ToArray();
-        Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql()
+        Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
             .Select(
                 "DISTINCT umbracoNode.id nodeId, umbracoUser.id userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
             .From<User2NodeNotifyDto>()
@@ -31,20 +37,25 @@ public class NotificationsRepository : INotificationsRepository
             .Where<User2NodeNotifyDto>(x => x.Action == action); // on the specified action
         if (nodeIdsA.Length > 0)
         {
-            sql?
+            sql
                 .WhereIn<NodeDto>(x => x.NodeId, nodeIdsA); // for the specified nodes
         }
 
-        sql?
+        sql
             .OrderBy<UserDto>(x => x.Id)
             .OrderBy<NodeDto>(dto => dto.NodeId);
-        return AmbientScope?.Database.Fetch<UserNotificationDto>(sql)
+        return AmbientScope.Database.Fetch<UserNotificationDto>(sql)
             .Select(x => new Notification(x.NodeId, x.UserId, x.Action, objectType));
     }
 
-    public IEnumerable<Notification>? GetUserNotifications(IUser user)
+    public IEnumerable<Notification> GetUserNotifications(IUser user)
     {
-        Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql()
+        if (AmbientScope is null)
+        {
+            return [];
+        }
+
+        Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
             .Select(
                 "DISTINCT umbracoNode.id AS nodeId, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
             .From<User2NodeNotifyDto>()
@@ -53,21 +64,33 @@ public class NotificationsRepository : INotificationsRepository
             .Where<User2NodeNotifyDto>(dto => dto.UserId == user.Id)
             .OrderBy<NodeDto>(dto => dto.NodeId);
 
-        List<UserNotificationDto>? dtos = AmbientScope?.Database.Fetch<UserNotificationDto>(sql);
+        List<UserNotificationDto> dtos = AmbientScope.Database.Fetch<UserNotificationDto>(sql);
 
         // need to map the results
-        return dtos?.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
+        return dtos.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
     }
 
     public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
     {
         DeleteNotifications(user, entity);
-        return actions.Select(action => CreateNotification(user, entity, action)).ToList();
+        return actions
+            .Select(action =>
+            {
+                TryCreateNotification(user, entity, action, out Notification? n);
+                return n;
+            })
+            .WhereNotNull()
+            .ToList();
     }
 
-    public IEnumerable<Notification>? GetEntityNotifications(IEntity entity)
+    public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
     {
-        Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql()
+        if (AmbientScope is null)
+        {
+            return [];
+        }
+
+        Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
             .Select(
                 "DISTINCT umbracoNode.id as nodeId, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
             .From<User2NodeNotifyDto>()
@@ -76,10 +99,10 @@ public class NotificationsRepository : INotificationsRepository
             .Where<User2NodeNotifyDto>(dto => dto.NodeId == entity.Id)
             .OrderBy<NodeDto>(dto => dto.NodeId);
 
-        List<UserNotificationDto>? dtos = AmbientScope?.Database.Fetch<UserNotificationDto>(sql);
+        List<UserNotificationDto> dtos = AmbientScope.Database.Fetch<UserNotificationDto>(sql);
 
         // need to map the results
-        return dtos?.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
+        return dtos.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
     }
 
     public int DeleteNotifications(IEntity entity) =>
@@ -95,16 +118,23 @@ public class NotificationsRepository : INotificationsRepository
             "WHERE userId = @userId AND nodeId = @nodeId",
             new { userId = user.Id, nodeId = entity.Id }) ?? 0;
 
-    public Notification CreateNotification(IUser user, IEntity entity, string action)
+    public bool TryCreateNotification(IUser user, IEntity entity, string action, [NotNullWhen(true)] out Notification? notification)
     {
-        Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql()
+        if (AmbientScope is null)
+        {
+            notification = null;
+            return false;
+        }
+
+        Sql<ISqlContext>? sql = AmbientScope.SqlContext.Sql()
             .Select("DISTINCT nodeObjectType")
             .From<NodeDto>()
             .Where<NodeDto>(nodeDto => nodeDto.NodeId == entity.Id);
-        Guid? nodeType = AmbientScope?.Database.ExecuteScalar<Guid>(sql);
+        Guid nodeType = AmbientScope.Database.ExecuteScalar<Guid>(sql);
 
         var dto = new User2NodeNotifyDto { Action = action, NodeId = entity.Id, UserId = user.Id };
-        AmbientScope?.Database.Insert(dto);
-        return new Notification(dto.NodeId, dto.UserId, dto.Action, nodeType);
+        AmbientScope.Database.Insert(dto);
+        notification = new Notification(dto.NodeId, dto.UserId, dto.Action, nodeType);
+        return true;
     }
 }

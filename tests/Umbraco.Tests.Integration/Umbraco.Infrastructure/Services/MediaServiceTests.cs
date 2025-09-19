@@ -100,13 +100,15 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (provider.CreateScope())
         {
+            var filter = provider.CreateQuery<IMedia>()
+                .Where(x => new List<int> { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId));
+
             var result = MediaService.GetPagedChildren(
                 -1,
                 0,
                 11,
                 out var total,
-                provider.CreateQuery<IMedia>()
-                    .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
+                filter,
                 Ordering.By("SortOrder"));
             Assert.AreEqual(11, result.Count());
             Assert.AreEqual(20, total);
@@ -116,8 +118,7 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
                 1,
                 11,
                 out total,
-                provider.CreateQuery<IMedia>()
-                    .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
+                filter,
                 Ordering.By("SortOrder"));
             Assert.AreEqual(9, result.Count());
             Assert.AreEqual(20, total);

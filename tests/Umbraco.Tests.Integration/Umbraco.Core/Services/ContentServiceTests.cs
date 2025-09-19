@@ -2094,7 +2094,8 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
         var userGroup = await UserGroupService.GetAsync(user.Groups.First().Alias);
-        Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
+        NotificationService.TryCreateNotification(user, content1, "X", out Notification? notification);
+        Assert.IsNotNull(notification);
 
         ContentService.SetPermission(content1, "A", new[] { userGroup.Id });
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
