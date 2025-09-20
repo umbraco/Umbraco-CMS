@@ -13,6 +13,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	@property({ type: String })
 	label: string = '';
 
+	@property({ type: String })
+	placeholder: string = '';
+
 	@property({ type: String, reflect: false })
 	alias = '';
 
@@ -96,12 +99,13 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 
 	override render() {
 		const nameLabel = this.label ?? this.localize.term('placeholders_entername');
+		const namePlaceholder = this.placeholder ?? this.localize.term('placeholders_entername');
 		const aliasLabel = this.localize.term('placeholders_enterAlias');
 
 		return html`
 			<uui-input
 				id="name"
-				placeholder=${nameLabel}
+				placeholder=${namePlaceholder ? namePlaceholder : ''}
 				label=${nameLabel}
 				.value=${this.value}
 				@input=${this.#onNameChange}
