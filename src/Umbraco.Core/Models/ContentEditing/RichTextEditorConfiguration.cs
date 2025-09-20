@@ -19,4 +19,7 @@ public class RichTextEditorConfiguration
 
     [DataMember(Name = "customConfig")]
     public IDictionary<string, string>? CustomConfig { get; set; }
+
+    [DataMember(Name = "cloudApiKey")]
+    public string? CloudApiKey { get; set; }
 }

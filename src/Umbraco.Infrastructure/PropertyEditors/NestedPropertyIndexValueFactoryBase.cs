@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
@@ -42,20 +43,39 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         bool published) =>
         Handle(deserializedPropertyValue, property, culture, segment, published, Enumerable.Empty<string>());
 
+    [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
     protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
         TSerialized deserializedPropertyValue,
         IProperty property,
         string? culture,
         string? segment,
         bool published,
-        IEnumerable<string> availableCultures)
+        IEnumerable<string> availableCultures) =>
+        Handle(
+            deserializedPropertyValue,
+            property,
+            culture,
+            segment,
+            published,
+            Enumerable.Empty<string>(),
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>().GetAll().ToDictionary(x=>x.Key));
+
+
+    protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
+        TSerialized deserializedPropertyValue,
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published,
+        IEnumerable<string> availableCultures,
+        IDictionary<Guid, IContentType> contentTypeDictionary)
     {
         var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
         var index = 0;
         foreach (TItem nestedContentRowValue in GetDataItems(deserializedPropertyValue))
         {
-            IContentType? contentType = GetContentTypeOfNestedItem(nestedContentRowValue);
+            IContentType? contentType = GetContentTypeOfNestedItem(nestedContentRowValue, contentTypeDictionary);
 
             if (contentType is null)
             {
@@ -92,7 +112,8 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                 published,
                 propertyTypeDictionary,
                 nestedContentRowValue,
-                availableCultures));
+                availableCultures,
+                contentTypeDictionary));
 
             index++;
         }
@@ -125,6 +146,9 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
     /// <summary>
     /// Gets the content type using the nested item.
     /// </summary>
+    protected abstract IContentType? GetContentTypeOfNestedItem(TItem nestedItem, IDictionary<Guid, IContentType> contentTypeDictionary);
+
+    [Obsolete("Use non-obsolete overload. Scheduled for removal in Umbraco 14.")]
     protected abstract IContentType? GetContentTypeOfNestedItem(TItem nestedItem);
 
     /// <summary>
@@ -190,7 +214,8 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         bool published,
         IDictionary<string, IPropertyType> propertyTypeDictionary,
         TItem nestedContentRowValue,
-        IEnumerable<string> availableCultures)
+        IEnumerable<string> availableCultures,
+        IDictionary<Guid,IContentType> contentTypeDictionary)
     {
         foreach ((var propertyAlias, var propertyValue) in GetRawProperty(nestedContentRowValue))
         {
@@ -215,7 +240,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                             subProperty.PublishValues(availableCulture, segment ?? "*");
                         }
                         indexValues =
-                            editor.PropertyIndexValueFactory.GetIndexValues(subProperty, availableCulture, segment, published, availableCultures);
+                            editor.PropertyIndexValueFactory.GetIndexValues(subProperty, availableCulture, segment, published, availableCultures, contentTypeDictionary);
                     }
                 }
                 else
@@ -225,7 +250,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                     {
                         subProperty.PublishValues(culture ?? "*", segment ?? "*");
                     }
-                    indexValues = editor.PropertyIndexValueFactory.GetIndexValues(subProperty, culture, segment, published, availableCultures);
+                    indexValues = editor.PropertyIndexValueFactory.GetIndexValues(subProperty, culture, segment, published, availableCultures, contentTypeDictionary);
                 }
 
                 foreach ((var nestedAlias, IEnumerable<object?> nestedValue) in indexValues)

@@ -1,8 +1,10 @@
 using Examine;
 using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 
@@ -22,8 +24,26 @@ public static class UmbracoBuilderExtensions
 
         services.AddExamine();
 
-        // Create the indexes
-        services
+        services.AddSingleton<UmbracoTempEnvFileSystemDirectoryFactory>();
+        services.RemoveAll<SyncedFileSystemDirectoryFactory>();
+        services.AddSingleton<SyncedFileSystemDirectoryFactory>(
+            s =>
+            {
+                var baseDir = s.GetRequiredService<IApplicationRoot>().ApplicationRoot;
+
+                var tempDir = UmbracoTempEnvFileSystemDirectoryFactory.GetTempPath(
+                    s.GetRequiredService<IApplicationIdentifier>(), s.GetRequiredService<IHostingEnvironment>());
+
+                return ActivatorUtilities.CreateInstance<SyncedFileSystemDirectoryFactory>(
+                    s,
+                    new object[]
+                    {
+                        new DirectoryInfo(tempDir), s.GetRequiredService<IApplicationRoot>().ApplicationRoot
+                    });
+            });
+
+    // Create the indexes
+    services
             .AddExamineLuceneIndex<UmbracoContentIndex, ConfigurationEnabledDirectoryFactory>(Constants.UmbracoIndexes
                 .InternalIndexName)
             .AddExamineLuceneIndex<UmbracoContentIndex, ConfigurationEnabledDirectoryFactory>(Constants.UmbracoIndexes

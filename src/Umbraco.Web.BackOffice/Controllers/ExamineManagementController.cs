@@ -1,6 +1,7 @@
 using Examine;
 using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -8,11 +9,13 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 using SearchResult = Umbraco.Cms.Core.Models.ContentEditing.SearchResult;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
+[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
 public class ExamineManagementController : UmbracoAuthorizedJsonController
 {
@@ -202,7 +205,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
             documentCount = indexDiag.GetDocumentCount();
             fieldCount = indexDiag.GetFieldNames().Count();
         }
-        catch (FileNotFoundException ex)
+        catch (Exception ex)
         {
             // Safe catch that will allow to rebuild a corrupted index
             documentCount = 0;
@@ -303,7 +306,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
         }
 
-        _logger.LogInformation($"Rebuilding index '{indexer?.Name}' done.");
+        _logger.LogInformation("Rebuilding index '{indexerName}' done.", indexer?.Name);
 
         var cacheKey = "temp_indexing_op_" + indexer?.Name;
         _runtimeCache.Clear(cacheKey);

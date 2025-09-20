@@ -147,6 +147,8 @@ public static partial class Constants
 
         public const string LogViewer = "logViewer";
 
+        public const string Webhooks = "webhooks";
+
         public static class Groups
         {
             public const string Settings = "settingsGroup";

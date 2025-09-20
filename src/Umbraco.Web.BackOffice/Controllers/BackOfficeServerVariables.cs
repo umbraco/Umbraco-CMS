@@ -269,6 +269,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 "imageFileTypes",
                 "loginBackgroundImage",
                 "loginLogoImage",
+                "loginLogoImageAlternative",
                 "canSendRequiredEmail",
                 "usernameIsEmail",
                 "hideBackofficeLogo",
@@ -585,6 +586,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                             "mediaPickerThreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaPickerThreeController>(
                                 controller => controller.UploadMedia(null!))
                         },
+                        {
+                            "webhooksApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<WebhookController>(
+                                controller => controller.GetAll(0, 0))
+                        },
                     }
                 },
                 {
@@ -615,6 +620,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"loginLogoImage", _contentSettings.LoginLogoImage },
+                        {"loginLogoImageAlternative", _contentSettings.LoginLogoImageAlternative },
                         {"hideBackofficeLogo", _contentSettings.HideBackOfficeLogo },
                         {"disableDeleteWhenReferenced", _contentSettings.DisableDeleteWhenReferenced },
                         {"disableUnpublishWhenReferenced", _contentSettings.DisableUnpublishWhenReferenced },

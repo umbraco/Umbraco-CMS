@@ -74,6 +74,8 @@ public class AuthenticationController : UmbracoApiControllerBase
     private readonly IUserService _userService;
     private readonly WebRoutingSettings _webRoutingSettings;
 
+    private static long? _loginDurationAverage;
+
     // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
     [ActivatorUtilitiesConstructor]
     public AuthenticationController(
@@ -129,12 +131,17 @@ public class AuthenticationController : UmbracoApiControllerBase
         AuthorizationPolicies.BackOfficeAccess)] // Needed to enforce the principle set on the request, if one exists.
     public IDictionary<string, object> GetPasswordConfig(int userId)
     {
+        if (HttpContext.HasActivePasswordResetFlowSession(userId))
+        {
+            return _passwordConfiguration.GetConfiguration();
+        }
+
         Attempt<int> currentUserId =
             _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int>.Fail();
-        return _passwordConfiguration.GetConfiguration(
-            currentUserId.Success
-                ? currentUserId.Result != userId
-                : true);
+
+        return currentUserId.Success
+            ? _passwordConfiguration.GetConfiguration(currentUserId.Result != userId)
+            : new Dictionary<string, object>();
     }
 
     /// <summary>
@@ -307,14 +314,15 @@ public class AuthenticationController : UmbracoApiControllerBase
     ///     When a user is invited they are not approved but we need to resolve the partially logged on (non approved)
     ///     user.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>It returns a 403 error if the logged-in user has already been created.</returns>
     /// <remarks>
     ///     We cannot user GetCurrentUser since that requires they are approved, this is the same as GetCurrentUser but doesn't
     ///     require them to be approved
     /// </remarks>
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
-    [SetAngularAntiForgeryTokens]
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
+    [SetAngularAntiForgeryTokens]
+    [AllowAnonymous] // Needed for users that are invited when they use the link from the mail they may have logged in on a different session, so we don't want to redirect them.
     public ActionResult<UserDetail?> GetCurrentInvitedUser()
     {
         IUser? user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
@@ -337,6 +345,76 @@ public class AuthenticationController : UmbracoApiControllerBase
     }
 
     /// <summary>
+    ///     When a user is invited and they click on the invitation link, they will be partially logged in
+    ///     where they can set their username/password.
+    /// </summary>
+    /// <param name="invitePasswordModel">The model for the new password.</param>
+    /// <returns>The user model for the invited user.</returns>
+    /// <remarks>
+    ///     This only works when the user is logged in (partially).
+    /// </remarks>
+    [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
+    [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
+    [SetAngularAntiForgeryTokens]
+    [AllowAnonymous] // Needed for users that are invited when they use the link from the mail they may have logged in on a different session, so we don't want to redirect them.
+    public async Task<ActionResult<UserDetail?>> PostSetInvitedUserPassword(InvitePasswordModel invitePasswordModel)
+    {
+        IUser? currentUser = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+
+        if (currentUser is null)
+        {
+            return BadRequest("Could not find user");
+        }
+
+        if (currentUser.IsApproved)
+        {
+            // if they are approved, than they are no longer invited and we can return an error
+            return Forbid();
+        }
+
+        BackOfficeIdentityUser? user = await _userManager.FindByIdAsync(currentUser!.Id.ToString());
+
+        if (user is null)
+        {
+            return BadRequest("Could not find identity user");
+        }
+
+        IdentityResult result = await _userManager.AddPasswordAsync(user, invitePasswordModel.NewPassword);
+
+        if (result.Succeeded is false)
+        {
+            // it wasn't successful, so add the change error to the model state, we've name the property alias _umb_password on the form
+            // so that is why it is being used here.
+            ModelState.AddModelError("value", result.Errors.ToErrorMessage());
+
+            return ValidationProblem(ModelState);
+        }
+
+        if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null)
+        {
+            // They've successfully set their password, we can now update their user account to be approved
+            _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsApproved = true;
+
+            // They've successfully set their password, and will now get fully logged into the back office, so the lastlogindate is set so the backoffice shows they have logged in
+            _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.LastLoginDate = DateTime.UtcNow;
+
+            _userService.Save(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
+        }
+
+
+        // now we can return their full object since they are now really logged into the back office
+        UserDetail? userDisplay =
+            _umbracoMapper.Map<UserDetail>(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser);
+
+        if (userDisplay is not null)
+        {
+            userDisplay.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
+        }
+
+        return userDisplay;
+    }
+
+    /// <summary>
     ///     Logs a user in
     /// </summary>
     /// <returns></returns>
@@ -344,47 +422,63 @@ public class AuthenticationController : UmbracoApiControllerBase
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<ActionResult<UserDetail?>> PostLogin(LoginModel loginModel)
     {
+        HttpContext.EndPasswordResetFlowSession();
+
+        // Start a timed scope to ensure failed responses return is a consistent time
+        var loginDuration = Math.Max(_loginDurationAverage ?? _securitySettings.UserDefaultFailedLoginDurationInMilliseconds, _securitySettings.UserMinimumFailedLoginDurationInMilliseconds);
+        await using var timedScope = new TimedScope(loginDuration, HttpContext.RequestAborted);
+
         // Sign the user in with username/password, this also gives a chance for developers to
         // custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
-        SignInResult result = await _signInManager.PasswordSignInAsync(
-            loginModel.Username, loginModel.Password, true, true);
-
-        if (result.Succeeded)
+        SignInResult result = await _signInManager.PasswordSignInAsync(loginModel.Username, loginModel.Password, true, true);
+        if (result.Succeeded is false)
         {
-            // return the user detail
-            return GetUserDetail(_userService.GetByUsername(loginModel.Username));
-        }
+            BackOfficeIdentityUser? user = await _userManager.FindByNameAsync(loginModel.Username.Trim());
 
-        if (result.RequiresTwoFactor)
-        {
-            var twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(loginModel.Username);
-            if (twofactorView.IsNullOrWhiteSpace())
+            if (user is not null &&
+                await _userManager.CheckPasswordAsync(user, loginModel.Password))
             {
-                return new ValidationErrorResult(
-                    $"The registered {typeof(IBackOfficeTwoFactorOptions)} of type {_backOfficeTwoFactorOptions.GetType()} did not return a view for two factor auth ");
+                // The credentials were correct, so cancel timed scope and provide a more detailed failure response
+                await timedScope.CancelAsync();
+
+                if (result.RequiresTwoFactor)
+                {
+                    var twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(loginModel.Username);
+
+                    IUser? attemptedUser = _userService.GetByUsername(loginModel.Username);
+
+                    // create a with information to display a custom two factor send code view
+                    var verifyResponse =
+                        new ObjectResult(new { twoFactorView = twofactorView, userId = attemptedUser?.Id })
+                        {
+                            StatusCode = StatusCodes.Status402PaymentRequired
+                        };
+
+                    return verifyResponse;
+                }
+
+                // TODO: We can check for these and respond differently if we think it's important
+                //  result.IsLockedOut
+                //  result.IsNotAllowed
             }
 
-            IUser? attemptedUser = _userService.GetByUsername(loginModel.Username);
-
-            // create a with information to display a custom two factor send code view
-            var verifyResponse =
-                new ObjectResult(new { twoFactorView = twofactorView, userId = attemptedUser?.Id })
-                {
-                    StatusCode = StatusCodes.Status402PaymentRequired
-                };
-
-            return verifyResponse;
+            // Return BadRequest (400), we don't want to return a 401 because that get's intercepted
+            // by our angular helper because it thinks that we need to re-perform the request once we are
+            // authorized and we don't want to return a 403 because angular will show a warning message indicating
+            // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
+            return BadRequest();
         }
 
-        // TODO: We can check for these and respond differently if we think it's important
-        //  result.IsLockedOut
-        //  result.IsNotAllowed
+        // Set initial or update average (successful) login duration
+        _loginDurationAverage = _loginDurationAverage is long average
+            ? (average + (long)timedScope.Elapsed.TotalMilliseconds) / 2
+            : (long)timedScope.Elapsed.TotalMilliseconds;
 
-        // return BadRequest (400), we don't want to return a 401 because that get's intercepted
-        // by our angular helper because it thinks that we need to re-perform the request once we are
-        // authorized and we don't want to return a 403 because angular will show a warning message indicating
-        // that the user doesn't have access to perform this function, we just want to return a normal invalid message.
-        return BadRequest();
+        // Cancel the timed scope (we don't want to unnecessarily wait on a successful response)
+        await timedScope.CancelAsync();
+
+        // Return the user detail
+        return GetUserDetail(_userService.GetByUsername(loginModel.Username));
     }
 
     /// <summary>
@@ -403,7 +497,12 @@ public class AuthenticationController : UmbracoApiControllerBase
             return BadRequest();
         }
 
+        HttpContext.EndPasswordResetFlowSession();
+
         BackOfficeIdentityUser? identityUser = await _userManager.FindByEmailAsync(model.Email);
+
+        await Task.Delay(RandomNumberGenerator.GetInt32(400, 2500)); // To randomize response time preventing user enumeration
+
         if (identityUser != null)
         {
             IUser? user = _userService.GetByEmail(model.Email);
@@ -424,13 +523,19 @@ public class AuthenticationController : UmbracoApiControllerBase
 
                 var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
-                await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.PasswordReset, true);
+                try
+                {
+                    await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.PasswordReset, true);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error sending email, please check your SMTP configuration: {ErrorMessage}", ex.Message);
+                    return Ok();
+                }
 
                 _userManager.NotifyForgotPasswordRequested(User, user.Id.ToString());
             }
         }
-
-        await Task.Delay(RandomNumberGenerator.GetInt32(400, 2500));
 
         return Ok();
     }
@@ -526,7 +631,7 @@ public class AuthenticationController : UmbracoApiControllerBase
             await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent, model.RememberClient);
         if (result.Succeeded)
         {
-            return GetUserDetail(_userService.GetByUsername(user.UserName));
+            return Ok(GetUserDetail(_userService.GetByUsername(user.UserName)));
         }
 
         if (result.IsLockedOut)
@@ -550,6 +655,8 @@ public class AuthenticationController : UmbracoApiControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> PostSetPassword(SetPasswordModel model)
     {
+        HttpContext.EndPasswordResetFlowSession();
+
         BackOfficeIdentityUser? identityUser =
             await _userManager.FindByIdAsync(model.UserId.ToString(CultureInfo.InvariantCulture));
             if (identityUser is null)
@@ -632,6 +739,8 @@ public class AuthenticationController : UmbracoApiControllerBase
         {
             return Ok();
         }
+
+
 
         await _signInManager.SignOutAsync();
 

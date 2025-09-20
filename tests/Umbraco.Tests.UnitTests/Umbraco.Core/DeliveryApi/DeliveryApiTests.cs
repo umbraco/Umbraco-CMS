@@ -43,6 +43,7 @@ public class DeliveryApiTests
         deliveryApiPropertyValueConverter.Setup(p => p.IsValue(It.IsAny<object?>(), It.IsAny<PropertyValueLevel>())).Returns(true);
         deliveryApiPropertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
         deliveryApiPropertyValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        deliveryApiPropertyValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevelForExpansion(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 
         DeliveryApiPropertyType = SetupPublishedPropertyType(deliveryApiPropertyValueConverter.Object, "deliveryApi", "Delivery.Api.Editor");
 
@@ -113,7 +114,7 @@ public class DeliveryApiTests
         => $"{name.ToLowerInvariant().Replace(" ", "-")}{(culture.IsNullOrWhiteSpace() ? string.Empty : $"-{culture}")}";
 
     protected ApiContentRouteBuilder CreateContentRouteBuilder(
-        IPublishedUrlProvider publishedUrlProvider,
+        IApiContentPathProvider contentPathProvider,
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor? variationContextAccessor = null,
         IPublishedSnapshotAccessor? publishedSnapshotAccessor = null,
@@ -128,7 +129,7 @@ public class DeliveryApiTests
         }
 
         return new ApiContentRouteBuilder(
-            publishedUrlProvider,
+            contentPathProvider,
             globalSettings,
             variationContextAccessor ?? Mock.Of<IVariationContextAccessor>(),
             publishedSnapshotAccessor ?? Mock.Of<IPublishedSnapshotAccessor>(),

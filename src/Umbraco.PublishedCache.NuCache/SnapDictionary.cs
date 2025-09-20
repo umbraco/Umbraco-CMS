@@ -9,6 +9,8 @@ public class SnapDictionary<TKey, TValue>
     where TValue : class
     where TKey : notnull
 {
+    private static readonly TimeSpan _monitorTimeout = TimeSpan.FromSeconds(30);
+
     // minGenDelta to be adjusted
     // we may want to throttle collects even if delta is reached
     // we may want to force collect if delta is not reached but very old
@@ -26,13 +28,9 @@ public class SnapDictionary<TKey, TValue>
     // This class is optimized for many readers, few writers
     // Readers are lock-free
 
-    // NOTE - we used to lock _rlocko the long hand way with Monitor.Enter(_rlocko, ref lockTaken) but this has
-    // been replaced with a normal c# lock because that's exactly how the normal c# lock works,
-    // see https://blogs.msdn.microsoft.com/ericlippert/2009/03/06/locks-and-exceptions-do-not-mix/
-    // for the readlock, there's no reason here to use the long hand way.
     private readonly ConcurrentDictionary<TKey, LinkedNode<TValue>> _items;
     private readonly object _rlocko = new();
-    private readonly object _wlocko = new();
+    private readonly SemaphoreSlim _writeLock = new(1);
     private Task? _collectTask;
     private GenObj? _genObj;
     private long _liveGen;
@@ -185,7 +183,7 @@ public class SnapDictionary<TKey, TValue>
 
     private void EnsureLocked()
     {
-        if (!Monitor.IsEntered(_wlocko))
+        if (_writeLock.CurrentCount != 0)
         {
             throw new InvalidOperationException("Write lock must be acquried.");
         }
@@ -193,12 +191,19 @@ public class SnapDictionary<TKey, TValue>
 
     private void Lock(WriteLockInfo lockInfo, bool forceGen = false)
     {
-        if (Monitor.IsEntered(_wlocko))
+        if (_writeLock.CurrentCount == 0)
         {
             throw new InvalidOperationException("Recursive locks not allowed");
         }
 
-        Monitor.Enter(_wlocko, ref lockInfo.Taken);
+        if (_writeLock.Wait(_monitorTimeout))
+        {
+            lockInfo.Taken = true;
+        }
+        else
+        {
+            throw new TimeoutException("Could not enter the monitor before timeout in SnapDictionary");
+        }
 
         lock (_rlocko)
         {
@@ -210,6 +215,7 @@ public class SnapDictionary<TKey, TValue>
             // RuntimeHelpers.PrepareConstrainedRegions();
             try
             {
+                // Run all code in finally to ensure ThreadAbortException does not interrupt execution
             }
             finally
             {
@@ -237,43 +243,48 @@ public class SnapDictionary<TKey, TValue>
             return;
         }
 
-        if (commit == false)
+        try
         {
-            lock (_rlocko)
+            if (commit == false)
             {
-                try
+                lock (_rlocko)
                 {
-                }
-                finally
-                {
-                    // forget about the temp. liveGen
-                    _nextGen = false;
-                    _liveGen -= 1;
-                }
-            }
-
-            foreach (KeyValuePair<TKey, LinkedNode<TValue>> item in _items)
-            {
-                LinkedNode<TValue>? link = item.Value;
-                if (link.Gen <= _liveGen)
-                {
-                    continue;
+                    try
+                    {
+                        // Run all code in finally to ensure ThreadAbortException does not interrupt execution
+                    }
+                    finally
+                    {
+                        // forget about the temp. liveGen
+                        _nextGen = false;
+                        _liveGen -= 1;
+                    }
                 }
 
-                TKey key = item.Key;
-                if (link.Next == null)
+                foreach (KeyValuePair<TKey, LinkedNode<TValue>> item in _items)
                 {
-                    _items.TryRemove(key, out link);
-                }
-                else
-                {
-                    _items.TryUpdate(key, link.Next, link);
+                    LinkedNode<TValue>? link = item.Value;
+                    if (link.Gen <= _liveGen)
+                    {
+                        continue;
+                    }
+
+                    TKey key = item.Key;
+                    if (link.Next == null)
+                    {
+                        _items.TryRemove(key, out link);
+                    }
+                    else
+                    {
+                        _items.TryUpdate(key, link.Next, link);
+                    }
                 }
             }
         }
-
-        // TODO: Shouldn't this be in a finally block?
-        Monitor.Exit(_wlocko);
+        finally
+        {
+            _writeLock.Release();
+        }
     }
 
     #endregion
@@ -427,7 +438,7 @@ public class SnapDictionary<TKey, TValue>
             // else we need to try to create a new gen object
             // whether we are wlocked or not, noone can rlock while we do,
             // so _liveGen and _nextGen are safe
-            if (Monitor.IsEntered(_wlocko))
+            if (_writeLock.CurrentCount == 0)
             {
                 // write-locked, cannot use latest gen (at least 1) so use previous
                 var snapGen = _nextGen ? _liveGen - 1 : _liveGen;
@@ -617,7 +628,7 @@ public class SnapDictionary<TKey, TValue>
 
         public bool NextGen => _dict._nextGen;
 
-        public bool IsLocked => Monitor.IsEntered(_dict._wlocko);
+        public bool IsLocked => _dict._writeLock.CurrentCount == 0;
 
         public bool CollectAuto
         {

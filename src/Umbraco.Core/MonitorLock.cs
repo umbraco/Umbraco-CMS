@@ -4,6 +4,7 @@ namespace Umbraco.Cms.Core;
 ///     Provides an equivalent to the c# lock statement, to be used in a using block.
 /// </summary>
 /// <remarks>Ie replace <c>lock (o) {...}</c> by <c>using (new MonitorLock(o)) { ... }</c></remarks>
+[Obsolete("Use System.Threading.Lock instead. This will be removed in a future version.")]
 public class MonitorLock : IDisposable
 {
     private readonly bool _entered;

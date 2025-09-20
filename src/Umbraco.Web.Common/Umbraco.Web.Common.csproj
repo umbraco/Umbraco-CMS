@@ -11,14 +11,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Asp.Versioning.Mvc" Version="7.0.0" />
-    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.0.0" />
-    <PackageReference Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.7" />
-    <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
-    <PackageReference Include="Smidge.InMemory" Version="4.3.0" />
-    <PackageReference Include="Smidge.Nuglify" Version="4.3.0" />
+    <PackageReference Include="Asp.Versioning.Mvc" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
+    <PackageReference Include="Dazinator.Extensions.FileProviders" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
+    <PackageReference Include="MiniProfiler.AspNetCore.Mvc" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Smidge.InMemory" />
+    <PackageReference Include="Smidge.Nuglify" />
+    <!-- Take top-level depedendency on System.Net.Http, because Dazinator.Extensions.FileProviders depends on a vulnerable version -->
+    <PackageReference Include="System.Net.Http" />
+    <!-- Take top-level depedendency on System.Text.RegularExpressions, because both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depend on a vulnerable version -->
+    <PackageReference Include="System.Text.RegularExpressions" />
+    <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens"/>
+    <!-- Both Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer,NPoco.SqlServer, and more bring in a vulnerable version of System.Text.Json -->
+    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
   <ItemGroup>

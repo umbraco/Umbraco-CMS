@@ -32,5 +32,14 @@ public static partial class Constants
         public static string BackofficeExternalLoginProviderCount = "BackofficeExternalLoginProviderCount";
         public static string DeliverApiEnabled = "DeliverApiEnabled";
         public static string DeliveryApiPublicAccess = "DeliveryApiPublicAccess";
+        public static string WebhookPrefix = "WebhookCount_";
+        public static string WebhookTotal = $"{WebhookPrefix}Total";
+        public static string WebhookCustomHeaders = $"{WebhookPrefix}CustomHeaders";
+        public static string WebhookCustomEvent = $"{WebhookPrefix}CustomEvent";
+        public static string RichTextEditorCount = "RichTextEditorCount";
+        public static string RichTextBlockCount = "RichTextBlockCount";
+        public static string TotalPropertyCount = "TotalPropertyCount";
+        public static string HighestPropertyCount = "HighestPropertyCount";
+        public static string TotalCompositions = "TotalCompositions";
     }
 }

@@ -6,7 +6,7 @@
         <div ui-sortable="sortableOptions" ng-model="renderModel">
             <umb-node-preview ng-repeat="link in renderModel"
                               icon="link.icon"
-                              name="link.name"
+                              name="link.name || link.nodeName"
                               published="link.published"
                               description="link.url + (link.queryString ? link.queryString : '')"
                               sortable="!sortableOptions.disabled"

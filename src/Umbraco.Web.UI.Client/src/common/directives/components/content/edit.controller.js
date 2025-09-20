@@ -5,7 +5,7 @@
         appState, contentResource, entityResource, navigationService, notificationsService, contentAppHelper,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
         editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
-        $exceptionHandler, uploadTracker) {        
+        $exceptionHandler, uploadTracker) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -35,15 +35,18 @@
         $scope.activeApp = null;
 
         //initializes any watches
-        function startWatches(content) {
+        var watchers = [];
 
-            $scope.$watchGroup(['culture', 'segment'],
+        function startWatches(content) {
+            clearWatchers();
+
+            watchers.push($scope.$watchGroup(['culture', 'segment'],
             function (value, oldValue) {
                 createPreviewButton($scope.content, value[0], value[1]);
-            });
+            }));
 
             //watch for changes to isNew, set the page.isNew accordingly and load the breadcrumb if we can
-            $scope.$watch('isNew', function (newVal, oldVal) {
+            watchers.push($scope.$watch('isNew', function (newVal, oldVal) {
 
                 $scope.page.isNew = Object.toBoolean(newVal);
 
@@ -59,8 +62,12 @@
                             });
                     }
                 }
-            });
+            }));
+        }
 
+        function clearWatchers () {
+            watchers.forEach(w => w());
+            watchers = [];
         }
 
         //this initializes the editor with the data which will be called more than once if the data is re-loaded
@@ -109,6 +116,7 @@
             bindEvents();
 
             resetVariantFlags();
+            startWatches($scope.content);
         }
 
         function loadBreadcrumb() {
@@ -241,7 +249,6 @@
 
                     appendRuntimeData();
                     init();
-                    startWatches($scope.content);
 
                     syncTreeNode($scope.content, $scope.content.path, true);
 
@@ -265,7 +272,6 @@
 
                     appendRuntimeData();
                     init();
-                    startWatches($scope.content);
 
                     resetLastListPageNumber($scope.content);
 
@@ -305,10 +311,12 @@
             // create the save button
             if (_.contains($scope.content.allowedActions, "A")) {
                 $scope.page.showSaveButton = true;
+                $scope.page.showPreviewButton = true;
                 // add ellipsis to the save button if it opens the variant overlay
                 $scope.page.saveButtonEllipsis = content.variants && content.variants.length > 1 ? "true" : "false";
             } else {
                 $scope.page.showSaveButton = false;
+                $scope.page.showPreviewButton = false;
             }
 
             // create the pubish combo button
@@ -346,7 +354,10 @@
                 labelKey: "buttons_saveAndPreview"
             };
 
-            const activeVariant = content.variants?.find((variant) => content.documentType?.variations === "Nothing" || variant.compositeId === compositeId);
+            let activeVariant = content.variants?.find((variant) => content.documentType?.variations === "Nothing" || variant.compositeId === compositeId);
+            /* if we can't find the active variant and there is only one variant available, we will use that.
+            this happens if we have a node that can vary by culture but there is only one language available. */
+            activeVariant = !activeVariant && content.variants.length === 1 ? content.variants[0] : activeVariant;
 
             $scope.previewSubButtons = activeVariant?.additionalPreviewUrls?.map((additionalPreviewUrl) => {
                 return {
@@ -356,8 +367,6 @@
                     handler: () => $scope.preview(content, additionalPreviewUrl.url, '_blank')
                 }
             });
-
-            $scope.page.showPreviewButton = true;
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
@@ -488,6 +497,7 @@
             //Set them all to be invalid
             var fieldsToRollback = checkValidility();
             eventsService.emit("content.saving", { content: $scope.content, action: args.action });
+            eventsService.emit("form.lock");
 
             return contentEditingHelper.contentEditorPerformSave({
                 saveMethod: args.saveMethod,
@@ -503,11 +513,12 @@
                 init();
 
                 //needs to be manually set for infinite editing mode
-                $scope.page.isNew = false;
+                $scope.isNew = false;
 
                 syncTreeNode($scope.content, data.path, false, args.reloadChildren);
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: true });
+                eventsService.emit("form.unlock");
 
                 if($scope.contentForm.$invalid !== true) {
                     resetNestedFieldValiation(fieldsToRollback);
@@ -527,6 +538,7 @@
                         eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: false });
                     }
 
+                    eventsService.emit("form.unlock");
                     return $q.reject(err);
                 });
         }
@@ -747,9 +759,9 @@
                                 //ensure error messages are displayed
                                 formHelper.showNotifications(err.data);
                                 clearNotifications($scope.content);
-                                
-                                handleHttpException(err);
-                                deferred.reject(err);
+
+                              handleHttpException(err);
+                              deferred.reject(err);
                             });
                         },
                         close: function () {
@@ -778,6 +790,7 @@
                 }, function (err) {
                     $scope.page.buttonGroupState = "error";
                     handleHttpException(err);
+                    $scope.$broadcast("formSubmittedValidationFailed")
                     deferred.reject(err);
                 });
             }
@@ -911,8 +924,6 @@
                                 formHelper.showNotifications(err.data);
                             }
                             model.submitButtonState = "error";
-                            //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = Utilities.copy($scope.content.variants);
                             handleHttpException(err);
                         });
 
@@ -992,7 +1003,7 @@
             const openPreviewWindow = (url, target) => {
                 // Chromes popup blocker will kick in if a window is opened
                 // without the initial scoped request. This trick will fix that.
-              
+
               const previewWindow = $window.open(url, target);
 
               previewWindow.addEventListener('load', () => {
@@ -1022,9 +1033,12 @@
                 $scope.content.variants.forEach(variant => variant.save = false);
                 //ensure the save flag is set for the active variant
                 selectedVariant.save = true;
+                $scope.page.previewButtonState = "busy";
                 performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function (data) {
+                    $scope.page.previewButtonState = "success";
                     openPreviewWindow(url, urlTarget);
                 }, function (err) {
+                    $scope.page.previewButtonState = "error";
                     //validation issues ....
                 });
             }

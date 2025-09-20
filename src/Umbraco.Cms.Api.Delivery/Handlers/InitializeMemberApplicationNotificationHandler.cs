@@ -1,30 +1,37 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.Api.Delivery.Handlers;
 
 internal sealed class InitializeMemberApplicationNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartingNotification>
 {
-    private readonly IMemberApplicationManager _memberApplicationManager;
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<InitializeMemberApplicationNotificationHandler> _logger;
     private readonly DeliveryApiSettings _deliveryApiSettings;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
+    private static readonly SemaphoreSlim _locker = new(1);
+    private static bool _isInitialized = false;
 
     public InitializeMemberApplicationNotificationHandler(
-        IMemberApplicationManager memberApplicationManager,
         IRuntimeState runtimeState,
         IOptions<DeliveryApiSettings> deliveryApiSettings,
-        ILogger<InitializeMemberApplicationNotificationHandler> logger)
+        ILogger<InitializeMemberApplicationNotificationHandler> logger,
+        IServiceScopeFactory serviceScopeFactory,
+        IServerRoleAccessor serverRoleAccessor)
     {
-        _memberApplicationManager = memberApplicationManager;
         _runtimeState = runtimeState;
         _logger = logger;
+        _serviceScopeFactory = serviceScopeFactory;
+        _serverRoleAccessor = serverRoleAccessor;
         _deliveryApiSettings = deliveryApiSettings.Value;
     }
 
@@ -35,29 +42,55 @@ internal sealed class InitializeMemberApplicationNotificationHandler : INotifica
             return;
         }
 
-        if (_deliveryApiSettings.MemberAuthorization?.AuthorizationCodeFlow?.Enabled is not true)
+        if (_serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber)
         {
-            await _memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
+            // subscriber instances should not alter the member application
             return;
         }
 
-        if (ValidateRedirectUrls(_deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LoginRedirectUrls) is false)
+        try
         {
-            await _memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
-            return;
-        }
+            await _locker.WaitAsync(cancellationToken);
+            if (_isInitialized)
+            {
+                return;
+            }
 
-        if (_deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LogoutRedirectUrls.Any()
-            && ValidateRedirectUrls(_deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LogoutRedirectUrls) is false)
+            _isInitialized = true;
+
+            // we cannot inject the IMemberApplicationManager because it ultimately takes a dependency on the DbContext ... and during
+            // install that is not allowed (no connection string means no DbContext)
+            using IServiceScope scope = _serviceScopeFactory.CreateScope();
+            IMemberApplicationManager memberApplicationManager = scope.ServiceProvider.GetRequiredService<IMemberApplicationManager>();
+
+            if (_deliveryApiSettings.MemberAuthorization?.AuthorizationCodeFlow?.Enabled is not true)
+            {
+                await memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
+                return;
+            }
+
+            if (ValidateRedirectUrls(_deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LoginRedirectUrls) is false)
+            {
+                await memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
+                return;
+            }
+
+            if (_deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LogoutRedirectUrls.Any()
+                && ValidateRedirectUrls(_deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LogoutRedirectUrls) is false)
+            {
+                await memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
+                return;
+            }
+
+            await memberApplicationManager.EnsureMemberApplicationAsync(
+                _deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LoginRedirectUrls,
+                _deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LogoutRedirectUrls,
+                cancellationToken);
+        }
+        finally
         {
-            await _memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
-            return;
+            _locker.Release();
         }
-
-        await _memberApplicationManager.EnsureMemberApplicationAsync(
-            _deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LoginRedirectUrls,
-            _deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LogoutRedirectUrls,
-            cancellationToken);
     }
 
     private bool ValidateRedirectUrls(Uri[] redirectUrls)

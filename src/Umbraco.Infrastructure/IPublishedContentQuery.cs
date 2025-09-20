@@ -131,4 +131,21 @@ public interface IPublishedContentQuery
     ///     The search results.
     /// </returns>
     IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords);
+
+    /// <summary>
+    ///     Executes the query and converts the results to <see cref="PublishedSearchResult" />.
+    /// </summary>
+    /// <param name="query">The query.</param>
+    /// <param name="skip">The amount of results to skip.</param>
+    /// <param name="take">The amount of results to take/return.</param>
+    /// <param name="totalRecords">The total amount of records.</param>
+    /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
+    /// <returns>
+    ///     The search results.
+    /// </returns>
+    /// <remarks>
+    ///     While enumerating results, the ambient culture is changed to be the searched culture.
+    /// </remarks>
+    IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords, string? culture)
+        => Search(query, skip, take, out totalRecords);
 }

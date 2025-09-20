@@ -32,11 +32,14 @@
 
         var unsubscribe = [];
         var modelObject;
-        
+
         // Property actions:
         let copyAllBlocksAction = null;
         let deleteAllBlocksAction = null;
         let pasteSingleBlockAction = null;
+        let resetSingleBlock = null;
+
+        let scopeOfExistence = null;
 
         var inlineEditing = false;
         var liveEditing = true;
@@ -113,7 +116,7 @@
                 vm.model.config.validationLimit.max == 1 &&
                 vm.model.config.blocks.length == 1 &&
                 vm.model.config.useSingleBlockMode;
-            
+
             vm.blockEditorApi.singleBlockMode = vm.singleBlockMode;
 
             vm.validationLimit = vm.model.config.validationLimit;
@@ -124,12 +127,12 @@
                 vm.listWrapperStyles['max-width'] = vm.model.config.maxPropertyWidth;
             }
 
-            // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
+            // We need to ensure that the property model value is an object, this is needed for modelObject to receive a reference and keep that updated.
             if (typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = {};
             }
 
-            var scopeOfExistence = $scope;
+            scopeOfExistence = $scope;
             if (vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
                 scopeOfExistence = vm.umbVariantContentEditors.getScope();
             } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
@@ -151,7 +154,7 @@
                     setDirty();
                 }
             };
-            
+
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
@@ -179,9 +182,18 @@
                 useLegacyIcon: false
             };
 
+            resetSingleBlock = {
+                labelKey: "content_removeItem",
+                labelTokens: [],
+                icon: "icon-trash",
+                method: requestResetSingleBlock,
+                isDisabled: false,
+                useLegacyIcon: false
+            };
+
             var propertyActions = [copyAllBlocksAction, deleteAllBlocksAction];
 
-            var propertyActionsForSingleBlockMode = [pasteSingleBlockAction];
+            var propertyActionsForSingleBlockMode = [pasteSingleBlockAction, resetSingleBlock];
 
             if (vm.umbProperty) {
                 if (vm.singleBlockMode) {
@@ -256,7 +268,7 @@
 
             updateClipboard(true);
 
-            if (vm.singleBlockMode && vm.layout.length == 0) {
+            if (vm.singleBlockMode && vm.layout.length == 0 && vm.availableBlockTypes?.length > 0) {
                 var wasAdded = false;
                 var blockType = vm.availableBlockTypes[0];
 
@@ -306,12 +318,13 @@
          */
         function ensureCultureData(content) {
 
-            if (!content) return;
+            if (!content || !vm.umbVariantContent) return;
 
             if (vm.umbVariantContent.editor.content.language) {
                 // set the scaffolded content's language to the language of the current editor
                 content.language = vm.umbVariantContent.editor.content.language;
             }
+
             // currently we only ever deal with invariant content for blocks so there's only one
             content.variants[0].tabs.forEach(tab => {
                 tab.properties.forEach(prop => {
@@ -537,7 +550,7 @@
         }
 
         vm.requestShowCreate = requestShowCreate;
-        
+
         function requestShowCreate(createIndex, mouseEvent) {
 
             if (vm.blockTypePicker) {
@@ -558,15 +571,15 @@
             }
 
         }
-        
+
         vm.requestShowClipboard = requestShowClipboard;
-        
+
         function requestShowClipboard(createIndex) {
             showCreateDialog(createIndex, true);
         }
 
         vm.showCreateDialog = showCreateDialog;
-        
+
         function showCreateDialog(createIndex, openClipboard) {
 
             if (vm.blockTypePicker) {
@@ -618,7 +631,7 @@
                     }
                 },
                 close: function() {
-                    // if opned by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
+                    // If opened by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
                     if (createIndex < vm.layout.length) {
                         vm.setBlockFocus(vm.layout[Math.max(createIndex-1, 0)].$block);
                     }
@@ -791,14 +804,14 @@
             // make block model
             var blockObject = getBlockObject(layoutEntry);
             if (blockObject === null) {
-                // Initalization of the Block Object didnt go well, therefor we will fail the paste action.
+                // Initialization of the Block Object didn't go well, therefor we will fail the paste action.
                 return false;
             }
 
             // set the BlockObject on our layout entry.
             layoutEntry.$block = blockObject;
 
-            // insert layout entry at the decired location in layout.
+            // insert layout entry at the desired location in layout.
             vm.layout.splice(index, 0, layoutEntry);
 
             vm.currentBlockInFocus = blockObject;
@@ -808,7 +821,7 @@
 
         function requestDeleteBlock(block) {
             if (vm.readonly) return;
-            
+
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {
                     title: data[0],
@@ -843,6 +856,24 @@
             });
         }
 
+        function requestResetSingleBlock() {
+            localizationService.localizeMany(["content_nestedContentDeleteItem", "general_delete"]).then(function (data) {
+                overlayService.confirmDelete({
+                    title: data[1],
+                    content: data[0],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        deleteAllBlocks();
+                        modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
+                        modelObject.load().then(onLoaded);
+                        overlayService.close();
+                    }
+                });
+            });
+        }
+
         function openSettingsForBlock(block, blockIndex, parentForm) {
             editBlock(block, true, blockIndex, parentForm);
         }
@@ -864,7 +895,7 @@
             if (copyAllBlocksAction) {
                 copyAllBlocksAction.isDisabled = vm.layout.length === 0;
             }
-            
+
             if (deleteAllBlocksAction) {
                 deleteAllBlocksAction.isDisabled = vm.layout.length === 0 || vm.readonly;
             }

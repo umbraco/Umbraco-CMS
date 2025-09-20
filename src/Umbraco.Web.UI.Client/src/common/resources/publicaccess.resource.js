@@ -79,7 +79,7 @@ function publicAccessResource($http, umbRequestHelper) {
                 publicAccess.groups = groups;
             }
             else if (Utilities.isArray(usernames) && usernames.length) {
-                publicAccess.usernames = usernames;
+                publicAccess.usernames = usernames.map(u => encodeURIComponent(u));
             }
             else {
                 throw "must supply either userName/password or roles";

@@ -5,7 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NPoco.SqlServer" Version="5.7.1" />
+    <!-- Take top-level depedendency on Azure.Identity, because NPoco.SqlServer depends on a vulnerable version -->
+    <PackageReference Include="Azure.Identity" />
+    <!-- Both Azure.Identity, Microsoft.EntityFrameworkCore.SqlServer,NPoco.SqlServer, and more bring in a vulnerable version of System.Text.Json -->
+    <PackageReference Include="System.Text.Json" />
+    <!-- Both Microsoft.EntityFrameworkCore.SqlServer and NPoco.SqlServer bring in a vulnerable version of Microsoft.Data.SqlClient -->
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+
+    <PackageReference Include="NPoco.SqlServer" />
+
+    <!-- Both OpenIddict.AspNetCore, Npoco.SqlServer and Microsoft.EntityFrameworkCore.SqlServer bring in a vulnerable version of Microsoft.IdentityModel.JsonWebTokens -->
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens"/>
   </ItemGroup>
 
   <ItemGroup>

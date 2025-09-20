@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -231,5 +231,6 @@ public sealed class UdiParser
             { Constants.UdiEntityType.PartialView, UdiType.StringUdi },
             { Constants.UdiEntityType.PartialViewMacro, UdiType.StringUdi },
             { Constants.UdiEntityType.Stylesheet, UdiType.StringUdi },
+            { Constants.UdiEntityType.Webhook, UdiType.GuidUdi },
         };
 }

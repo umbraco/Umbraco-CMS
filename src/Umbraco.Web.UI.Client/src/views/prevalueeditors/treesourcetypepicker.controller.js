@@ -39,7 +39,7 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
             return;
         }
 
-        var editor = {
+        const editor = {
             multiPicker: true,
             filterCssClass: "not-allowed not-published",
             filter: function (item) {
@@ -62,15 +62,17 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
 
         switch (currentItemType) {
             case "content":
-                editorService.contentTypePicker(editor);
+                editor.entityType = "documentType";
                 break;
             case "media":
-                editorService.mediaTypePicker(editor);
+                editor.entityType = "mediaType";
                 break;
             case "member":
-                editorService.memberTypePicker(editor);
+                editor.entityType = "memberType";
                 break;
         }
+
+        editorService.contentTypePicker(editor);
     }
 
     function remove(itemType) {

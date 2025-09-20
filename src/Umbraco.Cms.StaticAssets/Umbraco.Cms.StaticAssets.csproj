@@ -7,41 +7,61 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
-    <BellePath>$(ProjectDir)wwwroot\umbraco</BellePath>
+    <BasePath>$(ProjectDir)wwwroot\umbraco</BasePath>
+    <BellePath>$(BasePath)\lib</BellePath>
+    <LoginPath>$(BasePath)\login</LoginPath>
   </PropertyGroup>
 
-  <Target Name="BuildBellePreconditions" BeforeTargets="Build">
+  <Target Name="BuildStaticAssetsPreconditions" BeforeTargets="Build">
     <Message Text="Skip BuildBelle target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip BuildBelle target because '$(BellePath)' already exists" Importance="high" Condition="Exists('$(BellePath)')" />
     <Message Text="Call BuildBelle target because UmbracoBuild is empty (this is Visual Studio) and '$(BellePath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
     <CallTarget Targets="BuildBelle" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
-  </Target>
-  
-  <Target Name="BuildBelle">
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" />
+
+    <Message Text="Skip BuildLogin target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip BuildLogin target because '$(LoginPath)' already exists" Importance="high" Condition="Exists('$(LoginPath)')" />
+    <Message Text="Call BuildLogin target because UmbracoBuild is empty (this is Visual Studio) and '$(LoginPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
+    <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
   </Target>
 
-  <Target Name="CleanBellePreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
+  <Target Name="BuildBelle">
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" Timeout="600000" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" Timeout="600000" />
+  </Target>
+
+  <Target Name="BuildLogin">
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm ci --no-fund --no-audit --prefer-offline" Timeout="600000" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm run build" Timeout="600000" />
+  </Target>
+
+  <Target Name="CleanStaticAssetsPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
     <Message Text="Skip CleanBelle target because '$(BellePath)' doesn't exist" Importance="high" Condition="!Exists('$(BellePath)')" />
     <Message Text="Skip CleanBelle target because preserve.belle marker file exists" Importance="high" Condition="Exists('$(BellePath)') and Exists('$(SolutionDir)preserve.belle')" />
     <Message Text="Call CleanBelle target because '$(BellePath)' exists and preserve.belle marker file doesn't exist" Importance="high" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
     <CallTarget Targets="CleanBelle" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
+
+    <Message Text="Skip CleanLogin target because '$(LoginPath)' doesn't exist" Importance="high" Condition="!Exists('$(LoginPath)')" />
+    <Message Text="Skip CleanLogin target because preserve.login marker file exists" Importance="high" Condition="Exists('$(LoginPath)') and Exists('$(SolutionDir)preserve.login')" />
+    <Message Text="Call CleanLogin target because '$(LoginPath)' exists and preserve.login marker file doesn't exist" Importance="high" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.login')" />
+    <CallTarget Targets="CleanLogin" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.login')" />
   </Target>
-  
+
   <Target Name="CleanBelle">
     <ItemGroup>
-      <BelleLib Include="$(BellePath)" />
+      <BelleDirectories Include="$(BasePath)/js;$(BasePath)/lib;$(BasePath)/assets;$(BasePath)/views;" />
     </ItemGroup>
-    <RemoveDir Directories="@(BelleLib)" />
+    <RemoveDir Directories="@(BelleDirectories)" />
+  </Target>
+
+  <Target Name="CleanLogin">
+    <ItemGroup>
+      <LoginDirectories Include="$(LoginPath)" />
+    </ItemGroup>
+    <RemoveDir Directories="@(LoginDirectories)" />
   </Target>
 </Project>

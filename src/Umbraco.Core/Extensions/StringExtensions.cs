@@ -419,7 +419,7 @@ public static class StringExtensions
     ///     returns <see langword="false" />.
     /// </returns>
     public static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? value) => string.IsNullOrWhiteSpace(value);
-    
+
     [return: NotNullIfNotNull("defaultValue")]
     public static string? IfNullOrWhiteSpace(this string? str, string? defaultValue) =>
         str.IsNullOrWhiteSpace() ? defaultValue : str;
@@ -1557,4 +1557,9 @@ public static class StringExtensions
 
         yield return sb.ToString();
     }
+
+    // having benchmarked various solutions (incl. for/foreach, split and LINQ based ones),
+    // this is by far the fastest way to find string needles in a string haystack
+    public static int CountOccurrences(this string haystack, string needle)
+        => haystack.Length - haystack.Replace(needle, string.Empty).Length;
 }

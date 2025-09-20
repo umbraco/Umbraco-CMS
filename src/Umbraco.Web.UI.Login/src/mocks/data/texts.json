@@ -1,0 +1,39 @@
+{
+  "general": {
+    "login": "Login",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "welcome": "Welcome",
+    "or": "Or",
+    "validate": "Validate",
+    "back": "Back",
+    "required": "Required",
+    "continue": "Continue"
+  },
+  "login": {
+    "greeting0": "Welcome",
+    "greeting1": "Welcome",
+    "greeting2": "Welcome",
+    "greeting3": "Welcome",
+    "greeting4": "Welcome",
+    "greeting5": "Welcome",
+    "greeting6": "Welcome",
+    "forgottenPassword": "Forgotten password?",
+    "signInWith": "Sign in with",
+    "forgottenPasswordInstruction": "Enter your email address and we'll send you a link to reset your password.",
+    "returnToLogin": "Return to login",
+    "2faTitle": "Two-factor authentication",
+    "2faText": "Enter the code from your authenticator app",
+    "2faMultipleText": "Select an authentication method",
+    "2faCodeInput": "Enter your code",
+    "2faCodeInputHelp": "Enter the code from your authenticator app"
+  },
+  "user": {
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm password"
+  }
+}

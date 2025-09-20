@@ -1,5 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
@@ -12,17 +15,30 @@ public class PropertyValidationService : IPropertyValidationService
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly ILocalizedTextService _textService;
     private readonly IValueEditorCache _valueEditorCache;
+    private readonly ICultureDictionary _cultureDictionary;
 
+    [Obsolete("Use the constructor that accepts ICultureDictionary. Will be removed in V15.")]
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
         ILocalizedTextService textService,
         IValueEditorCache valueEditorCache)
+        : this(propertyEditors, dataTypeService, textService, valueEditorCache, StaticServiceProvider.Instance.GetRequiredService<ICultureDictionary>())
+    {
+    }
+
+    public PropertyValidationService(
+        PropertyEditorCollection propertyEditors,
+        IDataTypeService dataTypeService,
+        ILocalizedTextService textService,
+        IValueEditorCache valueEditorCache,
+        ICultureDictionary cultureDictionary)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
         _textService = textService;
         _valueEditorCache = valueEditorCache;
+        _cultureDictionary = cultureDictionary;
     }
 
     /// <inheritdoc />
@@ -76,13 +92,13 @@ public class PropertyValidationService : IPropertyValidationService
             if (isRequired && !string.IsNullOrWhiteSpace(isRequiredMessage) &&
                 requiredDefaultMessages.Contains(validationResult.ErrorMessage, StringComparer.OrdinalIgnoreCase))
             {
-                validationResult.ErrorMessage = isRequiredMessage;
+                validationResult.ErrorMessage = _textService.UmbracoDictionaryTranslate(_cultureDictionary, isRequiredMessage);
             }
 
             if (!string.IsNullOrWhiteSpace(validationRegExp) && !string.IsNullOrWhiteSpace(validationRegExpMessage) &&
                 formatDefaultMessages.Contains(validationResult.ErrorMessage, StringComparer.OrdinalIgnoreCase))
             {
-                validationResult.ErrorMessage = validationRegExpMessage;
+                validationResult.ErrorMessage = _textService.UmbracoDictionaryTranslate(_cultureDictionary, validationRegExpMessage);
             }
 
             yield return validationResult;

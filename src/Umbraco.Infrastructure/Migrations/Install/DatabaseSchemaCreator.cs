@@ -82,7 +82,13 @@ public class DatabaseSchemaCreator
         typeof(ContentVersionCleanupPolicyDto),
         typeof(UserGroup2NodeDto),
         typeof(CreatedPackageSchemaDto),
-        typeof(UserGroup2LanguageDto)
+        typeof(UserGroup2LanguageDto),
+        typeof(WebhookDto),
+        typeof(Webhook2ContentTypeKeysDto),
+        typeof(Webhook2EventsDto),
+        typeof(Webhook2HeadersDto),
+        typeof(WebhookLogDto),
+        typeof(WebhookRequestDto),
     };
 
     private readonly IUmbracoDatabase _database;

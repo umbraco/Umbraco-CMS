@@ -56,6 +56,8 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
 
     protected IShortStringHelper ShortStringHelper => Services.GetRequiredService<IShortStringHelper>();
 
+    protected IIdKeyMap IdKeyMap => Services.GetRequiredService<IIdKeyMap>();
+
     protected GlobalSettings GlobalSettings => Services.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
     protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
@@ -81,7 +83,11 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     }
 
     [TearDown]
-    public void TearDownAsync() => _host.StopAsync();
+    public void TearDownAsync()
+    {
+        _host.StopAsync();
+        Services.DisposeIfDisposable();
+    }
 
     /// <summary>
     ///     Create the Generic Host and execute startup ConfigureServices/Configure calls

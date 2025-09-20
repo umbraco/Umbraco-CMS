@@ -152,13 +152,15 @@ public class ContentSettings
     internal const string StaticMacroErrors = "Inline";
     internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
     internal const bool StaticShowDeprecatedPropertyEditors = false;
-    internal const string StaticLoginBackgroundImage = "assets/img/login.svg";
-    internal const string StaticLoginLogoImage = "assets/img/application/umbraco_logo_white.svg";
+    internal const string StaticLoginBackgroundImage = "assets/img/login.jpg";
+    internal const string StaticLoginLogoImage = "assets/img/application/umbraco_logo_blue.svg";
+    internal const string StaticLoginLogoImageAlternative = "assets/img/application/umbraco_logo_blue.svg";
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
     internal const bool StaticShowDomainWarnings = true;
+    internal const bool StaticShowUnroutableContentWarnings = true;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.
@@ -219,10 +221,20 @@ public class ContentSettings
     public string LoginBackgroundImage { get; set; } = StaticLoginBackgroundImage;
 
     /// <summary>
-    ///     Gets or sets a value for the path to the login screen logo image.
+    ///     Gets or sets a value for the path to the login screen logo image
+    ///     shown on top of the background image set in <see cref="LoginBackgroundImage" />.
     /// </summary>
+    /// <remarks>The alternative version of this logo can be found at <see cref="LoginLogoImageAlternative"/>.</remarks>
     [DefaultValue(StaticLoginLogoImage)]
     public string LoginLogoImage { get; set; } = StaticLoginLogoImage;
+
+    /// <summary>
+    ///     Gets or sets a value for the path to the login screen logo image when shown on top
+    ///     of a light background (e.g. in mobile resolutions).
+    /// </summary>
+    /// <remarks>This is the alternative version to the regular logo found at <see cref="LoginLogoImage"/>.</remarks>
+    [DefaultValue(StaticLoginLogoImageAlternative)]
+    public string LoginLogoImageAlternative { get; set; } = StaticLoginLogoImageAlternative;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
@@ -274,4 +286,10 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticShowDomainWarnings)]
     public bool ShowDomainWarnings { get; set; } = StaticShowDomainWarnings;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to show unroutable content warnings.
+    /// </summary>
+    [DefaultValue(StaticShowUnroutableContentWarnings)]
+    public bool ShowUnroutableContentWarnings { get; set; } = StaticShowUnroutableContentWarnings;
 }

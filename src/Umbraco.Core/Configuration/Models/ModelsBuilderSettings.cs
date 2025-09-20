@@ -16,6 +16,7 @@ public class ModelsBuilderSettings
     internal const string StaticModelsDirectory = "~/umbraco/models";
     internal const bool StaticAcceptUnsafeModelsDirectory = false;
     internal const int StaticDebugLevel = 0;
+    internal const bool StaticIncludeVersionNumberInGeneratedModels = true;
     private bool _flagOutOfDateModels = true;
 
     /// <summary>
@@ -78,4 +79,16 @@ public class ModelsBuilderSettings
     /// <remarks>0 means minimal (safe on live site), anything else means more and more details (maybe not safe).</remarks>
     [DefaultValue(StaticDebugLevel)]
     public int DebugLevel { get; set; } = StaticDebugLevel;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the version number should be included in generated models.
+    /// </summary>
+    /// <remarks>
+    ///     By default this is written to the <see cref="System.CodeDom.Compiler.GeneratedCodeAttribute"/> output in
+    ///     generated code for each property of the model. This can be useful for debugging purposes but isn't essential,
+    ///     and it has the causes the generated code to change every time Umbraco is upgraded. In turn, this leads
+    ///     to unnecessary code file changes that need to be checked into source control. Default is <c>true</c>.
+    /// </remarks>
+    [DefaultValue(StaticIncludeVersionNumberInGeneratedModels)]
+    public bool IncludeVersionNumberInGeneratedModels { get; set; } = StaticIncludeVersionNumberInGeneratedModels;
 }
