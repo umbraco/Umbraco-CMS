@@ -112,6 +112,11 @@ public static partial class Constants
             public const string DatePickerWithTime = "e4d66c0f-b935-4200-81f0-025f7256b89a";
 
             /// <summary>
+            ///     Guid for Date Time Picker (with Timezone) as string
+            /// </summary>
+            public const string DateTimePickerWithTimeZone = "88E8A052-30EE-4D44-A507-59F2CDFC769C";
+
+            /// <summary>
             ///     Guid for Approved Color as string
             /// </summary>
             public const string ApprovedColor = "0225af17-b302-49cb-9176-b9f35cab9c17";
@@ -295,6 +300,11 @@ public static partial class Constants
             ///     Guid for Date Picker with time
             /// </summary>
             public static readonly Guid DatePickerWithTimeGuid = new(DatePickerWithTime);
+
+            /// <summary>
+            ///     Guid for Date Time Picker (with Timezone).
+            /// </summary>
+            public static readonly Guid DateTimePickerWithTimeZoneGuid = new(DateTimePickerWithTimeZone);
 
             /// <summary>
             ///     Guid for Approved Color

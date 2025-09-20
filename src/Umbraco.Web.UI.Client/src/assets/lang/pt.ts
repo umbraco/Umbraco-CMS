@@ -2837,4 +2837,22 @@ export default {
 		detailsDescription:
 			'<p>Este tipo de propriedade já não se encontra disponível.<br/>Por favor, contacte o administrador para que ele possa apagar a propriedade ou restaurar o tipo de propriedade.</p><p><strong>Dados:</strong></p>',
 	},
+	dateTimePicker: {
+		local: 'Local',
+		differentTimeZoneLabel: (offset: string, localDate: string) =>
+			`A hora selecionada (${offset}) é equivalente a ${localDate} no fuso horário local.`,
+		config_format: 'Formato',
+		config_format_datetime: 'Data e hora',
+		config_format_dateOnly: 'Apenas data',
+		config_format_timeOnly: 'Apenas hora',
+		config_timeFormat: 'Formato da hora',
+		config_timeZones: 'Fusos horários',
+		config_timeZones_description: 'Selecione os fusos horários que o editor deve poder escolher.',
+		config_timeZones_all: 'Todos - Mostrar todos os fusos horários disponíveis',
+		config_timeZones_local: 'Local - Mostrar apenas o fuso horário local',
+		config_timeZones_custom: 'Personalizado - Mostrar uma lista pré-definida de fusos horários',
+		emptyDate: 'Por favor, selecione uma data',
+		emptyTimeZone: 'Por favor, selecione um fuso horário',
+		invalidTimeZone: 'O fuso horário selecionado não é válido',
+	},
 } as UmbLocalizationDictionary;

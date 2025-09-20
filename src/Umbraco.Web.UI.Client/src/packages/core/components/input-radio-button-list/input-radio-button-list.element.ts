@@ -80,8 +80,10 @@ export class UmbInputRadioButtonListElement extends UmbFormControlMixin<string, 
 			<uui-radio
 				value=${item.value}
 				class=${classMap({ invalid: !!item.invalid })}
-				label=${item.label + (item.invalid ? ` (${this.localize.term('validation_legacyOption')})` : '')}
-				title=${item.invalid ? this.localize.term('validation_legacyOptionDescription') : ''}></uui-radio>
+				label=${this.localize.string(item.label) +
+				(item.invalid ? ` (${this.localize.term('validation_legacyOption')})` : '')}
+				title=${item.invalid ? this.localize.term('validation_legacyOptionDescription') : ''}>
+			</uui-radio>
 		`;
 	}
 
