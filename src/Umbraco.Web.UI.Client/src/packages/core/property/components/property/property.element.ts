@@ -165,7 +165,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	@state()
-	private _variantDifference?: string;
+	private _variantDifferenceTerm?: string;
 
 	@state()
 	private _element?: ManifestPropertyEditorUi['ELEMENT_TYPE'];
@@ -238,7 +238,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		this.observe(
 			this.#propertyContext.variantDifference,
 			(variantDifference) => {
-				this._variantDifference = variantDifference;
+				this._variantDifferenceTerm = variantDifference;
 			},
 			null,
 		);
@@ -418,9 +418,9 @@ export class UmbPropertyElement extends UmbLitElement {
 				?mandatory=${this._mandatory}
 				?invalid=${this._invalid}>
 				${this.#renderPropertyActionMenu()}
-				${this._variantDifference
+				${this._variantDifferenceTerm
 					? html`<div id="variant-info" slot="description">
-							<uui-tag look="secondary">${this._variantDifference}</uui-tag>
+							<uui-tag look="secondary">${this.localize.term(this._variantDifferenceTerm)}</uui-tag>
 						</div> `
 					: ''}
 				${this.#renderPropertyEditor()}
