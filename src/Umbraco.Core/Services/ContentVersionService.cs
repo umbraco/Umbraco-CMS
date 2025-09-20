@@ -269,32 +269,30 @@ internal sealed class ContentVersionService : IContentVersionService
 
         _logger.LogDebug("Removing {count} ContentVersion(s)", versionsToDelete.Count);
 
-        foreach (IEnumerable<ContentVersionMeta> group in versionsToDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
-        {
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
-                var groupEnumerated = group.ToList();
-                _documentVersionRepository.DeleteVersions(groupEnumerated.Select(x => x.VersionId));
-
-                foreach (ContentVersionMeta version in groupEnumerated)
+                foreach (IEnumerable<ContentVersionMeta> group in versionsToDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
                 {
-                    EventMessages messages = _eventMessagesFactory.Get();
+                    var groupEnumerated = group.ToList();
+                    _documentVersionRepository.DeleteVersions(groupEnumerated.Select(x => x.VersionId));
 
-                    scope.Notifications.Publish(
-                        new ContentDeletedVersionsNotification(version.ContentId, messages, version.VersionId));
+                    foreach (ContentVersionMeta version in groupEnumerated)
+                    {
+                        EventMessages messages = _eventMessagesFactory.Get();
+
+                        scope.Notifications.Publish(new ContentDeletedVersionsNotification(version.ContentId, messages, version.VersionId));
+                    }
                 }
+                scope.Complete();
+            }
+
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+            {
+                Audit(AuditType.Delete, Constants.Security.SuperUserId, -1, $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy");
 
                 scope.Complete();
             }
-        }
-
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-        {
-            Audit(AuditType.Delete, Constants.Security.SuperUserId, -1, $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy");
-
-            scope.Complete();
-        }
 
         return versionsToDelete;
     }
