@@ -268,20 +268,8 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	private _renderCredentials = () => html`
 		<h2 class="uui-h4">Credentials</h2>
 		<hr />
-		<uui-form-layout-item>
-			<uui-checkbox
-				name="useIntegratedAuthentication"
-				label="Use integrated authentication"
-				@change=${this._handleChange}
-				.checked=${this.databaseFormData.useIntegratedAuthentication || false}></uui-checkbox>
-		</uui-form-layout-item>
-		<uui-form-layout-item>
-			<uui-checkbox
-				name="trustServerCertificate"
-				label="Trust the database certificate"
-				@change=${this._handleChange}
-				.checked=${this.databaseFormData.trustServerCertificate || false}></uui-checkbox>
-		</uui-form-layout-item>
+		${this._renderIntegratedAuthentication()}
+		${this._renderTrustDatabaseCertificate()}
 
 			${
 				!this.databaseFormData.useIntegratedAuthentication
@@ -315,6 +303,34 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			}
 		</uui-form-layout-item>
 	`;
+
+	private _renderIntegratedAuthentication() {
+		if (this._selectedDatabase?.supportsIntegratedAuthentication) {
+			return html`<uui-form-layout-item>
+				<uui-checkbox
+					name="useIntegratedAuthentication"
+					label="Use integrated authentication"
+					@change=${this._handleChange}
+					.checked=${this.databaseFormData.useIntegratedAuthentication || false}></uui-checkbox>
+			</uui-form-layout-item>`;
+		} else {
+			return null;
+		}
+	}
+
+	private _renderTrustDatabaseCertificate() {
+		if (this._selectedDatabase?.supportsTrustServerCertificate) {
+			return html`<uui-form-layout-item>
+				<uui-checkbox
+					name="trustServerCertificate"
+					label="Trust the database certificate"
+					@change=${this._handleChange}
+					.checked=${this.databaseFormData.trustServerCertificate || false}></uui-checkbox>
+			</uui-form-layout-item>`;
+		} else {
+			return null;
+		}
+	}
 
 	private _renderCustom = () => html`
 		<uui-form-layout-item>

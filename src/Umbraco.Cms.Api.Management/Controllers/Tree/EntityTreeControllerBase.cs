@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
@@ -16,20 +16,20 @@ namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerBase
     where TItem : EntityTreeItemResponseModel, new()
 {
-    private readonly SignProviderCollection _signProviders;
+    private readonly FlagProviderCollection _flagProviders;
 
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected EntityTreeControllerBase(IEntityService entityService)
         : this(
               entityService,
-              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>())
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
 
-    protected EntityTreeControllerBase(IEntityService entityService, SignProviderCollection signProviders)
+    protected EntityTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
     {
         EntityService = entityService;
-        _signProviders = signProviders;
+        _flagProviders = flagProviders;
     }
 
     protected IEntityService EntityService { get; }
@@ -44,7 +44,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(null, rootEntities);
 
-        await PopulateSigns(treeItemViewModels);
+        await PopulateFlags(treeItemViewModels);
 
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
@@ -57,7 +57,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(parentId, children);
 
-        await PopulateSigns(treeItemViewModels);
+        await PopulateFlags(treeItemViewModels);
 
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
 
@@ -73,18 +73,24 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         }
 
         IEntitySlim? entity = siblings.FirstOrDefault();
-        Guid? parentKey = entity?.ParentId > 0
-            ? EntityService.GetKey(entity.ParentId, ItemObjectType).Result
-            : Constants.System.RootKey;
+        Guid? parentKey = GetParentKey(entity);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(parentKey, siblings);
 
-        await PopulateSigns(treeItemViewModels);
+        await PopulateFlags(treeItemViewModels);
 
         SubsetViewModel<TItem> result = SubsetViewModel(treeItemViewModels, totalBefore, totalAfter);
 
         return Ok(result);
     }
+
+    /// <summary>
+    /// Gets the parent key for an entity, or root if null or no parent.
+    /// </summary>
+    protected virtual Guid? GetParentKey(IEntitySlim? entity) =>
+        entity?.ParentId > 0
+            ? EntityService.GetKey(entity.ParentId, ItemObjectType).Result
+            : Constants.System.RootKey;
 
     protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
     {
@@ -101,7 +107,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             })
             .ToArray();
 
-        await PopulateSigns(treeItemViewModels);
+        await PopulateFlags(treeItemViewModels);
 
         return Ok(treeItemViewModels);
     }
@@ -162,11 +168,11 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
 
-    protected virtual async Task PopulateSigns(TItem[] treeItemViewModels)
+    protected virtual async Task PopulateFlags(TItem[] treeItemViewModels)
     {
-        foreach (ISignProvider signProvider in _signProviders.Where(x => x.CanProvideSigns<TItem>()))
+        foreach (IFlagProvider signProvider in _flagProviders.Where(x => x.CanProvideFlags<TItem>()))
         {
-            await signProvider.PopulateSignsAsync(treeItemViewModels);
+            await signProvider.PopulateFlagsAsync(treeItemViewModels);
         }
     }
 

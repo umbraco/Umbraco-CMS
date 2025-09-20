@@ -1862,6 +1862,7 @@ export default {
 		openBackofficeSearch: 'Ouvrir la recherche backoffice',
 		openCloseBackofficeHelp: "Ouvrir/Fermer l'aide backoffice",
 		openCloseBackofficeProfileOptions: 'Ouvrir/Fermer vos options de profil',
+		profileOptions: 'Options de profil',
 		openContextMenu: 'Ouvrir le menu de contexte pour',
 		currentLanguage: 'Langue actuelle',
 		switchLanguage: 'Changer la langue vers',

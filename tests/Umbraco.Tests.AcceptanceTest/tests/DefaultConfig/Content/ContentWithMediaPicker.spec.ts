@@ -175,12 +175,10 @@ test('can add a media image to a media picker in variant content, remove it and 
   await umbracoUi.content.clickChooseButtonAndSelectMediaWithKey(mediaFileId);
   await umbracoUi.content.clickChooseModalButton();
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
   // Removes media item from the media picker
   await umbracoUi.content.removeMediaPickerByName(mediaFileName);
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
   await umbracoUi.content.isSuccessStateVisibleForSaveAndPublishButton();
 
   // Adds media item to a media picker again

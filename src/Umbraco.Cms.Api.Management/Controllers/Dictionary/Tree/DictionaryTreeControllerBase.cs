@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
@@ -25,13 +25,13 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
     public DictionaryTreeControllerBase(IEntityService entityService, IDictionaryItemService dictionaryItemService)
         : this(
               entityService,
-              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>(),
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
               dictionaryItemService)
     {
     }
 
-    public DictionaryTreeControllerBase(IEntityService entityService, SignProviderCollection signProviders, IDictionaryItemService dictionaryItemService)
-        : base(entityService, signProviders) =>
+    public DictionaryTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
+        : base(entityService, flagProviders) =>
         DictionaryItemService = dictionaryItemService;
 
     // dictionary items do not currently have a known UmbracoObjectType, so we'll settle with Unknown for now
