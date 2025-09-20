@@ -282,6 +282,14 @@ export class UmbDataTypeWorkspaceContext
 		this._data.updateCurrent({ editorUiAlias: alias });
 	}
 
+	getPropertyEditorDataSourceAlias() {
+		return this._data.getCurrent()?.editorDataSourceAlias;
+	}
+
+	setPropertyEditorDataSourceAlias(alias?: string) {
+		this._data.updateCurrent({ editorDataSourceAlias: alias });
+	}
+
 	/**
 	 * @function propertyValueByAlias
 	 * @param {string} propertyAlias
