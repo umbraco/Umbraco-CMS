@@ -51,7 +51,7 @@ public class UserDataService : RepositoryService, IUserDataService
             return Attempt<IUserData, UserDataOperationStatus>.Fail(UserDataOperationStatus.AlreadyExists, userData);
         }
 
-        if (await ReferencedUserExists(userData) is false)
+        if (await ReferencedUserExits(userData) is false)
         {
             return Attempt<IUserData, UserDataOperationStatus>.Fail(UserDataOperationStatus.UserNotFound, userData);
         }
@@ -71,7 +71,7 @@ public class UserDataService : RepositoryService, IUserDataService
             return Attempt<IUserData, UserDataOperationStatus>.Fail(UserDataOperationStatus.NotFound, userData);
         }
 
-        if (await ReferencedUserExists(userData) is false)
+        if (await ReferencedUserExits(userData) is false)
         {
             return Attempt<IUserData, UserDataOperationStatus>.Fail(UserDataOperationStatus.UserNotFound, userData);
         }
@@ -82,7 +82,7 @@ public class UserDataService : RepositoryService, IUserDataService
         return Attempt<IUserData, UserDataOperationStatus>.Succeed(UserDataOperationStatus.Success, userData);
     }
 
-    public async Task<Attempt<UserDataOperationStatus>> DeleteAsync(Guid key, Guid userKey)
+    public async Task<Attempt<UserDataOperationStatus>> DeleteAsync(Guid key)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IUserData? existingUserData = await _userDataRepository.GetAsync(key);
@@ -91,20 +91,12 @@ public class UserDataService : RepositoryService, IUserDataService
             return Attempt<UserDataOperationStatus>.Fail(UserDataOperationStatus.NotFound);
         }
 
-        if (await ReferencedUserExists(userKey) is false)
-        {
-            return Attempt<UserDataOperationStatus>.Fail(UserDataOperationStatus.UserNotFound);
-        }
-
         await _userDataRepository.Delete(existingUserData);
 
         scope.Complete();
         return Attempt<UserDataOperationStatus>.Succeed(UserDataOperationStatus.Success);
     }
 
-    private async Task<bool> ReferencedUserExists(Guid userKey)
-        => await _userService.GetAsync(userKey) is not null;
-
-    private async Task<bool> ReferencedUserExists(IUserData userData)
+    private async Task<bool> ReferencedUserExits(IUserData userData)
         => await _userService.GetAsync(userData.UserKey) is not null;
 }

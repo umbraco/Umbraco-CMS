@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -29,9 +30,20 @@ public class DeleteUserDataController : UserDataControllerBase
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
+        IUserData? data = await _userDataService.GetAsync(id);
+        if (data is null)
+        {
+            return NotFound();
+        }
+
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
-        Attempt<UserDataOperationStatus> attempt = await _userDataService.DeleteAsync(id, currentUserKey);
+        if (data.UserKey != currentUserKey)
+        {
+            return Unauthorized();
+        }
+
+        Attempt<UserDataOperationStatus> attempt = await _userDataService.DeleteAsync(id);
 
         return attempt.Success
             ? Ok()
