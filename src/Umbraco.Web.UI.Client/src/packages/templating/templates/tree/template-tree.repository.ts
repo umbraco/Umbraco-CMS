@@ -1,5 +1,5 @@
 import { UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbTemplateTreeServerDataSource } from './template-tree.server.data-source.js';
+import { UmbTemplateTreeServerDataSource } from './server-data-source/template-tree.server.data-source.js';
 import type { UmbTemplateTreeItemModel, UmbTemplateTreeRootModel } from './types.js';
 import { UMB_TEMPLATE_TREE_STORE_CONTEXT } from './template-tree.store.context-token.js';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';

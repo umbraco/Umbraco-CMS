@@ -35,6 +35,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
+	#isNew: boolean | undefined = undefined;
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
@@ -62,6 +63,15 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				},
 				'observeUnique',
 			);
+
+			this.observe(this.#workspaceContext?.isNew, (value) => {
+				// Workspace has changed from new to existing
+				if (value === false && this.#isNew === true) {
+					// TODO: We do not need to request here as we already know the structure and unique
+					this.#requestStructure();
+				}
+				this.#isNew = value;
+			});
 		});
 	}
 
