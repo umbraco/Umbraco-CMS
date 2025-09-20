@@ -1,5 +1,5 @@
-import type { UmbPropertyEditorDataSourceItemModel } from '../item/types.js';
 import { UmbPropertyEditorDataSourceCollectionRepository } from '../collection/index.js';
+import type { UmbPropertyEditorDataSourceCollectionItemModel } from '../collection/types.js';
 import type {
 	UmbPropertyEditorDataSourcePickerModalData,
 	UmbPropertyEditorDataSourcePickerModalValue,
@@ -14,7 +14,7 @@ export class UmbPropertyEditorDataSourcePickerModalElement extends UmbModalBaseE
 	UmbPropertyEditorDataSourcePickerModalValue
 > {
 	@state()
-	private _items: Array<UmbPropertyEditorDataSourceItemModel> = [];
+	private _items: Array<UmbPropertyEditorDataSourceCollectionItemModel> = [];
 
 	#collectionRepository = new UmbPropertyEditorDataSourceCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
