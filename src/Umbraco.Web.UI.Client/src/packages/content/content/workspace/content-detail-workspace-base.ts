@@ -825,7 +825,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * Request a submit of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be submitted.
 	 * @returns {Promise<void>} a promise which resolves once it has been completed.
 	 */
-	public override requestSubmit() {
+	public override requestSubmit(): Promise<void> {
 		return this._handleSubmit();
 	}
 
@@ -835,7 +835,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Request a save of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be saved.
-	 * @returns {Promise<void>} a promise which resolves once it has been completed.
+	 * @returns {Promise<void>} A promise which resolves once it has been completed.
 	 */
 	public requestSave() {
 		return this._handleSave();
@@ -851,11 +851,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this._data.constructData(variantIds);
 	}
 
-	protected async _handleSubmit() {
+	protected async _handleSubmit(): Promise<void> {
 		await this._handleSave();
 		this._closeModal();
 	}
-	protected async _handleSave() {
+	protected async _handleSave(): Promise<void> {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');
@@ -881,7 +881,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				value: { selection: selected },
 			}).catch(() => undefined);
 
-			if (!result?.selection.length) return;
+			if (!result?.selection.length) {
+				return Promise.reject('Cannot save without selecting at least one variant.');
+			}
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		} else {
@@ -901,7 +903,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				() => false,
 			);
 			if (valid || this.#ignoreValidationResultOnSubmit) {
-				return this.performCreateOrUpdate(variantIds, saveData);
+				await this.performCreateOrUpdate(variantIds, saveData);
+			} else {
+				return Promise.reject('Validation issues prevents saving');
 			}
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);

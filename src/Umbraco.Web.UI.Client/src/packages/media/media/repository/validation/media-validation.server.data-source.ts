@@ -49,6 +49,9 @@ export class UmbMediaValidationServerDataSource {
 			MediaService.postMediaValidate({
 				body,
 			}),
+			{
+				disableNotifications: true,
+			},
 		);
 
 		if (data && typeof data === 'string') {
@@ -86,6 +89,9 @@ export class UmbMediaValidationServerDataSource {
 				path: { id: model.unique },
 				body,
 			}),
+			{
+				disableNotifications: true,
+			},
 		);
 
 		if (data && typeof data === 'string') {
