@@ -12,6 +12,6 @@ export interface MetaPropertyEditorDataSource {
 
 declare global {
 	interface UmbExtensionManifestMap {
-		UmbPropertyEditorDataSource: UmbPropertyEditorDataSource;
+		UmbPropertyEditorDataSource: ManifestPropertyEditorDataSource;
 	}
 }
