@@ -66,7 +66,7 @@ export class UmbPropertyEditorDataSourcePickerModalElement extends UmbModalBaseE
 									@selected=${() => this.#selectionManager.select(item.unique)}
 									@deselected=${() => this.#selectionManager.deselect(item.unique)}
 									?selected=${this.value.selection.includes(item.unique)}>
-									<uui-icon slot="icon" name="icon-globe"></uui-icon>
+									<uui-icon slot="icon" name=${item.icon}></uui-icon>
 								</uui-menu-item>
 							`,
 						)
