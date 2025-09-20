@@ -50,7 +50,6 @@ export class UmbViewController extends UmbControllerBase {
 	}
 	#removeActive() {
 		this.#active = false;
-		console.log('——— deactivated view', this.viewAlias, this.getHostElement());
 		if (!this.#inherit) {
 			if (UmbViewController.#ActiveView === this) {
 				UmbViewController.#ActiveView = undefined;
