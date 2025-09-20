@@ -1,0 +1,2 @@
+export const UMB_PROPERTY_EDITOR_DATA_SOURCE_COLLECTION_REPOSITORY_ALIAS =
+	'Umb.Repository.PropertyEditorDataSourceCollection';

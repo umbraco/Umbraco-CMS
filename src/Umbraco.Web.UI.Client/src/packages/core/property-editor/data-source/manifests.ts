@@ -1,4 +1,11 @@
+import { manifests as collectionManifests } from './collection/manifests.js';
+import { manifests as itemManifests } from './item/manifests.js';
+import { manifests as pickerModalManifests } from './picker-modal/manifests.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
+	...collectionManifests,
+	...itemManifests,
+	...pickerModalManifests,
 	{
 		type: 'propertyEditorDataSource',
 		alias: 'Umb.PropertyEditor.DataSource.Test1',
