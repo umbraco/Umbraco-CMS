@@ -72,6 +72,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 				${this._propertyEditorUiAlias && this._propertyEditorSchemaAlias
 					? this.#renderPropertyEditorReference()
 					: this.#renderChooseButton()}
+				${this.#renderDataSourceInput()}
 			</uui-box>
 			${this.#renderSettings()}
 		`;
@@ -131,6 +132,14 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 							@click=${this.#openPropertyEditorUIPicker}></uui-button>
 					</uui-action-bar>
 				</umb-ref-property-editor-ui>
+			</umb-property-layout>
+		`;
+	}
+
+	#renderDataSourceInput() {
+		return html`
+			<umb-property-layout label="Data Source" description="Some description">
+				<umb-input-property-editor-data-source slot="editor"></umb-input-property-editor-data-source>
 			</umb-property-layout>
 		`;
 	}
