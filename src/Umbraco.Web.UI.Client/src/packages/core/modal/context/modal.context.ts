@@ -10,7 +10,7 @@ import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/router';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import { UmbViewController } from '../../view/context/view.controller.js';
+import { UmbViewController } from '@umbraco-cms/backoffice/view';
 
 export interface UmbModalRejectReason {
 	type: string;

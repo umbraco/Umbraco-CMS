@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_VIEW_CONTEXT, UmbViewContext } from '@umbraco-cms/backoffice/view';
+import { UMB_VIEW_CONTEXT, UmbViewContext, UmbViewController } from '@umbraco-cms/backoffice/view';
 import type {
 	PageComponent,
 	UmbRoute,
@@ -21,7 +21,6 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { UmbViewController } from 'src/packages/core/view/context/view.controller.js';
 
 import './content-editor-tab.element.js';
 
