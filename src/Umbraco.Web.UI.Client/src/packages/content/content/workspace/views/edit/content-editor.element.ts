@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_VIEW_CONTEXT, UmbViewContext, UmbViewController } from '@umbraco-cms/backoffice/view';
+import { UMB_VIEW_CONTEXT, UmbViewContext, type UmbViewController } from '@umbraco-cms/backoffice/view';
 import type {
 	PageComponent,
 	UmbRoute,
