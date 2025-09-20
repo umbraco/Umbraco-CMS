@@ -150,6 +150,9 @@ public class PublishedContentQuery : IPublishedContentQuery
     public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         => ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
 
+    public IEnumerable<IPublishedContent> ContentAtRoot()
+        => ItemsAtRoot(_publishedSnapshot.Content);
+
     public IEnumerable<IPublishedContent> ContentAtRoot(string? culture = null)
         => ItemsAtRoot(_publishedSnapshot.Content, culture);
 
