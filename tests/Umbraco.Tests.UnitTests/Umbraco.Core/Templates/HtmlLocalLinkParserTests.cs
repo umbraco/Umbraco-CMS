@@ -320,7 +320,7 @@ public class HtmlLocalLinkParserTests
     [TestCase(UrlMode.Auto, "hello href=\"{localLink:umb://media/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/media/relative/image.jpg\" world ")]
     public void ParseLocalLinks_WithVariousUrlModes_ReturnsCorrectUrls(UrlMode urlMode, string input, string expectedResult)
     {
-        // setup content URL provider that returns different URLs based on UrlMode
+        // Setup content URL provider that returns different URLs based on UrlMode
         var contentUrlProvider = new Mock<IUrlProvider>();
         contentUrlProvider
             .Setup(x => x.GetUrl(
@@ -363,7 +363,7 @@ public class HtmlLocalLinkParserTests
         publishedContent.Setup(x => x.Id).Returns(1234);
         publishedContent.Setup(x => x.ContentType).Returns(contentType);
 
-        // setup media URL provider that returns different URLs based on UrlMode
+        // Setup media URL provider that returns different URLs based on UrlMode
         var mediaUrlProvider = new Mock<IMediaUrlProvider>();
         mediaUrlProvider.Setup(x => x.GetMediaUrl(
                 It.IsAny<IPublishedContent>(),
