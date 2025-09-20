@@ -19,8 +19,8 @@ import './content-type-design-editor-group.element.js';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerMergedModel, UmbContentTypeWorkspaceViewEditGroupElement> =
 	{
-		getUniqueOfElement: (element) => element.group?.key,
-		getUniqueOfModel: (modelEntry) => modelEntry.key,
+		getUniqueOfElement: (element) => element.group?.ownerId,
+		getUniqueOfModel: (modelEntry) => modelEntry.ownerId,
 		// TODO: Make specific to the current owner document. [NL]
 		identifier: 'content-type-container-sorter',
 		itemSelector: 'umb-content-type-design-editor-group',
@@ -297,6 +297,10 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			.container-list #convert-to-tab {
 				margin-bottom: var(--uui-size-layout-1);
 				display: flex;
+			}
+
+			.container-list[sort-mode-active] {
+				min-height: 100px;
 			}
 		`,
 	];
