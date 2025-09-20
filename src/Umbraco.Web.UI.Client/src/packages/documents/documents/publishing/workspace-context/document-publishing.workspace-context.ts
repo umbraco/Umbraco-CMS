@@ -26,6 +26,7 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 	/**
@@ -48,7 +49,18 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, async (context) => {
+				if (this.#documentWorkspaceContext) {
+					// remove shortcut:
+					this.#documentWorkspaceContext.view.shortcuts.removeOne(UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE);
+				}
 				this.#documentWorkspaceContext = context;
+				this.#documentWorkspaceContext?.view.shortcuts.addOne({
+					unique: UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE,
+					label: this.#localize.term('content_saveAndPublishShortcut'),
+					key: 'p',
+					modifier: true,
+					action: () => this.saveAndPublish(),
+				});
 				this.#initPendingChanges();
 			})
 				.asPromise({ preventTimeout: true })
