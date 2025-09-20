@@ -31,6 +31,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                 if ($scope.model.value === null || $scope.model.value === undefined) {
                     $scope.model.value = [];
                 }
+
+                // ensure any values that are not in the config are removed from the model.value (i.e. if the config has changed since the value was saved).
+                var validValues = vm.configItems.map(item => item.value);
+                $scope.model.value = $scope.model.value.filter(val => validValues.includes(val));
                 
                 // update view model.
                 generateViewModel($scope.model.value);
