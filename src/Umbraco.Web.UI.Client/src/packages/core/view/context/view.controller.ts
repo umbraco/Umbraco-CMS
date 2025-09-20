@@ -96,7 +96,6 @@ export class UmbViewController extends UmbControllerBase {
 		this.#consumeParentCtrl = this.consumeContext(UMB_VIEW_CONTEXT, (parentView) => {
 			// In case of explicit inheritance we do not want to overview the parent view.
 			if (this.#explicitInheritance) return;
-
 			if (parentView) {
 				this.#setParentView(parentView);
 			}
@@ -109,27 +108,12 @@ export class UmbViewController extends UmbControllerBase {
 
 	#setParentView(view: UmbViewController | undefined) {
 		if (this.#parentView === view) return;
-		if (this.#parentView) {
-			//this.#parentView.removeEventListener('umb:before-view-activated', this.#beforeParentActivates);
-		}
 		this.#parentView = view;
-		//this.#parentView?.addEventListener('umb:before-view-activated', this.#beforeParentActivates);
 
 		if (this.#inherit) {
 			this.#inheritFromParent();
 		}
 	}
-
-	/*
-	#beforeParentActivates = (event: Event) => {
-		//if(!this.isActive) return;
-		//event.preventDefault();
-		if (this.#attached && this.#autoActivate) {
-			this._internal_activate();
-			event.preventDefault();
-		}
-	};
-	*/
 
 	public setVariantId(variantId: UmbVariantId | undefined): void {
 		this.#variantId.setValue(variantId);
@@ -187,7 +171,6 @@ export class UmbViewController extends UmbControllerBase {
 
 	override hostDisconnected(): void {
 		const wasAttached = this.#attached;
-		//const wasActive = this.isActive;
 		this.#attached = false;
 		if (wasAttached) {
 			this.#parentView?._internal_removeChild(this);
