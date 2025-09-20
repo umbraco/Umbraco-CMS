@@ -70,9 +70,7 @@ export class UmbPropertyEditorDataSourcePickerModalElement extends UmbModalBaseE
 								</uui-menu-item>
 							`,
 						)
-					: html`<umb-localize key="language_noFallbackLanguages">
-							There are no other languages to choose from
-						</umb-localize>`}
+					: html`<p>No items found</p>`}
 			</uui-box>
 			<div slot="actions">
 				<uui-button label="Close" @click=${this.#close}></uui-button>
