@@ -122,7 +122,8 @@ public abstract class Builder
     {
         TypeModel.MapModelTypes(TypeModels, ModelsNamespace);
 
-        var isInMemoryMode = Config.ModelsMode == ModelsMode.InMemoryAuto;
+        // TODO: Remove this, this is a hack ideally InMemoryAuto should have its own builder in Umbraco.Cms.DevelopmentMode.Backoffice
+        var isInMemoryMode = Config.ModelsMode == "InMemoryAuto";
 
         // for the first two of these two tests,
         //  always throw, even in InMemory mode: cannot happen unless ppl start fidling with attributes to rename

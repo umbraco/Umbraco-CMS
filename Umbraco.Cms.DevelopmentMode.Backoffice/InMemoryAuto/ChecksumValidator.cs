@@ -5,7 +5,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Razor.Hosting;
 using Microsoft.AspNetCore.Razor.Language;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
+namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 
 /*
  * This is a clone of Microsofts implementation.

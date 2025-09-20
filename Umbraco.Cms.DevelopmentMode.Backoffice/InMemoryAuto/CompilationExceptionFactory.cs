@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
+namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 
 /*
  * This is a partial clone of the frameworks CompilationFailedExceptionFactory, a few things has been simplified to fit our needs.

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
+namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 
 internal sealed class UmbracoCompilationException : Exception, ICompilationException
 {

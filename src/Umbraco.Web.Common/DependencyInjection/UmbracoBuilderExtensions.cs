@@ -240,11 +240,6 @@ public static partial class UmbracoBuilderExtensions
         // this will directly affect developers who need to call that themselves.
         IMvcBuilder mvcBuilder = builder.Services.AddControllersWithViews();
 
-        if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
-        {
-            mvcBuilder.AddRazorRuntimeCompilation();
-        }
-
         mvcBuilding?.Invoke(mvcBuilder);
 
         return builder;

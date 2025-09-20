@@ -29,7 +29,7 @@ public class ModelsBuilderPresentationFactory : IModelsBuilderPresentationFactor
         new()
         {
             Mode = _modelsBuilderSettings.ModelsMode,
-            CanGenerate = _modelsBuilderSettings.ModelsMode.SupportsExplicitGeneration(),
+            CanGenerate = _modelsBuilderSettings.ModelsMode is Constants.ModelsBuilder.ModelsModes.SourceCodeManual or Constants.ModelsBuilder.ModelsModes.SourceCodeAuto,
             OutOfDateModels = _outOfDateModels.IsOutOfDate,
             LastError = _mbErrors.GetLastError(),
             Version = ApiVersion.Current.Version.ToString(),

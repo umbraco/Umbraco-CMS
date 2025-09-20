@@ -3,6 +3,7 @@ namespace Umbraco.Cms.Core.Configuration;
 /// <summary>
 ///     Defines the models generation modes.
 /// </summary>
+[Obsolete("A string is now used instead to facilitate extension. Use Constants.ModelsBuilder.ModelsModes instead. Scheduled for removal in v18.")]
 public enum ModelsMode
 {
     /// <summary>

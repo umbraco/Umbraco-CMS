@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.ModelsBuilderDashboard;
 
 public class ModelsBuilderResponseModel
 {
-    public ModelsMode Mode { get; set; }
+    public required string Mode { get; set; }
 
     public bool CanGenerate { get; set; }
 

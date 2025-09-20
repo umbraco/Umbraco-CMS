@@ -11,5 +11,14 @@ public static partial class Constants
     public static class ModelsBuilder
     {
         public const string DefaultModelsNamespace = "Umbraco.Cms.Web.Common.PublishedModels";
+
+        public static class ModelsModes
+        {
+            public const string SourceCodeAuto = "SourceCodeAuto";
+
+            public const string SourceCodeManual = "SourceCodeManual";
+
+            public const string Nothing = "Nothing";
+        }
     }
 }
