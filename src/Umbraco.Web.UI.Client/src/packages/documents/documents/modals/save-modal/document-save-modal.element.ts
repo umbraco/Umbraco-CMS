@@ -6,6 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
 import '../shared/document-variant-language-picker.element.js';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-document-save-modal')
 export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
@@ -65,6 +66,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
+					${umbFocus()}
 					label="${this.localize.term('buttons_save')}"
 					look="primary"
 					color="positive"

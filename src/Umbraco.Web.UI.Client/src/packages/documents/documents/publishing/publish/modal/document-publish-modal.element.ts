@@ -7,6 +7,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
 import '../../../modals/shared/document-variant-language-picker.element.js';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-document-publish-modal')
 export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
@@ -121,6 +122,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
+					${umbFocus()}
 					label="${this.data?.confirmLabel
 						? this.localize.string(this.data.confirmLabel)
 						: this.localize.term('buttons_saveAndPublish')}"
