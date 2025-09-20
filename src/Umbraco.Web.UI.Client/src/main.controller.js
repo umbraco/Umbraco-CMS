@@ -83,7 +83,7 @@ function MainController($scope, $location, appState, treeService, notificationsS
     evts.push(eventsService.on("app.notAuthenticated", function (evt, data) {
         $scope.authenticated = null;
         $scope.user = null;
-        const isTimedOut = data && data.isTimedOut ? true : false;
+        const isTimedOut = !!(data && data.isTimedOut);
 
         $scope.showLoginScreen(isTimedOut);
 

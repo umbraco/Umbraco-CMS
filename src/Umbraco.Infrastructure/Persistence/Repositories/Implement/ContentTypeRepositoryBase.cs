@@ -29,15 +29,22 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     where TEntity : class, IContentTypeComposition
 {
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly Lazy<IIdKeyMap> _idKeyMap;
 
-    protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache,
-        ILogger<ContentTypeRepositoryBase<TEntity>> logger, IContentTypeCommonRepository commonRepository,
-        ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
+    protected ContentTypeRepositoryBase(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<ContentTypeRepositoryBase<TEntity>> logger,
+        IContentTypeCommonRepository commonRepository,
+        ILanguageRepository languageRepository,
+        IShortStringHelper shortStringHelper,
+        Lazy<IIdKeyMap> idKeyMap)
         : base(scopeAccessor, cache, logger)
     {
         _shortStringHelper = shortStringHelper;
         CommonRepository = commonRepository;
         LanguageRepository = languageRepository;
+        _idKeyMap = idKeyMap;
     }
 
     protected IContentTypeCommonRepository CommonRepository { get; }
@@ -287,7 +294,7 @@ AND umbracoNode.nodeObjectType = @objectType",
             // If the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
             if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default)
             {
-                AssignDataTypeFromPropertyEditor(propertyType);
+                AssignDataTypeIdFromProvidedKeyOrPropertyEditor(propertyType);
             }
 
             PropertyTypeDto propertyTypeDto =
@@ -590,7 +597,7 @@ AND umbracoNode.id <> @id",
             // if the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
             if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default)
             {
-                AssignDataTypeFromPropertyEditor(propertyType);
+                AssignDataTypeIdFromProvidedKeyOrPropertyEditor(propertyType);
             }
 
             // validate the alias
@@ -1223,8 +1230,11 @@ AND umbracoNode.id <> @id",
     ///     If this is not done, then in some cases the "edited" value for a particular culture for a document will remain true
     ///     when it should be false
     ///     if the property was changed to invariant. In order to do this we need to recalculate this value based on the values
-    ///     stored for each
-    ///     property, culture and current/published version.
+    ///     stored for each property, culture and current/published version.
+    ///
+    ///     Some of the sql statements in this function have a tendency to take a lot of parameters (nodeIds)
+    ///     as the WhereIn Npoco method translates all the nodeIds being passed in as parameters when using the SqlClient provider.
+    ///     this results in to many parameters (>2100) error => We need to batch the calls
     /// </remarks>
     private void RenormalizeDocumentEditedFlags(
         IReadOnlyCollection<int> propertyTypeIds,
@@ -1380,15 +1390,23 @@ AND umbracoNode.id <> @id",
         // Now bulk update the table DocumentCultureVariationDto, once for edited = true, another for edited = false
         foreach (IGrouping<bool, DocumentCultureVariationDto> editValue in toUpdate.GroupBy(x => x.Edited))
         {
-            Database.Execute(Sql().Update<DocumentCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
-                .WhereIn<DocumentCultureVariationDto>(x => x.Id, editValue.Select(x => x.Id)));
+            // update in batches to account for maximum parameter count
+            foreach (IEnumerable<DocumentCultureVariationDto> batchedValues in editValue.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Database.Execute(Sql().Update<DocumentCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
+                    .WhereIn<DocumentCultureVariationDto>(x => x.Id, batchedValues.Select(x => x.Id)));
+            }
         }
 
         // Now bulk update the umbracoDocument table
-        foreach (IGrouping<bool, KeyValuePair<int, bool>> editValue in editedDocument.GroupBy(x => x.Value))
+        foreach (IGrouping<bool, KeyValuePair<int, bool>> groupByValue in editedDocument.GroupBy(x => x.Value))
         {
-            Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, editValue.Key))
-                .WhereIn<DocumentDto>(x => x.NodeId, editValue.Select(x => x.Key)));
+            // update in batches to account for maximum parameter count
+            foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, groupByValue.Key))
+                    .WhereIn<DocumentDto>(x => x.NodeId, batch.Select(x => x.Key)));
+            }
         }
     }
 
@@ -1423,36 +1441,58 @@ AND umbracoNode.id <> @id",
     protected abstract TEntity? PerformGet(Guid id);
 
     /// <summary>
-    ///     Try to set the data type id based on its ControlId
+    ///     Try to set the data type Id based on the provided key or property editor alias.
     /// </summary>
     /// <param name="propertyType"></param>
-    private void AssignDataTypeFromPropertyEditor(IPropertyType propertyType)
+    private void AssignDataTypeIdFromProvidedKeyOrPropertyEditor(IPropertyType propertyType)
     {
-        // we cannot try to assign a data type of it's empty
-        if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
+        // If a key is provided, use that.
+        if (propertyType.DataTypeKey != Guid.Empty)
         {
-            Sql<ISqlContext> sql = Sql()
-                .Select<DataTypeDto>(dt => dt.Select(x => x.NodeDto))
-                .From<DataTypeDto>()
-                .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((dt, n) => dt.NodeId == n.NodeId)
-                .Where(
-                    "propertyEditorAlias = @propertyEditorAlias",
-                    new { propertyEditorAlias = propertyType.PropertyEditorAlias })
-                .OrderBy<DataTypeDto>(typeDto => typeDto.NodeId);
-            DataTypeDto? datatype = Database.FirstOrDefault<DataTypeDto>(sql);
-
-            // we cannot assign a data type if one was not found
-            if (datatype != null)
+            Attempt<int> dataTypeIdAttempt = _idKeyMap.Value.GetIdForKey(propertyType.DataTypeKey, UmbracoObjectTypes.DataType);
+            if (dataTypeIdAttempt.Success)
             {
-                propertyType.DataTypeId = datatype.NodeId;
-                propertyType.DataTypeKey = datatype.NodeDto.UniqueId;
+                propertyType.DataTypeId = dataTypeIdAttempt.Result;
+                return;
             }
             else
             {
                 Logger.LogWarning(
-                    "Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}",
-                    propertyType.Alias, propertyType.PropertyEditorAlias);
+                    "Could not assign a data type for the property type {PropertyTypeAlias} since no integer Id was found matching the key {DataTypeKey}. Falling back to look up via the property editor alias.",
+                    propertyType.Alias,
+                    propertyType.DataTypeKey);
             }
+        }
+
+        // Otherwise if a property editor alias is provided, try to find a data type that uses that alias.
+        if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace())
+        {
+            // We cannot try to assign a data type if it's empty.
+            return;
+        }
+
+        Sql<ISqlContext> sql = Sql()
+            .Select<DataTypeDto>(dt => dt.Select(x => x.NodeDto))
+            .From<DataTypeDto>()
+            .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((dt, n) => dt.NodeId == n.NodeId)
+            .Where(
+                "propertyEditorAlias = @propertyEditorAlias",
+                new { propertyEditorAlias = propertyType.PropertyEditorAlias })
+            .OrderBy<DataTypeDto>(typeDto => typeDto.NodeId);
+        DataTypeDto? datatype = Database.FirstOrDefault<DataTypeDto>(sql);
+
+        // we cannot assign a data type if one was not found
+        if (datatype != null)
+        {
+            propertyType.DataTypeId = datatype.NodeId;
+            propertyType.DataTypeKey = datatype.NodeDto.UniqueId;
+        }
+        else
+        {
+            Logger.LogWarning(
+                "Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}",
+                propertyType.Alias,
+                propertyType.PropertyEditorAlias);
         }
     }
 

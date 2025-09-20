@@ -102,10 +102,15 @@
     width: 100%;
 }
 
+.umb-node-preview-add + .umb-node-preview-add {
+  margin-left: -1px;
+}
+
 .umb-node-preview-add:hover {
     color: @ui-action-discreet-type-hover;
     border-color: @ui-action-discreet-border-hover;
     text-decoration: none;
+    z-index:1;
 }
 
 .umb-node-preview-add:disabled {

@@ -978,13 +978,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="renewSession">Vernieuw je sessie om je wijzigingen te behouden</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Fijne super zondag</key>
-    <key alias="greeting1">Fijne manische maandag</key>
-    <key alias="greeting2">Fijne dinsdag</key>
-    <key alias="greeting3">Fijne geweldige woensdag</key>
-    <key alias="greeting4">Fijne donderende donderdag</key>
-    <key alias="greeting5">Fijne funky vrijdag</key>
-    <key alias="greeting6">Fijne zaterdag</key>
+    <key alias="greeting0">Welkom</key>
+    <key alias="greeting1">Welkom</key>
+    <key alias="greeting2">Welkom</key>
+    <key alias="greeting3">Welkom</key>
+    <key alias="greeting4">Welkom</key>
+    <key alias="greeting5">Welkom</key>
+    <key alias="greeting6">Welkom</key>
     <key alias="instruction">log hieronder in</key>
     <key alias="signInWith">Inloggen met</key>
     <key alias="timeout">Sessie is verlopen</key>
@@ -1234,6 +1234,10 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="pickedTrashedItems">Je hebt content-items geselecteerd die op dit ogenblik verwijderd of in the
       prullenbak zijn
     </key>
+  </area>
+  <area alias="dynamicRoot">
+    <key alias="noValidStartNodeTitle">Geen overeenkomende inhoud</key>
+    <key alias="noValidStartNodeDesc">De configuratie van deze eigenschap komt met geen enkele inhoud overeen. Maak de ontbrekende inhoud aan of neem contact op met uw beheerder om de dynamische root-instellingen voor deze eigenschap aan te passen.</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Verwijderd item</key>
@@ -1706,6 +1710,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="historyCleanupEnableCleanup">Opschonen aanzetten</key>
     <key alias="historyCleanupGloballyDisabled">Geschiedenis opschonen is globaal uitgeschakeld. Deze instellingen worden pas van kracht nadat ze zijn ingeschakeld.</key>
   </area>
+  <area alias="webhooks">
+    <key alias="addWebhook">Webhook aanmaken</key>
+    <key alias="addWebhookHeader">Webhook header toevoegen</key>
+    <key alias="logs">Logboek</key>
+    <key alias="addDocumentType">Documenttype toevoegen</key>
+    <key alias="addMediaType">Mediatype toevoegen</key>
+  </area>
   <area alias="languages">
     <key alias="addLanguage">Taal toevoegen</key>
     <key alias="mandatoryLanguage">Verplichte taal</key>
@@ -1846,6 +1857,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="settingsGroup">Instellingen</key>
     <key alias="templatingGroup">Sjabloon</key>
     <key alias="thirdPartyGroup">Derde partij</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nieuwe update beschikbaar</key>

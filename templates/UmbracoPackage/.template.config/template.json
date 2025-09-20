@@ -28,13 +28,13 @@
       "datatype": "choice",
       "choices": [
         {
-          "displayName": ".NET 7.0",
-          "description": "Target net7.0",
-          "choice": "net7.0"
+          "displayName": ".NET 8.0",
+          "description": "Target net8.0",
+          "choice": "net8.0"
         }
       ],
-      "defaultValue": "net7.0",
-      "replaces": "net7.0"
+      "defaultValue": "net8.0",
+      "replaces": "net8.0"
     },
     "UmbracoVersion": {
       "displayName": "Umbraco version",

@@ -852,7 +852,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
                             orderBySystemField: toBool(options.orderBySystemField),
-                            filter: options.filter,
+                            filter: encodeURIComponent(options.filter),
                             cultureName: options.cultureName
                         })),
                 'Failed to retrieve children for content item ' + parentId);
@@ -1003,13 +1003,13 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         * @returns {Promise} resourcePromise object containing the saved content item.
         *
         */
-        publishWithDescendants: function (content, isNew, force, files, showNotifications) {
+        publishWithDescendants: function (content, isNew, includeUnpublished, files, showNotifications) {
             var endpoint = umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
                 "PostSave");
 
             var action = "publishWithDescendants";
-            if (force === true) {
+            if (includeUnpublished === true) {
                 action += "Force";
             }
 

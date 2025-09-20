@@ -20,10 +20,9 @@
 
             scope.close = function () {
                 if (scope.onClose) {
-                   scope.onClose();
+                  scope.onClose();
                 }
             }
-
         }
 
         var directive = {

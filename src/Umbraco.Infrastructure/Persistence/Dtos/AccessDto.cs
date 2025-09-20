@@ -37,5 +37,5 @@ internal class AccessDto
 
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = "AccessId")]
-    public List<AccessRuleDto> Rules { get; set; } = null!;
+    public List<AccessRuleDto> Rules { get; set; } = new();
 }

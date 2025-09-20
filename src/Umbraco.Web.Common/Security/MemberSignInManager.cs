@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -32,11 +33,39 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         IUserConfirmation<MemberIdentityUser> confirmation,
         IMemberExternalLoginProviders memberExternalLoginProviders,
         IEventAggregator eventAggregator,
-        IOptions<SecuritySettings> securitySettings)
-        : base(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, securitySettings)
+        IOptions<SecuritySettings> securitySettings,
+        IRequestCache requestCache)
+        : base(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, securitySettings, requestCache)
     {
         _memberExternalLoginProviders = memberExternalLoginProviders;
         _eventAggregator = eventAggregator;
+    }
+
+    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V15.")]
+    public MemberSignInManager(
+        UserManager<MemberIdentityUser> memberManager,
+        IHttpContextAccessor contextAccessor,
+        IUserClaimsPrincipalFactory<MemberIdentityUser> claimsFactory,
+        IOptions<IdentityOptions> optionsAccessor,
+        ILogger<SignInManager<MemberIdentityUser>> logger,
+        IAuthenticationSchemeProvider schemes,
+        IUserConfirmation<MemberIdentityUser> confirmation,
+        IMemberExternalLoginProviders memberExternalLoginProviders,
+        IEventAggregator eventAggregator,
+        IOptions<SecuritySettings> securitySettings)
+        : this(
+            memberManager,
+            contextAccessor,
+            claimsFactory,
+            optionsAccessor,
+            logger,
+            schemes,
+            confirmation,
+            memberExternalLoginProviders,
+            eventAggregator,
+            securitySettings,
+            StaticServiceProvider.Instance.GetRequiredService<IRequestCache>())
+    {
     }
 
     [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]

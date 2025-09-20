@@ -1,6 +1,8 @@
 using System.Xml.XPath;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Xml;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PublishedCache;
@@ -9,10 +11,24 @@ public abstract class PublishedCacheBase : IPublishedCache
 {
     private readonly IVariationContextAccessor? _variationContextAccessor;
 
-    public PublishedCacheBase(IVariationContextAccessor variationContextAccessor) => _variationContextAccessor =
-        variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
 
-    protected PublishedCacheBase(bool previewDefault) => PreviewDefault = previewDefault;
+    [Obsolete("Use ctor with all parameters. This will be removed in V15")]
+    public PublishedCacheBase(IVariationContextAccessor variationContextAccessor)
+        : this(variationContextAccessor, false)
+    {
+    }
+
+    [Obsolete("Use ctor with all parameters. This will be removed in V15")]
+    protected PublishedCacheBase(bool previewDefault)
+        : this(StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>(), previewDefault)
+    {
+    }
+
+    public PublishedCacheBase(IVariationContextAccessor variationContextAccessor, bool previewDefault)
+    {
+        _variationContextAccessor = variationContextAccessor;
+        PreviewDefault = previewDefault;
+    }
 
     public bool PreviewDefault { get; }
 

@@ -118,15 +118,37 @@ public static class DistributedCacheExtensions
     #region ContentCacheRefresher
 
     public static void RefreshAllContentCache(this DistributedCache dc)
+    {
+        ContentCacheRefresher.JsonPayload[] payloads = new[]
+        {
+            new ContentCacheRefresher.JsonPayload()
+            {
+                ChangeTypes = TreeChangeTypes.RefreshAll
+            }
+        };
+
         // note: refresh all content cache does refresh content types too
-        => dc.RefreshByPayload(ContentCacheRefresher.UniqueId, new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll).Yield());
+        dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
+    }
 
     [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
     public static void RefreshContentCache(this DistributedCache dc, TreeChange<IContent>[] changes)
         => dc.RefreshContentCache(changes.AsEnumerable());
 
     public static void RefreshContentCache(this DistributedCache dc, IEnumerable<TreeChange<IContent>> changes)
-        => dc.RefreshByPayload(ContentCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.Item.Key, x.ChangeTypes)).Select(x => new ContentCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes)));
+    {
+        IEnumerable<ContentCacheRefresher.JsonPayload> payloads = changes.Select(x => new ContentCacheRefresher.JsonPayload()
+        {
+            Id = x.Item.Id,
+            Key = x.Item.Key,
+            ChangeTypes = x.ChangeTypes,
+            Blueprint = x.Item.Blueprint,
+            PublishedCultures = x.PublishedCultures?.ToArray(),
+            UnpublishedCultures = x.UnpublishedCultures?.ToArray()
+        });
+
+        dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
+    }
 
     #endregion
 
@@ -137,15 +159,30 @@ public static class DistributedCacheExtensions
         => dc.RefreshMemberCache(members.AsEnumerable());
 
     public static void RefreshMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
-        => dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.DistinctBy(x => (x.Id, x.Username)).Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, false)));
-
+        => dc.RefreshByPayload(
+            MemberCacheRefresher.UniqueId,
+            GetPayloads(members, false));
 
     [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
     public static void RemoveMemberCache(this DistributedCache dc, params IMember[] members)
         => dc.RemoveMemberCache(members.AsEnumerable());
 
     public static void RemoveMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
-        => dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.DistinctBy(x => (x.Id, x.Username)).Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, true)));
+        => dc.RefreshByPayload(
+            MemberCacheRefresher.UniqueId,
+            GetPayloads(members, true));
+
+    // Internal for unit test.
+    internal static IEnumerable<MemberCacheRefresher.JsonPayload> GetPayloads(IEnumerable<IMember> members, bool removed)
+        => members
+            .DistinctBy(x => (x.Id, x.Username))
+            .Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, removed)
+            {
+                PreviousUsername = x.HasAdditionalData &&
+                    x.AdditionalData!.TryGetValue(Cms.Core.Constants.Entities.AdditionalDataKeys.MemberPreviousUserName, out var previousUsername)
+                    ? previousUsername?.ToString()
+                    : null,
+            });
 
     #endregion
 

@@ -1,4 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <!-- Enable multi-level merging with src -->
-  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..\src\'))" />
+  <Import Project="$([MSBuild]::GetPathOfFileAbove(Directory.Build.props, $(MSBuildThisFileDirectory)..\src))" />
 </Project>

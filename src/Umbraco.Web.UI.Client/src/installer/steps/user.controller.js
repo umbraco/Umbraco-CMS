@@ -86,6 +86,13 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
     }
   };
 
+  $scope.togglePassword = function () {
+    var elem = $("form[name='installerForm'] input[name='installer.current.model.password']");
+    elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
+    elem.focus();
+    $(".password-text.show, .password-text.hide").toggle();
+  }
+
   function onChangeConsent(values) {
     const result = Math.round(Number(values[0]) - 1);
 

@@ -20,8 +20,9 @@ angular.module('umbraco')
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             $scope.acceptFileExt = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
+            
             /**
-             * Called when the umgImageGravity component updates the focal point value
+             * Called when the umbImageGravity component updates the focal point value
              * @param {any} left
              * @param {any} top
              */
@@ -81,7 +82,7 @@ angular.module('umbraco')
             function imageLoaded(isCroppable, hasDimensions) {
                 $scope.isCroppable = isCroppable;
                 $scope.hasDimensions = hasDimensions;
-            };
+            }
 
             /**
              * Called when the file collection changes

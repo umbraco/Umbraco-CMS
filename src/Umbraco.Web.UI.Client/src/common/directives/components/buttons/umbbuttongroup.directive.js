@@ -90,10 +90,8 @@ Use this directive to render a button with a dropdown of alternative actions.
 **/
 (function () {
   'use strict';
-
   function ButtonGroupDirective() {
-
-    function controller($scope) {
+    function controller($scope, localizationService) {
       $scope.toggleStyle = null;
       $scope.blockElement = false;
 
@@ -121,6 +119,37 @@ Use this directive to render a button with a dropdown of alternative actions.
           }
         }
       }
+
+      // As the <localize /> directive doesn't support Angular expressions as fallback, we instead listen for changes
+      // to the label key of the default button, and if detected, we update the button label with the localized value
+      // received from the localization service
+      $scope.$watch("defaultButton", localizeDefaultButtonLabel);
+      $scope.$watch("defaultButton.labelKey", localizeDefaultButtonLabel);
+
+      function localizeDefaultButtonLabel() {
+        if (!$scope.defaultButton?.labelKey) return;
+        localizationService.localize($scope.defaultButton.labelKey).then(value => {
+          if (value && value.indexOf("[") === 0) return;
+          $scope.defaultButton.label = value;
+        });
+      }
+
+      // In a similar way, we must listen for changes to the sub buttons (or their label keys), and if detected, update
+      // the label with the localized value received from the localization service
+      $scope.$watch("subButtons", localizeSubButtons, true);
+      $scope.$watch("defaultButton.subButtons", localizeSubButtons, true);
+
+      function localizeSubButtons() {
+        if (!$scope.subButtons || !Array.isArray($scope.subButtons)) return;
+        $scope.subButtons.forEach(function (sub) {
+          if (!sub.labelKey) return;
+          localizationService.localize(sub.labelKey).then(value => {
+            if (value && value.indexOf("[") === 0) return;
+            sub.label = value;
+          });
+        });
+      }
+
     }
 
     function link(scope) {

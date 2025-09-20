@@ -16,7 +16,6 @@
                         show-labels="true">
             </umb-toggle>
         </div>
-
     </div>
 
     <div ng-if="vm.displayVariants.length > 1">
@@ -37,6 +36,17 @@
         </div>
 
         <div class="umb-list umb-list--condensed">
+
+            <div class="umb-list-item" ng-if="vm.displayVariants.length > 1">
+              <umb-checkbox
+                            model="vm.publishAll"
+                            name="publishAllVariantsSelector"
+                            on-change="vm.changePublishAllSelection()"
+                            disabled="vm.displayVariants.length == 0">
+              <span class="umb-variant-selector-entry__title">
+                <localize key="content_selectAllVariants">Select all variants</localize>
+              </span>
+            </div>
 
             <div class="umb-list-item umb-list--condensed" ng-repeat="variant in vm.displayVariants track by variant.compositeId">
                 <ng-form name="publishVariantSelectorForm">

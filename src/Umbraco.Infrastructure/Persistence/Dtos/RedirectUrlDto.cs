@@ -38,6 +38,7 @@ internal class RedirectUrlDto
 
     [Column("url")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     public string Url { get; set; } = null!;
 
     [Column("culture")]

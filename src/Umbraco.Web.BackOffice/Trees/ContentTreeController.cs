@@ -100,7 +100,13 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
 
     public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
     {
-        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out var totalFound, searchFrom);
+        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(
+            query,
+            UmbracoEntityTypes.Document,
+            pageSize,
+            pageIndex,
+            out var totalFound,
+            searchFrom: searchFrom);
         return new EntitySearchResults(results, totalFound);
     }
 
@@ -317,13 +323,7 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
 
         if (_emailSender.CanSendRequiredEmail())
         {
-            menu.Items.Add(new MenuItem("notify", LocalizedTextService)
-            {
-                Icon = "icon-megaphone",
-                SeparatorBefore = true,
-                OpensDialog = true,
-                UseLegacyIcon = false
-            });
+            AddActionNode<ActionNotify>(item, menu, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
         }
 
         if ((item is DocumentEntitySlim documentEntity && documentEntity.IsContainer) == false)
@@ -405,7 +405,14 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeW
 
     public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null, string? culture = null)
     {
-        var results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out long totalFound, culture: culture, searchFrom: searchFrom);
+        var results = _treeSearcher.ExamineSearch(
+            query,
+            UmbracoEntityTypes.Document,
+            pageSize,
+            pageIndex,
+            out long totalFound,
+            culture: culture,
+            searchFrom: searchFrom);
         return new EntitySearchResults(results, totalFound);
     }
 }

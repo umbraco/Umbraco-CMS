@@ -193,18 +193,7 @@ internal class CompilationOptionsProvider
 
         var parseOptions = new CSharpParseOptions(preprocessorSymbols: (IEnumerable<string>)defines);
 
-        if (string.IsNullOrEmpty(dependencyContextOptions.LanguageVersion))
-        {
-            parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.Latest);
-        }
-        else if (LanguageVersionFacts.TryParse(dependencyContextOptions.LanguageVersion, out var languageVersion))
-        {
-            parseOptions = parseOptions.WithLanguageVersion(languageVersion);
-        }
-        else
-        {
-            Debug.Fail($"LanguageVersion {languageVersion} specified in the deps file could not be parsed.");
-        }
+        parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.Latest);
 
         return parseOptions;
     }

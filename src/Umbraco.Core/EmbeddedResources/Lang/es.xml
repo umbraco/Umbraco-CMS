@@ -672,13 +672,13 @@
     <key alias="renewSession">Renovar tu sesión para guardar sus cambios</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Feliz super domingo</key>
-    <key alias="greeting1">Feliz lunes</key>
-    <key alias="greeting2">Tremendo martes</key>
-    <key alias="greeting3">Maravilloso miércoles</key>
-    <key alias="greeting4">Fantástico jueves</key>
-    <key alias="greeting5">¡Ya es viernes!</key>
-    <key alias="greeting6">Resplandeciente sábado</key>
+    <key alias="greeting0">Bienvenido</key>
+    <key alias="greeting1">Bienvenido</key>
+    <key alias="greeting2">Bienvenido</key>
+    <key alias="greeting3">Bienvenido</key>
+    <key alias="greeting4">Bienvenido</key>
+    <key alias="greeting5">Bienvenido</key>
+    <key alias="greeting6">Bienvenido</key>
     <key alias="instruction">Iniciar sesión</key>
     <key alias="timeout">La sesión ha caducado</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>

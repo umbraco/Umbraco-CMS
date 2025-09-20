@@ -43,15 +43,7 @@ public abstract class BlockEditorDataConverter
         return Convert(value);
     }
 
-    /// <summary>
-    ///     Return the collection of <see cref="IBlockReference" /> from the block editor's Layout (which could be an array or
-    ///     an object depending on the editor)
-    /// </summary>
-    /// <param name="jsonLayout"></param>
-    /// <returns></returns>
-    protected abstract IEnumerable<ContentAndSettingsReference>? GetBlockReferences(JToken jsonLayout);
-
-    private BlockEditorData Convert(BlockValue? value)
+    public BlockEditorData Convert(BlockValue? value)
     {
         if (value?.Layout == null)
         {
@@ -65,4 +57,12 @@ public abstract class BlockEditorDataConverter
 
         return new BlockEditorData(_propertyEditorAlias, references!, value);
     }
+
+    /// <summary>
+    ///     Return the collection of <see cref="IBlockReference" /> from the block editor's Layout (which could be an array or
+    ///     an object depending on the editor)
+    /// </summary>
+    /// <param name="jsonLayout"></param>
+    /// <returns></returns>
+    protected abstract IEnumerable<ContentAndSettingsReference>? GetBlockReferences(JToken jsonLayout);
 }

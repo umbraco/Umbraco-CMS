@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Xml.XPath;
 
@@ -639,6 +640,11 @@ public class NavigableNavigator : XPathNavigator
             InternalState.Position = StatePosition.PropertyText;
             DebugState();
             return true;
+        }
+
+        if (valueForXPath is IRichTextEditorIntermediateValue)
+        {
+            return false;
         }
 
         throw new InvalidOperationException("XPathValue must be an XPathNavigator or a string.");

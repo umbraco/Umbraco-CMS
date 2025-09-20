@@ -8,11 +8,5 @@ internal abstract class RequestHeaderHandler
 
     protected RequestHeaderHandler(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 
-    protected string? GetHeaderValue(string headerName)
-    {
-        HttpContext httpContext = _httpContextAccessor.HttpContext ??
-                                  throw new InvalidOperationException("Could not obtain an HTTP context");
-
-        return httpContext.Request.Headers[headerName];
-    }
+    protected string? GetHeaderValue(string headerName) => _httpContextAccessor.HttpContext?.Request.Headers[headerName];
 }

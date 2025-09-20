@@ -261,7 +261,7 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
         // lookup domain
-        publishedRouter.FindDomain(frequest);
+        publishedRouter.FindAndSetDomain(frequest);
 
         Assert.AreEqual(expectedCulture, frequest.Culture);
 
@@ -310,7 +310,7 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
         // lookup domain
-        publishedRouter.FindDomain(frequest);
+        publishedRouter.FindAndSetDomain(frequest);
 
         // find document
         var finder = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
@@ -345,7 +345,7 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
         // lookup domain
-        publishedRouter.FindDomain(frequest);
+        publishedRouter.FindAndSetDomain(frequest);
         Assert.IsNotNull(frequest.Domain);
 
         Assert.AreEqual(expectedCulture, frequest.Culture);

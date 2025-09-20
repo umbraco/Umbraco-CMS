@@ -8,12 +8,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Diagnostics;
 using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
@@ -35,7 +37,6 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -317,8 +318,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<ConflictingPackageData>();
             Services.AddSingleton<CompiledPackageXmlParser>();
 
-            // Register a noop IHtmlSanitizer to be replaced
+            // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
+            Services.AddUnique<IMarkdownSanitizer, NoopMarkdownSanitizer>();
 
             Services.AddUnique<IPropertyTypeUsageService, PropertyTypeUsageService>();
             Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();
@@ -329,6 +331,22 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register filestream security analyzers
             Services.AddUnique<IFileStreamSecurityValidator,FileStreamSecurityValidator>();
+            Services.AddUnique<IDynamicRootService,DynamicRoot.DynamicRootService>();
+
+            // Register Webhook services
+            Services.AddUnique<IWebhookService, WebhookService>();
+            Services.AddUnique<IWebhookLogService, WebhookLogService>();
+            Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
+            Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
+
+            // Data type configuration cache
+            Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
+            Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCacheRefresher>();
+
+            // Partial view cache invalidators (no-op, shipped implementation is added in Umbraco.Web.Website, but we
+            // need this to ensure we have a service registered for this interface even in headless setups).
+            // See: https://github.com/umbraco/Umbraco-CMS/issues/19661
+            Services.AddUnique<IMemberPartialViewCacheInvalidator, NoopMemberPartialViewCacheInvalidator>();
         }
     }
 }

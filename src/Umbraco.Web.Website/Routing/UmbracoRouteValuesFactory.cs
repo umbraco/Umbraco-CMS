@@ -128,11 +128,12 @@ public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
         IPublishedRequest request = def.PublishedRequest;
 
         // Here we need to check if there is no hijacked route and no template assigned but there is a content item.
-        // If this is the case we want to return a blank page.
+        // If this is the case we want to return a blank page, the only exception being if the content item has a redirect field present.
         // We also check if templates have been disabled since if they are then we're allowed to render even though there's no template,
         // for example for json rendering in headless.
         if (request.HasPublishedContent()
             && !request.HasTemplate()
+            && !request.IsRedirect()
             && !_umbracoFeatures.Disabled.DisableTemplates
             && !hasHijackedRoute)
         {

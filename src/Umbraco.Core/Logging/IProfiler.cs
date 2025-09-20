@@ -27,4 +27,9 @@ public interface IProfiler
     ///     authenticated or you want to clear the results, based upon some other mechanism.
     /// </remarks>
     void Stop(bool discardResults = false);
+
+    /// <summary>
+    /// Whether the profiler is enabled.
+    /// </summary>
+    bool IsEnabled => true;
 }

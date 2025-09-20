@@ -51,7 +51,7 @@ public class ExcessiveHeadersCheck : HealthCheck
         var url = _hostingEnvironment.ApplicationMainUrl?.GetLeftPart(UriPartial.Authority);
 
         // Access the site home page and check for the headers
-        var request = new HttpRequestMessage(HttpMethod.Head, url);
+        using var request = new HttpRequestMessage(HttpMethod.Head, url);
         try
         {
             using HttpResponseMessage response = await HttpClient.SendAsync(request);

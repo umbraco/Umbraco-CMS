@@ -14,5 +14,18 @@ public static partial class Constants
         ///     Name for http client which ignores certificate errors.
         /// </summary>
         public const string IgnoreCertificateErrors = "Umbraco:HttpClients:IgnoreCertificateErrors";
+
+        /// <summary>
+        ///     Name for http client which sends webhook requests.
+        /// </summary>
+        public const string WebhookFiring = "Umbraco:HttpClients:WebhookFiring";
+
+        public static class Headers
+        {
+            /// <summary>
+            ///     User agent name for the product name.
+            /// </summary>
+            public const string UserAgentProductName = "Umbraco-Cms";
+        }
     }
 }
