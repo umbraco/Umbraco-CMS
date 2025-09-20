@@ -497,7 +497,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			return variantOption?.segmentInfo?.name ?? this._labelDefault;
 		}
 
-		return variantOption.variant?.name ?? variantOption.language.name;
+		if (variantOption.variant?.name && variantOption.variant?.name.trim() !== '') {
+			return variantOption.variant?.name;
+		}
+
+		return variantOption.language.name;
 	}
 
 	#getVariantSpecInfo(variantOption: VariantOptionModelType | undefined) {
