@@ -88,7 +88,9 @@ angular.module("umbraco")
                 totalItems: 0,
                 totalPages: 0,
                 filter: '',
-                dataTypeKey: dataTypeKey
+                dataTypeKey: dataTypeKey,
+                orderBy: "VersionDate",          // NEW
+                orderDirection: "Descending"     // NEW
             };
             vm.layout = {
                 layouts: [{ name: "Grid", icon: "icon-thumbnails-small", path: "gridpath", selected: true },
@@ -272,7 +274,12 @@ angular.module("umbraco")
                     performGotoFolder(folder);
                 }
 
-              return getChildren(folder.id);
+                // --- MOD: reset pagination when entering a folder ---
+                vm.searchOptions.pageNumber = 1;
+                vm.searchOptions.totalItems = 0;
+                vm.searchOptions.totalPages = 0;
+
+                return getChildren(folder.id);
             }
 
             function performGotoFolder(folder) {
@@ -484,8 +491,15 @@ angular.module("umbraco")
             function changePagination(pageNumber) {
                 vm.loading = true;
                 vm.searchOptions.pageNumber = pageNumber;
-                searchMedia();
-            };
+
+                if (vm.searchOptions.filter) {
+                    // search pagination (already present)
+                    searchMedia();
+                } else {
+                    // pagination in folder view
+                    getChildren($scope.currentFolder.id);
+                }
+            }
 
             function searchMedia() {
                 vm.loading = true;
@@ -559,23 +573,49 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 vm.loading = true;
-                return entityResource.getChildren(id, "Media", vm.searchOptions).then(function (data) {
-
-                    var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
-
-                    for (var i = 0; i < data.length; i++) {
-                        setDefaultData(data[i]);
-                        data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
-                    }
-
-                    vm.searchOptions.filter = "";
-                    $scope.images = data ? data : [];
-
-                    // set already selected medias to selected
-                    preSelectMedia();
-                    vm.loading = false;
-                });
+                return entityResource
+                   .getPagedChildren(id, "Media", vm.searchOptions)
+                    .then(handlePagedChildren)
+                    .finally(function () { vm.loading = false; });
             }
+
+            // --- helpers to reduce cyclomatic complexity ---
+            function handlePagedChildren(data) {
+                var items = transformItems(data && data.items ? data.items : [], getAllowedTypes());
+                $scope.images = items;
+                syncPagination(vm.searchOptions, data);
+                vm.searchOptions.filter = ""; // keep legacy behaviour
+                preSelectMedia();
+            }
+
+            function getAllowedTypes() {
+                return dialogOptions.filter ? dialogOptions.filter.split(",") : null;
+            }
+
+            function transformItems(items, allowedTypes) {
+                for (var i = 0; i < items.length; i++) {
+                    setDefaultData(items[i]);
+                   items[i].filtered = !!(allowedTypes && allowedTypes.indexOf(items[i].metaData.ContentTypeAlias) < 0);
+                }
+                return items;
+            }
+
+            // Helpers to avoid conditionals in syncPagination (lower cyclomatic complexity)
+            function pickPositive(value, fallback) {
+                return (typeof value === "number" && value > 0) ? value : fallback;
+            }
+
+            function pickNonNegative(value, fallback) {
+                return (typeof value === "number" && value >= 0) ? value : fallback;
+            }
+
+            function syncPagination(opts, data) {
+                var d = data || {};
+                opts.pageNumber = pickPositive(d.pageNumber, opts.pageNumber);
+                opts.pageSize   = pickPositive(d.pageSize,   opts.pageSize);
+                opts.totalItems = pickNonNegative(d.totalItems, 0);
+                opts.totalPages = pickNonNegative(d.totalPages, 0);
+           }
 
             function setDefaultData(item) {
                 if (item.metaData.MediaPath !== null) {
