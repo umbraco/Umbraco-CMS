@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_VIEW_CONTEXT, UmbViewContext, type UmbViewController } from '@umbraco-cms/backoffice/view';
+import { UMB_VIEW_CONTEXT, UmbViewController } from '@umbraco-cms/backoffice/view';
 import type {
 	PageComponent,
 	UmbRoute,
@@ -31,7 +31,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	@state()
 	private _hasRootProperties = false;
   */
-	#viewContext?: UmbViewContext;
+	#viewContext?: typeof UMB_VIEW_CONTEXT.TYPE;
 
 	@state()
 	private _hasRootGroups = false;
