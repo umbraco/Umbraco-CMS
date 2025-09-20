@@ -2410,6 +2410,7 @@ export default {
 		searchContentTree: 'Tìm kiếm cây nội dung',
 		maxAmount: 'Số lượng tối đa',
 		expandChildItems: 'Mở rộng các mục con cho',
+		collapseChildItems: 'Thu gọn các mục con cho',
 		openContextNode: 'Mở nút ngữ cảnh cho %0%',
 	},
 	references: {
