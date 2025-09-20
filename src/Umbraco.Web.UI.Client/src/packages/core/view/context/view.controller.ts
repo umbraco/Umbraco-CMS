@@ -41,7 +41,7 @@ export class UmbViewController extends UmbControllerBase {
 			this.#parentView?._internal_activate();
 		} else {
 			// This is for a single, or top level of the inheritance chain, so we can disable the previous active view.
-			if (UmbViewController.#ActiveView) {
+			if (UmbViewController.#ActiveView && UmbViewController.#ActiveView !== this) {
 				UmbViewController.#ActiveView._internal_deactivate();
 				UmbViewController.#ActiveView = undefined;
 			}
@@ -50,6 +50,7 @@ export class UmbViewController extends UmbControllerBase {
 	}
 	#removeActive() {
 		this.#active = false;
+		console.log('——— deactivated view', this.viewAlias, this.getHostElement());
 		if (!this.#inherit) {
 			if (UmbViewController.#ActiveView === this) {
 				UmbViewController.#ActiveView = undefined;
@@ -266,7 +267,10 @@ export class UmbViewController extends UmbControllerBase {
 			}
 		} else {
 			// Check if any of the children likes to be activated instead:
-			for (const child of this.#children) {
+			// A reverse loop ensures latest added child gets first chance to activate. This may matter in some future issue-scenario, I will say it could be that it is not the right way to determine if multiple children wants to be active. [NL]
+			let i = this.#children.length;
+			while (i--) {
+				const child = this.#children[i];
 				if (child._internal_requestActivate()) {
 					// If we have an active child we should not update the title.
 					return true;
