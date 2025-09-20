@@ -250,6 +250,37 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void DeleteVersions()
+    {
+        // Arrange
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = CreateRepository(provider, out var mediaTypeRepository);
+
+            // Act
+            var media = repository.Get(_testFile.Id);
+
+            int initialCount = repository.GetAllVersions(media.Id).Count();
+            repository.DeleteVersions(media.Id, DateTime.Now);
+            int initialDeleteCount = repository.GetAllVersions(media.Id).Count();
+
+            media.Name = $"Test File Updated";
+            repository.Save(media);
+
+            int updatedCount = repository.GetAllVersions(media.Id).Count();
+            repository.DeleteVersions(media.Id, DateTime.Now);
+            int updatedDeleteCount = repository.GetAllVersions(media.Id).Count();
+
+            // Assert
+            Assert.That(initialCount == 1);
+            Assert.That(initialDeleteCount == initialCount);
+            Assert.That(updatedCount == 1); // media has no unpublished state and therefore only one Version
+            Assert.That(updatedDeleteCount == initialCount);
+        }
+    }
+
+    [Test]
     public void GetMedia()
     {
         // Arrange

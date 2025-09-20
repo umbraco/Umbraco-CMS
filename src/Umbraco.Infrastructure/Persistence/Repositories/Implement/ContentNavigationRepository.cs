@@ -2,6 +2,7 @@ using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -31,14 +32,16 @@ public class ContentNavigationRepository : INavigationRepository
             return Enumerable.Empty<NavigationDto>();
         }
 
+        ISqlSyntaxProvider syntax = AmbientScope.SqlContext.SqlSyntax;
+
         Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
             .Select(
-                $"n.{NodeDto.IdColumnName} as {NodeDto.IdColumnName}",
-                $"n.{NodeDto.KeyColumnName} as {NodeDto.KeyColumnName}",
-                $"ctn.{NodeDto.KeyColumnName} as {NavigationDto.ContentTypeKeyColumnName}",
-                $"n.{NodeDto.ParentIdColumnName} as {NodeDto.ParentIdColumnName}",
-                $"n.{NodeDto.SortOrderColumnName} as {NodeDto.SortOrderColumnName}",
-                $"n.{NodeDto.TrashedColumnName} as {NodeDto.TrashedColumnName}")
+                $"n.{syntax.GetQuotedColumnName(NodeDto.IdColumnName)} as {syntax.GetQuotedColumnName(NodeDto.IdColumnName)}",
+                $"n.{syntax.GetQuotedColumnName(NodeDto.KeyColumnName)} as {syntax.GetQuotedColumnName(NodeDto.KeyColumnName)}",
+                $"ctn.{syntax.GetQuotedColumnName(NodeDto.KeyColumnName)} as {syntax.GetQuotedColumnName(NavigationDto.ContentTypeKeyColumnName)}",
+                $"n.{syntax.GetQuotedColumnName(NodeDto.ParentIdColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.ParentIdColumnName)}",
+                $"n.{syntax.GetQuotedColumnName(NodeDto.SortOrderColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.SortOrderColumnName)}",
+                $"n.{syntax.GetQuotedColumnName(NodeDto.TrashedColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.TrashedColumnName)}")
             .From<NodeDto>("n")
             .InnerJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
             .InnerJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn")

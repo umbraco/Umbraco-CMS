@@ -53,8 +53,13 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
     }
 
     /// <inheritdoc />
-    public void DeleteUserLogins(Guid userOrMemberKey) =>
-        Database.Delete<ExternalLoginDto>("WHERE userOrMemberKey=@userOrMemberKey", new { userOrMemberKey });
+    public void DeleteUserLogins(Guid userOrMemberKey)
+    {
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Delete<ExternalLoginDto>()
+            .Where<ExternalLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
+        Database.Execute(sql);
+    }
 
     /// <inheritdoc />
     public void DeleteUserLoginsForRemovedProviders(IEnumerable<string> currentLoginProviders)
@@ -205,7 +210,7 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where(GetBaseWhereClause(), new { id });
 
-        ExternalLoginDto? dto = Database.Fetch<ExternalLoginDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+        ExternalLoginDto? dto = Database.FirstOrDefault<ExternalLoginDto>(sql);
         if (dto == null)
         {
             return null;
@@ -290,11 +295,13 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.ExternalLogin}.id = @id";
+    private string QuotedTableName => QuoteTableName(ExternalLoginDto.TableName);
+
+    protected override string GetBaseWhereClause() => $"{QuotedTableName}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> { "DELETE FROM umbracoExternalLogin WHERE id = @id" };
+        var list = new List<string> { $"DELETE FROM {QuotedTableName} WHERE id = @id" };
         return list;
     }
 
