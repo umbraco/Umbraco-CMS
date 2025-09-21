@@ -1,4 +1,4 @@
-import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestEntitySignIconKind } from './types.js';
 
@@ -14,6 +14,14 @@ export class UmbEntitySignIconElement extends UmbLitElement {
 					title="TODO: ... get it from the API"></umb-icon>`
 			: nothing;
 	}
+
+	static override styles = [
+		css`
+			umb-icon {
+				background: var(--umb-entity-bundle-background);
+			}
+		`,
+	];
 }
 
 export { UmbEntitySignIconElement as element };

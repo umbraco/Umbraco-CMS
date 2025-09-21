@@ -179,10 +179,12 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	static override styles = [
 		css`
 			#sign-icon {
+				width: 14px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				font-size: 8px;
+				height: 14px;
+				font-size: 14px;
 				border-radius: 50%;
 				cursor: pointer;
 				border: none;
@@ -194,6 +196,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			}
 			.labels-pop {
 				padding: 5px;
+				font-size: 12px;
 			}
 			.label {
 				display: flex;

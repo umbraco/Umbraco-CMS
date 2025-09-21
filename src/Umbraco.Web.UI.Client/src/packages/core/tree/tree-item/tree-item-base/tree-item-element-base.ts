@@ -247,6 +247,14 @@ export abstract class UmbTreeItemElementBase<
 				position: relative;
 			}
 
+			uui-menu-item {
+				--umb-entity-bundle-background: red;
+			}
+
+			uui-menu-item[active] {
+				--umb-entity-bundle-background: red;
+			}
+
 			#sign-bundle {
 				position: absolute;
 				bottom: -5px;
