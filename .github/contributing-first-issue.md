@@ -1,6 +1,8 @@
-## Finding your first issue: Up for grabs
+## Finding your first issue
 
-Umbraco HQ will regularly mark newly created issues on the issue tracker with [the `community/up-for-grabs` tag][up for grabs issues]. This means that the proposed changes are wanted in Umbraco but the HQ does not have the time to make them at this time. We encourage anyone to pick them up and help out.
+Umbraco HQ will regularly mark newly created issues on the issue tracker with [the `community/up-for-grabs` tag][up for grabs issues]. This means that the proposed changes are wanted in Umbraco but the HQ does not have the time to make them at this time. In adding the label we will endeavour to provide some guidelines on how to go about the implementation, such that it aligns with the project. We encourage anyone to pick them up and help out.
+
+You don't need to restrict yourselves to issues that are specifically marked as "up for grabs" though. If you are running into a bug you have reported or found on the [issue tracker][issue tracker], it's not necessary to wait for HQ response. Feel free to dive in and try to provide a fix, raising questions as you need if you have concerns about the modifications necessary to resolve the problem.
 
 If you do start working on something, make sure to leave a small comment on the issue saying something like: "I'm working on this". That way other people stumbling upon the issue know they don't need to pick it up, someone already has.
 
@@ -11,15 +13,15 @@ Great question! The short version goes like this:
 1. **Fork**
 
     Create a fork of [`Umbraco-CMS` on GitHub][Umbraco CMS repo]
-    
+
     ![Fork the repository](img/forkrepository.png)
-    
+
 1. **Clone**
 
     When GitHub has created your fork, you can clone it in your favorite Git tool
-    
-    ![Clone the fork](img/clonefork.png) 
-    
+
+    ![Clone the fork](img/clonefork.png)
+
 1. **Switch to the correct branch**
 
     Switch to the `contrib` branch
@@ -91,3 +93,4 @@ You can get in touch with [the core contributors team][core collabs] in multiple
 [contrib forum]: https://our.umbraco.com/forum/contributing-to-umbraco-cms/
 [Umbraco CMS repo]: https://github.com/umbraco/Umbraco-CMS
 [up for grabs issues]: https://github.com/umbraco/Umbraco-CMS/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity%2Fup-for-grabs
+[issue tracker]: https://github.com/umbraco/Umbraco-CMS/issues

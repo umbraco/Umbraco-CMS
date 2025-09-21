@@ -2,12 +2,14 @@ import { UmbModalToken } from '../token/modal-token.js';
 import type { UmbModalConfig, UmbModalType } from '../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { umbDeepMerge } from '@umbraco-cms/backoffice/utils';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { type UmbDeepPartialObject, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
+import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_ROUTE_CONTEXT, type IRouterSlot } from '@umbraco-cms/backoffice/router';
+import type { IRouterSlot } from '@umbraco-cms/backoffice/router';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbModalRejectReason {
 	type: string;
