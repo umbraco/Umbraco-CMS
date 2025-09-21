@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -14,7 +14,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	label: string = '';
 
 	@property({ type: String })
-	placeholder: string = '';
+	placeholder?: string;
 
 	@property({ type: String, reflect: false })
 	alias = '';
@@ -99,13 +99,12 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 
 	override render() {
 		const nameLabel = this.label ?? this.localize.term('placeholders_entername');
-		const namePlaceholder = this.placeholder ?? this.localize.term('placeholders_entername');
 		const aliasLabel = this.localize.term('placeholders_enterAlias');
 
 		return html`
 			<uui-input
 				id="name"
-				placeholder=${namePlaceholder ? namePlaceholder : ''}
+				placeholder=${ifDefined(this.placeholder)}
 				label=${nameLabel}
 				.value=${this.value}
 				@input=${this.#onNameChange}

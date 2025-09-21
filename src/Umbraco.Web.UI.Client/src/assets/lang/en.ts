@@ -2195,7 +2195,7 @@ export default {
 		enterCustomValidation: '...or enter a custom validation',
 		fieldIsMandatory: 'Field is mandatory',
 		mandatoryMessage: 'Enter a custom validation error message (optional)',
-		mandatoryMessageLabel: 'Feedback message (Optional)',
+		mandatoryMessageLabel: 'Feedback message',
 		validationRegExp: 'Enter a regular expression',
 		validationRegExpMessage: 'Enter a custom validation error message (optional)',
 		minCount: 'You need to add at least',

@@ -1385,7 +1385,7 @@ export default {
 		customValidation: 'Validación personalizada',
 		fieldIsMandatory: 'Campo obligatorio',
 		validationRegExp: 'Introduce una expresión regular',
-		mandatoryMessageLabel: 'Mensaje de validación (opcional)',
+		mandatoryMessageLabel: 'Mensaje de validación',
 		minCount: 'Necesitas añadir al menos',
 		maxCount: 'Sólo puedes tener',
 		items: 'elementos',
