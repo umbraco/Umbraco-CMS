@@ -347,6 +347,7 @@ public class UmbracoHelper
     public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars) =>
         _publishedContentQuery.ContentAtXPath(xpath, vars);
 
+    [Obsolete("Please use the method overload taking a culture parameter. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IPublishedContent> ContentAtRoot() => _publishedContentQuery.ContentAtRoot();
 
     public IEnumerable<IPublishedContent> ContentAtRoot(string? culture = null) => _publishedContentQuery.ContentAtRoot(culture);
