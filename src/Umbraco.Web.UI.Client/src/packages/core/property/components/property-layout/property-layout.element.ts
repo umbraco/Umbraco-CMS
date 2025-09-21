@@ -111,10 +111,6 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				grid-column: span 2;
 			}
 
-			:host([orientation='vertical']) {
-				padding: var(--uui-size-space-3) 0;
-			}
-
 			/*@container (width > 600px) {*/
 			:host(:not([orientation='vertical'])) > div {
 				grid-column: span 1;

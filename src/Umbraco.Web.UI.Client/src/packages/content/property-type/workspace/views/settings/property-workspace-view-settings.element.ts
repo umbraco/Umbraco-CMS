@@ -224,59 +224,67 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 			<uui-box class="uui-text">
 				<umb-localize key="validation_validation" slot="headline">Validation</umb-localize>
-				${this.#renderMandatory()} ${this.#renderCustomValidation()} ${this.#renderVariationControls()}</uui-box
+				${this.#renderMandatory()} ${this.#renderCustomValidation()}</uui-box
 			>
+
+			${this.#renderVariationControls()}
 
 			<uui-box class="uui-text">
 				<umb-localize key="contentTypeEditor_displaySettingsHeadline" slot="headline">Appearance</umb-localize>
 				<umb-property-layout orientation="vertical">
 					<div id="appearances" slot="editor">${this.#renderAlignLeftIcon()} ${this.#renderAlignTopIcon()}</div>
 				</umb-property-layout>
+			</uui-box>
 
-				${this.#renderMemberTypeOptions()}</uui-box
-			>
+			${this.#renderMemberTypeOptions()}
 		`;
 	}
 
 	#renderMemberTypeOptions() {
 		if (this._entityType !== 'member-type') return nothing;
-		return html` <hr />
-			<div class="container">
-				<b style="margin-bottom: var(--uui-size-space-3)">
-					<umb-localize key="general_options">Options</umb-localize>
-				</b>
-				<div class="options">
+		return html` <uui-box class="uui-text">
+			<umb-localize key="" slot="headline">Member type options</umb-localize>
+			<div class="options">
+				<umb-property-layout orientation="vertical">
 					<uui-toggle
+						slot="editor"
 						?checked=${this._data?.visibility?.memberCanView}
 						@change=${this.#onToggleShowOnMemberProfile}
 						label=${this.localize.term('contentTypeEditor_showOnMemberProfile')}></uui-toggle>
-					<small>
+					<small slot="description">
 						<umb-localize key="contentTypeEditor_showOnMemberProfileDescription">
 							Allow this property value to be displayed on the member profile page
 						</umb-localize>
 					</small>
+				</umb-property-layout>
 
+				<umb-property-layout orientation="vertical">
 					<uui-toggle
+						slot="editor"
 						?checked=${this._data?.visibility?.memberCanEdit}
 						@change=${this.#onToggleMemberCanEdit}
 						label=${this.localize.term('contentTypeEditor_memberCanEdit')}></uui-toggle>
-					<small>
+					<small slot="description">
 						<umb-localize key="contentTypeEditor_memberCanEditDescription">
 							Allow this property value to be edited by the member on their profile page
 						</umb-localize>
 					</small>
+				</umb-property-layout>
 
+				<umb-property-layout orientation="vertical">
 					<uui-toggle
+						slot="editor"
 						?checked=${this._data?.isSensitive}
 						@change=${this.#onToggleIsSensitiveData}
 						label=${this.localize.term('contentTypeEditor_isSensitiveData')}></uui-toggle>
-					<small>
+					<small slot="description">
 						<umb-localize key="contentTypeEditor_isSensitiveDataDescription">
 							Hide this property value from content editors that don't have access to view sensitive information
 						</umb-localize>
 					</small>
-				</div>
-			</div>`;
+				</umb-property-layout>
+			</div>
+		</uui-box>`;
 	}
 
 	#renderAlignLeftIcon() {
@@ -371,12 +379,15 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	#renderVariationControls() {
 		return this._contentTypeVariesByCulture || this._contentTypeVariesBySegment
-			? html` <umb-property-layout label="#contentTypeEditor_variantsHeading" orientation="vertical">
-					<umb-stack slot="editor" look="compact">
-						${this._contentTypeVariesByCulture ? this.#renderVaryByCulture() : nothing}
-						${this._contentTypeVariesBySegment ? this.#renderVaryBySegment() : nothing}
-					</umb-stack>
-				</umb-property-layout>`
+			? html` <uui-box class="uui-text">
+					<umb-localize key="contentTypeEditor_variantsHeading" slot="headline">Variation</umb-localize
+					><umb-property-layout orientation="vertical">
+						<umb-stack slot="editor" look="compact">
+							${this._contentTypeVariesByCulture ? this.#renderVaryByCulture() : nothing}
+							${this._contentTypeVariesBySegment ? this.#renderVaryBySegment() : nothing}
+						</umb-stack>
+					</umb-property-layout></uui-box
+				>`
 			: '';
 	}
 
@@ -410,6 +421,16 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				flex-direction: column;
 				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
+			}
+			umb-property-layout[orientation='vertical'] {
+				padding: var(--uui-size-space-2) 0;
+			}
+
+			umb-property-layout:first-of-type {
+				padding-top: 0;
+			}
+			umb-property-layout:last-of-type {
+				padding-bottom: 0;
 			}
 
 			uui-select {
