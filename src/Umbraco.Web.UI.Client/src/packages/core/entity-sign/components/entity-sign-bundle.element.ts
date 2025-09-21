@@ -150,6 +150,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				@mouseenter=${this.#openDropdown}
 				@mouseleave=${this.#closeDropdown}>
 				<umb-icon name="icon-grid"></umb-icon>
+				<umb-icon name="icon-lock"></umb-icon>
 			</button>
 			<uui-popover-container
 				id="popover"
@@ -178,12 +179,10 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	static override styles = [
 		css`
 			#sign-icon {
-				width: 10px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				height: 10px;
-				font-size: 10px;
+				font-size: 8px;
 				border-radius: 50%;
 				cursor: pointer;
 				border: none;
@@ -191,7 +190,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			}
 
 			umb-icon {
-				font-size: 10px;
+				background: white;
 			}
 			.labels-pop {
 				padding: 5px;
