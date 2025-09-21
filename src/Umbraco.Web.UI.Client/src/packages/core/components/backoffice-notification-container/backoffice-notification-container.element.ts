@@ -53,16 +53,12 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 		return notificationText;
 	}
 
-	//Announce by replacing the SR text
 	private _announce(message: string) {
-		if (!this._srLive) {
-			this.updateComplete.then(() => this._announce(message));
-			return;
-		}
-		this._srLive.textContent = '';
-		requestAnimationFrame(() => {
+		if (!this._srLive) return;
+		this._srLive.textContent = 'u00A0'; //to avoid same text suppression
+		setTimeout(() => {
 			this._srLive!.textContent = message || '';
-		});
+		}, 0);
 	}
 
 	private _announceNewest(list?: UmbNotificationHandler[]) {
@@ -78,12 +74,11 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 					? repeat(
 							this._notifications,
 							(notification: UmbNotificationHandler) => notification.key,
-							(notification) =>
-								html`${notification.element}
-									<div id="sr-live" role="alert" aria-atomic="true"></div>`,
+							(notification) => html`${notification.element} `,
 						)
 					: ''}
 			</uui-toast-notification-container>
+			<div id="sr-live" aria-live="assertive" aria-role="true"></div>
 		`;
 	}
 
