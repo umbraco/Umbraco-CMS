@@ -1,15 +1,18 @@
 import type { UmbCollectionSelectionConfiguration } from '../types.js';
 import { UmbCollectionItemPickerContext } from './collection-item-picker-modal.context.js';
+import type {
+	UmbCollectionItemPickerModalData,
+	UmbCollectionItemPickerModalValue,
+} from './collection-item-picker-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement, type UmbPickerModalData, type UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
+import { html, customElement, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-collection-item-picker-modal')
 export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
-	UmbPickerModalData<UmbEntityModel>,
-	UmbPickerModalValue
+	UmbCollectionItemPickerModalData,
+	UmbCollectionItemPickerModalValue
 > {
 	@state()
 	private _selectionConfiguration: UmbCollectionSelectionConfiguration = {
@@ -118,7 +121,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			return nothing;
 		}
 
-		return html`<div>RENDER COLLECTION HERE</div>`;
+		return html` <umb-collection-menu alias=${ifDefined(this.data?.collectionMenuAlias)}></umb-collection-menu>`;
 	}
 
 	#renderActions() {
