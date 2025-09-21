@@ -32,7 +32,6 @@ export class UmbPropertyEditorDataSourcePickerModalElement extends UmbModalBaseE
 
 	override async firstUpdated() {
 		const { data } = await this.#collectionRepository.requestCollection({});
-		debugger;
 		this._items = data?.items ?? [];
 	}
 
