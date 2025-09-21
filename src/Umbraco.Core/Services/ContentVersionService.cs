@@ -79,18 +79,13 @@ internal sealed class ContentVersionService : IContentVersionService
             return Task.FromResult(Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.InvalidSkipTake));
         }
 
-        IEnumerable<ContentVersionMeta>? versions =
+        IEnumerable<ContentVersionMeta> versions =
             HandleGetPagedContentVersions(
                 document.Id,
                 pageNumber,
                 pageSize,
                 out var total,
                 culture);
-
-        if (versions is null)
-        {
-            return Task.FromResult(Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound));
-        }
 
         return Task.FromResult(Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Succeed(
             ContentVersionOperationStatus.Success, new PagedModel<ContentVersionMeta>(total, versions)));
@@ -152,8 +147,12 @@ internal sealed class ContentVersionService : IContentVersionService
         }
     }
 
-    private IEnumerable<ContentVersionMeta>? HandleGetPagedContentVersions(int contentId, long pageIndex,
-        int pageSize, out long totalRecords, string? culture = null)
+    private IEnumerable<ContentVersionMeta> HandleGetPagedContentVersions(
+        int contentId,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string? culture = null)
     {
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -221,18 +220,20 @@ internal sealed class ContentVersionService : IContentVersionService
          */
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            IReadOnlyCollection<ContentVersionMeta>? allHistoricVersions =
+            IReadOnlyCollection<ContentVersionMeta> allHistoricVersions =
                 _documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
 
-            if (allHistoricVersions is null)
+            if (allHistoricVersions.Count == 0)
             {
                 scope.Complete();
                 return Array.Empty<ContentVersionMeta>();
             }
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("Discovered {count} candidate(s) for ContentVersion cleanup", allHistoricVersions.Count);
             }
+
             versionsToDelete = new List<ContentVersionMeta>(allHistoricVersions.Count);
 
             IEnumerable<ContentVersionMeta> filteredContentVersions =
@@ -245,7 +246,7 @@ internal sealed class ContentVersionService : IContentVersionService
                 if (scope.Notifications.PublishCancelable(
                         new ContentDeletingVersionsNotification(version.ContentId, messages, version.VersionId)))
                 {
-                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    if (_logger.IsEnabled(LogLevel.Debug))
                     {
                         _logger.LogDebug("Delete cancelled for ContentVersion [{versionId}]", version.VersionId);
                     }
@@ -260,7 +261,7 @@ internal sealed class ContentVersionService : IContentVersionService
 
         if (!versionsToDelete.Any())
         {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("No remaining ContentVersions for cleanup");
             }

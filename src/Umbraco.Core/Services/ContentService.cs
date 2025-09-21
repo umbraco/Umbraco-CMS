@@ -695,9 +695,13 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
+            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            List<int> contentTypeIdsAsList = [.. contentTypeIds];
+
             scope.ReadLock(Constants.Locks.ContentTree);
             return _documentRepository.GetPage(
-                Query<IContent>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)),
+                Query<IContent>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)),
                 pageIndex,
                 pageSize,
                 out totalRecords,
@@ -3759,7 +3763,10 @@ public class ContentService : RepositoryService, IContentService
             IQuery<IContent> query = Query<IContent>();
             if (contentTypeId.Length > 0)
             {
-                query.Where(x => contentTypeId.Contains(x.ContentTypeId));
+                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+                // See ExpressionTests.Sql_In().
+                List<int> contentTypeIdsAsList = [.. contentTypeId];
+                query.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId));
             }
 
             return _documentBlueprintRepository.Get(query).Select(x =>
@@ -3778,11 +3785,14 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            var contentTypeIdsA = contentTypeIds.ToArray();
+            // Need to use a List here because the expression tree cannot convert an array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            var contentTypeIdsAsList = contentTypeIds.ToList();
+
             IQuery<IContent> query = Query<IContent>();
-            if (contentTypeIdsA.Length > 0)
+            if (contentTypeIdsAsList.Count > 0)
             {
-                query.Where(x => contentTypeIdsA.Contains(x.ContentTypeId));
+                query.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId));
             }
 
             IContent[]? blueprints = _documentBlueprintRepository.Get(query)?.Select(x =>

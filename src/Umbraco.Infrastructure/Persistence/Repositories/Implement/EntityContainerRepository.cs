@@ -37,7 +37,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     // temp - so we don't have to implement GetByQuery
     public EntityContainer? Get(Guid id)
     {
-        Sql<ISqlContext> sql = GetBaseQuery(false).Where("UniqueId=@uniqueId", new { uniqueId = id });
+        Sql<ISqlContext> sql = GetBaseQuery(false).Where<NodeDto>(c => c.UniqueId == id);
 
         NodeDto? nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
         return nodeDto == null ? null : CreateEntity(nodeDto);
@@ -46,9 +46,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     public IEnumerable<EntityContainer> Get(string name, int level)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
-            .Where(
-                "text=@name AND level=@level AND nodeObjectType=@umbracoObjectTypeId",
-                new { name, level, umbracoObjectTypeId = NodeObjectTypeId });
+            .Where<NodeDto>(c => c.Text == name && c.Level == level && c.NodeObjectType == NodeObjectTypeId);
         return Database.Fetch<NodeDto>(sql).Select(CreateEntity).WhereNotNull();
     }
 
@@ -61,7 +59,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         Sql<ISqlContext> sql = GetBaseQuery(false)
             .Where(GetBaseWhereClause(), new { id, NodeObjectType = NodeObjectTypeId });
 
-        NodeDto? nodeDto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+        NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(sql);
         return nodeDto == null ? null : CreateEntity(nodeDto);
     }
 
@@ -78,7 +76,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
         // else
         Sql<ISqlContext> sql = GetBaseQuery(false)
-            .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
+            .Where<NodeDto>(c => c.NodeObjectType == NodeObjectTypeId)
             .OrderBy<NodeDto>(x => x.Level);
 
         return Database.Fetch<NodeDto>(sql).Select(CreateEntity).WhereNotNull();
@@ -128,18 +126,18 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         return entity;
     }
 
-    protected override string GetBaseWhereClause() => "umbracoNode.id = @id and nodeObjectType = @NodeObjectType";
+    protected override string GetBaseWhereClause() => $"id = @id and {QuoteColumnName("nodeObjectType")} = @NodeObjectType";
 
     protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 
     public bool HasDuplicateName(Guid parentKey, string name)
     {
-        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+        NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
             .InnerJoin<NodeDto>("parent")
             .On<NodeDto, NodeDto>(
                 (node, parent) => node.ParentId == parent.NodeId, aliasRight: "parent")
-            .Where<NodeDto>(dto => dto.Text == name &&  dto.NodeObjectType == NodeObjectTypeId)
+            .Where<NodeDto>(dto => dto.Text == name && dto.NodeObjectType == NodeObjectTypeId)
             .Where<NodeDto>(parent => parent.UniqueId == parentKey, alias: "parent"));
 
         return nodeDto is not null;
@@ -147,7 +145,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
     public bool HasDuplicateName(int parentId, string name)
     {
-        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+        NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto => dto.Text == name && dto.NodeObjectType == NodeObjectTypeId && dto.ParentId == parentId));
 
@@ -163,7 +161,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
         EnsureContainerType(entity);
 
-        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+        NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
 
@@ -175,14 +173,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         // move children to the parent so they are not orphans
         List<NodeDto> childDtos = Database.Fetch<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
-            .Where(
-                "parentID=@parentID AND (nodeObjectType=@containedObjectType OR nodeObjectType=@containerObjectType)",
-                new
-                {
-                    parentID = entity.Id,
-                    containedObjectType = entity.ContainedObjectType,
-                    containerObjectType = entity.ContainerObjectType,
-                }));
+            .Where<NodeDto>(c => c.ParentId == entity.Id && (c.NodeObjectType == entity.ContainedObjectType || c.NodeObjectType == entity.ContainerObjectType)));
 
         foreach (NodeDto childDto in childDtos)
         {
@@ -219,7 +210,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         entity.Name = entity.Name.Trim();
 
         // guard against duplicates
-        NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+        NodeDto? nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto =>
                 dto.ParentId == entity.ParentId && dto.Text == entity.Name &&
@@ -302,7 +293,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             ?? throw new InvalidOperationException("Could not find container with id " + entity.Id);
 
         // guard against duplicates
-        NodeDto dupNodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+        NodeDto? dupNodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
             .From<NodeDto>()
             .Where<NodeDto>(dto =>
                 dto.ParentId == entity.ParentId && dto.Text == entity.Name &&

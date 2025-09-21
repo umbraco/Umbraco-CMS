@@ -4,11 +4,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.LogViewerQuery)]
+[TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
 internal sealed class LogViewerQueryDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.LogViewerQuery;
+
     [Column("id")]
     [PrimaryKeyColumn]
     public int Id { get; set; }
