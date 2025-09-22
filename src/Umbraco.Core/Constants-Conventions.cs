@@ -305,12 +305,12 @@ public static partial class Constants
         }
 
         /// <summary>
-        ///     Constants for relating to view model signs.
+        ///     Constants for relating to view model flags.
         /// </summary>
-        public static class Signs
+        public static class Flags
         {
             /// <summary>
-            ///     Prefix for all sign aliases.
+            ///     Prefix for all flag aliases.
             /// </summary>
             public const string Prefix = "Umb.";
         }

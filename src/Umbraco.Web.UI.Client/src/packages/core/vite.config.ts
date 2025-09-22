@@ -37,6 +37,7 @@ export default defineConfig({
 			'id/index': './id/index.ts',
 			'lit-element/index': './lit-element/index.ts',
 			'localization/index': './localization/index.ts',
+			'interaction-memory/index': './interaction-memory/index.ts',
 			'menu/index': './menu/index.ts',
 			'modal/index': './modal/index.ts',
 			'models/index': './models/index.ts',
