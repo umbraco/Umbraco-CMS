@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -9,19 +10,34 @@ using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Models;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
-public partial class DateTime2PropertyEditorTests
+[TestFixture]
+public class DateTimeUnspecifiedPropertyEditorTests
 {
-    private readonly DateTimeUnspecifiedValueConverter _dateTimeUnspecifiedValueConverter = new(_jsonSerializer);
+    private static readonly IJsonSerializer _jsonSerializer =
+        new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+
+    private static readonly object[] _validateDateReceivedTestCases =
+    [
+        new object[] { null, true },
+        new object[] { JsonNode.Parse("{}"), false },
+        new object[] { JsonNode.Parse("{\"test\": \"\"}"), false },
+        new object[] { JsonNode.Parse("{\"date\": \"\"}"), false },
+        new object[] { JsonNode.Parse("{\"date\": \"INVALID\"}"), false },
+        new object[] { JsonNode.Parse("{\"date\": \"2025-08-20T14:30:00\"}"), true }
+    ];
 
     [TestCaseSource(nameof(_validateDateReceivedTestCases))]
-    public void DateTimeUnspecified_Validates_Date_Received(object? value, bool expectedSuccess)
+    public void Validates_Date_Received(object? value, bool expectedSuccess)
     {
-        var editor = CreateDateTimeUnspecifiedValueEditor();
+        var editor = CreateValueEditor();
         var result = editor.Validate(value, false, null, PropertyValidationContext.Empty()).ToList();
         if (expectedSuccess)
         {
@@ -47,21 +63,21 @@ public partial class DateTime2PropertyEditorTests
     ];
 
     [TestCaseSource(nameof(_dateTimeUnspecifiedParseValuesFromEditorTestCases))]
-    public void DateTimeUnspecified_Can_Parse_Values_From_Editor(
+    public void Can_Parse_Values_From_Editor(
         object? value,
         DateTimeOffset? expectedDateTimeOffset,
         string? expectedTimeZone)
     {
         var expectedJson = expectedDateTimeOffset is null ? null : _jsonSerializer.Serialize(
-            new DateTime2ValueConverterBase.DateTime2Dto
+            new DateTimeValueConverterBase.DateTimeDto
             {
                 Date = expectedDateTimeOffset.Value,
                 TimeZone = expectedTimeZone,
             });
-        var result = CreateDateTimeUnspecifiedValueEditor().FromEditor(
+        var result = CreateValueEditor().FromEditor(
             new ContentPropertyData(
                 value,
-                new DateTime2Configuration
+                new DateTimeConfiguration
                 {
                     TimeZones = null,
                 }),
@@ -71,24 +87,23 @@ public partial class DateTime2PropertyEditorTests
 
     private static readonly object[][] _dateTimeUnspecifiedParseValuesToEditorTestCases =
     [
-        [null, null, null],
-        [0, null, new DateTime2PropertyEditorBase.DateTime2ApiModel { Date = "2025-08-20T16:30:00.0000000", TimeZone = null }],
+        [null, null],
+        [0, new DateTimeEditorValue { Date = "2025-08-20T16:30:00", TimeZone = null }],
+        [2, new DateTimeEditorValue { Date = "2025-08-20T16:30:00", TimeZone = null }],
     ];
 
     [TestCaseSource(nameof(_dateTimeUnspecifiedParseValuesToEditorTestCases))]
-    public void DateTimeUnspecified_Can_Parse_Values_To_Editor(
+    public void Can_Parse_Values_To_Editor(
         int? offset,
-        string? timeZone,
         object? expectedResult)
     {
         var storedValue = offset is null
             ? null
-            : new DateTime2ValueConverterBase.DateTime2Dto
+            : new DateTimeValueConverterBase.DateTimeDto
             {
                 Date = new DateTimeOffset(2025, 8, 20, 16, 30, 00, TimeSpan.FromHours(offset.Value)),
-                TimeZone = timeZone,
             };
-        var valueEditor = CreateDateTimeUnspecifiedValueEditor(timeZoneMode: null);
+        var valueEditor = CreateValueEditor(timeZoneMode: null);
         var storedValueJson = storedValue is null ? null : _jsonSerializer.Serialize(storedValue);
         var result = valueEditor.ToEditor(
             new Property(new PropertyType(Mock.Of<IShortStringHelper>(), "dataType", ValueStorageType.Ntext))
@@ -110,14 +125,14 @@ public partial class DateTime2PropertyEditorTests
         }
 
         Assert.IsNotNull(result);
-        Assert.IsInstanceOf<DateTime2PropertyEditorBase.DateTime2ApiModel>(result);
-        var apiModel = (DateTime2PropertyEditorBase.DateTime2ApiModel)result;
-        Assert.AreEqual(((DateTime2PropertyEditorBase.DateTime2ApiModel)expectedResult).Date, apiModel.Date);
-        Assert.AreEqual(((DateTime2PropertyEditorBase.DateTime2ApiModel)expectedResult).TimeZone, apiModel.TimeZone);
+        Assert.IsInstanceOf<DateTimeEditorValue>(result);
+        var apiModel = (DateTimeEditorValue)result;
+        Assert.AreEqual(((DateTimeEditorValue)expectedResult).Date, apiModel.Date);
+        Assert.AreEqual(((DateTimeEditorValue)expectedResult).TimeZone, apiModel.TimeZone);
     }
 
-    private DateTime2PropertyEditorBase.DateTime2DataValueEditor<DateTimeUnspecifiedValueConverter> CreateDateTimeUnspecifiedValueEditor(
-        DateTime2Configuration.TimeZoneMode? timeZoneMode = null,
+    private DateTimePropertyEditorBase.DateTimeDataValueEditor CreateValueEditor(
+        DateTimeConfiguration.TimeZoneMode? timeZoneMode = null,
         string[]? timeZones = null)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
@@ -127,19 +142,20 @@ public partial class DateTime2PropertyEditorTests
                 It.IsAny<CultureInfo>(),
                 It.IsAny<IDictionary<string, string>>()))
             .Returns((string key, string alias, CultureInfo _, IDictionary<string, string> _) => $"{key}_{alias}");
-        var valueEditor = new DateTime2PropertyEditorBase.DateTime2DataValueEditor<DateTimeUnspecifiedValueConverter>(
+        var valueEditor = new DateTimePropertyEditorBase.DateTimeDataValueEditor(
             Mock.Of<IShortStringHelper>(),
             _jsonSerializer,
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute(Constants.PropertyEditors.Aliases.DateTimeUnspecified),
             localizedTextServiceMock.Object,
-            _dateTimeUnspecifiedValueConverter)
+            Mock.Of<ILogger<DateTimePropertyEditorBase.DateTimeDataValueEditor>>(),
+            dt => dt.Date.ToString("yyyy-MM-ddTHH:mm:ss"))
         {
-            ConfigurationObject = new DateTime2Configuration
+            ConfigurationObject = new DateTimeConfiguration
             {
                 TimeZones = timeZoneMode is null
                     ? null
-                    : new DateTime2Configuration.TimeZonesConfiguration
+                    : new DateTimeConfiguration.TimeZonesConfiguration
                     {
                         Mode = timeZoneMode.Value,
                         TimeZones = timeZones?.ToList() ?? [],

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
 
@@ -6,10 +7,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// <summary>
 /// The DateTimeWithTimeZone property value converter.
 /// </summary>
-public class DateTimeWithTimeZoneValueConverter : DateTime2ValueConverterBase
+public class DateTimeWithTimeZoneValueConverter : DateTimeValueConverterBase
 {
-    public DateTimeWithTimeZoneValueConverter(IJsonSerializer jsonSerializer)
-        : base(jsonSerializer)
+    public DateTimeWithTimeZoneValueConverter(IJsonSerializer jsonSerializer, ILogger<DateTimeWithTimeZoneValueConverter> logger)
+        : base(jsonSerializer, logger)
     {
     }
 
@@ -17,10 +18,10 @@ public class DateTimeWithTimeZoneValueConverter : DateTime2ValueConverterBase
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.DateTimeWithTimeZone;
 
-    /// <inheritdoc/>
-    internal override object ConvertToObject(DateTime2Dto dateTimeDto)
-        => dateTimeDto.Date;
-
     /// <inheritdoc />
-    protected override Type GetPropertyValueType() => typeof(DateTimeOffset?);
+    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(DateTimeOffset?);
+
+    /// <inheritdoc/>
+    protected override object ConvertToObject(DateTimeDto dateTimeDto)
+        => dateTimeDto.Date;
 }

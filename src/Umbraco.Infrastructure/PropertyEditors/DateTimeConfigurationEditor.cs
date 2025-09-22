@@ -5,9 +5,9 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class DateTime2ConfigurationEditor : ConfigurationEditor<DateTime2Configuration>
+internal class DateTimeConfigurationEditor : ConfigurationEditor<DateTimeConfiguration>
 {
-    public DateTime2ConfigurationEditor(IIOHelper ioHelper)
+    public DateTimeConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)
     {
     }

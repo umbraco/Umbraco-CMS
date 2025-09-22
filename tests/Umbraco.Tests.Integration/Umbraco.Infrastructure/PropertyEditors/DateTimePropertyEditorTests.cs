@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DateTime2PropertyEditorTests : UmbracoIntegrationTest
+public class DateTimePropertyEditorTests : UmbracoIntegrationTest
 {
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
@@ -57,7 +57,7 @@ public class DateTime2PropertyEditorTests : UmbracoIntegrationTest
             .AddEditor()
             .WithAlias(editorAlias)
             .WithConfigurationEditor(
-                new DateTime2ConfigurationEditor(IOHelper)
+                new DateTimeConfigurationEditor(IOHelper)
                 {
                     DefaultConfiguration = new Dictionary<string, object>
                     {

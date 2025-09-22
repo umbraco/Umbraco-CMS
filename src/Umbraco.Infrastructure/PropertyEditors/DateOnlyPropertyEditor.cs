@@ -1,8 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Globalization;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.DateOnly,
     ValueType = ValueTypes.Json,
     ValueEditorIsReusable = true)]
-public class DateOnlyPropertyEditor : DateTime2PropertyEditorBase
+public sealed class DateOnlyPropertyEditor : DateTimePropertyEditorBase
 {
     public DateOnlyPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
@@ -22,6 +22,6 @@ public class DateOnlyPropertyEditor : DateTime2PropertyEditorBase
     }
 
     /// <inheritdoc />
-    protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<DateTime2DataValueEditor<DateOnlyValueConverter>>(Attribute!);
+    protected override string MapDateToEditorFormat(DateTimeValueConverterBase.DateTimeDto dateTimeDto)
+        => dateTimeDto.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 }

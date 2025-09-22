@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
 
@@ -6,10 +7,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// <summary>
 /// The TimeOnly property value converter.
 /// </summary>
-public class TimeOnlyValueConverter : DateTime2ValueConverterBase
+public class TimeOnlyValueConverter : DateTimeValueConverterBase
 {
-    public TimeOnlyValueConverter(IJsonSerializer jsonSerializer)
-        : base(jsonSerializer)
+    public TimeOnlyValueConverter(IJsonSerializer jsonSerializer, ILogger<TimeOnlyValueConverter> logger)
+        : base(jsonSerializer, logger)
     {
     }
 
@@ -17,10 +18,10 @@ public class TimeOnlyValueConverter : DateTime2ValueConverterBase
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.TimeOnly;
 
-    /// <inheritdoc/>
-    internal override object ConvertToObject(DateTime2Dto dateTimeDto)
-        => TimeOnly.FromDateTime(dateTimeDto.Date.UtcDateTime);
-
     /// <inheritdoc />
-    protected override Type GetPropertyValueType() => typeof(TimeOnly?);
+    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(TimeOnly?);
+
+    /// <inheritdoc/>
+    protected override object ConvertToObject(DateTimeDto dateTimeDto)
+        => TimeOnly.FromDateTime(dateTimeDto.Date.UtcDateTime);
 }

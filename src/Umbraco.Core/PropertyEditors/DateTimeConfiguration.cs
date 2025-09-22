@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-public class DateTime2Configuration
+public class DateTimeConfiguration
 {
     /// <summary>
     /// Gets or sets the time zones configuration.
