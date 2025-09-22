@@ -108,7 +108,6 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 	}
 
 	#renderPaging() {
-		debugger;
 		if (this._totalPages <= 1 || this._currentPage === this._totalPages) {
 			return nothing;
 		}
