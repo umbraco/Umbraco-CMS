@@ -7,9 +7,26 @@ We recommend you to [sync with our repository][sync fork] before you submit your
 GitHub will have picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
 ![Create a pull request](img/createpullrequest.png)
 
-We like to use [git flow][git flow] as much as possible, but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to `contrib`. This is the branch you should be targeting.
+We like to use [git flow][git flow] as much as possible, but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to `main`. This is the branch you should be targeting.
 
-Please note: we are no longer accepting features for v8 and below but will continue to merge security fixes as and when they arise.
+We welcome PRs for features and bugfixes for different versions according to the [published support and EOL schedule][support-and-eol].
+
+We don't have rules for naming PRs - so name them as you prefer. At HQ we do have a best practice on clear and concise PR naming, so if you would like to use the format feel free to do so. 
+
+Our convention of doing it is:
+
+_Area: Description (closes #IssueID)_
+
+1. Start by specifying the area. Fx the feature name(UFM, Tiptap etc.) or specific section (migrations, relations, segmentation).
+
+2. In your description, where applicable, mention type of PR (Build, Bump, Fix, Refactor etc.).
+   
+4. Good practise is to make sure you describe specifically the change and/or impact of change.<br>
+   Example: Writing "Extension Insights: Fixes CSS alignment" instead of "Fixed issue".
+
+6. Add (closes #IssueID) behind description, if your PR resolves an issue. 
+
+That's it! 
   
 ## The review process
 [review process]: #the-review-process
@@ -49,3 +66,4 @@ There will be times that we really like your proposed changes and we’ll finish
 [making larger changes]: contributing-before-you-start.md#making-large-changes
 [pr or package]: contributing-before-you-start.md#pull-request-or-package
 [Core collabs]: contributing-core-collabs-team.md
+[support-and-eol]: https://umbraco.com/products/knowledge-center/long-term-support-and-end-of-life/
