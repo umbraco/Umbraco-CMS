@@ -108,11 +108,16 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 	}
 
 	#renderPaging() {
+		debugger;
 		if (this._totalPages <= 1 || this._currentPage === this._totalPages) {
 			return nothing;
 		}
 
-		return html` <umb-tree-load-more-button @click=${this.#onLoadMoreClick}></umb-tree-load-more-button> `;
+		return html` <uui-button
+			data-mark="load-more"
+			id="load-more"
+			look="secondary"
+			.label=${this.localize.term('actions_loadMore')}></uui-button>`;
 	}
 
 	static override styles = css`
