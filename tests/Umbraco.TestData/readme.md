@@ -14,7 +14,7 @@ It has to be enabled by an appSetting:
   "Umbraco": {
     "CMS": {
       "TestData": {
-        "Enabled" : true,
+        "Enabled" : true
       }
     }
   }

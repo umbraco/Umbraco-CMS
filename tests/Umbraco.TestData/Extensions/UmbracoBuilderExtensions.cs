@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using Umbraco.Cms.Web.Website.Collections;
 using Umbraco.TestData.Configuration;
 
 namespace Umbraco.TestData.Extensions;
@@ -13,7 +14,6 @@ public static class UmbracoBuilderExtensions
     {
         if (builder.Services.Any(x => x.ServiceType == typeof(LoadTestController)))
         {
-            // We assume the test data project is composed if any implementations of LoadTestController exist.
             return builder;
         }
 
@@ -26,7 +26,6 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.Configure<TestDataSettings>(testDataSection);
 
-
         builder.Services.Configure<UmbracoPipelineOptions>(options =>
             options.AddFilter(new UmbracoPipelineFilter(nameof(LoadTestController))
             {
@@ -38,6 +37,9 @@ public static class UmbracoBuilderExtensions
             }));
 
         builder.Services.AddScoped(typeof(LoadTestController));
+
+        builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
+            .Add<UmbracoTestDataController>();
 
         return builder;
     }
