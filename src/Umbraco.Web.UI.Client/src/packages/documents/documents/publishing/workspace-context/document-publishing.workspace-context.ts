@@ -12,21 +12,21 @@ import { UMB_DOCUMENT_PUBLISH_MODAL } from '../publish/constants.js';
 import { UmbUnpublishDocumentEntityAction } from '../unpublish/index.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from './document-publishing.workspace-context.token.js';
 import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase {
 	/**
