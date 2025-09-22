@@ -121,7 +121,15 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			return nothing;
 		}
 
-		return html` <umb-collection-menu alias=${ifDefined(this.data?.collectionMenuAlias)}></umb-collection-menu>`;
+		return html` <umb-collection-menu
+			alias=${ifDefined(this.data?.collectionMenuAlias)}
+			.props=${{
+				selectionConfiguration: this._selectionConfiguration,
+				filter: this.data?.filter,
+				selectableFilter: this.data?.pickableFilter,
+			}}
+			@selected=${this.#onItemSelected}
+			@deselected=${this.#onItemDeselected}></umb-collection-menu>`;
 	}
 
 	#renderActions() {
