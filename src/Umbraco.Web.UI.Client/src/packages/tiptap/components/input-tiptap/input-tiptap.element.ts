@@ -300,7 +300,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				border: 1px solid transparent;
 				padding: 1rem;
 				box-sizing: border-box;
-				transition: border-color 120ms ease-out;
 
 				height: var(--umb-rte-height, 100%);
 				min-height: var(--umb-rte-min-height, 100%);
@@ -338,6 +337,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					border-bottom-left-radius: 0;
 					border-bottom-right-radius: 0;
 				}
+			}
+
+			#editor,
+			umb-tiptap-toolbar,
+			umb-tiptap-statusbar {
+				transition: border-color 120ms ease-out;
 			}
 
 			umb-tiptap-toolbar + #editor {
