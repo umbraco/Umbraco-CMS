@@ -3,8 +3,8 @@ import type { ManifestTree, UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode
 import type { UmbTreeRootItemsRequestArgs } from './data/types.js';
 import type { UmbTreeRepository } from './data/tree-repository.interface.js';
 import type { UmbTreeExpansionModel } from './expansion-manager/types.js';
-import type { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	UmbPaginationManager,
 	UmbSelectionManager,

@@ -1,9 +1,9 @@
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbTreeItemEntityActionManager<
 	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,

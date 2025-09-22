@@ -6,9 +6,9 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceResponse, UmbTargetPagedModel } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 export interface UmbTreeServerDataSourceBaseArgs<
 	ServerTreeItemType extends { hasChildren: boolean },

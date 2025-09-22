@@ -1,8 +1,9 @@
 import type { UmbTreeExpansionModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UmbEntityExpansionManager } from '@umbraco-cms/backoffice/utils';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
-import { UmbEntityExpansionManager, type UmbEntityExpansionEntryModel } from '@umbraco-cms/backoffice/utils';
+import type { UmbEntityExpansionEntryModel } from '@umbraco-cms/backoffice/utils';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 /**
  * Manages the expansion state of a tree

@@ -3,8 +3,8 @@ import { UmbDocumentTypeTreeServerDataSource } from './server-data-source/docume
 import { UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT } from './document-type.tree.store.context-token.js';
 import type { UmbDocumentTypeTreeItemModel, UmbDocumentTypeTreeRootModel } from './types.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentTypeTreeRepository
 	extends UmbTreeRepositoryBase<UmbDocumentTypeTreeItemModel, UmbDocumentTypeTreeRootModel>

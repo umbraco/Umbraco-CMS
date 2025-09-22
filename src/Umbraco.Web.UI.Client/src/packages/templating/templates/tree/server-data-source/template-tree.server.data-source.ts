@@ -1,14 +1,14 @@
 import type { UmbTemplateTreeItemModel } from '../types.js';
 import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbManagementApiTemplateTreeDataRequestManager } from './template-tree.server.request-manager.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeDataSource,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A data source for the Template tree that fetches data from the server

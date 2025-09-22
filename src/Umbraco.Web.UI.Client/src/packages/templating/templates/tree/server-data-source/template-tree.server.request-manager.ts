@@ -1,18 +1,18 @@
 /* eslint-disable local-rules/no-direct-api-import */
 
+import { TemplateService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbManagementApiTreeDataRequestManager } from '@umbraco-cms/backoffice/management-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import {
-	TemplateService,
-	type NamedEntityTreeItemResponseModel,
-	type PagedNamedEntityTreeItemResponseModel,
-	type SubsetNamedEntityTreeItemResponseModel,
+import type {
+	NamedEntityTreeItemResponseModel,
+	PagedNamedEntityTreeItemResponseModel,
+	SubsetNamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import {
-	UmbManagementApiTreeDataRequestManager,
-	type UmbManagementApiTreeAncestorsOfRequestArgs,
-	type UmbManagementApiTreeChildrenOfRequestArgs,
-	type UmbManagementApiTreeRootItemsRequestArgs,
-	type UmbManagementApiTreeSiblingsFromRequestArgs,
+import type {
+	UmbManagementApiTreeAncestorsOfRequestArgs,
+	UmbManagementApiTreeChildrenOfRequestArgs,
+	UmbManagementApiTreeRootItemsRequestArgs,
+	UmbManagementApiTreeSiblingsFromRequestArgs,
 } from '@umbraco-cms/backoffice/management-api';
 
 export class UmbManagementApiTemplateTreeDataRequestManager extends UmbManagementApiTreeDataRequestManager<

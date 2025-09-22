@@ -1,6 +1,6 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export class UmbTargetPaginationManager<
 	ItemModelType extends UmbEntityModel = UmbEntityModel,
@@ -55,7 +55,7 @@ export class UmbTargetPaginationManager<
 			return undefined;
 		}
 
-		/* When choosing a new base target we check on both sides of the current base target 
+		/* When choosing a new base target we check on both sides of the current base target
 		as the base target could be the first or last item */
 		const nextItem = currentItems[currentBaseTargetIndex + 1];
 		const previousItem = currentItems[currentBaseTargetIndex - 1];

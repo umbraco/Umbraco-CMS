@@ -1,19 +1,19 @@
-import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
-import type { UmbTreeContext } from '../tree.context.interface.js';
-import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
-import type { ManifestTree } from '../extensions/types.js';
 import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
-import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
-import type { UmbTreeRepository } from '../data/index.js';
+import { UmbTreeItemChildrenManager } from '../tree-item/tree-item-children.manager.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item/tree-item-expansion.manager.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
-import { UmbTreeItemChildrenManager } from '../tree-item/tree-item-children.manager.js';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
+import type { ManifestTree } from '../extensions/types.js';
+import type { UmbTreeContext } from '../tree.context.interface.js';
+import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
+import type { UmbTreeRepository } from '../data/index.js';
+import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,

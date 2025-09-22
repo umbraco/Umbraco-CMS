@@ -5,9 +5,9 @@ import type {
 	UmbDocumentTreeRootItemsRequestArgs,
 } from '../types.js';
 import { UmbManagementApiDocumentTreeDataRequestManager } from './document-tree.server.request-manager.js';
-import type { UmbTreeAncestorsOfRequestArgs, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbTreeAncestorsOfRequestArgs, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Document tree that fetches data from the server

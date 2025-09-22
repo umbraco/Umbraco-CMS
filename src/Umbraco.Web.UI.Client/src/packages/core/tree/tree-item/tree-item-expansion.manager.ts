@@ -1,10 +1,11 @@
-import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type { UmbTreeItemChildrenManager } from './tree-item-children.manager.js';
-import type { UmbTargetPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBooleanState, type UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbTargetPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 interface UmbTreeItemTargetExpansionManagerArgs<
 	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,

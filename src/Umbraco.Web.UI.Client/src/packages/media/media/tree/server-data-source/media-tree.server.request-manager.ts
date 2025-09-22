@@ -1,19 +1,19 @@
 /* eslint-disable local-rules/no-direct-api-import */
 
 import type { UmbMediaTreeChildrenOfRequestArgs, UmbMediaTreeRootItemsRequestArgs } from '../types.js';
+import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbManagementApiTreeDataRequestManager } from '@umbraco-cms/backoffice/management-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import {
-	MediaService,
-	type MediaTreeItemResponseModel,
-	type PagedMediaTreeItemResponseModel,
-	type SubsetMediaTreeItemResponseModel,
+import type {
+	MediaTreeItemResponseModel,
+	PagedMediaTreeItemResponseModel,
+	SubsetMediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import {
-	UmbManagementApiTreeDataRequestManager,
-	type UmbManagementApiTreeAncestorsOfRequestArgs,
-	type UmbManagementApiTreeChildrenOfRequestArgs,
-	type UmbManagementApiTreeRootItemsRequestArgs,
-	type UmbManagementApiTreeSiblingsFromRequestArgs,
+import type {
+	UmbManagementApiTreeAncestorsOfRequestArgs,
+	UmbManagementApiTreeChildrenOfRequestArgs,
+	UmbManagementApiTreeRootItemsRequestArgs,
+	UmbManagementApiTreeSiblingsFromRequestArgs,
 } from '@umbraco-cms/backoffice/management-api';
 
 interface UmbManagementApiMediaTreeRootItemsRequestArgs

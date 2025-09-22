@@ -1,19 +1,20 @@
+import type { ManifestTreeItem } from '../../extensions/types.js';
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
-import type { ManifestTreeItem } from '../../extensions/types.js';
 import { UmbTreeItemChildrenManager } from '../tree-item-children.manager.js';
 import { UmbTreeItemEntityActionManager } from '../tree-item-entity-action.manager.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item-expansion.manager.js';
 import { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
 import { UMB_TREE_ITEM_CONTEXT } from '../tree-item.context.token.js';
+import { ensureSlash } from '@umbraco-cms/backoffice/router';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
-import { UmbParentEntityContext, type UmbEntityModel, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import { ensureSlash } from '@umbraco-cms/backoffice/router';
+import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityModel, UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbTreeItemContextBase<
 		TreeItemType extends UmbTreeItemModel,

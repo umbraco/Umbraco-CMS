@@ -2,14 +2,14 @@ import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } fro
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../folder/constants.js';
 import type { UmbDocumentTypeTreeItemModel } from '../types.js';
 import { UmbManagementApiDocumentTypeTreeDataRequestManager } from './document-type-tree.server.request-manager.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeDataSource,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A data source for the Document Type tree that fetches data from the server

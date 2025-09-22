@@ -1,9 +1,9 @@
+import type { UmbOffsetPaginationRequestModel, UmbTargetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
-import type { UmbOffsetPaginationRequestModel, UmbTargetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbManagementApiTreeRootItemsRequestArgs extends UmbTreeRootItemsRequestArgs {

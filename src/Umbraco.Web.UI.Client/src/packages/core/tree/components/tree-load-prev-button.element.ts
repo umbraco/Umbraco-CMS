@@ -1,6 +1,6 @@
 import { css, customElement, html, ifDefined, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-tree-load-prev-button')
 export class UmbTreeLoadPrevButtonElement extends UmbLitElement {

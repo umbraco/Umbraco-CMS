@@ -5,17 +5,17 @@ import {
 } from '../../entity.js';
 import type { UmbDataTypeTreeItemModel } from '../types.js';
 import { UmbManagementApiDataTypeTreeDataRequestManager } from './data-type-tree.server.request-manager.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeDataSource,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * A data source for the Data Type tree that fetches data from the server

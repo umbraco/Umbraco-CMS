@@ -1,19 +1,19 @@
 /* eslint-disable local-rules/no-direct-api-import */
 
 import type { UmbDocumentTreeChildrenOfRequestArgs, UmbDocumentTreeRootItemsRequestArgs } from '../types.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import {
-	DocumentService,
-	type DocumentTreeItemResponseModel,
-	type PagedDocumentTreeItemResponseModel,
-	type SubsetDocumentTreeItemResponseModel,
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbManagementApiTreeDataRequestManager } from '@umbraco-cms/backoffice/management-api';
+import type {
+	DocumentTreeItemResponseModel,
+	PagedDocumentTreeItemResponseModel,
+	SubsetDocumentTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import {
-	UmbManagementApiTreeDataRequestManager,
-	type UmbManagementApiTreeAncestorsOfRequestArgs,
-	type UmbManagementApiTreeChildrenOfRequestArgs,
-	type UmbManagementApiTreeRootItemsRequestArgs,
-	type UmbManagementApiTreeSiblingsFromRequestArgs,
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type {
+	UmbManagementApiTreeAncestorsOfRequestArgs,
+	UmbManagementApiTreeChildrenOfRequestArgs,
+	UmbManagementApiTreeRootItemsRequestArgs,
+	UmbManagementApiTreeSiblingsFromRequestArgs,
 } from '@umbraco-cms/backoffice/management-api';
 
 interface UmbManagementApiDocumentTreeRootItemsRequestArgs

@@ -4,13 +4,13 @@ import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type {
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 	UmbTargetPagedModel,
 } from '@umbraco-cms/backoffice/repository';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Interface for a tree repository.
