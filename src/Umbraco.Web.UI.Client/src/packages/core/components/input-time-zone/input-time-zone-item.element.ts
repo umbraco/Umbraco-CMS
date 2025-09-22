@@ -31,18 +31,8 @@ export class UmbInputTimeZoneItemElement extends UmbFormControlMixin<
 	@property({ type: Boolean, reflect: true })
 	readonly: boolean = false;
 
-	constructor() {
-		super();
-
-		this.addValidator(
-			'valueMissing',
-			() => this.localize.term('validation_invalidEmpty'),
-			() => !this.value || this.value.trim() === '',
-		);
-	}
-
 	override render() {
-		const label = this.value ? getTimeZoneName(this.value) : '';
+		const label = (this.value && getTimeZoneName(this.value)) || '';
 		return html`
 			<div class="time-zone-item">
 				${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip" class="handle"></uui-icon>`}

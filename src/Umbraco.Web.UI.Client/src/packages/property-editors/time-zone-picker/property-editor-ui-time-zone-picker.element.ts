@@ -6,7 +6,11 @@ import type {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, umbBindToValidation, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import {
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	umbBindToValidation,
+	UmbFormControlMixin,
+} from '@umbraco-cms/backoffice/validation';
 import type { UmbInputTimeZoneElement } from '@umbraco-cms/backoffice/components';
 
 export interface UmbTimeZonePickerValue {
@@ -53,6 +57,10 @@ export class UmbPropertyEditorUITimeZonePickerElement
 		);
 	}
 
+	protected override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-time-zone')!);
+	}
+
 	#onModeInput(event: UUIRadioEvent) {
 		if (!this._supportedModes.includes(event.target.value)) throw new Error(`Unknown mode: ${event.target.value}`);
 		this.value = { mode: event.target.value, timeZones: Array.from(this.inputElem.value) };
@@ -89,15 +97,12 @@ export class UmbPropertyEditorUITimeZonePickerElement
 				)}
 			</uui-radio-group>
 			<div class="timezone-picker" ?hidden=${this.value?.mode !== 'custom'}>
-				<umb-form-validation-message>
-					<umb-input-time-zone
-						.value=${this._selectedTimeZones}
-						?readonly=${this.readonly}
-						?required=${this.value?.mode === 'custom'}
-						@change=${this.#onChange}
-						${umbBindToValidation(this)}>
-					</umb-input-time-zone>
-				</umb-form-validation-message>
+				<umb-input-time-zone
+					.value=${this._selectedTimeZones}
+					?readonly=${this.readonly}
+					?required=${this.value?.mode === 'custom'}
+					@change=${this.#onChange}>
+				</umb-input-time-zone>
 			</div>
 		`;
 	}

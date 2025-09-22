@@ -1,4 +1,3 @@
-import type UmbInputTimeZoneItemElement from './input-time-zone-item.element.js';
 import type { UmbInputTimeZonePickerElement, UmbTimeZoneOption } from './input-time-zone-picker.element.js';
 import {
 	html,
@@ -12,7 +11,7 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { umbBindToValidation, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { getTimeZoneList, getTimeZoneOffset } from '@umbraco-cms/backoffice/utils';
@@ -112,7 +111,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 
 	@property({ type: Array, reflect: false })
 	override set value(value: Array<string>) {
-		super.value = value;
+		super.value = [...new Set(value.filter((v) => !!v))];
 		this.#sorter.setModel(this.value);
 	}
 
@@ -163,15 +162,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onChange(event: UmbChangeEvent, currentIndex: number) {
-		const target = event.currentTarget as UmbInputTimeZoneItemElement;
-		const value = target.value as string;
-		this.value = this.value.map((item, index) => (index === currentIndex ? value : item));
-		this.pristine = false;
-		this.dispatchEvent(new UmbChangeEvent());
-	}
-
-	#deleteItem(itemIndex: number) {
+	#onDelete(itemIndex: number) {
 		this.value = this.value.filter((_item, index) => index !== itemIndex);
 		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
@@ -186,20 +177,16 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		return html`
 			${repeat(
 				this.value,
-				(_item, index) => index,
+				(item) => item,
 				(item, index) => html`
-					<uui-form-validation-message>
-						<umb-input-time-zone-item
-							name="item-${index}"
-							data-sort-entry-id=${item}
-							value=${item}
-							?disabled=${this.disabled}
-							?readonly=${this.readonly}
-							@delete=${() => this.#deleteItem(index)}
-							@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}
-							${umbBindToValidation(this)}>
-						</umb-input-time-zone-item>
-					</uui-form-validation-message>
+					<umb-input-time-zone-item
+						name="item-${index}"
+						data-sort-entry-id=${item}
+						value=${item}
+						?disabled=${this.disabled}
+						?readonly=${this.readonly}
+						@delete=${() => this.#onDelete(index)}>
+					</umb-input-time-zone-item>
 				`,
 			)}
 		`;
