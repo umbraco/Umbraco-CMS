@@ -88,7 +88,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		this.getName = () => {
 			const contentTypeLabel = this.structure.getOwnerContentType()?.name;
 			const blockLabel = host.getName();
-			return `${contentTypeLabel} ${blockLabel}`;
+			return contentTypeLabel ? `${contentTypeLabel} ${blockLabel}` : blockLabel;
 		};
 
 		this.propertyViewGuard.fallbackToPermitted();
