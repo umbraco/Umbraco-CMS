@@ -9,7 +9,9 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -1828,7 +1830,7 @@ internal sealed class DatabaseDataCreator
                 };
                 _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, dto);
                 isDefault = false;
-                id++;
+                id += 1;
             }
         }
         else

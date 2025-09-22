@@ -56,7 +56,7 @@ public class ExpressionTests : BaseUsingSqlSyntax
     public void Can_Query_With_Content_Type_Aliases_IEnumerable()
     {
         // Arrange - Contains is IEnumerable.Contains extension method
-        var aliases = new[] { "Test1", "Test2" };
+        var aliases = new List<string> { "Test1", "Test2" };
         Expression<Func<IMedia, bool>> predicate = content => aliases.Contains(content.ContentType.Alias);
         var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
         var result = modelToSqlExpressionHelper.Visit(predicate);
@@ -178,7 +178,14 @@ public class ExpressionTests : BaseUsingSqlSyntax
     [Test]
     public void Sql_In()
     {
-        var userNames = new[] { "hello@world.com", "blah@blah.com" };
+        // This unit test reveals a breaking change for .NET 10 and NPoco.
+        // When a List<string> is used with Contains in an expression, we call bool List<string>.Contains(string), which NPoco translates to SQL IN.
+        // However, if we use string[] with Contains, we call the extension method bool ReadOnlySpan.Contains<string>(string) which
+        // blows up in ExpressionVisitorBase as the method name of "op_Implicit" is unrecognized.
+        // As such we need to ensure we use a List<string and not string[] here (and anywhere we call Contains).
+
+        //var userNames = new[] { "hello@world.com", "blah@blah.com" };
+        var userNames = new List<string> { "hello@world.com", "blah@blah.com" };
 
         Expression<Func<IUser, bool>> predicate = user => userNames.Contains(user.Username);
         var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>(SqlContext.SqlSyntax, Mappers);

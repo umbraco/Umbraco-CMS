@@ -66,9 +66,14 @@ internal sealed class DeliveryApiItemsEndpointsMatcherPolicy : MatcherPolicy, IE
     {
         ApiVersion[]? supportedApiVersions = endpoint.Metadata.GetMetadata<MapToApiVersionAttribute>()?.Versions.ToArray();
 
-        // if the endpoint is versioned, the requested API version must be among the API versions supported by the endpoint.
-        // if the endpoint is NOT versioned, it cannot be used with a requested API version
-        return supportedApiVersions?.Contains(requestedApiVersion) ?? requestedApiVersion is null;
+        // If the endpoint is versioned, the requested API version must be among the API versions supported by the endpoint.
+        // If the endpoint is NOT versioned, it cannot be used with a requested API version.
+        if (supportedApiVersions is not null && requestedApiVersion is not null)
+        {
+            return supportedApiVersions.Contains(requestedApiVersion);
+        }
+
+        return requestedApiVersion is null;
     }
 
     private static bool IsByIdsController(ControllerActionDescriptor? controllerActionDescriptor)
