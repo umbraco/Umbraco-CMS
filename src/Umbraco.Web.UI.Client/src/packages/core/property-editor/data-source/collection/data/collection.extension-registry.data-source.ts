@@ -32,7 +32,7 @@ export class UmbPropertyEditorDataSourceCollectionExtensionRegistryDataSource
 		return {
 			data: {
 				items,
-				total: items.length,
+				total: filtered.length,
 			},
 		};
 	}
