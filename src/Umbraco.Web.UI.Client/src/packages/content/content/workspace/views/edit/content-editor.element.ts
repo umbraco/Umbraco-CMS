@@ -188,6 +188,11 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			throw new Error(`View context with alias ${viewAlias} not found`);
 		}
 		this.#currentProvidedView = view;
+		// ViewAlias null is only for the root tab, therefor we can implement this hack.
+		if (viewAlias === null) {
+			// Specific hack for the Generic tab to only show its name if there are other tabs.
+			view.setBrowserTitle(this._tabs && this._tabs?.length > 0 ? '#general_generic' : undefined);
+		}
 		view.provideAt(component as any);
 	}
 
