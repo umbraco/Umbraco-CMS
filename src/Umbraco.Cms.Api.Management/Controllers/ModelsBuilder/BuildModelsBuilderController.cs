@@ -41,7 +41,7 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
         try
         {
             if (_modelsBuilderSettings.ModelsMode != Constants.ModelsBuilder.ModelsModes.SourceCodeManual
-                || _modelsBuilderSettings.ModelsMode != Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)
+                && _modelsBuilderSettings.ModelsMode != Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)
             {
                 var problemDetailsModel = new ProblemDetails
                 {
