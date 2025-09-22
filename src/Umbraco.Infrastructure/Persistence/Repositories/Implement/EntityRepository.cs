@@ -218,7 +218,7 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         out long totalBefore,
         out long totalAfter)
     {
-                // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
+        // Ideally we don't want to have to do a second query for the parent ID, but the siblings query is already messy enough
         // without us also having to do a nested query for the parent ID too.
         Sql<ISqlContext> parentIdQuery = Sql()
             .Select<NodeDto>(x => x.ParentId)

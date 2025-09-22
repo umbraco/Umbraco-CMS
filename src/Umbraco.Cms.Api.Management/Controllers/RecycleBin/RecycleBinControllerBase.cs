@@ -57,7 +57,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
             return NotFound();
         }
 
-        IEntitySlim? entity = siblings.FirstOrDefault();
+        IEntitySlim entity = siblings.First();
         Guid? parentKey = GetParentKey(entity);
 
         TItem[] treeItemViewModels = MapRecycleBinViewModels(parentKey, siblings);
@@ -177,8 +177,8 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
     /// <summary>
     /// Gets the parent key for an entity, or root if null or no parent.
     /// </summary>
-    protected virtual Guid? GetParentKey(IEntitySlim? entity) =>
-        entity?.ParentId > 0
+    protected virtual Guid? GetParentKey(IEntitySlim entity) =>
+        entity.ParentId > 0
             ? _entityService.GetKey(entity.ParentId, ItemObjectType).Result
             : Constants.System.RootKey;
 }
