@@ -19,7 +19,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     private readonly IRequestRedirectService _requestRedirectService;
     private readonly IRequestPreviewService _requestPreviewService;
     private readonly IRequestMemberAccessService _requestMemberAccessService;
-    private const string PreviewContentRequestPathPrefix = $"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}";
+    private const string PreviewContentRequestPathPrefix = $"/{Umbraco.Cms.Core.Constants.DeliveryApi.Routing.PreviewContentPathPrefix}";
 
     [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
     public ByRouteContentApiController(

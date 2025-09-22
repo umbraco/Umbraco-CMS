@@ -88,7 +88,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
     {
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
-        BlockEditorData? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
+        BlockEditorData? blockEditorData = SafeParseBlockEditorData(rawJson);
         if (blockEditorData is null)
         {
             yield break;
@@ -115,17 +115,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
     {
         var val = property.GetValue(culture, segment);
 
-        BlockEditorData? blockEditorData;
-        try
-        {
-            blockEditorData = BlockEditorValues.DeserializeAndClean(val);
-        }
-        catch (JsonSerializationException)
-        {
-            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
-            return string.Empty;
-        }
-
+        BlockEditorData? blockEditorData = SafeParseBlockEditorData(val);
         if (blockEditorData == null)
         {
             return string.Empty;
@@ -150,17 +140,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
             return null;
         }
 
-        BlockEditorData? blockEditorData;
-        try
-        {
-            blockEditorData = BlockEditorValues.DeserializeAndClean(editorValue.Value);
-        }
-        catch (JsonSerializationException)
-        {
-            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
-            return string.Empty;
-        }
-
+        BlockEditorData? blockEditorData = SafeParseBlockEditorData(editorValue.Value);
         if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
         {
             return string.Empty;
@@ -170,5 +150,24 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
 
         // return json
         return JsonConvert.SerializeObject(blockEditorData.BlockValue, Formatting.None);
+    }
+
+    // We don't throw on error here because we want to be able to parse what we can, even if some of the data is invalid. In cases where migrating
+    // from nested content to blocks, we don't want to trigger a fatal error for retrieving references, as this isn't vital to the operation.
+    // See: https://github.com/umbraco/Umbraco-CMS/issues/19784 and Umbraco support cases.
+    private BlockEditorData? SafeParseBlockEditorData(object? value)
+    {
+        try
+        {
+            return BlockEditorValues.DeserializeAndClean(value);
+        }
+        catch (JsonSerializationException ex)
+        {
+            _logger.LogWarning(
+                "Could not deserialize the provided property value into a block editor value: {PropertyValue}. Error: {ErrorMessage}.",
+                value,
+                ex.Message);
+            return null;
+        }
     }
 }

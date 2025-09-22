@@ -131,12 +131,17 @@ public class AuthenticationController : UmbracoApiControllerBase
         AuthorizationPolicies.BackOfficeAccess)] // Needed to enforce the principle set on the request, if one exists.
     public IDictionary<string, object> GetPasswordConfig(int userId)
     {
+        if (HttpContext.HasActivePasswordResetFlowSession(userId))
+        {
+            return _passwordConfiguration.GetConfiguration();
+        }
+
         Attempt<int> currentUserId =
             _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int>.Fail();
-        return _passwordConfiguration.GetConfiguration(
-            currentUserId.Success
-                ? currentUserId.Result != userId
-                : true);
+
+        return currentUserId.Success
+            ? _passwordConfiguration.GetConfiguration(currentUserId.Result != userId)
+            : new Dictionary<string, object>();
     }
 
     /// <summary>
@@ -417,6 +422,8 @@ public class AuthenticationController : UmbracoApiControllerBase
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<ActionResult<UserDetail?>> PostLogin(LoginModel loginModel)
     {
+        HttpContext.EndPasswordResetFlowSession();
+
         // Start a timed scope to ensure failed responses return is a consistent time
         var loginDuration = Math.Max(_loginDurationAverage ?? _securitySettings.UserDefaultFailedLoginDurationInMilliseconds, _securitySettings.UserMinimumFailedLoginDurationInMilliseconds);
         await using var timedScope = new TimedScope(loginDuration, HttpContext.RequestAborted);
@@ -489,6 +496,8 @@ public class AuthenticationController : UmbracoApiControllerBase
         {
             return BadRequest();
         }
+
+        HttpContext.EndPasswordResetFlowSession();
 
         BackOfficeIdentityUser? identityUser = await _userManager.FindByEmailAsync(model.Email);
 
@@ -646,6 +655,8 @@ public class AuthenticationController : UmbracoApiControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> PostSetPassword(SetPasswordModel model)
     {
+        HttpContext.EndPasswordResetFlowSession();
+
         BackOfficeIdentityUser? identityUser =
             await _userManager.FindByIdAsync(model.UserId.ToString(CultureInfo.InvariantCulture));
             if (identityUser is null)

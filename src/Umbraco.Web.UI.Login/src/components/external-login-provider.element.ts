@@ -74,7 +74,12 @@ export class UmbExternalLoginProviderElement extends LitElement {
   set externalLoginUrl(value: string) {
     const tempUrl = new URL(value, window.location.origin);
     const searchParams = new URLSearchParams(window.location.search);
-    tempUrl.searchParams.append('redirectUrl', decodeURIComponent(searchParams.get('returnPath') ?? ''));
+    let returnUrl = decodeURIComponent(searchParams.get('returnPath') ?? '');
+    if(!returnUrl && window.location.hash) {
+      returnUrl = `/umbraco${window.location.hash}`;
+    }
+
+    tempUrl.searchParams.append('redirectUrl', returnUrl);
     this.#externalLoginUrl = tempUrl.pathname + tempUrl.search;
   }
 

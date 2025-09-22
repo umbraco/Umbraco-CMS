@@ -2269,6 +2269,10 @@ public class OpenApiContractTest : UmbracoTestServerTestBase
                 "type": "string",
                 "readOnly": true
               },
+              "queryString": {
+                "type": "string",
+                "nullable": true
+              },
               "startItem": {
                 "$ref": "#/components/schemas/IApiContentStartItemModel"
               }
