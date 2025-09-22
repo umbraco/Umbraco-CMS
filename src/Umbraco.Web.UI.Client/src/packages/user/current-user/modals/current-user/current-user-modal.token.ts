@@ -4,5 +4,6 @@ export const UMB_CURRENT_USER_MODAL = new UmbModalToken('Umb.Modal.CurrentUser',
 	modal: {
 		type: 'sidebar',
 		size: 'small',
+		title: '#general_user',
 	},
 });
