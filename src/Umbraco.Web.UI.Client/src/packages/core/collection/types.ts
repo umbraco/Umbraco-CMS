@@ -6,6 +6,7 @@ import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 export type * from './action/create/types.js';
 export type * from './conditions/types.js';
 export type * from './extensions/types.js';
+export type * from './item/types.js';
 export type * from './menu/types.js';
 export type * from './workspace-view/types.js';
 
