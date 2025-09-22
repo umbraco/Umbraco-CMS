@@ -87,7 +87,7 @@ public abstract class DateTimePropertyEditorBase : DataEditor
 
             var selectedDate = dateTimeEditorValue.Date;
             if (selectedDate.IsNullOrWhiteSpace()
-                || !DateTimeOffset.TryParse(selectedDate, null, DateTimeStyles.AssumeUniversal, out DateTimeOffset dateTimeOffset))
+                || DateTimeOffset.TryParse(selectedDate, null, DateTimeStyles.AssumeUniversal, out DateTimeOffset dateTimeOffset) is false)
             {
                 return null;
             }
@@ -163,7 +163,7 @@ public abstract class DateTimePropertyEditorBase : DataEditor
                 }
 
                 if (mode == DateTimeConfiguration.TimeZoneMode.Custom
-                    && configuration.TimeZones.TimeZones.Any(t => t.Equals(value.TimeZone, StringComparison.InvariantCultureIgnoreCase)) != true)
+                    && configuration.TimeZones?.TimeZones.Any(t => t.Equals(value.TimeZone, StringComparison.InvariantCultureIgnoreCase)) != true)
                 {
                     yield return new ValidationResult(
                         _localizedTextService.Localize("validation", "notOneOfOptions", [value.TimeZone]),

@@ -36,7 +36,7 @@ internal abstract class DateTimePropertyIndexValueFactory : IPropertyIndexValueF
 
         var sourceValue = property.GetValue(culture, segment, published);
         if (sourceValue is null
-            || !DateTimePropertyEditorHelper.TryParseToIntermediateValue(sourceValue, _jsonSerializer, _logger, out DateTimeValueConverterBase.DateTimeDto? dateTimeDto)
+            || DateTimePropertyEditorHelper.TryParseToIntermediateValue(sourceValue, _jsonSerializer, _logger, out DateTimeValueConverterBase.DateTimeDto? dateTimeDto) is false
             || dateTimeDto is null)
         {
             return [indexValue];
