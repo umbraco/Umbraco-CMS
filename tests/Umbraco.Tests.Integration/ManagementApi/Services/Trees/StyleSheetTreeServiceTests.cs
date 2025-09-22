@@ -60,7 +60,7 @@ public class StyleSheetTreeServiceTests : UmbracoIntegrationTest
     {
         var service = new StyleSheetTreeService(_fileSystems);
 
-        FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModel("file5.css", 1, 1, out long before, out var after);
+        FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModels("file5.css", 1, 1, out long before, out var after);
         int index = Array.FindIndex(treeModel, item => item.Name == "file5.css");
 
         Assert.AreEqual(treeModel[index].Name, "file5.css");

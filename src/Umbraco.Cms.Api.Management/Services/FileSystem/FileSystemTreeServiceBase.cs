@@ -49,7 +49,7 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
             .ToArray();
     }
 
-    public FileSystemTreeItemPresentationModel[] GetSiblingsViewModel(string path, int before, int after, out long totalBefore, out long totalAfter)
+    public FileSystemTreeItemPresentationModel[] GetSiblingsViewModels(string path, int before, int after, out long totalBefore, out long totalAfter)
     {
         var filePath = Path.GetDirectoryName(path);
         var fileName = Path.GetFileName(path);

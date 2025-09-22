@@ -9,7 +9,7 @@ public interface IFileSystemTreeService
 
     FileSystemTreeItemPresentationModel[] GetPathViewModels(string path, int skip, int take, out long totalItems);
 
-    FileSystemTreeItemPresentationModel[] GetSiblingsViewModel(string path, int before, int after, out long totalBefore,
+    FileSystemTreeItemPresentationModel[] GetSiblingsViewModels(string path, int before, int after, out long totalBefore,
         out long totalAfter);
 
     string[] GetDirectories(string path);

@@ -53,7 +53,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
     /// <returns>A SubsetViewModel of the siblings of the item and the item itself.</returns>
     protected Task<ActionResult<SubsetViewModel<FileSystemTreeItemPresentationModel>>> GetSiblings(string path, int before, int after)
     {
-        FileSystemTreeItemPresentationModel[] viewModels = _fileSystemTreeService.GetSiblingsViewModel(path, before, after, out var totalBefore, out var totalAfter);
+        FileSystemTreeItemPresentationModel[] viewModels = _fileSystemTreeService.GetSiblingsViewModels(path, before, after, out var totalBefore, out var totalAfter);
 
         SubsetViewModel<FileSystemTreeItemPresentationModel> result = new() { TotalBefore = totalBefore, TotalAfter = totalAfter, Items = viewModels };
         return Task.FromResult<ActionResult<SubsetViewModel<FileSystemTreeItemPresentationModel>>>(Ok(result));

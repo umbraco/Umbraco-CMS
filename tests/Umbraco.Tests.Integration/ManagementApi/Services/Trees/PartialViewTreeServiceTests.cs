@@ -61,7 +61,7 @@ public class PartialViewTreeServiceTests : UmbracoIntegrationTest
     {
         var service = new PartialViewTreeService(_fileSystems);
 
-        FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModel("file5.cshtml", 1, 1, out long before, out var after);
+        FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModels("file5.cshtml", 1, 1, out long before, out var after);
         int index = Array.FindIndex(treeModel, item => item.Name == "file5.cshtml");
 
         Assert.AreEqual(treeModel[index].Name, "file5.cshtml");

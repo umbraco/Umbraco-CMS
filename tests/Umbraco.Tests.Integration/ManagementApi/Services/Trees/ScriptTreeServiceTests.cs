@@ -59,7 +59,7 @@ public class ScriptTreeServiceTests : UmbracoIntegrationTest
     {
         var service = new ScriptTreeService(_fileSystems);
 
-        FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModel("file5.js", 1, 1, out long before, out var after);
+        FileSystemTreeItemPresentationModel[] treeModel = service.GetSiblingsViewModels("file5.js", 1, 1, out long before, out var after);
         int index = Array.FindIndex(treeModel, item => item.Name == "file5.js");
 
         Assert.AreEqual(treeModel[index].Name, "file5.js");
