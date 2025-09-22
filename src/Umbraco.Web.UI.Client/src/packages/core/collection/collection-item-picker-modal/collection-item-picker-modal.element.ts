@@ -1,9 +1,6 @@
 import type { UmbCollectionSelectionConfiguration } from '../types.js';
 import { UmbCollectionItemPickerContext } from './collection-item-picker-modal.context.js';
-import type {
-	UmbCollectionItemPickerModalData,
-	UmbCollectionItemPickerModalValue,
-} from './collection-item-picker-modal.token.js';
+import type { UmbCollectionItemPickerModalData, UmbCollectionItemPickerModalValue } from './types.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
