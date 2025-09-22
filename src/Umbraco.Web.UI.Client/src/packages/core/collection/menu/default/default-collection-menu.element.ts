@@ -117,7 +117,8 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 			data-mark="load-more"
 			id="load-more"
 			look="secondary"
-			.label=${this.localize.term('actions_loadMore')}></uui-button>`;
+			.label=${this.localize.term('actions_loadMore')}
+			@click=${this.#onLoadMoreClick}></uui-button>`;
 	}
 
 	static override styles = css`

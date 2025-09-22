@@ -76,11 +76,10 @@ export class UmbDefaultCollectionMenuContext extends UmbContextBase {
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		this.#paging.skip = target.getSkip();
-		//this.loadMore();
+		this.#loadItems(true);
 	};
 
 	async #loadItems(loadMore = false) {
-		debugger;
 		await this.#init;
 
 		const skip = loadMore ? this.#paging.skip : 0;
