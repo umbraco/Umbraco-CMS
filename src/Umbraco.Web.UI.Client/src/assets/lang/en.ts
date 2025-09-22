@@ -1443,6 +1443,7 @@ export default {
 			'No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.',
 		createMatchingTemplate: 'Create matching template',
 		addIcon: 'Add icon',
+		unnamedPropertyType: 'Unnamed property',
 	},
 	sort: {
 		sortOrder: 'Sort order',

@@ -75,7 +75,11 @@ export class UmbPropertyTypeWorkspaceContext
 		this.observe(
 			this.name,
 			(name) => {
-				this.view.setBrowserTitle(name);
+				if (name && name !== '') {
+					this.view.setBrowserTitle(name);
+				} else {
+					this.view.setBrowserTitle('#settings_unnamedPropertyType');
+				}
 			},
 			null,
 		);
