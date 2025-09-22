@@ -2369,6 +2369,7 @@ export default {
 		openBackofficeSearch: 'Open backoffice search',
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
 		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
+		profileOptions: 'Profile options',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',
@@ -2773,6 +2774,7 @@ export default {
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
 	rte: {
+		label: 'Rich Text Editor',
 		config_blocks: 'Available Blocks',
 		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
@@ -2831,6 +2833,12 @@ export default {
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
 	},
+	missingEditor: {
+		description:
+			'<p><strong>Error!</strong> This property type is no longer available. Please reach out to your administrator.</p>',
+		detailsDescription:
+			'<p>This property type is no longer available.<br/>Please contact your administrator so they can either delete this property or restore the property type.</p><p><strong>Data:</strong></p>',
+	},
 	uiCulture: {
 		ar: 'العربية',
 		bs: 'Bosanski',
@@ -2859,5 +2867,6 @@ export default {
 		uk: 'Українська',
 		zh: '中文',
 		'zh-tw': '中文（正體，台灣）',
+		vi: 'Tiếng Việt',
 	},
 } as UmbLocalizationDictionary;

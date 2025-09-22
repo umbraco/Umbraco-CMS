@@ -278,7 +278,12 @@ public class BackOfficeUserStore :
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => ids.Contains(x.Id));
+
+        // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+        // See ExpressionTests.Sql_In().
+        List<int> idsAsList = [.. ids];
+        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => idsAsList.Contains(x.Id));
+
         IEnumerable<IUser> users = _userRepository.Get(query);
 
         return Task.FromResult(users);

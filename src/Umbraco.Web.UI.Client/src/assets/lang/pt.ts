@@ -2368,6 +2368,7 @@ export default {
 		openBackofficeSearch: 'Abrir pesquisa do backoffice',
 		openCloseBackofficeHelp: 'Abrir/Fechar ajuda do backoffice',
 		openCloseBackofficeProfileOptions: 'Abrir/Fechar as opções do seu perfil',
+		profileOptions: 'Opções perfil',
 		assignDomainDescription: 'Configurar Cultura e Domínios para %0%',
 		createDescription: 'Criar novo nó em %0%',
 		protectDescription: 'Configurar restrições de acesso em %0%',
@@ -2829,5 +2830,11 @@ export default {
 		resetUrlHeadline: 'Redefinir URL?',
 		resetUrlMessage: 'Tem a certeza que quer redefinir este URL?',
 		resetUrlLabel: 'Redefinir',
+	},
+	missingEditor: {
+		description:
+			'<p><strong>Erro!</strong> Este tipo de propriedade já não se encontra disponível. Por favor, contacte o administrador.</p>',
+		detailsDescription:
+			'<p>Este tipo de propriedade já não se encontra disponível.<br/>Por favor, contacte o administrador para que ele possa apagar a propriedade ou restaurar o tipo de propriedade.</p><p><strong>Dados:</strong></p>',
 	},
 } as UmbLocalizationDictionary;

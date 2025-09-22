@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.Services.Signs;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -26,13 +26,13 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
     public DataTypeTreeControllerBase(IEntityService entityService, IDataTypeService dataTypeService)
         : this(
               entityService,
-              StaticServiceProvider.Instance.GetRequiredService<SignProviderCollection>(),
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
               dataTypeService)
     {
     }
 
-    public DataTypeTreeControllerBase(IEntityService entityService, SignProviderCollection signProviders, IDataTypeService dataTypeService)
-        : base(entityService, signProviders) =>
+    public DataTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDataTypeService dataTypeService)
+        : base(entityService, flagProviders) =>
         _dataTypeService = dataTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DataType;

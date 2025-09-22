@@ -21,14 +21,12 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// </summary>
     public class DataTypeService : RepositoryService, IDataTypeService
     {
-        private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly IDataTypeRepository _dataTypeRepository;
         private readonly IDataTypeContainerRepository _dataTypeContainerRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly IAuditService _auditService;
-        private readonly IIOHelper _ioHelper;
         private readonly IDataTypeContainerService _dataTypeContainerService;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly Lazy<IIdKeyMap> _idKeyMap;
@@ -38,22 +36,18 @@ namespace Umbraco.Cms.Core.Services.Implement
             ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository,
-            IDataValueEditorFactory dataValueEditorFactory,
             IAuditService auditService,
             IContentTypeRepository contentTypeRepository,
             IMediaTypeRepository mediaTypeRepository,
             IMemberTypeRepository memberTypeRepository,
-            IIOHelper ioHelper,
             Lazy<IIdKeyMap> idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
-            _dataValueEditorFactory = dataValueEditorFactory;
             _dataTypeRepository = dataTypeRepository;
             _auditService = auditService;
             _contentTypeRepository = contentTypeRepository;
             _mediaTypeRepository = mediaTypeRepository;
             _memberTypeRepository = memberTypeRepository;
-            _ioHelper = ioHelper;
             _idKeyMap = idKeyMap;
 
             // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
@@ -62,7 +56,31 @@ namespace Umbraco.Cms.Core.Services.Implement
             _userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
         }
 
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v18.")]
+        public DataTypeService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IDataTypeRepository dataTypeRepository,
+            IAuditRepository auditRepository,
+            IContentTypeRepository contentTypeRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IMemberTypeRepository memberTypeRepository,
+            Lazy<IIdKeyMap> idKeyMap)
+            : this(
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                dataTypeRepository,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+                contentTypeRepository,
+                mediaTypeRepository,
+                memberTypeRepository,
+                idKeyMap)
+        {
+        }
+
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v18.")]
         public DataTypeService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
@@ -80,17 +98,15 @@ namespace Umbraco.Cms.Core.Services.Implement
                 loggerFactory,
                 eventMessagesFactory,
                 dataTypeRepository,
-                dataValueEditorFactory,
                 StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
                 contentTypeRepository,
                 mediaTypeRepository,
                 memberTypeRepository,
-                ioHelper,
                 idKeyMap)
         {
         }
 
-        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v18.")]
         public DataTypeService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
@@ -109,12 +125,10 @@ namespace Umbraco.Cms.Core.Services.Implement
                 loggerFactory,
                 eventMessagesFactory,
                 dataTypeRepository,
-                dataValueEditorFactory,
                 auditService,
                 contentTypeRepository,
                 mediaTypeRepository,
                 memberTypeRepository,
-                ioHelper,
                 idKeyMap)
         {
         }
@@ -289,7 +303,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))?.FirstOrDefault();
-            ConvertMissingEditorOfDataTypeToLabel(dataType);
 
             return Task.FromResult(dataType);
         }
@@ -302,11 +315,13 @@ namespace Umbraco.Cms.Core.Services.Implement
             IQuery<IDataType> query = Query<IDataType>();
             if (keys.Length > 0)
             {
-                query = query.Where(x => keys.Contains(x.Key));
+                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+                // See ExpressionTests.Sql_In().
+                List<Guid> keysAsList = [.. keys];
+                query = query.Where(x => keysAsList.Contains(x.Key));
             }
 
             IDataType[] dataTypes = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
 
             return Task.FromResult<IEnumerable<IDataType>>(dataTypes);
         }
@@ -350,7 +365,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = _dataTypeRepository.Get(id);
-            ConvertMissingEditorOfDataTypeToLabel(dataType);
 
             return dataType;
         }
@@ -360,7 +374,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = GetDataTypeFromRepository(id);
-            ConvertMissingEditorOfDataTypeToLabel(dataType);
 
             return Task.FromResult(dataType);
         }
@@ -380,7 +393,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
 
             return Task.FromResult(dataTypes);
         }
@@ -389,9 +401,13 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAlias.Contains(x.EditorAlias));
+
+            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            List<string> propertyEditorAliasesAsList = [.. propertyEditorAlias];
+            IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAliasesAsList.Contains(x.EditorAlias));
+
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
             return Task.FromResult(dataTypes);
         }
 
@@ -401,7 +417,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorUiAlias == editorUiAlias);
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
 
             return Task.FromResult(dataTypes);
         }
@@ -415,30 +430,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.GetMany(ids).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
 
             return dataTypes;
-        }
-
-        private void ConvertMissingEditorOfDataTypeToLabel(IDataType? dataType)
-        {
-            if (dataType == null)
-            {
-                return;
-            }
-
-            ConvertMissingEditorsOfDataTypesToLabels([dataType]);
-        }
-
-        private void ConvertMissingEditorsOfDataTypesToLabels(IEnumerable<IDataType> dataTypes)
-        {
-            // Any data types that don't have an associated editor are created of a specific type.
-            // We convert them to labels to make clear to the user why the data type cannot be used.
-            IEnumerable<IDataType> dataTypesWithMissingEditors = dataTypes.Where(x => x.Editor is MissingPropertyEditor);
-            foreach (IDataType dataType in dataTypesWithMissingEditors)
-            {
-                dataType.Editor = new LabelPropertyEditor(_dataValueEditorFactory, _ioHelper);
-            }
         }
 
         public Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId)

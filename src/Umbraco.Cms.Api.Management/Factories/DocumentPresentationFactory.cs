@@ -1,10 +1,13 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentPublishing;
@@ -23,7 +26,9 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     private readonly IPublicAccessService _publicAccessService;
     private readonly TimeProvider _timeProvider;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly FlagProviderCollection _flagProviderCollection;
 
+    [Obsolete("Please use the controller with all parameters. Scheduled for removal in Umbraco 18")]
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,
@@ -31,6 +36,25 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         IPublicAccessService publicAccessService,
         TimeProvider timeProvider,
         IIdKeyMap idKeyMap)
+        : this(
+            umbracoMapper,
+            documentUrlFactory,
+            templateService,
+            publicAccessService,
+            timeProvider,
+            idKeyMap,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
+    {
+    }
+
+    public DocumentPresentationFactory(
+        IUmbracoMapper umbracoMapper,
+        IDocumentUrlFactory documentUrlFactory,
+        ITemplateService templateService,
+        IPublicAccessService publicAccessService,
+        TimeProvider timeProvider,
+        IIdKeyMap idKeyMap,
+        FlagProviderCollection flagProviderCollection)
     {
         _umbracoMapper = umbracoMapper;
         _documentUrlFactory = documentUrlFactory;
@@ -38,6 +62,7 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         _publicAccessService = publicAccessService;
         _timeProvider = timeProvider;
         _idKeyMap = idKeyMap;
+        _flagProviderCollection = flagProviderCollection;
     }
 
     public async Task<PublishedDocumentResponseModel> CreatePublishedResponseModelAsync(IContent content)
@@ -89,6 +114,8 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
+        PopulateFlagsOnDocuments(responseModel);
+
         return responseModel;
     }
 
@@ -109,23 +136,29 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     {
         if (entity.Variations.VariesByCulture() is false)
         {
-            yield return new()
+            var model = new DocumentVariantItemResponseModel()
             {
                 Name = entity.Name ?? string.Empty,
                 State = DocumentVariantStateHelper.GetState(entity, null),
                 Culture = null,
             };
+
+            PopulateFlagsOnVariants(model);
+            yield return model;
             yield break;
         }
 
         foreach (KeyValuePair<string, string> cultureNamePair in entity.CultureNames)
         {
-            yield return new()
+            var model = new DocumentVariantItemResponseModel()
             {
                 Name = cultureNamePair.Value,
                 Culture = cultureNamePair.Key,
                 State = DocumentVariantStateHelper.GetState(entity, cultureNamePair.Key)
             };
+
+            PopulateFlagsOnVariants(model);
+            yield return model;
         }
     }
 
@@ -177,5 +210,21 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         }
 
         return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
+    }
+
+    private void PopulateFlagsOnDocuments(DocumentItemResponseModel model)
+    {
+        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<DocumentItemResponseModel>()))
+        {
+            signProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
+        }
+    }
+
+    private void PopulateFlagsOnVariants(DocumentVariantItemResponseModel model)
+    {
+        foreach (IFlagProvider signProvider in _flagProviderCollection.Where(x => x.CanProvideFlags<DocumentVariantItemResponseModel>()))
+        {
+            signProvider.PopulateFlagsAsync([model]).GetAwaiter().GetResult();
+        }
     }
 }

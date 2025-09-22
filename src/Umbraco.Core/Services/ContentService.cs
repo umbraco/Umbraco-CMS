@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
@@ -694,9 +695,13 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
+            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            List<int> contentTypeIdsAsList = [.. contentTypeIds];
+
             scope.ReadLock(Constants.Locks.ContentTree);
             return _documentRepository.GetPage(
-                Query<IContent>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)),
+                Query<IContent>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)),
                 pageIndex,
                 pageSize,
                 out totalRecords,
@@ -1017,18 +1022,29 @@ public class ContentService : RepositoryService, IContentService
 
 
     /// <inheritdoc/>
-    public IEnumerable<Guid> GetScheduledContentKeys(IEnumerable<Guid> keys)
+    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys)
     {
-        Guid[] idsA = keys.ToArray();
-        if (idsA.Length == 0)
+        if (keys.Length == 0)
         {
-            return Enumerable.Empty<Guid>();
+            return ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
+        }
+
+        List<int> contentIds = [];
+        foreach (var key in keys)
+        {
+            Attempt<int> contentId = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document);
+            if (contentId.Success is false)
+            {
+                continue;
+            }
+
+            contentIds.Add(contentId.Result);
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetScheduledContentKeys(idsA);
+            return _documentRepository.GetContentSchedulesByIds(contentIds.ToArray());
         }
     }
 
@@ -3747,7 +3763,10 @@ public class ContentService : RepositoryService, IContentService
             IQuery<IContent> query = Query<IContent>();
             if (contentTypeId.Length > 0)
             {
-                query.Where(x => contentTypeId.Contains(x.ContentTypeId));
+                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+                // See ExpressionTests.Sql_In().
+                List<int> contentTypeIdsAsList = [.. contentTypeId];
+                query.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId));
             }
 
             return _documentBlueprintRepository.Get(query).Select(x =>
@@ -3766,11 +3785,14 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            var contentTypeIdsA = contentTypeIds.ToArray();
+            // Need to use a List here because the expression tree cannot convert an array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            var contentTypeIdsAsList = contentTypeIds.ToList();
+
             IQuery<IContent> query = Query<IContent>();
-            if (contentTypeIdsA.Length > 0)
+            if (contentTypeIdsAsList.Count > 0)
             {
-                query.Where(x => contentTypeIdsA.Contains(x.ContentTypeId));
+                query.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId));
             }
 
             IContent[]? blueprints = _documentBlueprintRepository.Get(query)?.Select(x =>
