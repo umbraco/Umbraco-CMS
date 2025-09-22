@@ -10,7 +10,7 @@ internal class DateOnlyPropertyIndexValueFactory : DateTimePropertyIndexValueFac
     /// </summary>
     public DateOnlyPropertyIndexValueFactory(
         IJsonSerializer jsonSerializer,
-        ILogger<DateTimePropertyIndexValueFactory> logger)
+        ILogger<DateOnlyPropertyIndexValueFactory> logger)
         : base(jsonSerializer, logger)
     {
     }

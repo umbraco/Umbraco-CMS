@@ -10,7 +10,7 @@ internal class DateTimeWithTimeZonePropertyIndexValueFactory : DateTimePropertyI
     /// </summary>
     public DateTimeWithTimeZonePropertyIndexValueFactory(
         IJsonSerializer jsonSerializer,
-        ILogger<DateTimePropertyIndexValueFactory> logger)
+        ILogger<DateTimeWithTimeZonePropertyIndexValueFactory> logger)
         : base(jsonSerializer, logger)
     {
     }

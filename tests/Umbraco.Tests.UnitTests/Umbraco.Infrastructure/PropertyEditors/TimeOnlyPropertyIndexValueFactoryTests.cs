@@ -22,7 +22,7 @@ public class TimeOnlyPropertyIndexValueFactoryTests
             .Returns("testAlias");
         propertyMock.Setup(x => x.GetValue("en-US", null, true))
             .Returns(null);
-        var factory = new TimeOnlyPropertyIndexValueFactory(_jsonSerializer, Mock.Of<ILogger<DateTimePropertyIndexValueFactory>>());
+        var factory = new TimeOnlyPropertyIndexValueFactory(_jsonSerializer, Mock.Of<ILogger<TimeOnlyPropertyIndexValueFactory>>());
 
         var result = factory.GetIndexValues(
             propertyMock.Object,
@@ -48,7 +48,7 @@ public class TimeOnlyPropertyIndexValueFactoryTests
         propertyMock.Setup(x => x.GetValue("en-US", null, true))
             .Returns("{\"date\":\"2023-01-18T12:00:00+01:00\",\"timeZone\":\"Europe/Copenhagen\"}");
 
-        var factory = new TimeOnlyPropertyIndexValueFactory(_jsonSerializer, Mock.Of<ILogger<DateTimePropertyIndexValueFactory>>());
+        var factory = new TimeOnlyPropertyIndexValueFactory(_jsonSerializer, Mock.Of<ILogger<TimeOnlyPropertyIndexValueFactory>>());
 
         var result = factory.GetIndexValues(
             propertyMock.Object,
