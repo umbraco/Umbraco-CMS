@@ -8,6 +8,7 @@ export interface ManifestPropertyEditorDataSource extends ManifestApi<UmbPropert
 
 export interface MetaPropertyEditorDataSource {
 	label: string;
+	icon: string;
 }
 
 declare global {
