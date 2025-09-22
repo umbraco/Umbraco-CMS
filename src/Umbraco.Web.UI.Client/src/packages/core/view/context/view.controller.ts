@@ -1,3 +1,4 @@
+import { UmbShortcutController } from '../../shortcut/context/shortcut.controller.js';
 import { UMB_VIEW_CONTEXT } from './view.context-token.js';
 import { UmbClassState, UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -8,7 +9,6 @@ import type { UmbContextConsumerController, UmbContextProviderController } from 
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbShortcutController } from '../../shortcut/context/shortcut.controller.js';
 
 /**
  *

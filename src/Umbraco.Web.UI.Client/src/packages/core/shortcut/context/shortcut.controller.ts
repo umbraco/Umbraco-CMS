@@ -1,10 +1,10 @@
+import type { UmbShortcut } from '../types.js';
 import { UMB_SHORTCUT_CONTEXT } from './shortcut.context-token.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPartialSome } from '@umbraco-cms/backoffice/utils';
-import type { UmbShortcut } from '../types.js';
 
 type IncomingShortcutType = UmbPartialSome<UmbShortcut, 'unique' | 'weight' | 'modifier' | 'shift' | 'alt'>;
 
@@ -132,6 +132,10 @@ export class UmbShortcutController extends UmbControllerBase {
 
 	/**
 	 * Get all hints
+	 * @param key
+	 * @param modifier
+	 * @param shift
+	 * @param alt
 	 * @returns {UmbShortcut[]} Array of hints
 	 */
 	findShortcut(key: string, modifier: boolean, shift: boolean = false, alt: boolean = false): UmbShortcut | undefined {
