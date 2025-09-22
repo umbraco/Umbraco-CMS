@@ -103,4 +103,6 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     ///     Returns true if there is any content in the recycle bin
     /// </summary>
     bool RecycleBinSmells();
+
+    PagedModel<Guid> GetReferencingDocumentsByDocumentTypeKey(Guid documentTypeKey);
 }
