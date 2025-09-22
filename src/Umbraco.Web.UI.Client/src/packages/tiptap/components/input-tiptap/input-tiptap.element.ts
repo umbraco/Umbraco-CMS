@@ -261,6 +261,15 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				max-width: var(--umb-rte-max-width, 100%);
 			}
 
+			:host(:hover) {
+				--umb-tiptap-edge-border-color: var(--uui-color-border-standalone);
+			}
+
+			:host(:focus),
+			:host(:focus-within) {
+				--umb-tiptap-edge-border-color: var(--uui-color-border-emphasis);
+			}
+
 			:host([readonly]) {
 				pointer-events: none;
 
@@ -302,10 +311,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 				&[data-loaded] {
 					border-color: var(--umb-tiptap-edge-border-color, var(--uui-color-border));
-
-					&:hover:not(:has(.ProseMirror-focused)) {
-						border-color: var(--uui-color-border-standalone);
-					}
 				}
 
 				> .tiptap {
@@ -340,8 +345,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				border-top-left-radius: 0;
 				border-top-right-radius: 0;
 			}
-			#editor:has(.ProseMirror-focused) {
-				border-color: var(--uui-color-border-standalone);
 		`,
 	];
 }
