@@ -38,7 +38,7 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
             _fileSystem);
         for (int i = 0; i < 10; i++)
         {
-            using (var stream = CreateStream("/tests/"))
+            using (var stream = CreateStream(Path.Join("tests")))
             {
                 _fileSystem.AddFile($"file{i}", stream);
             }
