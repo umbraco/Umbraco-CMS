@@ -6,11 +6,7 @@ import type {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
-	umbBindToValidation,
-	UmbFormControlMixin,
-} from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbInputTimeZoneElement } from '@umbraco-cms/backoffice/components';
 
 export interface UmbTimeZonePickerValue {

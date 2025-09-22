@@ -148,6 +148,10 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		);
 	}
 
+	protected override firstUpdated() {
+		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-time-zone-picker')!);
+	}
+
 	protected override getFormElement() {
 		return undefined;
 	}
