@@ -349,7 +349,7 @@ public class UmbracoHelper
 
     public IEnumerable<IPublishedContent> ContentAtRoot() => _publishedContentQuery.ContentAtRoot();
 
-    public IEnumerable<IPublishedContent> ContentAtRoot(string culture) => _publishedContentQuery.ContentAtRoot(culture);
+    public IEnumerable<IPublishedContent> ContentAtRoot(string? culture) => _publishedContentQuery.ContentAtRoot(culture);
 
     #endregion
 

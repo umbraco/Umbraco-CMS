@@ -153,7 +153,7 @@ public class PublishedContentQuery : IPublishedContentQuery
     public IEnumerable<IPublishedContent> ContentAtRoot()
         => ItemsAtRoot(_publishedSnapshot.Content);
 
-    public IEnumerable<IPublishedContent> ContentAtRoot(string culture)
+    public IEnumerable<IPublishedContent> ContentAtRoot(string? culture)
         => ItemsAtRoot(_publishedSnapshot.Content, culture);
 
     #endregion

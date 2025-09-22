@@ -35,7 +35,7 @@ public interface IPublishedContentQuery
 
     IEnumerable<IPublishedContent> ContentAtRoot();
 
-    IEnumerable<IPublishedContent> ContentAtRoot(string culture) => throw new NotSupportedException();
+    IEnumerable<IPublishedContent> ContentAtRoot(string? culture) => culture is null ? ContentAtRoot() : throw new NotSupportedException();
 
     IPublishedContent? Media(int id);
 
