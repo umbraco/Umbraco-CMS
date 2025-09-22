@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Microsoft.Extensions.DependencyInjection;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
@@ -13,51 +12,60 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees;
 
 public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
 {
-    public FileSystems _fileSystems;
-    public IFileSystem _fileSystem;
+    protected FileSystems FileSystems { get; private set; }
 
-    protected abstract string path { get; }
+    protected IFileSystem TestFileSystem { get; private set; }
 
-    public IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+    protected abstract string FileSystemPath { get; }
 
-    protected virtual T GetRequiredService<T>() => Services.GetRequiredService<T>();
+    protected IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
     [SetUp]
     public void SetUpFileSystem()
     {
-        _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(path), HostingEnvironment.ToAbsolute(path));
+        TestFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(FileSystemPath), HostingEnvironment.ToAbsolute(FileSystemPath));
 
-        _fileSystems = FileSystemsCreator.CreateTestFileSystems(
+        FileSystems = FileSystemsCreator.CreateTestFileSystems(
             LoggerFactory,
             IOHelper,
             GetRequiredService<IOptions<GlobalSettings>>(),
             HostingEnvironment,
-            _fileSystem,
-            _fileSystem,
-            _fileSystem,
-            _fileSystem);
+            GetPartialViewsFileSystem(),
+            GetStylesheetsFileSystem(),
+            GetScriptsFileSystem(),
+            null);
         for (int i = 0; i < 10; i++)
         {
-            using (var stream = CreateStream(Path.Join("tests")))
-            {
-                _fileSystem.AddFile($"file{i}", stream);
-            }
+            using var stream = CreateStream(Path.Join("tests"));
+            TestFileSystem.AddFile($"file{i}", stream);
         }
     }
+
+    private static Stream CreateStream(string contents = null)
+    {
+        if (string.IsNullOrEmpty(contents))
+        {
+            contents = "/* test */";
+        }
+
+        var bytes = Encoding.UTF8.GetBytes(contents);
+        return new MemoryStream(bytes);
+    }
+
+    protected virtual IFileSystem? GetPartialViewsFileSystem() => null;
+
+    protected virtual IFileSystem? GetStylesheetsFileSystem() => null;
+
+    protected virtual IFileSystem? GetScriptsFileSystem() => null;
 
     [TearDown]
     public void TearDownFileSystem()
     {
-        // Delete all files
-        Purge(_fileSystems.StylesheetsFileSystem, string.Empty);
-        Purge(_fileSystems.ScriptsFileSystem, string.Empty);
-        Purge(_fileSystems.PartialViewsFileSystem, string.Empty);
-        Purge(_fileSystems.MvcViewsFileSystem, string.Empty);
-
-        _fileSystems = null;
+        Purge(TestFileSystem, string.Empty);
+        FileSystems = null;
     }
 
-    private void Purge(IFileSystem fs, string path)
+    private static void Purge(IFileSystem fs, string path)
     {
         var files = fs.GetFiles(path, "*");
         foreach (var file in files)
@@ -71,18 +79,5 @@ public abstract class FileSystemTreeServiceTestsBase : UmbracoIntegrationTest
             Purge(fs, dir);
             fs.DeleteDirectory(dir);
         }
-    }
-
-    protected Stream CreateStream(string contents = null)
-    {
-        if (string.IsNullOrEmpty(contents))
-        {
-            contents = "/* test */";
-        }
-
-        var bytes = Encoding.UTF8.GetBytes(contents);
-        var stream = new MemoryStream(bytes);
-
-        return stream;
     }
 }
