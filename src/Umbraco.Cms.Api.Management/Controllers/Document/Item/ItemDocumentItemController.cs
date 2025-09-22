@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Core.Models;
@@ -15,7 +16,10 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     private readonly IEntityService _entityService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-    public ItemDocumentItemController(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
+    [ActivatorUtilitiesConstructor]
+    public ItemDocumentItemController(
+        IEntityService entityService,
+        IDocumentPresentationFactory documentPresentationFactory)
     {
         _entityService = entityService;
         _documentPresentationFactory = documentPresentationFactory;
@@ -24,20 +28,20 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentItemResponseModel>), StatusCodes.Status200OK)]
-    public Task<IActionResult> Item(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<DocumentItemResponseModel>()));
+            return Ok(Enumerable.Empty<DocumentItemResponseModel>());
         }
 
         IEnumerable<IDocumentEntitySlim> documents = _entityService
             .GetAll(UmbracoObjectTypes.Document, ids.ToArray())
             .OfType<IDocumentEntitySlim>();
 
-        IEnumerable<DocumentItemResponseModel> documentItemResponseModels = documents.Select(_documentPresentationFactory.CreateItemResponseModel);
-        return Task.FromResult<IActionResult>(Ok(documentItemResponseModels));
+        IEnumerable<DocumentItemResponseModel> responseModels = documents.Select(_documentPresentationFactory.CreateItemResponseModel);
+        return Ok(responseModels);
     }
 }

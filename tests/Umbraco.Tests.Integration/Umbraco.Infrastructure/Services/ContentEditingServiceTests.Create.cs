@@ -1,12 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -15,6 +17,58 @@ public partial class ContentEditingServiceTests
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Create_At_Root(bool allowedAtRoot)
+        => await Test_Can_Create_At_Root(allowedAtRoot, allowedAtRoot);
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToAllowTextPageAtRoot))]
+    public async Task Can_Create_At_Root_With_Content_Type_Filter() =>
+
+        // Verifies that when allowed at root, the content can be created if not filtered out by a content type filter.
+        await Test_Can_Create_At_Root(true, true);
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowTextPageAtRoot))]
+    public async Task Cannot_Create_At_Root_With_Content_Type_Filter() =>
+
+        // Verifies that when allowed at root, the content cannot be created if filtered out by a content type filter.
+        await Test_Can_Create_At_Root(true, false);
+
+    public static void ConfigureContentTypeFilterToAllowTextPageAtRoot(IUmbracoBuilder builder)
+        => builder.ContentTypeFilters()
+            .Append<ContentTypeFilterForAllowedTextPageAtRoot>();
+
+    public static void ConfigureContentTypeFilterToDisallowTextPageAtRoot(IUmbracoBuilder builder)
+        => builder.ContentTypeFilters()
+            .Append<ContentTypeFilterForDisallowedTextPageAtRoot>();
+
+    private class ContentTypeFilterForAllowedTextPageAtRoot : ContentTypeFilterForTextPageAtRoot
+    {
+        public ContentTypeFilterForAllowedTextPageAtRoot()
+            : base(true)
+        {
+        }
+    }
+
+    private class ContentTypeFilterForDisallowedTextPageAtRoot : ContentTypeFilterForTextPageAtRoot
+    {
+        public ContentTypeFilterForDisallowedTextPageAtRoot()
+            : base(false)
+        {
+        }
+    }
+
+    private abstract class ContentTypeFilterForTextPageAtRoot : IContentTypeFilter
+    {
+        private readonly bool _allowed;
+
+        protected ContentTypeFilterForTextPageAtRoot(bool allowed) => _allowed = allowed;
+
+        public Task<IEnumerable<TItem>> FilterAllowedAtRootAsync<TItem>(IEnumerable<TItem> contentTypes)
+            where TItem : IContentTypeComposition
+            => Task.FromResult(contentTypes.Where(x => (_allowed && x.Alias == "textPage") || (!_allowed && x.Alias != "textPage")));
+    }
+
+    private async Task Test_Can_Create_At_Root(bool allowedAtRoot, bool expectSuccess)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -41,7 +95,7 @@ public partial class ContentEditingServiceTests
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        if (allowedAtRoot)
+        if (expectSuccess)
         {
             Assert.IsTrue(result.Success);
             Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
@@ -72,6 +126,57 @@ public partial class ContentEditingServiceTests
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Create_As_Child(bool allowedAsChild)
+        => await Test_Can_Create_As_Child(allowedAsChild, allowedAsChild);
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToAllowTextPageAsChild))]
+    public async Task Can_Create_As_Child_With_Content_Type_Filter() =>
+
+        // Verifies that when allowed as a child, the content can be created if not filtered out by a content type filter.
+        await Test_Can_Create_As_Child(true, true);
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowTextPageAsChild))]
+    public async Task Cannot_Create_As_Child_With_Content_Type_Filter() =>
+
+        // Verifies that when allowed as a child, the content cannot be created if filtered out by a content type filter.
+        await Test_Can_Create_As_Child(true, false);
+
+    public static void ConfigureContentTypeFilterToAllowTextPageAsChild(IUmbracoBuilder builder)
+        => builder.ContentTypeFilters()
+            .Append<ContentTypeFilterForAllowedTextPageAsChild>();
+
+    public static void ConfigureContentTypeFilterToDisallowTextPageAsChild(IUmbracoBuilder builder)
+        => builder.ContentTypeFilters()
+            .Append<ContentTypeFilterForDisallowedTextPageAsChild>();
+
+    private class ContentTypeFilterForAllowedTextPageAsChild : ContentTypeFilterForTextPageAsChild
+    {
+        public ContentTypeFilterForAllowedTextPageAsChild()
+            : base(true)
+        {
+        }
+    }
+
+    private class ContentTypeFilterForDisallowedTextPageAsChild : ContentTypeFilterForTextPageAsChild
+    {
+        public ContentTypeFilterForDisallowedTextPageAsChild()
+            : base(false)
+        {
+        }
+    }
+
+    private abstract class ContentTypeFilterForTextPageAsChild : IContentTypeFilter
+    {
+        private readonly bool _allowed;
+
+        protected ContentTypeFilterForTextPageAsChild(bool allowed) => _allowed = allowed;
+
+        public Task<IEnumerable<ContentTypeSort>> FilterAllowedChildrenAsync(IEnumerable<ContentTypeSort> contentTypes, Guid parentContentTypeKey, Guid? parentContentKey)
+            => Task.FromResult(contentTypes.Where(x => (_allowed && x.Alias == "textPage") || (!_allowed && x.Alias != "textPage")));
+    }
+
+    private async Task Test_Can_Create_As_Child(bool allowedAsChild, bool expectSuccess)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -121,7 +226,7 @@ public partial class ContentEditingServiceTests
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        if (allowedAsChild)
+        if (expectSuccess)
         {
             Assert.IsTrue(result.Success);
             Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);

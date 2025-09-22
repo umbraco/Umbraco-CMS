@@ -456,6 +456,10 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				height: min-content;
 			}
 
+			#header i {
+				opacity: 0.55;
+			}
+
 			#editor {
 				position: relative;
 				--uui-button-background-color: var(--uui-color-background);

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Api.Management.ServerEvents;
 
 internal sealed class ServerEventSender :
     INotificationAsyncHandler<ContentSavedNotification>,
+    INotificationAsyncHandler<ContentSavedBlueprintNotification>,
     INotificationAsyncHandler<ContentTypeSavedNotification>,
     INotificationAsyncHandler<MediaSavedNotification>,
     INotificationAsyncHandler<MediaTypeSavedNotification>,
@@ -31,6 +32,7 @@ internal sealed class ServerEventSender :
     INotificationAsyncHandler<UserSavedNotification>,
     INotificationAsyncHandler<WebhookSavedNotification>,
     INotificationAsyncHandler<ContentDeletedNotification>,
+    INotificationAsyncHandler<ContentDeletedBlueprintNotification>,
     INotificationAsyncHandler<ContentTypeDeletedNotification>,
     INotificationAsyncHandler<MediaDeletedNotification>,
     INotificationAsyncHandler<MediaTypeDeletedNotification>,
@@ -56,26 +58,28 @@ internal sealed class ServerEventSender :
 {
     private readonly IServerEventRouter _serverEventRouter;
 
-    public ServerEventSender(IServerEventRouter serverEventRouter)
-    {
-        _serverEventRouter = serverEventRouter;
-    }
+    public ServerEventSender(IServerEventRouter serverEventRouter) => _serverEventRouter = serverEventRouter;
 
     private async Task NotifySavedAsync<T>(SavedNotification<T> notification, string source)
         where T : IEntity
     {
         foreach (T entity in notification.SavedEntities)
         {
-            var eventModel = new ServerEvent
-            {
-                EventType = entity.CreateDate == entity.UpdateDate
-                    ? Constants.ServerEvents.EventType.Created : Constants.ServerEvents.EventType.Updated,
-                Key = entity.Key,
-                EventSource = source,
-            };
-
-            await _serverEventRouter.RouteEventAsync(eventModel);
+            await RouteCreatedOrUpdatedEvent(source, entity);
         }
+    }
+
+    private async Task RouteCreatedOrUpdatedEvent<T>(string source, T entity) where T : IEntity
+    {
+        var eventModel = new ServerEvent
+        {
+            EventType = entity.CreateDate == entity.UpdateDate
+                ? Constants.ServerEvents.EventType.Created : Constants.ServerEvents.EventType.Updated,
+            Key = entity.Key,
+            EventSource = source,
+        };
+
+        await _serverEventRouter.RouteEventAsync(eventModel);
     }
 
     private async Task NotifyDeletedAsync<T>(DeletedNotification<T> notification, string source)
@@ -83,14 +87,17 @@ internal sealed class ServerEventSender :
     {
         foreach (T entity in notification.DeletedEntities)
         {
-            await _serverEventRouter.RouteEventAsync(new ServerEvent
-            {
-                EventType = Constants.ServerEvents.EventType.Deleted,
-                EventSource = source,
-                Key = entity.Key,
-            });
+            await RouteDeletedEvent(source, entity);
         }
     }
+
+    private async Task RouteDeletedEvent<T>(string source, T entity) where T : IEntity =>
+        await _serverEventRouter.RouteEventAsync(new ServerEvent
+        {
+            EventType = Constants.ServerEvents.EventType.Deleted,
+            EventSource = source,
+            Key = entity.Key,
+        });
 
     private async Task NotifyTrashedAsync<T>(MovedToRecycleBinNotification<T> notification, string source)
         where T : IEntity
@@ -108,6 +115,9 @@ internal sealed class ServerEventSender :
 
     public async Task HandleAsync(ContentSavedNotification notification, CancellationToken cancellationToken) =>
         await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.Document);
+
+    public async Task HandleAsync(ContentSavedBlueprintNotification notification, CancellationToken cancellationToken) =>
+        await RouteCreatedOrUpdatedEvent(Constants.ServerEvents.EventSource.DocumentBlueprint, notification.SavedBlueprint);
 
     public async Task HandleAsync(ContentTypeSavedNotification notification, CancellationToken cancellationToken) =>
         await NotifySavedAsync(notification, Constants.ServerEvents.EventSource.DocumentType);
@@ -187,6 +197,14 @@ internal sealed class ServerEventSender :
 
     public async Task HandleAsync(ContentDeletedNotification notification, CancellationToken cancellationToken) =>
         await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.Document);
+
+    public async Task HandleAsync(ContentDeletedBlueprintNotification notification, CancellationToken cancellationToken)
+    {
+        foreach (Core.Models.IContent entity in notification.DeletedBlueprints)
+        {
+            await RouteDeletedEvent(Constants.ServerEvents.EventSource.DocumentBlueprint, entity);
+        }
+    }
 
     public async Task HandleAsync(ContentTypeDeletedNotification notification, CancellationToken cancellationToken) =>
         await NotifyDeletedAsync(notification, Constants.ServerEvents.EventSource.DocumentType);

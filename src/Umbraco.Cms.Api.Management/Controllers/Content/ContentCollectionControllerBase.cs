@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -18,8 +21,19 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
     where TVariantResponseModel : VariantResponseModelBase
 {
     private readonly IUmbracoMapper _mapper;
+    private readonly FlagProviderCollection _flagProviders;
 
-    protected ContentCollectionControllerBase(IUmbracoMapper mapper) => _mapper = mapper;
+    protected ContentCollectionControllerBase(IUmbracoMapper mapper, FlagProviderCollection flagProvider)
+    {
+        _mapper = mapper;
+        _flagProviders = flagProvider;
+    }
+
+    [Obsolete("Use the constructer with all parameters. To be removed in Umbraco 18")]
+    protected ContentCollectionControllerBase(IUmbracoMapper mapper)
+        : this(mapper, StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
+    {
+    }
 
     [Obsolete("This method is no longer used and will be removed in Umbraco 17.")]
     protected IActionResult CollectionResult(ListViewPagedModel<TContent> result)
@@ -48,6 +62,9 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
         return Ok(pageViewModel);
     }
 
+    /// <summary>
+    /// Creates a collection result from the provided collection response models and total number of items.
+    /// </summary>
     protected IActionResult CollectionResult(List<TCollectionResponseModel> collectionResponseModels, long totalNumberOfItems)
     {
         var pageViewModel = new PagedViewModel<TCollectionResponseModel>

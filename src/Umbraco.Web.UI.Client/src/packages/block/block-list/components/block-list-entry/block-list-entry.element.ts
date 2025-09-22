@@ -5,24 +5,25 @@ import {
 	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 } from '../../constants.js';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
+import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
 import '../unsupported-list-block/index.js';
+
 /**
  * @element umb-block-list-entry
  */
@@ -309,7 +310,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 		const workspaceName = propertyDatasetContext?.getName();
 		const propertyLabel = propertyContext?.getLabel();
-		const blockLabel = this._label;
+		const blockLabel = this.#context.getName();
 
 		const entryName = workspaceName
 			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
@@ -399,7 +400,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			${umbDestroyOnDisconnect()}></umb-unsupported-list-block>`;
 	}
 
-	#renderBuiltinBlockView() {
+	#renderBuiltinBlockView = () => {
 		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
@@ -407,7 +408,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			return this.#renderInlineBlock();
 		}
 		return this.#renderRefBlock();
-	}
+	};
 
 	#renderBlock() {
 		return this.contentKey && (this._contentTypeAlias || this._unsupported)
@@ -417,11 +418,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							type="blockEditorCustomView"
 							default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
 							.renderMethod=${this.#extensionSlotRenderMethod}
+							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							.filter=${this.#extensionSlotFilterMethod}
-							single
-							>${this.#renderBuiltinBlockView()}</umb-extension-slot
-						>
+							single></umb-extension-slot>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
