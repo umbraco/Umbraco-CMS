@@ -7,16 +7,9 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbRepositoryItemsStatus } from './types.js';
 
 const ObserveRepositoryAlias = Symbol();
-
-interface UmbRepositoryItemsStatus {
-	state: {
-		type: 'success' | 'error' | 'loading';
-		error?: string;
-	};
-	unique: string;
-}
 
 export class UmbRepositoryItemsManager<ItemType extends { unique: string }> extends UmbControllerBase {
 	//
