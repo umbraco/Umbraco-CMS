@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 /// <summary>
 /// Validates that ModelsBuilderMode is set to <see cref="ModelsMode.Nothing" /> when in production runtime mode.
 /// </summary>
-/// <seealso cref="Umbraco.Cms.Infrastructure.R½-untime.IRuntimeModeValidator" />
+/// <seealso cref="Umbraco.Cms.Infrastructure.Runtime.IRuntimeModeValidator" />
 public class ModelsBuilderModeValidator : IRuntimeModeValidator
 {
     private readonly IOptionsMonitor<ModelsBuilderSettings> _modelsBuilderSettings;
