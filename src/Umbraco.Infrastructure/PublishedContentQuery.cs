@@ -150,11 +150,10 @@ public class PublishedContentQuery : IPublishedContentQuery
     public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         => ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
 
-    [Obsolete("Please use the method overload taking a culture parameter. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IPublishedContent> ContentAtRoot()
         => ItemsAtRoot(_publishedSnapshot.Content);
 
-    public IEnumerable<IPublishedContent> ContentAtRoot(string? culture = null)
+    public IEnumerable<IPublishedContent> ContentAtRoot(string culture)
         => ItemsAtRoot(_publishedSnapshot.Content, culture);
 
     #endregion

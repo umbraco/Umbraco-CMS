@@ -33,10 +33,9 @@ public interface IPublishedContentQuery
     [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars);
 
-    [Obsolete("Please use the method overload taking a culture parameter. Scheduled for removal in Umbraco 18.")]
     IEnumerable<IPublishedContent> ContentAtRoot();
 
-    IEnumerable<IPublishedContent> ContentAtRoot(string? culture = null) => throw new NotSupportedException();
+    IEnumerable<IPublishedContent> ContentAtRoot(string culture) => throw new NotSupportedException();
 
     IPublishedContent? Media(int id);
 
