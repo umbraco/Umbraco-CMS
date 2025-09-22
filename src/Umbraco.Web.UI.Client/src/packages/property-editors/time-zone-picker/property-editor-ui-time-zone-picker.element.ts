@@ -1,4 +1,4 @@
-import { html, customElement, property, state, css, query } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, query, map } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
@@ -6,11 +6,11 @@ import type {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
-import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, umbBindToValidation, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { UmbInputTimeZoneElement } from '@umbraco-cms/backoffice/components';
 
 export interface UmbTimeZonePickerValue {
-	mode: 'all' | 'local' | 'custom';
+	mode: string;
 	timeZones: Array<string>;
 }
 
@@ -18,19 +18,20 @@ export interface UmbTimeZonePickerValue {
  * @element umb-property-editor-ui-time-zone-picker
  */
 @customElement('umb-property-editor-ui-time-zone-picker')
-export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUITimeZonePickerElement
+	extends UmbFormControlMixin<UmbTimeZonePickerValue, typeof UmbLitElement, undefined>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
+	private _supportedModes = ['all', 'local', 'custom'];
 	private _selectedTimeZones: Array<string> = [];
 
-	@state()
-	private _value: UmbTimeZonePickerValue | undefined;
-
-	@property({ type: Object })
-	public set value(value: UmbTimeZonePickerValue | undefined) {
-		this._value = value;
+	override set value(value: UmbTimeZonePickerValue | undefined) {
+		super.value = value;
+		this._selectedTimeZones = value?.timeZones ?? [];
 	}
 
-	public get value(): UmbTimeZonePickerValue | undefined {
-		return this._value;
+	override get value(): UmbTimeZonePickerValue | undefined {
+		return super.value;
 	}
 
 	@property({ type: Boolean, reflect: true })
@@ -42,29 +43,19 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 	@query('umb-input-time-zone')
 	inputElem!: UmbInputTimeZoneElement;
 
-	override connectedCallback() {
-		super.connectedCallback();
-		this._selectedTimeZones = this.value?.timeZones ?? [];
+	constructor() {
+		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.value?.mode || this._supportedModes.indexOf(this.value.mode) === -1,
+		);
 	}
 
 	#onModeInput(event: UUIRadioEvent) {
-		switch (event.target.value) {
-			case 'all':
-				this.value = { mode: 'all', timeZones: [] };
-				break;
-			case 'local':
-				this.value = { mode: 'local', timeZones: [] };
-				break;
-			case 'custom':
-				this.value = {
-					mode: 'custom',
-					timeZones: Array.from(this.inputElem.value),
-				};
-				break;
-			default:
-				throw new Error(`Unknown value: ${event.target.value}`);
-		}
-
+		if (!this._supportedModes.includes(event.target.value)) throw new Error(`Unknown mode: ${event.target.value}`);
+		this.value = { mode: event.target.value, timeZones: Array.from(this.inputElem.value) };
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -72,7 +63,6 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 		const target = event.target as UmbInputTimeZoneElement;
 		const selectedOptions = target.value;
 
-		this._selectedTimeZones = selectedOptions;
 		if (this.value?.mode === 'custom') {
 			this.value = { mode: this.value.mode, timeZones: selectedOptions };
 		} else {
@@ -89,18 +79,14 @@ export class UmbPropertyEditorUITimeZonePickerElement extends UmbLitElement impl
 				?readonly=${this.readonly}
 				@input=${this.#onModeInput}
 				.value=${this.value?.mode ?? 'all'}>
-				<uui-radio
-					name="order"
-					label=${this.localize.term('dateTimePicker_config_timeZones_all')}
-					value="all"></uui-radio>
-				<uui-radio
-					name="order"
-					label=${this.localize.term('dateTimePicker_config_timeZones_local')}
-					value="local"></uui-radio>
-				<uui-radio
-					name="order"
-					label=${this.localize.term('dateTimePicker_config_timeZones_custom')}
-					value="custom"></uui-radio>
+				${map(
+					this._supportedModes,
+					(mode) =>
+						html`<uui-radio
+							name="order"
+							label=${this.localize.term(`dateTimePicker_config_timeZones_${mode}`)}
+							value="${mode}"></uui-radio>`,
+				)}
 			</uui-radio-group>
 			<div class="timezone-picker" ?hidden=${this.value?.mode !== 'custom'}>
 				<umb-form-validation-message>

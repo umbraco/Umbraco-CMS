@@ -12,7 +12,7 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { umbBindToValidation, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { getTimeZoneList, getTimeZoneOffset } from '@umbraco-cms/backoffice/utils';
@@ -188,15 +188,18 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 				this.value,
 				(_item, index) => index,
 				(item, index) => html`
-					<umb-input-time-zone-item
-						name="item-${index}"
-						data-sort-entry-id=${item}
-						value=${item}
-						?disabled=${this.disabled}
-						?readonly=${this.readonly}
-						@delete=${() => this.#deleteItem(index)}
-						@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}>
-					</umb-input-time-zone-item>
+					<uui-form-validation-message>
+						<umb-input-time-zone-item
+							name="item-${index}"
+							data-sort-entry-id=${item}
+							value=${item}
+							?disabled=${this.disabled}
+							?readonly=${this.readonly}
+							@delete=${() => this.#deleteItem(index)}
+							@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}
+							${umbBindToValidation(this)}>
+						</umb-input-time-zone-item>
+					</uui-form-validation-message>
 				`,
 			)}
 		`;

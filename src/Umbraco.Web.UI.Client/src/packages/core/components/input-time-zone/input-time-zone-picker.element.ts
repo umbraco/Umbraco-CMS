@@ -3,6 +3,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbTimeZone } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 export interface UmbTimeZoneOption extends UmbTimeZone {
 	offset: string;
@@ -12,7 +13,9 @@ export interface UmbTimeZoneOption extends UmbTimeZone {
  * @element umb-input-time-zone-picker
  */
 @customElement('umb-input-time-zone-picker')
-export class UmbInputTimeZonePickerElement extends UmbLitElement {
+export class UmbInputTimeZonePickerElement extends UmbFormControlMixin<string, typeof UmbLitElement, ''>(
+	UmbLitElement,
+) {
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -20,7 +23,7 @@ export class UmbInputTimeZonePickerElement extends UmbLitElement {
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	disabled = false;
+	disabled: boolean = false;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -29,7 +32,7 @@ export class UmbInputTimeZonePickerElement extends UmbLitElement {
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	readonly: boolean = false;
 
 	@property({ type: Array })
 	public set options(value) {
@@ -40,15 +43,6 @@ export class UmbInputTimeZonePickerElement extends UmbLitElement {
 		return this.#options;
 	}
 	#options: Array<UmbTimeZoneOption> = [];
-
-	@property({ type: String, reflect: true })
-	public set value(value) {
-		this.#value = value;
-	}
-	public get value() {
-		return this.#value;
-	}
-	#value: string = '';
 
 	@state()
 	private _filteredOptions: Array<UmbTimeZone> = [];

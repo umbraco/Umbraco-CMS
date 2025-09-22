@@ -18,7 +18,7 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 
-interface UmbDateTime2 {
+interface UmbDateTime {
 	date: string | undefined;
 	timeZone: string | undefined;
 }
@@ -29,7 +29,7 @@ interface UmbTimeZonePickerOption extends UmbTimeZone {
 }
 
 export abstract class UmbPropertyEditorUiDateTimePickerElementBase
-	extends UmbFormControlMixin<UmbDateTime2, typeof UmbLitElement, undefined>(UmbLitElement)
+	extends UmbFormControlMixin<UmbDateTime, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
 	private _timeZoneOptions: Array<UmbTimeZonePickerOption> = [];
@@ -81,10 +81,6 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 				break;
 		}
 		this._displayTimeZone = displayTimeZone;
-	}
-
-	override connectedCallback() {
-		super.connectedCallback();
 
 		this.addValidator(
 			'customError',

@@ -2,15 +2,17 @@ import { html, customElement, css, property, nothing, when } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { getTimeZoneName } from '@umbraco-cms/backoffice/utils';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-input-time-zone-item
  */
 @customElement('umb-input-time-zone-item')
-export class UmbInputTimeZoneItemElement extends UmbLitElement {
-	@property({ reflect: false })
-	value = '';
-
+export class UmbInputTimeZoneItemElement extends UmbFormControlMixin<
+	string | undefined,
+	typeof UmbLitElement,
+	undefined
+>(UmbLitElement) {
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -18,7 +20,7 @@ export class UmbInputTimeZoneItemElement extends UmbLitElement {
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	disabled = false;
+	disabled: boolean = false;
 
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
@@ -27,10 +29,20 @@ export class UmbInputTimeZoneItemElement extends UmbLitElement {
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	readonly: boolean = false;
+
+	constructor() {
+		super();
+
+		this.addValidator(
+			'valueMissing',
+			() => this.localize.term('validation_invalidEmpty'),
+			() => !this.value || this.value.trim() === '',
+		);
+	}
 
 	override render() {
-		const label = getTimeZoneName(this.value);
+		const label = this.value ? getTimeZoneName(this.value) : '';
 		return html`
 			<div class="time-zone-item">
 				${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-grip" class="handle"></uui-icon>`}
