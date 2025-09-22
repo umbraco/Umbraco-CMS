@@ -111,10 +111,9 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			: nothing;
 	}
 
-#getDashboardName(dashboard:ManifestDashboard) {
-	return dashboard.meta?.label ? this.localize.string(dashboard.meta.label) : dashboard.name ?? dashboard.alias;
-}
-
+	#getDashboardName(dashboard: ManifestDashboard) {
+		return dashboard.meta?.label ? this.localize.string(dashboard.meta.label) : (dashboard.name ?? dashboard.alias);
+	}
 
 	#renderDashboards() {
 		// Only show dashboards if there are more than one dashboard or if there are both dashboards and views
@@ -130,7 +129,9 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 								<uui-tab
 									href="${this._routerPath}/${dashboardPath}"
 									label="${this.#getDashboardName(dashboard)}"
-									?active="${isActive}">${this.#getDashboardName(dashboard)}</uui-tab>
+									?active="${isActive}"
+									>${this.#getDashboardName(dashboard)}</uui-tab
+								>
 							`;
 						})}
 					</uui-tab-group>
