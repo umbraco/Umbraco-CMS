@@ -446,7 +446,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 		controller.setValues(data.values);
 
-		data.values = await controller.create(valueDefinitions, {
+		const processedValues = await controller.create(valueDefinitions, {
 			entityType: this.getEntityType(),
 			entityUnique: data.unique,
 			entityTypeUnique: contentTypeUnique,
@@ -472,7 +472,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		data.values = dataValues;
 		*/
 
-		return data;
+		return { ...data, values: processedValues };
 	}
 
 	/**
