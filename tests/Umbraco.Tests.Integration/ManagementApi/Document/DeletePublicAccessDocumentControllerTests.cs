@@ -20,10 +20,10 @@ public class DeletePublicAccessDocumentControllerTests : ManagementApiUserGroupT
     [SetUp]
     public async Task Setup()
     {
-        var template = TemplateBuilder.CreateTextPageTemplate();
+        var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
-        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -32,7 +32,7 @@ public class DeletePublicAccessDocumentControllerTests : ManagementApiUserGroupT
             ContentTypeKey = contentType.Key,
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
-            InvariantName = "Test Copy",
+            InvariantName = Guid.NewGuid().ToString(),
             InvariantProperties = new[]
             {
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
