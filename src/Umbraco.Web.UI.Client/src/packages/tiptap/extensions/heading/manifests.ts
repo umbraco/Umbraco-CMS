@@ -49,4 +49,43 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Heading 3',
 		},
 	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.Heading4',
+		name: 'Heading 4 Tiptap Toolbar Extension',
+		api: () => import('./heading4.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.Heading'],
+		meta: {
+			alias: 'heading4',
+			icon: 'icon-heading-4',
+			label: 'Heading 4',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.Heading5',
+		name: 'Heading 5 Tiptap Toolbar Extension',
+		api: () => import('./heading5.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.Heading'],
+		meta: {
+			alias: 'heading5',
+			icon: 'icon-heading-5',
+			label: 'Heading 5',
+		},
+	},
+	{
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.Heading6',
+		name: 'Heading 6 Tiptap Toolbar Extension',
+		api: () => import('./heading6.tiptap-toolbar-api.js'),
+		forExtensions: ['Umb.Tiptap.Heading'],
+		meta: {
+			alias: 'heading6',
+			icon: 'icon-heading-6',
+			label: 'Heading 6',
+		},
+	},
 ];
