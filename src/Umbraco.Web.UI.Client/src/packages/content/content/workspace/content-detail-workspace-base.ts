@@ -392,17 +392,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#segments.setValue(data?.items ?? []);
 	}
 
-	protected override async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
+	protected override async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		const contentTypeUnique: string | undefined = (data as any)[this.#contentTypePropertyName].unique;
 		if (!contentTypeUnique) {
 			throw new Error(`Could not find content type unique on property '${this.#contentTypePropertyName}'`);
 		}
 		// Load the content type structure, usually this comes from the data, but in this case we are making the data, and we need this to be able to complete the data. [NL]
 		await this.structure.loadType(contentTypeUnique);
-
-		/**
-		 * TODO: Should we also set Preset Values when loading Content, because maybe content contains uncreated Cultures or Segments.
-		 */
 
 		// Set culture and segment for all values:
 		const cultures = this.#languages.getValue().map((x) => x.unique);
