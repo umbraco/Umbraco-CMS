@@ -263,6 +263,9 @@ export function UmbFormControlMixin<
 		 * @returns {void}
 		 */
 		protected addFormControlElement(element: UmbNativeFormControlElement) {
+			if (!element) {
+				throw new Error('Element is null or undefined');
+			}
 			this.#formCtrlElements.push(element);
 			element.addEventListener(UmbValidationInvalidEvent.TYPE, this.#runValidatorsCallback);
 			element.addEventListener(UmbValidationValidEvent.TYPE, this.#runValidatorsCallback);
