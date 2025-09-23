@@ -139,7 +139,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	#renderDataSourceInput() {
 		return html`
 			<umb-property-layout label="Data Source" description="Some description">
-				<umb-input-property-editor-data-source slot="editor"></umb-input-property-editor-data-source>
+				<umb-input-property-editor-data-source slot="editor" max="1"></umb-input-property-editor-data-source>
 			</umb-property-layout>
 		`;
 	}
