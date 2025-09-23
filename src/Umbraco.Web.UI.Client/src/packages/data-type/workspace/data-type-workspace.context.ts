@@ -293,7 +293,6 @@ export class UmbDataTypeWorkspaceContext
 	setPropertyEditorDataSourceAlias(alias?: string) {
 		// TODO: Do we need to prefix this to ensure uniqueness?
 		this.setPropertyValue('editorDataSourceAlias', alias);
-		debugger;
 	}
 
 	/**
