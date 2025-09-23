@@ -74,7 +74,7 @@ public class DecimalPropertyEditor : DataEditor
                         : null,
                 _ => decimal.TryParse(value?.ToString(), CultureInfo.CurrentCulture, out var parsedDecimalValue)
                         ? parsedDecimalValue
-                        : null
+                        : null,
             };
 
         /// <summary>
