@@ -54,7 +54,7 @@ export class UmbPropertyEditorUITimeZonePickerElement
 	}
 
 	protected override firstUpdated() {
-		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-time-zone')!);
+		this.addFormControlElement(this.inputElem);
 	}
 
 	#onModeInput(event: UUIRadioEvent) {
