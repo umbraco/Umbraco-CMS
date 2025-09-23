@@ -448,11 +448,16 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			controller.setSegments(segments);
 		}
 
-		const presetValues = await controller.create(valueDefinitions, {
+		controller.setValues(data.values);
+
+		data.values = await controller.create(valueDefinitions, {
 			entityType: this.getEntityType(),
 			entityUnique: data.unique,
 			entityTypeUnique: contentTypeUnique,
 		});
+
+		/*
+		const presetValues = ...
 
 		// Don't just set the values, as we could have some already populated from a blueprint.
 		// If we have a value from both a blueprint and a preset, use the latter as priority.
@@ -469,6 +474,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		data.values = dataValues;
+		*/
 
 		return data;
 	}
