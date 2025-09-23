@@ -117,7 +117,7 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 				return this.localize.term('validation_numberMaximum', [this.max?.toString()]);
 			},
 			() => {
-				if (this.min !== undefined) {
+				if (this.max !== undefined) {
 					const [from, to] = splitString(this.value);
 					if (to !== undefined && to > this.max) {
 						return true;
