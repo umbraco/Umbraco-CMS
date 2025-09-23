@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -36,7 +37,8 @@ internal sealed class ContentEditingService
         ILocalizationService localizationService,
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             contentService,
             contentTypeService,
@@ -48,7 +50,8 @@ internal sealed class ContentEditingService
             contentValidationService,
             treeEntitySortingService,
             optionsMonitor,
-            relationService)
+            relationService,
+            contentTypeFilters)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _templateService = templateService;

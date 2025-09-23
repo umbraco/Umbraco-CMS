@@ -2311,6 +2311,7 @@ export default {
 		openBackofficeSearch: 'Åben backoffice søgning',
 		openCloseBackofficeHelp: 'Åben/Luk backoffice hjælp',
 		openCloseBackofficeProfileOptions: 'Åben/Luk dine profil indstillinger',
+		profileOptions: 'Profil indstillinger',
 		assignDomainDescription: 'Tilføj domæne på %0%',
 		createDescription: 'Opret ny node under %0%',
 		protectDescription: 'Opsæt offentlig adgang på %0%',
@@ -2349,6 +2350,7 @@ export default {
 		maxAmount: 'Maximum antal',
 		contextDialogDescription: 'Perform action %0% on the %1% node',
 		expandChildItems: 'Udvid underordnede elementer for',
+		collapseChildItems: 'Skjul underordnede elementer for',
 		openContextNode: 'Åbn kontekstnode for',
 	},
 	references: {

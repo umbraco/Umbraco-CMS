@@ -15,6 +15,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { query } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 export type UmbPoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
 export interface UmbPoolingConfig {
@@ -30,6 +31,8 @@ export interface UmbLogViewerDateRange {
 export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbWorkspaceContext {
 	public readonly workspaceAlias: string = 'Umb.Workspace.LogViewer';
 	#repository: UmbLogViewerRepository;
+
+	public readonly view = new UmbViewContext(this, null);
 
 	getEntityType() {
 		return 'log-viewer';
@@ -108,6 +111,8 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token, we need to update UMB_APP_LOG_VIEWER_CONTEXT to become a workspace context. [NL]
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		this.#repository = new UmbLogViewerRepository(host);
+
+		this.view.setBrowserTitle('#treeHeaders_logViewer');
 	}
 
 	override hostConnected() {
