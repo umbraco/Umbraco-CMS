@@ -4,22 +4,37 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbFormControlMixin } from '../../validation/mixins';
 
-function stringToValueObject(value: string | undefined) {
-	const [from, to] = (value ?? ',').split(',').map(Number);
-	return { from, to: to ?? from };
+function splitString(value: string | undefined): Partial<[number | undefined, number | undefined]> {
+	const [from, to] = (value ?? ',').split(',');
+	const fromNumber = makeNumberOrUndefined(from);
+	return [fromNumber, makeNumberOrUndefined(to, fromNumber)];
 }
 
-function undefinedFallback(value: number | undefined, fallback: number) {
-	return value === undefined ? fallback : value;
+function makeNumberOrUndefined(value: string | undefined, fallback?: undefined | number) {
+	if (value === undefined) {
+		return fallback;
+	}
+	const n = Number(value);
+	if (isNaN(n)) {
+		return fallback;
+	}
+	return n;
+}
+
+function undefinedFallbackToString(value: number | undefined, fallback: number): string {
+	return (value === undefined ? fallback : value).toString();
 }
 
 @customElement('umb-input-slider')
 export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof UmbLitElement, ''>(UmbLitElement, '') {
 	override set value(value: string) {
-		const { from, to } = stringToValueObject(value);
+		const [from, to] = splitString(value);
 		this.#valueLow = from;
 		this.#valueHigh = to;
 		super.value = value;
+	}
+	override get value() {
+		return super.value;
 	}
 
 	@property()
@@ -56,9 +71,9 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 
 	#setValueFromLowHigh() {
 		if (this.enableRange) {
-			this.value = `${undefinedFallback(this.valueLow, this.min)},${undefinedFallback(this.valueHigh, this.max)}`;
+			super.value = `${undefinedFallbackToString(this.valueLow, this.min)},${undefinedFallbackToString(this.valueHigh, this.max)}`;
 		} else {
-			this.value = `${undefinedFallback(this.valueLow, this.min)}`;
+			super.value = `${undefinedFallbackToString(this.valueLow, this.min)}`;
 		}
 	}
 
@@ -83,8 +98,16 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 				return this.localize.term('validation_numberMinimum', [this.min?.toString()]);
 			},
 			() => {
-				const { from, to } = stringToValueObject(this.value);
-				return this.min !== undefined ? from < this.min || to < this.min : false;
+				if (this.min !== undefined) {
+					const [from, to] = splitString(this.value);
+					if (to !== undefined && to < this.min) {
+						return true;
+					}
+					if (from !== undefined && from < this.min) {
+						return true;
+					}
+				}
+				return false;
 			},
 		);
 
@@ -94,8 +117,16 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 				return this.localize.term('validation_numberMaximum', [this.max?.toString()]);
 			},
 			() => {
-				const { from, to } = stringToValueObject(this.value);
-				return this.max !== undefined ? from > this.max || to > this.max : false;
+				if (this.min !== undefined) {
+					const [from, to] = splitString(this.value);
+					if (to !== undefined && to > this.max) {
+						return true;
+					}
+					if (from !== undefined && from > this.max) {
+						return true;
+					}
+				}
+				return false;
 			},
 		);
 
@@ -105,7 +136,11 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 				return this.localize.term('validation_rangeExceeds');
 			},
 			() => {
-				return this.min !== undefined && this.max !== undefined ? this.min > this.max : false;
+				const [from, to] = splitString(this.value);
+				if (to !== undefined && from !== undefined) {
+					return from > to;
+				}
+				return false;
 			},
 		);
 	}
@@ -131,7 +166,7 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 				.min=${this.min}
 				.max=${this.max}
 				.step=${this.step}
-				.value=${undefinedFallback(this.valueLow, this.min).toString()}
+				.value=${undefinedFallbackToString(this.valueLow, this.min).toString()}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}>
 			</uui-slider>
@@ -145,7 +180,7 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 				.min=${this.min}
 				.max=${this.max}
 				.step=${this.step}
-				.value="${undefinedFallback(this.valueLow, this.min).toString()},${undefinedFallback(
+				.value="${undefinedFallbackToString(this.valueLow, this.min).toString()},${undefinedFallbackToString(
 					this.valueHigh,
 					this.max,
 				).toString()}"
