@@ -5,7 +5,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Headings Tiptap Extension',
 		api: () => import('./heading.tiptap-api.js'),
 		meta: {
-			icon: 'icon-heading-1',
+			icon: 'icon-heading',
 			label: 'Headings',
 			group: '#tiptap_extGroup_formatting',
 		},
