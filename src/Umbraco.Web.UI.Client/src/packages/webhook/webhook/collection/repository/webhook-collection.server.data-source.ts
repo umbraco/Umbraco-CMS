@@ -41,7 +41,7 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 				entityType: UMB_WEBHOOK_ENTITY_TYPE,
 				unique: item.id,
 				url: item.url,
-				name: item.name,
+				name: item.name ?? '',
 				description: item.description,
 				enabled: item.enabled,
 				headers: item.headers,

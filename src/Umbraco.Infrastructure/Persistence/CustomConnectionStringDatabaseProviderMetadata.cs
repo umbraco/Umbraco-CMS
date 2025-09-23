@@ -43,6 +43,9 @@ public class CustomConnectionStringDatabaseProviderMetadata : IDatabaseProviderM
     public bool SupportsIntegratedAuthentication => false;
 
     /// <inheritdoc />
+    public bool SupportsTrustServerCertificate => false;
+
+    /// <inheritdoc />
     public bool RequiresConnectionTest => true;
 
     /// <inheritdoc />
