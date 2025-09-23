@@ -1,6 +1,10 @@
 import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { InputType, UUIFormLayoutItemElement } from '@umbraco-cms/backoffice/external/uui';
+import {
+	UUIFormValidationMessageElement,
+	type InputType,
+	type UUIFormLayoutItemElement,
+} from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from './contexts';
@@ -45,10 +49,21 @@ const createLabel = (opts: { forId: string; localizeAlias: string; localizeFallb
 	return label;
 };
 
-const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement) => {
+const createValidationMessage = (id: string, localizationKey: string) => {
+	const validationElement = document.createElement('div');
+	validationElement.className = 'validation-message';
+	validationElement.setAttribute('for', id);
+	const localizeElement = document.createElement('umb-localize');
+	localizeElement.key = localizationKey;
+	validationElement.appendChild(localizeElement);
+	return validationElement;
+};
+
+const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement, localizationKey: string) => {
 	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
 	formLayoutItem.appendChild(label);
 	formLayoutItem.appendChild(input);
+	formLayoutItem.appendChild(createValidationMessage(input.id, localizationKey));
 
 	return formLayoutItem;
 };
@@ -60,9 +75,39 @@ const createForm = (elements: HTMLElement[]) => {
 	form.id = 'umb-login-form';
 	form.name = 'login-form';
 	form.spellcheck = false;
+	form.noValidate = true;
 
 	elements.push(styles);
 	elements.forEach((element) => form.appendChild(element));
+
+	form.addEventListener('submit', (e) => {
+		e.preventDefault();
+
+		const form = e.target as HTMLFormElement;
+		if (!form) return;
+
+		const formData = new FormData(form);
+
+		const username = formData.get('username') as string;
+		const password = formData.get('password') as string;
+
+		const validationMessages = Array.from(form.querySelectorAll('.validation-message'));
+		validationMessages.forEach((vm) => vm.removeAttribute('state'));
+
+		if (!username) {
+			const validationMessage = validationMessages.find(
+				(vm) => vm.getAttribute('for') === 'username-input'
+			) as UUIFormValidationMessageElement;
+			validationMessage?.setAttribute('state', 'error');
+		}
+
+		if (!password) {
+			const validationMessage = validationMessages.find(
+				(vm) => vm.getAttribute('for') === 'password-input'
+			) as UUIFormValidationMessageElement;
+			validationMessage?.setAttribute('state', 'error');
+		}
+	});
 
 	return form;
 };
@@ -192,8 +237,16 @@ export default class UmbAuthElement extends UmbLitElement {
 			localizeFallback: 'Password',
 		});
 
-		this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
-		this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);
+		this._usernameLayoutItem = createFormLayoutItem(
+			this._usernameLabel,
+			this._usernameInput,
+			this.usernameIsEmail ? 'auth_requiredEmailValidationMessage' : 'auth_requiredUsernameValidationMessage'
+		);
+		this._passwordLayoutItem = createFormLayoutItem(
+			this._passwordLabel,
+			this._passwordInput,
+			'auth_requiredPasswordValidationMessage'
+		);
 
 		this._form = createForm([this._usernameLayoutItem, this._passwordLayoutItem]);
 
