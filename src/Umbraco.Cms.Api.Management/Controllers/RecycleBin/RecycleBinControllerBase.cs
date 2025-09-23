@@ -24,9 +24,6 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
 
     protected abstract Guid RecycleBinRootKey { get; }
 
-    protected virtual Ordering ItemOrdering => Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
-
-
     protected Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
         IEntitySlim[] rootEntities = GetPagedRootEntities(skip, take, out var totalItems);
@@ -171,7 +168,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
                 after,
                 out totalBefore,
                 out totalAfter,
-                ordering: ItemOrdering)
+                ordering: Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text)))
             .ToArray();
 
     /// <summary>
