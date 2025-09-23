@@ -91,6 +91,42 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         return Database.Fetch<int>(sql);
     }
 
+    public PagedModel<Guid> GetChildren(Guid parentKey)
+    {
+
+        // TODO: Make this one query.
+        // Get content type id
+        Sql<ISqlContext> sqlContentTypeId = Sql()
+            .Select<ContentTypeDto>(x => x.NodeId)
+            .From<ContentTypeDto>()
+            .InnerJoin<NodeDto>()
+            .On<ContentTypeDto, NodeDto>((c, n) => c.NodeId == n.NodeId)
+            .Where<NodeDto>(x => x.UniqueId == parentKey);
+
+        var contentTypeId = Database.FirstOrDefault<int?>(sqlContentTypeId);
+
+        if (contentTypeId is null)
+        {
+            return new PagedModel<Guid>();
+        }
+
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(x => x.UniqueId)
+            .From<NodeDto>()
+            .InnerJoin<ContentType2ContentTypeDto>()
+            .On<ContentType2ContentTypeDto, NodeDto>((c, n) => c.ChildId == n.NodeId)
+            .Where<ContentType2ContentTypeDto>(c => c.ParentId == contentTypeId.Value);
+
+        List<Guid>? contentGuids = Database.Fetch<Guid>(sql);
+
+
+        return new PagedModel<Guid>()
+        {
+            Items = contentGuids,
+            Total = contentGuids.Count
+        };
+    }
+
     protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy() =>
         new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
 

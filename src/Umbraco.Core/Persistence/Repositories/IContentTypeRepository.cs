@@ -29,4 +29,6 @@ public interface IContentTypeRepository : IContentTypeRepositoryBase<IContentTyp
     IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes);
 
     IEnumerable<int> GetAllContentTypeIds(string[] aliases);
+
+    PagedModel<Guid> GetChildren(Guid parentKey);
 }
