@@ -64,11 +64,18 @@ public class DecimalPropertyEditor : DataEditor
             => TryParsePropertyValue(editorValue.Value);
 
         private static decimal? TryParsePropertyValue(object? value)
-            => value is decimal decimalValue
-                ? decimalValue
-                : decimal.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out var parsedDecimalValue)
-                    ? parsedDecimalValue
-                    : null;
+            => value switch
+            {
+                decimal d => d,
+                double db => (decimal)db,
+                float f => (decimal)f,
+                IFormattable f => decimal.TryParse(f.ToString(null, CultureInfo.InvariantCulture), NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedDecimalValue)
+                        ? parsedDecimalValue
+                        : null,
+                _ => decimal.TryParse(value?.ToString(), CultureInfo.CurrentCulture, out var parsedDecimalValue)
+                        ? parsedDecimalValue
+                        : null,
+            };
 
         /// <summary>
         /// Base validator for the decimal property editor validation against data type configured values.
