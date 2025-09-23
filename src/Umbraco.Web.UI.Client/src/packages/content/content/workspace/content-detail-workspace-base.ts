@@ -898,6 +898,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			);
 			if (valid || this.#ignoreValidationResultOnSubmit) {
 				return this.performCreateOrUpdate(variantIds, saveData);
+			} else {
+				throw new Error('Content is not valid');
 			}
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
