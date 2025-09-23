@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Bogus;
+﻿using Bogus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -26,9 +23,6 @@ namespace Umbraco.TestData;
 /// </summary>
 public class UmbracoTestDataController : SurfaceController
 {
-    private const string RichTextDataTypeName = "UmbracoTestDataContent.RTE";
-    private const string MediaPickerDataTypeName = "UmbracoTestDataContent.MediaPicker";
-    private const string TextDataTypeName = "UmbracoTestDataContent.Text";
     private const string TestDataContentTypeAlias = "umbTestDataContent";
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly ICoreScopeProvider _scopeProvider;
@@ -52,11 +46,6 @@ public class UmbracoTestDataController : SurfaceController
         _propertyEditors = propertyEditors;
         _shortStringHelper = shortStringHelper;
         _testDataSettings = testDataSettings.Value;
-    }
-
-    public IActionResult Debug()
-    {
-        return Ok("Debug");
     }
 
     /// <summary>

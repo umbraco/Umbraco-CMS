@@ -10,7 +10,7 @@ namespace Umbraco.TestData.Extensions;
 
 public static class UmbracoBuilderExtensions
 {
-    public static IUmbracoBuilder AddUmbracoTestData(this IUmbracoBuilder builder)
+    public static IUmbracoBuilder AddUmbracoLoadTest(this IUmbracoBuilder builder)
     {
         if (builder.Services.Any(x => x.ServiceType == typeof(LoadTestController)))
         {
@@ -37,6 +37,25 @@ public static class UmbracoBuilderExtensions
             }));
 
         builder.Services.AddScoped(typeof(LoadTestController));
+
+        return builder;
+    }
+
+    public static IUmbracoBuilder AddUmbracoTestData(this IUmbracoBuilder builder)
+    {
+        if (builder.Services.Any(x => x.ServiceType == typeof(UmbracoTestDataController)))
+        {
+            return builder;
+        }
+
+        var testDataSection = builder.Config.GetSection("Umbraco:CMS:TestData");
+        var config = testDataSection.Get<TestDataSettings>();
+        if (config == null || config.Enabled == false)
+        {
+            return builder;
+        }
+
+        builder.Services.Configure<TestDataSettings>(testDataSection);
 
         builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
             .Add<UmbracoTestDataController>();
