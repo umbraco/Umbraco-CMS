@@ -9,6 +9,7 @@ import {
 	query,
 	when,
 	state,
+	ref,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -122,7 +123,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	@state()
 	private _disableAddButton = true;
 
-	@query('umb-input-time-zone-picker')
+	@state()
 	protected _timeZonePicker?: UmbInputTimeZonePickerElement;
 
 	private _timeZoneList: Array<UmbTimeZoneOption> = [];
@@ -208,7 +209,8 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 						this._disableAddButton = !(event.target as UmbInputTimeZonePickerElement)?.value;
 					}}
 					?disabled=${this.disabled}
-					?readonly=${this.readonly}>
+					?readonly=${this.readonly}
+					${ref(this.#inputTimeZonePiclerChanged)}>
 				</umb-input-time-zone-picker>
 				${when(
 					!this.readonly,
@@ -226,6 +228,16 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 				)}
 			</div>
 		`;
+	}
+
+	#inputTimeZonePiclerChanged(input?: Element) {
+		if (this._timeZonePicker) {
+			this.removeFormControlElement(this._timeZonePicker);
+		}
+		this._timeZonePicker = input as UmbInputTimeZonePickerElement;
+		if (this._timeZonePicker) {
+			this.addFormControlElement(this._timeZonePicker);
+		}
 	}
 
 	static override styles = [
