@@ -306,16 +306,23 @@ export class UmbViewController extends UmbControllerBase {
 			return;
 		}
 		const localTitle = this.getComputedTitle();
-		document.title = (localTitle ? localTitle + ' | ' : '') + 'Umbraco';
+		document.title = (localTitle && localTitle !== '' ? localTitle + ' | ' : '') + 'Umbraco';
 	}
 
 	#computeTitle() {
 		const titles = [];
 		if (this.#inherit && this.#parentView) {
-			titles.push(this.#parentView.getComputedTitle());
+			const computedTitle = this.#parentView.getComputedTitle();
+			if (computedTitle) {
+				titles.push(computedTitle);
+			}
 		}
-		if (this.#title) {
-			titles.push(this.#localize.string(this.#title));
+		if (this.#title !== undefined && this.#title !== null) {
+			if (this.#title === '') {
+				titles.push(this.#localize.term('general_unnamed'));
+			} else {
+				titles.push(this.#localize.string(this.#title));
+			}
 		}
 		this.#computedTitle.setValue(titles.length > 0 ? titles.join(' | ') : undefined);
 	}
