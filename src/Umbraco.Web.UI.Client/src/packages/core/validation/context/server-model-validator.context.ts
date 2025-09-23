@@ -95,7 +95,7 @@ export class UmbServerModelValidatorContext extends UmbContextBase implements Um
 						}
 					}
 
-					// Correct the end of the path to ensure the `.value` properties start with a lowerCase v. (notice it the server in some cases returns it with an upperCase V): [NL]
+					// Correct the end of the path to ensure the `.value` properties start with a lowercase v. (notice it the server in some cases returns it with an upperCase V): [NL]
 					// This is surely a Hack but the Backend seem not to be able to solve this. [NL]
 					if (path.endsWith('.Value')) {
 						path = path.slice(0, -6) + '.value';
