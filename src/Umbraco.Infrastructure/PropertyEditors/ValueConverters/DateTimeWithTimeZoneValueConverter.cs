@@ -5,10 +5,17 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 /// <summary>
-/// The DateTimeWithTimeZone property value converter.
+/// Provides a property value converter for timezone specified datetime property editors.
 /// </summary>
+/// <remarks>
+/// This is one of four property value converters derived from <see cref="DateTimeValueConverterBase"/> and storing their
+/// value as JSON with timezone information.
+/// </remarks>
 public class DateTimeWithTimeZoneValueConverter : DateTimeValueConverterBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DateTimeWithTimeZoneValueConverter"/> class.
+    /// </summary>
     public DateTimeWithTimeZoneValueConverter(IJsonSerializer jsonSerializer, ILogger<DateTimeWithTimeZoneValueConverter> logger)
         : base(jsonSerializer, logger)
     {

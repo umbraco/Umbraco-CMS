@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 /// <summary>
-/// The base DateTime property value converter.
+/// Provides base functionality for date time property value converters that store their value as a JSON string with timezone information.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public abstract class DateTimeValueConverterBase : PropertyValueConverterBase
@@ -56,13 +56,19 @@ public abstract class DateTimeValueConverterBase : PropertyValueConverterBase
     protected abstract object ConvertToObject(DateTimeDto dateTimeDto);
 
     /// <summary>
-    ///     Model/DTO that represents the JSON that DateTime2 stores.
+    /// Model/DTO that represents the JSON that date time property editors persisting as a JSON string stores.
     /// </summary>
     public class DateTimeDto
     {
+        /// <summary>
+        /// Gets or sets the date time value.
+        /// </summary>
         [JsonPropertyName("date")]
         public DateTimeOffset Date { get; init; }
 
+        /// <summary>
+        /// Gets or sets the (optional) timezone.
+        /// </summary>
         [JsonPropertyName("timeZone")]
         public string? TimeZone { get; init; }
     }

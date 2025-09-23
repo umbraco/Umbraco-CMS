@@ -5,12 +5,15 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Provides base functionality for date time property editors index value factories that store their value as a JSON string with timezone information.
+/// </summary>
 internal abstract class DateTimePropertyIndexValueFactory : IPropertyIndexValueFactory
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<DateTimePropertyIndexValueFactory> _logger;
 
-    public DateTimePropertyIndexValueFactory(
+    protected DateTimePropertyIndexValueFactory(
         IJsonSerializer jsonSerializer,
         ILogger<DateTimePropertyIndexValueFactory> logger)
     {

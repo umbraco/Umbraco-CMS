@@ -3,7 +3,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -19,11 +18,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Provides base functionality for date time property editors that store their value as a JSON string with timezone information.
+/// </summary>
 public abstract class DateTimePropertyEditorBase : DataEditor
 {
     private readonly IIOHelper _ioHelper;
     private readonly IPropertyIndexValueFactory _propertyIndexValueFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DateTimePropertyEditorBase"/> class.
+    /// </summary>
     protected DateTimePropertyEditorBase(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
@@ -43,11 +48,20 @@ public abstract class DateTimePropertyEditorBase : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<DateTimeDataValueEditor>(Attribute!, MapDateToEditorFormat);
 
+    /// <summary>
+    /// Converts the specified date and time value to a string formatted for use in the property editor.
+    /// </summary>
+    /// <param name="dateTimeDto">An object containing the date and time components to be formatted.</param>
+    /// <returns>A string representation of the date and time, formatted for use in the property editor.</returns>
     protected abstract string MapDateToEditorFormat(DateTimeValueConverterBase.DateTimeDto dateTimeDto);
 
     /// <inheritdoc/>
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _propertyIndexValueFactory;
 
+    /// <summary>
+    /// Provides a data value editor for date and time properties, supporting conversion between editor values and
+    /// persisted values for date/time property editors.
+    /// </summary>
     internal class DateTimeDataValueEditor : DataValueEditor
     {
         private readonly IJsonSerializer _jsonSerializer;
@@ -55,6 +69,9 @@ public abstract class DateTimePropertyEditorBase : DataEditor
         private readonly Func<DateTimeValueConverterBase.DateTimeDto, string> _mappingFunc;
         private readonly string _editorAlias;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DateTimeDataValueEditor"/> class.
+        /// </summary>
         public DateTimeDataValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,

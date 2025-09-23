@@ -5,10 +5,17 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 /// <summary>
-/// The TimeOnly property value converter.
+/// Provides a property value converter for time only datetime property editors.
 /// </summary>
+/// <remarks>
+/// This is one of four property value converters derived from <see cref="DateTimeValueConverterBase"/> and storing their
+/// value as JSON with timezone information.
+/// </remarks>
 public class TimeOnlyValueConverter : DateTimeValueConverterBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TimeOnlyValueConverter"/> class.
+    /// </summary>
     public TimeOnlyValueConverter(IJsonSerializer jsonSerializer, ILogger<TimeOnlyValueConverter> logger)
         : base(jsonSerializer, logger)
     {
