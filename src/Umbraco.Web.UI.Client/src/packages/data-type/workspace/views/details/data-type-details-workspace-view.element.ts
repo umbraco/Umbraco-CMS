@@ -21,6 +21,9 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	@state()
 	private _propertyEditorSchemaAlias?: string | null = null;
 
+	@state()
+	private _propertyEditorDataSourceAlias?: string | null = null;
+
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -52,6 +55,10 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		this.observe(this.#workspaceContext.propertyEditorUiIcon, (value) => {
 			this._propertyEditorUiIcon = value;
 		});
+
+		this.observe(this.#workspaceContext.propertyEditorDataSourceAlias, (value) => {
+			this._propertyEditorDataSourceAlias = value;
+		});
 	}
 
 	async #openPropertyEditorUIPicker() {
@@ -64,6 +71,11 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		if (value) {
 			this.#workspaceContext?.setPropertyEditorUiAlias(value.selection[0]);
 		}
+	}
+
+	#onDataSourceChange(event: CustomEvent) {
+		const value = (event.target as HTMLInputElement).value;
+		this.#workspaceContext?.setPropertyEditorDataSourceAlias(value || undefined);
 	}
 
 	override render() {
@@ -139,7 +151,11 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	#renderDataSourceInput() {
 		return html`
 			<umb-property-layout label="Data Source" description="Some description">
-				<umb-input-property-editor-data-source slot="editor" max="1"></umb-input-property-editor-data-source>
+				<umb-input-property-editor-data-source
+					.value=${this._propertyEditorDataSourceAlias}
+					slot="editor"
+					max="1"
+					@change=${this.#onDataSourceChange}></umb-input-property-editor-data-source>
 			</umb-property-layout>
 		`;
 	}

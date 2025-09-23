@@ -7,7 +7,6 @@ export interface UmbDataTypeDetailModel {
 	name: string;
 	editorAlias: string | undefined;
 	editorUiAlias: string | null;
-	editorDataSourceAlias?: string | null;
 	values: Array<UmbDataTypePropertyValueModel>;
 }
 

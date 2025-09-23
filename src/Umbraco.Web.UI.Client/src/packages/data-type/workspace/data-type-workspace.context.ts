@@ -46,6 +46,9 @@ export class UmbDataTypeWorkspaceContext
 {
 	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
+	readonly propertyEditorDataSourceAlias = this._data.createObservablePartOfCurrent(
+		(data) => data?.values?.find((x) => x.alias === 'editorDataSourceAlias')?.value as string | null | undefined,
+	);
 
 	readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
 	async getValues() {
@@ -283,11 +286,14 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	getPropertyEditorDataSourceAlias() {
-		return this._data.getCurrent()?.editorDataSourceAlias;
+		// TODO: Do we need to prefix this to ensure uniqueness?
+		return this.getPropertyDefaultValue('editorDataSourceAlias');
 	}
 
 	setPropertyEditorDataSourceAlias(alias?: string) {
-		this._data.updateCurrent({ editorDataSourceAlias: alias });
+		// TODO: Do we need to prefix this to ensure uniqueness?
+		this.setPropertyValue('editorDataSourceAlias', alias);
+		debugger;
 	}
 
 	/**
