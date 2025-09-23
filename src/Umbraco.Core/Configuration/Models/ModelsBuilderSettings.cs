@@ -37,7 +37,7 @@ public class ModelsBuilderSettings
     /// </summary>
     public bool FlagOutOfDateModels
     {
-        get => ModelsMode == Constants.ModelsBuilder.ModelsModes.SourceCodeAuto && _flagOutOfDateModels;
+        get => ModelsMode == Constants.ModelsBuilder.ModelsModes.SourceCodeManual && _flagOutOfDateModels;
 
         set => _flagOutOfDateModels = value;
     }

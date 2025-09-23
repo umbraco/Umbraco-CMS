@@ -93,7 +93,7 @@ public class TextBuilder : Builder
             sb.AppendFormat("using {0};\n", t);
         }
 
-        // A hack to include the using for the assembly attribute
+        // A hack to include the using for the assembly attribute (works because this method is only called from InMemoryModelFactory)
         sb.AppendLine("using Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;");
 
         // assembly attributes marker
