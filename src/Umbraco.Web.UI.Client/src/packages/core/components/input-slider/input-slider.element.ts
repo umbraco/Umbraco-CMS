@@ -15,6 +15,13 @@ function undefinedFallback(value: number | undefined, fallback: number) {
 
 @customElement('umb-input-slider')
 export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof UmbLitElement, ''>(UmbLitElement, '') {
+	override set value(value: string) {
+		const { from, to } = stringToValueObject(value);
+		this.#valueLow = from;
+		this.#valueHigh = to;
+		super.value = value;
+	}
+
 	@property()
 	label: string = '';
 
@@ -109,9 +116,6 @@ export class UmbInputSliderElement extends UmbFormControlMixin<string, typeof Um
 
 	#onChange(event: UUISliderEvent) {
 		event.stopPropagation();
-		const { from, to } = stringToValueObject(this.value);
-		this.valueLow = from;
-		this.valueHigh = to;
 		this.value = event.target.value as string;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
