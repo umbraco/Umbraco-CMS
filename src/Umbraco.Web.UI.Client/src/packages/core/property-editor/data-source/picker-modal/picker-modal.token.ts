@@ -1,12 +1,12 @@
 import type { UmbPropertyEditorDataSourceItemModel } from '../item/types.js';
 import { UMB_PROPERTY_EDITOR_DATA_SOURCE_COLLECTION_MENU_ALIAS } from '../constants.js';
+import { UMB_PROPERTY_EDITOR_DATA_SOURCE_SEARCH_PROVIDER_ALIAS } from '../search/constants.js';
 import {
 	UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
 	type UmbCollectionItemPickerModalData,
 	type UmbCollectionItemPickerModalValue,
 } from '@umbraco-cms/backoffice/collection';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { UMB_PROPERTY_EDITOR_DATA_SOURCE_SEARCH_PROVIDER_ALIAS } from '../search/constants.js';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbPropertyEditorDataSourcePickerModalData

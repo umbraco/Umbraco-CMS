@@ -9,6 +9,7 @@ export type * from './extensions/types.js';
 export type * from './item/types.js';
 export type * from './menu/types.js';
 export type * from './workspace-view/types.js';
+export type * from './collection-item-picker-modal/types.js';
 
 /** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export interface UmbCollectionBulkActionPermissions {
