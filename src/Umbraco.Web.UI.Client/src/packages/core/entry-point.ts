@@ -11,7 +11,7 @@ import './menu/components/index.js';
 import './extension-registry/components/index.js';
 import './entity-item/global-components.js';
 import './property-editor/global-components.js';
-import './collection/global-elements.js';
+import './collection/global-components.js';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);
