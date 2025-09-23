@@ -245,15 +245,42 @@ export abstract class UmbTreeItemElementBase<
 		css`
 			#icon-container {
 				position: relative;
+				font-size: 15px;
 			}
 
 			uui-menu-item {
+				--sign-bundle-bg: var(--uui-color-surface);
+				--sign-bundle-border: var(--uui-color-divider);
+				--sign-bundle-shadow: var(--uui-shadow-level-1);
+			}
+
+			uui-menu-item:hover {
+				--sign-bundle-bg: var(--uui-color-surface-emphasis);
+			}
+
+			uui-menu-item[active],
+			uui-menu-item[selected] {
+				--sign-bundle-bg: var(--uui-color-current);
+			}
+
+			uui-menu-item[selected]:hover {
+				--sign-bundle-bg: var(--uui-color-current-emphasis);
+			}
+
+			uui-menu-item[active]:hover {
+				--sign-bundle-bg: var(--uui-color-current-emphasis);
+			}
+
+			/* uui-menu-item {
 				--umb-entity-bundle-background: red;
+			} */
+			/* uui-menu-item:hover {
+				--umb-entity-bundle-background: pink;
 			}
 
 			uui-menu-item[active] {
 				--umb-entity-bundle-background: red;
-			}
+			} */
 
 			#sign-bundle {
 				position: absolute;
