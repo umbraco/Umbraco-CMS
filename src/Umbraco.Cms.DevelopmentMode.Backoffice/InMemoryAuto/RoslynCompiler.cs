@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.DependencyModel;
 
-namespace Umbraco.Cms.Infrastructure.ModelsBuilder;
+namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 
 public class RoslynCompiler
 {
