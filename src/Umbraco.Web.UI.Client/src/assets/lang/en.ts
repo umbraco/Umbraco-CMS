@@ -2229,7 +2229,7 @@ export default {
 		numberMinimum: "Value must be greater than or equal to '%0%'.",
 		numberMaximum: "Value must be less than or equal to '%0%'.",
 		numberMisconfigured: "Minimum value '%0%' must be less than the maximum value '%1%'.",
-		rangeExceeds: 'The low value must not be exceed the high value.',
+		rangeExceeds: 'The low value must not exceed the high value.',
 		invalidExtensions: 'One or more of the extensions are invalid.',
 		allowedExtensions: 'Allowed extensions are:',
 		disallowedExtensions: 'Disallowed extensions are:',
