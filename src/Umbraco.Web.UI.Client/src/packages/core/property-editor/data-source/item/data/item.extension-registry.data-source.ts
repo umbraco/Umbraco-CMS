@@ -1,6 +1,7 @@
 import type { UmbPropertyEditorDataSourceItemModel } from './types.js';
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE } from '../../entity.js';
 
 /**
  * A server data source for Property Editor Data Source items
@@ -18,7 +19,7 @@ export class UmbPropertyEditorDataSourceItemExtensionRegistryDataSource
 		const items: Array<UmbPropertyEditorDataSourceItemModel> = extensions
 			.filter((manifest) => uniques.includes(manifest.alias))
 			.map((manifest) => ({
-				entityType: manifest.type,
+				entityType: UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE,
 				unique: manifest.alias,
 				name: manifest.meta.label ?? manifest.name,
 				icon: manifest.meta.icon ?? 'icon-box',

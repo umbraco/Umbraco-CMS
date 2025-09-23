@@ -1,4 +1,5 @@
 import type { UmbPropertyEditorDataSourceItemModel } from '../item/types.js';
+import { UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE } from '../entity.js';
 import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -24,7 +25,7 @@ export class UmbPropertyEditorDataSourceSearchExtensionRegistryDataSource
 		);
 
 		const items: UmbPropertyEditorDataSourceItemModel[] = filteredExtensions.map((extension) => ({
-			entityType: 'propertyEditorDataSource',
+			entityType: UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE,
 			unique: extension.alias,
 			name: extension.name,
 			icon: extension.meta?.icon,

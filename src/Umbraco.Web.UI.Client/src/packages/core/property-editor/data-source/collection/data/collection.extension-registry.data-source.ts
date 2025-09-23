@@ -5,6 +5,7 @@ import type {
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE } from '../../entity.js';
 
 export class UmbPropertyEditorDataSourceCollectionExtensionRegistryDataSource
 	extends UmbControllerBase
@@ -23,7 +24,7 @@ export class UmbPropertyEditorDataSourceCollectionExtensionRegistryDataSource
 		const paged = filtered.slice(skip, skip + take);
 
 		const items: Array<UmbPropertyEditorDataSourceCollectionItemModel> = paged.map((manifest) => ({
-			entityType: manifest.type,
+			entityType: UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE,
 			unique: manifest.alias,
 			name: manifest.meta.label ?? manifest.name,
 			icon: manifest.meta.icon ?? 'icon-box',
