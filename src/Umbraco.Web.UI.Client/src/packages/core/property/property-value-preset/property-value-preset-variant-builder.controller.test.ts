@@ -82,8 +82,8 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 			ctrl.setValues([
 				{
 					alias: 'test',
-					value: 'blueprint-value-for-cultureA',
-					culture: 'cultureA',
+					value: 'blueprint value for cultureB',
+					culture: 'cultureB',
 					segment: null,
 					editorAlias: 'test-editor-schema',
 				},
@@ -105,9 +105,9 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 			});
 
 			expect(result.length).to.be.equal(2);
-			expect(result[0]?.value).to.be.equal('blueprint-value');
+			expect(result[0]?.value).to.be.equal('value for culture cultureA');
 			expect(result[0]?.culture).to.be.equal('cultureA');
-			expect(result[1]?.value).to.be.equal('value for culture cultureB');
+			expect(result[1]?.value).to.be.equal('blueprint value for cultureB');
 			expect(result[1]?.culture).to.be.equal('cultureB');
 		});
 
