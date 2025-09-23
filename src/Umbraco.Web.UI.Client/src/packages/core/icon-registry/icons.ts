@@ -769,6 +769,9 @@ legacy: true,
 hidden: true,
 path: () => import("./icons/icon-hard-drive.js"),
 },{
+name: "icon-heading",
+path: () => import("./icons/icon-heading.js"),
+},{
 name: "icon-heading-1",
 path: () => import("./icons/icon-heading-1.js"),
 },{
@@ -780,6 +783,12 @@ path: () => import("./icons/icon-heading-3.js"),
 },{
 name: "icon-heading-4",
 path: () => import("./icons/icon-heading-4.js"),
+},{
+name: "icon-heading-5",
+path: () => import("./icons/icon-heading-5.js"),
+},{
+name: "icon-heading-6",
+path: () => import("./icons/icon-heading-6.js"),
 },{
 name: "icon-headphones",
 path: () => import("./icons/icon-headphones.js"),
