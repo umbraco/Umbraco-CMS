@@ -283,7 +283,6 @@ export abstract class UmbTreeItemElementBase<
 			} */
 
 			#sign-bundle {
-				position: absolute;
 				bottom: -5px;
 				right: -5px;
 			}

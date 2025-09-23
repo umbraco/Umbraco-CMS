@@ -21,17 +21,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	@state() private _signs?: Array<any>;
 	@state() private _labels: Map<string, string> = new Map();
 
-	public open() {
-		this.#openDropdown();
-	}
-	public close() {
-		this.#closeDropdown();
-	}
-
-	private _hoverTimer?: number;
-	private _closeTimer?: number;
-	private _overPanel = false;
-
 	#signLabelObservations: Array<UmbObserverController<string>> = [];
 
 	#manifestFilter = (manifest: ManifestEntitySign) => {
@@ -77,64 +66,6 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		);
 	}
 
-	#animateOpen() {
-		const panel = this.renderRoot.querySelector<HTMLElement>('.panel');
-		if (!panel) return;
-		panel.getAnimations().forEach((a) => a.cancel());
-		panel.animate(
-			[
-				{ opacity: 0, transform: 'translateY(-10px)' },
-				{ opacity: 1, transform: 'translateY(0)' },
-			],
-			{ duration: 300, easing: 'ease', fill: 'forwards' },
-		);
-	}
-
-	#openDropdown = () => {
-		if (this._closeTimer) {
-			clearTimeout(this._closeTimer);
-			this._closeTimer = undefined;
-		}
-		if (this._hoverTimer) {
-			clearTimeout(this._hoverTimer);
-		}
-		this._hoverTimer = window.setTimeout(() => {
-			const pop = this.renderRoot.querySelector<HTMLElement>('#popover');
-			if (!pop || pop.matches(':popover-open')) return;
-			(pop as any).showPopover?.();
-			this.#animateOpen();
-			this._hoverTimer = undefined;
-		}, 1000);
-	};
-
-	#closeDropdown = () => {
-		if (this._hoverTimer) {
-			clearTimeout(this._hoverTimer);
-			this._hoverTimer = undefined;
-		}
-
-		if (this._closeTimer) {
-			clearTimeout(this._closeTimer);
-		}
-
-		this._closeTimer = window.setTimeout(() => {
-			if (this._overPanel) return;
-			const pop = this.renderRoot.querySelector<HTMLElement>('#popover');
-			if (pop && pop.matches(':popover-open')) {
-				(pop as any).hidePopover?.();
-			}
-			this._closeTimer = undefined;
-		}, 120);
-	};
-
-	#onPanelEnter = () => {
-		this._overPanel = true;
-	};
-	#onPanelLeave = () => {
-		this._overPanel = false;
-		this.#closeDropdown();
-	};
-
 	override render() {
 		if (!this._signs || this._signs.length === 0) return nothing;
 
@@ -143,25 +74,11 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		if (!first) return nothing;
 
 		return html`
-			<button
-				id="sign-icon"
-				popovertarget="popover"
-				type="button"
-				@mouseenter=${this.#openDropdown}
-				@mouseleave=${this.#closeDropdown}>
+			<button id="sign-icon" type="button">
 				<umb-icon class="inner" name="icon-lock"></umb-icon>
 				<umb-icon name="icon-grid"></umb-icon>
 			</button>
-			<uui-popover-container
-				id="popover"
-				popover
-				placement="bottom-start"
-				@mouseenter=${this.#onPanelEnter}
-				@mouseleave=${this.#onPanelLeave}>
-				<umb-popover-layout class="panel">
-					<div class="labels-pop">${this.#renderOptions()}</div>
-				</umb-popover-layout>
-			</uui-popover-container>
+			<div class="infobox">${this.#renderOptions()}</div>
 		`;
 	}
 	#renderOptions() {
@@ -178,52 +95,69 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 	static override styles = [
 		css`
+			:host {
+				position: absolute;
+				anchor-name: --entity-sign;
+			}
 			#sign-icon {
-				border-radius: 50%;
-				gap: 1px;
-				cursor: pointer;
-				border: none;
-				background: transparent;
-				padding: 1px;
-				color: var(--sign-bundle-text-color);
-
 				position: relative;
-				display: inline;
+				display: inline-flex;
+				border: 0;
+				background: transparent;
+				cursor: pointer;
+				padding: 1px;
+				border-radius: 50%;
+				color: var(--sign-bundle-text-color);
 			}
 
 			umb-icon {
 				position: absolute;
-				background: var(--sign-bundle-bg, transparent);
 				right: 7px;
 				bottom: -2px;
 				font-size: 8px;
 				border-radius: 50%;
+				background: var(--sign-bundle-bg, transparent);
 				padding: 1px;
 			}
 			.inner {
-				position: absolute;
 				z-index: 1;
-				bottom: -2px;
 				right: 1px;
+				bottom: -2px;
 			}
 
-			.labels-pop {
-				padding: 5px;
-				font-size: 12px;
+			@supports (position-anchor: --my-name) {
+				.infobox {
+					position: fixed;
+					position-anchor: --entity-sign;
+					margin-left: -15px;
+					margin-top: -55px;
+					width: 550px;
+					height: 120px;
+					border: 1px solid black;
+					top: anchor(top);
+					left: anchor(right);
+					border-radius: 6px;
+					background: white;
+					opacity: 0;
+					transform: translateY(-4px);
+					pointer-events: none;
+					transition:
+						opacity 120ms ease,
+						transform 120ms ease;
+				}
 			}
+
+			:host(:hover) .infobox {
+				opacity: 1;
+				transform: translateY(0);
+				pointer-events: auto;
+			}
+
 			.label {
 				display: flex;
 				align-items: center;
-				gap: 5px;
-			}
-
-			.panel {
-				opacity: 0;
-				transform: translateY(-10px);
-				transition:
-					opacity 300ms ease,
-					transform 300ms ease;
-				will-change: opacity, transform;
+				gap: 6px;
+				padding: 4px 6px;
 			}
 		`,
 	];
