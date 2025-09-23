@@ -11,13 +11,12 @@ export type * from './global-search/types.js';
 
 export type UmbSearchResultModel = SearchResultResponseModel;
 
-// TODO: lower requirement for search provider item type
 export type UmbSearchResultItemModel = {
 	entityType: string;
-	icon?: string | null;
-	name: string;
 	unique: string;
-	href: string;
+	name: string;
+	icon?: string | null;
+	href?: string;
 };
 
 export type UmbSearchRequestArgs = {
