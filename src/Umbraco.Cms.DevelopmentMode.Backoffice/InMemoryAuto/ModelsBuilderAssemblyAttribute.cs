@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Infrastructure.ModelsBuilder;
+namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto;
 
 /// <summary>
 ///     Indicates that an Assembly is a Models Builder assembly.

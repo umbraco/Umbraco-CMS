@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Hosting;
@@ -20,7 +19,7 @@ using Umbraco.Extensions;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
+namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto
 {
     internal sealed partial class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
     {
@@ -143,7 +142,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         }
 
         /// <inheritdoc />
-        public bool Enabled => _config.ModelsMode == ModelsMode.InMemoryAuto;
+        public bool Enabled => _config.ModelsMode == ModelsModeConstants.InMemoryAuto;
 
         public IPublishedElement CreateModel(IPublishedElement element)
         {
