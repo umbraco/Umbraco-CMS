@@ -127,6 +127,8 @@ export class UmbDefaultCollectionMenuElement extends UmbLitElement {
 	`;
 }
 
+export { UmbDefaultCollectionMenuElement as element };
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-default-collection-menu': UmbDefaultCollectionMenuElement;

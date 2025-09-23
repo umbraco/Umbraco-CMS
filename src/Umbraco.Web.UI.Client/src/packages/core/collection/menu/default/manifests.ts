@@ -9,8 +9,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'collectionMenu',
 			kind: 'default',
-			element: () => import('./default-collection-menu.element.ts'),
-			api: () => import('./default-collection-menu.context.ts'),
+			element: () => import('./default-collection-menu.element.js'),
+			api: () => import('./default-collection-menu.context.js'),
 		},
 	},
 ];
