@@ -165,6 +165,7 @@ export class UmbShortcutController extends UmbControllerBase {
 	}
 
 	#onKeyDown = (e: KeyboardEvent) => {
+		if (e.defaultPrevented) return; // If the event is already handled by someone else then we do nothing. [NL]
 		const keyDown = e.key.toLowerCase();
 		const modifierDown = IsMac ? e.metaKey : e.ctrlKey;
 
