@@ -18,7 +18,7 @@ const testValue = 'This is a test value for the custom property editor';
 test.afterEach(async ({umbracoApi}) => {
 	await umbracoApi.document.ensureNameNotExists(contentName);
 	await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-    await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
 test('custom property editor appears in Property Editor Picker', async ({umbracoApi, umbracoUi}) =>{
