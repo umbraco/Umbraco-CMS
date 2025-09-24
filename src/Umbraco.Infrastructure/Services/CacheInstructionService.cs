@@ -1,9 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -26,11 +28,10 @@ namespace Umbraco.Cms
             private readonly ICacheInstructionRepository _cacheInstructionRepository;
             private readonly GlobalSettings _globalSettings;
             private readonly ILogger<CacheInstructionService> _logger;
+            private readonly ILastSyncedManager _lastSyncedManager;
             private readonly IProfilingLogger _profilingLogger;
 
-            /// <summary>
-            ///     Initializes a new instance of the <see cref="CacheInstructionService" /> class.
-            /// </summary>
+            [Obsolete("Use the overload that requires ILastSyncedManager. Scheduled for removal in V18.")]
             public CacheInstructionService(
                 ICoreScopeProvider provider,
                 ILoggerFactory loggerFactory,
@@ -39,11 +40,33 @@ namespace Umbraco.Cms
                 IProfilingLogger profilingLogger,
                 ILogger<CacheInstructionService> logger,
                 IOptions<GlobalSettings> globalSettings)
+                 : this(
+                     provider,
+                     loggerFactory,
+                     eventMessagesFactory,
+                     cacheInstructionRepository,
+                     profilingLogger,
+                     logger,
+                     globalSettings,
+                     StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>())
+            {
+            }
+
+            public CacheInstructionService(
+                ICoreScopeProvider provider,
+                ILoggerFactory loggerFactory,
+                IEventMessagesFactory eventMessagesFactory,
+                ICacheInstructionRepository cacheInstructionRepository,
+                IProfilingLogger profilingLogger,
+                ILogger<CacheInstructionService> logger,
+                IOptions<GlobalSettings> globalSettings,
+                ILastSyncedManager lastSyncedManager)
                 : base(provider, loggerFactory, eventMessagesFactory)
             {
                 _cacheInstructionRepository = cacheInstructionRepository;
                 _profilingLogger = profilingLogger;
                 _logger = logger;
+                _lastSyncedManager = lastSyncedManager;
                 _globalSettings = globalSettings.Value;
             }
 
@@ -119,7 +142,7 @@ namespace Umbraco.Cms
                 }
             }
 
-            /// <inheritdoc />
+            [Obsolete("Use non obsolete version instead, scheduled for removal in V18.")]
             public ProcessInstructionsResult ProcessInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 CancellationToken cancellationToken,
@@ -136,15 +159,51 @@ namespace Umbraco.Cms
             }
 
             /// <inheritdoc />
-            [Obsolete("Use the non-obsolete overload. Scheduled for removal in V17.")]
-            public ProcessInstructionsResult ProcessInstructions(
+            public ProcessInstructionsResult ProcessAllInstructions(
                 CacheRefresherCollection cacheRefreshers,
-                ServerRole serverRole,
                 CancellationToken cancellationToken,
-                string localIdentity,
-                DateTime lastPruned,
-                int lastId) =>
-                ProcessInstructions(cacheRefreshers, cancellationToken, localIdentity, lastId);
+                string localIdentity)
+            {
+                // TODO: Add Locking
+                using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
+                using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+                {
+                    var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
+                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
+
+                    if (numberOfInstructionsProcessed > 0)
+                    {
+                        _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
+                        _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                    }
+
+                    scope.Complete();
+                    return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                }
+            }
+
+            /// <inheritdoc />
+            public ProcessInstructionsResult ProcessInternalInstructions(
+                CacheRefresherCollection cacheRefreshers,
+                CancellationToken cancellationToken,
+                string localIdentity)
+            {
+                // TODO: Add Locking
+                using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
+                using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+                {
+                    var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
+                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
+
+                    if (numberOfInstructionsProcessed > 0)
+                    {
+                        _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                    }
+
+                    scope.Complete();
+                    return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                }
+            }
 
             private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity)
                 => new(

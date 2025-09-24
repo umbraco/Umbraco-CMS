@@ -202,17 +202,10 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
 
         try
         {
-            var lastSyncId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? -1;
-            ProcessInstructionsResult result = CacheInstructionService.ProcessInstructions(
+            CacheInstructionService.ProcessAllInstructions(
                 _cacheRefreshers,
                 _cancellationToken,
-                LocalIdentity,
-                lastSyncId);
-
-            if (result.LastId > 0)
-            {
-                _lastSyncedManager.SaveLastSyncedExternalAsync(result.LastId).GetAwaiter().GetResult();
-            }
+                LocalIdentity);
         }
         finally
         {
