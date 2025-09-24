@@ -9,6 +9,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
+import '../../components/input-upload-field/input-upload-field.element.js';
+
 /**
  * @element umb-property-editor-ui-upload-field
  */
