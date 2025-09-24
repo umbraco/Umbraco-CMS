@@ -1,8 +1,11 @@
-import type { UmbPropertyEditorDataSource } from './types.js';
+import type { UmbPickerPropertyEditorTreeDataSource } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbTest1PropertyEditorDataSource extends UmbControllerBase implements UmbPropertyEditorDataSource {
+export class UmbTest1PropertyEditorDataSource
+	extends UmbControllerBase
+	implements UmbPickerPropertyEditorTreeDataSource
+{
 	constructor(host: UmbControllerHost) {
 		super(host);
 		debugger;

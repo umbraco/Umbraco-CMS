@@ -15,7 +15,10 @@ export class UmbPropertyEditorDataSourceSearchExtensionRegistryDataSource
 	implements UmbSearchDataSource<UmbPropertyEditorDataSourceItemModel>
 {
 	async search(args: UmbSearchRequestArgs) {
-		const extensions = umbExtensionsRegistry.getByType('propertyEditorDataSource');
+		// TODO: make a getByTypes method in the registry
+		const collectionExtensions = umbExtensionsRegistry.getByType('pickerPropertyEditorCollectionDataSource');
+		const treeExtensions = umbExtensionsRegistry.getByType('pickerPropertyEditorTreeDataSource');
+		const extensions = [...collectionExtensions, ...treeExtensions];
 
 		// Simple filter by name or alias
 		const filteredExtensions = extensions.filter(

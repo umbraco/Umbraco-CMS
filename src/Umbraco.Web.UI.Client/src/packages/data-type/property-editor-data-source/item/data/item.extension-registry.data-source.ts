@@ -1,7 +1,7 @@
+import { UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbPropertyEditorDataSourceItemModel } from './types.js';
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_PROPERTY_EDITOR_DATA_SOURCE_ENTITY_TYPE } from '../../entity.js';
 
 /**
  * A server data source for Property Editor Data Source items
@@ -14,7 +14,10 @@ export class UmbPropertyEditorDataSourceItemExtensionRegistryDataSource
 	async getItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const extensions = umbExtensionsRegistry.getByType('propertyEditorDataSource');
+		// TODO: make a getByTypes method in the registry
+		const collectionExtensions = umbExtensionsRegistry.getByType('pickerPropertyEditorCollectionDataSource');
+		const treeExtensions = umbExtensionsRegistry.getByType('pickerPropertyEditorTreeDataSource');
+		const extensions = [...collectionExtensions, ...treeExtensions];
 
 		const items: Array<UmbPropertyEditorDataSourceItemModel> = extensions
 			.filter((manifest) => uniques.includes(manifest.alias))
