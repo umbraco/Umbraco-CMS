@@ -122,10 +122,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 						this.#expandVariant(UmbVariantId.Create(variantOptions[0]));
 					}
 				},
-				'_observeExpendFirstVariantIfSegmentOnly',
+				'_observeExpandFirstVariantIfSegmentOnly',
 			);
 		} else {
-			this.removeUmbControllerByAlias('_observeExpendFirstVariantIfSegmentOnly');
+			this.removeUmbControllerByAlias('_observeExpandFirstVariantIfSegmentOnly');
 		}
 	}
 
