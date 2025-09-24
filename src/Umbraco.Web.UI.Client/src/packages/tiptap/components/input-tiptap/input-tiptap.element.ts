@@ -173,7 +173,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this._editor = new Editor({
 			element: element,
 			editable: !this.readonly,
-			editorProps: { attributes: { 'aria-label': this.label ?? 'Rich Text Editor' } },
+			editorProps: {
+				attributes: {
+					'aria-label': this.label || this.localize.term('rte_label'),
+					'aria-required': this.required ? 'true' : 'false',
+				},
+			},
 			extensions: tiptapExtensions,
 			content: this.#value,
 			injectCSS: false, // Prevents injecting CSS into `window.document`, as it never applies to the shadow DOM. [LK]
@@ -261,6 +266,15 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				max-width: var(--umb-rte-max-width, 100%);
 			}
 
+			:host(:hover) {
+				--umb-tiptap-edge-border-color: var(--uui-color-border-standalone);
+			}
+
+			:host(:focus),
+			:host(:focus-within) {
+				--umb-tiptap-edge-border-color: var(--uui-color-border-emphasis);
+			}
+
 			:host([readonly]) {
 				pointer-events: none;
 
@@ -328,6 +342,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 					border-bottom-left-radius: 0;
 					border-bottom-right-radius: 0;
 				}
+			}
+
+			#editor,
+			umb-tiptap-toolbar,
+			umb-tiptap-statusbar {
+				transition: border-color 120ms ease-out;
 			}
 
 			umb-tiptap-toolbar + #editor {

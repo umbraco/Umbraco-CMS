@@ -101,6 +101,10 @@
 			"file": "delete.svg"
 		},
 		{
+			"name": "icon-badge",
+			"file": "badge.svg"
+		},
+		{
 			"name": "icon-badge-add",
 			"file": "circle-plus.svg"
 		},

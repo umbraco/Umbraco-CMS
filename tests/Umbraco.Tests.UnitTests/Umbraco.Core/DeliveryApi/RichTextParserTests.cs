@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -127,12 +128,15 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual("the original something", span.Attributes.First().Value);
     }
 
-    [Test]
-    public void ParseElement_CanParseContentLink()
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("#some-anchor")]
+    [TestCase("?something=true")]
+    public void ParseElement_CanParseContentLink(string? postfix)
     {
         var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>", RichTextBlockModel.Empty) as RichTextRootElement;
+        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}{postfix}\"></a></p>", RichTextBlockModel.Empty) as RichTextRootElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -142,6 +146,7 @@ public class RichTextParserTests : PropertyValueConverterTests
         var route = link.Attributes.First().Value as IApiContentRoute;
         Assert.IsNotNull(route);
         Assert.AreEqual("/some-content-path", route.Path);
+        Assert.AreEqual(postfix.NullOrWhiteSpaceAsNull(), route.QueryString);
         Assert.AreEqual(_contentRootKey, route.StartItem.Id);
         Assert.AreEqual("the-root-path", route.StartItem.Path);
     }
@@ -174,6 +179,22 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(1, link.Attributes.Count);
         Assert.AreEqual("href", link.Attributes.First().Key);
         Assert.AreEqual("https://some.where/else/", link.Attributes.First().Value);
+    }
+
+    [TestCase("#some-anchor")]
+    [TestCase("?something=true")]
+    public void ParseElement_CanHandleNonLocalLink_WithPostfix(string postfix)
+    {
+        var parser = CreateRichTextElementParser();
+
+        var element = parser.Parse($"<p><a href=\"https://some.where/else/{postfix}\"></a></p>", RichTextBlockModel.Empty) as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(link);
+        Assert.AreEqual("a", link.Tag);
+        Assert.AreEqual(1, link.Attributes.Count);
+        Assert.AreEqual("href", link.Attributes.First().Key);
+        Assert.AreEqual($"https://some.where/else/{postfix}", link.Attributes.First().Value);
     }
 
     [Test]
@@ -459,8 +480,47 @@ public class RichTextParserTests : PropertyValueConverterTests
     {
         var parser = CreateRichTextMarkupParser();
 
+        var result = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}\" type=\"document\"></a></p>");
+        Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
+        Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
+        Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+    }
+
+    [Test]
+    public void ParseMarkup_CanParseLegacyContentLink()
+    {
+        var parser = CreateRichTextMarkupParser();
+
         var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>");
         Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
+        Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
+        Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+    }
+
+    [TestCase("#some-anchor")]
+    [TestCase("?something=true")]
+    [TestCase("#!some-hashbang")]
+    [TestCase("?something=true#some-anchor")]
+    public void ParseMarkup_CanParseContentLink_WithPostfix(string postfix)
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        var result = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}{postfix}\" type=\"document\"></a></p>");
+        Assert.IsTrue(result.Contains($"href=\"/some-content-path{postfix}\""));
+        Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
+        Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+    }
+
+    [TestCase("#some-anchor")]
+    [TestCase("?something=true")]
+    [TestCase("#!some-hashbang")]
+    [TestCase("?something=true#some-anchor")]
+    public void ParseMarkup_CanParseLegacyContentLink_WithPostfix(string postfix)
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}{postfix}\"></a></p>");
+        Assert.IsTrue(result.Contains($"href=\"/some-content-path{postfix}\""));
         Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
         Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
     }
@@ -485,6 +545,8 @@ public class RichTextParserTests : PropertyValueConverterTests
     }
 
     [TestCase("<p><a href=\"https://some.where/else/\"></a></p>")]
+    [TestCase("<p><a href=\"https://some.where/else/#some-anchor\"></a></p>")]
+    [TestCase("<p><a href=\"https://some.where/else/?something=true\"></a></p>")]
     [TestCase("<p><img src=\"https://some.where/something.png?rmode=max&amp;width=500\"></p>")]
     public void ParseMarkup_CanHandleNonLocalReferences(string html)
     {
