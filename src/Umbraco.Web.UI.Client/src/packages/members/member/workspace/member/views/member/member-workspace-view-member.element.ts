@@ -94,7 +94,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						required
 						${umbBindToValidation(
 							this,
-							"$.values[?(@.alias == 'password' && @.culture == null && @.segment == null)].Value",
+							"$.values[?(@.alias == 'password' && @.culture == null && @.segment == null)].value",
 							this._workspaceContext.newPassword,
 						)}></uui-input>
 				</umb-property-layout>
@@ -168,7 +168,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							value=${this._workspaceContext.username}
 							${umbBindToValidation(
 								this,
-								"$.values[?(@.alias == 'username' && @.culture == null && @.segment == null)].Value",
+								"$.values[?(@.alias == 'username' && @.culture == null && @.segment == null)].value",
 								this._workspaceContext.username,
 							)}
 							required
@@ -184,7 +184,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							value=${this._workspaceContext.email}
 							${umbBindToValidation(
 								this,
-								"$.values[?(@.alias == 'email' && @.culture == null && @.segment == null)].Value",
+								"$.values[?(@.alias == 'email' && @.culture == null && @.segment == null)].value",
 								this._workspaceContext.email,
 							)}
 							required
