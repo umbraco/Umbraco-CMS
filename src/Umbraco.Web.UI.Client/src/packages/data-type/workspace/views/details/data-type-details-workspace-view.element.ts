@@ -154,7 +154,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		return html`
 			<umb-property-layout label="Data Source" description="Some description">
 				<umb-input-property-editor-data-source
-					.value=${this._propertyEditorDataSourceAlias}
+					.value=${this._propertyEditorDataSourceAlias || ''}
 					slot="editor"
 					max="1"
 					@change=${this.#onDataSourceChange}></umb-input-property-editor-data-source>
