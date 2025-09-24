@@ -1,4 +1,4 @@
-import { Image } from '@umbraco-cms/backoffice/external/tiptap';
+import { Image } from '../../externals.js';
 
 export interface UmbImageAttributes {
 	src: string;

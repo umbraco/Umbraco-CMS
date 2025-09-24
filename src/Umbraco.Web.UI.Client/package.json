@@ -130,7 +130,6 @@
 		"./external/openid": "./dist-cms/external/openid/index.js",
 		"./external/rxjs": "./dist-cms/external/rxjs/index.js",
 		"./external/signalr": "./dist-cms/external/signalr/index.js",
-		"./external/tiptap": "./dist-cms/external/tiptap/index.js",
 		"./external/uui": "./dist-cms/external/uui/index.js"
 	},
 	"files": [

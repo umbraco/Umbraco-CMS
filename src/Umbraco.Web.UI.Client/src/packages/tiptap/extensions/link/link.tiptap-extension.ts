@@ -1,4 +1,4 @@
-import { Link } from '@umbraco-cms/backoffice/external/tiptap';
+import { Link } from '../../externals.js';
 
 export const UmbLink = Link.extend({
 	name: 'umbLink',

@@ -1,5 +1,5 @@
-import { Extension } from '@umbraco-cms/backoffice/external/tiptap';
-import type { Attributes } from '@umbraco-cms/backoffice/external/tiptap';
+import { Extension } from '../../externals.js';
+import type { Attributes } from '../../externals.js';
 
 declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
