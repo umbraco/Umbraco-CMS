@@ -8,14 +8,20 @@ namespace Umbraco.Cms.Core.Services;
 public interface IContentTypeReferenceService
 {
     /// <summary>
-    ///     Gets docuiment keys of all documents using the given document type key.
+    ///     Gets document keys of all documents using the given document type key.
     /// </summary>
     /// <returns></returns>
     Task<PagedModel<Guid>> GetReferencedDocumentKeysAsync(Guid key, CancellationToken cancellationToken, int skip, int take);
 
     /// <summary>
-    ///     Gets all property type aliases.
+    ///     Gets keys of all the document type inhereting from given document type key.
     /// </summary>
     /// <returns></returns>
     Task<PagedModel<Guid>> GetReferencedDocumentTypeKeysAsync(Guid key, CancellationToken cancellationToken, int skip, int take);
+
+    /// <summary>
+    ///     Gets all property type aliases.
+    /// </summary>
+    /// <returns></returns>
+    Task<PagedModel<Guid>> GetReferencedElementsFromDataTypesAsync(Guid key, CancellationToken cancellationToken, int skip, int take);
 }

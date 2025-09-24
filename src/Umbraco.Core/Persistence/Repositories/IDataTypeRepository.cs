@@ -25,4 +25,6 @@ public interface IDataTypeRepository : IReadWriteQueryRepository<int, IDataType>
     /// <param name="id"></param>
     /// <returns></returns>
     IReadOnlyDictionary<Udi, IEnumerable<string>> FindListViewUsages(int id) => throw new NotImplementedException();
+
+    PagedModel<Guid> GetBlockEditorsReferencingContentType(Guid contentTypeId, int skip, int take) => throw new NotImplementedException();
 }
