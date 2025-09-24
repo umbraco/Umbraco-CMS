@@ -1,6 +1,7 @@
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
+
 import { Node, mergeAttributes } from '@tiptap/core';
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const Anchor = Node.create({
 	name: 'anchor',
 
