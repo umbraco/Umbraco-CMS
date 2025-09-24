@@ -13,7 +13,7 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 	UmbExamineFieldsSettingsModalValue
 > {
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('examineManagement_fields')}>
+		return html`<umb-body-layout headline=${this.localize.term('general_fields')}>
 			<uui-scroll-container id="field-settings"> ${this.#renderFields()} </uui-scroll-container>
 			<div slot="actions">
 				<uui-button

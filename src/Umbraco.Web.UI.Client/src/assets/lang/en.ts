@@ -860,6 +860,7 @@ export default {
 		email: 'Email',
 		error: 'Error',
 		field: 'Field',
+		fields: 'Fields',
 		fieldFor: 'Field for %0%',
 		toggleFor: 'Toggle for %0%',
 		findDocument: 'Find',

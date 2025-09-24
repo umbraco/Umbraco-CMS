@@ -847,6 +847,7 @@ export default {
 		email: 'Email',
 		error: 'Erro',
 		field: 'Campo',
+		fields: 'Campos',
 		fieldFor: 'Campo para %0%',
 		toggleFor: 'Alternar para %0%',
 		findDocument: 'Encontrar',
