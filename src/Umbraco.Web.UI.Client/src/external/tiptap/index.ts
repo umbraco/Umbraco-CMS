@@ -131,8 +131,6 @@ export {
 export { StarterKit } from '@tiptap/starter-kit';
 
 // CUSTOM EXTENSIONS
-export * from './extensions/tiptap-figcaption.extension.js';
-export * from './extensions/tiptap-figure.extension.js';
 export * from './extensions/tiptap-text-direction-extension.js';
 export * from './extensions/tiptap-text-indent-extension.js';
 export * from './extensions/tiptap-trailing-node.extension.js';
