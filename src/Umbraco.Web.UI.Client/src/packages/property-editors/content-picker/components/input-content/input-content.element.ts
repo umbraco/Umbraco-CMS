@@ -1,9 +1,11 @@
 import type { UmbContentPickerSource } from '../../types.js';
-import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
@@ -72,7 +74,17 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	public readonly = false;
+
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#interactionMemories;
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemories = value;
+	}
+
+	#interactionMemories: Array<UmbInteractionMemoryModel> | undefined;
 
 	#entityTypeLookup = { content: 'document', media: 'media', member: 'member' };
 
@@ -86,6 +98,15 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		this.#selection = event.target.selection ?? [];
 		this.value = this.#selection.join(',');
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#onInteractionMemoriesChange(event: UmbInteractionMemoriesChangeEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbInputContentElement;
+		const interactionMemories = target.interactionMemories;
+		this.#interactionMemories = interactionMemories;
+		// The event is not composed so we need to re-dispatch it from this component.
+		this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
 	}
 
 	override render() {
@@ -112,7 +133,9 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
 				?readonly=${this.readonly}
-				@change=${this.#onChange}></umb-input-document>
+				@change=${this.#onChange}
+				.interactionMemories=${this.#interactionMemories}
+				@interaction-memories-change=${this.#onInteractionMemoriesChange}></umb-input-document>
 		`;
 	}
 
@@ -126,7 +149,9 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.max=${this.max}
 				.maxMessage=${this.maxMessage}
 				?readonly=${this.readonly}
-				@change=${this.#onChange}></umb-input-media>
+				@change=${this.#onChange}
+				.interactionMemories=${this.#interactionMemories}
+				@interaction-memories-change=${this.#onInteractionMemoriesChange}></umb-input-media>
 		`;
 	}
 

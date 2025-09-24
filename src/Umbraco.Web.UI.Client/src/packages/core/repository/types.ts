@@ -17,6 +17,14 @@ export interface UmbRepositoryResponse<T> extends UmbDataSourceResponse<T> {}
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbRepositoryErrorResponse extends UmbDataSourceErrorResponse {}
 
+export interface UmbRepositoryItemsStatus {
+	state: {
+		type: 'success' | 'error' | 'loading';
+		error?: string;
+	};
+	unique: string;
+}
+
 /**
  * Interface for a repository that can return a paged model.
  * @template T - The type of items in the paged model.

@@ -357,6 +357,9 @@ export default {
 		saveAndPublishModalTitle: 'Save and publish',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
+		sharedAcrossCultures: 'Shared across cultures',
+		sharedAcrossSegments: 'Shared across segments',
+		shared: 'Shared',
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
@@ -2408,6 +2411,7 @@ export default {
 		searchContentTree: 'Search content tree',
 		maxAmount: 'Maximum amount',
 		expandChildItems: 'Expand child items for',
+		collapseChildItems: 'Collapse child items for',
 		openContextNode: 'Open context node for',
 	},
 	references: {
@@ -2834,10 +2838,17 @@ export default {
 		resetUrlLabel: 'Reset',
 	},
 	missingEditor: {
+		title: 'This property type is no longer available.',
 		description:
-			'<p><strong>Error!</strong> This property type is no longer available. Please reach out to your administrator.</p>',
+			"Don't worry, your content is safe and publishing this document won't overwrite it or remove it.<br/>Please contact your site administrator to resolve this issue.",
+		detailsTitle: 'Additional details',
 		detailsDescription:
-			'<p>This property type is no longer available.<br/>Please contact your administrator so they can either delete this property or restore the property type.</p><p><strong>Data:</strong></p>',
+			"To resolve this you should either restore the property editor, change the property to use a supported data type or remove the property if it's no longer needed.",
+		detailsDataType: 'Data type',
+		detailsPropertyEditor: 'Property editor',
+		detailsData: 'Data',
+		detailsHide: 'Hide details',
+		detailsShow: 'Show details',
 	},
 	uiCulture: {
 		ar: 'العربية',
