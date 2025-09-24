@@ -227,6 +227,7 @@ export class UmbDataTypeWorkspaceContext
 	#observePropertyEditorDataSourceManifest(propertyEditorDataSourceAlias: string | null | undefined) {
 		if (!propertyEditorDataSourceAlias) {
 			this.removeUmbControllerByAlias('dataSource');
+			this.#mergeConfigProperties();
 			return;
 		}
 		this.observe(
@@ -272,11 +273,6 @@ export class UmbDataTypeWorkspaceContext
 				this.#transferConfigDefaultData();
 			}
 		}
-	}
-
-	#getSettingsToMerge(candidates: Array<Array<PropertyEditorSettingsProperty>>) {
-		const present = candidates.filter((arr) => Array.isArray(arr) && arr.length > 0);
-		return present.length >= 2 ? present : null;
 	}
 
 	#transferConfigDefaultData() {
