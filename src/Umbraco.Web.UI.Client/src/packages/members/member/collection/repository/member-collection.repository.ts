@@ -19,7 +19,7 @@ export class UmbMemberCollectionRepository extends UmbMemberRepositoryBase imple
 		const { data, error } = await this.#collectionSource.getCollection(filter);
 
 		if (data) {
-			this.detailStore!.appendItems(data.items);
+			this.detailStore?.appendItems(data.items);
 		}
 
 		return { data, error, asObservable: () => this.detailStore!.all() };
