@@ -189,7 +189,7 @@ export class UmbBodyLayoutElement extends LitElement {
 			:host([header-transparent]:not([main-no-padding])) #main:not(*[style='display: none'] + *) {
 				/* The following styling is only applied if the clear-header IS present,
 				the main-no-padding attribute is NOT present, and the header is NOT hidden */
-				padding-top: var(--uui-size-space-1);
+				padding-top: var(--uui-size-space-2);
 			}
 			:host([main-no-padding]) #main {
 				padding: 0;
