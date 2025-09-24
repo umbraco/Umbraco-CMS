@@ -129,6 +129,3 @@ export {
 
 /** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 export { StarterKit } from '@tiptap/starter-kit';
-
-// CUSTOM EXTENSIONS
-export * from './extensions/tiptap-umb-image.extension.js';
