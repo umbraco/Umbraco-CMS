@@ -51,7 +51,7 @@ export class UmbDataTypeWorkspaceContext
 	readonly propertyEditorUiAlias = this._data.createObservablePartOfCurrent((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this._data.createObservablePartOfCurrent((data) => data?.editorAlias);
 	readonly propertyEditorDataSourceAlias = this._data.createObservablePartOfCurrent(
-		(data) => data?.values?.find((x) => x.alias === 'editorDataSourceAlias')?.value as string | null | undefined,
+		(data) => data?.editorDataSourceAlias,
 	);
 
 	readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
@@ -250,20 +250,16 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	#mergeConfigProperties() {
-		const sources = [
+		const settings = [
 			this.#propertyEditorSchemaSettingsProperties,
 			this.#propertyEditorUISettingsProperties,
 			this.#propertyEditorDataSourceSettingsProperties,
-		].filter((x) => Array.isArray(x));
+		].filter((x) => Array.isArray(x) && x.length > 0);
 
-		if (sources) {
-			sources.forEach((item, index) => {
-				if (index === 0) {
-					this.#properties.setValue(item);
-				} else {
-					this.#properties.append(item);
-				}
-			});
+		const mergedSettings = settings.flat();
+
+		if (mergedSettings) {
+			this.#properties.setValue(mergedSettings);
 
 			// If new or if the alias was changed then set default values. This 'complexity' to prevent setting default data when initialized [NL]
 			const previousPropertyEditorUIAlias = this.#lastPropertyEditorUIAlias;
@@ -345,13 +341,11 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	getPropertyEditorDataSourceAlias() {
-		// TODO: Do we need to prefix this to ensure uniqueness?
-		return this.getPropertyDefaultValue('editorDataSourceAlias');
+		return this._data.getCurrent()?.editorDataSourceAlias;
 	}
 
 	setPropertyEditorDataSourceAlias(alias?: string) {
-		// TODO: Do we need to prefix this to ensure uniqueness?
-		this.setPropertyValue('editorDataSourceAlias', alias);
+		this._data.updateCurrent({ editorDataSourceAlias: alias });
 	}
 
 	/**

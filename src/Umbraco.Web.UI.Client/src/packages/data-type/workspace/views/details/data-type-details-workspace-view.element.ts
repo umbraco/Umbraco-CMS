@@ -93,12 +93,13 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	}
 
 	#renderSettings() {
-		if (!this._propertyEditorUiAlias || !this._propertyEditorSchemaAlias) return nothing;
-		return html`
-			<uui-box headline=${this.localize.term('general_settings')}>
+		if (this._propertyEditorUiAlias || this._propertyEditorSchemaAlias || this._propertyEditorDataSourceAlias) {
+			return html` <uui-box headline=${this.localize.term('general_settings')}>
 				<umb-property-editor-config></umb-property-editor-config>
-			</uui-box>
-		`;
+			</uui-box>`;
+		} else {
+			return nothing;
+		}
 	}
 
 	// Notice, we have implemented a property-layout for each states of the property editor ui picker, in this way the validation message gets removed once the choose-button is gone. (As we are missing ability to detect if elements got removed from DOM)[NL]
