@@ -29,7 +29,7 @@ export class UmbSectionContext extends UmbContextBase {
 		this.#manifestPathname.setValue(manifest?.meta?.pathname);
 		const sectionLabel = manifest ? manifest.meta?.label || manifest.name : undefined;
 		this.#manifestLabel.setValue(sectionLabel);
-		this.#viewContext.setBrowserTitle(sectionLabel);
+		this.#viewContext.setTitle(sectionLabel);
 	}
 
 	getPathname() {

@@ -979,6 +979,10 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-heading",
+			"file": "heading.svg"
+		},
+		{
 			"name": "icon-heading-1",
 			"file": "heading-1.svg"
 		},
@@ -993,6 +997,14 @@
 		{
 			"name": "icon-heading-4",
 			"file": "heading-4.svg"
+		},
+		{
+			"name": "icon-heading-5",
+			"file": "heading-5.svg"
+		},
+		{
+			"name": "icon-heading-6",
+			"file": "heading-6.svg"
 		},
 		{
 			"name": "icon-headphones",

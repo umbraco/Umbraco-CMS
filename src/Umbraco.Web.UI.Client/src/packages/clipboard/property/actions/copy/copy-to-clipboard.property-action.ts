@@ -70,4 +70,5 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 		});
 	}
 }
+
 export { UmbCopyToClipboardPropertyAction as api };

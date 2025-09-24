@@ -78,7 +78,7 @@ export class UmbPropertyEditorUIDropdownElement
 
 			// If selection includes a value that is not in the list, add it to the list
 			this.#selection.forEach((value) => {
-				if (!this._options.find((item) => item.value === value)) {
+				if (value !== '' && !this._options.find((item) => item.value === value)) {
 					this._options.push({
 						name: `${value} (${this.localize.term('validation_legacyOption')})`,
 						value,
@@ -109,7 +109,7 @@ export class UmbPropertyEditorUIDropdownElement
 		this.#setValue(value ? [value] : []);
 	}
 
-	#onChangeMulitple(event: Event & { target: HTMLSelectElement }) {
+	#onChangeMultiple(event: Event & { target: HTMLSelectElement }) {
 		const selected = event.target.selectedOptions;
 		const value = selected ? Array.from(selected).map((option) => option.value) : [];
 		this.#setValue(value);
@@ -155,7 +155,7 @@ export class UmbPropertyEditorUIDropdownElement
 		}
 
 		return html`
-			<select id="native" multiple ?required=${this.mandatory} @change=${this.#onChangeMulitple}>
+			<select id="native" multiple ?required=${this.mandatory} @change=${this.#onChangeMultiple}>
 				${map(
 					this._options,
 					(item) => html`<option value=${item.value} ?selected=${item.selected}>${item.name}</option>`,
