@@ -59,6 +59,7 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 
 			uui-scroll-container {
 				overflow-y: scroll;
+				height: 100%;
 				max-height: 100%;
 				min-height: 0;
 				flex: 1;
