@@ -9,7 +9,8 @@
     "testSqlite": "npx playwright test DefaultConfig --grep-invert \"Users\"",
     "all": "npx playwright test",
     "createTest": "node createTest.js",
-    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
+    "smokeTest": "npx playwright test DefaultConfig --grep \"can save a variant content node after removing embedded block in RTE\"",
+    "smokerTest": "npx playwright test DefaultConfig --grep \"@smoke\"",
     "smokeTestSqlite": "npx playwright test DefaultConfig --grep \"@smoke\" --grep-invert \"Users\"",
     "releaseTest": "npx playwright test DefaultConfig --grep \"@release\""
   },
