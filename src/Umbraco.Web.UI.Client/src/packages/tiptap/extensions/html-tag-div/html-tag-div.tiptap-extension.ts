@@ -1,7 +1,8 @@
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
+
 import { Node, mergeAttributes } from '@tiptap/core';
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export interface DivOptions {
+export interface UmbHtmlTagDivOptions {
 	/**
 	 * HTML attributes to add to the element.
 	 * @default {}
@@ -10,8 +11,7 @@ export interface DivOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export const Div = Node.create<DivOptions>({
+export const Div = Node.create<UmbHtmlTagDivOptions>({
 	name: 'div',
 
 	priority: 50,
