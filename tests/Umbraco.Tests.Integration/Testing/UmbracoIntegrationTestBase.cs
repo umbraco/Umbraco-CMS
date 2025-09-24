@@ -45,9 +45,9 @@ public abstract class UmbracoIntegrationTestBase
 
     protected TestHelper TestHelper { get; } = new();
 
-    private void AddOnTestTearDown(Action tearDown) => _testTeardown.Enqueue(tearDown);
+    protected void AddOnTestTearDown(Action tearDown) => _testTeardown.Enqueue(tearDown);
 
-    private void AddOnFixtureTearDown(Action tearDown) => _fixtureTeardown.Add(tearDown);
+    protected void AddOnFixtureTearDown(Action tearDown) => _fixtureTeardown.Add(tearDown);
 
     [SetUp]
     public void SetUp_Logging() =>
