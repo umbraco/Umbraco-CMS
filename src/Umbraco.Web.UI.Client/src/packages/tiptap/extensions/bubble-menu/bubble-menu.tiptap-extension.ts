@@ -1,17 +1,17 @@
-import type { UUIPopoverContainerElement } from '../../uui/index.js';
-import { Extension } from '@tiptap/core';
-import { Editor } from '@tiptap/core';
-import { EditorState, Plugin, PluginKey } from '@tiptap/pm/state';
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
+
+import { Extension, Editor } from '@tiptap/core';
+import { EditorState, Plugin } from '@tiptap/pm/state';
 import { EditorView } from '@tiptap/pm/view';
 import type { PluginView } from '@tiptap/pm/state';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export interface UmbTiptapBubbleMenuElement extends HTMLElement {
 	editor?: Editor;
 	menuAlias?: string;
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export type UmbBubbleMenuPluginProps = {
 	unique: string;
 	placement?: UUIPopoverContainerElement['placement'];
@@ -22,10 +22,8 @@ export type UmbBubbleMenuPluginProps = {
 		| null;
 };
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export type UmbBubbleMenuOptions = UmbBubbleMenuPluginProps;
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbBubbleMenu = Extension.create<UmbBubbleMenuOptions>({
 	name: 'umbBubbleMenu',
 
@@ -84,6 +82,7 @@ class UmbBubbleMenuPluginView implements PluginView {
 		this.update(view, null);
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	update(view: EditorView, prevState: EditorState | null) {
 		const editor = this.#editor;
 
@@ -108,7 +107,6 @@ class UmbBubbleMenuPluginView implements PluginView {
 	}
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbBubbleMenuPlugin = (editor: Editor, props: UmbBubbleMenuPluginProps) => {
 	return new Plugin({
 		view(editorView) {
