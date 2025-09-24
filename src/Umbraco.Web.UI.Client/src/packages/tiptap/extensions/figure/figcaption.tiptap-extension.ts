@@ -1,6 +1,6 @@
 import { Node } from '../../externals.js';
 
-export interface UmbFigcaptionOptions {
+export interface UmbTiptapFigcaptionOptions {
 	/**
 	 * HTML attributes to add to the image element.
 	 * @default {}
@@ -9,7 +9,7 @@ export interface UmbFigcaptionOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
-export const Figcaption = Node.create<UmbFigcaptionOptions>({
+export const Figcaption = Node.create<UmbTiptapFigcaptionOptions>({
 	name: 'figcaption',
 
 	addOptions() {

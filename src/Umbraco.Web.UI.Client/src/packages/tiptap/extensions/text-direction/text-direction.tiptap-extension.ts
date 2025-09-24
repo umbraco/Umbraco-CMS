@@ -1,11 +1,11 @@
 import { Extension } from '../../externals.js';
 
-export interface UmbTextDirectionOptions {
+export interface UmbTiptapTextDirectionOptions {
 	directions: Array<'auto' | 'ltr' | 'rtl'>;
 	types: Array<string>;
 }
 
-export const TextDirection = Extension.create<UmbTextDirectionOptions>({
+export const TextDirection = Extension.create<UmbTiptapTextDirectionOptions>({
 	name: 'textDirection',
 
 	addOptions() {

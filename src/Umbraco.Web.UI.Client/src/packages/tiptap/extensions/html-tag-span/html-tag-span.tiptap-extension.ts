@@ -1,6 +1,6 @@
 import { Mark, mergeAttributes } from '../../externals.js';
 
-export interface UmbHtmlTagSpanOptions {
+export interface UmbTiptapHtmlTagSpanOptions {
 	/**
 	 * HTML attributes to add to the span element.
 	 * @default {}
@@ -36,7 +36,7 @@ function serializeStyles(items: Record<string, string>): string {
 	);
 }
 
-export const Span = Mark.create<UmbHtmlTagSpanOptions>({
+export const Span = Mark.create<UmbTiptapHtmlTagSpanOptions>({
 	name: 'span',
 
 	priority: 50,

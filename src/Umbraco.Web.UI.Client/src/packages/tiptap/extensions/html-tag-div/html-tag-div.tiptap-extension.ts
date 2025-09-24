@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from '../../externals.js';
 
-export interface UmbHtmlTagDivOptions {
+export interface UmbTiptapHtmlTagDivOptions {
 	/**
 	 * HTML attributes to add to the element.
 	 * @default {}
@@ -9,7 +9,7 @@ export interface UmbHtmlTagDivOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
-export const Div = Node.create<UmbHtmlTagDivOptions>({
+export const Div = Node.create<UmbTiptapHtmlTagDivOptions>({
 	name: 'div',
 
 	priority: 50,

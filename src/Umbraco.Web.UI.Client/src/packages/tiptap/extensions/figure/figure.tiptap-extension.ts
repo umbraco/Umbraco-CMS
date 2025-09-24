@@ -1,6 +1,6 @@
 import { mergeAttributes, Node } from '../../externals.js';
 
-export interface UmbFigureOptions {
+export interface UmbTiptapFigureOptions {
 	/**
 	 * HTML attributes to add to the image element.
 	 * @default {}
@@ -9,7 +9,7 @@ export interface UmbFigureOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
-export const Figure = Node.create<UmbFigureOptions>({
+export const Figure = Node.create<UmbTiptapFigureOptions>({
 	name: 'figure',
 	group: 'block',
 	content: 'block+',

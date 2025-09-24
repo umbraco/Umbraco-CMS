@@ -13,13 +13,13 @@ import type { Dispatch } from '../../externals.js';
 import { AllSelection, TextSelection } from '@tiptap/pm/state';
 import type { EditorState, Transaction } from '@tiptap/pm/state';
 
-export interface UmbTextIndentOptions {
+export interface UmbTiptapTextIndentOptions {
 	minLevel: number;
 	maxLevel: number;
 	types: Array<string>;
 }
 
-export const TextIndent = Extension.create<UmbTextIndentOptions>({
+export const TextIndent = Extension.create<UmbTiptapTextIndentOptions>({
 	name: 'textIndent',
 
 	addOptions() {

@@ -16,12 +16,12 @@ function nodeEqualsType({ types, node }) {
 	return (Array.isArray(types) && types.includes(node.type)) || node.type === types;
 }
 
-export interface UmbTrailingNodeOptions {
+export interface UmbTiptapTrailingNodeOptions {
 	node: string;
 	notAfter: string[];
 }
 
-export const TrailingNode = Extension.create<UmbTrailingNodeOptions>({
+export const TrailingNode = Extension.create<UmbTiptapTrailingNodeOptions>({
 	name: 'trailingNode',
 
 	addOptions() {

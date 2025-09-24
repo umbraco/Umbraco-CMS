@@ -12,7 +12,7 @@ export interface UmbTiptapBubbleMenuElement extends HTMLElement {
 	menuAlias?: string;
 }
 
-export type UmbBubbleMenuPluginProps = {
+export type UmbTiptapBubbleMenuPluginProps = {
 	unique: string;
 	placement?: UUIPopoverContainerElement['placement'];
 	elementName?: string | null;
@@ -22,7 +22,7 @@ export type UmbBubbleMenuPluginProps = {
 		| null;
 };
 
-export type UmbBubbleMenuOptions = UmbBubbleMenuPluginProps;
+export type UmbBubbleMenuOptions = UmbTiptapBubbleMenuPluginProps;
 
 export const UmbBubbleMenu = Extension.create<UmbBubbleMenuOptions>({
 	name: 'umbBubbleMenu',
@@ -58,9 +58,9 @@ class UmbBubbleMenuPluginView implements PluginView {
 
 	#popover: UUIPopoverContainerElement;
 
-	#shouldShow: UmbBubbleMenuPluginProps['shouldShow'];
+	#shouldShow: UmbTiptapBubbleMenuPluginProps['shouldShow'];
 
-	constructor(editor: Editor, view: EditorView, props: UmbBubbleMenuPluginProps) {
+	constructor(editor: Editor, view: EditorView, props: UmbTiptapBubbleMenuPluginProps) {
 		this.#editor = editor;
 
 		this.#shouldShow = props.shouldShow ?? null;
@@ -107,7 +107,7 @@ class UmbBubbleMenuPluginView implements PluginView {
 	}
 }
 
-export const UmbBubbleMenuPlugin = (editor: Editor, props: UmbBubbleMenuPluginProps) => {
+export const UmbBubbleMenuPlugin = (editor: Editor, props: UmbTiptapBubbleMenuPluginProps) => {
 	return new Plugin({
 		view(editorView) {
 			return new UmbBubbleMenuPluginView(editor, editorView, props);

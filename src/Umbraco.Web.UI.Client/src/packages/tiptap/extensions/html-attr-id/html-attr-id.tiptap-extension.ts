@@ -11,11 +11,11 @@ declare module '@tiptap/core' {
 	}
 }
 
-interface HtmlIdAttributeOptions {
+export interface UmbTiptapHtmlIdAttributeOptions {
 	types: Array<string>;
 }
 
-export const HtmlIdAttribute = Extension.create<HtmlIdAttributeOptions>({
+export const HtmlIdAttribute = Extension.create<UmbTiptapHtmlIdAttributeOptions>({
 	name: 'htmlIdAttribute',
 
 	addOptions() {

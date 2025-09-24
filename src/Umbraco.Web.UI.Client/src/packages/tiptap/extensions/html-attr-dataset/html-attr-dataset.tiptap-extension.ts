@@ -20,11 +20,11 @@ function camelCaseToKebabCase(str: string): string {
 	return str.replace(/[A-Z]+(?![a-z])|[A-Z]/g, ($, ofs) => (ofs ? '-' : '') + $.toLowerCase());
 }
 
-interface HtmlDatasetAttributesOptions {
+export interface UmbTiptapHtmlDatasetAttributesOptions {
 	types: Array<string>;
 }
 
-export const HtmlDatasetAttributes = Extension.create<HtmlDatasetAttributesOptions>({
+export const HtmlDatasetAttributes = Extension.create<UmbTiptapHtmlDatasetAttributesOptions>({
 	name: 'htmlDatasetAttributes',
 
 	addOptions() {

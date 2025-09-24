@@ -11,11 +11,11 @@ declare module '@tiptap/core' {
 	}
 }
 
-interface UmbHtmlClassAttributeOptions {
+export interface UmbTiptapHtmlClassAttributeOptions {
 	types: Array<string>;
 }
 
-export const HtmlClassAttribute = Extension.create<UmbHtmlClassAttributeOptions>({
+export const HtmlClassAttribute = Extension.create<UmbTiptapHtmlClassAttributeOptions>({
 	name: 'htmlClassAttribute',
 
 	addOptions() {
