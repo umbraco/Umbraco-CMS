@@ -1,4 +1,5 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+
 // Content
 const contentName = 'TestContent';
 // DocumentType
@@ -7,18 +8,17 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Textstring';
 //Media
 const mediaName = 'TestMedia';
+
 test.afterEach(async ({umbracoApi}) => {
 	await umbracoApi.document.ensureNameNotExists(contentName);
 	await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-test('can retrieve unique and entity type of document', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can retrieve unique and entity type of document', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  if (!documentTypeId) throw new Error('Document type id is undefined');
-
   const documentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, 'Test content', dataTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -29,10 +29,10 @@ test('can retrieve unique and entity type of document', {tag: '@release'}, async
   await umbracoUi.content.clickEntityActionWithName('Retrieve');
 
   // Assert
-  await umbracoUi.content.doesSuccessNotificationHaveText('document_'+documentId);
+  await umbracoUi.content.doesSuccessNotificationHaveText('document_' + documentId);
 });
 
-test('can retrieve unique and entity type of media', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can retrieve unique and entity type of media', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
 
@@ -41,12 +41,9 @@ test('can retrieve unique and entity type of media', {tag: '@release'}, async ({
 
   // Act
   await umbracoUi.media.goToMediaWithName(mediaName);
-  await umbracoUi.media.enterMediaItemName(mediaName);
-  await umbracoUi.media.clickSaveButton();
   await umbracoUi.media.clickWorkspaceActionMenuButton(); 
-  
   await umbracoUi.media.clickEntityActionWithName('Retrieve');
   
   // Assert
-  await umbracoUi.media.doesSuccessNotificationHaveText('media_'+mediaId);
+  await umbracoUi.media.doesSuccessNotificationHaveText('media_' + mediaId);
 });
