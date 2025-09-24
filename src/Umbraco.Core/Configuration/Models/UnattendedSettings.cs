@@ -64,5 +64,6 @@ public class UnattendedSettings
     /// <summary>
     ///     Gets or sets a telemetry level to use for Unattended Installs
     /// </summary>
+    [DefaultValue(StaticTelemetryLevel)]
     public TelemetryLevel UnattendedTelemetryLevel { get; set; } = StaticTelemetryLevel;
 }
