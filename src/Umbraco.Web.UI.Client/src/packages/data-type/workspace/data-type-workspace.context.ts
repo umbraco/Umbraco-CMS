@@ -126,6 +126,8 @@ export class UmbDataTypeWorkspaceContext
 		this.#propertyEditorUISettingsProperties = [];
 		this.#propertyEditorSchemaSettingsDefaultData = [];
 		this.#propertyEditorUISettingsDefaultData = [];
+		this.#propertyEditorDataSourceSettingsProperties = [];
+		this.#propertyEditorDataSourceSettingsDefaultData = [];
 		this.#settingsDefaultData = undefined;
 		this.#mergeConfigProperties();
 	}
