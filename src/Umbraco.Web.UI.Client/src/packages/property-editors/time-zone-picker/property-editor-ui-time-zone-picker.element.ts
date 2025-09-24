@@ -1,4 +1,4 @@
-import { html, customElement, property, css, query, map, ref } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, map, ref } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
