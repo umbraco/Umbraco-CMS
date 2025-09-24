@@ -55,6 +55,17 @@ export default defineConfig({
       }
     },
     {
+      name: 'extensionRegistry',
+      testMatch: 'ExtensionRegistry/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
+    },
+    {
       name: 'deliveryApi',
       testMatch: 'DeliveryApi/**',
       dependencies: ['setup'],
