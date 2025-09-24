@@ -18,7 +18,7 @@ const testValue = 'This is a test value for the custom property editor';
 test.afterEach(async ({umbracoApi}) => {
 	await umbracoApi.document.ensureNameNotExists(contentName);
 	await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+    await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
 test('custom property editor appears in Property Editor Picker', async ({umbracoApi, umbracoUi}) =>{
@@ -43,7 +43,7 @@ test('custom property editor appears in Property Editor Picker', async ({umbraco
 test('custom property editor appears in Document type when configuring a property', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
-    await umbracoApi.dataType.create(
+    const dataTypeId =await umbracoApi.dataType.create(
 		dataTypeName, 
 		editorAlias, 
 		editorUiAlias,
@@ -63,13 +63,12 @@ test('custom property editor appears in Document type when configuring a propert
     await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
     expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-    const dataType = await umbracoApi.dataType.getByName(dataTypeName);
     // Checks if the correct property was added to the document type
-    expect(documentTypeData.properties[0].dataType.id).toBe(dataType.id);
+    expect(documentTypeData.properties[0].dataType.id).toBe(dataTypeId);
 });
 
 test('user can write and read value from custom property editor', async({umbracoApi, umbracoUi}) => {
-  // Arrange - Create Data Type with custom property editor
+    // Arrange - Create Data Type with custom property editor
 	const dataTypeId = await umbracoApi.dataType.create(
 		dataTypeName, 
 		editorAlias, 
@@ -94,10 +93,10 @@ test('user can write and read value from custom property editor', async({umbraco
     // Act - Navigate to content and write value
     await umbracoUi.content.goToContentWithName(contentName);
 
-	await umbracoUi.content.enterPropertyValue(dataTypeName, testValue1);
+    await umbracoUi.content.enterPropertyValue(dataTypeName, testValue);
     await umbracoUi.content.clickSaveButton();
 
 	// Read value back from property editor using the API
-	const contentData = await umbracoApi.document.getByName(contentName);
-    expect(contentData.values[0].value).toEqual(testValue1);
+    const contentData = await umbracoApi.document.getByName(contentName);
+    expect(contentData.values[0].value).toEqual(testValue);
 });
