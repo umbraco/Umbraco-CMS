@@ -17,6 +17,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Documents',
 			icon: 'icon-document',
 			description: 'Pick a document',
+			settings: {
+				properties: [
+					{
+						alias: 'testSetting',
+						label: 'From Document Data Source',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextString',
+					},
+				],
+			},
 		},
 	},
 	{

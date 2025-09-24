@@ -11,6 +11,18 @@ const manifest: ManifestPropertyEditorUi = {
 		group: 'pickers',
 		propertyEditorSchemaAlias: 'Umbraco.Plain.Json',
 		supportsReadOnly: true,
+		settings: {
+			properties: [
+				// TODO: Move this to schema manifest when server can validate it
+				{
+					alias: 'validationLimit',
+					label: 'Amount',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
+					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
+					weight: 100,
+				},
+			],
+		},
 	},
 };
 
