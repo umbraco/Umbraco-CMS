@@ -6,7 +6,6 @@ import {
 	css,
 	repeat,
 	nothing,
-	query,
 	when,
 	state,
 	ref,
@@ -121,17 +120,15 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	}
 
 	@state()
-	private _disableAddButton = true;
+	protected _timeZonePickerValue = '';
 
-	@state()
-	protected _timeZonePicker?: UmbInputTimeZonePickerElement;
-
-	private _timeZoneList: Array<UmbTimeZoneOption> = [];
+	#timeZonePicker?: UmbInputTimeZonePickerElement;
+	#timeZoneList: Array<UmbTimeZoneOption> = [];
 
 	constructor() {
 		super();
 		const now = DateTime.now();
-		this._timeZoneList = getTimeZoneList(undefined).map((tz) => ({
+		this.#timeZoneList = getTimeZoneList(undefined).map((tz) => ({
 			...tz,
 			offset: getTimeZoneOffset(tz.value, now), // Format offset as string
 		}));
@@ -158,10 +155,10 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	}
 
 	#onAdd() {
-		if (this._timeZonePicker) {
-			this.value = [...this.value, this._timeZonePicker.value];
-			this._timeZonePicker.value = '';
-			this._disableAddButton = true;
+		if (this.#timeZonePicker) {
+			this.value = [...this.value, this.#timeZonePicker.value];
+			this.#timeZonePicker.value = '';
+			this._timeZonePickerValue = '';
 		}
 		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
@@ -204,9 +201,10 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 				<umb-input-time-zone-picker
 					id="time-zone-picker"
 					name="picker"
-					.options=${this._timeZoneList.filter((tz) => !this.value.includes(tz.value))}
+					.options=${this.#timeZoneList.filter((tz) => !this.value.includes(tz.value))}
 					@change=${(event: UmbChangeEvent) => {
-						this._disableAddButton = !(event.target as UmbInputTimeZonePickerElement)?.value;
+						const target = event.target as UmbInputTimeZonePickerElement;
+						this._timeZonePickerValue = target?.value;
 					}}
 					?disabled=${this.disabled}
 					?readonly=${this.readonly}
@@ -217,10 +215,10 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 					() => html`
 						<uui-button
 							compact
-							label="${this.localize.term('general_add')} ${this._timeZonePicker?.value}"
+							label="${this.localize.term('general_add')} ${this._timeZonePickerValue}"
 							look="outline"
 							color="positive"
-							?disabled=${this.disabled || this._disableAddButton}
+							?disabled=${this.disabled || !this._timeZonePickerValue}
 							@click=${this.#onAdd}>
 							<uui-icon name="icon-add"></uui-icon>
 						</uui-button>
@@ -231,12 +229,12 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	}
 
 	#inputTimeZonePiclerChanged(input?: Element) {
-		if (this._timeZonePicker) {
-			this.removeFormControlElement(this._timeZonePicker);
+		if (this.#timeZonePicker) {
+			this.removeFormControlElement(this.#timeZonePicker);
 		}
-		this._timeZonePicker = input as UmbInputTimeZonePickerElement;
-		if (this._timeZonePicker) {
-			this.addFormControlElement(this._timeZonePicker);
+		this.#timeZonePicker = input as UmbInputTimeZonePickerElement;
+		if (this.#timeZonePicker) {
+			this.addFormControlElement(this.#timeZonePicker);
 		}
 	}
 
