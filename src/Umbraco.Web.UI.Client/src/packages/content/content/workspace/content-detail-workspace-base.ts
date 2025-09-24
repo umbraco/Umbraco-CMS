@@ -881,7 +881,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			if (valid || this.#ignoreValidationResultOnSubmit) {
 				await this.performCreateOrUpdate(variantIds, saveData);
 			} else {
-				return Promise.reject('Validation issues prevents saving');
+				return Promise.reject('Validation issues prevent saving');
 			}
 		} else {
 			await this.performCreateOrUpdate(variantIds, saveData);
