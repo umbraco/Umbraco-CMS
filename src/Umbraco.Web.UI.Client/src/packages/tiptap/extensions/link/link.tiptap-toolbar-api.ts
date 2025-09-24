@@ -1,5 +1,5 @@
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
-import { UmbLink } from '@umbraco-cms/backoffice/external/tiptap';
+import { UmbLink } from './link.tiptap-extension.js';
 import { UMB_LINK_PICKER_MODAL } from '@umbraco-cms/backoffice/multi-url-picker';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
