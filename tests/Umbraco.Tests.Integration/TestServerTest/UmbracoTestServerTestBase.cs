@@ -103,6 +103,13 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 AllowAutoRedirect = false,
                 BaseAddress = new Uri("https://localhost/", UriKind.Absolute)
             });
+
+            AddOnTestTearDown(() =>
+            {
+                factory.ClearHost();
+                Client.DisposeIfDisposable();
+                Factory.DisposeIfDisposable();
+            });
         }
 
         /// <summary>
