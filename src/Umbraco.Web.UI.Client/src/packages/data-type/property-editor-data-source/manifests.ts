@@ -22,7 +22,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 					{
 						alias: 'testSetting',
 						label: 'From Document Data Source',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextString',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 					},
 				],
 			},
