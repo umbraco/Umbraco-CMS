@@ -1,6 +1,4 @@
-/* eslint-disable local-rules/enforce-umbraco-external-imports */
-
-import { Extension } from '@tiptap/core';
+import { Extension } from '../../externals.js';
 
 export interface UmbTextDirectionOptions {
 	directions: Array<'auto' | 'ltr' | 'rtl'>;

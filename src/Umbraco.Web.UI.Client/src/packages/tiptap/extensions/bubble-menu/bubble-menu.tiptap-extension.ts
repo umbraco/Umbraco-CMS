@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 /* eslint-disable local-rules/enforce-umbraco-external-imports */
 
-import { Extension, Editor } from '@tiptap/core';
-import { EditorState, Plugin } from '@tiptap/pm/state';
-import { EditorView } from '@tiptap/pm/view';
-import type { PluginView } from '@tiptap/pm/state';
+import { Extension } from '../../externals.js';
+import type { Editor } from '../../externals.js';
+import { Plugin } from '@tiptap/pm/state';
+import type { EditorState, PluginView } from '@tiptap/pm/state';
+import type { EditorView } from '@tiptap/pm/view';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 
 export interface UmbTiptapBubbleMenuElement extends HTMLElement {

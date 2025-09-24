@@ -1,6 +1,4 @@
-/* eslint-disable local-rules/enforce-umbraco-external-imports */
-
-import { Node } from '@tiptap/core';
+import { Node } from '../../externals.js';
 
 export interface UmbFigcaptionOptions {
 	/**

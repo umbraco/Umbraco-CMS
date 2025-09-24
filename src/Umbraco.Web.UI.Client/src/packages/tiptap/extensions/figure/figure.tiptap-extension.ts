@@ -1,6 +1,4 @@
-/* eslint-disable local-rules/enforce-umbraco-external-imports */
-
-import { mergeAttributes, Node } from '@tiptap/core';
+import { mergeAttributes, Node } from '../../externals.js';
 
 export interface UmbFigureOptions {
 	/**

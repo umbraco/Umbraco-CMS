@@ -1,6 +1,4 @@
-/* eslint-disable local-rules/enforce-umbraco-external-imports */
-
-import { Node, mergeAttributes } from '@tiptap/core';
+import { Node, mergeAttributes } from '../../externals.js';
 
 export interface UmbHtmlTagDivOptions {
 	/**

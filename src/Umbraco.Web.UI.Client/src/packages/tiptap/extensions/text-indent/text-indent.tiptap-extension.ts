@@ -7,11 +7,11 @@
  * Modifications are licensed under the MIT License.
  */
 
-import type { Dispatch } from '@tiptap/core';
-import type { EditorState, Transaction } from '@tiptap/pm/state';
+import { Extension } from '../../externals.js';
+import type { Dispatch } from '../../externals.js';
 
-import { Extension } from '@tiptap/core';
 import { AllSelection, TextSelection } from '@tiptap/pm/state';
+import type { EditorState, Transaction } from '@tiptap/pm/state';
 
 export interface UmbTextIndentOptions {
 	minLevel: number;

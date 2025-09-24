@@ -1,7 +1,4 @@
-/* eslint-disable jsdoc/require-jsdoc */
-/* eslint-disable local-rules/enforce-umbraco-external-imports */
-
-import { Mark, mergeAttributes } from '@tiptap/core';
+import { Mark, mergeAttributes } from '../../externals.js';
 
 export interface UmbHtmlTagSpanOptions {
 	/**
@@ -12,6 +9,7 @@ export interface UmbHtmlTagSpanOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 function parseStyles(style: string | undefined): Record<string, string> {
 	const items: Record<string, string> = {};
 
@@ -29,6 +27,7 @@ function parseStyles(style: string | undefined): Record<string, string> {
 	return items;
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 function serializeStyles(items: Record<string, string>): string {
 	return (
 		Object.entries(items)

@@ -1,16 +1,13 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 /* eslint-disable local-rules/enforce-umbraco-external-imports */
-
+import { findParentNode, Table, TableCell, TableHeader, TableRow } from '../../externals.js';
 import { UmbBubbleMenuPlugin } from '../bubble-menu/bubble-menu.tiptap-extension.js';
+import type { Editor } from '../../externals.js';
 import { CellSelection, TableMap, TableView } from '@tiptap/pm/tables';
-import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view';
-import { EditorState, Plugin, Selection, Transaction } from '@tiptap/pm/state';
-import { findParentNode, Editor } from '@tiptap/core';
-import { Node as ProseMirrorNode } from '@tiptap/pm/model';
-import { Table } from '@tiptap/extension-table';
-import { TableCell } from '@tiptap/extension-table-cell';
-import { TableHeader } from '@tiptap/extension-table-header';
-import { TableRow } from '@tiptap/extension-table-row';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import { Plugin } from '@tiptap/pm/state';
+import type { EditorView } from '@tiptap/pm/view';
+import type { EditorState, Selection, Transaction } from '@tiptap/pm/state';
+import type { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
 import type { Rect } from '@tiptap/pm/tables';
 
 // NOTE: Custom TableView, to allow for custom styles to be applied to the <table> element. [LK]
@@ -69,9 +66,9 @@ export const UmbTableHeader = TableHeader.extend({
 	},
 
 	addProseMirrorPlugins() {
-		//const { editor } = this;
+		const { editor } = this;
 		return [
-			UmbBubbleMenuPlugin(this.editor, {
+			UmbBubbleMenuPlugin(editor, {
 				unique: 'table-column-menu',
 				placement: 'top',
 				elementName: 'umb-tiptap-menu',
@@ -83,7 +80,7 @@ export const UmbTableHeader = TableHeader.extend({
 			new Plugin({
 				props: {
 					decorations: (state) => {
-						const { isEditable } = this.editor;
+						const { isEditable } = editor;
 
 						if (!isEditable) {
 							return DecorationSet.empty;
@@ -108,7 +105,7 @@ export const UmbTableHeader = TableHeader.extend({
 										grip.addEventListener('mousedown', (event) => {
 											event.preventDefault();
 											event.stopImmediatePropagation();
-											this.editor.view.dispatch(selectColumn(index)(this.editor.state.tr));
+											editor.view.dispatch(selectColumn(index)(editor.state.tr));
 										});
 
 										return grip;
@@ -162,9 +159,9 @@ export const UmbTableCell = TableCell.extend({
 	},
 
 	addProseMirrorPlugins() {
-		//const { editor } = this;
+		const { editor } = this;
 		return [
-			UmbBubbleMenuPlugin(this.editor, {
+			UmbBubbleMenuPlugin(editor, {
 				unique: 'table-row-menu',
 				placement: 'left',
 				elementName: 'umb-tiptap-menu',
@@ -176,7 +173,7 @@ export const UmbTableCell = TableCell.extend({
 			new Plugin({
 				props: {
 					decorations: (state) => {
-						const { isEditable } = this.editor;
+						const { isEditable } = editor;
 
 						if (!isEditable) {
 							return DecorationSet.empty;
@@ -202,7 +199,7 @@ export const UmbTableCell = TableCell.extend({
 											event.preventDefault();
 											event.stopImmediatePropagation();
 
-											this.editor.view.dispatch(selectRow(index)(this.editor.state.tr));
+											editor.view.dispatch(selectRow(index)(editor.state.tr));
 										});
 
 										return grip;
@@ -355,51 +352,53 @@ const getCellsInRow = (rowIndex: number | number[]) => (selection: Selection) =>
 	return null;
 };
 
-// const getCellsInTable = (selection: Selection) => {
-// 	const table = findTable(selection);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getCellsInTable = (selection: Selection) => {
+	const table = findTable(selection);
 
-// 	if (table) {
-// 		const map = TableMap.get(table.node);
-// 		const cells = map.cellsInRect({
-// 			left: 0,
-// 			right: map.width,
-// 			top: 0,
-// 			bottom: map.height,
-// 		});
+	if (table) {
+		const map = TableMap.get(table.node);
+		const cells = map.cellsInRect({
+			left: 0,
+			right: map.width,
+			top: 0,
+			bottom: map.height,
+		});
 
-// 		return cells.map((nodePos) => {
-// 			const node = table.node.nodeAt(nodePos);
-// 			const pos = nodePos + table.start;
+		return cells.map((nodePos) => {
+			const node = table.node.nodeAt(nodePos);
+			const pos = nodePos + table.start;
 
-// 			return { pos, start: pos + 1, node };
-// 		});
-// 	}
+			return { pos, start: pos + 1, node };
+		});
+	}
 
-// 	return null;
-// };
+	return null;
+};
 
-// const findParentNodeClosestToPos = ($pos: ResolvedPos, predicate: (node: ProseMirrorNode) => boolean) => {
-// 	for (let i = $pos.depth; i > 0; i -= 1) {
-// 		const node = $pos.node(i);
+const findParentNodeClosestToPos = ($pos: ResolvedPos, predicate: (node: ProseMirrorNode) => boolean) => {
+	for (let i = $pos.depth; i > 0; i -= 1) {
+		const node = $pos.node(i);
 
-// 		if (predicate(node)) {
-// 			return {
-// 				pos: i > 0 ? $pos.before(i) : 0,
-// 				start: $pos.start(i),
-// 				depth: i,
-// 				node,
-// 			};
-// 		}
-// 	}
+		if (predicate(node)) {
+			return {
+				pos: i > 0 ? $pos.before(i) : 0,
+				start: $pos.start(i),
+				depth: i,
+				node,
+			};
+		}
+	}
 
-// 	return null;
-// };
+	return null;
+};
 
-// const findCellClosestToPos = ($pos: ResolvedPos) => {
-// 	const predicate = (node: ProseMirrorNode) => node.type.spec.tableRole && /cell/i.test(node.type.spec.tableRole);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const findCellClosestToPos = ($pos: ResolvedPos) => {
+	const predicate = (node: ProseMirrorNode) => node.type.spec.tableRole && /cell/i.test(node.type.spec.tableRole);
 
-// 	return findParentNodeClosestToPos($pos, predicate);
-// };
+	return findParentNodeClosestToPos($pos, predicate);
+};
 
 const select = (type: 'row' | 'column') => (index: number) => (tr: Transaction) => {
 	const table = findTable(tr.selection);
@@ -447,24 +446,25 @@ const selectColumn = select('column');
 
 const selectRow = select('row');
 
-// const selectTable = (tr: Transaction) => {
-// 	const table = findTable(tr.selection);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const selectTable = (tr: Transaction) => {
+	const table = findTable(tr.selection);
 
-// 	if (table) {
-// 		const { map } = TableMap.get(table.node);
+	if (table) {
+		const { map } = TableMap.get(table.node);
 
-// 		if (map && map.length) {
-// 			const head = table.start + map[0];
-// 			const anchor = table.start + map[map.length - 1];
-// 			const $head = tr.doc.resolve(head);
-// 			const $anchor = tr.doc.resolve(anchor);
+		if (map && map.length) {
+			const head = table.start + map[0];
+			const anchor = table.start + map[map.length - 1];
+			const $head = tr.doc.resolve(head);
+			const $anchor = tr.doc.resolve(anchor);
 
-// 			return tr.setSelection(new CellSelection($anchor, $head));
-// 		}
-// 	}
+			return tr.setSelection(new CellSelection($anchor, $head));
+		}
+	}
 
-// 	return tr;
-// };
+	return tr;
+};
 
 const isColumnGripSelected = ({
 	editor,
