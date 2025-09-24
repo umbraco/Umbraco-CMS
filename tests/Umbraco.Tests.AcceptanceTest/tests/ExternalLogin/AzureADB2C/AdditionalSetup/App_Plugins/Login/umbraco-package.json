@@ -1,0 +1,25 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "Azure B2C Login",
+  "allowPublicAccess": true,
+  "extensions": [
+    {
+      "type": "authProvider",
+      "alias": "Test.AzureB2C",
+      "name": "Azure AD B2C",
+      "forProviderName": "Umbraco.AzureB2C",
+      "meta": {
+        "label": "Sign in with Azure AD B2C",
+        "defaultView": {
+          "icon": "icon-cloud"
+        },
+        "behavior": {
+          "autoRedirect": false
+        },
+        "linking": {
+          "allowManualLinking": true
+        }
+      }
+    }
+  ]
+}

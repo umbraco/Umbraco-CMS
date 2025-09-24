@@ -59,7 +59,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
         Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("/the-page-url", result.First().Route.Path);
+        Assert.AreEqual("/the-page-url/", result.First().Route.Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
         Assert.IsEmpty(result.First().Properties);
     }
@@ -86,7 +86,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
         Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("/the-page-url", result.First().Route.Path);
+        Assert.AreEqual("/the-page-url/", result.First().Route.Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
 
         Assert.AreEqual("The other page", result.Last().Name);
@@ -130,7 +130,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual("The page", result.First().Name);
         Assert.AreEqual(key, result.First().Id);
-        Assert.AreEqual("/page-url-segment", result.First().Route.Path);
+        Assert.AreEqual("/page-url-segment/", result.First().Route.Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
         Assert.AreEqual(2, result.First().Properties.Count);
         Assert.AreEqual("Delivery API value", result.First().Properties[DeliveryApiPropertyType.Alias]);
@@ -204,7 +204,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
         Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("/the-page-url", result.First().Route.Path);
+        Assert.AreEqual("/the-page-url/", result.First().Route.Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
     }
 

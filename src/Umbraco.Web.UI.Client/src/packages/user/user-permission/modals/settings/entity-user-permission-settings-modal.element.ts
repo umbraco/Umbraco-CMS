@@ -31,8 +31,8 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	override connectedCallback(): void {
 		super.connectedCallback();
 
-		if (this._preset?.allowedVerbs) {
-			this.updateValue({ allowedVerbs: this._preset?.allowedVerbs });
+		if (this._preset?.allowedVerbs && !this.value?.allowedVerbs) {
+			this.updateValue({ allowedVerbs: this._preset.allowedVerbs });
 		}
 	}
 

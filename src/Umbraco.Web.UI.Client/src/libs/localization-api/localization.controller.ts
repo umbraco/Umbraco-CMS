@@ -20,7 +20,6 @@ import type {
 import { umbLocalizationManager } from './localization.manager.js';
 import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 
 const LocalizationControllerAlias = Symbol();
 /**
@@ -137,20 +136,16 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 			return String(key);
 		}
 
-		// As translated texts can contain HTML, we will need to render with unsafeHTML.
-		// But arguments can come from user input, so they should be escaped.
-		const sanitizedArgs = args.map((a) => escapeHTML(a));
-
 		if (typeof term === 'function') {
-			return term(...sanitizedArgs) as string;
+			return term(...args) as string;
 		}
 
 		if (typeof term === 'string') {
-			if (sanitizedArgs.length) {
+			if (args.length) {
 				// Replace placeholders of format "%index%" and "{index}" with provided values
 				term = term.replace(/(%(\d+)%|\{(\d+)\})/g, (match, _p1, p2, p3): string => {
 					const index = p2 || p3;
-					return typeof sanitizedArgs[index] !== 'undefined' ? String(sanitizedArgs[index]) : match;
+					return typeof args[index] !== 'undefined' ? String(args[index]) : match;
 				});
 			}
 		}

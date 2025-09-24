@@ -6,11 +6,15 @@ export default class UmbInputUploadFieldVideoElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 
+	get #label() {
+		return this.path.split('/').pop() ?? '';
+	}
+
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
 
 		return html`
-			<video controls>
+			<video controls title=${this.#label}>
 				<source src=${this.path} />
 				Video format not supported
 			</video>

@@ -46,5 +46,8 @@
     <Compile Update="Umbraco.Cms.Api.Management\Services\BackOfficeExternalLoginServiceTests.UnLinkLoginAsync.cs">
       <DependentUpon>BackOfficeExternalLoginServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Extensions\ContentExtensionsTests.GetStatus.cs">
+      <DependentUpon>ContentExtensionsTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

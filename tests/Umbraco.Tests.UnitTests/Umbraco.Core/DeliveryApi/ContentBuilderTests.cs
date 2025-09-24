@@ -48,7 +48,7 @@ public class ContentBuilderTests : DeliveryApiTests
         Assert.NotNull(result);
         Assert.AreEqual("The page", result.Name);
         Assert.AreEqual("thePageType", result.ContentType);
-        Assert.AreEqual("/url:url-segment", result.Route.Path);
+        Assert.AreEqual("/url:url-segment/", result.Route.Path);
         Assert.AreEqual(key, result.Id);
         Assert.AreEqual(2, result.Properties.Count);
         Assert.AreEqual("Delivery API value", result.Properties["deliveryApi"]);

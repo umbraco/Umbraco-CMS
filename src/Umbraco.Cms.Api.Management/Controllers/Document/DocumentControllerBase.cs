@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Content;
@@ -140,6 +140,10 @@ public abstract class DocumentControllerBase : ContentControllerBase
                 .WithDetail(
                     "An unspecified error occurred while (un)publishing. Please check the logs for additional information.")
                 .Build()),
+            ContentPublishingOperationStatus.TaskResultNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("The result of the submitted task could not be found")
+                .Build()),
+
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
         });
 

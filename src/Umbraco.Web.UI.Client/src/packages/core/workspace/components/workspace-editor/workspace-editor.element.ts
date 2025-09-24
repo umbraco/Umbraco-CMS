@@ -70,11 +70,11 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							(component as any).manifest = manifest;
 						}
 					},
-				} as UmbRoute;
+				};
 			});
 
 			// Duplicate first workspace and use it for the empty path scenario. [NL]
-			newRoutes.push({ ...newRoutes[0], path: '' });
+			newRoutes.push({ ...newRoutes[0], unique: newRoutes[0].path, path: '' });
 
 			newRoutes.push({
 				path: `**`,

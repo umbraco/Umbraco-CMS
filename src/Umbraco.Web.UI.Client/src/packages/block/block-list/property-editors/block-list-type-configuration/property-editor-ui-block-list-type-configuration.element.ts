@@ -1,9 +1,9 @@
 import '../../../block-type/components/input-block-type/index.js';
 import { UMB_BLOCK_LIST_TYPE } from '../../constants.js';
 import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
-import {
-	type UmbPropertyEditorUiElement,
-	type UmbPropertyEditorConfigCollection,
+import type {
+	UmbPropertyEditorUiElement,
+	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

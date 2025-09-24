@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -56,8 +56,12 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
         IReferenceResponseModel[] result = relationItemModelsCollection.Select(relationItemModel =>
             relationItemModel.NodeType switch
             {
-                Constants.UdiEntityType.Document => MapDocumentReference(relationItemModel, slimEntities),
-                Constants.UdiEntityType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.Document => MapDocumentReference(relationItemModel, slimEntities),
+                Constants.ReferenceType.Media => _umbracoMapper.Map<MediaReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.Member => _umbracoMapper.Map<MemberReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.DocumentTypePropertyType => _umbracoMapper.Map<DocumentTypePropertyTypeReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.MediaTypePropertyType => _umbracoMapper.Map<MediaTypePropertyTypeReferenceResponseModel>(relationItemModel),
+                Constants.ReferenceType.MemberTypePropertyType => _umbracoMapper.Map<MemberTypePropertyTypeReferenceResponseModel>(relationItemModel),
                 _ => _umbracoMapper.Map<DefaultReferenceResponseModel>(relationItemModel),
             }).WhereNotNull().ToArray();
 

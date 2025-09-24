@@ -49,8 +49,9 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 	}
 
 	async #setMenu() {
-		if (!this.#manifest?.meta.items) return;
-		this.#menu = await this.#getMenuItems(this.#manifest.meta.items);
+		const items = this.#manifest?.items ?? this.#manifest?.meta.items;
+		if (!items) return;
+		this.#menu = await this.#getMenuItems(items);
 	}
 
 	async #getMenuItems(items: Array<MetaTiptapToolbarMenuItem>): Promise<Array<UmbCascadingMenuItem>> {
@@ -92,10 +93,10 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 		}
 
 		return {
-			icon: item.icon,
+			icon: item.appearance?.icon ?? item.icon,
 			items,
 			label: item.label,
-			style: item.style,
+			style: item.appearance?.style ?? item.style,
 			separatorAfter: item.separatorAfter,
 			element,
 			execute: () => this.api?.execute(this.editor, item),

@@ -131,10 +131,10 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 
 	static override styles = css`
 		:host(:invalid:not([pristine])) {
-			color: var(--uui-color-danger);
+			color: var(--uui-color-invalid);
 		}
 		:host(:invalid:not([pristine])) uui-input {
-			border-color: var(--uui-color-danger);
+			border-color: var(--uui-color-invalid);
 		}
 	`;
 }

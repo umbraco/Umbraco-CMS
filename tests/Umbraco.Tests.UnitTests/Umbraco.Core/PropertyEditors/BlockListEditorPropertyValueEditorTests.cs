@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -75,6 +76,14 @@ public class BlockListEditorPropertyValueEditorTests
         }
     }
 
+    [Test]
+    public void MergeVariantInvariantPropertyValue_Can_Merge_Null_Values()
+    {
+        var editor = CreateValueEditor();
+        var result = editor.MergeVariantInvariantPropertyValue(null, null, true, ["en-US"]);
+        Assert.IsNull(result);
+    }
+
     private static JsonObject CreateBlocksJson(int numberOfBlocks)
     {
         var layoutItems = new JsonArray();
@@ -140,7 +149,7 @@ public class BlockListEditorPropertyValueEditorTests
             new DataEditorAttribute("alias"),
             new BlockListEditorDataConverter(jsonSerializer),
             new(new DataEditorCollection(() => [])),
-            new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>),
+            new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>, Mock.Of<ILogger<DataValueReferenceFactoryCollection>>()),
             Mock.Of<IDataTypeConfigurationCache>(),
             Mock.Of<IBlockEditorElementTypeCache>(),
             localizedTextServiceMock.Object,

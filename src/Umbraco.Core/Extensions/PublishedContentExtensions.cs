@@ -3850,9 +3850,8 @@ public static class PublishedContentExtensions
 
         if (parentKey.HasValue)
         {
-            IEnumerable<Guid> childrenKeys;
             var foundChildrenKeys = contentTypeAlias is null
-                ? navigationQueryService.TryGetChildrenKeys(parentKey.Value, out childrenKeys)
+                ? navigationQueryService.TryGetChildrenKeys(parentKey.Value, out IEnumerable<Guid> childrenKeys)
                 : navigationQueryService.TryGetChildrenKeysOfType(parentKey.Value, contentTypeAlias, out childrenKeys);
 
             return foundChildrenKeys
@@ -3860,19 +3859,12 @@ public static class PublishedContentExtensions
                 : [];
         }
 
-        IEnumerable<Guid> rootKeys;
         var foundRootKeys = contentTypeAlias is null
-            ? navigationQueryService.TryGetRootKeys(out rootKeys)
+            ? navigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys)
             : navigationQueryService.TryGetRootKeysOfType(contentTypeAlias, out rootKeys);
 
-        if (foundRootKeys)
-        {
-            IEnumerable<Guid> rootKeysArray = rootKeys as Guid[] ?? rootKeys.ToArray();
-            return rootKeysArray.Contains(content.Key)
-                ? publishedStatusFilteringService.FilterAvailable(rootKeysArray, culture)
-                : [];
-        }
-
-        return [];
+        return foundRootKeys
+            ? publishedStatusFilteringService.FilterAvailable(rootKeys, culture)
+            : [];
     }
 }

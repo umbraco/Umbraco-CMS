@@ -61,7 +61,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			},
 			undefined,
 			undefined,
-			() => import('../toolbar/default-tiptap-toolbar-element.api.js'),
+			() => import('../toolbar/default-tiptap-toolbar-api.js'),
 		);
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };

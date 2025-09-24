@@ -16,14 +16,14 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 		 will first be triggered when the condition is changed to permitted */
 		this.disable();
 
-		const condition = new UmbDocumentUserPermissionCondition(host, {
+		new UmbDocumentUserPermissionCondition(host, {
 			host,
 			config: {
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
 			},
-			onChange: () => {
-				if (condition.permitted) {
+			onChange: (permitted) => {
+				if (permitted) {
 					this.enable();
 				} else {
 					this.disable();

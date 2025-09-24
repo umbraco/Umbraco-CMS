@@ -119,6 +119,18 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		return this.#data.getCurrent();
 	}
 
+	setPersistedData(data: UmbBlockDataModel | undefined) {
+		this.#data.setPersisted(data);
+	}
+
+	/**
+	 * Check if there are unpersisted changes.
+	 * @returns { boolean } true if there are unpersisted changes.
+	 */
+	public getHasUnpersistedChanges(): boolean {
+		return this.#data.getHasUnpersistedChanges();
+	}
+
 	getUnique() {
 		return this.getData()?.key;
 	}

@@ -334,7 +334,7 @@ export abstract class UmbBlockManagerContext<
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
 		originData?: BlockOriginDataType,
-	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
+	): never;
 
 	abstract createWithPresets(
 		contentElementTypeKey: string,

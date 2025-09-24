@@ -55,6 +55,7 @@ test('can create child content in a collection', async ({umbracoApi, umbracoUi})
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
   await umbracoUi.content.enterContentName(firstChildContentName);
   await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
   const childData = await umbracoApi.document.getChildren(contentId);
@@ -87,6 +88,7 @@ test('can create multiple child nodes in a collection', async ({umbracoApi, umbr
   await umbracoUi.content.chooseDocumentType(childDocumentTypeName);
   await umbracoUi.content.enterContentName(secondChildContentName);
   await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.isSuccessNotificationVisible();
 
   // Assert
   const childData = await umbracoApi.document.getChildren(contentId);

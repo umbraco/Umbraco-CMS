@@ -1,18 +1,15 @@
 import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
+import { UMB_BLOCK_MANAGER_CONTEXT } from '../../context/index.js';
+import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from './block-catalogue-modal.token.js';
 import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
-import {
-	UMB_BLOCK_MANAGER_CONTEXT,
-	type UmbBlockCatalogueModalData,
-	type UmbBlockCatalogueModalValue,
-} from '@umbraco-cms/backoffice/block';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_MODAL_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the umb-block-type-card element
 import '@umbraco-cms/backoffice/block-type';
-import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<

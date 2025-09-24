@@ -6,6 +6,10 @@ import { umbScopeMapperForJsonPaths } from './scope-mapper-json-paths.function.j
  * @param {Array<string>} paths - the JSON paths to map.
  * @param {string} scopePath - the JSON path to scope the mapping to.
  * @param {(Array<string>)} scopedMapper - Map function which receives the paths in the scope and returns the resolved paths.
+ * @param scopePaths
+ * @param scopeData
+ * @param queryConstructor
+ * @param mapper
  * @returns {string} - the paths, including the once mapped by the scoped mapper. Notice the order is kept.
  */
 export async function umbQueryMapperForJsonPaths<T>(

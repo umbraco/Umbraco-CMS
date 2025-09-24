@@ -72,6 +72,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	 * @memberof UmbDocumentPublishingWorkspaceContext
 	 */
 	public async saveAndPublish(): Promise<void> {
+		const elementStyle = (this.getHostElement() as HTMLElement).style;
+		elementStyle.removeProperty('--uui-color-invalid');
+		elementStyle.removeProperty('--uui-color-invalid-emphasis');
+		elementStyle.removeProperty('--uui-color-invalid-standalone');
+		elementStyle.removeProperty('--uui-color-invalid-contrast');
 		return this.#handleSaveAndPublish();
 	}
 
@@ -172,6 +177,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase<UmbDoc
 	 * Convert a date string to a server time string in ISO format, example: 2021-01-01T12:00:00.000+00:00.
 	 * The input must be a valid date string, otherwise it will return null.
 	 * The output matches the DateTimeOffset format in C#.
+	 * @param dateString
 	 */
 	#convertToDateTimeOffset(dateString: string | null | undefined) {
 		if (!dateString || dateString.length === 0) {

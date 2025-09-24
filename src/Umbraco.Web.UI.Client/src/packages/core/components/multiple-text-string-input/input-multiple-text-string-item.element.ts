@@ -106,7 +106,6 @@ export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(U
 				() => html`
 					<uui-button
 						compact
-						color="danger"
 						label="${this.localize.term('general_remove')} ${this.value}"
 						look="outline"
 						?disabled=${this.disabled}

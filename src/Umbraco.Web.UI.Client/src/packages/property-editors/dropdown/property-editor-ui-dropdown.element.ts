@@ -1,4 +1,5 @@
 import { css, customElement, html, map, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
@@ -6,8 +7,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbInputDropdownListElement } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-dropdown
@@ -30,7 +30,7 @@ export class UmbPropertyEditorUIDropdownElement
 
 	@property({ type: Array })
 	public override set value(value: Array<string> | string | undefined) {
-		this.#selection = Array.isArray(value) ? value : value ? [value] : [];
+		this.#selection = this.#ensureValueIsArray(value);
 	}
 	public override get value(): Array<string> | undefined {
 		return this.#selection;
@@ -97,7 +97,11 @@ export class UmbPropertyEditorUIDropdownElement
 		}
 	}
 
-	#onChange(event: UUISelectEvent) {
+	#ensureValueIsArray(value: Array<string> | string | null | undefined): Array<string> {
+		return Array.isArray(value) ? value : value ? [value] : [];
+	}
+
+	#onChange(event: CustomEvent & { target: UmbInputDropdownListElement }) {
 		const value = event.target.value as string;
 		this.#setValue(value ? [value] : []);
 	}
@@ -110,6 +114,8 @@ export class UmbPropertyEditorUIDropdownElement
 
 	#setValue(value: Array<string> | string | null | undefined) {
 		if (!value) return;
+		const selection = this.#ensureValueIsArray(value);
+		this._options.forEach((item) => (item.selected = selection.includes(item.value)));
 		this.value = value;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -174,7 +180,7 @@ export class UmbPropertyEditorUIDropdownElement
 			}
 
 			.error {
-				color: var(--uui-color-danger);
+				color: var(--uui-color-invalid);
 				font-size: var(--uui-font-size-small);
 			}
 		`,

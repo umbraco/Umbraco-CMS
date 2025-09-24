@@ -79,11 +79,11 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 		return html`
 			${this._hasProperties
 				? html`<uui-box>
-								<umb-block-workspace-view-edit-properties
-								.managerName=${this.#managerName}
-								data-mark="property-group:root"
-								.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>
-							</uui-box>`
+						<umb-block-workspace-view-edit-properties
+							.managerName=${this.#managerName}
+							data-mark="property-group:root"
+							.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>
+					</uui-box>`
 				: ''}
 			${this.hideSingleGroup && this._groups.length === 1
 				? this.renderGroup(this._groups[0])

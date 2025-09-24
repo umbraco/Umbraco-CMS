@@ -92,18 +92,16 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 				value=${this._selectedTelemetryIndex + 1}
 				min="1"
 				max=${this._telemetryLevels.length}
-				hide-step-values></uui-slider>
-			<h2 class="uui-h3">${this._selectedTelemetry.telemetryLevel}</h2>
+				hide-step-values
+				hide-value-label></uui-slider>
+			<h3>${this._selectedTelemetry.telemetryLevel}</h3>
 			<p>${unsafeHTML(this._selectedTelemetryDescription)}</p>
 		`;
 	}
 
 	override render() {
 		return html`
-			<uui-box class="uui-text">
-				<h1 class="uui-h2">
-					<umb-localize key="analytics_consentForAnalytics">Consent for telemetry data</umb-localize>
-				</h1>
+			<uui-box headline=${this.localize.term('analytics_consentForAnalytics')}>
 				<div style="max-width:75ch">
 					<umb-localize key="analytics_analyticsDescription"></umb-localize>
 					${this._renderSettingSlider()}

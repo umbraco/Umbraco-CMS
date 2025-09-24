@@ -14,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Media.Delete',
-		name: 'Delete Media Entity Action ',
+		name: 'Delete Media Entity Action',
 		kind: 'deleteWithRelation',
 		forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
 		meta: {

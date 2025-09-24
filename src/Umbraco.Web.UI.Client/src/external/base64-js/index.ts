@@ -1,9 +1,9 @@
 /*
- * This Source Code has been derived from Jameson Little's base64-js.
+ * This Source Code has been derived from base64-js.
  * https://github.com/beatgammit/base64-js
- * SPDX-License-Identifier: MIT
- * Copyright © 2014 Jameson Little.
- * Modifications are licensed under the MIT License.
+ * Copyright © 2014 Jameson Little
+ * Copyright © 2024 Umbraco A/S
+ * Licensed under the MIT License.
  */
 
 const lookup: string[] = [];

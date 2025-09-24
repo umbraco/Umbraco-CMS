@@ -10,7 +10,7 @@ import {
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import type { UmbBlockDataModel, UmbBlockDataObjectModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
@@ -92,6 +92,9 @@ export class UmbBlockGridManagerContext<
 		});
 	}
 	/**
+	 * @param contentElementTypeKey
+	 * @param partialLayoutEntry
+	 * @param _originData
 	 * @deprecated Use createWithPresets instead. Will be removed in v.17.
 	 */
 	create(
@@ -102,9 +105,8 @@ export class UmbBlockGridManagerContext<
 		// This property is used by some implementations, but not used in this. Do not remove. [NL]
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_originData?: UmbBlockGridWorkspaceOriginData,
-	) {
+	): never {
 		throw new Error('Method deparecated use createWithPresets');
-		return {} as UmbBlockDataObjectModel<BlockLayoutType>;
 	}
 
 	async createWithPresets(

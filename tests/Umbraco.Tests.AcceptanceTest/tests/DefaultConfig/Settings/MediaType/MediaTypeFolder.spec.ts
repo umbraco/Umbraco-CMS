@@ -54,6 +54,7 @@ test('can rename a media type folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.mediaType.clickRootFolderCaretButton();
   await umbracoUi.mediaType.clickActionsMenuForName(oldFolderName);
   await umbracoUi.mediaType.clickRenameFolderButton();
+  await umbracoUi.waitForTimeout(500);
   await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
   await umbracoUi.mediaType.clickConfirmRenameButton();
 

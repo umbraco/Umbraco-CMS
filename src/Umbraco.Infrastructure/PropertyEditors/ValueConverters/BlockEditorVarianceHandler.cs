@@ -25,15 +25,7 @@ public sealed class BlockEditorVarianceHandler
         _contentTypeService = contentTypeService;
     }
 
-    /// <summary>
-    /// Aligns a block property value for variance changes.
-    /// </summary>
-    /// <param name="blockPropertyValue">The block property value to align.</param>
-    /// <param name="propertyType">The underlying property type.</param>
-    /// <param name="culture">The culture being handled (null if invariant).</param>
-    /// <remarks>
-    /// Used for aligning variance changes when editing content.
-    /// </remarks>
+    [Obsolete("Please use the method that allows alignment for a collection of values. Scheduled for removal in V17.")]
     public async Task AlignPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPropertyType propertyType, string? culture)
     {
         culture ??= await _languageService.GetDefaultIsoCodeAsync();
@@ -43,6 +35,48 @@ public sealed class BlockEditorVarianceHandler
                 ? culture
                 : null;
         }
+    }
+
+    /// <summary>
+    /// Aligns a collection of block property values for variance changes.
+    /// </summary>
+    /// <param name="blockPropertyValues">The block property values to align.</param>
+    /// <param name="culture">The culture being handled (null if invariant).</param>
+    /// <remarks>
+    /// Used for aligning variance changes when editing content.
+    /// </remarks>
+    public async Task<IList<BlockPropertyValue>> AlignPropertyVarianceAsync(IList<BlockPropertyValue> blockPropertyValues, string? culture)
+    {
+        var defaultIsoCodeAsync = await _languageService.GetDefaultIsoCodeAsync();
+        culture ??= defaultIsoCodeAsync;
+
+        var valuesToRemove = new List<BlockPropertyValue>();
+        foreach (BlockPropertyValue blockPropertyValue in blockPropertyValues)
+        {
+            IPropertyType? propertyType = blockPropertyValue.PropertyType;
+            if (propertyType is null)
+            {
+                throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them to editor.", nameof(blockPropertyValues));
+            }
+
+            if (propertyType.VariesByCulture() == VariesByCulture(blockPropertyValue))
+            {
+                continue;
+            }
+
+            if (propertyType.VariesByCulture() is false && blockPropertyValue.Culture.InvariantEquals(defaultIsoCodeAsync) is false)
+            {
+                valuesToRemove.Add(blockPropertyValue);
+            }
+            else
+            {
+                blockPropertyValue.Culture = propertyType.VariesByCulture()
+                    ? culture
+                    : null;
+            }
+        }
+
+        return blockPropertyValues.Except(valuesToRemove).ToList();
     }
 
     /// <summary>
@@ -199,6 +233,8 @@ public sealed class BlockEditorVarianceHandler
                 blockValue.Expose.Add(new BlockItemVariation(contentData.Key, value.Culture, value.Segment));
             }
         }
+
+        blockValue.Expose = blockValue.Expose.DistinctBy(e => $"{e.ContentKey}.{e.Culture}.{e.Segment}").ToList();
     }
 
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)

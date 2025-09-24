@@ -1,5 +1,5 @@
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMediaElement } from '../../components/index.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';

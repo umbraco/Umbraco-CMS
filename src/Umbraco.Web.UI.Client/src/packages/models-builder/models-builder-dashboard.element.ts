@@ -63,8 +63,8 @@ export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 					look="secondary"
 					label="Reload"
 					@click="${this._onDashboardReload}">
-						Reload
-					</uui-button>
+					Reload
+				</uui-button>
 				<p>Version: ${this._modelsBuilder?.version}</p>
 				<div class="models-description">
 					<p>ModelsBuilder is enabled with the following configuration:</p>

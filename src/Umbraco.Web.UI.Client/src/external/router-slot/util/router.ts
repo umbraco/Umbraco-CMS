@@ -160,7 +160,7 @@ export async function resolvePageComponent(route: IComponentRoute, info: IRoutin
 
 	// Setup the component using the callback.
 	if (route.setup != null) {
-		route.setup(component, info);
+		await route.setup(component, info);
 	}
 
 	return component;
@@ -301,9 +301,10 @@ export function shouldNavigate<D>(currentMatch: IRouteMatch<D> | null, newMatch:
 	const { route: currentRoute, fragments: currentFragments } = currentMatch;
 	const { route: newRoute, fragments: newFragments } = newMatch;
 
-	const isSameRoute = currentRoute == newRoute;
+	const isSameRoute = currentRoute.path == newRoute.path;
 	const isSameFragments = currentFragments.consumed == newFragments.consumed;
+	const isSameBasedOnUnique = currentRoute.unique === newRoute.unique;
 
 	// Only navigate if the URL consumption is new or if the two routes are no longer the same.
-	return !isSameFragments || !isSameRoute;
+	return !isSameFragments || !isSameRoute || !isSameBasedOnUnique;
 }

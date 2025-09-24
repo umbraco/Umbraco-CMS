@@ -306,7 +306,7 @@ namespace Umbraco.Cms.Core.Strings
             return text;
         }
 
-        private string RemoveSurrogatePairs(string text)
+        private static string RemoveSurrogatePairs(string text)
         {
             var input = text.AsSpan();
             Span<char> output = input.Length <= 1024 ? stackalloc char[input.Length] : new char[text.Length];
@@ -622,7 +622,8 @@ namespace Umbraco.Cms.Core.Strings
             }
 
             var input = text.ToCharArray();
-            var output = new char[input.Length * 2];
+            int outputLength = input.Length * 2;
+            Span<char> output = outputLength <= 1024 ? stackalloc char[outputLength] : new char[outputLength];
             var opos = 0;
             var a = input.Length > 0 ? input[0] : char.MinValue;
             var upos = char.IsUpper(a) ? 1 : 0;
@@ -666,7 +667,7 @@ namespace Umbraco.Cms.Core.Strings
                 output[opos++] = a;
             }
 
-            return new string(output, 0, opos);
+            return new string(output[..opos]);
         }
 
         #endregion

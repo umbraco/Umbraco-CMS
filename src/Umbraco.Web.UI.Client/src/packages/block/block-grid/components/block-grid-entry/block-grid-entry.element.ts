@@ -456,7 +456,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
-							? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 							: nothing}
 						${this._invalidLocation
 							? html`<uui-tag id="invalidLocation" color="danger"
@@ -562,7 +562,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 					href=${this._workspaceEditContentPath}>
 					<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
 					${this._contentInvalid
-						? html`<uui-badge attention color="danger" label="Invalid content">!</uui-badge>`
+						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
 						: nothing}
 				</uui-button>`
 			: this._showContentEdit === false && this._exposed === false
@@ -581,11 +581,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				? html`<uui-button
 						label="Edit settings"
 						look="secondary"
-						color=${this._settingsInvalid ? 'danger' : ''}
+						color=${this._settingsInvalid ? 'invalid' : ''}
 						href=${this._workspaceEditSettingsPath}>
 						<uui-icon name="icon-settings"></uui-icon>
 						${this._settingsInvalid
-							? html`<uui-badge attention color="danger" label="Invalid settings">!</uui-badge>`
+							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
 							: nothing}
 					</uui-button>`
 				: nothing}
@@ -638,7 +638,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			:host([location-invalid])::after,
 			:host([settings-invalid])::after,
 			:host([content-invalid])::after {
-				border-color: var(--uui-color-danger);
+				border-color: var(--uui-color-invalid);
 			}
 
 			#invalidLocation {

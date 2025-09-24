@@ -80,7 +80,7 @@ test(`can upload a file with the svg extension in the content`, async ({umbracoA
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value.src).toContain(AliasHelper.toAlias(vectorGraphicsName));
-  await umbracoUi.content.doesUploadedSvgThumbnailHaveSrc(contentData.values[0].value.src);
+  await umbracoUi.content.doesUploadedSvgThumbnailHaveSrc(umbracoApi.baseUrl + contentData.values[0].value.src);
 });
 
 test('can remove an svg file in the content', async ({umbracoApi, umbracoUi}) => {

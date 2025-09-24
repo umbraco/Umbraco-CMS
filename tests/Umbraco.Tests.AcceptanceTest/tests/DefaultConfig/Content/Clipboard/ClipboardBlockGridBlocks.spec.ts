@@ -334,3 +334,29 @@ test('can not copy a block from a block grid to a block list without allowed blo
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(blockListElementTypeName);
 });
+
+test('can not copy a block from a block grid to root without allowed in root', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const secondElementTypeName = 'SecondElementType';
+  const areaAlias = 'testArea';
+  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
+  const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
+  const blockGridId = await umbracoApi.dataType.createBlockGridWithAnAreaInABlockWithAllowInAreasAndASecondBlock(blockGridDataTypeName, elementTypeId, secondElementTypeId, areaAlias, true, 'TestCreateLabel' ,12 ,1, 0 , 10, false, true);
+  const areaKey = await umbracoApi.dataType.getBlockGridAreaKeyFromBlock(blockGridDataTypeName, elementTypeId, areaAlias);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockGridDataTypeName, blockGridId, groupName);
+  await umbracoApi.document.createDocumentWithABlockGridEditorWithABlockThatContainsABlockInAnArea(contentName, documentTypeId, blockGridDataTypeName, elementTypeId, areaKey, secondElementTypeId, AliasHelper.toAlias(elementPropertyName), blockPropertyValue, richTextDataTypeUiAlias);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+  await umbracoUi.content.goToContentWithName(contentName);
+
+  // Act
+  await umbracoUi.content.clickCopyBlockGridBlockButton(groupName, blockGridDataTypeName, secondElementTypeName, 1);
+  await umbracoUi.content.clickActionsMenuForProperty(groupName, blockGridDataTypeName);
+  await umbracoUi.content.clickExactReplaceButton();
+
+  // Assert
+  await umbracoUi.content.doesClipboardContainCopiedBlocksCount(0);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
+});

@@ -188,7 +188,6 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 						() => html`
 							<uui-button
 								compact
-								color="danger"
 								label=${this.localize.term('actions_delete')}
 								look="primary"
 								?disabled=${this.disabled}

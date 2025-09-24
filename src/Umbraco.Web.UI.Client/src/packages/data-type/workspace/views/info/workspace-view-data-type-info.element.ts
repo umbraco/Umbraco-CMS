@@ -4,8 +4,6 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
-import './data-type-workspace-view-info-reference.element.js';
-
 @customElement('umb-workspace-view-data-type-info')
 export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
@@ -47,8 +45,7 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 	override render() {
 		return html`
 			<div class="container">
-				<umb-data-type-workspace-view-info-reference
-					.dataTypeUnique=${this._unique}></umb-data-type-workspace-view-info-reference>
+				<umb-extension-slot id="workspace-info-apps" type="workspaceInfoApp"></umb-extension-slot>
 			</div>
 			<div class="container">${this.#renderGeneralInfo()}</div>
 		`;

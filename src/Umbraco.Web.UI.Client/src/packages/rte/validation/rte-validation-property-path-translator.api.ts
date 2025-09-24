@@ -1,5 +1,5 @@
-import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyEditorRteValueType } from '../types.js';
+import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cms/backoffice/property';
 import { UmbBlockEditorValidationPropertyPathTranslatorBase } from '@umbraco-cms/backoffice/block';
 
 export class UmbRteValidationPropertyPathTranslator extends UmbBlockEditorValidationPropertyPathTranslatorBase<UmbPropertyEditorRteValueType> {

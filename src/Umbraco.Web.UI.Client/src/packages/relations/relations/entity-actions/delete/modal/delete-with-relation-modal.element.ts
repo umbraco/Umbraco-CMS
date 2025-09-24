@@ -1,3 +1,4 @@
+import type { UmbConfirmActionModalEntityReferencesConfig } from '../../../global-components/types.js';
 import type {
 	UmbDeleteWithRelationConfirmModalData,
 	UmbDeleteWithRelationConfirmModalValue,
@@ -17,8 +18,6 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
-import '../../local-components/confirm-action-entity-references.element.js';
-
 @customElement('umb-delete-with-relation-confirm-modal')
 export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElement<
 	UmbDeleteWithRelationConfirmModalData,
@@ -28,7 +27,7 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 	_name?: string;
 
 	@state()
-	_referencesConfig?: any;
+	_referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
 
 	#itemRepository?: UmbItemRepository<any>;
 

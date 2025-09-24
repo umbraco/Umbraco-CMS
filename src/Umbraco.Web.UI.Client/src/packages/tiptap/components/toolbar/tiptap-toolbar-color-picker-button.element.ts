@@ -38,7 +38,7 @@ export class UmbTiptapToolbarColorPickerButtonElement extends UmbTiptapToolbarBu
 				<uui-popover-container id="color-picker-popover" placement="bottom-end">
 					<umb-popover-layout>
 						<uui-scroll-container>
-							<uui-color-picker inline @change=${this.#onChange}></uui-color-picker>
+							<uui-color-picker inline label=${label} @change=${this.#onChange}></uui-color-picker>
 						</uui-scroll-container>
 					</umb-popover-layout>
 				</uui-popover-container>

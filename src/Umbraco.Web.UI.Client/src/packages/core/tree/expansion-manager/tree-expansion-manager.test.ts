@@ -57,7 +57,6 @@ describe('UmbTreeExpansionManager', () => {
 			const isExpanded = manager.isExpanded(item);
 			expect(isExpanded).to.be.an.instanceOf(Observable);
 			manager.isExpanded(item).subscribe((value) => {
-				console.log('VALUE', value);
 				expect(value).to.be.true;
 				done();
 			});
