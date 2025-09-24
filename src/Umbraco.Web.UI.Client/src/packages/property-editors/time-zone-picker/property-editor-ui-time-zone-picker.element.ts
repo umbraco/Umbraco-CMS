@@ -1,4 +1,4 @@
-import { html, customElement, property, css, query, map } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, query, map, ref } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
@@ -40,8 +40,7 @@ export class UmbPropertyEditorUITimeZonePickerElement
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	@query('umb-input-time-zone')
-	inputElem!: UmbInputTimeZoneElement;
+	#inputTimeZone?: UmbInputTimeZoneElement;
 
 	constructor() {
 		super();
@@ -53,13 +52,12 @@ export class UmbPropertyEditorUITimeZonePickerElement
 		);
 	}
 
-	protected override firstUpdated() {
-		this.addFormControlElement(this.inputElem);
-	}
-
 	#onModeInput(event: UUIRadioEvent) {
 		if (!this._supportedModes.includes(event.target.value)) throw new Error(`Unknown mode: ${event.target.value}`);
-		this.value = { mode: event.target.value, timeZones: Array.from(this.inputElem.value) };
+		this.value = {
+			mode: event.target.value,
+			timeZones: this.#inputTimeZone?.value ? Array.from(this.#inputTimeZone?.value) : [],
+		};
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -74,6 +72,16 @@ export class UmbPropertyEditorUITimeZonePickerElement
 		}
 
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#inputTimeZoneRefChanged(input?: Element) {
+		if (this.#inputTimeZone) {
+			this.removeFormControlElement(this.#inputTimeZone);
+		}
+		this.#inputTimeZone = input as UmbInputTimeZoneElement | undefined;
+		if (this.#inputTimeZone) {
+			this.addFormControlElement(this.#inputTimeZone);
+		}
 	}
 
 	override render() {
@@ -97,7 +105,8 @@ export class UmbPropertyEditorUITimeZonePickerElement
 					.value=${this._selectedTimeZones}
 					?readonly=${this.readonly}
 					?required=${this.value?.mode === 'custom'}
-					@change=${this.#onChange}>
+					@change=${this.#onChange}
+					${ref(this.#inputTimeZoneRefChanged)}>
 				</umb-input-time-zone>
 			</div>
 		`;

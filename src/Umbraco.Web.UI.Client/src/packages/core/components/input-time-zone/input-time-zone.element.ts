@@ -146,10 +146,6 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		);
 	}
 
-	protected override firstUpdated() {
-		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-time-zone-picker')!);
-	}
-
 	protected override getFormElement() {
 		return undefined;
 	}
@@ -208,7 +204,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 					}}
 					?disabled=${this.disabled}
 					?readonly=${this.readonly}
-					${ref(this.#inputTimeZonePiclerChanged)}>
+					${ref(this.#onTimeZonePickerRefChanged)}>
 				</umb-input-time-zone-picker>
 				${when(
 					!this.readonly,
@@ -228,11 +224,11 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		`;
 	}
 
-	#inputTimeZonePiclerChanged(input?: Element) {
+	#onTimeZonePickerRefChanged(input?: Element) {
 		if (this.#timeZonePicker) {
 			this.removeFormControlElement(this.#timeZonePicker);
 		}
-		this.#timeZonePicker = input as UmbInputTimeZonePickerElement;
+		this.#timeZonePicker = input as UmbInputTimeZonePickerElement | undefined;
 		if (this.#timeZonePicker) {
 			this.addFormControlElement(this.#timeZonePicker);
 		}
