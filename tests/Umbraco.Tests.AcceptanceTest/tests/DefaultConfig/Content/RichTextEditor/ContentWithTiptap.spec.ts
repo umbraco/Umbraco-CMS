@@ -86,26 +86,23 @@ test('can publish content with RTE Tiptap property editor', async ({umbracoApi, 
   expect(contentData.values[0].value.markup).toEqual('<p>' + inputText + '</p>');
 });
 
-// test for regression issue: https://github.com/umbraco/Umbraco-CMS/issues/19763
+// This is a test for the regression issue #19763
 test('can save a variant content node after removing embedded block in RTE', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   // Language
   const danishIsoCode = 'da';
   await umbracoApi.language.createDanishLanguage();
-
   // Content Names
   const englishContentName = 'English Content';
   const danishContentName = 'Danish Content';
-
   // Element Type
   const elementTypeName = 'Default Element Type';
   const elementTypeGroupName = 'Content';
   const elementTypeDataTypeName = 'Textstring';
   const elementTypeDataType = await umbracoApi.dataType.getByName(elementTypeDataTypeName);
-
   // Rich Text Editor
   const richTextEditorDataTypeName = 'Rich Text Editor with a block';
-
+  const textStringValue = 'Block Content';
   const elementTypeId = await umbracoApi.documentType.createDefaultElementTypeWithVaryByCulture(elementTypeName, elementTypeGroupName, elementTypeDataTypeName, elementTypeDataType.id, true, false);
   const richTextEditorId = await umbracoApi.dataType.createRichTextEditorWithABlock(richTextEditorDataTypeName, elementTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, richTextEditorDataTypeName, richTextEditorId, 'TestGroup', true, false);
@@ -118,11 +115,13 @@ test('can save a variant content node after removing embedded block in RTE', asy
   // Act
   await umbracoUi.content.clickInsertBlockButton();
   await umbracoUi.content.clickLinkWithName(elementTypeName);
+  await umbracoUi.content.enterTextstring(textStringValue);
   await umbracoUi.content.clickCreateModalButton();
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveButton();
   // Wait a bit for the save to complete
-  await umbracoUi.waitForTimeout(1000);
+  const contentData = await umbracoApi.document.getByName(englishContentName);
+  expect(contentData.values[0].value.blocks.contentData[0].values[0].value).toBe(textStringValue);
   await umbracoUi.content.clearTipTapEditor();
   await umbracoUi.content.clickSaveButtonForContent();
   await umbracoUi.content.clickSaveButton();
