@@ -131,6 +131,5 @@ export {
 export { StarterKit } from '@tiptap/starter-kit';
 
 // CUSTOM EXTENSIONS
-export * from './extensions/tiptap-umb-embedded-media.extension.js';
 export * from './extensions/tiptap-umb-image.extension.js';
 export * from './extensions/tiptap-umb-link.extension.js';

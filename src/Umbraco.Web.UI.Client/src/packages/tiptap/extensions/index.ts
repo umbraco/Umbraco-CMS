@@ -3,6 +3,7 @@ export * from './tiptap-toolbar-element-api-base.js';
 export * from './anchor/index.js';
 export * from './bubble-menu/index.js';
 export * from './character-map/index.js';
+export * from './embedded-media/index.js';
 export * from './figure/index.js';
 export * from './html-attr-class/index.js';
 export * from './html-attr-dataset/index.js';
