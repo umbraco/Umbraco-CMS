@@ -340,7 +340,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				const variantName = variants.find(
 					(v) => v.culture === activeVariant?.culture && v.segment === activeVariant?.segment,
 				)?.name;
-				this.view.setBrowserTitle(variantName);
+				this.view.setTitle(variantName);
 			},
 			null,
 		);
