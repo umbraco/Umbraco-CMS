@@ -42,7 +42,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 					.forEach((manifest) => {
 						const context = new UmbWorkspaceViewContext(this, manifest);
 						context.setVariantId(this.#variantId);
-						context.setBrowserTitle(manifest.meta.label);
+						context.setTitle(manifest.meta.label);
 						context.inherit();
 						contexts.push(context);
 					});

@@ -29,7 +29,7 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 		this.observe(
 			this.name,
 			(name) => {
-				this.view.setBrowserTitle(name);
+				this.view.setTitle(name);
 			},
 			null,
 		);

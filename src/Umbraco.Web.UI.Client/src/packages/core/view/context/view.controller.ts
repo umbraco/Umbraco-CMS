@@ -119,7 +119,7 @@ export class UmbViewController extends UmbControllerBase {
 		this.hints.updateScaffold({ variantId: variantId });
 	}
 
-	public setBrowserTitle(title: string | undefined): void {
+	public setTitle(title: string | undefined): void {
 		if (this.#title === title) return;
 		this.#title = title;
 		this.#computeTitle();

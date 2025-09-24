@@ -75,7 +75,7 @@ export class UmbPropertyTypeWorkspaceContext
 		this.observe(
 			this.name,
 			(name) => {
-				this.view.setBrowserTitle(name);
+				this.view.setTitle(name);
 			},
 			null,
 		);
