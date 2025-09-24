@@ -13,7 +13,7 @@ const editorAlias = 'Umbraco.TextBox';
 const customPropertyEditorName = 'Custom Text Editor';
 
 // Test values
-const testValue1 = 'This is a test value for the custom property editor';
+const testValue = 'This is a test value for the custom property editor';
 
 test.afterEach(async ({umbracoApi}) => {
 	await umbracoApi.document.ensureNameNotExists(contentName);
