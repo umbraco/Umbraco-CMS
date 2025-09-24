@@ -1,13 +1,13 @@
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
+
 import { Extension } from '@tiptap/core';
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export interface TextDirectionOptions {
+export interface UmbTextDirectionOptions {
 	directions: Array<'auto' | 'ltr' | 'rtl'>;
 	types: Array<string>;
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export const TextDirection = Extension.create<TextDirectionOptions>({
+export const TextDirection = Extension.create<UmbTextDirectionOptions>({
 	name: 'textDirection',
 
 	addOptions() {

@@ -10,6 +10,11 @@ export * from './html-attr-id/index.js';
 export * from './html-attr-style/index.js';
 export * from './html-tag-div/index.js';
 export * from './html-tag-span/index.js';
+//export * from './image/index.js';
+//export * from './link/index.js';
 export * from './table/index.js';
+export * from './text-direction/index.js';
+//export * from './text-indent/index.js';
+//export * from './trailing-node/index.js';
 
 export type * from './types.js';
