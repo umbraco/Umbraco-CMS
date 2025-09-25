@@ -52,7 +52,7 @@ test('custom property editor appears in Document type when configuring a propert
     await umbracoUi.goToBackOffice();
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
-    //Act
+    // Act
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
     await umbracoUi.documentType.clickAddGroupButton();
     await umbracoUi.documentType.addPropertyEditor(dataTypeName);
