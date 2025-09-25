@@ -145,7 +145,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailDataSource<
 			isElement: model.isElement,
 			properties: model.properties.map((property) => {
 				return {
-					id: property.id,
+					id: property.unique,
 					container: property.container ? { id: property.container.id } : null,
 					sortOrder: property.sortOrder,
 					alias: property.alias,
@@ -205,7 +205,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailDataSource<
 			isElement: model.isElement,
 			properties: model.properties.map((property) => {
 				return {
-					id: property.id,
+					id: property.unique,
 					container: property.container ? { id: property.container.id } : null,
 					sortOrder: property.sortOrder,
 					isSensitive: property.isSensitive ?? false,
