@@ -22,7 +22,7 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 test('custom property editor appears in Property Editor Picker', async ({umbracoApi, umbracoUi}) =>{
-    //Arrange
+    // Arrange
     await umbracoUi.goToBackOffice();
     await umbracoUi.dataType.goToSection(ConstantHelper.sections.settings);
 
