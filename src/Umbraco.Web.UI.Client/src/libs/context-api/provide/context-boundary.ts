@@ -45,7 +45,6 @@ export class UmbContextBoundary {
 	 * @memberof UmbContextBoundary
 	 */
 	public hostConnected(): void {
-		//this.hostElement.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		this.#eventTarget.dispatchEvent(new UmbContextProvideEventImplementation(this.#contextAlias));
 	}
 
