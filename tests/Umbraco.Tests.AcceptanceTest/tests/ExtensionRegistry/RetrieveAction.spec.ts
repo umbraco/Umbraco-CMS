@@ -35,7 +35,6 @@ test('can retrieve unique and entity type of document', async ({umbracoApi, umbr
 test('can retrieve unique and entity type of media', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mediaId = await umbracoApi.media.createDefaultMediaWithImage(mediaName);
-
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.media);
 
