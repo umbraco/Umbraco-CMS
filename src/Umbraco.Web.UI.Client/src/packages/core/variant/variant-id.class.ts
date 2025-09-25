@@ -1,21 +1,4 @@
-import { UmbDeprecation } from '../utils/index.js';
 import type { UmbObjectWithVariantProperties } from './types.js';
-
-/**
- *
- * @param {UmbObjectWithVariantProperties} variant - An object with variant specifying properties to convert to a string.
- * @returns {string} A string representation of the variant properties.
- * @deprecated Use UmbVariantId to make this conversion. Will ve removed in v.17
- */
-export function variantPropertiesObjectToString(variant: UmbObjectWithVariantProperties): string {
-	new UmbDeprecation({
-		deprecated: 'Method `variantPropertiesObjectToString` is deprecated',
-		removeInVersion: '17',
-		solution: 'Use UmbVariantId to make this conversion',
-	}).warn();
-	// Currently a direct copy of the toString method of variantId.
-	return (variant.culture || UMB_INVARIANT_CULTURE) + (variant.segment ? `_${variant.segment}` : '');
-}
 
 export const UMB_INVARIANT_CULTURE = 'invariant';
 

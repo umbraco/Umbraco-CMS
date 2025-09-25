@@ -6,7 +6,8 @@ export interface UmbEntityModel {
 }
 
 export interface UmbNamedEntityModel extends UmbEntityModel {
-	name: string;
+	// TODO: ⚠️[v17]⚠️ Review this, as I had to make `name` nullable to TS compile! Which works against what a `UmbNamedEntityModel` should be! [LK]
+	name?: string;
 }
 
 export type * from './entity-type/types.js';

@@ -48,9 +48,10 @@ export abstract class UmbPickerSearchResultItemElementBase<ItemType extends UmbN
 	override render() {
 		const item = this.item;
 		if (!item) return nothing;
+		// TODO: ⚠️[v17]⚠️ Review this, as `name` shouldn't really be nullable here, (I only did it so I could TS compile)! [LK]
 		return html`
 			<umb-ref-item
-				name=${item.name}
+				name=${item.name ?? 'Unnamed document'}
 				select-only
 				?selectable=${!this.disabled}
 				?selected=${this._isSelected}

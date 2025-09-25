@@ -11,11 +11,6 @@ export type UmbWorkspaceEntityTypeConditionConfig = UmbConditionConfigBase<
 	 */
 	match: string;
 };
-/**
- * @deprecated Use `UmbWorkspaceEntityTypeConditionConfig` instead. This will be removed in Umbraco 17.
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export type WorkspaceEntityTypeConditionConfig = UmbWorkspaceEntityTypeConditionConfig;
 
 declare global {
 	interface UmbExtensionConditionConfigMap {

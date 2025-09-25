@@ -168,8 +168,9 @@ export class UmbInputEntityElement extends UmbFormControlMixin<string | undefine
 	#renderItem(item: UmbUniqueItemModel) {
 		if (!item.unique) return;
 		const icon = this.getIcon?.(item) ?? item.icon ?? '';
+		// TODO: ⚠️[v17]⚠️ Review this, as I had to make `name` nullable to TS compile! [LK]
 		return html`
-			<uui-ref-node name=${item.name} id=${item.unique}>
+			<uui-ref-node name=${item.name ?? 'Unnamed entity'} id=${item.unique}>
 				${when(icon, () => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>

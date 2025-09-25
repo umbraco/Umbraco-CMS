@@ -8,8 +8,3 @@ export const umbExtensionsRegistry = new UmbExtensionRegistry<
 	UmbExtensionManifest,
 	UmbExtensionConditionConfig
 >() as UmbBackofficeExtensionRegistry;
-
-/**
- * @deprecated Use `UmbExtensionManifestKind` instead.
- */
-export type UmbBackofficeManifestKind = ManifestKind<UmbExtensionManifest>;

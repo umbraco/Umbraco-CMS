@@ -30,6 +30,7 @@ export interface UmbReferenceByUniqueAndType {
 
 export interface UmbUniqueItemModel {
 	unique: string;
-	name: string;
+	// TODO: ⚠️[v17]⚠️ Review this, as I had to make `name` nullable to TS compile! [LK]
+	name?: string;
 	icon?: string;
 }
