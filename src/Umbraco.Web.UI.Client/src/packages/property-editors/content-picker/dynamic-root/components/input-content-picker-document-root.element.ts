@@ -83,7 +83,8 @@ export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixi
 			if (!documents?.length) return;
 
 			documents.forEach((document) => {
-				this.#documentLookup[document.unique] = document.name;
+				// TODO: ⚠️[v17]⚠️ Review the `item.variants[0].name` as this is a hack! [LK]
+				this.#documentLookup[document.unique] = document.variants[0].name;
 			});
 
 			this.requestUpdate();
