@@ -91,11 +91,15 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 		return html`
 			<div id="container" class="uui-text" data-test="installer-telemetry">
 				<h1>Consent for telemetry data</h1>
-				${this._renderSlider()}
-				<div id="buttons">
-					<uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>
-					<uui-button id="button-install" @click=${this._onNext} label="Next" look="primary"></uui-button>
-				</div>
+				<uui-form>
+					<form id="consent-form" name="consent" @submit=${this._onNext}>
+						${this._renderSlider()}
+						<div id="buttons">
+							<uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>
+							<uui-button id="button-install" type="submit" label="Next" look="primary"></uui-button>
+						</div>
+					</form>
+				</uui-form>
 			</div>
 		`;
 	}
