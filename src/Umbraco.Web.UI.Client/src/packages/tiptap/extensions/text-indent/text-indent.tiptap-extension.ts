@@ -1,3 +1,5 @@
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
+
 /* This Source Code has been derived from Tiptiz.
  * https://github.com/tiptiz/editor/blob/main/packages/tiptiz-extension-indent/src/indent.ts
  * SPDX-License-Identifier: MIT
@@ -5,21 +7,19 @@
  * Modifications are licensed under the MIT License.
  */
 
-import type { Dispatch } from '@tiptap/core';
+import { Extension } from '../../externals.js';
+import type { Dispatch } from '../../externals.js';
+
+import { AllSelection, TextSelection } from '@tiptap/pm/state';
 import type { EditorState, Transaction } from '@tiptap/pm/state';
 
-import { Extension } from '@tiptap/core';
-import { AllSelection, TextSelection } from '@tiptap/pm/state';
-
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export interface TextIndentOptions {
+export interface UmbTiptapTextIndentOptions {
 	minLevel: number;
 	maxLevel: number;
 	types: Array<string>;
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export const TextIndent = Extension.create<TextIndentOptions>({
+export const TextIndent = Extension.create<UmbTiptapTextIndentOptions>({
 	name: 'textIndent',
 
 	addOptions() {

@@ -1,11 +1,9 @@
-import { mergeAttributes, Node } from '@tiptap/core';
+import { mergeAttributes, Node } from '../../externals.js';
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export interface UmbEmbeddedMediaOptions {
 	inline: boolean;
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const umbEmbeddedMedia = Node.create<UmbEmbeddedMediaOptions>({
 	name: 'umbEmbeddedMedia',
 	group() {

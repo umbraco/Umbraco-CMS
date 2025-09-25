@@ -1,18 +1,17 @@
-import { UmbBubbleMenuPlugin } from './tiptap-umb-bubble-menu.extension.js';
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
+import { findParentNode, Table, TableCell, TableHeader, TableRow } from '../../externals.js';
+import { UmbBubbleMenuPlugin } from '../bubble-menu/bubble-menu.tiptap-extension.js';
+import type { Editor } from '../../externals.js';
 import { CellSelection, TableMap, TableView } from '@tiptap/pm/tables';
-import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view';
-import { EditorState, Plugin, Selection, Transaction } from '@tiptap/pm/state';
-import { findParentNode, Editor } from '@tiptap/core';
-import { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
-import { Table } from '@tiptap/extension-table';
-import { TableCell } from '@tiptap/extension-table-cell';
-import { TableHeader } from '@tiptap/extension-table-header';
-import { TableRow } from '@tiptap/extension-table-row';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import { Plugin } from '@tiptap/pm/state';
+import type { EditorView } from '@tiptap/pm/view';
+import type { EditorState, Selection, Transaction } from '@tiptap/pm/state';
+import type { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
 import type { Rect } from '@tiptap/pm/tables';
 
 // NOTE: Custom TableView, to allow for custom styles to be applied to the <table> element. [LK]
 // ref: https://github.com/ueberdosis/tiptap/blob/v2.11.5/packages/extension-table/src/TableView.ts
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export class UmbTableView extends TableView {
 	constructor(node: ProseMirrorNode, cellMinWidth: number) {
 		super(node, cellMinWidth);
@@ -35,16 +34,13 @@ export class UmbTableView extends TableView {
 	}
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTable = Table.configure({ resizable: true, View: UmbTableView });
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTableRow = TableRow.extend({
 	allowGapCursor: false,
 	content: '(tableCell | tableHeader)*',
 });
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTableHeader = TableHeader.extend({
 	addAttributes() {
 		return {
@@ -72,7 +68,7 @@ export const UmbTableHeader = TableHeader.extend({
 	addProseMirrorPlugins() {
 		const { editor } = this;
 		return [
-			UmbBubbleMenuPlugin(this.editor, {
+			UmbBubbleMenuPlugin(editor, {
 				unique: 'table-column-menu',
 				placement: 'top',
 				elementName: 'umb-tiptap-menu',
@@ -84,7 +80,7 @@ export const UmbTableHeader = TableHeader.extend({
 			new Plugin({
 				props: {
 					decorations: (state) => {
-						const { isEditable } = this.editor;
+						const { isEditable } = editor;
 
 						if (!isEditable) {
 							return DecorationSet.empty;
@@ -109,7 +105,7 @@ export const UmbTableHeader = TableHeader.extend({
 										grip.addEventListener('mousedown', (event) => {
 											event.preventDefault();
 											event.stopImmediatePropagation();
-											this.editor.view.dispatch(selectColumn(index)(this.editor.state.tr));
+											editor.view.dispatch(selectColumn(index)(editor.state.tr));
 										});
 
 										return grip;
@@ -126,7 +122,6 @@ export const UmbTableHeader = TableHeader.extend({
 	},
 });
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbTableCell = TableCell.extend({
 	addAttributes() {
 		return {
@@ -166,7 +161,7 @@ export const UmbTableCell = TableCell.extend({
 	addProseMirrorPlugins() {
 		const { editor } = this;
 		return [
-			UmbBubbleMenuPlugin(this.editor, {
+			UmbBubbleMenuPlugin(editor, {
 				unique: 'table-row-menu',
 				placement: 'left',
 				elementName: 'umb-tiptap-menu',
@@ -178,7 +173,7 @@ export const UmbTableCell = TableCell.extend({
 			new Plugin({
 				props: {
 					decorations: (state) => {
-						const { isEditable } = this.editor;
+						const { isEditable } = editor;
 
 						if (!isEditable) {
 							return DecorationSet.empty;
@@ -204,7 +199,7 @@ export const UmbTableCell = TableCell.extend({
 											event.preventDefault();
 											event.stopImmediatePropagation();
 
-											this.editor.view.dispatch(selectRow(index)(this.editor.state.tr));
+											editor.view.dispatch(selectRow(index)(editor.state.tr));
 										});
 
 										return grip;
@@ -357,6 +352,7 @@ const getCellsInRow = (rowIndex: number | number[]) => (selection: Selection) =>
 	return null;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getCellsInTable = (selection: Selection) => {
 	const table = findTable(selection);
 
@@ -397,6 +393,7 @@ const findParentNodeClosestToPos = ($pos: ResolvedPos, predicate: (node: ProseMi
 	return null;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const findCellClosestToPos = ($pos: ResolvedPos) => {
 	const predicate = (node: ProseMirrorNode) => node.type.spec.tableRole && /cell/i.test(node.type.spec.tableRole);
 
@@ -449,6 +446,7 @@ const selectColumn = select('column');
 
 const selectRow = select('row');
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const selectTable = (tr: Transaction) => {
 	const table = findTable(tr.selection);
 
