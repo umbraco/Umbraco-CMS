@@ -14,13 +14,13 @@ using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 
+/// <inheritdoc/>
 internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRepository
 {
     private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
@@ -58,9 +58,16 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         _nucacheSettings = nucacheSettings;
     }
 
+    /// <inheritdoc/>
     public async Task DeleteContentItemAsync(int id)
-        => await Database.ExecuteAsync("DELETE FROM cmsContentNu WHERE nodeId=@id", new { id = id });
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Delete<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == id);
+        await Database.ExecuteAsync(sql);
+    }
 
+    /// <inheritdoc/>
     public async Task RefreshContentAsync(ContentCacheNode contentCacheNode, PublishedState publishedState)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
@@ -69,7 +76,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         if (contentCacheNode.IsDraft)
         {
             await OnRepositoryRefreshed(serializer, contentCacheNode, true);
-            // if it's a draft node we don't need to worry about the published state
+
+            // If it's a draft node we don't need to worry about the published state.
             return;
         }
 
@@ -79,11 +87,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 await OnRepositoryRefreshed(serializer, contentCacheNode, false);
                 break;
             case PublishedState.Unpublishing:
-                await Database.ExecuteAsync("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = contentCacheNode.Id });
+                Sql<ISqlContext> sql = Sql()
+                    .Delete<ContentNuDto>()
+                    .Where<ContentNuDto>(x => x.NodeId == contentCacheNode.Id && x.Published);
+                await Database.ExecuteAsync(sql);
                 break;
         }
     }
 
+    /// <inheritdoc/>
     public async Task RefreshMediaAsync(ContentCacheNode contentCacheNode)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
@@ -107,15 +119,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             mediaTypeIds is not null && mediaTypeIds.Count == 0 &&
             memberTypeIds is not null && memberTypeIds.Count == 0)
         {
-            if (Database.DatabaseType == DatabaseType.SqlServer2012)
-            {
-                Database.Execute($"TRUNCATE TABLE cmsContentNu");
-            }
-
-            if (Database.DatabaseType == DatabaseType.SQLite)
-            {
-                Database.Execute($"DELETE FROM cmsContentNu");
-            }
+            TruncateContent();
         }
 
         RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
@@ -123,6 +127,20 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
     }
 
+    private void TruncateContent()
+    {
+        if (Database.DatabaseType == DatabaseType.SqlServer2012)
+        {
+            Database.Execute($"TRUNCATE TABLE cmsContentNu");
+        }
+
+        if (Database.DatabaseType == DatabaseType.SQLite)
+        {
+            Database.Execute($"DELETE FROM cmsContentNu");
+        }
+    }
+
+    /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
@@ -147,6 +165,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return CreateContentNodeKit(dto, serializer, preview);
     }
 
+    /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
@@ -170,7 +189,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys, Guid objectType)
     {
         Guid[] keys = documentTypeKeys.ToArray();
-        if (keys.Any() is false)
+        if (keys.Length == 0)
         {
             return [];
         }
@@ -181,15 +200,16 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 ? SqlMediaSourcesSelect()
                 : throw new ArgumentOutOfRangeException(nameof(objectType), objectType, null);
 
-            sql.InnerJoin<NodeDto>("n")
+        sql.InnerJoin<NodeDto>("n")
             .On<NodeDto, ContentDto>((n, c) => n.NodeId == c.ContentTypeId, "n", "umbracoContent")
             .Append(SqlObjectTypeNotTrashed(SqlContext, objectType))
-            .WhereIn<NodeDto>(x => x.UniqueId, keys,"n")
+            .WhereIn<NodeDto>(x => x.UniqueId, keys, "n")
             .Append(SqlOrderByLevelIdSortOrder(SqlContext));
 
         return GetContentNodeDtos(sql);
     }
 
+    /// <inheritdoc/>
     public IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType)
     {
         Guid objectType = entityType switch
@@ -222,6 +242,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     public IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
         => GetContentSourceByDocumentTypeKey(keys, Constants.ObjectTypes.Document).Where(x => x.Published == published).Select(x => x.Key);
 
+    /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetMediaSourceAsync(Guid key)
     {
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
@@ -241,6 +262,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return CreateMediaNodeKit(dto, serializer);
     }
 
+    /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
     {
         Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
@@ -262,13 +284,13 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
     private async Task OnRepositoryRefreshed(IContentCacheDataSerializer serializer, ContentCacheNode content, bool preview)
     {
-        // use a custom SQL to update row version on each update
-        // db.InsertOrUpdate(dto);
         ContentNuDto dto = GetDtoFromCacheNode(content, !preview, serializer);
+
+        string c(string s) => SqlSyntax.GetQuotedColumnName(s);
 
         await Database.InsertOrUpdateAsync(
             dto,
-            "SET data=@data, dataRaw=@dataRaw, rv=rv+1 WHERE nodeId=@id AND published=@published",
+            $"SET data = @data, {c("dataRaw")} = @dataRaw, rv = rv + 1 WHERE {c("nodeId")} = @id AND published = @published",
             new
             {
                 dataRaw = dto.RawData ?? Array.Empty<byte>(),
@@ -278,7 +300,12 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             });
     }
 
-    // assumes content tree lock
+    /// <summary>
+    /// Rebuilds the content database cache for documents by clearing and repopulating the cache with the latest document data.
+    /// </summary>
+    /// <remarks>
+    /// Assumes content tree lock.
+    /// </remarks>
     private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         if (contentTypeIds is null)
@@ -288,55 +315,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid contentObjectType = Constants.ObjectTypes.Document;
 
-        // remove all - if anything fails the transaction will rollback
-        if (contentTypeIds.Count == 0)
-        {
-            // must support SQL-CE
-            Database.Execute(
-                @"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
-)",
-                new { objType = contentObjectType });
-        }
-        else
-        {
-            // assume number of ctypes won't blow IN(...)
-            // must support SQL-CE
-            Database.Execute(
-                $@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode
-    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
-    WHERE umbracoNode.nodeObjectType=@objType
-    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-)",
-                new { objType = contentObjectType, ctypes = contentTypeIds });
-        }
+        // Remove all - if anything fails the transaction will rollback.
+        RemoveByObjectType(contentObjectType, contentTypeIds);
 
-        // insert back - if anything fails the transaction will rollback
-        IQuery<IContent> query = SqlContext.Query<IContent>();
-        if (contentTypeIds.Count > 0)
-        {
-            query = query.WhereIn(x => x.ContentTypeId, contentTypeIds); // assume number of ctypes won't blow IN(...)
-        }
+        // Insert back - if anything fails the transaction will rollback.
+        IQuery<IContent> query = GetInsertQuery<IContent>(contentTypeIds);
 
         long pageIndex = 0;
         long processed = 0;
         long total;
         do
         {
-            // the tree is locked, counting and comparing to total is safe
+            // The tree is locked, counting and comparing to total is safe.
             IEnumerable<IContent> descendants =
                 _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
             var items = new List<ContentNuDto>();
             var count = 0;
             foreach (IContent c in descendants)
             {
-                // always the edited version
+                // Always include the edited version.
                 items.Add(GetDtoFromContent(c, false, serializer));
 
-                // and also the published version if it makes any sense
+                // And also the published version if the document is published.
                 if (c.Published)
                 {
                     items.Add(GetDtoFromContent(c, true, serializer));
@@ -347,10 +347,16 @@ WHERE cmsContentNu.nodeId IN (
 
             Database.BulkInsertRecords(items);
             processed += count;
-        } while (processed < total);
+        }
+        while (processed < total);
     }
 
-    // assumes media tree lock
+    /// <summary>
+    /// Rebuilds the content database cache for media by clearing and repopulating the cache with the latest media data.
+    /// </summary>
+    /// <remarks>
+    /// Assumes content tree lock.
+    /// </remarks>
     private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         if (contentTypeIds is null)
@@ -360,54 +366,33 @@ WHERE cmsContentNu.nodeId IN (
 
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
-        // remove all - if anything fails the transaction will rollback
-        if (contentTypeIds.Count == 0)
-        {
-            // must support SQL-CE
-            Database.Execute(
-                @"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
-)",
-                new { objType = mediaObjectType });
-        }
-        else
-        {
-            // assume number of ctypes won't blow IN(...)
-            // must support SQL-CE
-            Database.Execute(
-                $@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode
-    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
-    WHERE umbracoNode.nodeObjectType=@objType
-    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-)",
-                new { objType = mediaObjectType, ctypes = contentTypeIds });
-        }
+        // Remove all - if anything fails the transaction will rollback.
+        RemoveByObjectType(mediaObjectType, contentTypeIds);
 
-        // insert back - if anything fails the transaction will rollback
-        IQuery<IMedia> query = SqlContext.Query<IMedia>();
-        if (contentTypeIds.Count > 0)
-        {
-            query = query.WhereIn(x => x.ContentTypeId, contentTypeIds); // assume number of ctypes won't blow IN(...)
-        }
+        // Insert back - if anything fails the transaction will rollback.
+        IQuery<IMedia> query = GetInsertQuery<IMedia>(contentTypeIds);
 
         long pageIndex = 0;
         long processed = 0;
         long total;
         do
         {
-            // the tree is locked, counting and comparing to total is safe
+            // The tree is locked, counting and comparing to total is safe.
             IEnumerable<IMedia> descendants =
                 _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-            var items = descendants.Select(m => GetDtoFromContent(m, false, serializer)).ToArray();
+            ContentNuDto[] items = descendants.Select(m => GetDtoFromContent(m, false, serializer)).ToArray();
             Database.BulkInsertRecords(items);
             processed += items.Length;
-        } while (processed < total);
+        }
+        while (processed < total);
     }
 
-    // assumes member tree lock
+    /// <summary>
+    /// Rebuilds the content database cache for members by clearing and repopulating the cache with the latest member data.
+    /// </summary>
+    /// <remarks>
+    /// Assumes content tree lock.
+    /// </remarks>
     private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         if (contentTypeIds is null)
@@ -417,38 +402,11 @@ WHERE cmsContentNu.nodeId IN (
 
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
-        // remove all - if anything fails the transaction will rollback
-        if (contentTypeIds.Count == 0)
-        {
-            // must support SQL-CE
-            Database.Execute(
-                @"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
-)",
-                new { objType = memberObjectType });
-        }
-        else
-        {
-            // assume number of ctypes won't blow IN(...)
-            // must support SQL-CE
-            Database.Execute(
-                $@"DELETE FROM cmsContentNu
-WHERE cmsContentNu.nodeId IN (
-    SELECT id FROM umbracoNode
-    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
-    WHERE umbracoNode.nodeObjectType=@objType
-    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
-)",
-                new { objType = memberObjectType, ctypes = contentTypeIds });
-        }
+        // Remove all - if anything fails the transaction will rollback.
+        RemoveByObjectType(memberObjectType, contentTypeIds);
 
-        // insert back - if anything fails the transaction will rollback
-        IQuery<IMember> query = SqlContext.Query<IMember>();
-        if (contentTypeIds.Count > 0)
-        {
-            query = query.WhereIn(x => x.ContentTypeId, contentTypeIds); // assume number of ctypes won't blow IN(...)
-        }
+        // Insert back - if anything fails the transaction will rollback.
+        IQuery<IMember> query = GetInsertQuery<IMember>(contentTypeIds);
 
         long pageIndex = 0;
         long processed = 0;
@@ -460,12 +418,59 @@ WHERE cmsContentNu.nodeId IN (
             ContentNuDto[] items = descendants.Select(m => GetDtoFromContent(m, false, serializer)).ToArray();
             Database.BulkInsertRecords(items);
             processed += items.Length;
-        } while (processed < total);
+        }
+        while (processed < total);
+    }
+
+    private void RemoveByObjectType(Guid objectType, IReadOnlyCollection<int> contentTypeIds)
+    {
+        // If the provided contentTypeIds collection is empty, remove all records for the provided object type.
+        Sql<ISqlContext> sql;
+        if (contentTypeIds.Count == 0)
+        {
+            sql = Sql()
+                .Delete<ContentNuDto>()
+                .WhereIn<ContentNuDto>(
+                    x => x.NodeId,
+                    Sql().Select<NodeDto>(n => n.NodeId)
+                        .From<NodeDto>()
+                        .Where<NodeDto>(n => n.NodeObjectType == objectType));
+            Database.Execute(sql);
+        }
+        else
+        {
+            // Otherwise, if contentTypeIds are provided remove only those records that match the object type and one of the content types.
+            sql = Sql()
+                .Delete<ContentNuDto>()
+                .WhereIn<ContentNuDto>(
+                    x => x.NodeId,
+                    Sql()
+                    .Select<NodeDto>(n => n.NodeId)
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>()
+                    .On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                    .Where<NodeDto, ContentDto>((n, c) =>
+                        n.NodeObjectType == objectType &&
+                        contentTypeIds.Contains(c.ContentTypeId)));
+            Database.Execute(sql);
+        }
+    }
+
+    private IQuery<TContent> GetInsertQuery<TContent>(IReadOnlyCollection<int> contentTypeIds)
+        where TContent : IContentBase
+    {
+        IQuery<TContent> query = SqlContext.Query<TContent>();
+        if (contentTypeIds.Count > 0)
+        {
+            query = query.WhereIn(x => x.ContentTypeId, contentTypeIds);
+        }
+
+        return query;
     }
 
     private ContentNuDto GetDtoFromCacheNode(ContentCacheNode cacheNode, bool published, IContentCacheDataSerializer serializer)
     {
-        // the dictionary that will be serialized
+        // Prepare the data structure that will be serialized.
         var contentCacheData = new ContentCacheDataModel
         {
             PropertyData = cacheNode.Data?.Properties,
@@ -479,7 +484,10 @@ WHERE cmsContentNu.nodeId IN (
 
         var dto = new ContentNuDto
         {
-            NodeId = cacheNode.Id, Published = published, Data = serialized.StringData, RawData = serialized.ByteData,
+            NodeId = cacheNode.Id,
+            Published = published,
+            Data = serialized.StringData,
+            RawData = serialized.ByteData,
         };
 
         return dto;
@@ -487,23 +495,19 @@ WHERE cmsContentNu.nodeId IN (
 
     private ContentNuDto GetDtoFromContent(IContentBase content, bool published, IContentCacheDataSerializer serializer)
     {
-        // should inject these in ctor
-        // BUT for the time being we decide not to support ConvertDbToXml/String
-        // var propertyEditorResolver = PropertyEditorResolver.Current;
-        // var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
         var propertyData = new Dictionary<string, PropertyData[]>();
         foreach (IProperty prop in content.Properties)
         {
             var pdatas = new List<PropertyData>();
             foreach (IPropertyValue pvalue in prop.Values.OrderBy(x => x.Culture))
             {
-                // sanitize - properties should be ok but ... never knows
+                // Sanitize - properties should be ok but ... never knows.
                 if (!prop.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment))
                 {
                     continue;
                 }
 
-                // note: at service level, invariant is 'null', but here invariant becomes 'string.Empty'
+                // Note: at service level, invariant is 'null', but here invariant becomes 'string.Empty'
                 var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
                 if (value != null)
                 {
@@ -521,7 +525,7 @@ WHERE cmsContentNu.nodeId IN (
 
         var cultureData = new Dictionary<string, CultureVariation>();
 
-        // sanitize - names should be ok but ... never knows
+        // Sanitize - names should be ok but ... never knows.
         if (content.ContentType.VariesByCulture())
         {
             ContentCultureInfosCollection? infos = content is IContent document
@@ -530,7 +534,6 @@ WHERE cmsContentNu.nodeId IN (
                     : document.CultureInfos
                 : content.CultureInfos;
 
-            // ReSharper disable once UseDeconstruction
             if (infos is not null)
             {
                 foreach (ContentCultureInfos cultureInfo in infos)
@@ -547,7 +550,7 @@ WHERE cmsContentNu.nodeId IN (
             }
         }
 
-        // the dictionary that will be serialized
+        // Prepare the data structure that will be serialized.
         var contentCacheData = new ContentCacheDataModel
         {
             PropertyData = propertyData,
@@ -560,13 +563,15 @@ WHERE cmsContentNu.nodeId IN (
 
         var dto = new ContentNuDto
         {
-            NodeId = content.Id, Published = published, Data = serialized.StringData, RawData = serialized.ByteData,
+            NodeId = content.Id,
+            Published = published,
+            Data = serialized.StringData,
+            RawData = serialized.ByteData,
         };
 
         return dto;
     }
 
-    // we want arrays, we want them all loaded, not an enumerable
     private Sql<ISqlContext> SqlContentSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
     {
         SqlTemplate sqlTemplate = SqlContext.Templates.Get(
@@ -632,80 +637,39 @@ WHERE cmsContentNu.nodeId IN (
         return sql;
     }
 
-    private Sql<ISqlContext> SqlContentSourcesSelectUmbracoNodeJoin(ISqlContext sqlContext)
-    {
-        ISqlSyntaxProvider syntax = sqlContext.SqlSyntax;
-
-        SqlTemplate sqlTemplate = sqlContext.Templates.Get(
-            Constants.SqlTemplates.NuCacheDatabaseDataSource.SourcesSelectUmbracoNodeJoin, builder =>
-                builder.InnerJoin<NodeDto>("x")
-                    .On<NodeDto, NodeDto>(
-                        (left, right) => left.NodeId == right.NodeId ||
-                                         SqlText<bool>(left.Path, right.Path,
-                                             (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"),
-                        aliasRight: "x"));
-
-        Sql<ISqlContext> sql = sqlTemplate.Sql();
-        return sql;
-    }
-
-    private Sql<ISqlContext> SqlWhereNodeId(ISqlContext sqlContext, int id)
-    {
-        ISqlSyntaxProvider syntax = sqlContext.SqlSyntax;
-
-        SqlTemplate sqlTemplate = sqlContext.Templates.Get(
-            Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeId,
-            builder =>
-                builder.Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("id")));
-
-        Sql<ISqlContext> sql = sqlTemplate.Sql(id);
-        return sql;
-    }
-
     private Sql<ISqlContext> SqlWhereNodeKey(ISqlContext sqlContext, Guid key)
     {
-        ISqlSyntaxProvider syntax = sqlContext.SqlSyntax;
-
         SqlTemplate sqlTemplate = sqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeKey,
             builder =>
                 builder.Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("key")));
-
         Sql<ISqlContext> sql = sqlTemplate.Sql(key);
         return sql;
     }
 
     private Sql<ISqlContext> SqlOrderByLevelIdSortOrder(ISqlContext sqlContext)
     {
-        ISqlSyntaxProvider syntax = sqlContext.SqlSyntax;
-
         SqlTemplate sqlTemplate = sqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.OrderByLevelIdSortOrder, s =>
                 s.OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder));
-
         Sql<ISqlContext> sql = sqlTemplate.Sql();
         return sql;
     }
 
     private Sql<ISqlContext> SqlObjectTypeNotTrashed(ISqlContext sqlContext, Guid nodeObjectType)
     {
-        ISqlSyntaxProvider syntax = sqlContext.SqlSyntax;
-
         SqlTemplate sqlTemplate = sqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.ObjectTypeNotTrashedFilter, s =>
                 s.Where<NodeDto>(x =>
                     x.NodeObjectType == SqlTemplate.Arg<Guid?>("nodeObjectType") &&
                     x.Trashed == SqlTemplate.Arg<bool>("trashed")));
-
         Sql<ISqlContext> sql = sqlTemplate.Sql(nodeObjectType, false);
         return sql;
     }
 
     /// <summary>
-    ///     Returns a slightly more optimized query to use for the document counting when paging over the content sources
+    /// Returns a slightly more optimized query to use for the document counting when paging over the content sources.
     /// </summary>
-    /// <param name="joins"></param>
-    /// <returns></returns>
     private Sql<ISqlContext> SqlContentSourcesCount(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
     {
         SqlTemplate sqlTemplate = SqlContext.Templates.Get(
@@ -714,7 +678,6 @@ WHERE cmsContentNu.nodeId IN (
                     .From<NodeDto>()
                     .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                     .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId));
-
         Sql<ISqlContext>? sql = sqlTemplate.Sql();
 
         if (joins != null)

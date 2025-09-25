@@ -191,6 +191,11 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
         Assert.AreEqual(LanguageOperationStatus.Success, result.Status);
 
+        // Verify that the create and update dates can be used to distinguish between creates
+        // and updates (as these fields are used in ServerEventSender to emit a "Created" or "Updated"
+        // event.
+        Assert.Greater(result.Result.UpdateDate, result.Result.CreateDate);
+
         // re-get
         languageDaDk = await LanguageService.GetAsync(languageDaDk.IsoCode);
         Assert.NotNull(languageDaDk);

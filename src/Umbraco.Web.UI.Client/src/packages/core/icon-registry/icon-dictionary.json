@@ -101,6 +101,10 @@
 			"file": "delete.svg"
 		},
 		{
+			"name": "icon-badge",
+			"file": "badge.svg"
+		},
+		{
 			"name": "icon-badge-add",
 			"file": "circle-plus.svg"
 		},
@@ -975,6 +979,10 @@
 			"legacy": true
 		},
 		{
+			"name": "icon-heading",
+			"file": "heading.svg"
+		},
+		{
 			"name": "icon-heading-1",
 			"file": "heading-1.svg"
 		},
@@ -989,6 +997,14 @@
 		{
 			"name": "icon-heading-4",
 			"file": "heading-4.svg"
+		},
+		{
+			"name": "icon-heading-5",
+			"file": "heading-5.svg"
+		},
+		{
+			"name": "icon-heading-6",
+			"file": "heading-6.svg"
 		},
 		{
 			"name": "icon-headphones",
@@ -2211,6 +2227,10 @@
 			"file": "tree-deciduous.svg"
 		},
 		{
+			"name": "icon-trending-up-down",
+			"file": "trending-up-down.svg"
+		},
+		{
 			"name": "icon-trophy",
 			"file": "trophy.svg"
 		},
@@ -2410,6 +2430,10 @@
 		{
 			"name": "icon-star",
 			"file": "star.svg"
+		},
+		{
+			"name": "icon-stretch-horizontal",
+			"file": "stretch-horizontal.svg"
 		},
 		{
 			"name": "icon-database",

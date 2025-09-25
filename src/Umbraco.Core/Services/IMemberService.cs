@@ -385,6 +385,12 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
     IEnumerable<IMember>? GetMembersByPropertyValue(
         string propertyTypeAlias,
         string value,
@@ -402,6 +408,12 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
     IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
     /// <summary>
@@ -412,6 +424,12 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
     IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value);
 
     /// <summary>
@@ -426,6 +444,12 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
+    /// <remarks>
+    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
+    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
+    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
+    /// </remarks>
+    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
     IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
     /// <summary>
