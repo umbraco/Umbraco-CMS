@@ -63,7 +63,8 @@ export class UmbUfmContentNameElement extends UmbUfmElementBase {
 			if (repository) {
 				const { data } = await repository.requestItems(uniques);
 				if (Array.isArray(data) && data.length > 0) {
-					return data.map((item) => item.name).join(', ');
+					// TODO: ⚠️[v17]⚠️ Review the `item.variants[0].name` as this is a hack! [LK]
+					return data.map((item) => item.variants[0].name).join(', ');
 				}
 			}
 		}
