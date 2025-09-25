@@ -121,9 +121,6 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.pagination.setCurrentPageNumber(next);
 	};
 
-	#onIconEnter = () => this.renderRoot.querySelector('umb-entity-sign-bundle')?.open();
-	#onIconLeave = () => this.renderRoot.querySelector('umb-entity-sign-bundle')?.close();
-
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
 	override render() {
@@ -156,7 +153,7 @@ export abstract class UmbTreeItemElementBase<
 
 	renderIconContainer() {
 		return html`
-			<div id="icon-container" slot="icon" @pointerenter=${this.#onIconEnter} @pointerleave=${this.#onIconLeave}>
+			<div id="icon-container" slot="icon">
 				<slot
 					name="icon"
 					@slotchange=${(e: Event) => {
@@ -283,8 +280,9 @@ export abstract class UmbTreeItemElementBase<
 			} */
 
 			#sign-bundle {
-				bottom: -5px;
-				right: -5px;
+				position: absolute;
+				bottom: -4px;
+				right: 10px;
 			}
 
 			#label {

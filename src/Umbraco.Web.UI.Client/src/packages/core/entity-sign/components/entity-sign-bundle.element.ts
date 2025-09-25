@@ -70,24 +70,34 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		if (!this._signs || this._signs.length === 0) return nothing;
 
 		const first = this._signs?.[0];
-		console.log(first);
 		if (!first) return nothing;
 
 		return html`
-			<button id="sign-icon" type="button">
-				<umb-icon class="inner" name="icon-lock"></umb-icon>
-				<umb-icon name="icon-grid"></umb-icon>
-			</button>
+			<!-- <button id="sign-icon" type="button">${this.#renderIcons()}</button> -->
 			<div class="infobox">${this.#renderOptions()}</div>
 		`;
+	}
+	#renderIcons() {
+		return this._signs
+			? repeat(
+					this._signs,
+					(c) => c.alias,
+					(c, i) => {
+						return html`<span class="badge-icon ${i === 0 ? 'inner' : ''}">${c.component}</span>`;
+					},
+				)
+			: nothing;
 	}
 	#renderOptions() {
 		return this._signs
 			? repeat(
 					this._signs,
 					(c) => c.alias,
-					(c) => {
-						return html`<div class="label"><span>${c.component}</span><span>${this._labels.get(c.alias)}</span></div>`;
+					(c, i) => {
+						return html`<div class="signs-container">
+							<span class="badge-icon" style=${`--i:${i}`}>${c.component}</span
+							><span class="label">${this._labels.get(c.alias)}</span>
+						</div>`;
 					},
 				)
 			: nothing;
@@ -96,68 +106,98 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	static override styles = [
 		css`
 			:host {
-				position: absolute;
 				anchor-name: --entity-sign;
+				--row-h: 18px;
+				--open-delay: 300ms;
+				--scale-dur: 300ms;
+				--fade-dur: 160ms;
+				--ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 			}
-			#sign-icon {
+			/* #sign-icon {
 				position: relative;
 				display: inline-flex;
 				border: 0;
-				background: transparent;
+				background: red;
 				cursor: pointer;
 				padding: 1px;
 				border-radius: 50%;
 				color: var(--sign-bundle-text-color);
-			}
+			} */
 
-			umb-icon {
+			/* .badge-icon {
 				position: absolute;
 				right: 7px;
 				bottom: -2px;
 				font-size: 8px;
 				border-radius: 50%;
 				background: var(--sign-bundle-bg, transparent);
-				padding: 1px;
 			}
-			.inner {
+			.badge-icon > * {
+				filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+			} */
+			/* .inner {
 				z-index: 1;
 				right: 1px;
 				bottom: -2px;
+			} */
+
+			.infobox {
+				position: fixed;
+				position-anchor: --entity-sign;
+				bottom: anchor(bottom);
+				left: anchor(right);
+				border-radius: 3px;
+				font-size: 12px;
+				transform: scale(0.7);
+				transform-origin: bottom left;
+				opacity: 0.85;
+				overflow: hidden;
+				max-height: var(--row-h);
+				background: transparent;
+				box-shadow: none;
+				transition:
+					transform var(--scale-dur) var(--ease) var(--open-delay),
+					opacity var(--fade-dur) ease var(--open-delay);
+				will-change: transform, opacity;
 			}
 
-			@supports (position-anchor: --my-name) {
-				.infobox {
-					position: fixed;
-					position-anchor: --entity-sign;
-					margin-left: -15px;
-					margin-top: -55px;
-					width: 550px;
-					height: 120px;
-					border: 1px solid black;
-					top: anchor(top);
-					left: anchor(right);
-					border-radius: 6px;
-					background: white;
-					opacity: 0;
-					transform: translateY(-4px);
-					pointer-events: none;
-					transition:
-						opacity 120ms ease,
-						transform 120ms ease;
-				}
-			}
-
-			:host(:hover) .infobox {
-				opacity: 1;
-				transform: translateY(0);
-				pointer-events: auto;
-			}
-
-			.label {
+			.signs-container {
 				display: flex;
 				align-items: center;
-				gap: 6px;
-				padding: 4px 6px;
+				gap: 3px;
+				padding: 4px;
+				height: var(--row-h);
+			}
+
+			.infobox .signs-container .label {
+				display: none;
+			}
+			.infobox .badge-icon {
+				font-size: 10px;
+				border-radius: 50%;
+				background: var(--sign-bundle-bg, transparent);
+			}
+			.infobox .badge-icon > * {
+				filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+			}
+			.infobox:hover {
+				transform: scale(1);
+				opacity: 1;
+				overflow: visible;
+				max-height: none;
+				background: white;
+				box-shadow:
+					0 1px 2px rgba(0, 0, 0, 0.25),
+					0 0 0 1px rgba(0, 0, 0, 0.06);
+				transition-delay: 0ms, 0ms, 0ms, 0ms;
+			}
+
+			.infobox:hover .signs-container .label {
+				display: inline;
+			}
+			.infobox:hover .badge-icon {
+				font-size: 12px;
+				background: transparent;
 			}
 		`,
 	];
