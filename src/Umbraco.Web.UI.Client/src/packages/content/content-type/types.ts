@@ -32,6 +32,7 @@ export interface UmbPropertyTypeContainerMergedModel {
  * @interface UmbContentTypeModel
  */
 export interface UmbContentTypeModel {
+	// TODO: ⚠️[v17]⚠️ Need clarification. Should these properties be moved over to `UmbContentTypeDetailModel`? [LK]
 	unique: string;
 	name: string;
 	alias: string;
@@ -58,13 +59,6 @@ export interface UmbPropertyTypeScaffoldModel extends Omit<UmbPropertyTypeModel,
 
 export interface UmbPropertyTypeModel {
 	dataType: { unique: string };
-	/**
-	 * The unique identifier of the property type
-	 * @deprecated The id property is deprecated and will be removed in version 17. Please use the unique property instead.
-	 * @type {string}
-	 * @memberof UmbPropertyTypeModel
-	 */
-	id: string; // TODO: change to unique
 	unique: string;
 	container?: { id: string } | null; // TODO: change to unique
 	sortOrder: number;
