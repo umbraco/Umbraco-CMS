@@ -88,9 +88,7 @@ angular.module("umbraco")
                 totalItems: 0,
                 totalPages: 0,
                 filter: '',
-                dataTypeKey: dataTypeKey,
-                orderBy: "VersionDate",          // NEW
-                orderDirection: "Descending"     // NEW
+                dataTypeKey: dataTypeKey
             };
             vm.layout = {
                 layouts: [{ name: "Grid", icon: "icon-thumbnails-small", path: "gridpath", selected: true },
@@ -274,7 +272,7 @@ angular.module("umbraco")
                     performGotoFolder(folder);
                 }
 
-                // --- MOD: reset pagination when entering a folder ---
+                // Reset pagination to first page whenever a new folder is opened
                 vm.searchOptions.pageNumber = 1;
                 vm.searchOptions.totalItems = 0;
                 vm.searchOptions.totalPages = 0;
@@ -574,17 +572,16 @@ angular.module("umbraco")
             function getChildren(id) {
                 vm.loading = true;
                 return entityResource
-                   .getPagedChildren(id, "Media", vm.searchOptions)
+                    .getPagedChildren(id, "Media", vm.searchOptions)
                     .then(handlePagedChildren)
                     .finally(function () { vm.loading = false; });
             }
 
-            // --- helpers to reduce cyclomatic complexity ---
             function handlePagedChildren(data) {
                 var items = transformItems(data && data.items ? data.items : [], getAllowedTypes());
                 $scope.images = items;
                 syncPagination(vm.searchOptions, data);
-                vm.searchOptions.filter = ""; // keep legacy behaviour
+                vm.searchOptions.filter = ""; // reset filter to ensure folder navigation always starts unfiltered
                 preSelectMedia();
             }
 
@@ -600,21 +597,12 @@ angular.module("umbraco")
                 return items;
             }
 
-            // Helpers to avoid conditionals in syncPagination (lower cyclomatic complexity)
-            function pickPositive(value, fallback) {
-                return (typeof value === "number" && value > 0) ? value : fallback;
-            }
-
-            function pickNonNegative(value, fallback) {
-                return (typeof value === "number" && value >= 0) ? value : fallback;
-            }
-
             function syncPagination(opts, data) {
                 var d = data || {};
-                opts.pageNumber = pickPositive(d.pageNumber, opts.pageNumber);
-                opts.pageSize   = pickPositive(d.pageSize,   opts.pageSize);
-                opts.totalItems = pickNonNegative(d.totalItems, 0);
-                opts.totalPages = pickNonNegative(d.totalPages, 0);
+                opts.pageNumber = d.pageNumber;
+                opts.pageSize   = d.pageSize;
+                opts.totalItems = d.totalItems;
+                opts.totalPages = d.totalPages;
            }
 
             function setDefaultData(item) {
