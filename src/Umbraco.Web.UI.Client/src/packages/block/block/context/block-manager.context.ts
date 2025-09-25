@@ -325,18 +325,6 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
-	/**
-	 * @deprecated Use `createWithPresets` instead. Which is Async. Will be removed in v.17
-	 * @param contentElementTypeKey
-	 * @param partialLayoutEntry
-	 * @param originData
-	 */
-	abstract create(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
-		originData?: BlockOriginDataType,
-	): never;
-
 	abstract createWithPresets(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
