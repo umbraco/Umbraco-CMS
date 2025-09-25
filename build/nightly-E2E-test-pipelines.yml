@@ -27,16 +27,6 @@ parameters:
     type: boolean
     default: false
 
-  - name: exstensionRegistryAcceptanceTests
-    displayName: Run acceptance tests with Exstension Registry
-    type: boolean
-    default: true
-
-  - name: skipDefaultConfigAcceptanceTests
-    displayName: Skip tests with DefaultConfig
-    type: boolean
-    default: false
-
 variables:
   nodeVersion: 20
   solution: umbraco.sln
@@ -385,13 +375,6 @@ stages:
           - pwsh: |
               dotnet build UmbracoProject --configuration ${{ variables.buildConfiguration }} --no-restore
               dotnet dev-certs https
-            displayName: Install template
-            workingDirectory: $(Agent.BuildDirectory)/app
-
-          # Build application
-          - pwsh: |
-              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
-              dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
             condition: succeeded()
@@ -412,7 +395,6 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
-        condition: ${{ eq(parameters.skipDefaultConfigAcceptanceTests, false) }}
         timeoutInMinutes: 180
         condition: ${{ eq(parameters.skipDefaultConfigAcceptanceTests, false) }}
         variables:
