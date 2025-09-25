@@ -65,8 +65,8 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	#documentItemRepository?: UmbItemRepository<UmbUniqueItemModel>;
 	#mediaItemRepository?: UmbItemRepository<UmbUniqueItemModel>;
 
-	#documentStartNodeMap = new Map<string, string>();
-	#mediaStartNodeMap = new Map<string, string>();
+	#documentStartNodeMap = new Map<string, string | undefined>(); // TODO: ⚠️[v17]⚠️ Review this, as I had to make `name` nullable to TS compile! [LK]
+	#mediaStartNodeMap = new Map<string, string | undefined>(); // TODO: ⚠️[v17]⚠️ Review this, as I had to make `name` nullable to TS compile! [LK]
 
 	constructor() {
 		super();
@@ -167,7 +167,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		userGroups: Array<UmbUserGroupDetailModel>,
 		startNodeField: 'documentStartNode' | 'mediaStartNode',
 		itemRepository: UmbItemRepository<UmbUniqueItemModel>,
-		map: Map<string, string>,
+		map: Map<string, string | undefined>, // TODO: ⚠️[v17]⚠️ Review this, as I had to make `name` nullable to TS compile! [LK]
 	) {
 		const allStartNodes = userGroups.map((userGroup) => userGroup[startNodeField]?.unique).filter(Boolean) as string[];
 		const uniqueStartNodes = [...new Set(allStartNodes)];
