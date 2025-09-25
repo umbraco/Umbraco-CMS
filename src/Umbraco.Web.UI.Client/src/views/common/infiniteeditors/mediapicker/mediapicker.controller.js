@@ -130,16 +130,12 @@ angular.module("umbraco")
                 }
             }
 
-
             function onInit() {
-
-
                 localizationService.localizeMany(["defaultdialogs_selectMedia", "mediaPicker_tabClipboard"])
                     .then(function (localizationResult) {
                         setTitle(localizationResult);
                         setNavigation(localizationResult);
                     });
-
 
                 userService.getCurrentUser().then(function (userData) {
                     userStartNodes = userData.startMediaIds;
@@ -148,10 +144,10 @@ angular.module("umbraco")
                         entityResource.getById($scope.startNodeId, "media")
                             .then(function (ent) {
                                 $scope.startNodeId = ent.id;
-                                run();
+                                return run();
                             });
                     } else {
-                        run();
+                        return run();
                     }
                 });
             }
@@ -160,10 +156,11 @@ angular.module("umbraco")
                 //default root item
                 if (!$scope.target) {
                     if ($scope.lastOpenedNode && $scope.lastOpenedNode !== -1) {
-                        entityResource.getById($scope.lastOpenedNode, "media")
-                            .then(ensureWithinStartNode, gotoStartNode);
+                        return entityResource.getById($scope.lastOpenedNode, "media")
+                          .then(ensureWithinStartNode)
+                          .catch(function () { return gotoStartNode(); });
                     } else {
-                        gotoStartNode();
+                        return gotoStartNode();
                     }
                 } else {
                     // if a target is specified, go look it up - generally this target will just contain ids not the actual full
@@ -176,11 +173,11 @@ angular.module("umbraco")
                     // ID of a UDI or legacy int ID still could be null/undefinied here
                     // As user may dragged in an image that has not been saved to media section yet
                     if (id) {
-                        entityResource.getById(id, "Media")
+                        return entityResource.getById(id, "Media")
                             .then(function (node) {
                                 $scope.target = node;
-                                // Moving directly to existing node's folder
-                                gotoFolder({ id: node.parentId }).then(function () {
+                                // Move directly to existing node's folder, then open details
+                                return gotoFolder({ id: node.parentId }).then(function () {
                                     selectMedia(node);
                                     $scope.target.url = mediaHelper.resolveFileFromEntity(node);
                                     $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
@@ -195,6 +192,7 @@ angular.module("umbraco")
                         // No ID set - then this is going to be a tmpimg that has not been uploaded
                         // User editing this will want to be changing the ALT text
                         openDetailsDialog();
+                        return;
                     }
                 }
             }
@@ -257,27 +255,27 @@ angular.module("umbraco")
                     folder = { id: -1, name: "Media", icon: "icon-folder" };
                 }
 
-                if (folder.id > 0) {
-                    entityResource.getAncestors(folder.id, "media", null, { dataTypeKey: dataTypeKey })
-                        .then(function (anc) {
-                            $scope.path = _.filter(anc,
-                                function (f) {
-                                    return f.path.indexOf($scope.startNodeId) !== -1;
-                                });
-                            folder.path = $scope.path[0].path;
-                            performGotoFolder(folder);
-                        });
-                } else {
-                    $scope.path = [];
+                var setPathPromise = (folder.id > 0)
+                  ? entityResource.getAncestors(folder.id, "media", null, { dataTypeKey: dataTypeKey })
+                      .then(function (anc) {
+                          $scope.path = _.filter(anc, function (f) {
+                              return f.path.indexOf($scope.startNodeId) !== -1;
+                          });
+                          folder.path = $scope.path[0].path;
+                      })
+                  : Promise.resolve().then(function () {
+                        $scope.path = [];
+                    });
+
+                // Chain: resolve path → set current folder → reset paging → fetch page
+                return setPathPromise.then(function () {
                     performGotoFolder(folder);
-                }
-
-                // Reset pagination to first page whenever a new folder is opened
-                vm.searchOptions.pageNumber = 1;
-                vm.searchOptions.totalItems = 0;
-                vm.searchOptions.totalPages = 0;
-
-                return getChildren(folder.id);
+                    // Reset pagination to the first page on folder change
+                    vm.searchOptions.pageNumber = 1;
+                    vm.searchOptions.totalItems = 0;
+                    vm.searchOptions.totalPages = 0;
+                    return getChildren(folder.id);
+                });
             }
 
             function performGotoFolder(folder) {
@@ -393,11 +391,9 @@ angular.module("umbraco")
 
                 // also make sure the node is not trashed
                 if (nodePath.indexOf($scope.startNodeId.toString()) !== -1 && node.trashed === false) {
-                    gotoFolder({ id: $scope.lastOpenedNode || $scope.startNodeId, name: "Media", icon: "icon-folder", path: node.path });
-                    return true;
+                    return gotoFolder({ id: $scope.lastOpenedNode || $scope.startNodeId, name: "Media", icon: "icon-folder", path: node.path });
                 } else {
-                    gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
-                    return false;
+                    return gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
                 }
             }
 
@@ -413,7 +409,7 @@ angular.module("umbraco")
             }
 
             function gotoStartNode() {
-                gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+                return gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
             }
 
             function openDetailsDialog() {
@@ -572,9 +568,9 @@ angular.module("umbraco")
             function getChildren(id) {
                 vm.loading = true;
                 return entityResource
-                    .getPagedChildren(id, "Media", vm.searchOptions)
-                    .then(handlePagedChildren)
-                    .finally(function () { vm.loading = false; });
+                  .getPagedChildren(id, "Media", vm.searchOptions)
+                  .then(handlePagedChildren)
+                  .finally(function () { vm.loading = false; });
             }
 
             function handlePagedChildren(data) {
@@ -592,7 +588,7 @@ angular.module("umbraco")
             function transformItems(items, allowedTypes) {
                 for (var i = 0; i < items.length; i++) {
                     setDefaultData(items[i]);
-                   items[i].filtered = !!(allowedTypes && allowedTypes.indexOf(items[i].metaData.ContentTypeAlias) < 0);
+                    items[i].filtered = !!(allowedTypes && allowedTypes.indexOf(items[i].metaData.ContentTypeAlias) < 0);
                 }
                 return items;
             }
@@ -603,7 +599,7 @@ angular.module("umbraco")
                 opts.pageSize   = d.pageSize;
                 opts.totalItems = d.totalItems;
                 opts.totalPages = d.totalPages;
-           }
+            }
 
             function setDefaultData(item) {
                 if (item.metaData.MediaPath !== null) {
