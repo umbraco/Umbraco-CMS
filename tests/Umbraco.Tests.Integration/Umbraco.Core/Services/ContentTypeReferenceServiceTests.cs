@@ -84,28 +84,12 @@ internal class ContentTypeReferenceServiceTests : ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Get_Referenced_DocumentTypes_From_BlockList()
+    public async Task Get_Referenced_DocumentTypes_From_BlockList_ContentElementTypeKey()
     {
         var elementTypeCreateModel = ContentTypeEditingBuilder.CreateElementType();
         var elementType = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel, Constants.Security.SuperUserKey)).Result!;
-        var blockListConfig = new BlockListConfiguration.BlockConfiguration[] {
-            new()
-            {
-                ContentElementTypeKey = elementType.Key, SettingsElementTypeKey = elementType.Key
 
-            }
-        };
-
-        var dataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
-        {
-            ConfigurationData = new Dictionary<string, object> { { "blocks", blockListConfig } },
-            Name = "My Block Editor",
-            DatabaseType = ValueStorageType.Ntext,
-            ParentId = Constants.System.Root,
-            CreateDate = DateTime.UtcNow
-        };
-
-        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        var dataType = await CreateBlockList(elementType.Key);
         var keys = await ContentTypeReferenceService.GetReferencedElementsFromDataTypesAsync(elementType.Key, CancellationToken.None, 0, 100);
 
         // Assert
@@ -117,28 +101,49 @@ internal class ContentTypeReferenceServiceTests : ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Get_Referenced_DocumentTypes_From_BlockGrid()
+    public async Task Get_Referenced_DocumentTypes_From_BlockList_SettingsElementTypeKey()
+    {
+        var elementTypeCreateModel = ContentTypeEditingBuilder.CreateElementType();
+        var elementTypeCreateModel2 = ContentTypeEditingBuilder.CreateElementType("otherElement", "Other Element");
+        var elementType1 = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var elementType2 = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel2, Constants.Security.SuperUserKey)).Result!;
+
+        var dataType = await CreateBlockList(elementType1.Key, elementType2.Key);
+        var keys = await ContentTypeReferenceService.GetReferencedElementsFromDataTypesAsync(elementType2.Key, CancellationToken.None, 0, 100);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(keys.Items.Count(), Is.EqualTo(1));
+            Assert.That(keys.Items.First(), Is.EqualTo(dataType.Key));
+        });
+    }
+
+    [Test]
+    public async Task Get_Referenced_DocumentTypes_From_BlockGrid_ContentElementTypeKey()
     {
         var elementTypeCreateModel = ContentTypeEditingBuilder.CreateElementType();
         var elementType = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel, Constants.Security.SuperUserKey)).Result!;
-        var blockListConfig = new BlockGridConfiguration.BlockGridBlockConfiguration[] {
-            new()
-            {
-                ContentElementTypeKey = elementType.Key, SettingsElementTypeKey = elementType.Key
-            }
-        };
-
-        var dataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockGrid], ConfigurationEditorJsonSerializer)
-        {
-            ConfigurationData = new Dictionary<string, object> { { "blocks", blockListConfig } },
-            Name = "My Block Editor",
-            DatabaseType = ValueStorageType.Ntext,
-            ParentId = Constants.System.Root,
-            CreateDate = DateTime.UtcNow
-        };
-
-        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        var dataType = await CreateBlockGrid(elementType.Key);
         var keys = await ContentTypeReferenceService.GetReferencedElementsFromDataTypesAsync(elementType.Key, CancellationToken.None, 0, 100);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(keys.Items.Count(), Is.EqualTo(1));
+            Assert.That(keys.Items.First(), Is.EqualTo(dataType.Key));
+        });
+    }
+
+    [Test]
+    public async Task Get_Referenced_DocumentTypes_From_BlockGrid_SettingsElementTypeKey()
+    {
+        var elementTypeCreateModel = ContentTypeEditingBuilder.CreateElementType();
+        var elementTypeCreateModel2 = ContentTypeEditingBuilder.CreateElementType("otherElement", "Other Element");
+        var elementType1 = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var elementType2 = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel2, Constants.Security.SuperUserKey)).Result!;
+        var dataType = await CreateBlockGrid(elementType1.Key, elementType2.Key);
+        var keys = await ContentTypeReferenceService.GetReferencedElementsFromDataTypesAsync(elementType2.Key, CancellationToken.None, 0, 100);
 
         // Assert
         Assert.Multiple(() =>
@@ -178,5 +183,52 @@ internal class ContentTypeReferenceServiceTests : ContentTypeEditingServiceTests
             Assert.That(keys.Items.Count(), Is.EqualTo(1));
             Assert.That(keys.Items.First(), Is.EqualTo(dataType.Key));
         });
+    }
+
+    private async Task<IDataType> CreateBlockList(Guid contentElementTypeKey, Guid? settingsElementTypeKey = null)
+    {
+        var blockListConfig = new BlockListConfiguration.BlockConfiguration[] {
+            new()
+            {
+                ContentElementTypeKey = contentElementTypeKey, SettingsElementTypeKey = settingsElementTypeKey
+
+            }
+        };
+
+        var dataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
+        {
+            ConfigurationData = new Dictionary<string, object> { { "blocks", blockListConfig } },
+            Name = "My Block Editor",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+
+        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        return dataType;
+    }
+
+    private async Task<IDataType> CreateBlockGrid(Guid contentElementTypeKey, Guid? settingsElementTypeKey = null)
+    {
+        var blockListConfig = new BlockGridConfiguration.BlockGridBlockConfiguration[] {
+            new()
+            {
+                ContentElementTypeKey = contentElementTypeKey, SettingsElementTypeKey = settingsElementTypeKey
+            }
+        };
+
+        var dataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockGrid], ConfigurationEditorJsonSerializer)
+        {
+            ConfigurationData = new Dictionary<string, object> { { "blocks", blockListConfig } },
+            Name = "My Block Editor",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow
+        };
+
+        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+
+        return dataType;
     }
 }
