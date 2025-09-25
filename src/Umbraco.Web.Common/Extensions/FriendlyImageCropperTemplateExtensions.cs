@@ -358,6 +358,5 @@ public static class FriendlyImageCropperTemplateExtensions
             cacheBusterValue,
             furtherOptions,
             sourceWidth,
-            sourceHeight
-            );
+            sourceHeight);
 }
