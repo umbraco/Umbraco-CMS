@@ -21,11 +21,12 @@ test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('custom property editor appears in Property Editor Picker', async ({umbracoApi, umbracoUi}) =>{
+test('can add custom property editor to a document type', async ({umbracoApi, umbracoUi}) =>{
     // Arrange
     await umbracoUi.goToBackOffice();
     await umbracoUi.dataType.goToSection(ConstantHelper.sections.settings);
 
+    // Act
     await umbracoUi.dataType.clickActionsMenuAtRoot();
     await umbracoUi.dataType.clickCreateActionMenuOption();
 	await umbracoUi.dataType.clickDataTypeButton();
@@ -40,7 +41,7 @@ test('custom property editor appears in Property Editor Picker', async ({umbraco
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 });
 
-test('custom property editor appears in Document type when configuring a property', async ({umbracoApi, umbracoUi}) => {
+test('can select custom property editor in property editor picker on data type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
     const dataTypeId =await umbracoApi.dataType.create(
@@ -67,8 +68,9 @@ test('custom property editor appears in Document type when configuring a propert
     expect(documentTypeData.properties[0].dataType.id).toBe(dataTypeId);
 });
 
-test('user can write and read value from custom property editor', async({umbracoApi, umbracoUi}) => {
-    // Arrange - Create Data Type with custom property editor
+test('can write and read value from custom property editor', async({umbracoApi, umbracoUi}) => {
+    // Arrange
+    // Create Data Type with custom property editor
 	const dataTypeId = await umbracoApi.dataType.create(
 		dataTypeName, 
 		editorAlias, 
@@ -77,26 +79,22 @@ test('user can write and read value from custom property editor', async({umbraco
 			alias: 'maxChars', value: '100',
 		}]
 	);
-    if (!dataTypeId) throw new Error('Data type id is undefined');
 
     // Create Document Type with custom property editor
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);
-    if (!documentTypeId) throw new Error('Document type id is undefined');
 
 	// Create Content with custom property editor
 	const documentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, 'Test content', dataTypeName);
-	if (!documentId) throw new Error('Document id is undefined');
 
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
-    // Act - Navigate to content and write value
+    // Act
     await umbracoUi.content.goToContentWithName(contentName);
-
     await umbracoUi.content.enterPropertyValue(dataTypeName, testValue);
     await umbracoUi.content.clickSaveButton();
 
-	// Read value back from property editor using the API
+	// Assert
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.values[0].value).toEqual(testValue);
 });
