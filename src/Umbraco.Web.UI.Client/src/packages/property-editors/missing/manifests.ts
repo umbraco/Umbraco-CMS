@@ -1,5 +1,3 @@
-import { manifests as modalManifests } from './modal/manifests.js';
-
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
@@ -14,5 +12,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 			supportsReadOnly: true,
 		},
 	},
-	...modalManifests,
 ];
