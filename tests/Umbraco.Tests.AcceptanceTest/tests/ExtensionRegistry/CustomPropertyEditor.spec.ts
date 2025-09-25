@@ -53,7 +53,7 @@ test('can select custom property editor in property editor picker on data type',
     await umbracoUi.goToBackOffice();
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
-    //Act
+    // Act
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
     await umbracoUi.documentType.clickAddGroupButton();
     await umbracoUi.documentType.addPropertyEditor(dataTypeName);
