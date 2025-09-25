@@ -347,7 +347,7 @@ public static class FriendlyPublishedContentExtensions
     /// </param>
     /// <returns></returns>
     /// <remarks>
-    ///     This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
+    ///     This can be useful in order to return all nodes in an entire site by a type when combined with ContentAtRoot.
     /// </remarks>
     public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(
         this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias, string? culture = null)
@@ -375,7 +375,7 @@ public static class FriendlyPublishedContentExtensions
     /// </param>
     /// <returns></returns>
     /// <remarks>
-    ///     This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
+    ///     This can be useful in order to return all nodes in an entire site by a type when combined with ContentAtRoot.
     /// </remarks>
     public static IEnumerable<T> DescendantsOrSelf<T>(
         this IEnumerable<IPublishedContent> parentNodes,

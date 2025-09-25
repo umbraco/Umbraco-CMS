@@ -55,6 +55,7 @@ export class UmbModalElement extends UmbLitElement {
 		}
 
 		this.#modalContext.addEventListener('umb:destroy', this.#onContextDestroy);
+		this.#modalContext.view.provideAt(this);
 		this.element = await this.#createContainerElement();
 
 		// Makes sure that the modal triggers the reject of the context promise when it is closed by pressing escape.

@@ -41,10 +41,10 @@ export class ExampleHintWorkspaceView extends UmbElementMixin(LitElement) {
 			throw new Error('Could not find the workspace');
 		}
 
-		if (workspace.hints.has('exampleHintFromToggleAction')) {
-			workspace.hints.removeOne('exampleHintFromToggleAction');
+		if (workspace.view.hints.has('exampleHintFromToggleAction')) {
+			workspace.view.hints.removeOne('exampleHintFromToggleAction');
 		} else {
-			workspace.hints.addOne({
+			workspace.view.hints.addOne({
 				unique: 'exampleHintFromToggleAction',
 				path: ['Umb.WorkspaceView.Document.Edit'],
 				text: 'Hi',

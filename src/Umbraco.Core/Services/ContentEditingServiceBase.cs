@@ -526,8 +526,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         // this should already have been validated by now, so it's OK to throw exceptions here
         if (_propertyEditorCollection.TryGet(propertyType.PropertyEditorAlias, out IDataEditor? dataEditor) == false)
         {
-            _logger.LogWarning("Unable to retrieve property value - no data editor found for property editor: {PropertyEditorAlias}", propertyType.PropertyEditorAlias);
-            return null;
+            _logger.LogWarning(
+                "Unable to find property editor {PropertyEditorAlias}, for property {PropertyAlias}. Leaving property value unchanged.",
+                propertyType.PropertyEditorAlias,
+                propertyType.Alias);
+
+            return content.GetValue(propertyType.Alias, culture, segment);
         }
 
         IDataValueEditor dataValueEditor = dataEditor.GetValueEditor();

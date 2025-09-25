@@ -681,6 +681,15 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 
     protected override void PersistDeletedItem(IUser entity)
     {
+        // Clear user group caches for any user groups associated with the deleted user.
+        // We need to do this because the count of the number of users in the user group is cached
+        // along with the user group, and if we've made changes to the user groups assigned to the user,
+        // the count for the groups need to be refreshed.
+        foreach (IReadOnlyUserGroup group in entity.Groups)
+        {
+            ClearRepositoryCacheForUserGroup(group.Id);
+        }
+
         IEnumerable<string> deletes = GetDeleteClauses();
         foreach (var delete in deletes)
         {
@@ -722,19 +731,30 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 
         if (entity.IsPropertyDirty("Groups"))
         {
-            // lookup all assigned
-            Sql<ISqlContext> sql = SqlContext.Sql()
-                .SelectAll()
-                .From<UserGroupDto>()
-                .WhereIn<UserGroupDto>(x => x.Alias, entity.Groups.Select(x => x.Alias).ToArray());
-            List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
-                ? new List<UserGroupDto>()
-                : Database.Fetch<UserGroupDto>(sql);
+            // Lookup all assigned groups.
+            List<UserGroupDto> assigned = [];
+            if (entity.Groups.Any())
+            {
+                Sql<ISqlContext> sql = SqlContext.Sql()
+                    .SelectAll()
+                    .From<UserGroupDto>()
+                    .WhereIn<UserGroupDto>(x => x.Alias, entity.Groups.Select(x => x.Alias).ToArray());
+                assigned = Database.Fetch<UserGroupDto>(sql);
+            }
 
             foreach (UserGroupDto? groupDto in assigned)
             {
                 var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
                 Database.Insert(dto);
+            }
+
+            // Clear user group caches for the user groups associated with the new user.
+            // We need to do this because the count of the number of users in the user group is cached
+            // along with the user group, and if we've made changes to the user groups assigned to the user,
+            // the count for the groups need to be refreshed.
+            foreach (IReadOnlyUserGroup group in entity.Groups)
+            {
+                ClearRepositoryCacheForUserGroup(group.Id);
             }
         }
 
@@ -849,32 +869,66 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
 
         if (entity.IsPropertyDirty("Groups"))
         {
-            // lookup all assigned
+            // Get all user groups Ids currently assigned to the user.
             Sql<ISqlContext> sql = SqlContext.Sql()
-                .SelectAll()
-                .From<UserGroupDto>()
-                .WhereIn<UserGroupDto>(
-                    x => x.Alias,
-                    entity.Groups.Select(x => x.Alias).ToArray());
-
-            List<UserGroupDto>? assigned = entity.Groups == null || entity.Groups.Any() == false
-                ? []
-                : Database.Fetch<UserGroupDto>(sql);
-
-            // first delete all
-            sql = SqlContext.Sql()
-                .Delete<User2UserGroupDto>()
+                .Select<User2UserGroupDto>(x => x.UserGroupId)
+                .From<User2UserGroupDto>()
                 .Where<User2UserGroupDto>(c => c.UserId == entity.Id);
-            Database.Execute(sql);
 
-            foreach (UserGroupDto? groupDto in assigned)
+            List<int> existingUserGroupIds = Database.Fetch<int>(sql);
+
+            // Get the user groups Ids that need to be removed and added.
+            var userGroupsIdsToRemove = existingUserGroupIds
+                .Except(entity.Groups.Select(x => x.Id))
+                .ToList();
+            var userGroupIdsToAdd = entity.Groups
+                .Select(x => x.Id)
+                .Except(existingUserGroupIds)
+                .ToList();
+
+            // Remove user groups that are no longer assigned to the user.
+            if (userGroupsIdsToRemove.Count > 0)
             {
-                var dto = new User2UserGroupDto { UserGroupId = groupDto.Id, UserId = entity.Id };
-                Database.Insert(dto);
+                Database.Delete<User2UserGroupDto>(
+                    Sql()
+                        .Where<User2UserGroupDto>(x => x.UserId == entity.Id)
+                        .WhereIn<User2UserGroupDto>(x => x.UserGroupId, userGroupsIdsToRemove));
+            }
+
+            // Add user groups that are newly assigned to the user.
+            if (userGroupIdsToAdd.Count > 0)
+            {
+                IEnumerable<User2UserGroupDto> user2UserGroupDtos = userGroupIdsToAdd
+                    .Select(userGroupId => new User2UserGroupDto
+                    {
+                        UserGroupId = userGroupId,
+                        UserId = entity.Id,
+                    });
+                Database.InsertBulk(user2UserGroupDtos);
+            }
+
+            // Clear user group caches for any user group that have been removed or added.
+            // We need to do this because the count of the number of users in the user group is cached
+            // along with the user group, and if we've made changes to the user groups assigned to the user,
+            // the count for the groups need to be refreshed.
+            var userGroupIdsToRefresh = userGroupsIdsToRemove
+                .Union(userGroupIdsToAdd)
+                .ToList();
+            foreach (int userGroupIdToRefresh in userGroupIdsToRefresh)
+            {
+                ClearRepositoryCacheForUserGroup(userGroupIdToRefresh);
             }
         }
 
         entity.ResetDirtyProperties();
+    }
+
+    private void ClearRepositoryCacheForUserGroup(int id)
+    {
+        IAppPolicyCache userGroupCache = AppCaches.IsolatedCaches.GetOrCreate<IUserGroup>();
+
+        string cacheKey = RepositoryCacheKeys.GetKey<IUserGroup, int>(id);
+        userGroupCache.Clear(cacheKey);
     }
 
     private void AddingOrUpdateStartNodes(IEntity entity, IEnumerable<UserStartNodeDto> current,
