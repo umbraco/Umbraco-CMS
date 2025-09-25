@@ -27,12 +27,12 @@ public class LoadTestController : Controller
     private const string FootHtml = @"</body>
 </html>";
 
-    private static readonly Random s_random = new();
-    private static readonly Lock s_locko = new();
+    private static readonly Random _random = new();
+    private static readonly Lock _locko = new();
 
-    private static volatile int s_containerId = -1;
+    private static volatile int _containerId = -1;
 
-    private static readonly string s_headHtml = @"<html>
+    private static readonly string _headHtml = @"<html>
 <head>
   <title>LoadTest</title>
   <style>
@@ -53,7 +53,7 @@ public class LoadTestController : Controller
   </div>
 ";
 
-    private static readonly string s_containerTemplateText = @"
+    private static readonly string _containerTemplateText = @"
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @inject Umbraco.Cms.Core.Configuration.IUmbracoVersion _umbracoVersion
 @{
@@ -65,7 +65,7 @@ public class LoadTestController : Controller
     var wurl = Context.Request.Query[""u""] == ""1"";
     var missing = contents.Length > 0 && contents[contents.Length - 1].Id - contents[0].Id >= contents.Length;
 }
-" + s_headHtml + @"
+" + _headHtml + @"
 <div class=""block"">
 <span @Html.Raw(missing ? ""style=\""color:red;\"""" : """")>@contents.Length items</span>
 <ul>
@@ -147,14 +147,14 @@ public class LoadTestController : Controller
 
     private IActionResult EnsureInitialize()
     {
-        if (s_containerId > 0)
+        if (_containerId > 0)
         {
             return null;
         }
 
-        lock (s_locko)
+        lock (_locko)
         {
-            if (s_containerId > 0)
+            if (_containerId > 0)
             {
                 return null;
             }
@@ -177,12 +177,12 @@ public class LoadTestController : Controller
                 return ContentHtml("Panic! Container is missing.");
             }
 
-            s_containerId = container.Id;
+            _containerId = container.Id;
             return null;
         }
     }
 
-    private IActionResult ContentHtml(string s) => Content(s_headHtml + s + FootHtml, "text/html");
+    private IActionResult ContentHtml(string s) => Content(_headHtml + s + FootHtml, "text/html");
 
     public IActionResult Install()
     {
@@ -205,7 +205,7 @@ public class LoadTestController : Controller
         var containerTemplate = ImportTemplate(
             "LoadTestContainer",
             "LoadTestContainer",
-            s_containerTemplateText);
+            _containerTemplateText);
 
         var containerType = new ContentType(_shortStringHelper, -1)
         {
@@ -276,7 +276,7 @@ public class LoadTestController : Controller
         for (var i = 0; i < n; i++)
         {
             var name = Guid.NewGuid().ToString("N").ToUpper() + "-" + (restart ? "R" : "X") + "-" + o;
-            var content = _contentService.Create(name, s_containerId, ContentAlias);
+            var content = _contentService.Create(name, _containerId, ContentAlias);
             content.SetValue("origin", o);
             _contentService.Save(content);
             _contentService.Publish(content, content.AvailableCultures.ToArray());
@@ -294,9 +294,9 @@ public class LoadTestController : Controller
 
     private static int GetRandom(int minValue, int maxValue)
     {
-        lock (s_locko)
+        lock (_locko)
         {
-            return s_random.Next(minValue, maxValue);
+            return _random.Next(minValue, maxValue);
         }
     }
 
@@ -354,7 +354,7 @@ public class LoadTestController : Controller
         var pos = currentName.IndexOf('-');
         if (pos > 0)
         {
-            currentName = currentName.Substring(0, pos);
+            currentName = currentName[..pos];
         }
 
         var text = new StringBuilder();
