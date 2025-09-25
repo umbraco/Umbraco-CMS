@@ -20,6 +20,7 @@ export * from './input-manifest/index.js';
 export * from './input-number-range/index.js';
 export * from './input-radio-button-list/index.js';
 export * from './input-slider/index.js';
+export * from './input-time-zone/index.js';
 export * from './input-toggle/index.js';
 export * from './input-with-alias/input-with-alias.element.js';
 export * from './multiple-color-picker-input/index.js';

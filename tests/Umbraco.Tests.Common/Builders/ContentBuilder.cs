@@ -464,6 +464,7 @@ public class ContentBuilder
         content.SetValue("memberPicker", Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D")).ToString());
         content.SetValue("multiUrlPicker", "[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]");
         content.SetValue("tags", "this,is,tags");
+        content.SetValue("dateTimeWithTimeZone", "{\"date\":\"2025-01-22T18:33:01.0000000+01:00\",\"timeZone\":\"Europe/Copenhagen\"}");
 
         return content;
     }
