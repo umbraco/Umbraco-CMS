@@ -1,10 +1,10 @@
-#umb-login-form .validation-message {
+#umb-login-form .errormessage {
 	color: var(--uui-color-invalid-standalone);
 	display: none;
 	margin-top: var(--uui-size-1);
 }
 
-#umb-login-form .validation-message[state='error'] {
+#umb-login-form [aria-invalid='true'] ~ .errormessage {
 	display: block;
 }
 

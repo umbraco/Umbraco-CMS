@@ -22,6 +22,7 @@ const createInput = (opts: {
 	name: string;
 	autocomplete: AutoFill;
 	label: string;
+	errorId: string;
 	inputmode: string;
 	autofocus?: boolean;
 }) => {
@@ -33,7 +34,9 @@ const createInput = (opts: {
 	input.required = true;
 	input.inputMode = opts.inputmode;
 	input.ariaLabel = opts.label;
+	input.setAttribute('aria-errormessage', opts.errorId);
 	input.autofocus = opts.autofocus || false;
+	input.className = 'input';
 
 	return input;
 };
@@ -49,21 +52,23 @@ const createLabel = (opts: { forId: string; localizeAlias: string; localizeFallb
 	return label;
 };
 
-const createValidationMessage = (id: string, localizationKey: string) => {
+const createValidationMessage = (errorId: string, localizationKey: string) => {
 	const validationElement = document.createElement('div');
-	validationElement.className = 'validation-message';
-	validationElement.setAttribute('for', id);
+	validationElement.className = 'errormessage';
+	validationElement.id = errorId;
 	const localizeElement = document.createElement('umb-localize');
 	localizeElement.key = localizationKey;
 	validationElement.appendChild(localizeElement);
+
 	return validationElement;
 };
 
 const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement, localizationKey: string) => {
 	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
+	const errorId = input.getAttribute('aria-errormessage') || input.id + '-error';
 	formLayoutItem.appendChild(label);
 	formLayoutItem.appendChild(input);
-	formLayoutItem.appendChild(createValidationMessage(input.id, localizationKey));
+	formLayoutItem.appendChild(createValidationMessage(errorId, localizationKey));
 
 	return formLayoutItem;
 };
@@ -91,21 +96,21 @@ const createForm = (elements: HTMLElement[]) => {
 		const username = formData.get('username') as string;
 		const password = formData.get('password') as string;
 
-		const validationMessages = Array.from(form.querySelectorAll('.validation-message'));
-		validationMessages.forEach((vm) => vm.removeAttribute('state'));
+		const validationMessages = Array.from(form.querySelectorAll('.input'));
+		validationMessages.forEach((vm) => vm.removeAttribute('aria-invalid'));
 
 		if (!username) {
 			const validationMessage = validationMessages.find(
-				(vm) => vm.getAttribute('for') === 'username-input'
+				(vm) => vm.getAttribute('id') === 'username-input'
 			) as UUIFormValidationMessageElement;
-			validationMessage?.setAttribute('state', 'error');
+			validationMessage?.setAttribute('aria-invalid', 'true');
 		}
 
 		if (!password) {
 			const validationMessage = validationMessages.find(
-				(vm) => vm.getAttribute('for') === 'password-input'
+				(vm) => vm.getAttribute('id') === 'password-input'
 			) as UUIFormValidationMessageElement;
-			validationMessage?.setAttribute('state', 'error');
+			validationMessage?.setAttribute('aria-invalid', 'true');
 		}
 	});
 
@@ -215,6 +220,7 @@ export default class UmbAuthElement extends UmbLitElement {
 			name: 'username',
 			autocomplete: 'username',
 			label: labelUsername,
+			errorId: 'username-input-error',
 			inputmode: this.usernameIsEmail ? 'email' : '',
 			autofocus: true,
 		});
@@ -224,6 +230,7 @@ export default class UmbAuthElement extends UmbLitElement {
 			name: 'password',
 			autocomplete: 'current-password',
 			label: labelPassword,
+			errorId: 'password-input-error',
 			inputmode: '',
 		});
 		this._usernameLabel = createLabel({
