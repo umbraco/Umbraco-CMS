@@ -41,5 +41,5 @@ internal sealed class PropertyTypeGroupDto
 
     [ResultColumn]
     [Reference(ReferenceType.Many, ReferenceMemberName = "PropertyTypeGroupId")]
-    public List<PropertyTypeDto>? PropertyTypeDtos { get; set; }
+    public List<PropertyTypeDto> PropertyTypeDtos { get; set; } = [];
 }

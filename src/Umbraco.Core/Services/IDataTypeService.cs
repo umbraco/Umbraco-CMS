@@ -9,17 +9,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IDataTypeService : IService
 {
-    [Obsolete("Please use GetPagedRelationsAsync. Scheduled for removal in Umbraco 17.")]
-    IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id) => throw new NotImplementedException();
-
-    /// <summary>
-    ///     Returns a dictionary of content type <see cref="Udi" />s and the property type aliases that use a <see cref="IDataType" />
-    /// </summary>
-    /// <param name="id">The guid Id of the <see cref="IDataType" /></param>
-    /// <returns></returns>
-    [Obsolete("Please use GetPagedRelationsAsync. Scheduled for removal in Umbraco 17.")]
-    Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id);
-
     /// <summary>
     ///     Gets a paged result of items which are in relation with the current data type.
     /// </summary>

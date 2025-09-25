@@ -20,6 +20,6 @@ public class LegacyScriptDeletedWebhookEvent : WebhookEventBase<ScriptDeletedNot
 
     public override string Alias => Constants.WebhookEvents.Aliases.ScriptDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(ScriptDeletedNotification notification)
+    public override object ConvertNotificationToRequestPayload(ScriptDeletedNotification notification)
         => notification.DeletedEntities;
 }

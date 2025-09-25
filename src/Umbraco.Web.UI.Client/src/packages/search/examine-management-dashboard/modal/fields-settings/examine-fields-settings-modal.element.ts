@@ -13,7 +13,7 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 	UmbExamineFieldsSettingsModalValue
 > {
 	override render() {
-		return html`<umb-body-layout headline=${this.localize.term('examineManagement_fields')}>
+		return html`<umb-body-layout headline=${this.localize.term('general_fields')}>
 			<uui-scroll-container id="field-settings"> ${this.#renderFields()} </uui-scroll-container>
 			<div slot="actions">
 				<uui-button
@@ -59,6 +59,7 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 
 			uui-scroll-container {
 				overflow-y: scroll;
+				height: 100%;
 				max-height: 100%;
 				min-height: 0;
 				flex: 1;

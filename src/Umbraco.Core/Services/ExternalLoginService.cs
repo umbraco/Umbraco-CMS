@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -12,21 +10,6 @@ public class ExternalLoginService : RepositoryService, IExternalLoginWithKeyServ
 {
     private readonly IExternalLoginWithKeyRepository _externalLoginRepository;
     private readonly IUserRepository _userRepository;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
-    public ExternalLoginService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IExternalLoginWithKeyRepository externalLoginRepository)
-        : this(
-              provider,
-              loggerFactory,
-              eventMessagesFactory,
-              externalLoginRepository,
-              StaticServiceProvider.Instance.GetRequiredService<IUserRepository>())
-    {
-    }
 
     public ExternalLoginService(
         ICoreScopeProvider provider,

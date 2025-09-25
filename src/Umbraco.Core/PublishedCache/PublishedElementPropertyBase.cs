@@ -46,10 +46,6 @@ internal sealed class PublishedElementPropertyBase : PublishedPropertyBase
     // ReSharper disable InconsistentlySynchronizedField
     private string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValuesKey();
 
-    [Obsolete("Do not use this. Will be removed in V17.")]
-    public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing) =>
-        "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
-
     private string PropertyCacheValuesKey() =>
         $"PublishedSnapshot.Property.CacheValues[{(IsPreviewing ? "D:" : "P:")}{Element.Key}:{Alias}:{_variationContext.Culture.IfNullOrWhiteSpace("inv")}+{_variationContext.Segment.IfNullOrWhiteSpace("inv")}]";
 

@@ -5,11 +5,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.LongRunningOperation)]
+[TableName(TableName)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
 internal class LongRunningOperationDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.LongRunningOperation;
+
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoLongRunningOperation", AutoIncrement = false)]
     public Guid Id { get; set; }

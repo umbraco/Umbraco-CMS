@@ -1,4 +1,3 @@
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
@@ -7,19 +6,6 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 
 public class ApiContentResponseBuilder : ApiContentBuilderBase<IApiContentResponse>, IApiContentResponseBuilder
 {
-    [Obsolete("Please use the constructor that takes an IVariationContextAccessor instead. Scheduled for removal in V17.")]
-    public ApiContentResponseBuilder(
-        IApiContentNameProvider apiContentNameProvider,
-        IApiContentRouteBuilder apiContentRouteBuilder,
-        IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
-        : this(
-            apiContentNameProvider,
-            apiContentRouteBuilder,
-            outputExpansionStrategyAccessor,
-            StaticServiceProvider.Instance.CreateInstance<IVariationContextAccessor>())
-    {
-    }
-
     public ApiContentResponseBuilder(
         IApiContentNameProvider apiContentNameProvider,
         IApiContentRouteBuilder apiContentRouteBuilder,
