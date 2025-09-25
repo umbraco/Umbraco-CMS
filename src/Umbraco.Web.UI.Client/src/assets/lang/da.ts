@@ -857,6 +857,7 @@ export default {
 		email: 'E-mail',
 		error: 'Fejl',
 		field: 'Felt',
+		fields: 'Felter',
 		fieldFor: 'Felt for %0%',
 		findDocument: 'Find',
 		first: 'Første',
