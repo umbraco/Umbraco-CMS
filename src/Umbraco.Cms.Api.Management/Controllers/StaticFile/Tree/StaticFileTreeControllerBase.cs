@@ -19,11 +19,13 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem)
-        : this(physicalFileSystem, StaticServiceProvider.Instance.GetRequiredService<IPhysicalFileSystemTreeService>())
+        : base(StaticServiceProvider.Instance.GetRequiredService<IPhysicalFileSystemTreeService>())
     {
+        FileSystem = physicalFileSystem;
+        _fileSystemTreeService = StaticServiceProvider.Instance.GetRequiredService<IPhysicalFileSystemTreeService>();
     }
 
-    protected StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
+    public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem, IPhysicalFileSystemTreeService fileSystemTreeService)
         : base (fileSystemTreeService)
     {
         FileSystem = physicalFileSystem;
