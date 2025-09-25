@@ -357,6 +357,9 @@ export default {
 		saveAndPublishModalTitle: 'Save and publish',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
+		sharedAcrossCultures: 'Shared across cultures',
+		sharedAcrossSegments: 'Shared across segments',
+		shared: 'Shared',
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
@@ -2408,6 +2411,7 @@ export default {
 		searchContentTree: 'Search content tree',
 		maxAmount: 'Maximum amount',
 		expandChildItems: 'Expand child items for',
+		collapseChildItems: 'Collapse child items for',
 		openContextNode: 'Open context node for',
 	},
 	references: {
