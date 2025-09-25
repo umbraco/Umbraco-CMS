@@ -10,22 +10,27 @@ import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 export function getPropertyValueByAlias(item: UmbDocumentCollectionItemModel, alias: string) {
 	switch (alias) {
 		case 'contentTypeAlias':
-			return item.contentTypeAlias;
-		case 'createDate':
-			return item.createDate.toLocaleString();
+			return item.documentType.alias;
+		// TODO: ⚠️[v17]⚠️ Review where to get `createDate` from, as it's no longer available on `UmbDocumentCollectionItemModel`. [LK]
+		// case 'createDate':
+		// 	return item.createDate.toLocaleString();
 		case 'creator':
 		case 'owner':
 			return item.creator;
 		case 'name':
-			return item.name;
+			// TODO: ⚠️[v17]⚠️ Review the `item.variants[0].name` as this is a hack! [LK]
+			return item.variants[0].name;
 		case 'state':
-			return fromCamelCase(item.state);
+			// TODO: ⚠️[v17]⚠️ Review the `item.variants[0].state` as this is a hack! [LK]
+			return item.variants[0].state ? fromCamelCase(item.variants[0].state) : '';
 		case 'published':
-			return item.state !== 'Draft' ? 'True' : 'False';
+			// TODO: ⚠️[v17]⚠️ Review the `item.variants[0].state` as this is a hack! [LK]
+			return item.variants[0].state !== 'Draft' ? 'True' : 'False';
 		case 'sortOrder':
 			return item.sortOrder;
-		case 'updateDate':
-			return item.updateDate.toLocaleString();
+		// TODO: ⚠️[v17]⚠️ Review where to get `updateDate` from, as it's no longer available on `UmbDocumentCollectionItemModel`. [LK]
+		// case 'updateDate':
+		// 	return item.updateDate.toLocaleString();
 		case 'updater':
 			return item.updater;
 		default:

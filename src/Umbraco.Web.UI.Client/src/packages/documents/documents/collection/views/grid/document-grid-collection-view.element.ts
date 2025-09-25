@@ -99,16 +99,17 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbDocumentCollectionItemModel) {
+		// TODO: ⚠️[v17]⚠️ Review the `item.variants[0].name` as this is a hack! [LK]
 		return html`
 			<uui-card-content-node
-				.name=${item.name ?? 'Unnamed Document'}
+				.name=${item.variants[0].name ?? 'Unnamed Document'}
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
 				href=${this.#getEditUrl(item)}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
-				<umb-icon slot="icon" name=${item.icon}></umb-icon>
+				<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>
 				${this.#renderState(item)} ${this.#renderProperties(item)}
 			</uui-card-content-node>
 		`;
@@ -130,7 +131,10 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderState(item: UmbDocumentCollectionItemModel) {
-		const tagConfig = this.#getStateTagConfig(item.state);
+		// TODO: ⚠️[v17]⚠️ Review the `item.variants[0].state` as this is a hack! [LK]
+		const state = item.variants[0].state;
+		if (!state) return;
+		const tagConfig = this.#getStateTagConfig(state);
 		return html`<uui-tag slot="tag" color=${tagConfig.color} look="secondary">${tagConfig.label}</uui-tag>`;
 	}
 

@@ -15,7 +15,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../constants.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
-import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingRepository } from '../publishing/index.js';
+import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../publishing/index.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
@@ -51,13 +51,6 @@ export class UmbDocumentWorkspaceContext
 		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContext
 {
-	/**
-	 * The publishing repository for the document workspace.
-	 * @deprecated Will be removed in v17. Use the methods on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 * @memberof UmbDocumentWorkspaceContext
-	 */
-	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
-
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
 
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
@@ -123,6 +116,7 @@ export class UmbDocumentWorkspaceContext
 		);
 
 		// TODO: Remove this in v17 as we have moved the publishing methods to the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.
+		// TODO: ⚠️[v17]⚠️ I can't remove this until the deprecated `publish`, `saveAndPublish` and `unpublish` methods have been removed. [LK]
 		this.consumeContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, (context) => {
 			this.#publishingContext = context;
 		});
@@ -337,6 +331,7 @@ export class UmbDocumentWorkspaceContext
 		previewWindow?.focus();
 	}
 
+	// TODO: ⚠️[v17]⚠️ Unable to remove this method as `UmbPublishableWorkspaceContext` requires it. [LK]
 	public async publish() {
 		new UmbDeprecation({
 			deprecated: 'The Publish method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
@@ -347,6 +342,7 @@ export class UmbDocumentWorkspaceContext
 		await this.#publishingContext.publish();
 	}
 
+	// TODO: ⚠️[v17]⚠️ Unable to remove this method as `UmbPublishableWorkspaceContext` requires it. [LK]
 	/**
 	 * Save the document and publish it.
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
@@ -361,20 +357,7 @@ export class UmbDocumentWorkspaceContext
 		await this.#publishingContext.saveAndPublish();
 	}
 
-	/**
-	 * Schedule the document to be published at a later date.
-	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 */
-	public async schedule() {
-		new UmbDeprecation({
-			deprecated: 'The Schedule method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the Schedule method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.schedule();
-	}
-
+	// TODO: ⚠️[v17]⚠️ Unable to remove this method as `UmbPublishableWorkspaceContext` requires it. [LK]
 	/**
 	 * Unpublish the document.
 	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
@@ -387,20 +370,6 @@ export class UmbDocumentWorkspaceContext
 		}).warn();
 		if (!this.#publishingContext) throw new Error('Publishing context is missing');
 		await this.#publishingContext.unpublish();
-	}
-
-	/**
-	 * Publish the document and all its descendants.
-	 * @deprecated Will be removed in v17. Use the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.
-	 */
-	public async publishWithDescendants() {
-		new UmbDeprecation({
-			deprecated: 'The PublishWithDescendants method on the UMB_DOCUMENT_WORKSPACE_CONTEXT is deprecated.',
-			removeInVersion: '17.0.0',
-			solution: 'Use the PublishWithDescendants method on the UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT instead.',
-		}).warn();
-		if (!this.#publishingContext) throw new Error('Publishing context is missing');
-		await this.#publishingContext.publishWithDescendants();
 	}
 
 	public createPropertyDatasetContext(

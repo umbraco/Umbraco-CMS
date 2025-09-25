@@ -129,7 +129,6 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 		const value = allowedVerbs.length > 0 ? { allowedVerbs } : undefined;
 		this.#entityUserPermissionModalContext = this.#modalManagerContext?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
-				unique: item.unique,
 				entityType: item.entityType,
 				headline,
 				preset: {
