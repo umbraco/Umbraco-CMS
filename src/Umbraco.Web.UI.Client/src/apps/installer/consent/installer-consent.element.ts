@@ -8,7 +8,7 @@ import type {
 	TelemetryResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-installer-consent')
 export class UmbInstallerConsentElement extends UmbLitElement {
@@ -54,7 +54,8 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 		this._installerContext?.appendData(value);
 	}
 
-	private _onNext() {
+	private _onNext(evt: SubmitEvent) {
+		evt.preventDefault();
 		this._installerContext?.nextStep();
 	}
 
@@ -75,6 +76,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 
 		return html`
 			<uui-slider
+				${umbFocus()}
 				@input=${this._handleChange}
 				name="telemetryLevel"
 				label="telemetry-level"
