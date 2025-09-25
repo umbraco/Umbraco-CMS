@@ -41,7 +41,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(childMediaFolderName);
   await umbracoApi.media.ensureNameNotExists(rootImageName);
 });
-// Gets a media item by id
+
 test('can fetch an image item by its ID', async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Image';
@@ -100,8 +100,6 @@ test('can fetch a vector graphics item by its ID', async ({umbracoApi}) => {
 test('can fetch a media folder by its ID', async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Folder';
-  // Create a root level folder
-  const rootFolderId = await umbracoApi.media.createDefaultMediaFolder(rootMediaFolderName);
   const mediaPath = '/' + rootMediaFolderName.toLowerCase() + '/';
 
   // Act
@@ -165,7 +163,6 @@ test('returns 404 when fetching a non-existent media item', async ({umbracoApi})
   expect(mediaItem.status()).toBe(404);
 });
 
-// Gets a media item by path
 test('can fetch an media item by its path', async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Article';
@@ -250,7 +247,6 @@ test('returns 404 when fetching a non-existent media path', async ({umbracoApi})
   expect(mediaItem.status()).toBe(404);
 });
 
-// Gets media item(s) by id
 test('can fetch multiple media items by their IDs', async ({umbracoApi}) => {
   // Arrange
   const firstMediaName = rootImageName;
@@ -291,7 +287,6 @@ test('returns only valid media items when some IDs are invalid', async ({umbraco
   await umbracoApi.mediaDeliveryApi.verifyMultipleMediaItemsJson([validMediaName], mediaItemsJson, [validMediaPath], [validMediaTypeName]);
 });
 
-// Gets media item(s) from a query
 test('can fetch children at root', async ({umbracoApi}) => {
   // Arrange
   const fetch = 'children:/';
