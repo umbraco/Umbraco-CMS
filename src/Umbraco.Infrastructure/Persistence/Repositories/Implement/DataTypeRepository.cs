@@ -221,6 +221,7 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         {
             Constants.PropertyEditors.Aliases.BlockGrid,
             Constants.PropertyEditors.Aliases.BlockList,
+            Constants.PropertyEditors.Aliases.RichText,
         };
         // Get All contentTypes where isContainer (list view enabled) is set to true
         Sql<ISqlContext> sql = Sql()
@@ -254,20 +255,47 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
                 _serializer,
                 _dataValueEditorFactory);
 
-            BlockListConfiguration.BlockConfiguration[]? configurations = ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(dataType.ConfigurationObject)?.Blocks;
-
-            if(configurations is null)
+            switch (dataType.EditorAlias)
             {
-                continue;
-            }
+                case Constants.PropertyEditors.Aliases.BlockGrid:
+                    BlockGridConfiguration? blockGridConfigurations = ConfigurationEditor.ConfigurationAs<BlockGridConfiguration>(dataType.ConfigurationObject);
 
-            foreach (BlockListConfiguration.BlockConfiguration configuration in configurations)
-            {
-                keys.Add(configuration.ContentElementTypeKey);
-                if (configuration.SettingsElementTypeKey.HasValue)
-                {
-                    keys.Add(configuration.SettingsElementTypeKey.Value);
-                }
+                    if(blockGridConfigurations is null)
+                    {
+                        continue;
+                    }
+
+                    if (blockGridConfigurations.Blocks.Any(configuration => configuration.ContentElementTypeKey == contentTypeId || configuration.SettingsElementTypeKey == contentTypeId))
+                    {
+                        keys.Add(dataType.Key);
+                    }
+                    break;
+                case Constants.PropertyEditors.Aliases.BlockList:
+                    BlockListConfiguration.BlockConfiguration[]? blockListConfigurations = ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(dataType.ConfigurationObject)?.Blocks;
+
+                    if(blockListConfigurations is null)
+                    {
+                        continue;
+                    }
+
+                    if (blockListConfigurations.Any(configuration => configuration.ContentElementTypeKey == contentTypeId || configuration.SettingsElementTypeKey == contentTypeId))
+                    {
+                        keys.Add(dataType.Key);
+                    }
+                    break;
+                case Constants.PropertyEditors.Aliases.RichText:
+                    RichTextConfiguration? rteConfig = ConfigurationEditor.ConfigurationAs<RichTextConfiguration>(dataType.ConfigurationObject);
+
+                    if (rteConfig?.Blocks is null)
+                    {
+                        continue;
+                    }
+
+                    if (rteConfig.Blocks.Any(configuration => configuration.ContentElementTypeKey == contentTypeId || configuration.SettingsElementTypeKey == contentTypeId))
+                    {
+                        keys.Add(dataType.Key);
+                    }
+                    break;
             }
         }
 
