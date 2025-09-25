@@ -10,6 +10,7 @@ import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui'
 import './member-workspace-view-member-info.element.js';
 import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-member-workspace-view-member')
 export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -80,7 +81,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 	};
 
 	#renderPasswordInput() {
-		if (this._isNew) {
+		if (this._isNew && this._workspaceContext) {
 			return html`
 				<umb-property-layout label=${this.localize.term('user_password')} mandatory>
 					<uui-input
@@ -88,7 +89,14 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						name="newPassword"
 						label=${this.localize.term('user_passwordEnterNew')}
 						type="password"
-						@input=${() => this.#onPasswordUpdate()}></uui-input>
+						@input=${() => this.#onPasswordUpdate()}
+						value=${this._workspaceContext.newPassword}
+						required
+						${umbBindToValidation(
+							this,
+							"$.values[?(@.alias == 'password' && @.culture == null && @.segment == null)].value",
+							this._workspaceContext.newPassword,
+						)}></uui-input>
 				</umb-property-layout>
 
 				<umb-property-layout label="Confirm password" mandatory>
@@ -97,6 +105,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						name="confirmPassword"
 						label="Confirm password"
 						type="password"
+						value=${this._workspaceContext.newPassword}
 						@input=${() => this.#onPasswordUpdate()}></uui-input>
 				</umb-property-layout>
 
@@ -157,6 +166,11 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							name="login"
 							label=${this.localize.term('general_username')}
 							value=${this._workspaceContext.username}
+							${umbBindToValidation(
+								this,
+								"$.values[?(@.alias == 'username' && @.culture == null && @.segment == null)].value",
+								this._workspaceContext.username,
+							)}
 							required
 							required-message=${this.localize.term('user_loginnameRequired')}
 							@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
@@ -168,6 +182,11 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 							name="email"
 							label=${this.localize.term('general_email')}
 							value=${this._workspaceContext.email}
+							${umbBindToValidation(
+								this,
+								"$.values[?(@.alias == 'email' && @.culture == null && @.segment == null)].value",
+								this._workspaceContext.email,
+							)}
 							required
 							required-message=${this.localize.term('user_emailRequired')}
 							@input=${(e: Event) => this.#onChange('email', (e.target as HTMLInputElement).value)}></uui-input>

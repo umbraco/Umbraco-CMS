@@ -1,29 +1,15 @@
 import { UmbSectionSidebarMenuElement } from '../section-sidebar-menu/section-sidebar-menu.element.js';
 import type { ManifestSectionSidebarAppMenuWithEntityActionsKind } from '../section-sidebar-menu/types.js';
 import { css, html, customElement, type PropertyValues, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
-
-const manifestWithEntityActions: UmbExtensionManifestKind = {
-	type: 'kind',
-	alias: 'Umb.Kind.SectionSidebarAppMenuWithEntityActions',
-	matchKind: 'menuWithEntityActions',
-	matchType: 'sectionSidebarApp',
-	manifest: {
-		type: 'sectionSidebarApp',
-		elementName: 'umb-section-sidebar-menu-with-entity-actions',
-	},
-};
-umbExtensionsRegistry.register(manifestWithEntityActions);
 
 @customElement('umb-section-sidebar-menu-with-entity-actions')
 export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSidebarMenuElement<ManifestSectionSidebarAppMenuWithEntityActionsKind> {
 	@state()
-	_unique = null;
+	private _unique = null;
 
 	@state()
-	_entityType?: string | null;
+	private _entityType?: string | null;
 
 	#parentContext = new UmbParentEntityContext(this);
 

@@ -135,7 +135,7 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         var sourceString = intermediateValue.Markup;
 
         // ensures string is parsed for {localLink} and URLs and media are resolved correctly
-        sourceString = _linkParser.EnsureInternalLinks(sourceString, preview);
+        sourceString = _linkParser.EnsureInternalLinks(sourceString);
         sourceString = _urlParser.EnsureUrls(sourceString);
         sourceString = _imageSourceParser.EnsureImageSources(sourceString);
 
@@ -231,7 +231,7 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         };
     }
 
-    private class RichTextEditorIntermediateValue : IRichTextEditorIntermediateValue
+    private sealed class RichTextEditorIntermediateValue : IRichTextEditorIntermediateValue
     {
         public required string Markup { get; set; }
 

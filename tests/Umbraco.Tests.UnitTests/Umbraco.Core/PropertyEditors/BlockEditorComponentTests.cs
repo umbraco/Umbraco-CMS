@@ -22,7 +22,7 @@ public class BlockEditorComponentTests
     private const string SubContentGuid2 = "68606a64-a03a-4b78-bcb1-39daee0c590d";
     private const string SubSettingsGuid1 = "5ce1b7da-7c9f-491e-9b95-5510fd28c50c";
 
-    private readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer();
+    private readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
     [Test]
     public void Cannot_Have_Null_Udi()

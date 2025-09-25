@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// <summary>
     /// Implements <see cref="ITrackedReferencesRepository"/> to provide database access for tracked references."
     /// </summary>
-    internal class TrackedReferencesRepository : ITrackedReferencesRepository
+    internal sealed class TrackedReferencesRepository : ITrackedReferencesRepository
     {
         private readonly IScopeAccessor _scopeAccessor;
         private readonly IUmbracoMapper _umbracoMapper;
@@ -402,7 +402,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return innerUnionSql;
         }
 
-        private class UnionHelperDto
+        private sealed class UnionHelperDto
         {
             [Column("id")] public int Id { get; set; }
 

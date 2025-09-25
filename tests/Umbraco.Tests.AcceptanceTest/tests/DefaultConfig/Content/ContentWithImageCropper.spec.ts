@@ -22,7 +22,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create content with the image cropper data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+// TODO: Investigate pipeline flakiness for this test. Reapply '@smoke' tag once the issue is resolved.
+test('can create content with the image cropper data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

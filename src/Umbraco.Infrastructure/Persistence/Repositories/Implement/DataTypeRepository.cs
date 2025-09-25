@@ -1,7 +1,5 @@
 using System.Data;
 using System.Globalization;
-using System.Linq.Expressions;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -16,7 +14,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -27,11 +24,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="DataType" />
 /// </summary>
-internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataTypeRepository
+internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataTypeRepository
 {
     private readonly ILogger<IDataType> _dataTypeLogger;
     private readonly PropertyEditorCollection _editors;
     private readonly IConfigurationEditorJsonSerializer _serializer;
+    private readonly IDataValueEditorFactory _dataValueEditorFactory;
 
     public DataTypeRepository(
         IScopeAccessor scopeAccessor,
@@ -39,11 +37,13 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         PropertyEditorCollection editors,
         ILogger<DataTypeRepository> logger,
         ILoggerFactory loggerFactory,
-        IConfigurationEditorJsonSerializer serializer)
+        IConfigurationEditorJsonSerializer serializer,
+        IDataValueEditorFactory dataValueEditorFactory)
         : base(scopeAccessor, cache, logger)
     {
         _editors = editors;
         _serializer = serializer;
+        _dataValueEditorFactory = dataValueEditorFactory;
         _dataTypeLogger = loggerFactory.CreateLogger<IDataType>();
     }
 
@@ -234,7 +234,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
     }
 
     [TableName(Constants.DatabaseSchema.Tables.ContentType)]
-    private class ContentTypeReferenceDto : ContentTypeDto
+    private sealed class ContentTypeReferenceDto : ContentTypeDto
     {
         [ResultColumn]
         [Reference(ReferenceType.Many)]
@@ -242,7 +242,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
     }
 
     [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
-    private class PropertyTypeReferenceDto
+    private sealed class PropertyTypeReferenceDto
     {
         [Column("ptAlias")]
         public string? Alias { get; set; }
@@ -265,7 +265,12 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         }
 
         List<DataTypeDto>? dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-        return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors, _dataTypeLogger, _serializer)).ToArray();
+        return dtos.Select(x => DataTypeFactory.BuildEntity(
+            x,
+            _editors,
+            _dataTypeLogger,
+            _serializer,
+            _dataValueEditorFactory)).ToArray();
     }
 
     protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -276,7 +281,12 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
         List<DataTypeDto>? dtos = Database.Fetch<DataTypeDto>(sql);
 
-        return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors, _dataTypeLogger, _serializer)).ToArray();
+        return dtos.Select(x => DataTypeFactory.BuildEntity(
+            x,
+            _editors,
+            _dataTypeLogger,
+            _serializer,
+            _dataValueEditorFactory)).ToArray();
     }
 
     #endregion

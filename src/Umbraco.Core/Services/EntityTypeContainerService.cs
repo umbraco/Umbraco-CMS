@@ -52,18 +52,18 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
 
 
     /// <inheritdoc />
-    public async Task<IEnumerable<EntityContainer>> GetAsync(string name, int level)
+    public Task<IEnumerable<EntityContainer>> GetAsync(string name, int level)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         ReadLock(scope);
-        return await Task.FromResult(_entityContainerRepository.Get(name, level));
+        return Task.FromResult(_entityContainerRepository.Get(name, level));
     }
     /// <inheritdoc />
-    public async Task<IEnumerable<EntityContainer>> GetAllAsync()
+    public Task<IEnumerable<EntityContainer>> GetAllAsync()
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         ReadLock(scope);
-        return await Task.FromResult(_entityContainerRepository.GetMany());
+        return Task.FromResult(_entityContainerRepository.GetMany());
     }
 
     /// <inheritdoc />
@@ -107,7 +107,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
                     return EntityContainerOperationStatus.ParentNotFound;
                 }
 
-                if (_entityContainerRepository.HasDuplicateName(container.ParentId, container.Name!))
+                if (_entityContainerRepository.HasDuplicateName(parentContainer?.Id ?? Constants.System.Root, container.Name!))
                 {
                     return EntityContainerOperationStatus.DuplicateName;
                 }

@@ -22,8 +22,10 @@ import type {
 import { UmbDeprecation, UmbStateManager } from '@umbraco-cms/backoffice/utils';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbApiError } from '@umbraco-cms/backoffice/resources';
 
 const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
+const FORBIDDEN_STATE_UNIQUE = 'umbForbiddenEntityDetail';
 
 export abstract class UmbEntityDetailWorkspaceContextBase<
 		DetailModelType extends UmbEntityModel = UmbEntityModel,
@@ -51,6 +53,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	public readonly data = this._data.current;
 	public readonly persistedData = this._data.persisted;
 	public readonly loading = new UmbStateManager(this);
+	public readonly forbidden = new UmbStateManager(this);
 
 	protected _getDataPromise?: Promise<
 		UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>
@@ -60,12 +63,15 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	#createUnderParent = new UmbObjectState<UmbEntityModel | undefined>(undefined);
-	_internal_createUnderParent = this.#createUnderParent.asObservable();
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	public readonly _internal_createUnderParent = this.#createUnderParent.asObservable();
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public readonly _internal_createUnderParentEntityUnique = this.#createUnderParent.asObservablePart((parent) =>
 		parent ? parent.unique : undefined,
 	);
 
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public readonly _internal_createUnderParentEntityType = this.#createUnderParent.asObservablePart((parent) =>
 		parent ? parent.entityType : undefined,
 	);
@@ -174,6 +180,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Gets the parent that a new entity will be created under.
 	 * @returns { UmbEntityModel | undefined } The parent entity
 	 */
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_internal_getCreateUnderParent(): UmbEntityModel | undefined {
 		return this.#createUnderParent.getValue();
 	}
@@ -182,6 +189,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * Sets the parent that a new entity will be created under.
 	 * @param {UmbEntityModel} parent The parent entity
 	 */
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_internal_setCreateUnderParent(parent: UmbEntityModel): void {
 		this.#createUnderParent.setValue(parent);
 	}
@@ -234,18 +242,21 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Loading ${this.getEntityType()} Details` });
 		await this.#init;
 		this._getDataPromise = this._detailRepository!.requestByUnique(unique);
-		const response = await this._getDataPromise;
-		const data = response.data;
+		const response = (await this._getDataPromise) as UmbRepositoryResponseWithAsObservable<DetailModelType>;
+		const { data, error, asObservable } = response;
 
-		if (data) {
+		if (error) {
+			this.removeUmbControllerByAlias('umbEntityDetailTypeStoreObserver');
+			if (UmbApiError.isUmbApiError(error)) {
+				if (error.status === 401 || error.status === 403) {
+					this.forbidden.addState({ unique: FORBIDDEN_STATE_UNIQUE, message: error.message });
+				}
+			}
+		} else if (data) {
 			this._data.setPersisted(data);
 			this._data.setCurrent(data);
 
-			this.observe(
-				(response as UmbRepositoryResponseWithAsObservable<DetailModelType>).asObservable?.(),
-				(entity) => this.#onDetailStoreChange(entity),
-				'umbEntityDetailTypeStoreObserver',
-			);
+			this.observe(asObservable?.(), (entity) => this.#onDetailStoreChange(entity), 'umbEntityDetailTypeStoreObserver');
 		}
 
 		this.loading.removeState(LOADING_STATE_UNIQUE);
@@ -377,11 +388,20 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!eventContext) throw new Error('Event context not found.');
-		const event = new UmbRequestReloadChildrenOfEntityEvent({
+
+		const reloadStructureEvent = new UmbRequestReloadStructureForEntityEvent({
 			entityType: parent.entityType,
 			unique: parent.unique,
 		});
-		eventContext.dispatchEvent(event);
+
+		eventContext.dispatchEvent(reloadStructureEvent);
+
+		const reloadChildren = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType: parent.entityType,
+			unique: parent.unique,
+		});
+
+		eventContext.dispatchEvent(reloadChildren);
 	}
 
 	protected async _update(currentData: DetailModelType) {
@@ -461,6 +481,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	override resetState() {
 		super.resetState();
 		this.loading.clear();
+		this.forbidden.clear();
 		this._data.clear();
 		this.#allowNavigateAway = false;
 		this._getDataPromise = undefined;

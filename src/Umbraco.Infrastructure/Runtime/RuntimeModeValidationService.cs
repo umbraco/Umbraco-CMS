@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 namespace Umbraco.Cms.Infrastructure.Runtime;
 
 /// <inheritdoc />
-internal class RuntimeModeValidationService : IRuntimeModeValidationService
+internal sealed class RuntimeModeValidationService : IRuntimeModeValidationService
 {
     private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
     private readonly IServiceProvider _serviceProvider;

@@ -12,13 +12,13 @@ import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice
 export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 	//
 	@state()
-	_styleElement?: HTMLLinkElement;
+	private _styleElement?: HTMLLinkElement;
 
 	@state()
-	_areas?: Array<UmbBlockGridTypeAreaType> = [];
+	private _areas?: Array<UmbBlockGridTypeAreaType> = [];
 
 	@state()
-	_areaGridColumns?: number;
+	private _areaGridColumns?: number;
 
 	constructor() {
 		super();

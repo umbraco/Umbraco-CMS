@@ -57,73 +57,84 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderTimeout: number | undefined;
 
 	@state()
-	_contentTypeAlias?: string;
+	private _contentTypeAlias?: string;
 
 	@state()
-	_contentTypeName?: string;
+	private _contentTypeName?: string;
 
 	@state()
-	_columnSpan?: number;
+	private _columnSpan?: number;
 
 	@state()
-	_rowSpan?: number;
+	private _rowSpan?: number;
 
 	@state()
-	_showContentEdit = false;
+	private _showContentEdit = false;
+
 	@state()
-	_hasSettings = false;
+	private _hasSettings = false;
 
 	// If _createPath is undefined, its because no blocks are allowed to be created here[NL]
 	@state()
-	_createBeforePath?: string;
-	@state()
-	_createAfterPath?: string;
+	private _createBeforePath?: string;
 
 	@state()
-	_label = '';
+	private _createAfterPath?: string;
 
 	@state()
-	_icon?: string;
+	private _label = '';
 
 	@state()
-	_exposed?: boolean;
+	private _icon?: string;
+
+	@state()
+	private _exposed?: boolean;
 
 	// Unuspported is triggerede if the Block Type is not reconized, it can also be triggerede by the Content Element Type not existing any longer. [NL]
 	@state()
-	_unsupported?: boolean;
+	private _unsupported?: boolean;
 
 	@state()
-	_workspaceEditContentPath?: string;
+	private _showActions?: boolean;
 
 	@state()
-	_workspaceEditSettingsPath?: string;
+	private _workspaceEditContentPath?: string;
 
 	@state()
-	_inlineEditingMode?: boolean;
+	private _workspaceEditSettingsPath?: string;
 
 	@state()
-	_canScale?: boolean;
+	private _inlineEditingMode?: boolean;
+
 	@state()
-	_showInlineCreateBefore?: boolean;
+	private _canScale?: boolean;
+
 	@state()
-	_showInlineCreateAfter?: boolean;
+	private _showInlineCreateBefore?: boolean;
+
 	@state()
-	_inlineCreateAboveWidth?: string;
+	private _showInlineCreateAfter?: boolean;
+
+	@state()
+	private _inlineCreateAboveWidth?: string;
 
 	// If the Block Type is disallowed in this location then it become a invalid Block Type. Notice not supported blocks are determined via the unsupported property. [NL]
 	@property({ type: Boolean, attribute: 'location-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_invalidLocation?: boolean;
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_contentInvalid?: boolean;
 
 	// 'settings-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_settingsInvalid?: boolean;
 
 	@state()
-	_blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = {
+	private _blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel> = {
 		contentKey: undefined!,
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
@@ -211,6 +222,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				this.#updateBlockViewProps({ unsupported: unsupported });
 				this._unsupported = unsupported;
 				this.toggleAttribute('unsupported', unsupported);
+			},
+			null,
+		);
+		this.observe(
+			this.#context.actionsVisibility,
+			(showActions) => {
+				this._showActions = showActions;
 			},
 			null,
 		);
@@ -449,12 +467,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						<umb-extension-slot
 							.filter=${this.#extensionSlotFilterMethod}
 							.renderMethod=${this.#extensionSlotRenderMethod}
+							.fallbackRenderMethod=${this.#renderBuiltinBlockView}
 							.props=${this._blockViewProps}
 							default-element=${this._inlineEditingMode ? 'umb-block-grid-block-inline' : 'umb-block-grid-block'}
 							type="blockEditorCustomView"
-							single
-							>${this.#renderBuiltinBlockView()}</umb-extension-slot
-						>
+							single></umb-extension-slot>
 						${this.#renderActionBar()}
 						${!this._showContentEdit && this._contentInvalid
 							? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
@@ -476,7 +493,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			: nothing;
 	}
 
-	#renderBuiltinBlockView() {
+	#renderBuiltinBlockView = () => {
 		if (this._unsupported) {
 			return this.#renderUnsupportedBlock();
 		}
@@ -484,7 +501,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			return this.renderInlineBlock();
 		}
 		return this.#renderRefBlock();
-	}
+	};
 
 	#renderUnsupportedBlock() {
 		return html`<umb-block-grid-block-unsupported
@@ -546,12 +563,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderActionBar() {
-		return html`
-			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
-				${this.#renderDeleteAction()}</uui-action-bar
-			>
-		`;
+		return this._showActions
+			? html`
+					<uui-action-bar>
+						${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+						${this.#renderDeleteAction()}</uui-action-bar
+					>
+				`
+			: nothing;
 	}
 
 	#renderEditAction() {

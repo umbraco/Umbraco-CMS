@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'Textstring';
@@ -31,8 +31,9 @@ test('can update maximum allowed characters value', async ({umbracoApi, umbracoU
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });
 
-// Remove fixme when the front-end is ready. The "Input type" should be removed.
-test.fixme('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
+// Remove .skip when the front-end is ready. The "Input type" should be removed.
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19340
+test.skip('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);
 

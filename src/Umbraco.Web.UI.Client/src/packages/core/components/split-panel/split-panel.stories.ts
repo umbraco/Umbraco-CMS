@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import './split-panel.element.js';
 import type { UmbSplitPanelElement } from './split-panel.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const meta: Meta<UmbSplitPanelElement> = {
-	title: 'Components/Split Panel',
+	title: 'Generic Components/Split Panel',
 	component: 'umb-split-panel',
 	argTypes: {
 		lock: { options: ['none', 'start', 'end'] },
@@ -21,7 +21,7 @@ const meta: Meta<UmbSplitPanelElement> = {
 export default meta;
 type Story = StoryObj<UmbSplitPanelElement>;
 
-export const Overview: Story = {
+export const Docs: Story = {
 	render: (props) => html`
 		<umb-split-panel .lock=${props.lock} .snap=${props.snap} .position=${props.position}>
 			<div id="start" slot="start">Start</div>

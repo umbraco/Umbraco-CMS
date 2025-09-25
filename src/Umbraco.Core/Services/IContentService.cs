@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -47,7 +48,16 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Saves a blueprint.
     /// </summary>
+    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 18.")]
     void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Saves a blueprint.
+    /// </summary>
+    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => SaveBlueprint(content, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Deletes a blueprint.
@@ -55,8 +65,18 @@ public interface IContentService : IContentServiceBase<IContent>
     void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Creates a new content item from a blueprint.
+    ///     Creates a blueprint from a content item.
     /// </summary>
+    // TODO: Remove the default implementation when CreateContentFromBlueprint is removed.
+    IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
+
+    /// <summary>
+    ///     (Deprecated) Creates a new content item from a blueprint.
+    /// </summary>
+    /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
+    /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
+    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in V18.")]
     IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -255,6 +275,16 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     Gets a value indicating whether a document has children.
     /// </summary>
     bool HasChildren(int id);
+
+    /// <summary>
+    ///     Gets a dictionary of content Ids and their matching content schedules.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>
+    ///     A dictionary with a nodeId and an IEnumerable of matching ContentSchedules.
+    /// </returns>
+    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
+
 
     #endregion
 

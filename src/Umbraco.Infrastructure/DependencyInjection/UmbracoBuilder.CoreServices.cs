@@ -52,6 +52,8 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.Relations;
+using Umbraco.Cms.Infrastructure.PropertyEditors.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.Routing;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
@@ -89,6 +91,9 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
 
+        // Database availability check.
+        builder.Services.AddUnique<IDatabaseAvailabilityCheck, DefaultDatabaseAvailabilityCheck>();
+
         // Add runtime mode validation
         builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
         builder.RuntimeModeValidators()
@@ -123,6 +128,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
         builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, SystemTextConfigurationEditorJsonSerializer>();
+        builder.Services.AddUnique<IJsonSerializerEncoderFactory, DefaultJsonSerializerEncoderFactory>();
         builder.Services.AddUnique<IWebhookJsonSerializer, SystemTextWebhookJsonSerializer>();
 
         // register database builder
@@ -355,11 +361,14 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentSavingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, RichTextPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, RichTextPropertyNotificationHandler>()
-            .AddNotificationHandler<ContentCopiedNotification, FileUploadPropertyEditor>()
-            .AddNotificationHandler<ContentDeletedNotification, FileUploadPropertyEditor>()
-            .AddNotificationHandler<MediaDeletedNotification, FileUploadPropertyEditor>()
-            .AddNotificationHandler<MediaSavingNotification, FileUploadPropertyEditor>()
-            .AddNotificationHandler<MemberDeletedNotification, FileUploadPropertyEditor>()
+            .AddNotificationHandler<ContentCopiedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
+            .AddNotificationHandler<ContentScaffoldedNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
+            .AddNotificationHandler<ContentSavedBlueprintNotification, FileUploadContentCopiedOrScaffoldedNotificationHandler>()
+            .AddNotificationHandler<ContentDeletedNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<ContentDeletedBlueprintNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MediaDeletedNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MemberDeletedNotification, FileUploadContentDeletedNotificationHandler>()
+            .AddNotificationHandler<MediaSavingNotification, FileUploadMediaSavingNotificationHandler>()
             .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
@@ -426,6 +435,13 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddNotificationAsyncHandler<ContentTypeSavingNotification, WarnDocumentTypeElementSwitchNotificationHandler>()
             .AddNotificationAsyncHandler<ContentTypeSavedNotification, WarnDocumentTypeElementSwitchNotificationHandler>();
+
+        // Handles for relation persistence on content save.
+        builder
+            .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<MediaSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>();
 
         return builder;
     }

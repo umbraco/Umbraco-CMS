@@ -7,6 +7,7 @@ import {
 	UMB_MEMBER_TYPE_TREE_STORE_ALIAS,
 } from './constants.js';
 import { manifests as treeItemChildrenManifest } from './tree-item-children/manifests.js';
+import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -50,7 +51,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.WorkspaceAlias',
+				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				oneOf: [UMB_MEMBER_TYPE_ROOT_WORKSPACE_ALIAS],
 			},
 		],

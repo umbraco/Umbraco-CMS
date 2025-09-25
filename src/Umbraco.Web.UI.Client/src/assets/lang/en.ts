@@ -73,6 +73,7 @@ export default {
 		wasDeleted: 'was deleted',
 		wasMovedTo: 'was moved to',
 		viewActionsFor: (name) => (name ? `View actions for '${name}'` : 'View actions'),
+		loadMore: 'Load more',
 	},
 	actionCategories: {
 		content: 'Content',
@@ -175,6 +176,10 @@ export default {
 		confirmActionConfirm: 'Confirm',
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
+		viewSystemDetails: 'View Umbraco CMS system information and version number',
+		openInSplitView: 'Open in split view',
+		openVersionSelector: 'Open version selector',
+		closeVersionSelector: 'Close version selector',
 	},
 	auditTrailsMedia: {
 		delete: 'Media deleted',
@@ -293,7 +298,7 @@ export default {
 		notCreated: 'Not created',
 		updateDate: 'Last edited',
 		updateDateDesc: 'Date/time this document was edited',
-		uploadClear: 'Remove file(s)',
+		uploadClear: 'Clear file(s)',
 		uploadClearImageContext: 'Click here to remove the image from the media item',
 		uploadClearFileContext: 'Click here to remove the file from the media item',
 		urls: 'Link to document',
@@ -351,6 +356,10 @@ export default {
 		saveModalTitle: 'Save',
 		saveAndPublishModalTitle: 'Save and publish',
 		publishModalTitle: 'Publish',
+		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
+		sharedAcrossCultures: 'Shared across cultures',
+		sharedAcrossSegments: 'Shared across segments',
+		shared: 'Shared',
 	},
 	blueprints: {
 		createBlueprintFrom: "Create a new Document Blueprint from '%0%'",
@@ -372,6 +381,14 @@ export default {
 		notFoundDescription: (entityType: string) => {
 			const entityName = entityType ?? 'item';
 			return `The requested ${entityName} could not be found. Please check the URL and try again.`;
+		},
+		forbiddenTitle: (entityType: string) => {
+			const entityName = entityType ?? 'item';
+			return `Access denied to this ${entityName}`;
+		},
+		forbiddenDescription: (entityType: string) => {
+			const entityName = entityType ?? 'item';
+			return `You do not have permission to access this ${entityName}. Please contact your administrator for assistance.`;
 		},
 	},
 	media: {
@@ -1123,6 +1140,12 @@ export default {
 	lockout: {
 		lockoutWillOccur: "You've been idle and logout will automatically occur in",
 		renewSession: 'Renew now to save your work',
+	},
+	timeout: {
+		warningHeadline: 'Session timeout',
+		warningText: 'Your session is about to expire and you will be logged out in <strong>{0} seconds</strong>.',
+		warningLogoutAction: 'Log out',
+		warningContinueAction: 'Stay logged in',
 	},
 	login: {
 		greeting0: 'Welcome',
@@ -2349,6 +2372,7 @@ export default {
 		openBackofficeSearch: 'Open backoffice search',
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
 		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
+		profileOptions: 'Profile options',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',
@@ -2387,6 +2411,7 @@ export default {
 		searchContentTree: 'Search content tree',
 		maxAmount: 'Maximum amount',
 		expandChildItems: 'Expand child items for',
+		collapseChildItems: 'Collapse child items for',
 		openContextNode: 'Open context node for',
 	},
 	references: {
@@ -2735,6 +2760,9 @@ export default {
 	routing: {
 		routeNotFoundTitle: 'Not found',
 		routeNotFoundDescription: 'The requested route could not be found. Please check the URL and try again.',
+		routeForbiddenTitle: 'Access denied',
+		routeForbiddenDescription:
+			'You do not have permission to access this resource. Please contact your administrator for assistance.',
 	},
 	codeEditor: {
 		label: 'Code editor',
@@ -2750,6 +2778,7 @@ export default {
 		wordWrapConfigDescription: 'Enable word wrapping in the code editor.',
 	},
 	rte: {
+		label: 'Rich Text Editor',
 		config_blocks: 'Available Blocks',
 		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
@@ -2763,11 +2792,13 @@ export default {
 	tiptap: {
 		anchor: 'Anchor',
 		anchor_input: 'Enter an anchor ID',
-		config_dimensions_description: 'Set the maximum width and height of the editor. This excludes the toolbar height.',
+		config_dimensions_description:
+			'Sets the fixed width and height of the editor. This excludes the toolbar and statusbar heights.',
 		config_extensions: 'Capabilities',
 		config_statusbar: 'Statusbar',
 		config_toolbar: 'Toolbar',
 		extGroup_formatting: 'Text formatting',
+		extGroup_html: 'HTML',
 		extGroup_interactive: 'Interactive elements',
 		extGroup_media: 'Embeds and media',
 		extGroup_structure: 'Content structure',
@@ -2794,6 +2825,8 @@ export default {
 		charmap_extlatin: 'Extended Latin',
 		charmap_symbols: 'Symbols',
 		charmap_arrows: 'Arrows',
+		statusbar_characters: (count: number) => `${count.toLocaleString()} ${count === 1 ? 'character' : 'characters'}`,
+		statusbar_words: (count: number) => `${count.toLocaleString()} ${count === 1 ? 'word' : 'words'}`,
 	},
 	linkPicker: {
 		modalSource: 'Source',
@@ -2803,6 +2836,19 @@ export default {
 		resetUrlHeadline: 'Reset URL?',
 		resetUrlMessage: 'Are you sure you want to reset this URL?',
 		resetUrlLabel: 'Reset',
+	},
+	missingEditor: {
+		title: 'This property type is no longer available.',
+		description:
+			"Don't worry, your content is safe and publishing this document won't overwrite it or remove it.<br/>Please contact your site administrator to resolve this issue.",
+		detailsTitle: 'Additional details',
+		detailsDescription:
+			"To resolve this you should either restore the property editor, change the property to use a supported data type or remove the property if it's no longer needed.",
+		detailsDataType: 'Data type',
+		detailsPropertyEditor: 'Property editor',
+		detailsData: 'Data',
+		detailsHide: 'Hide details',
+		detailsShow: 'Show details',
 	},
 	uiCulture: {
 		ar: 'العربية',
@@ -2832,5 +2878,6 @@ export default {
 		uk: 'Українська',
 		zh: '中文',
 		'zh-tw': '中文（正體，台灣）',
+		vi: 'Tiếng Việt',
 	},
 } as UmbLocalizationDictionary;

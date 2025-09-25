@@ -1,4 +1,4 @@
-import type { LogViewerDateRange, UmbLogViewerWorkspaceContext } from '../workspace/logviewer-workspace.context.js';
+import type { UmbLogViewerDateRange, UmbLogViewerWorkspaceContext } from '../workspace/logviewer-workspace.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../workspace/logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -31,7 +31,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 		if (!this.#logViewerContext) return;
 		this.observe(
 			this.#logViewerContext.dateRange,
-			(dateRange: LogViewerDateRange) => {
+			(dateRange: UmbLogViewerDateRange) => {
 				this._startDate = dateRange.startDate;
 				this._endDate = dateRange.endDate;
 			},
@@ -102,7 +102,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 
 			:host([horizontal]) .input-container {
 				display: flex;
-				align-items: baseline;
+				align-items: center;
 				gap: var(--uui-size-space-3);
 			}
 		`,

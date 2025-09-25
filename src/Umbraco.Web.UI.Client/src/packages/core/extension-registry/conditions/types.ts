@@ -4,8 +4,9 @@ import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-a
 export type UmbCoreConditionConfigs = SwitchConditionConfig | UmbConditionConfigBase;
 
 /**
- * @deprecated instead use global UmbExtensionConditionConfig
+ * @deprecated instead use global UmbExtensionConditionConfig, will be removed in v.17
  */
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export type ConditionTypes = UmbCoreConditionConfigs;
 
 type UnionOfProperties<T> = T extends object ? T[keyof T] : never;

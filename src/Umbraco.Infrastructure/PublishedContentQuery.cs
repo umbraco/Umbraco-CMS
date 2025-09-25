@@ -144,6 +144,9 @@ public class PublishedContentQuery : IPublishedContentQuery
     public IEnumerable<IPublishedContent> ContentAtRoot()
         => ItemsAtRoot(_publishedContent);
 
+    public IEnumerable<IPublishedContent> ContentAtRoot(string? culture)
+        => ItemsAtRoot(_publishedContent, culture);
+
     #endregion
 
     #region Media
@@ -212,8 +215,8 @@ public class PublishedContentQuery : IPublishedContentQuery
     private IEnumerable<IPublishedContent> ItemsByIds(IPublishedCache? cache, IEnumerable<Guid> ids)
         => ids.Select(eachId => ItemById(eachId, cache)).WhereNotNull();
 
-    private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache)
-        => cache?.GetAtRoot() ?? Array.Empty<IPublishedContent>();
+    private static IEnumerable<IPublishedContent> ItemsAtRoot(IPublishedCache? cache, string? culture = null)
+        => cache?.GetAtRoot(culture) ?? Array.Empty<IPublishedContent>();
 
     #endregion
 
@@ -330,7 +333,7 @@ public class PublishedContentQuery : IPublishedContentQuery
     ///     This is used to contextualize the values in the search results when enumerating over them, so that the correct
     ///     culture values are used.
     /// </summary>
-    private class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
+    private sealed class CultureContextualSearchResults : IEnumerable<PublishedSearchResult>
     {
         private readonly string _culture;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -365,7 +368,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         /// <summary>
         ///     Resets the variation context when this is disposed.
         /// </summary>
-        private class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
+        private sealed class CultureContextualSearchResultsEnumerator : IEnumerator<PublishedSearchResult>
         {
             private readonly VariationContext? _originalContext;
             private readonly IVariationContextAccessor _variationContextAccessor;

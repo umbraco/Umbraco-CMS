@@ -63,6 +63,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
+		signs: [],
 	},
 
 	{
@@ -80,6 +81,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
+		signs: [],
 		properties: [
 			{
 				id: '1_tipTap',
@@ -790,6 +792,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
+		signs: [],
 		properties: [
 			{
 				id: '6',
@@ -868,6 +871,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
+		signs: [],
 		properties: [
 			{
 				id: '5b4ca208-134e-4865-b423-06e5e97adf3c',
@@ -1039,6 +1043,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
+		signs: [],
 		properties: [
 			{
 				id: '5e5f7456-c751-4846-9f2b-47965cc96ec6',
@@ -1093,6 +1098,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
+		signs: [],
 		properties: [
 			{
 				id: 'b92de6ac-1a22-4a45-a481-b6cae1cccbbf',
@@ -1194,6 +1200,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
+		signs: [],
 		properties: [
 			{
 				id: 'b92de6ac-1a22-4a45-a481-b6cae1cccbb0',
@@ -1258,6 +1265,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
+		signs: [],
 		properties: [
 			{
 				id: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',
@@ -1315,6 +1323,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
+		signs: [],
 		properties: [
 			{
 				id: '82d4b050-b128-42fe-ac8e-d5586e533592',
@@ -1398,6 +1407,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 		properties: [],
 		containers: [],
+		signs: [],
 	},
 	{
 		allowedTemplates: [],
@@ -1405,7 +1415,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		id: 'coffee-umbraco-demo-block-id',
 		alias: 'coffeeUmbracoDemoBlock',
 		name: 'Favorite Coffee',
-		description: null,
+		description: 'The delicious taste of coffee.',
 		icon: 'icon-coffee',
 		allowedAsRoot: true,
 		variesByCulture: false,
@@ -1421,6 +1431,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
+		signs: [],
 		properties: [
 			{
 				id: 'coffee-name-id',
@@ -1495,6 +1506,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
+		signs: [],
 		properties: [
 			{
 				id: 'headline-id',
@@ -1549,6 +1561,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
+		signs: [],
 		properties: [
 			{
 				id: 'block-alignment-id',
@@ -1603,6 +1616,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
+		signs: [],
 		properties: [
 			{
 				id: 'image-id',
@@ -1657,6 +1671,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
+		signs: [],
 		properties: [
 			{
 				id: 'rich-text-id',
@@ -1715,6 +1730,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 		properties: [],
 		containers: [],
+		signs: [],
 	},
 	{
 		allowedTemplates: [],
@@ -1738,6 +1754,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
+		signs: [],
 		properties: [],
 		containers: [],
 	},
@@ -1746,7 +1763,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		defaultTemplate: { id: 'all-rtes-document-type-id' },
 		id: 'all-rtes-document-type-id',
 		alias: 'allRtesDocumentType',
-		name: 'All RTEs document type',
+		name: 'Rich Text Editor document type',
 		description: null,
 		icon: 'icon-document',
 		allowedAsRoot: true,
@@ -1756,6 +1773,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
+		signs: [],
 		properties: [
 			{
 				id: '1dd0d4d2-cda8-4ac2-affd-a69fc10382b1',
@@ -1811,6 +1829,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
+		signs: [],
 		properties: [
 			{
 				id: '18',
@@ -1856,6 +1875,61 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: 'content-group-key',
+				parent: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	},
+	{
+		allowedTemplates: [],
+		defaultTemplate: { id: 'the-simplest-document-type-id' },
+		id: 'forbidden',
+		alias: 'forbidden',
+		name: 'A forbidden document type',
+		description: null,
+		icon: 'icon-document',
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: null,
+		isFolder: false,
+		signs: [],
+		properties: [
+			{
+				id: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',
+				container: { id: 'the-simplest-document-type-id-container' },
+				alias: 'prop1',
+				name: 'Prop 1',
+				description: null,
+				dataType: { id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				id: 'the-simplest-document-type-id-container',
 				parent: null,
 				name: 'Content',
 				type: 'Group',

@@ -29,15 +29,22 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     where TEntity : class, IContentTypeComposition
 {
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly IIdKeyMap _idKeyMap;
 
-    protected ContentTypeRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache,
-        ILogger<ContentTypeRepositoryBase<TEntity>> logger, IContentTypeCommonRepository commonRepository,
-        ILanguageRepository languageRepository, IShortStringHelper shortStringHelper)
+    protected ContentTypeRepositoryBase(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<ContentTypeRepositoryBase<TEntity>> logger,
+        IContentTypeCommonRepository commonRepository,
+        ILanguageRepository languageRepository,
+        IShortStringHelper shortStringHelper,
+        IIdKeyMap idKeyMap)
         : base(scopeAccessor, cache, logger)
     {
         _shortStringHelper = shortStringHelper;
         CommonRepository = commonRepository;
         LanguageRepository = languageRepository;
+        _idKeyMap = idKeyMap;
     }
 
     protected IContentTypeCommonRepository CommonRepository { get; }
@@ -291,7 +298,7 @@ AND umbracoNode.nodeObjectType = @objectType",
             // If the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
             if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default)
             {
-                AssignDataTypeFromPropertyEditor(propertyType);
+                AssignDataTypeIdFromProvidedKeyOrPropertyEditor(propertyType);
             }
 
             PropertyTypeDto propertyTypeDto =
@@ -431,7 +438,7 @@ AND umbracoNode.id <> @id",
             IEnumerable<int> propertyTypeToDeleteIds = dbPropertyTypeIds.Except(entityPropertyTypes);
             foreach (var propertyTypeId in propertyTypeToDeleteIds)
             {
-                DeletePropertyType(entity.Id, propertyTypeId);
+                DeletePropertyType(entity, propertyTypeId);
             }
         }
 
@@ -592,7 +599,7 @@ AND umbracoNode.id <> @id",
             // if the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
             if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default)
             {
-                AssignDataTypeFromPropertyEditor(propertyType);
+                AssignDataTypeIdFromProvidedKeyOrPropertyEditor(propertyType);
             }
 
             // validate the alias
@@ -640,7 +647,7 @@ AND umbracoNode.id <> @id",
         {
             foreach (var id in orphanPropertyTypeIds)
             {
-                DeletePropertyType(entity.Id, id);
+                DeletePropertyType(entity, id);
             }
         }
 
@@ -1403,16 +1410,27 @@ AND umbracoNode.id <> @id",
         }
     }
 
-    private void DeletePropertyType(int contentTypeId, int propertyTypeId)
+    private void DeletePropertyType(IContentTypeComposition contentType, int propertyTypeId)
     {
-        // first clear dependencies
+        // First clear dependencies.
         Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
         Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
 
-        // then delete the property type
+        // Clear the property value permissions, which aren't a hard dependency with a foreign key, but we want to ensure
+        // that any for removed property types are cleared.
+        var uniqueIdAsString = string.Format(SqlContext.SqlSyntax.ConvertUniqueIdentifierToString, "uniqueId");
+        var permissionSearchString = SqlContext.SqlSyntax.GetConcat(
+            "(SELECT " + uniqueIdAsString + " FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE id = @PropertyTypeId)",
+            "'|%'");
+
+        Database.Delete<UserGroup2GranularPermissionDto>(
+            "WHERE uniqueId = @ContentTypeKey AND permission LIKE " + permissionSearchString,
+            new { ContentTypeKey = contentType.Key, PropertyTypeId = propertyTypeId });
+
+        // Finally delete the property type.
         Database.Delete<PropertyTypeDto>(
             "WHERE contentTypeId = @Id AND id = @PropertyTypeId",
-            new { Id = contentTypeId, PropertyTypeId = propertyTypeId });
+            new { contentType.Id, PropertyTypeId = propertyTypeId });
     }
 
     protected void ValidateAlias(TEntity entity)
@@ -1434,36 +1452,58 @@ AND umbracoNode.id <> @id",
     protected abstract TEntity? PerformGet(Guid id);
 
     /// <summary>
-    ///     Try to set the data type id based on its ControlId
+    ///     Try to set the data type Id based on the provided key or property editor alias.
     /// </summary>
     /// <param name="propertyType"></param>
-    private void AssignDataTypeFromPropertyEditor(IPropertyType propertyType)
+    private void AssignDataTypeIdFromProvidedKeyOrPropertyEditor(IPropertyType propertyType)
     {
-        // we cannot try to assign a data type of it's empty
-        if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
+        // If a key is provided, use that.
+        if (propertyType.DataTypeKey != Guid.Empty)
         {
-            Sql<ISqlContext> sql = Sql()
-                .Select<DataTypeDto>(dt => dt.Select(x => x.NodeDto))
-                .From<DataTypeDto>()
-                .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((dt, n) => dt.NodeId == n.NodeId)
-                .Where(
-                    "propertyEditorAlias = @propertyEditorAlias",
-                    new { propertyEditorAlias = propertyType.PropertyEditorAlias })
-                .OrderBy<DataTypeDto>(typeDto => typeDto.NodeId);
-            DataTypeDto? datatype = Database.FirstOrDefault<DataTypeDto>(sql);
-
-            // we cannot assign a data type if one was not found
-            if (datatype != null)
+            Attempt<int> dataTypeIdAttempt = _idKeyMap.GetIdForKey(propertyType.DataTypeKey, UmbracoObjectTypes.DataType);
+            if (dataTypeIdAttempt.Success)
             {
-                propertyType.DataTypeId = datatype.NodeId;
-                propertyType.DataTypeKey = datatype.NodeDto.UniqueId;
+                propertyType.DataTypeId = dataTypeIdAttempt.Result;
+                return;
             }
             else
             {
                 Logger.LogWarning(
-                    "Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}",
-                    propertyType.Alias, propertyType.PropertyEditorAlias);
+                    "Could not assign a data type for the property type {PropertyTypeAlias} since no integer Id was found matching the key {DataTypeKey}. Falling back to look up via the property editor alias.",
+                    propertyType.Alias,
+                    propertyType.DataTypeKey);
             }
+        }
+
+        // Otherwise if a property editor alias is provided, try to find a data type that uses that alias.
+        if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace())
+        {
+            // We cannot try to assign a data type if it's empty.
+            return;
+        }
+
+        Sql<ISqlContext> sql = Sql()
+            .Select<DataTypeDto>(dt => dt.Select(x => x.NodeDto))
+            .From<DataTypeDto>()
+            .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((dt, n) => dt.NodeId == n.NodeId)
+            .Where(
+                "propertyEditorAlias = @propertyEditorAlias",
+                new { propertyEditorAlias = propertyType.PropertyEditorAlias })
+            .OrderBy<DataTypeDto>(typeDto => typeDto.NodeId);
+        DataTypeDto? datatype = Database.FirstOrDefault<DataTypeDto>(sql);
+
+        // we cannot assign a data type if one was not found
+        if (datatype != null)
+        {
+            propertyType.DataTypeId = datatype.NodeId;
+            propertyType.DataTypeKey = datatype.NodeDto.UniqueId;
+        }
+        else
+        {
+            Logger.LogWarning(
+                "Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}",
+                propertyType.Alias,
+                propertyType.PropertyEditorAlias);
         }
     }
 
@@ -1526,20 +1566,16 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
         // is included here just to be 100% sure since it has a FK on cmsPropertyType.
         var list = new List<string>
         {
-            "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-            "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @id",
-            "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @id",
-            "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @id",
-            "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData +
-            " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyType +
-            " WHERE contentTypeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyTypeGroup +
-            " WHERE contenttypeNodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentChildType + " WHERE Id = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentChildType + " WHERE AllowedId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentTypeTree + " WHERE parentContentTypeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentTypeTree + " WHERE childContentTypeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE contentTypeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyTypeGroup + " WHERE contenttypeNodeId = @id",
         };
         return list;
     }
@@ -1564,7 +1600,7 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
             ?? Array.Empty<(TEntity, int)>();
     }
 
-    private class NameCompareDto
+    private sealed class NameCompareDto
     {
         public int NodeId { get; set; }
 
@@ -1583,7 +1619,7 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
         public bool Edited { get; set; }
     }
 
-    private class PropertyValueVersionDto
+    private sealed class PropertyValueVersionDto
     {
         private decimal? _decimalValue;
 

@@ -612,13 +612,8 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="string"/> Value to match</param>
-        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -646,13 +641,8 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.Get(query);
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="int"/> Value to match</param>
-        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -683,12 +673,8 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.Get(query);
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="bool"/> Value to match</param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -698,13 +684,8 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.Get(query);
         }
 
-        /// <summary>
-        /// Gets a list of Members based on a property search
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-        /// <param name="value"><see cref="System.DateTime"/> Value to match</param>
-        /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
-        /// <returns><see cref="IEnumerable{IMember}"/></returns>
+        /// <inheritdoc />
+        [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
         public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -795,16 +776,29 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("Cannot save member with empty name.");
             }
 
+            var previousUsername = _memberRepository.Get(member.Id)?.Username;
+
             scope.WriteLock(Constants.Locks.MemberTree);
 
             _memberRepository.Save(member);
 
             if (publishNotificationSaveOptions.HasFlag(PublishNotificationSaveOptions.Saved))
             {
-                scope.Notifications.Publish(
-                    savingNotification is null
+                MemberSavedNotification memberSavedNotification = savingNotification is null
                     ? new MemberSavedNotification(member, evtMsgs)
-                    : new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+                    : new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification);
+
+                // If the user name has changed, populate the previous user name in the notification state, so the cache refreshers
+                // have it available to clear the cache by the old name as well as the new.
+                if (string.IsNullOrWhiteSpace(previousUsername) is false &&
+                    string.Equals(previousUsername, member.Username, StringComparison.OrdinalIgnoreCase) is false)
+                {
+                    memberSavedNotification.State.Add(
+                        MemberSavedNotification.PreviousUsernameStateKey,
+                        new Dictionary<Guid, string> { { member.Key, previousUsername } });
+                }
+
+                scope.Notifications.Publish(memberSavedNotification);
             }
 
             Audit(AuditType.Save, userId, member.Id);

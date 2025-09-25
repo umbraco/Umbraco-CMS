@@ -1,25 +1,19 @@
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from '../block-grid-entry/constants.js';
 import type { UmbBlockGridWorkspaceOriginData } from '../../workspace/block-grid-workspace.modal-token.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from '../block-grid-entries/constants.js';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
-import {
-	type UMB_BLOCK_WORKSPACE_CONTEXT,
-	UMB_BLOCK_WORKSPACE_ALIAS,
-	type UmbBlockDataType,
-} from '@umbraco-cms/backoffice/block';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbExtensionApiInitializer,
-	UmbExtensionsApiInitializer,
-	type UmbApiConstructorArgumentsMethodType,
-} from '@umbraco-cms/backoffice/extension-api';
-import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbDataPathPropertyValueQuery } from '@umbraco-cms/backoffice/validation';
+import { UmbExtensionApiInitializer, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
+import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UMB_BLOCK_WORKSPACE_CONTEXT, UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
 const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
 	return [{ manifest }];
@@ -50,11 +44,14 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	@property({ attribute: false })
 	content?: UmbBlockDataType;
 
-	@state()
-	_inlineProperty?: UmbPropertyTypeModel;
+	@property({ attribute: false })
+	settings?: UmbBlockDataType;
 
 	@state()
-	_inlinePropertyDataPath?: string;
+	private _inlineProperty?: UmbPropertyTypeModel;
+
+	@state()
+	private _inlinePropertyDataPath?: string;
 
 	@state()
 	private _ownerContentTypeName?: string;
@@ -176,20 +173,23 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 	}
 
 	#renderBlockInfo() {
+		const blockValue = { ...this.content, $settings: this.settings };
 		return html`
 			<span id="content">
 				<span id="icon">
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
-					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${this.content}></umb-ufm-render>
+					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
 				</div>
 			</span>
-			${this.unpublished
-				? html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
+			${when(
+				this.unpublished,
+				() =>
+					html`<uui-tag slot="name" look="secondary" title=${this.localize.term('blockEditor_notExposedDescription')}
 						><umb-localize key="blockEditor_notExposedLabel"></umb-localize
-					></uui-tag>`
-				: nothing}
+					></uui-tag>`,
+			)}
 		`;
 	}
 

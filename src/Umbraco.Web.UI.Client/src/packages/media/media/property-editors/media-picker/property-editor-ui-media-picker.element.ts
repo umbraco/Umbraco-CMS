@@ -2,30 +2,31 @@ import type { UmbInputRichMediaElement } from '../../components/input-rich-media
 import type { UmbCropModel, UmbMediaPickerValueModel } from '../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 import '../../components/input-rich-media/input-rich-media.element.js';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-
-const elementName = 'umb-property-editor-ui-media-picker';
-
 /**
  * @element umb-property-editor-ui-media-picker
  */
-@customElement(elementName)
+@customElement('umb-property-editor-ui-media-picker')
 export class UmbPropertyEditorUIMediaPickerElement
 	extends UmbFormControlMixin<UmbMediaPickerValueModel | undefined, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.#interactionMemoryManager.setPropertyEditorConfig(config);
+
 		if (!config) return;
 
 		this._allowedMediaTypes = config.getValueByAlias<string>('filter')?.split(',') ?? [];
@@ -87,12 +88,23 @@ export class UmbPropertyEditorUIMediaPickerElement
 	@state()
 	private _variantId?: string;
 
+	@state()
+	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
+
+	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
+		memoryUniquePrefix: 'UmbMediaPicker',
+	});
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context?.alias, (alias) => (this._alias = alias));
 			this.observe(context?.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
+		});
+
+		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
+			this._interactionMemories = interactionMemories ?? [];
 		});
 	}
 
@@ -108,6 +120,17 @@ export class UmbPropertyEditorUIMediaPickerElement
 		const isEmpty = event.target.value?.length === 0;
 		this.value = isEmpty ? undefined : event.target.value;
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	async #onInputInteractionMemoriesChange(event: UmbChangeEvent) {
+		const target = event.target as UmbInputRichMediaElement;
+		const interactionMemories = target.interactionMemories;
+
+		if (interactionMemories && interactionMemories.length > 0) {
+			await this.#interactionMemoryManager.saveMemoriesForPropertyEditor(interactionMemories);
+		} else {
+			await this.#interactionMemoryManager.deleteMemoriesForPropertyEditor();
+		}
 	}
 
 	override render() {
@@ -126,7 +149,9 @@ export class UmbPropertyEditorUIMediaPickerElement
 				.requiredMessage=${this.mandatoryMessage}
 				?multiple=${this._multiple}
 				@change=${this.#onChange}
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly}
+				.interactionMemories=${this._interactionMemories}
+				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-rich-media>
 		`;
 	}
@@ -136,6 +161,6 @@ export { UmbPropertyEditorUIMediaPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbPropertyEditorUIMediaPickerElement;
+		['umb-property-editor-ui-media-picker']: UmbPropertyEditorUIMediaPickerElement;
 	}
 }

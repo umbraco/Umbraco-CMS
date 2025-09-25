@@ -19,26 +19,23 @@ import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT, UmbDocumentPublishingReposit
 import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
+import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
+import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
-	type UmbPublishableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
-import {
-	UmbContentDetailWorkspaceContextBase,
-	type UmbContentCollectionWorkspaceContext,
-	type UmbContentWorkspaceContext,
-} from '@umbraco-cms/backoffice/content';
-import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
-import { ensurePathEndsWithSlash, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantPropertyGuardRule } from '@umbraco-cms/backoffice/property';
 
 type ContentModel = UmbDocumentDetailModel;
@@ -52,8 +49,7 @@ export class UmbDocumentWorkspaceContext
 	>
 	implements
 		UmbContentWorkspaceContext<ContentModel, ContentTypeModel, UmbDocumentVariantModel>,
-		UmbPublishableWorkspaceContext,
-		UmbContentCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
+		UmbPublishableWorkspaceContext
 {
 	/**
 	 * The publishing repository for the document workspace.
@@ -63,23 +59,28 @@ export class UmbDocumentWorkspaceContext
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
+
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
+
+	/*
+	 * @deprecated Use `collection.hasCollection` instead, will be removed in v.18
+	 */
 	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
 		(data) => !!data?.documentType.collection,
 	);
+
 	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
 
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#publishingContext?: typeof UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.TYPE;
-	#userCanCreate = false;
-	#userCanUpdate = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			workspaceAlias: UMB_DOCUMENT_WORKSPACE_ALIAS,
+			collectionAlias: UMB_DOCUMENT_COLLECTION_ALIAS,
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
 			contentValidationRepository: UmbDocumentValidationRepository,
@@ -126,52 +127,19 @@ export class UmbDocumentWorkspaceContext
 			this.#publishingContext = context;
 		});
 
-		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
-			{
-				config: {
-					allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
-				},
-				onChange: (permitted: boolean) => {
-					if (permitted === this.#userCanCreate) return;
-					this.#userCanCreate = permitted;
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_CREATE,
-						this.#userCanCreate,
-						'You do not have permission to create documents.',
-					);
-				},
-			},
-		]);
-
-		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
-			{
-				config: {
-					allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
-				},
-				onChange: (permitted: boolean) => {
-					if (permitted === this.#userCanUpdate) return;
-					this.#userCanUpdate = permitted;
-					this.#setReadOnlyStateForUserPermission(
-						UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-						this.#userCanUpdate,
-						'You do not have permission to update documents.',
-					);
-				},
-			},
-		]);
-
-		this.observe(this.variants, () => {
-			this.#setReadOnlyStateForUserPermission(
-				UMB_USER_PERMISSION_DOCUMENT_CREATE,
-				this.#userCanCreate,
-				'You do not have permission to create documents.',
-			);
-
-			this.#setReadOnlyStateForUserPermission(
-				UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-				this.#userCanUpdate,
-				'You do not have permission to update documents.',
-			);
+		this.observe(this.isNew, (isNew) => {
+			if (isNew === undefined) return;
+			if (isNew) {
+				this.#enforceUserPermission(
+					UMB_USER_PERMISSION_DOCUMENT_CREATE,
+					'You do not have permission to create documents.',
+				);
+			} else {
+				this.#enforceUserPermission(
+					UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+					'You do not have permission to update documents.',
+				);
+			}
 		});
 
 		this.routes.setRoutes([
@@ -225,6 +193,22 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
+	#enforceUserPermission(verb: string, message: string) {
+		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
+		this.#handleUserPermissionChange(verb, false, message);
+
+		createExtensionApiByAlias(this, UMB_DOCUMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [verb],
+				},
+				onChange: (permitted: boolean) => {
+					this.#handleUserPermissionChange(verb, permitted, message);
+				},
+			},
+		]);
+	}
+
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
@@ -267,6 +251,7 @@ export class UmbDocumentWorkspaceContext
 		});
 	}
 
+	/** @deprecated will be removed in v.18 */
 	getCollectionAlias() {
 		return UMB_DOCUMENT_COLLECTION_ALIAS;
 	}
@@ -425,7 +410,7 @@ export class UmbDocumentWorkspaceContext
 		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
-	async #setReadOnlyStateForUserPermission(identifier: string, permitted: boolean, message: string) {
+	async #handleUserPermissionChange(identifier: string, permitted: boolean, message: string) {
 		if (permitted) {
 			this.readOnlyGuard?.removeRule(identifier);
 			return;
@@ -434,6 +419,9 @@ export class UmbDocumentWorkspaceContext
 		this.readOnlyGuard?.addRule({
 			unique: identifier,
 			message,
+			/* This guard is a bit backwards. The rule is permitted to be read-only.
+			If the user does not have permission, we set it to true = permitted to be read-only. */
+			permitted: true,
 		});
 	}
 

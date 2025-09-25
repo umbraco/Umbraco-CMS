@@ -108,6 +108,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 					name: this.localize.string(item.header),
 					alias: item.alias,
 					elementName: item.elementName,
+					labelTemplate: item.nameTemplate,
 					allowSorting: true,
 				};
 			});

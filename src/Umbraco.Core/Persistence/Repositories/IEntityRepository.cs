@@ -20,6 +20,60 @@ public interface IEntityRepository : IRepository
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
 
     /// <summary>
+    /// Gets sibling entities of a specified target entity, within a given range before and after the target, ordered as specified.
+    /// </summary>
+    /// <param name="objectTypes">The object type keys of the entities.</param>
+    /// <param name="targetKey">The key of the target entity whose siblings are to be retrieved.</param>
+    /// <param name="before">The number of siblings to retrieve before the target entity.</param>
+    /// <param name="after">The number of siblings to retrieve after the target entity.</param>
+    /// <param name="filter">An optional filter to apply to the result set.</param>
+    /// <param name="ordering">The ordering to apply to the siblings.</param>
+    /// <param name="totalBefore">Outputs the total number of siblings before the target entity.</param>
+    /// <param name="totalAfter">Outputs the total number of siblings after the target entity.</param>
+    /// <returns>Enumerable of sibling entities.</returns>
+    IEnumerable<IEntitySlim> GetSiblings(
+        ISet<Guid> objectTypes,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
+    {
+        totalBefore = 0;
+        totalAfter = 0;
+        return [];
+    }
+
+    /// <summary>
+    /// Gets trashed sibling entities of a specified target entity, within a given range before and after the target, ordered as specified.
+    /// </summary>
+    /// <param name="objectTypes">The object type keys of the entities.</param>
+    /// <param name="targetKey">The key of the target entity whose siblings are to be retrieved.</param>
+    /// <param name="before">The number of siblings to retrieve before the target entity.</param>
+    /// <param name="after">The number of siblings to retrieve after the target entity.</param>
+    /// <param name="filter">An optional filter to apply to the result set.</param>
+    /// <param name="ordering">The ordering to apply to the siblings.</param>
+    /// <param name="totalBefore">Outputs the total number of siblings before the target entity.</param>
+    /// <param name="totalAfter">Outputs the total number of siblings after the target entity.</param>
+    /// <returns>Enumerable of trashed sibling entities.</returns>
+    IEnumerable<IEntitySlim> GetTrashedSiblings(
+        ISet<Guid> objectTypes,
+        Guid targetKey,
+        int before,
+        int after,
+        IQuery<IUmbracoEntity>? filter,
+        Ordering ordering,
+        out long totalBefore,
+        out long totalAfter)
+    {
+        totalBefore = 0;
+        totalAfter = 0;
+        return [];
+    }
+
+    /// <summary>
     ///     Gets entities for a query
     /// </summary>
     /// <param name="query"></param>

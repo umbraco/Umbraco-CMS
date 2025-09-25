@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -27,8 +28,9 @@ internal sealed class ContentBlueprintEditingService
         IContentValidationService validationService,
         IContentBlueprintContainerService containerService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService)
+        IRelationService relationService,
+        ContentTypeFilterCollection contentTypeFilters)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService, contentTypeFilters)
         => _containerService = containerService;
 
     public Task<IContent?> GetAsync(Guid key)
@@ -45,11 +47,13 @@ internal sealed class ContentBlueprintEditingService
             return Task.FromResult<IContent?>(null);
         }
 
+        IContent scaffold = blueprint.DeepCloneWithResetIdentities();
+
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        scope.Notifications.Publish(new ContentScaffoldedNotification(blueprint, blueprint, Constants.System.Root, new EventMessages()));
+        scope.Notifications.Publish(new ContentScaffoldedNotification(blueprint, scaffold, Constants.System.Root, new EventMessages()));
         scope.Complete();
 
-        return Task.FromResult<IContent?>(blueprint);
+        return Task.FromResult<IContent?>(scaffold);
     }
 
     public async Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeAsync(Guid contentTypeKey, int skip, int take)
@@ -112,7 +116,7 @@ internal sealed class ContentBlueprintEditingService
 
         // Create Blueprint
         var currentUserId = await GetUserIdAsync(userKey);
-        IContent blueprint = ContentService.CreateContentFromBlueprint(content, name, currentUserId);
+        IContent blueprint = ContentService.CreateBlueprintFromContent(content, name, currentUserId);
 
         if (key.HasValue)
         {
@@ -120,7 +124,7 @@ internal sealed class ContentBlueprintEditingService
         }
 
         // Save blueprint
-        await SaveAsync(blueprint, userKey);
+        await SaveAsync(blueprint, userKey, content);
 
         return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentCreateResult { Content = blueprint });
     }
@@ -238,10 +242,10 @@ internal sealed class ContentBlueprintEditingService
 
     protected override OperationResult? Delete(IContent content, int userId) => throw new NotImplementedException();
 
-    private async Task SaveAsync(IContent blueprint, Guid userKey)
+    private async Task SaveAsync(IContent blueprint, Guid userKey, IContent? createdFromContent = null)
     {
         var currentUserId = await GetUserIdAsync(userKey);
-        ContentService.SaveBlueprint(blueprint, currentUserId);
+        ContentService.SaveBlueprint(blueprint, createdFromContent, currentUserId);
     }
 
     private bool ValidateUniqueName(string name, IContent content)

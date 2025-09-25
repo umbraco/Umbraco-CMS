@@ -31,10 +31,10 @@ export class UmbPropertyEditorUIMediaEntityPickerElement extends UmbLitElement i
 	readonly = false;
 
 	@state()
-	_min: number = 0;
+	private _min: number = 0;
 
 	@state()
-	_max: number = Infinity;
+	private _max: number = Infinity;
 
 	#onChange(event: CustomEvent & { target: UmbInputMediaElement }) {
 		this.value = event.target.value;

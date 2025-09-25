@@ -21,7 +21,7 @@ public class MemberPickerPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MemberPickerPropertyValueEditor>(Attribute!);
 
-    private class MemberPickerPropertyValueEditor : DataValueEditor, IDataValueReference
+    private sealed class MemberPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IMemberService _memberService;
 

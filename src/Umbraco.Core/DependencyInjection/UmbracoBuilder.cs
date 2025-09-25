@@ -8,11 +8,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Diagnostics;
 using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
@@ -32,7 +34,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
-using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
@@ -340,6 +342,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),
                 factory.GetRequiredService<ILogger<LocalizedTextService>>()));
+            Services.AddUnique<ILongRunningOperationService, LongRunningOperationService>();
 
             Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
@@ -388,6 +391,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Data type configuration cache
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
             Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCacheRefresher>();
+
+            // Partial view cache invalidators (no-op, shipped implementation is added in Umbraco.Web.Website, but we
+            // need this to ensure we have a service registered for this interface even in headless setups).
+            // See: https://github.com/umbraco/Umbraco-CMS/issues/19661
+            Services.AddUnique<IMemberPartialViewCacheInvalidator, NoopMemberPartialViewCacheInvalidator>();
 
             // Two factor providers
             Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
