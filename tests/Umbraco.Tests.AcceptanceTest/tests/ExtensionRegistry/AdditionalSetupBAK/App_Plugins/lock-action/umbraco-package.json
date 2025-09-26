@@ -1,0 +1,12 @@
+    {
+		"name": "E2E Test Package",
+		"version": "1.0.0",
+		"extensions": [
+			{
+				"type": "bundle",
+				"alias": "E2E.Package.Bundle",
+				"name": "E2E Test Package Bundle",
+				"js": "/App_Plugins/lock-action/lock-action.manifests.js"
+			}
+		]
+	}
