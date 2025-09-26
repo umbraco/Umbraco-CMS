@@ -1,11 +1,13 @@
 import type { UmbPropertyEditorDataSourceItemModel } from '../item/data/types.js';
-import { UmbPropertyEditorDataSourcePickerInputContext } from './property-editor-data-source-picker-input.context.js';
+import { UMB_PROPERTY_EDITOR_DATA_SOURCE_ITEM_REPOSITORY_ALIAS } from '../item/constants.js';
+import { UMB_PROPERTY_EDITOR_DATA_SOURCE_PICKER_MODAL } from '../picker-modal/constants.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 
 @customElement('umb-input-property-editor-data-source')
 export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -115,7 +117,11 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	@state()
 	private _items: Array<UmbPropertyEditorDataSourceItemModel> = [];
 
-	#pickerContext = new UmbPropertyEditorDataSourcePickerInputContext(this);
+	#pickerContext = new UmbPickerInputContext<UmbPropertyEditorDataSourceItemModel>(
+		this,
+		UMB_PROPERTY_EDITOR_DATA_SOURCE_ITEM_REPOSITORY_ALIAS,
+		UMB_PROPERTY_EDITOR_DATA_SOURCE_PICKER_MODAL,
+	);
 
 	constructor() {
 		super();
