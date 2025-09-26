@@ -268,7 +268,7 @@
   </area>
   <area alias="user">
     <key alias="duplicateLogin">A user with this login already exists</key>
-    <key alias="passwordMismatch">The confirmed password doesn't match the new password!</key>
+    <key alias="passwordMismatch">New passwords don’t match</key>
     <key alias="passwordRequiresDigit">The password must have at least one digit ('0'-'9')</key>
     <key alias="passwordRequiresLower">The password must have at least one lowercase ('a'-'z')</key>
     <key alias="passwordRequiresNonAlphanumeric">The password must have at least one non alphanumeric character</key>

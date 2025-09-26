@@ -2081,7 +2081,7 @@ export default {
 		passwordInvalid: 'Invalid current password',
 		passwordIsDifferent:
 			'There was a difference between the new password and the confirmed password. Please try again!',
-		passwordMismatch: "The confirmed password doesn't match the new password!",
+		passwordMismatch: 'New passwords don’t match',
 		passwordRequiresDigit: "The password must have at least one digit ('0'-'9')",
 		passwordRequiresLower: "The password must have at least one lowercase ('a'-'z')",
 		passwordRequiresNonAlphanumeric: 'The password must have at least one non alphanumeric character',
