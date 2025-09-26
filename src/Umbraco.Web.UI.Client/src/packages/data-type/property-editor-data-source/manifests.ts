@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'pickerPropertyEditorTreeDataSource',
 		alias: 'Umb.PickerPropertyEditorTreeDataSource.Document',
 		name: 'Document Picker Tree Data Source',
-		api: () => import('./test-1.js'),
+		api: () => import('./test-document-picker-data-source.js'),
 		meta: {
 			label: 'Documents',
 			icon: 'icon-document',
@@ -32,7 +32,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'pickerPropertyEditorTreeDataSource',
 		alias: 'Umb.PickerPropertyEditorTreeDataSource.Media',
 		name: 'Media Picker Tree Data Source',
-		api: () => import('./test-1.js'),
+		api: () => import('./test-document-picker-data-source.js'),
 		meta: {
 			label: 'Media',
 			icon: 'icon-document-image',
@@ -43,7 +43,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'pickerPropertyEditorCollectionDataSource',
 		alias: 'Umb.PickerPropertyEditorCollectionDataSource.Language',
 		name: 'Language Picker Collection Data Source',
-		api: () => import('./test-1.js'),
+		api: () => import('./test-webhook-picker-data-source.js'),
 		meta: {
 			label: 'Languages',
 			icon: 'icon-globe',
@@ -54,7 +54,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'pickerPropertyEditorCollectionDataSource',
 		alias: 'Umb.PickerPropertyEditorCollectionDataSource.Webhook',
 		name: 'Webhook Picker Collection Data Source',
-		api: () => import('./test-1.js'),
+		api: () => import('./test-webhook-picker-data-source.js'),
 		meta: {
 			label: 'Webhooks',
 			icon: 'icon-webhook',
