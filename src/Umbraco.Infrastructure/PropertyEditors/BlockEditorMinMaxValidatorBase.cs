@@ -22,12 +22,16 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
     protected BlockEditorMinMaxValidatorBase(ILocalizedTextService textService) => TextService = textService;
 
     /// <summary>
-    /// Gets the <see cref="ILocalizedTextService"/>
+    /// Gets the <see cref="ILocalizedTextService"/>.
     /// </summary>
     protected ILocalizedTextService TextService { get; }
 
     /// <inheritdoc/>
     public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext);
+
+    /// <inheritdoc/>
+    public virtual IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext, ConfigurationField configurationField)
+        => throw new NotImplementedException();
 
     /// <summary>
     /// Validates the number of blocks are within the configured minimum and maximum values.

@@ -86,7 +86,7 @@ public class ConfigurationEditor : IConfigurationEditor
         => Fields
             .SelectMany(field =>
                 configuration.TryGetValue(field.Key, out var value)
-                    ? field.Validators.SelectMany(validator => validator.Validate(value, null, null, PropertyValidationContext.Empty()))
+                    ? field.Validators.SelectMany(validator => validator.Validate(value, null, null, PropertyValidationContext.Empty(), field))
                     : Enumerable.Empty<ValidationResult>())
             .ToArray();
 
