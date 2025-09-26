@@ -145,15 +145,16 @@ export class UmbDataTypeServerDataSource
 
 	// TODO: change this to a mapper extension when the endpoints returns a $type for DataTypeResponseModel
 	#mapServerResponseModelToEntityDetailModel(data: DataTypeResponseModel): UmbDataTypeDetailModel {
-		const index = data.values?.findIndex((x) => x.alias === this.#editorDataSourceAlias);
+		let values = data.values as Array<UmbDataTypePropertyValueModel>;
+		const index = values?.findIndex((x) => x.alias === this.#editorDataSourceAlias);
 
 		let editorDataSourceAlias;
 
-		// Remove the editorDataSourceAlias from the values collection
-		// to prevent it from being treated as a regular config value.
+		/* Remove the editorDataSourceAlias from the values collection
+		 to prevent it from being treated as a regular config value. */
 		if (index !== -1) {
-			editorDataSourceAlias = data.values?.[index].value as string | null;
-			data.values.splice(index, 1);
+			editorDataSourceAlias = values?.[index].value as string | null;
+			values = values?.filter((value) => value.alias !== this.#editorDataSourceAlias) ?? [];
 		}
 
 		return {
@@ -163,7 +164,7 @@ export class UmbDataTypeServerDataSource
 			editorAlias: data.editorAlias,
 			editorUiAlias: data.editorUiAlias || null,
 			editorDataSourceAlias: editorDataSourceAlias,
-			values: data.values as Array<UmbDataTypePropertyValueModel>,
+			values,
 		};
 	}
 }
