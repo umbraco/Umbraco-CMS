@@ -18,7 +18,22 @@ public class ValueListUniqueValueValidator : IValueValidator
     public ValueListUniqueValueValidator(IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
 
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
+    public IEnumerable<ValidationResult> Validate(
+        object? value,
+        string? valueType,
+        object? dataTypeConfiguration,
+        PropertyValidationContext validationContext)
+        => ValidateInternal(value, "items");
+
+    public IEnumerable<ValidationResult> Validate(
+        object? value,
+        string? valueType,
+        object? dataTypeConfiguration,
+        PropertyValidationContext validationContext,
+        ConfigurationField field)
+        => ValidateInternal(value, field.Key);
+
+    private IEnumerable<ValidationResult> ValidateInternal(object? value, string fieldName)
     {
         if (value is null)
         {
@@ -40,7 +55,7 @@ public class ValueListUniqueValueValidator : IValueValidator
 
         if (items is null)
         {
-            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", ["items"]);
+            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", [fieldName]);
             yield break;
         }
 
@@ -53,46 +68,7 @@ public class ValueListUniqueValueValidator : IValueValidator
 
         foreach (var duplicateValue in duplicateValues)
         {
-            yield return new ValidationResult($"The value \"{duplicateValue}\" must be unique", new[] { "items" });
-        }
-    }
-
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext, ConfigurationField field)
-    {
-        if (value is null)
-        {
-            yield break;
-        }
-
-        var items = value as IEnumerable<string>;
-        if (items is null)
-        {
-            try
-            {
-                items = _configurationEditorJsonSerializer.Deserialize<string[]>(value.ToString() ?? string.Empty);
-            }
-            catch
-            {
-                // swallow and report error below
-            }
-        }
-
-        if (items is null)
-        {
-            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", [field.Key]);
-            yield break;
-        }
-
-        var duplicateValues = items
-            .Select(item => item)
-            .GroupBy(v => v)
-            .Where(group => group.Count() > 1)
-            .Select(group => group.First())
-            .ToArray();
-
-        foreach (var duplicateValue in duplicateValues)
-        {
-            yield return new ValidationResult($"The value \"{duplicateValue}\" must be unique", [field.Key]);
+            yield return new ValidationResult($"The value \"{duplicateValue}\" must be unique", [fieldName]);
         }
     }
 }
