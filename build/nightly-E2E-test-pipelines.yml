@@ -619,7 +619,8 @@ stages:
               AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
               AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
               AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
-
+          - script: ls -R $(Agent.BuildDirectory)/app/src/Umbraco.Web.UI.Client/node_modules/@umbraco-cms/backoffice
+            displayName: 'Debug - Verify backoffice module exists'
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
             parameters:
