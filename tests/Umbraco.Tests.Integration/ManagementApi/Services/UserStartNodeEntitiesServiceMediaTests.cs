@@ -116,7 +116,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests : UmbracoIntegration
         return mediaStartNodeIds;
     }
 
-    private async Task<User> CreateUser(int[] startNodeIds)
+    private async Task<Core.Models.Membership.User> CreateUser(int[] startNodeIds)
     {
         var user = new UserBuilder()
             .WithName(Guid.NewGuid().ToString("N"))

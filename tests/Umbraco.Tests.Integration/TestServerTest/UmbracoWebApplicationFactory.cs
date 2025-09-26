@@ -2,9 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest;
 
@@ -13,6 +11,7 @@ public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TSta
 {
     private readonly Action<IHost> _beforeStart;
     private readonly Func<IHostBuilder> _createHostBuilder;
+    private IHost _host;
 
     /// <summary>
     ///     Constructor to create a new WebApplicationFactory
@@ -24,12 +23,17 @@ public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TSta
 
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        var host = builder.Build();
+        _host = builder.Build();
 
-        _beforeStart?.Invoke(host);
+        _beforeStart?.Invoke(_host);
 
-        host.Start();
+        _host.Start();
 
-        return host;
+        return _host;
+    }
+
+    public void ClearHost()
+    {
+        _host.StopAsync().GetAwaiter().GetResult();
     }
 }
