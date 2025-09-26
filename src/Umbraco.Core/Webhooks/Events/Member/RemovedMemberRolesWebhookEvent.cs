@@ -25,7 +25,7 @@ public class RemovedMemberRolesWebhookEvent : WebhookEventBase<RemovedMemberRole
 
     public override string Alias => Constants.WebhookEvents.Aliases.RemovedMemberRoles;
 
-    public override object? ConvertNotificationToRequestPayload(RemovedMemberRolesNotification notification)
+    public override object ConvertNotificationToRequestPayload(RemovedMemberRolesNotification notification)
         => new
         {
             Ids = notification.MemberIds.Select(id => _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Member).Result),

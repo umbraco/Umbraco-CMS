@@ -26,38 +26,61 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly IMemberTypeRepository _memberTypeRepository;
-        private readonly IAuditRepository _auditRepository;
+        private readonly IAuditService _auditService;
         private readonly IDataTypeContainerService _dataTypeContainerService;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly Lazy<IIdKeyMap> _idKeyMap;
 
-        [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 17.")]
         public DataTypeService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository,
-            IDataValueEditorFactory dataValueEditorFactory,
+            IAuditService auditService,
+            IContentTypeRepository contentTypeRepository,
+            IMediaTypeRepository mediaTypeRepository,
+            IMemberTypeRepository memberTypeRepository,
+            Lazy<IIdKeyMap> idKeyMap)
+            : base(provider, loggerFactory, eventMessagesFactory)
+        {
+            _dataTypeRepository = dataTypeRepository;
+            _auditService = auditService;
+            _contentTypeRepository = contentTypeRepository;
+            _mediaTypeRepository = mediaTypeRepository;
+            _memberTypeRepository = memberTypeRepository;
+            _idKeyMap = idKeyMap;
+
+            // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
+            _dataTypeContainerService = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerService>();
+            _dataTypeContainerRepository = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerRepository>();
+            _userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
+        }
+
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v18.")]
+        public DataTypeService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IDataTypeRepository dataTypeRepository,
             IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository,
-            IIOHelper ioHelper,
+            IMediaTypeRepository mediaTypeRepository,
+            IMemberTypeRepository memberTypeRepository,
             Lazy<IIdKeyMap> idKeyMap)
             : this(
-                  provider,
-                  loggerFactory,
-                  eventMessagesFactory,
-                  dataTypeRepository,
-                  dataValueEditorFactory,
-                  auditRepository,
-                  contentTypeRepository,
-                  StaticServiceProvider.Instance.GetRequiredService<IMediaTypeRepository>(),
-                  StaticServiceProvider.Instance.GetRequiredService<IMemberTypeRepository>(),
-                  ioHelper,
-                  idKeyMap)
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                dataTypeRepository,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+                contentTypeRepository,
+                mediaTypeRepository,
+                memberTypeRepository,
+                idKeyMap)
         {
         }
 
-        [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v18.")]
         public DataTypeService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
@@ -75,7 +98,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 loggerFactory,
                 eventMessagesFactory,
                 dataTypeRepository,
-                auditRepository,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
                 contentTypeRepository,
                 mediaTypeRepository,
                 memberTypeRepository,
@@ -83,29 +106,31 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
         }
 
+        [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v18.")]
         public DataTypeService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository,
+            IDataValueEditorFactory dataValueEditorFactory,
             IAuditRepository auditRepository,
+            IAuditService auditService,
             IContentTypeRepository contentTypeRepository,
             IMediaTypeRepository mediaTypeRepository,
             IMemberTypeRepository memberTypeRepository,
+            IIOHelper ioHelper,
             Lazy<IIdKeyMap> idKeyMap)
-            : base(provider, loggerFactory, eventMessagesFactory)
+            : this(
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                dataTypeRepository,
+                auditService,
+                contentTypeRepository,
+                mediaTypeRepository,
+                memberTypeRepository,
+                idKeyMap)
         {
-            _dataTypeRepository = dataTypeRepository;
-            _auditRepository = auditRepository;
-            _contentTypeRepository = contentTypeRepository;
-            _mediaTypeRepository = mediaTypeRepository;
-            _memberTypeRepository = memberTypeRepository;
-            _idKeyMap = idKeyMap;
-
-            // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
-            _dataTypeContainerService = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerService>();
-            _dataTypeContainerRepository = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerRepository>();
-            _userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
         }
 
         #region Containers
@@ -290,7 +315,10 @@ namespace Umbraco.Cms.Core.Services.Implement
             IQuery<IDataType> query = Query<IDataType>();
             if (keys.Length > 0)
             {
-                query = query.Where(x => keys.Contains(x.Key));
+                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+                // See ExpressionTests.Sql_In().
+                List<Guid> keysAsList = [.. keys];
+                query = query.Where(x => keysAsList.Contains(x.Key));
             }
 
             IDataType[] dataTypes = _dataTypeRepository.Get(query).ToArray();
@@ -373,7 +401,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         public Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAlias.Contains(x.EditorAlias));
+
+            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+            // See ExpressionTests.Sql_In().
+            List<string> propertyEditorAliasesAsList = [.. propertyEditorAlias];
+            IQuery<IDataType> query = Query<IDataType>().Where(x => propertyEditorAliasesAsList.Contains(x.EditorAlias));
+
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
             return Task.FromResult(dataTypes);
         }
@@ -465,8 +498,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingDataTypeNotification));
 
-                var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-                Audit(AuditType.Move, currentUserId, toMove.Id);
+                await AuditAsync(AuditType.Move, userKey, toMove.Id);
                 scope.Complete();
             }
 
@@ -588,7 +620,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                         : DataTypeOperationStatus.Success;
                 },
                 userKey,
-                AuditType.New);
+                AuditType.Save);
 
         /// <summary>
         /// Saves a collection of <see cref="IDataType"/>
@@ -696,33 +728,11 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, eventMessages).WithStateFrom(deletingDataTypeNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Delete, currentUserId, dataType.Id);
+            await AuditAsync(AuditType.Delete, userKey, dataType.Id);
 
             scope.Complete();
 
             return Attempt.SucceedWithStatus<IDataType?, DataTypeOperationStatus>(DataTypeOperationStatus.Success, dataType);
-        }
-
-        /// <inheritdoc />
-        public Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IDataType? dataType = GetDataTypeFromRepository(id);
-            if (dataType == null)
-            {
-                return Task.FromResult(Attempt.FailWithStatus<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>(DataTypeOperationStatus.NotFound, new Dictionary<Udi, IEnumerable<string>>()));
-            }
-
-            IReadOnlyDictionary<Udi, IEnumerable<string>> usages = _dataTypeRepository.FindUsages(dataType.Id);
-            return Task.FromResult(Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, usages));
-        }
-
-        /// <inheritdoc />
-        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            return _dataTypeRepository.FindListViewUsages(id);
         }
 
         /// <inheritdoc />
@@ -893,7 +903,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             scope.Notifications.Publish(new DataTypeSavedNotification(dataType, eventMessages).WithStateFrom(savingDataTypeNotification));
 
-            Audit(auditType, currentUserId, dataType.Id);
+            await AuditAsync(auditType, userKey, dataType.Id);
             scope.Complete();
 
             return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, dataType);
@@ -906,7 +916,20 @@ namespace Umbraco.Cms.Core.Services.Implement
             { Result: var intId } => _dataTypeRepository.Get(intId),
         };
 
-        private void Audit(AuditType type, int userId, int objectId)
-            => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));
+        private void Audit(AuditType type, int userId, int objectId) =>
+            AuditAsync(type, userId, objectId).GetAwaiter().GetResult();
+
+        private async Task AuditAsync(AuditType type, int userId, int objectId)
+        {
+            Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+            await AuditAsync(type, userKey, objectId);
+        }
+
+        private async Task AuditAsync(AuditType type, Guid userKey, int objectId) =>
+            await _auditService.AddAsync(
+                type,
+                userKey,
+                objectId,
+                UmbracoObjectTypes.DataType.GetName());
     }
 }

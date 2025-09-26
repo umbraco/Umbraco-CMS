@@ -29,39 +29,6 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
         _flagProviders = flagProvider;
     }
 
-    [Obsolete("Use the constructer with all parameters. To be removed in Umbraco 18")]
-    protected ContentCollectionControllerBase(IUmbracoMapper mapper)
-        : this(mapper, StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
-    }
-
-    [Obsolete("This method is no longer used and will be removed in Umbraco 17.")]
-    protected IActionResult CollectionResult(ListViewPagedModel<TContent> result)
-    {
-        PagedModel<TContent> collectionItemsResult = result.Items;
-        ListViewConfiguration collectionConfiguration = result.ListViewConfiguration;
-
-        var collectionPropertyAliases = collectionConfiguration
-            .IncludeProperties
-            .Select(p => p.Alias)
-            .WhereNotNull()
-            .ToArray();
-
-        List<TCollectionResponseModel> collectionResponseModels =
-            _mapper.MapEnumerable<TContent, TCollectionResponseModel>(collectionItemsResult.Items, context =>
-            {
-                context.SetIncludedProperties(collectionPropertyAliases);
-            });
-
-        var pageViewModel = new PagedViewModel<TCollectionResponseModel>
-        {
-            Items = collectionResponseModels,
-            Total = collectionItemsResult.Total,
-        };
-
-        return Ok(pageViewModel);
-    }
-
     /// <summary>
     /// Creates a collection result from the provided collection response models and total number of items.
     /// </summary>

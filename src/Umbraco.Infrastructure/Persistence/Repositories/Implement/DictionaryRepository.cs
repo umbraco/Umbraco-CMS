@@ -22,6 +22,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILanguageRepository _languageRepository;
 
+    private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
+
     public DictionaryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<DictionaryRepository> logger,
         ILoggerFactory loggerFactory, ILanguageRepository languageRepository)
         : base(scopeAccessor, cache, logger)
@@ -60,7 +62,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()
     {
-        var columns = new[] { "key", "id" }.Select(x => (object)SqlSyntax.GetQuotedColumnName(x)).ToArray();
+        var columns = new[] { "key", "id" }.Select(x => (object)QuotedColumn(x)).ToArray();
         Sql<ISqlContext> sql = Sql().Select(columns).From<DictionaryDto>();
         return Database.Fetch<DictionaryItemKeyIdDto>(sql).ToDictionary(x => x.Key, x => x.Id);
     }
@@ -186,6 +188,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         private readonly DictionaryRepository _dictionaryRepository;
         private readonly IDictionary<int, ILanguage> _languagesById;
 
+        private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
+
         public DictionaryByUniqueIdRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
             AppCaches cache, ILogger<DictionaryByUniqueIdRepository> logger)
             : base(scopeAccessor, cache, logger)
@@ -201,7 +205,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount) => _dictionaryRepository.GetBaseQuery(isCount);
 
         protected override string GetBaseWhereClause() =>
-            "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " = @id";
+            $"{QuotedColumn("id")} = @id";
 
         protected override IDictionaryItem ConvertToEntity(DictionaryDto dto) =>
             ConvertFromDto(dto, _languagesById);
@@ -209,7 +213,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         protected override object GetBaseWhereClauseArguments(Guid id) => new { id };
 
         protected override string GetWhereInClauseForGetAll() =>
-            "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " in (@ids)";
+            $"{QuotedColumn("id")} in (@ids)";
 
         protected override IRepositoryCachePolicy<IDictionaryItem, Guid> CreateCachePolicy()
         {
@@ -241,6 +245,8 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         private readonly DictionaryRepository _dictionaryRepository;
         private readonly IDictionary<int, ILanguage> _languagesById;
 
+        private string QuotedColumn(string columnName) => $"{QuoteTableName(DictionaryDto.TableName)}.{QuoteColumnName(columnName)}";
+
         public DictionaryByKeyRepository(DictionaryRepository dictionaryRepository, IScopeAccessor scopeAccessor,
             AppCaches cache, ILogger<DictionaryByKeyRepository> logger)
             : base(scopeAccessor, cache, logger)
@@ -256,7 +262,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount) => _dictionaryRepository.GetBaseQuery(isCount);
 
         protected override string GetBaseWhereClause() =>
-            "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " = @id";
+            $"{QuotedColumn("key")} = @id";
 
         protected override IDictionaryItem ConvertToEntity(DictionaryDto dto) =>
             ConvertFromDto(dto, _languagesById);
@@ -264,7 +270,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         protected override object GetBaseWhereClauseArguments(string? id) => new { id };
 
         protected override string GetWhereInClauseForGetAll() =>
-            "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " in (@ids)";
+            $"{QuotedColumn("key")} IN (@ids)";
 
         protected override IRepositoryCachePolicy<IDictionaryItem, string> CreateCachePolicy()
         {
@@ -345,7 +351,7 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.DictionaryEntry}.pk = @id";
+    protected override string GetBaseWhereClause() => $"{QuotedColumn("pk")} = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => new List<string>();
 
@@ -421,31 +427,46 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
     {
         RecursiveDelete(entity.Key);
 
-        Database.Delete<LanguageTextDto>("WHERE UniqueId = @Id", new { Id = entity.Key });
-        Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = entity.Key });
+        DeleteEntity(entity.Key);
 
         // Clear the cache entries that exist by uniqueid/item key
         IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(entity.ItemKey));
         IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(entity.Key));
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     private void RecursiveDelete(Guid parentId)
     {
-        List<DictionaryDto>? list =
-            Database.Fetch<DictionaryDto>("WHERE parent = @ParentId", new { ParentId = parentId });
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Select<DictionaryDto>()
+            .From<DictionaryDto>()
+            .Where<DictionaryDto>(c => c.Parent == parentId);
+        List<DictionaryDto>? list = Database.Fetch<DictionaryDto>(sql);
+
         foreach (DictionaryDto? dto in list)
         {
             RecursiveDelete(dto.UniqueId);
 
-            Database.Delete<LanguageTextDto>("WHERE UniqueId = @Id", new { Id = dto.UniqueId });
-            Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = dto.UniqueId });
+            DeleteEntity(dto.UniqueId);
 
             // Clear the cache entries that exist by uniqueid/item key
             IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(dto.Key));
             IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(dto.UniqueId));
         }
+    }
+
+    private void DeleteEntity(Guid key)
+    {
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Delete<LanguageTextDto>()
+            .Where<LanguageTextDto>(c => c.UniqueId == key);
+        Database.Execute(sql);
+
+        sql = SqlContext.Sql()
+            .Delete<DictionaryDto>()
+            .Where<DictionaryDto>(c => c.UniqueId == key);
+        Database.Execute(sql);
     }
 
     private IDictionary<int, ILanguage> GetLanguagesById() => _languageRepository

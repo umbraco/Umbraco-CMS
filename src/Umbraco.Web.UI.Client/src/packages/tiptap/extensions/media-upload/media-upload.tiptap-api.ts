@@ -1,12 +1,12 @@
+import { Extension } from '../../externals.js';
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
+import type { Editor } from '../../externals.js';
 import type { UmbTiptapExtensionArgs } from '../types.js';
 import { imageSize } from '@umbraco-cms/backoffice/utils';
-import { Extension } from '@umbraco-cms/backoffice/external/tiptap';
 import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';

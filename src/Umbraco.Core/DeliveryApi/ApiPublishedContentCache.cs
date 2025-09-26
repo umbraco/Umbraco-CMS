@@ -17,35 +17,6 @@ public sealed class ApiPublishedContentCache : IApiPublishedContentCache
     private readonly IVariationContextAccessor _variationContextAccessor;
     private DeliveryApiSettings _deliveryApiSettings;
 
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V17.")]
-    public ApiPublishedContentCache(
-        IRequestPreviewService requestPreviewService,
-        IRequestCultureService requestCultureService,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
-        IDocumentUrlService documentUrlService,
-        IPublishedContentCache publishedContentCache)
-        : this(
-            requestPreviewService,
-            deliveryApiSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IApiDocumentUrlService>(),
-            publishedContentCache,
-            StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Will be removed in V17.")]
-    public ApiPublishedContentCache(
-        IRequestPreviewService requestPreviewService,
-        IRequestCultureService requestCultureService,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
-        IDocumentUrlService documentUrlService,
-        IApiDocumentUrlService apiDocumentUrlService,
-        IPublishedContentCache publishedContentCache,
-        IVariationContextAccessor variationContextAccessor)
-        : this(requestPreviewService, deliveryApiSettings, apiDocumentUrlService, publishedContentCache, variationContextAccessor)
-    {
-    }
-
     public ApiPublishedContentCache(
         IRequestPreviewService requestPreviewService,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,

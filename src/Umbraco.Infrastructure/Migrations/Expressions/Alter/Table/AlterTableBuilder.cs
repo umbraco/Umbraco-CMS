@@ -28,6 +28,7 @@ public class AlterTableBuilder : ExpressionBuilderBase<AlterTableExpression, IAl
         {
             throw new NotSupportedException($"SQLite does not support ALTER TABLE operations. Instead you will have to:{Environment.NewLine}1. Create a temp table.{Environment.NewLine}2. Copy data from existing table into the temp table.{Environment.NewLine}3. Delete the existing table.{Environment.NewLine}4. Create a new table with the name of the table you're trying to alter, but with a new signature{Environment.NewLine}5. Copy data from the temp table into the new table.{Environment.NewLine}6. Delete the temp table.");
         }
+
         Expression.Execute();
     }
 

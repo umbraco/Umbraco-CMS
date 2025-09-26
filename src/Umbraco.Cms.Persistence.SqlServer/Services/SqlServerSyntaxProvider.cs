@@ -262,6 +262,12 @@ order by T.name, I.name");
     /// <inheritdoc />
     public override bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName)
     {
+        if (string.IsNullOrWhiteSpace(tableName))
+        {
+            constraintName = null;
+            return false;
+        }
+
         constraintName = db.Fetch<string>(
                 @"select con.[name] as [constraintName]
 from sys.default_constraints con
@@ -312,11 +318,8 @@ where tbl.[name]=@0 and col.[name]=@1;",
                 return "NEWID()";
             case SystemMethods.CurrentDateTime:
                 return "GETDATE()";
-
-                // case SystemMethods.NewSequentialId:
-                //    return "NEWSEQUENTIALID()";
-                // case SystemMethods.CurrentUTCDateTime:
-                //    return "GETUTCDATE()";
+            case SystemMethods.CurrentUTCDateTime:
+                return "GETUTCDATE()";
         }
 
         return null;

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Title>Umbraco CMS - DevelopmentMode - Backoffice</Title>
+    <Description>Adds backoffice development mode.</Description>
+    <RootNamespace>Umbraco.Cms.DevelopmentMode.Backoffice</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+  </ItemGroup>
+  
+</Project>

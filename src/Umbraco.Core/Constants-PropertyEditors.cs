@@ -41,6 +41,11 @@ public static partial class Constants
             public const string BlockList = "Umbraco.BlockList";
 
             /// <summary>
+            ///     Block List.
+            /// </summary>
+            public const string SingleBlock = "Umbraco.SingleBlock";
+
+            /// <summary>
             /// Block Grid.
             /// </summary>
             public const string BlockGrid = "Umbraco.BlockGrid";

@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Bogus;
+﻿using Bogus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -15,7 +12,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
 using Umbraco.TestData.Configuration;
@@ -27,9 +23,6 @@ namespace Umbraco.TestData;
 /// </summary>
 public class UmbracoTestDataController : SurfaceController
 {
-    private const string RichTextDataTypeName = "UmbracoTestDataContent.RTE";
-    private const string MediaPickerDataTypeName = "UmbracoTestDataContent.MediaPicker";
-    private const string TextDataTypeName = "UmbracoTestDataContent.Text";
     private const string TestDataContentTypeAlias = "umbTestDataContent";
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly ICoreScopeProvider _scopeProvider;
@@ -268,47 +261,18 @@ public class UmbracoTestDataController : SurfaceController
             Icon = "icon-science color-green"
         };
         docType.AddPropertyGroup("content", "Content");
-        docType.AddPropertyType(new PropertyType(_shortStringHelper, GetOrCreateRichText(), "review")
+        docType.AddPropertyType(
+            new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.RichText, ValueStorageType.Ntext, "review")
         {
-            Name = "Review"
-        });
-        docType.AddPropertyType(new PropertyType(_shortStringHelper, GetOrCreateText(), "desc") { Name = "Description" });
+            Name = "Review",
+        }, "content");
+        docType.AddPropertyType(new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "desc") { Name = "Description" }, "content");
+        docType.AddPropertyType(new PropertyType(_shortStringHelper, Constants.PropertyEditors.Aliases.MediaPicker3, ValueStorageType.Integer, "media") { Name = "Media" }, "content");
+
+
         Services.ContentTypeService.Save(docType);
         docType.AllowedContentTypes = new[] { new ContentTypeSort(docType.Key, 0, docType.Alias) };
         Services.ContentTypeService.Save(docType);
         return docType;
-    }
-
-    private IDataType GetOrCreateRichText() =>
-        GetOrCreateDataType(RichTextDataTypeName, Constants.PropertyEditors.Aliases.RichText);
-
-    private IDataType GetOrCreateText() =>
-        GetOrCreateDataType(TextDataTypeName, Constants.PropertyEditors.Aliases.TextBox);
-
-    private IDataType GetOrCreateDataType(string name, string editorAlias)
-    {
-        var dt = Services.DataTypeService.GetDataType(name);
-        if (dt != null)
-        {
-            return dt;
-        }
-
-        var editor = _propertyEditors.FirstOrDefault(x => x.Alias == editorAlias);
-        if (editor == null)
-        {
-            throw new InvalidOperationException($"No {editorAlias} editor found");
-        }
-
-        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
-
-        dt = new DataType(editor, serializer)
-        {
-            Name = name,
-            ConfigurationData = editor.GetConfigurationEditor().DefaultConfiguration,
-            DatabaseType = ValueStorageType.Ntext
-        };
-
-        Services.DataTypeService.Save(dt);
-        return dt;
     }
 }

@@ -212,14 +212,14 @@ public abstract class Item : IEntity, ICanBeDirty
     /// </summary>
     internal virtual void AddingEntity()
     {
-        CreateDate = DateTime.Now;
-        UpdateDate = DateTime.Now;
+        CreateDate = DateTime.UtcNow;
+        UpdateDate = DateTime.UtcNow;
     }
 
     /// <summary>
     ///     Method to call on entity saved/updated
     /// </summary>
-    internal virtual void UpdatingEntity() => UpdateDate = DateTime.Now;
+    internal virtual void UpdatingEntity() => UpdateDate = DateTime.UtcNow;
 
     public static bool operator ==(Item left, Item right) => ReferenceEquals(left, right);
 

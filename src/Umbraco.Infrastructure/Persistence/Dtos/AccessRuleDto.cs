@@ -5,11 +5,12 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.AccessRule)]
+[TableName(TableName)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class AccessRuleDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.AccessRule;
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoAccessRule", AutoIncrement = false)]
     public Guid Id { get; set; }
@@ -25,11 +26,11 @@ internal sealed class AccessRuleDto
     [Column("ruleType")]
     public string? RuleType { get; set; }
 
-    [Column("createDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("createDate")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
-    [Column("updateDate", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("updateDate")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 }
