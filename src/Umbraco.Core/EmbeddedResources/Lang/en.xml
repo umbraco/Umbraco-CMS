@@ -266,7 +266,7 @@
     <key alias="mailSubject">[%0%] Notification about %1% performed on %2%</key>
   </area>
   <area alias="user">
-    <key alias="passwordMismatch">The confirmed password doesn't match the new password!</key>
+    <key alias="passwordMismatch">New passwords don’t match</key>
     <key alias="inviteEmailCopySubject">Umbraco: Invitation</key>
     <key alias="inviteEmailCopyFormat"><![CDATA[
         <html>
