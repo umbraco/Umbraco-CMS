@@ -14,17 +14,20 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 public class MoveDataTypeControllerTests : ManagementApiUserGroupTestBase<MoveDataTypeController>
 {
     private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
+    private Guid _originalId;
     private Guid _targetId;
 
     [SetUp]
     public async Task Setup()
     {
-        var response = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "TestFolder", Guid.Empty, Constants.Security.SuperUserKey);
-        _targetId = response.Result.Key;
+        var response1 = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "OriginalFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
+        var response2 = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "TargetFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
+        _originalId = response1.Result.Key;
+        _targetId = response2.Result.Key;
     }
 
     protected override Expression<Func<MoveDataTypeController, object>> MethodSelector =>
-        x => x.Move(CancellationToken.None, Guid.NewGuid(), null);
+        x => x.Move(CancellationToken.None, _originalId, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
@@ -33,7 +36,7 @@ public class MoveDataTypeControllerTests : ManagementApiUserGroupTestBase<MoveDa
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -48,7 +51,7 @@ public class MoveDataTypeControllerTests : ManagementApiUserGroupTestBase<MoveDa
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
@@ -60,6 +63,6 @@ public class MoveDataTypeControllerTests : ManagementApiUserGroupTestBase<MoveDa
     {
         MoveDataTypeRequestModel moveDataTypeRequestModel = new() { Target = new ReferenceByIdModel(_targetId) };
 
-        return await Client.PostAsync(Url, JsonContent.Create(moveDataTypeRequestModel));
+        return await Client.PutAsync(Url, JsonContent.Create(moveDataTypeRequestModel));
     }
 }

@@ -18,7 +18,7 @@ public class CreateDataTypeControllerTests : ManagementApiUserGroupTestBase<Crea
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -33,7 +33,7 @@ public class CreateDataTypeControllerTests : ManagementApiUserGroupTestBase<Crea
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

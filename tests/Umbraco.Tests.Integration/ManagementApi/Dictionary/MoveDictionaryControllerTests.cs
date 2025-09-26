@@ -1,13 +1,32 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Dictionary;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Dictionary;
 
 public class MoveDictionaryControllerTests : ManagementApiUserGroupTestBase<MoveDictionaryController>
 {
+    private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
+
+    private Guid _originalId = new Guid();
+    private Guid _targetId = new Guid();
+
+    [SetUp]
+    public async Task Setup()
+    {
+        var original = new DictionaryItem(Constants.System.RootKey, _originalId.ToString());
+        var target = new DictionaryItem(Constants.System.RootKey, _targetId.ToString());
+
+        await DictionaryItemService.CreateAsync(original, Constants.Security.SuperUserKey);
+        await DictionaryItemService.CreateAsync(target, Constants.Security.SuperUserKey);
+    }
+
     protected override Expression<Func<MoveDictionaryController, object>> MethodSelector =>
         x => x.Move(CancellationToken.None, Guid.NewGuid(), null);
 
@@ -45,6 +64,6 @@ public class MoveDictionaryControllerTests : ManagementApiUserGroupTestBase<Move
     {
         MoveDictionaryRequestModel moveDictionaryRequestModel =
             new() { Target = null };
-        return await Client.PostAsync(Url, JsonContent.Create(moveDictionaryRequestModel));
+        return await Client.PutAsync(Url, JsonContent.Create(moveDictionaryRequestModel));
     }
 }

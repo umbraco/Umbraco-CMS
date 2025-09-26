@@ -68,7 +68,7 @@ public class DeletePublicAccessDocumentControllerTests : ManagementApiUserGroupT
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

@@ -67,7 +67,7 @@ public class GetPublicAccessDocumentControllerTests : ManagementApiUserGroupTest
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

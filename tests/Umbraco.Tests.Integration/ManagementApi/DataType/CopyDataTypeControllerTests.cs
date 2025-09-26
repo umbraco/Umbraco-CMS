@@ -18,7 +18,7 @@ public class CopyDataTypeControllerTests : ManagementApiUserGroupTestBase<CopyDa
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -33,7 +33,7 @@ public class CopyDataTypeControllerTests : ManagementApiUserGroupTestBase<CopyDa
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
