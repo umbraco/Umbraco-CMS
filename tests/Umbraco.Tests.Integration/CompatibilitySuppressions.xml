@@ -3,20 +3,6 @@
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest</Target>
-    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
-    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest_HideTopLevel_False</Target>
-    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
-    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Umbraco.Cms.Tests.Integration.ManagementApi.Policies.AllCultureControllerTests</Target>
     <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
@@ -32,6 +18,20 @@
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Umbraco.Cms.Tests.Integration.ManagementApi.Preview.EnterPreviewTests</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest</Target>
+    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentUrlServiceTest_HideTopLevel_False</Target>
     <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -102,27 +102,6 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.ManagementApiTest`1.Setup</Target>
-    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
-    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Tests.Integration.Testing.UmbracoIntegrationTestBase.SetUp_Logging</Target>
-    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
-    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Tests.Integration.Testing.UmbracoIntegrationTestBase.TearDown_Logging</Target>
-    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
-    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Tests.Integration.TestServerTest.UmbracoTestServerTestBase.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder)</Target>
     <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -220,28 +199,7 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0012</DiagnosticId>
-    <Target>M:Umbraco.Cms.Tests.Integration.TestServerTest.UmbracoTestServerTestBase.GetRequiredService``1</Target>
-    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
-    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0012</DiagnosticId>
     <Target>P:Umbraco.Cms.Tests.Integration.ManagementApi.ManagementApiTest`1.Url</Target>
-    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
-    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:TestDatabaseHostedLifecycleService</Target>
-    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
-    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0001</DiagnosticId>
-    <Target>T:Umbraco.Cms.Tests.Integration.ManagementApi.Policies.AllCultureControllerTests</Target>
     <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
