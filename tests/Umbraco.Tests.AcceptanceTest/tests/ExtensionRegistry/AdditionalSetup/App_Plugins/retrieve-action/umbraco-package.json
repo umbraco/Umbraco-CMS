@@ -1,5 +1,4 @@
 {
-  "$schema": "../../umbraco-package-schema.json",
   "name": "My entity action",
   "version": "1.0.0",
   "extensions": [
