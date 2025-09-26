@@ -25,6 +25,19 @@ export interface MetaPropertyEditorUi {
 	propertyEditorSchemaAlias?: string;
 	settings?: PropertyEditorSettings;
 	supportsReadOnly?: boolean;
+	supportsDataSource?: {
+		/**
+		 * Whether the property editor UI is enabled for use with data sources.
+		 * @type {boolean}
+		 */
+		enabled: boolean;
+		/**
+		 * A list of allowed data source aliases that can be used with this property editor UI.
+		 * If not specified, any data source can be used.
+		 * @example ["pickerPropertyEditorCollectionDataSource", "pickerPropertyEditorTreeDataSource"]
+		 */
+		forDataSourceTypes: string[];
+	}
 }
 
 // Model
