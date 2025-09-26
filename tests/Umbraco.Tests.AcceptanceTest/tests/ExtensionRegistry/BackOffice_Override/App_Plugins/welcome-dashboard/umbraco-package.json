@@ -1,0 +1,25 @@
+﻿{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "My.WelcomePackage",
+  "version": "0.1.0",
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "my.welcome.dashboard",
+      "name": "My Welcome Dashboard",
+      "element": "/App_Plugins/welcome-dashboard/welcome-dashboard.js",
+      "elementName": "my-welcome-dashboard",
+      "weight": 30,
+      "meta": {
+        "label": "Welcome Dashboard",
+        "pathname": "welcome-dashboard"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "Umb.Section.Content"
+        }
+      ]
+    }
+  ]
+}
