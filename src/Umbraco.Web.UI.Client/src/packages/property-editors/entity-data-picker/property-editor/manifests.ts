@@ -11,6 +11,10 @@ const manifest: ManifestPropertyEditorUi = {
 		group: 'pickers',
 		propertyEditorSchemaAlias: 'Umbraco.Plain.Json',
 		supportsReadOnly: true,
+		supportsDataSource: {
+			enabled: true,
+			forDataSourceTypes: ['pickerPropertyEditorTreeDataSource', 'pickerPropertyEditorCollectionDataSource'],
+		},
 		settings: {
 			properties: [
 				// TODO: Move this to schema manifest when server can validate it

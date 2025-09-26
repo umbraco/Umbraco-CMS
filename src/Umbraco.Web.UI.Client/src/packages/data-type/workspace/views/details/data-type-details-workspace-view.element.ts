@@ -8,6 +8,7 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 
 import '../../../property-editor-data-source/input/input-property-editor-data-source.element.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -25,6 +26,12 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 
 	@state()
 	private _propertyEditorDataSourceAlias?: string | null = null;
+
+	@state()
+	private _supportsDataSource = false;
+
+	@state()
+	private _supportedDataSourceTypes: Array<string> = [];
 
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
@@ -44,6 +51,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 
 		this.observe(this.#workspaceContext.propertyEditorUiAlias, (value) => {
 			this._propertyEditorUiAlias = value;
+			this.#observePropertyEditorUIManifest();
 		});
 
 		this.observe(this.#workspaceContext.propertyEditorSchemaAlias, (value) => {
@@ -73,6 +81,15 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		if (value) {
 			this.#workspaceContext?.setPropertyEditorUiAlias(value.selection[0]);
 		}
+	}
+
+	#observePropertyEditorUIManifest() {
+		if (!this._propertyEditorUiAlias) return;
+
+		this.observe(umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias), (manifest) => {
+			this._supportsDataSource = manifest?.meta?.supportsDataSource?.enabled ?? false;
+			this._supportedDataSourceTypes = manifest?.meta?.supportsDataSource?.forDataSourceTypes ?? [];
+		});
 	}
 
 	#onDataSourceChange(event: CustomEvent) {
@@ -152,6 +169,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	}
 
 	#renderDataSourceInput() {
+		if (!this._supportsDataSource) return nothing;
+
 		return html`
 			<umb-property-layout label="Data Source" description="Some description">
 				<umb-input-property-editor-data-source
