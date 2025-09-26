@@ -1,6 +1,6 @@
 import type { UmbPropertyEditorDataSourceItemModel } from '../item/data/types.js';
 import { UMB_PROPERTY_EDITOR_DATA_SOURCE_ITEM_REPOSITORY_ALIAS } from '../item/constants.js';
-import { UMB_PROPERTY_EDITOR_DATA_SOURCE_PICKER_MODAL } from '../picker-modal/constants.js';
+import { UMB_PROPERTY_EDITOR_DATA_SOURCE_COLLECTION_MENU_ALIAS } from '../collection/constants.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -8,6 +8,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
+import {
+	UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
+	type UmbCollectionItemPickerModalData,
+	type UmbCollectionItemPickerModalValue,
+} from '@umbraco-cms/backoffice/collection';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-input-property-editor-data-source')
 export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -117,10 +123,23 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 	@state()
 	private _items: Array<UmbPropertyEditorDataSourceItemModel> = [];
 
+	#modalToken = new UmbModalToken<UmbCollectionItemPickerModalData, UmbCollectionItemPickerModalValue>(
+		UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
+		{
+			modal: {
+				type: 'sidebar',
+				size: 'small',
+			},
+			data: {
+				collectionMenuAlias: UMB_PROPERTY_EDITOR_DATA_SOURCE_COLLECTION_MENU_ALIAS,
+			},
+		},
+	);
+
 	#pickerContext = new UmbPickerInputContext<UmbPropertyEditorDataSourceItemModel>(
 		this,
 		UMB_PROPERTY_EDITOR_DATA_SOURCE_ITEM_REPOSITORY_ALIAS,
-		UMB_PROPERTY_EDITOR_DATA_SOURCE_PICKER_MODAL,
+		this.#modalToken,
 	);
 
 	constructor() {
