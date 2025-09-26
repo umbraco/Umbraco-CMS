@@ -26,7 +26,7 @@ internal sealed class ColorPickerConfigurationEditor : ConfigurationEditor<Color
         public ColorListValidator(IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
 
-        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext, ConfigurationField field)
         {
             var stringValue = value?.ToString();
             if (stringValue.IsNullOrWhiteSpace())
@@ -46,7 +46,7 @@ internal sealed class ColorPickerConfigurationEditor : ConfigurationEditor<Color
 
             if (items is null)
             {
-                yield return new ValidationResult($"The configuration value {stringValue} is not a valid color picker configuration", new[] { "items" });
+                yield return new ValidationResult($"The configuration value {stringValue} is not a valid color picker configuration", [field.Key]);
                 yield break;
             }
 
@@ -54,7 +54,7 @@ internal sealed class ColorPickerConfigurationEditor : ConfigurationEditor<Color
             {
                 if (Regex.IsMatch(item.Value, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)
                 {
-                    yield return new ValidationResult($"The value {item.Value} is not a valid hex color", new[] { "items" });
+                    yield return new ValidationResult($"The value {item.Value} is not a valid hex color", [field.Key]);
                 }
             }
         }
