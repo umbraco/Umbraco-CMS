@@ -113,9 +113,14 @@ input.umb-table__input {
     position: relative;
     min-height: 52px;
 }
+.umb-table-body .umb-table-row.-no-bulk-actions {
+    cursor: not-allowed;
+}
+
 .umb-table-body .umb-table-row.-selectable {
     cursor: pointer;
 }
+
 .umb-table-row.-selected,
 .umb-table-body .umb-table-row.-selectable:hover {
     &::before {
