@@ -37,8 +37,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
     {
         private static readonly Dictionary<string, WebApplicationFactory<UmbracoTestServerTestBase>> _factoryCache = new();
 
-        private static int _testCounter;
-
         protected HttpClient Client { get; private set; }
 
         protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
@@ -92,15 +90,10 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             {
                 AllowAutoRedirect = false, BaseAddress = new Uri("https://localhost/"),
             });
-
-            if (++_testCounter % 10 == 0)
-            {
-                GC.Collect();
-            }
         }
 
         [TearDown]
-        public void TearDownClient() => Client?.Dispose();
+        public void TearDownClient() => Client.Dispose();
 
         [OneTimeTearDown]
         public static async Task CleanupFactories()
@@ -119,10 +112,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             var method = ExpressionHelper.GetMethodInfo(methodSelector);
             var methodParams = ExpressionHelper.GetMethodParams(methodSelector) ?? new Dictionary<string, object>();
             methodParams.Remove(methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key);
-            methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions?.First()
-                .MajorVersion.ToString();
-            return LinkGenerator.GetUmbracoControllerUrl(method.Name, ControllerExtensions.GetControllerName(typeof(T)),
-                null, methodParams);
+            methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions?.First().MajorVersion.ToString();
+            return LinkGenerator.GetUmbracoControllerUrl(method.Name, ControllerExtensions.GetControllerName(typeof(T)), null, methodParams);
         }
 
         protected string PrepareApiControllerUrl<T>(Expression<Func<T, object>> methodSelector)
@@ -194,8 +185,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
 
             var hostingEnvironment = TestHelper.GetHostingEnvironment();
-            var typeLoader = services.AddTypeLoader(GetType().Assembly, hostingEnvironment,
-                TestHelper.ConsoleLoggerFactory, AppCaches.NoCache, Configuration, TestHelper.Profiler);
+            var typeLoader = services.AddTypeLoader(GetType().Assembly, hostingEnvironment, TestHelper.ConsoleLoggerFactory, AppCaches.NoCache, Configuration, TestHelper.Profiler);
 
             services.AddLogger(TestHelper.GetWebHostEnvironment(), Configuration);
 

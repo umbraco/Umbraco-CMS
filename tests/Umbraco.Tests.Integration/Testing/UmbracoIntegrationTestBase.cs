@@ -45,7 +45,6 @@ public abstract class UmbracoIntegrationTestBase
     [OneTimeTearDown]
     public void FixtureTearDown()
     {
-        TestHelper?.DisposeIfDisposable();
         foreach (var a in _fixtureTeardown)
         {
             a();

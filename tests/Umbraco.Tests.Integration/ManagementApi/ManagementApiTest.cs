@@ -102,7 +102,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                             Email = username,
                             Name = username,
                             UserName = username,
-                            UserGroupKeys = new HashSet<Guid>(new[] { userGroupKey }),
+                            UserGroupKeys = new HashSet<Guid>([userGroupKey]),
                         },
                         true)).Result.CreatedUser;
                 }
