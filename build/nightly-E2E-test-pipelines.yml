@@ -535,6 +535,7 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+              buildBackoffice: true
             LinuxExtensionRegistry:
               vmImage: "ubuntu-latest"
               testFolder: "ExtensionRegistry"
@@ -543,6 +544,7 @@ stages:
               CONNECTIONSTRINGS__UMBRACODBDSN: Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);Encrypt=True;TrustServerCertificate=True
               CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
               additionalEnvironmentVariables: false
+              buildBackoffice: true
         pool:
           vmImage: $(vmImage)
         steps:
@@ -569,6 +571,7 @@ stages:
               testFolder: $(testFolder)
               buildConfiguration: ${{ variables.buildConfiguration }}
               additionalEnvironmentVariables: $(additionalEnvironmentVariables)
+              buildBackoffice: $(buildBackoffice)
 
           # Build application for AzureADB2C
           - pwsh: |
@@ -619,8 +622,7 @@ stages:
               AZUREADB2CPOLICY: $(AZUREB2CPOLICY)
               AZUREADB2CCLIENTID: $(AZUREB2CCLIENTID)
               AZUREADB2CCLIENTSECRET: $(AZUREB2CCLIENTSECRET)
-          - script: ls -R $(Agent.BuildDirectory)/app/src/Umbraco.Web.UI.Client/node_modules/@umbraco-cms/backoffice
-            displayName: 'Debug - Verify backoffice module exists'
+
           # Run tests Template
           - template: nightly-E2E-run-tests-template.yml
             parameters:
