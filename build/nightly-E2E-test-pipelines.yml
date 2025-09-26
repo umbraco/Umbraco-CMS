@@ -499,7 +499,7 @@ stages:
     jobs:
       - job:
         displayName: E2E Tests with Different App settings (SQL Server)
-        condition: ${{ or(eq(parameters.differentAppSettingsAcceptanceTests, true), eq(parameters.skipDefaultConfigAcceptanceTests, true)) }}
+        condition: ${{ eq(parameters.differentAppSettingsAcceptanceTests, true) }}
         timeoutInMinutes: 180
         variables:
           SA_PASSWORD: UmbracoAcceptance123!
