@@ -23,10 +23,11 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 [NonParallelizable]
 public abstract class UmbracoIntegrationTestBase
 {
-    private static readonly object s_dbLocker = new();
+    private static readonly Lock s_dbLocker = new();
     private static ITestDatabase? s_dbInstance;
     private static TestDbMeta s_fixtureDbMeta;
-    private readonly List<Action> _fixtureTeardown = new();
+    private static int s_testCount = 1;
+    private readonly List<Action> _fixtureTeardown = [];
     private readonly Queue<Action> _testTeardown = new();
     private bool _firstTestInFixture = true;
 
@@ -42,6 +43,14 @@ public abstract class UmbracoIntegrationTestBase
 
     protected void AddOnFixtureTearDown(Action tearDown) => _fixtureTeardown.Add(tearDown);
 
+    [SetUp]
+    public void SetUp_Logging() =>
+        TestContext.Out.Write($"Start test {s_testCount++}: {TestContext.CurrentContext.Test.Name}");
+
+    [TearDown]
+    public void TearDown_Logging() =>
+        TestContext.Out.Write($"  {TestContext.CurrentContext.Result.Outcome.Status}");
+
     [OneTimeTearDown]
     public void FixtureTearDown()
     {
@@ -49,9 +58,6 @@ public abstract class UmbracoIntegrationTestBase
         {
             a();
         }
-
-        (s_dbInstance as IDisposable)?.Dispose();
-        _firstTestInFixture = true;
     }
 
     [TearDown]
@@ -69,23 +75,37 @@ public abstract class UmbracoIntegrationTestBase
     {
         try
         {
-            return TestOptions.Logger switch
+            switch (TestOptions.Logger)
             {
-                UmbracoTestOptions.Logger.Serilog => LoggerFactory.Create(builder =>
-                    builder.AddSerilog(new LoggerConfiguration()
-                        .WriteTo.File(
-                            Path.Combine(TestHelper.WorkingDirectory, "logs", "umbraco_integration_tests_.txt"),
-                            rollingInterval: RollingInterval.Day)
-                        .MinimumLevel.Warning()
-                        .CreateLogger())),
-                UmbracoTestOptions.Logger.Console => LoggerFactory.Create(builder => builder.AddConsole()),
-                _ => NullLoggerFactory.Instance,
-            };
+                case UmbracoTestOptions.Logger.Mock:
+                    return NullLoggerFactory.Instance;
+                case UmbracoTestOptions.Logger.Serilog:
+                    return LoggerFactory.Create(builder =>
+                    {
+                        var path = Path.Combine(TestHelper.WorkingDirectory, "logs", "umbraco_integration_tests_.txt");
+
+                        Log.Logger = new LoggerConfiguration()
+                            .WriteTo.File(path, rollingInterval: RollingInterval.Day)
+                            .MinimumLevel.Debug()
+                            .ReadFrom.Configuration(Configuration)
+                            .CreateLogger();
+
+                        builder.AddSerilog(Log.Logger);
+                    });
+                case UmbracoTestOptions.Logger.Console:
+                    return LoggerFactory.Create(builder =>
+                    {
+                        builder.AddConfiguration(Configuration.GetSection("Logging"))
+                            .AddConsole();
+                    });
+            }
         }
         catch
         {
-            return NullLoggerFactory.Instance;
+            // ignored
         }
+
+        return NullLoggerFactory.Instance;
     }
 
     protected void UseTestDatabase(IApplicationBuilder app)
@@ -93,9 +113,9 @@ public abstract class UmbracoIntegrationTestBase
 
     protected void UseTestDatabase(IServiceProvider serviceProvider)
     {
+        var state = serviceProvider.GetRequiredService<IRuntimeState>();
         var databaseFactory = serviceProvider.GetRequiredService<IUmbracoDatabaseFactory>();
         var connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
-        var state = serviceProvider.GetRequiredService<IRuntimeState>();
 
         if (TestOptions.Database == UmbracoTestOptions.Database.None)
         {
@@ -144,23 +164,30 @@ public abstract class UmbracoIntegrationTestBase
         return s_fixtureDbMeta;
     }
 
-    private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory,
-        TestUmbracoDatabaseFactoryProvider dbFactory)
+    private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
     {
         lock (s_dbLocker)
         {
-            return s_dbInstance ??= TestDatabaseFactory.Create(
-                new TestDatabaseSettings
-                {
-                    FilesPath = Path.Combine(TestHelper.WorkingDirectory, "databases"),
-                    DatabaseType =
-                        Configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
-                    PrepareThreadCount = Configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
-                    EmptyDatabasesCount = Configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
-                    SchemaDatabaseCount = Configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
-                    SQLServerMasterConnectionString =
-                        Configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"),
-                }, dbFactory, loggerFactory);
+            if (s_dbInstance != null)
+            {
+                return s_dbInstance;
+            }
+
+            var settings = new TestDatabaseSettings
+            {
+                FilesPath = Path.Combine(TestHelper.WorkingDirectory, "databases"),
+                DatabaseType = Configuration.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType"),
+                PrepareThreadCount = Configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
+                EmptyDatabasesCount = Configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
+                SchemaDatabaseCount = Configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
+                SQLServerMasterConnectionString = Configuration.GetValue<string>("Tests:Database:SQLServerMasterConnectionString"),
+            };
+
+            Directory.CreateDirectory(settings.FilesPath);
+
+            s_dbInstance = TestDatabaseFactory.Create(settings, dbFactory, loggerFactory);
+
+            return s_dbInstance;
         }
     }
 }
