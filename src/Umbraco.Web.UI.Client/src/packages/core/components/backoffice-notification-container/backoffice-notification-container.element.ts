@@ -10,6 +10,8 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 	@query('#notifications')
 	private _notificationsElement?: HTMLElement;
 
+	@query('#sr-live') private _srLive?: HTMLDivElement;
+
 	@state()
 	private _notifications?: UmbNotificationHandler[];
 
@@ -29,7 +31,6 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 
 		this.observe(this._notificationContext.notifications, (notifications) => {
 			this._notifications = notifications;
-
 			// Close and instantly open the popover again to make sure it stays on top of all other content on the page
 			// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -39,7 +40,31 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			this._notificationsElement?.showPopover?.(); // To prevent issues in FireFox I added `?.` before `()`  [NL]
+
+			//Announce the newest notification
+			this._announceNewest(this._notifications);
 		});
+	}
+
+	private _getNotificationText(notificatonData: UmbNotificationHandler): string {
+		//Trick to be able to access to the data(notification messagge) inside a private propertity
+		const data = (notificatonData as any)._data ?? {};
+		const notificationText = data.message ?? '';
+		return notificationText;
+	}
+
+	private _announce(message: string) {
+		if (!this._srLive) return;
+		this._srLive.textContent = 'u00A0'; //to avoid same text suppression
+		setTimeout(() => {
+			this._srLive!.textContent = message || '';
+		}, 0);
+	}
+
+	private _announceNewest(list?: UmbNotificationHandler[]) {
+		const newest = list?.[list.length - 1];
+		if (!newest) return;
+		this._announce(this._getNotificationText(newest));
 	}
 
 	override render() {
@@ -49,10 +74,11 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 					? repeat(
 							this._notifications,
 							(notification: UmbNotificationHandler) => notification.key,
-							(notification) => html`${notification.element}`,
+							(notification) => html`${notification.element} `,
 						)
 					: ''}
 			</uui-toast-notification-container>
+			<div id="sr-live" aria-live="assertive" aria-role="true"></div>
 		`;
 	}
 
@@ -66,13 +92,24 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 				bottom: 45px;
 				height: auto;
 				padding: var(--uui-size-layout-1);
-
 				position: fixed;
 				width: 100vw;
 				background: 0;
 				outline: 0;
 				border: 0;
 				margin: 0;
+			}
+			#sr-live {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				white-space: nowrap;
+				clip: rect(0 0 0 0);
+				clip-path: inset(50%);
+				border: 0;
 			}
 		`,
 	];
