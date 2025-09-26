@@ -8,9 +8,10 @@ public class AllMessageTemplateLogViewerControllerTests : ManagementApiUserGroup
 {
     protected override Expression<Func<AllMessageTemplateLogViewerController, object>> MethodSelector => x => x.AllMessageTemplates(CancellationToken.None, 0, 100, null, null);
 
+    // We get the InternalServerError for the admin because it has access, but there is no log file to view
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.InternalServerError
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
