@@ -45,6 +45,7 @@ export interface UmbPropertyValuePresetApiCallArgs extends UmbPropertyValuePrese
 	propertyEditorUiAlias: string;
 	propertyEditorSchemaAlias?: string;
 	variantId?: UmbVariantId;
+	value?: unknown;
 }
 
 export interface UmbPropertyTypePresetWithSchemaAliasModel extends UmbPropertyTypePresetModel {

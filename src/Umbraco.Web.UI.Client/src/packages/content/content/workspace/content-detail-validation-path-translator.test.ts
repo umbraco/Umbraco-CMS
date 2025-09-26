@@ -32,7 +32,6 @@ describe('UmbValidationPropertyPathTranslationController', () => {
 					value: 'value1',
 					culture: null,
 					segment: null,
-					entityType: 'document-property-value',
 				},
 			],
 			variants: [],

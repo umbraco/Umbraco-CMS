@@ -114,6 +114,15 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
 	 * @param {...any} args - the arguments to parse for this localization entry.
 	 * @returns {string} - the translated term as a string.
+	 * @example
+	 * Retrieving a term without any arguments:
+	 * ```ts
+	 * this.localize.term('area_term');
+	 * ```
+	 * Retrieving a term with arguments:
+	 * ```ts
+	 * this.localize.term('general_greeting', ['John']);
+	 * ```
 	 */
 	term<K extends keyof LocalizationSetType>(key: K, ...args: FunctionParams<LocalizationSetType[K]>): string {
 		if (!this.#usedKeys.includes(key)) {
