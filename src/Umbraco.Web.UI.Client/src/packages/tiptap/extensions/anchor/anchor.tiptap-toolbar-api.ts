@@ -1,8 +1,8 @@
+import type { Editor } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
+import { Anchor } from './anchor.tiptap-extension.js';
 import { UMB_TIPTAP_ANCHOR_MODAL } from './modals/index.js';
-import { Anchor } from '@umbraco-cms/backoffice/external/tiptap';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 
 export default class UmbTiptapToolbarAnchorExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override async execute(editor?: Editor) {

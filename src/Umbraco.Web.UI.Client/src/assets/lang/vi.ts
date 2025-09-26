@@ -853,6 +853,7 @@ export default {
 		email: 'Email',
 		error: 'Lỗi',
 		field: 'Trường',
+		fields: 'Trường',
 		fieldFor: 'Trường cho %0%',
 		toggleFor: 'Chuyển đổi cho %0%',
 		findDocument: 'Tìm kiếm',
@@ -2410,6 +2411,7 @@ export default {
 		searchContentTree: 'Tìm kiếm cây nội dung',
 		maxAmount: 'Số lượng tối đa',
 		expandChildItems: 'Mở rộng các mục con cho',
+		collapseChildItems: 'Thu gọn các mục con cho',
 		openContextNode: 'Mở nút ngữ cảnh cho %0%',
 	},
 	references: {

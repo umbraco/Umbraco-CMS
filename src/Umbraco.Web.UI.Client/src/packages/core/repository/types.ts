@@ -2,14 +2,28 @@ import type { UmbDataSourceErrorResponse, UmbDataSourceResponse } from './data-s
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbPagedModel<T> {
-	total: number;
 	items: Array<T>;
+	total: number;
+}
+
+export interface UmbTargetPagedModel<T> extends UmbPagedModel<T> {
+	// TODO: v18: make mandatory
+	totalAfter?: number;
+	totalBefore?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbRepositoryResponse<T> extends UmbDataSourceResponse<T> {}
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbRepositoryErrorResponse extends UmbDataSourceErrorResponse {}
+
+export interface UmbRepositoryItemsStatus {
+	state: {
+		type: 'success' | 'error' | 'loading';
+		error?: string;
+	};
+	unique: string;
+}
 
 /**
  * Interface for a repository that can return a paged model.

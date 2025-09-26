@@ -84,7 +84,12 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 
 		// Ugly, but we just inherit these from the workspace context: [NL]
 		this.name = host.name;
-		this.getName = host.getName;
+
+		this.getName = () => {
+			const contentTypeLabel = this.structure.getOwnerContentType()?.name;
+			const blockLabel = host.getName();
+			return contentTypeLabel ? `${contentTypeLabel} ${blockLabel}` : blockLabel;
+		};
 
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
@@ -94,6 +99,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 				this.structure.loadType(id);
 			}
 		});
+
 		this.observe(this.unique, (key) => {
 			if (key) {
 				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key == '${key}')]`);

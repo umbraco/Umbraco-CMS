@@ -1,7 +1,6 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
-import { Span } from '@umbraco-cms/backoffice/external/tiptap';
+import { Span } from './html-tag-span.tiptap-extension.js';
 
 export default class UmbTiptapHtmlTagSpanExtensionApi extends UmbTiptapExtensionApiBase {
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
 	getTiptapExtensions = () => [Span];
 }

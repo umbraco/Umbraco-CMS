@@ -23,7 +23,7 @@ public class ModelsBuilderSettings
     ///     Gets or sets a value for the models mode.
     /// </summary>
     [DefaultValue(StaticModelsMode)]
-    public ModelsMode ModelsMode { get; set; } = Enum.Parse<ModelsMode>(StaticModelsMode);
+    public string ModelsMode { get; set; } = StaticModelsMode;
 
     /// <summary>
     ///     Gets or sets a value for models namespace.
@@ -35,23 +35,9 @@ public class ModelsBuilderSettings
     /// <summary>
     ///     Gets or sets a value indicating whether we should flag out-of-date models.
     /// </summary>
-    /// <remarks>
-    ///     Models become out-of-date when data types or content types are updated. When this
-    ///     setting is activated the ~/umbraco/models/PureLive/ood.txt file is then created. When models are
-    ///     generated through the dashboard, the files is cleared. Default value is <c>false</c>.
-    /// </remarks>
     public bool FlagOutOfDateModels
     {
-        get
-        {
-            if (ModelsMode == ModelsMode.Nothing ||ModelsMode.IsAuto())
-            {
-                return false;
-
-            }
-
-            return _flagOutOfDateModels;
-        }
+        get => ModelsMode == Constants.ModelsBuilder.ModelsModes.SourceCodeManual && _flagOutOfDateModels;
 
         set => _flagOutOfDateModels = value;
     }
