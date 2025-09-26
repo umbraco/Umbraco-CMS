@@ -309,7 +309,18 @@ public class UmbracoHelper
     /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
     public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids) => _publishedContentQuery.Content(ids);
 
+    /// <summary>
+    /// Gets the documents at root.
+    /// </summary>
+    /// <returns>A collection of <see cref="IPublishedContent"/> found at the root.</returns>
     public IEnumerable<IPublishedContent> ContentAtRoot() => _publishedContentQuery.ContentAtRoot();
+
+    /// <summary>
+    /// Gets the documents at root.
+    /// </summary>
+    /// <param name="culture">The requested culture.</param>
+    /// <returns>A collection of <see cref="IPublishedContent"/> found at the root.</returns>
+    public IEnumerable<IPublishedContent> ContentAtRoot(string? culture) => _publishedContentQuery.ContentAtRoot(culture);
 
     #endregion
 

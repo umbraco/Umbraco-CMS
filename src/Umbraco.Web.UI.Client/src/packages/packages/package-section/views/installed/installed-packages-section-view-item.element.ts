@@ -122,7 +122,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 						name=${ifDefined(this.name)}
 						version="${ifDefined(this.version ?? undefined)}"
 						@open=${this.#onConfigure}
-						?disabled="${!this._packageView}">
+						?readonly="${!this._packageView}">
 						${this.customIcon ? html`<umb-icon slot="icon" name=${this.customIcon}></umb-icon>` : nothing}
 						<div slot="tag">
 							${this.hasPendingMigrations
