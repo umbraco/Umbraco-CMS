@@ -569,8 +569,8 @@ angular.module("umbraco")
                 vm.loading = true;
                 return entityResource
                   .getPagedChildren(id, "Media", vm.searchOptions)
-                  .then(handlePagedChildren)
-                  .finally(function () { vm.loading = false; });
+                    .then(handlePagedChildren)
+                    .finally(function () { vm.loading = false; });
             }
 
             function handlePagedChildren(data) {
