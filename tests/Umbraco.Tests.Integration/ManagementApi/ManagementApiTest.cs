@@ -46,6 +46,10 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
     }
 
+    [SetUp]
+    public override void SetUp_Logging() =>
+        TestContext.Out.Write($"Start test {s_testCount++}: {TestContext.CurrentContext.Test.FullName}");
+
     [OneTimeTearDown]
     public void ClearCache() => _tokenCache.Clear();
 
