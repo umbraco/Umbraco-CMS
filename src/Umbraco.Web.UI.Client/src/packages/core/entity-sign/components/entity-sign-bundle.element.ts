@@ -75,7 +75,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			this._open = true;
 			this.requestUpdate();
 			this._hoverTimer = undefined;
-		}, 500);
+		}, 600);
 	};
 
 	#cancelOpen = () => {
@@ -111,9 +111,8 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					this._signs,
 					(c) => c.alias,
 					(c, i) => {
-						return html`<div class="sign-container ${i === 0 ? 'first-icon' : ''}">
-							<span class="badge-icon" style=${`--i:${i}`}>${c.component}</span
-							><span class="label">${this._labels.get(c.alias)}</span>
+						return html`<div class="sign-container ${i === 0 ? 'first-icon' : ''}" style=${`--i:${i}`}>
+							<span class="badge-icon">${c.component}</span><span class="label">${this._labels.get(c.alias)}</span>
 						</div>`;
 					},
 				)
@@ -125,75 +124,74 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 			:host {
 				anchor-name: --entity-sign;
 				--row-h: 22px;
-				--dur: 220ms;
-				--fade: 160ms;
+				--icon-w: 12px;
+				--pad-x: 4px;
 				--ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 			}
+
+			/* CLOSE STATE */
 			.infobox {
 				position: fixed;
 				position-anchor: --entity-sign;
 				bottom: anchor(bottom);
 				left: anchor(right);
-				font-size: 8px;
-				display: grid;
 				background: transparent;
-				box-shadow: none;
-				transition:
-					transform var(--dur) var(--ease),
-					background-color var(--fade) ease,
-					box-shadow var(--fade) ease;
+				padding: 0;
+				font-size: 8px;
+				clip-path: inset(calc((var(--count) - 1) * var(--row-h)) calc(100% - (var(--icon-w) + 2 * var(--pad-x))) 0 0);
+				transition: clip-path 220ms var(--ease);
+				will-change: clip-path;
 			}
-
 			.infobox > .sign-container {
-				grid-area: 1 / 1;
 				display: flex;
-				align-items: center;
+				align-items: end;
 				gap: 3px;
+				position: relative;
+				z-index: 0;
+				transform: translateY(calc((var(--count) - 1 - var(--i, 0)) * var(--row-h)));
+				transition: transform 220ms var(--ease);
+				will-change: transform;
 			}
-
 			.infobox > .sign-container.first-icon {
 				z-index: 1;
+				margin-left: 3px;
+			}
+			.infobox .sign-container .badge-icon {
+				background: var(--sign-bundle-bg, transparent);
+				border-radius: 50%;
 			}
 
 			.infobox .sign-container .label {
 				opacity: 0;
-				transition: opacity var(--fade) ease;
+				transition: opacity 160ms ease;
 			}
 
-			.badge-icon {
-				display: grid;
-				place-items: center;
-				background: var(--sign-bundle-bg, transparent);
-				border-radius: 50%;
-				transition: transform var(--dur) var(--ease);
-			}
-
-			.infobox .sign-container .badge-icon {
-				transform: translateX(-5px);
-			}
-			.infobox .sign-container.first-icon .badge-icon {
-				transform: none;
-			}
-
+			/*OPEN STATE*/
 			.infobox.is-open {
-				display: flex;
-				flex-direction: column;
-				background: white;
-				color: black;
-				padding: 4px;
+				background: var(--uui-color-surface);
 				font-size: 12px;
+				border-radius: 3px;
+				color: var(--uui-color-text);
+				padding: 4px;
 				box-shadow:
-					0 1px 2px rgba(0, 0, 0, 0.25),
-					0 0 0 1px rgba(0, 0, 0, 0.06);
+					0px 0px 15px 0px rgba(0, 0, 0, 0.1),
+					0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+				clip-path: inset(0);
 			}
 
+			.infobox.is-open > .sign-container {
+				transform: none;
+				align-items: center;
+			}
+			.infobox.is-open > .sign-container.first-icon {
+				margin-left: 0;
+			}
 			.infobox.is-open .sign-container .label {
 				opacity: 1;
+				pointer-events: auto;
 			}
-
 			.infobox.is-open .sign-container .badge-icon {
-				transform: none;
-				background: white;
+				background: transparent;
 			}
 		`,
 	];
