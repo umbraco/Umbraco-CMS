@@ -182,6 +182,11 @@ public class GlobalSettings
     public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
 
     /// <summary>
+    ///     Gets a value indicating whether SMTP expiry date is configured.
+    /// </summary>
+    public bool IsSmtpExpirationConfigured => Smtp?.EmailExpiration != TimeSpan.MinValue;
+
+    /// <summary>
     ///     Gets a value indicating whether there is a physical pickup directory configured.
     /// </summary>
     public bool IsPickupDirectoryLocationConfigured => !string.IsNullOrWhiteSpace(Smtp?.PickupDirectoryLocation);

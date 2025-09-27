@@ -11,5 +11,7 @@ public interface IEmailSender
 
     Task SendAsync(EmailMessage message, string emailType, bool enableNotification);
 
+    Task SendAsync(EmailMessage message, string emailType, bool enableNotification, TimeSpan? emailExpiration);
+
     bool CanSendRequiredEmail();
 }

@@ -15,27 +15,38 @@ namespace Umbraco.Cms.Infrastructure.Mail
     public class BasicSmtpEmailSenderClient : IEmailSenderClient
     {
         private readonly GlobalSettings _globalSettings;
-        public BasicSmtpEmailSenderClient(IOptionsMonitor<GlobalSettings> globalSettings)
-        {
-            _globalSettings = globalSettings.CurrentValue;
-        }
 
+        /// <inheritdoc />
+        public BasicSmtpEmailSenderClient(IOptionsMonitor<GlobalSettings> globalSettings)
+            => _globalSettings = globalSettings.CurrentValue;
+
+        /// <inheritdoc />
         public async Task SendAsync(EmailMessage message)
+            => await SendAsync(message, _globalSettings.Smtp?.EmailExpiration);
+
+        /// <inheritdoc />
+        public async Task SendAsync(EmailMessage message, TimeSpan? emailExpiration)
         {
             using var client = new SmtpClient();
 
             await client.ConnectAsync(
                 _globalSettings.Smtp!.Host,
-            _globalSettings.Smtp.Port,
+                _globalSettings.Smtp.Port,
                 (SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 
             if (!string.IsNullOrWhiteSpace(_globalSettings.Smtp.Username) &&
-            !string.IsNullOrWhiteSpace(_globalSettings.Smtp.Password))
+                !string.IsNullOrWhiteSpace(_globalSettings.Smtp.Password))
             {
                 await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
             }
 
             var mimeMessage = message.ToMimeMessage(_globalSettings.Smtp!.From);
+
+            if (emailExpiration != TimeSpan.MinValue)
+            {
+                // Header needs to be in RFC 1123/2822 compatible format
+                mimeMessage.Headers.Add("Expires", DateTimeOffset.UtcNow.Add(emailExpiration.GetValueOrDefault()).ToString("R"));
+            }
 
             if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
             {
