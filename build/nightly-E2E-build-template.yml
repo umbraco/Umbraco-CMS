@@ -11,10 +11,6 @@
     type: string
     default: 'false'
 
-  - name: buildBackoffice
-    type: string
-    default: 'false'
-
 steps:
   - pwsh: |
       dotnet restore UmbracoProject
@@ -69,15 +65,6 @@ steps:
       }
     displayName: Update application to use necessary classes
     workingDirectory: $(Agent.BuildDirectory)/app
-
-  # Build Umbraco Backoffice (Client)
-  - pwsh: |
-      Write-Host "Running npm install + npm run build for backoffice"
-      cd "$(Agent.BuildDirectory)/app/src/Umbraco.Web.UI.Client"
-      npm ci
-      npm run build
-    displayName: Build Umbraco Backoffice (Client)
-    condition: eq(variables['additionalEnvironmentVariables'], 'true')
 
   - pwsh: |
       dotnet build UmbracoProject --configuration ${{ parameters.buildConfiguration }} --no-restore
