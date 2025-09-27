@@ -21,6 +21,9 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	@state() private _signs?: Array<any>;
 	@state() private _labels: Map<string, string> = new Map();
 
+	private _open = false;
+	private _hoverTimer?: number;
+
 	#signLabelObservations: Array<UmbObserverController<string>> = [];
 
 	#manifestFilter = (manifest: ManifestEntitySign) => {
@@ -66,6 +69,26 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		);
 	}
 
+	#armOpen = () => {
+		if (this._hoverTimer) clearTimeout(this._hoverTimer);
+		this._hoverTimer = window.setTimeout(() => {
+			this._open = true;
+			this.requestUpdate();
+			this._hoverTimer = undefined;
+		}, 500);
+	};
+
+	#cancelOpen = () => {
+		if (this._hoverTimer) {
+			clearTimeout(this._hoverTimer);
+			this._hoverTimer = undefined;
+		}
+		if (this._open) {
+			this._open = false;
+			this.requestUpdate();
+		}
+	};
+
 	override render() {
 		if (!this._signs || this._signs.length === 0) return nothing;
 
@@ -73,20 +96,14 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		if (!first) return nothing;
 
 		return html`
-			<!-- <button id="sign-icon" type="button">${this.#renderIcons()}</button> -->
-			<div class="infobox">${this.#renderOptions()}</div>
+			<div
+				class="infobox ${this._open ? 'is-open' : ''}"
+				@mouseenter=${this.#armOpen}
+				@mouseleave=${this.#cancelOpen}
+				style=${`--count:${this._signs.length}`}>
+				${this.#renderOptions()}
+			</div>
 		`;
-	}
-	#renderIcons() {
-		return this._signs
-			? repeat(
-					this._signs,
-					(c) => c.alias,
-					(c, i) => {
-						return html`<span class="badge-icon ${i === 0 ? 'inner' : ''}">${c.component}</span>`;
-					},
-				)
-			: nothing;
 	}
 	#renderOptions() {
 		return this._signs
@@ -94,7 +111,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 					this._signs,
 					(c) => c.alias,
 					(c, i) => {
-						return html`<div class="signs-container">
+						return html`<div class="sign-container ${i === 0 ? 'first-icon' : ''}">
 							<span class="badge-icon" style=${`--i:${i}`}>${c.component}</span
 							><span class="label">${this._labels.get(c.alias)}</span>
 						</div>`;
@@ -107,97 +124,76 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		css`
 			:host {
 				anchor-name: --entity-sign;
-				--row-h: 18px;
-				--open-delay: 300ms;
-				--scale-dur: 300ms;
-				--fade-dur: 160ms;
+				--row-h: 22px;
+				--dur: 220ms;
+				--fade: 160ms;
 				--ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 			}
-			/* #sign-icon {
-				position: relative;
-				display: inline-flex;
-				border: 0;
-				background: red;
-				cursor: pointer;
-				padding: 1px;
-				border-radius: 50%;
-				color: var(--sign-bundle-text-color);
-			} */
-
-			/* .badge-icon {
-				position: absolute;
-				right: 7px;
-				bottom: -2px;
-				font-size: 8px;
-				border-radius: 50%;
-				background: var(--sign-bundle-bg, transparent);
-			}
-			.badge-icon > * {
-				filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
-			} */
-			/* .inner {
-				z-index: 1;
-				right: 1px;
-				bottom: -2px;
-			} */
-
 			.infobox {
 				position: fixed;
 				position-anchor: --entity-sign;
 				bottom: anchor(bottom);
 				left: anchor(right);
-				border-radius: 3px;
-				font-size: 12px;
-				transform: scale(0.7);
-				transform-origin: bottom left;
-				opacity: 0.85;
-				overflow: hidden;
-				max-height: var(--row-h);
+				font-size: 8px;
+				display: grid;
 				background: transparent;
 				box-shadow: none;
 				transition:
-					transform var(--scale-dur) var(--ease) var(--open-delay),
-					opacity var(--fade-dur) ease var(--open-delay);
-				will-change: transform, opacity;
+					transform var(--dur) var(--ease),
+					background-color var(--fade) ease,
+					box-shadow var(--fade) ease;
 			}
 
-			.signs-container {
+			.infobox > .sign-container {
+				grid-area: 1 / 1;
 				display: flex;
 				align-items: center;
 				gap: 3px;
-				padding: 4px;
-				height: var(--row-h);
 			}
 
-			.infobox .signs-container .label {
-				display: none;
+			.infobox > .sign-container.first-icon {
+				z-index: 1;
 			}
-			.infobox .badge-icon {
-				font-size: 10px;
-				border-radius: 50%;
+
+			.infobox .sign-container .label {
+				opacity: 0;
+				transition: opacity var(--fade) ease;
+			}
+
+			.badge-icon {
+				display: grid;
+				place-items: center;
 				background: var(--sign-bundle-bg, transparent);
+				border-radius: 50%;
+				transition: transform var(--dur) var(--ease);
 			}
-			.infobox .badge-icon > * {
-				filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+
+			.infobox .sign-container .badge-icon {
+				transform: translateX(-5px);
 			}
-			.infobox:hover {
-				transform: scale(1);
-				opacity: 1;
-				overflow: visible;
-				max-height: none;
+			.infobox .sign-container.first-icon .badge-icon {
+				transform: none;
+			}
+
+			.infobox.is-open {
+				display: flex;
+				flex-direction: column;
 				background: white;
+				color: black;
+				padding: 4px;
+				font-size: 12px;
 				box-shadow:
 					0 1px 2px rgba(0, 0, 0, 0.25),
 					0 0 0 1px rgba(0, 0, 0, 0.06);
-				transition-delay: 0ms, 0ms, 0ms, 0ms;
 			}
 
-			.infobox:hover .signs-container .label {
-				display: inline;
+			.infobox.is-open .sign-container .label {
+				opacity: 1;
 			}
-			.infobox:hover .badge-icon {
-				font-size: 12px;
-				background: transparent;
+
+			.infobox.is-open .sign-container .badge-icon {
+				transform: none;
+				background: white;
 			}
 		`,
 	];

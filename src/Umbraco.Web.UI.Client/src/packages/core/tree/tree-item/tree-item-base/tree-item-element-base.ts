@@ -283,8 +283,8 @@ export abstract class UmbTreeItemElementBase<
 
 			#sign-bundle {
 				position: absolute;
-				bottom: -4px;
-				right: 10px;
+				bottom: -10px;
+				right: 5px;
 			}
 
 			#label {
