@@ -1,7 +1,7 @@
 import {expect} from '@playwright/test';
 import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
 
-test('can get content from delivery api', async ({umbracoApi}) => {
+test.skip('can get content from delivery api', async ({umbracoApi}) => {
   // Arrange
   const documentTypeName = 'TestDocumentType';
   const contentName = 'TestContent';

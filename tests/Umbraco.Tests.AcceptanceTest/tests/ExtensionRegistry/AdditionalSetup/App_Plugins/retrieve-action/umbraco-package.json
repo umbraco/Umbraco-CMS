@@ -1,0 +1,12 @@
+{
+  "name": "My entity action",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "bundle",
+      "alias": "Umb.EntityAction.Test.Bundle",
+      "name": "Test entity action bundle",
+      "js": "/App_Plugins/retrieve-action/retrieve-action.manifests.js"
+    }
+  ]
+}
