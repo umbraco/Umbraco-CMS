@@ -42,11 +42,8 @@ namespace Umbraco.Cms.Infrastructure.Mail
 
             var mimeMessage = message.ToMimeMessage(_globalSettings.Smtp!.From);
 
-            if (emailExpiration != TimeSpan.MinValue)
-            {
-                // Header needs to be in RFC 1123/2822 compatible format
-                mimeMessage.Headers.Add("Expires", DateTimeOffset.UtcNow.Add(emailExpiration.GetValueOrDefault()).ToString("R"));
-            }
+            // `Expires` header needs to be in RFC 1123/2822 compatible format
+            mimeMessage.Headers.Add("Expires", DateTimeOffset.UtcNow.Add(emailExpiration.GetValueOrDefault()).ToString("R"));
 
             if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
             {
