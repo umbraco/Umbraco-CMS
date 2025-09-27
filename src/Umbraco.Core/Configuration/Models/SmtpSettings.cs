@@ -52,6 +52,7 @@ public class SmtpSettings : ValidatableEntryBase
 {
     internal const string StaticSecureSocketOptions = "Auto";
     internal const string StaticDeliveryMethod = "Network";
+    internal const string StaticEmailExpiration = "30.00:00:00";
 
     /// <summary>
     ///     Gets or sets a value for the SMTP from address to use for messages.
@@ -96,4 +97,13 @@ public class SmtpSettings : ValidatableEntryBase
     ///     Gets or sets a value for the SMTP password.
     /// </summary>
     public string? Password { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value for the time until an email expires.
+    /// </summary>
+    /// <remarks>
+    ///     The default value is 30 days
+    /// </remarks>
+    [DefaultValue(StaticEmailExpiration)]
+    public TimeSpan EmailExpiration { get; set; } = TimeSpan.Parse(StaticEmailExpiration);
 }

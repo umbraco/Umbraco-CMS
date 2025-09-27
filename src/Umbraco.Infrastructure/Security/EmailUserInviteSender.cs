@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -67,7 +67,7 @@ public class EmailUserInviteSender : IUserInviteSender
 
         var message = new EmailMessage(senderEmail, address.ToString(), emailSubject, emailBody, true);
 
-        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.UserInvite, true);
+        await _emailSender.SendAsync(message, Constants.Web.EmailTypes.UserInvite, true, new TimeSpan(72, 0, 0));
     }
 
     public bool CanSendInvites() => _emailSender.CanSendRequiredEmail();
