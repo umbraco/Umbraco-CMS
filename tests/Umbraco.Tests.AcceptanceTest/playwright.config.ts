@@ -56,7 +56,7 @@ export default defineConfig({
     },
     {
       name: 'extensionRegistry',
-      testMatch: 'ExtensionRegistry/**',
+      testMatch: 'ExtensionRegistry/*.spec.ts',
       dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
