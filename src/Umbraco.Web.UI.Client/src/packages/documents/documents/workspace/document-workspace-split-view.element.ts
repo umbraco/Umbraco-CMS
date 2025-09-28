@@ -21,6 +21,9 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	private _overrides?: Array<UmbDeepPartialObject<ManifestWorkspaceView>>;
 
+	@state()
+	private _loading = true;
+
 	constructor() {
 		super();
 
@@ -29,6 +32,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			this._workspaceContext = context;
 			this.#observeActiveVariantInfo();
 			this.#observeIcon();
+			this.#observeLoading();
 			this.#observeCollectionOverrides();
 		});
 	}
@@ -44,15 +48,33 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	}
 
 	#observeIcon() {
-		this.observe(this._workspaceContext?.contentTypeIcon, (icon) => {
-			this._icon = icon ?? undefined;
-		});
+		this.observe(
+			this._workspaceContext?.contentTypeIcon,
+			(icon) => {
+				this._icon = icon ?? undefined;
+			},
+			'observeIcon',
+		);
+	}
+
+	#observeLoading() {
+		this.observe(
+			this._workspaceContext?.loading.isOn,
+			(loading) => {
+				this._loading = loading ?? false;
+			},
+			'observeIcon',
+		);
 	}
 
 	#observeCollectionOverrides() {
-		this.observe(this._workspaceContext?.collection.manifestOverrides, (overrides) => {
-			this._overrides = overrides ? [overrides] : undefined;
-		});
+		this.observe(
+			this._workspaceContext?.collection.manifestOverrides,
+			(overrides) => {
+				this._overrides = overrides ? [overrides] : undefined;
+			},
+			'observeCollectionOverrides',
+		);
 	}
 
 	override render() {
@@ -64,6 +86,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 								view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
 							(view) => html`
 								<umb-workspace-split-view
+									.loading=${this._loading}
 									.displayNavigation=${view.index === this._variants!.length - 1}
 									.overrides=${this._overrides}
 									.splitViewIndex=${view.index}>
@@ -95,10 +118,6 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 				display: flex;
 				width: 100%;
 				height: calc(100% - var(--umb-footer-layout-height));
-			}
-
-			#breadcrumbs {
-				margin: 0 var(--uui-size-layout-1);
 			}
 		`,
 	];
