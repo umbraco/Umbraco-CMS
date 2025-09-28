@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
 
             var mimeMessage = message.ToMimeMessage(_globalSettings.Smtp!.From);
 
-            if (_globalSettings.IsSmtpExpiryConfigured && !emailExpiration.HasValue)
+            if (_globalSettings.IsSmtpExpiryConfigured)
             {
                 emailExpiration ??= _globalSettings.Smtp.EmailExpiration;
             }
