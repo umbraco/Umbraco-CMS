@@ -27,6 +27,9 @@ import './workspace-split-view-variant-selector.element.js';
 @customElement('umb-workspace-split-view')
 export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	@property({ type: Boolean })
+	public loading = false;
+
+	@property({ type: Boolean })
 	displayNavigation = false;
 
 	@property({ attribute: 'back-path' })
@@ -52,7 +55,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	private _variantId?: UmbVariantId;
 
-	splitViewContext = new UmbWorkspaceSplitViewContext(this);
+	readonly splitViewContext = new UmbWorkspaceSplitViewContext(this);
 
 	#onVariantSelectorSlotChanged(e: Event) {
 		this._variantSelectorSlotHasContent = (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
@@ -81,6 +84,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-workspace-editor
+				.loading=${this.loading}
 				back-path=${ifDefined(this.backPath)}
 				.hideNavigation=${!this.displayNavigation}
 				.variantId=${this._variantId}

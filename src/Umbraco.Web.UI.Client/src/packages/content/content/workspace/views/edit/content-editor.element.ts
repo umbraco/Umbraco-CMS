@@ -34,6 +34,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	#viewContext?: typeof UMB_VIEW_CONTEXT.TYPE;
 
 	@state()
+	private _loaded = false;
+
+	@state()
 	private _hasRootGroups = false;
 
 	@state()
@@ -84,6 +87,13 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			this.#structureManager = workspaceContext?.structure;
 			this._tabsStructureHelper.setStructureManager(workspaceContext?.structure);
 			this.#observeRootGroups();
+			this.observe(
+				this.#structureManager?.contentTypeLoaded,
+				(loaded) => {
+					this._loaded = loaded ?? false;
+				},
+				'observeContentTypeLoaded',
+			);
 		});
 	}
 
@@ -197,6 +207,9 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	}
 
 	override render() {
+		if (!this._loaded || !this._routes || this._routes.length === 0 || !this._tabs) {
+			return html`<umb-view-loader></umb-view-loader>`;
+		}
 		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
