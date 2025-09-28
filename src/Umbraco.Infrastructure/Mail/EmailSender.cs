@@ -79,7 +79,7 @@ public class EmailSender : IEmailSender
     /// <param name="emailType"></param>
     /// <returns></returns>
     public async Task SendAsync(EmailMessage message, string emailType) =>
-        await SendAsyncInternal(message, emailType, false, _globalSettings.Smtp?.EmailExpiration);
+        await SendAsyncInternal(message, emailType, false, null);
 
     /// <summary>
     ///     Sends the message async
@@ -99,7 +99,7 @@ public class EmailSender : IEmailSender
     /// <param name="enableNotification"></param>
     /// <returns></returns>
     public async Task SendAsync(EmailMessage message, string emailType, bool enableNotification) =>
-        await SendAsyncInternal(message, emailType, enableNotification, _globalSettings.Smtp?.EmailExpiration);
+        await SendAsyncInternal(message, emailType, enableNotification, null);
 
     /// <summary>
     ///     Sends the message async

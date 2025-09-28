@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
 
         /// <inheritdoc />
         public async Task SendAsync(EmailMessage message)
-            => await SendAsync(message, _globalSettings.Smtp?.EmailExpiration);
+            => await SendAsync(message, null);
 
         /// <inheritdoc />
         public async Task SendAsync(EmailMessage message, TimeSpan? emailExpiration)
@@ -41,6 +41,11 @@ namespace Umbraco.Cms.Infrastructure.Mail
             }
 
             var mimeMessage = message.ToMimeMessage(_globalSettings.Smtp!.From);
+
+            if (_globalSettings.IsSmtpExpiryConfigured && !emailExpiration.HasValue)
+            {
+                emailExpiration ??= _globalSettings.Smtp.EmailExpiration;
+            }
 
             if (emailExpiration.HasValue)
             {
