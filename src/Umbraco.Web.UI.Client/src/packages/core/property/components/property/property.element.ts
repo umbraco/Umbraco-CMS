@@ -100,13 +100,15 @@ export class UmbPropertyElement extends UmbLitElement {
 
 	@property({ type: String, attribute: 'property-editor-data-source-alias' })
 	public set propertyEditorDataSourceAlias(value: string | undefined) {
-		this._propertyEditorDataSourceAlias = value;
-		debugger;
+		this.#propertyContext.setEditorDataSourceAlias(value);
+
+		if (this._element) {
+			this._element.dataSourceAlias = value;
+		}
 	}
 	public get propertyEditorDataSourceAlias(): string | undefined {
-		return this._propertyEditorDataSourceAlias;
+		return this.#propertyContext.getEditorDataSourceAlias();
 	}
-	private _propertyEditorDataSourceAlias?: string;
 
 	/**
 	 * Config. Configuration to pass to the Property Editor UI. This is also the configuration data stored on the Data Type.
@@ -347,6 +349,7 @@ export class UmbPropertyElement extends UmbLitElement {
 				this._element.manifest = manifest;
 				this._element.mandatory = this._mandatory;
 				this._element.name = this._label;
+				this._element.dataSourceAlias = this.#propertyContext.getEditorDataSourceAlias();
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
 				this.#valueObserver = this.observe(
