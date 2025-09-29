@@ -17,9 +17,14 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		this.#gotEntityType();
 	}
 
-	@state() private _entityType?: string;
-	@state() private _signs?: Array<any>;
-	@state() private _labels: Map<string, string> = new Map();
+	@state()
+	private _entityType?: string;
+
+	@state()
+	private _signs?: Array<any>;
+
+	@state()
+	private _labels: Map<string, string> = new Map();
 
 	private _open = false;
 	private _hoverTimer?: number;
