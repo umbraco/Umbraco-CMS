@@ -409,17 +409,18 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         Sql<ISqlContext> sql;
         try
         {
-            sql = SqlContext.Sql()
+            foreach (IEnumerable<int> batchedUserIds in userIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                sql = SqlContext.Sql()
                 .Select<UserGroupDto>(x => x.Id, x => x.Key)
                 .From<UserGroupDto>()
                 .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
-                .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
+                .WhereIn<User2UserGroupDto>(x => x.UserId, batchedUserIds);
 
-            List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>(sql);
+                List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>(sql);
 
-
-            groupKeys = userGroups.Select(x => x.Key).ToList();
-
+                groupKeys.AddRange(userGroups.Select(x => x.Key));
+            }
         }
         catch (DbException)
         {
@@ -431,14 +432,17 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         }
 
-
         // get users2groups
-        sql = SqlContext.Sql()
+        List<User2UserGroupDto>? user2Groups = [];
+        foreach (IEnumerable<int> batchedUserIds in userIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            sql = SqlContext.Sql()
             .Select<User2UserGroupDto>()
             .From<User2UserGroupDto>()
-            .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
+            .WhereIn<User2UserGroupDto>(x => x.UserId, batchedUserIds);
 
-        List<User2UserGroupDto>? user2Groups = Database.Fetch<User2UserGroupDto>(sql);
+            user2Groups.AddRange(Database.Fetch<User2UserGroupDto>(sql));
+        }
 
         if (groupIds.Any() is false)
         {
@@ -485,13 +489,16 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .ToDictionary(x => x.Key, x => x);
 
         // get start nodes
-
-        sql = SqlContext.Sql()
+        List<UserStartNodeDto>? startNodes = [];
+        foreach (IEnumerable<int> batchedUserIds in userIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            sql = SqlContext.Sql()
             .Select<UserStartNodeDto>()
             .From<UserStartNodeDto>()
-            .WhereIn<UserStartNodeDto>(x => x.UserId, userIds);
+            .WhereIn<UserStartNodeDto>(x => x.UserId, batchedUserIds);
 
-        List<UserStartNodeDto>? startNodes = Database.Fetch<UserStartNodeDto>(sql);
+            startNodes.AddRange(Database.Fetch<UserStartNodeDto>(sql));
+        }
 
         // get groups2languages
 
