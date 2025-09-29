@@ -14,9 +14,6 @@ import '@umbraco-cms/backoffice/imaging';
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	@state()
-	private _workspacePathBuilder?: UmbModalRouteBuilder;
-
-	@state()
 	private _items: Array<UmbMediaCollectionItemModel> = [];
 
 	@state()
@@ -29,13 +26,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			collectionContext?.setupView(this);
-			this.observe(
-				collectionContext?.workspacePathBuilder,
-				(builder) => {
-					this._workspacePathBuilder = builder;
-				},
-				'observePath',
-			);
 			this.#observeCollectionContext();
 		});
 	}
@@ -69,12 +59,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#getEditUrl(item: UmbMediaCollectionItemModel) {
-		return item.unique && this._workspacePathBuilder
-			? this._workspacePathBuilder({ entityType: item.entityType }) +
-					UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
-						unique: item.unique,
-					})
-			: '';
+		return UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
 	}
 
 	override render() {
