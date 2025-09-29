@@ -99,10 +99,10 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbDocumentCollectionItemModel) {
-		// TODO: ⚠️[v17]⚠️ Review the `item.variants[0].name` as this is a hack! [LK]
+		// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
 		return html`
 			<uui-card-content-node
-				.name=${item.variants[0].name ?? 'Unnamed Document'}
+				.name=${item.variants[0].name}
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
@@ -131,7 +131,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderState(item: UmbDocumentCollectionItemModel) {
-		// TODO: ⚠️[v17]⚠️ Review the `item.variants[0].state` as this is a hack! [LK]
+		// TODO: [v17] Review usage of `item.variants[0].state` as this needs to be implemented properly! [LK]
 		const state = item.variants[0].state;
 		if (!state) return;
 		const tagConfig = this.#getStateTagConfig(state);

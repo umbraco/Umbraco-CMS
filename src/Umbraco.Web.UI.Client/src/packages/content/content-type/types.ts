@@ -32,7 +32,6 @@ export interface UmbPropertyTypeContainerMergedModel {
  * @interface UmbContentTypeModel
  */
 export interface UmbContentTypeModel {
-	// TODO: ⚠️[v17]⚠️ Need clarification. Should these properties be moved over to `UmbContentTypeDetailModel`? [LK]
 	unique: string;
 	name: string;
 	alias: string;

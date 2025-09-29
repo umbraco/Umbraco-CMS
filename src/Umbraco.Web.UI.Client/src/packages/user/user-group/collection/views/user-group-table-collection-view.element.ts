@@ -57,7 +57,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	@state()
-	private _selection: Array<string | null> = [];
+	private _selection: Array<string> = [];
 
 	#collectionContext?: UmbUserGroupCollectionContext;
 
@@ -65,8 +65,8 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	#documentItemRepository?: UmbItemRepository<UmbUniqueItemModel>;
 	#mediaItemRepository?: UmbItemRepository<UmbUniqueItemModel>;
 
-	#documentStartNodeMap = new Map<string, string | undefined>(); // TODO: ⚠️[v17]⚠️ Review this, as I had to make `name` nullable to TS compile! [LK]
-	#mediaStartNodeMap = new Map<string, string | undefined>(); // TODO: ⚠️[v17]⚠️ Review this, as I had to make `name` nullable to TS compile! [LK]
+	#documentStartNodeMap = new Map<string, string>();
+	#mediaStartNodeMap = new Map<string, string>();
 
 	constructor() {
 		super();
@@ -75,7 +75,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 			this.#collectionContext = instance;
 			this.observe(
 				this.#collectionContext?.selection.selection,
-				(selection) => (this._selection = selection ?? []),
+				(selection) => (this._selection = selection?.filter((x) => x !== undefined && x !== null) ?? []),
 				'umbCollectionSelectionObserver',
 			);
 			this.observe(
@@ -167,7 +167,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		userGroups: Array<UmbUserGroupDetailModel>,
 		startNodeField: 'documentStartNode' | 'mediaStartNode',
 		itemRepository: UmbItemRepository<UmbUniqueItemModel>,
-		map: Map<string, string | undefined>, // TODO: ⚠️[v17]⚠️ Review this, as I had to make `name` nullable to TS compile! [LK]
+		map: Map<string, string>,
 	) {
 		const allStartNodes = userGroups.map((userGroup) => userGroup[startNodeField]?.unique).filter(Boolean) as string[];
 		const uniqueStartNodes = [...new Set(allStartNodes)];
@@ -207,8 +207,8 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this.#onSelected}"
-				@deselected="${this.#onDeselected}"></umb-table>
+				@selected=${this.#onSelected}
+				@deselected=${this.#onDeselected}></umb-table>
 		`;
 	}
 

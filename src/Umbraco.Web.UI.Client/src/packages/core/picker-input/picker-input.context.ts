@@ -13,8 +13,7 @@ import {
 	type UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 
-// TODO: ⚠️[v17]⚠️ Review this, as `name` shouldn't really be nullable here, (I only did it so I could TS compile)! [LK]
-type PickerItemBaseType = { name?: string; unique: string };
+type PickerItemBaseType = { name: string; unique: string };
 
 export class UmbPickerInputContext<
 	PickedItemType extends PickerItemBaseType = PickerItemBaseType,

@@ -36,6 +36,8 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 		if (data) {
 			const items = data.items.map((item: DocumentCollectionResponseModel) => {
 				const model: UmbDocumentCollectionItemModel = {
+					// TODO: [v17] Review this, as needed to reintroduce the `name` field on `UmbDocumentCollectionItemModel` (due to the `UmbDocumentItemDataResolver`). [LK]
+					name: '',
 					ancestors: item.ancestors.map((ancestor) => {
 						return {
 							unique: ancestor.id,

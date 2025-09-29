@@ -38,6 +38,8 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 
 const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 	return {
+		// TODO: [v17] Review this, as needed to reintroduce the `name` field on `UmbDocumentCollectionItemModel` (due to the `UmbDocumentItemDataResolver`). [LK]
+		name: '',
 		documentType: {
 			collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
 			icon: item.documentType.icon,

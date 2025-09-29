@@ -15,8 +15,7 @@ export type UmbSearchResultModel = SearchResultResponseModel;
 export type UmbSearchResultItemModel = {
 	entityType: string;
 	icon?: string | null;
-	// TODO: ⚠️[v17]⚠️ Review this, as I had to make `name` nullable to TS compile! [LK]
-	name?: string;
+	name: string;
 	unique: string;
 	href: string;
 };

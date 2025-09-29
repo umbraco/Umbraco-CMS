@@ -288,7 +288,7 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 	async #getNameForDocument(unique: string) {
 		const { data } = await this.#documentItemRepository.requestItems([unique]);
-		// TODO: ⚠️[v17]⚠️ Review the `item.variants[0].name` as this is a hack! [LK]
+		// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
 		return data?.[0]?.variants[0].name ?? '';
 	}
 

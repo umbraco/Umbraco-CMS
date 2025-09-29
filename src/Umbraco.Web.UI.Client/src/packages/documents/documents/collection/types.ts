@@ -13,6 +13,8 @@ export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterMod
 }
 
 export interface UmbDocumentCollectionItemModel {
+	// TODO: [v17] Review this, as when used with `UmbDocumentItemDataResolver`, the `UmbDocumentItemDataResolverModel` requires a `name` field in the root. [LK]
+	name: string;
 	ancestors: Array<UmbEntityModel>;
 	unique: string;
 	entityType: UmbDocumentEntityType;
