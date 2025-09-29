@@ -210,7 +210,6 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		if (!this._loaded || !this._routes || this._routes.length === 0 || !this._tabs) {
 			return html`<umb-view-loader></umb-view-loader>`;
 		}
-		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
 				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups))
