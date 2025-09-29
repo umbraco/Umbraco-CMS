@@ -20,7 +20,7 @@ public interface IContentTypeReferenceService
     Task<PagedModel<Guid>> GetReferencedDocumentTypeKeysAsync(Guid key, CancellationToken cancellationToken, int skip, int take);
 
     /// <summary>
-    ///     Gets all property type aliases.
+    ///     Gets data type keys that reference element types.
     /// </summary>
     /// <returns></returns>
     Task<PagedModel<Guid>> GetReferencedElementsFromDataTypesAsync(Guid key, CancellationToken cancellationToken, int skip, int take);
