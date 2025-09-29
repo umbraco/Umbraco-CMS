@@ -8,6 +8,7 @@ import type {
 	UmbModalContext,
 	UmbModalContextClassArgs,
 	UmbModalManagerContext,
+	UmbModalRouteHandler,
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -327,7 +328,12 @@ export class UmbModalRouteRegistrationController<
 		this.#modalContext = undefined;
 	};
 
-	async routeSetup(router: IRouterSlot, modalManagerContext: UmbModalManagerContext, params: Params) {
+	async routeSetup(
+		router: IRouterSlot,
+		modalManagerContext: UmbModalManagerContext,
+		params: Params,
+		routeHandler: UmbModalRouteHandler,
+	) {
 		// If already open, don't do anything:
 		if (this.active) return;
 
@@ -337,6 +343,7 @@ export class UmbModalRouteRegistrationController<
 				modal: {},
 				...modalData,
 				router,
+				routeHandler,
 			} as UmbModalContextClassArgs<UmbModalToken<UmbModalTokenData, UmbModalTokenValue>>;
 			args.modal!.key = this.#key;
 

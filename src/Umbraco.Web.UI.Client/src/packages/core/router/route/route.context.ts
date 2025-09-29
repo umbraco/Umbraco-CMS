@@ -3,6 +3,7 @@ import type { IRouterSlot } from '../router-slot/index.js';
 import type { UmbModalRouteRegistration } from '../modal-registration/modal-route-registration.interface.js';
 import { umbGenerateRoutePathBuilder } from '../generate-route-path-builder.function.js';
 import type { UmbRoute } from './route.interface.js';
+import { UmbRouteModalHandler } from './route-modal-handler.class.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -19,6 +20,7 @@ export class UmbRouteContext extends UmbContextBase {
 	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#modalRoutes: UmbRoutePlusModalKey[] = [];
 	#activeModalPath?: string;
+	#routeHandler: UmbRouteModalHandler;
 
 	#basePath = new UmbStringState(undefined);
 	public readonly basePath = this.#basePath.asObservable();
@@ -32,6 +34,7 @@ export class UmbRouteContext extends UmbContextBase {
 	constructor(host: UmbControllerHost, mainRouter: IRouterSlot, modalRouter: IRouterSlot) {
 		super(host, UMB_ROUTE_CONTEXT);
 		this.#modalRouter = modalRouter;
+		this.#routeHandler = new UmbRouteModalHandler((path) => this._internal_removeModalPath(path));
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
 			this.#modalContext = context;
 			this.#generateModalRoutes();
@@ -70,6 +73,7 @@ export class UmbRouteContext extends UmbContextBase {
 					this.#modalRouter,
 					this.#modalContext,
 					info.match.params,
+					this.#routeHandler,
 				);
 				if (modalContext) {
 					modalContext._internal_setCurrentModalPath(info.match.fragments.consumed);

@@ -1,6 +1,11 @@
 import type { IRouterSlot, Params } from '../router-slot/index.js';
 import type { UmbModalRouteBuilder } from './modal-route-registration.controller.js';
-import type { UmbModalContext, UmbModalManagerContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type {
+	UmbModalContext,
+	UmbModalManagerContext,
+	UmbModalToken,
+	UmbModalRouteHandler,
+} from '@umbraco-cms/backoffice/modal';
 
 export interface UmbModalRouteRegistration<
 	UmbModalTokenData extends { [key: string]: any } = { [key: string]: any },
@@ -18,6 +23,7 @@ export interface UmbModalRouteRegistration<
 		router: IRouterSlot,
 		modalManagerContext: UmbModalManagerContext,
 		params: Params,
+		routeHandler: UmbModalRouteHandler,
 	): Promise<undefined | UmbModalContext<UmbModalTokenData, UmbModalTokenValue>>;
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
