@@ -34,6 +34,7 @@ export class UmbPickerInputContext<
 
 	/**
 	 * Define a minimum amount of selected items in this input, for this input to be valid.
+	 * @returns {number} The minimum number of items required.
 	 */
 	public get max() {
 		return this._max;
@@ -45,6 +46,7 @@ export class UmbPickerInputContext<
 
 	/**
 	 * Define a maximum amount of selected items in this input, for this input to be valid.
+	 * @returns {number} The minimum number of items required.
 	 */
 	public get min() {
 		return this._min;
