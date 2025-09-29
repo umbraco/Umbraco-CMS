@@ -1,3 +1,5 @@
+import type { UmbEntityDataItemModel } from '../types.js';
+import { UmbEntityDataPickerInputContext } from './Input-entity-data.context.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -29,12 +31,26 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 	 * @attr
 	 * @default
 	 */
+	@property({ type: String, attribute: 'data-source-alias' })
+	public set dataSourceAlias(value: string | undefined) {
+		this.#pickerInputContext.setDataSourceAlias(value);
+	}
+	public get dataSourceAlias(): string | undefined {
+		return this.#pickerInputContext.getDataSourceAlias();
+	}
+
+	/**
+	 * This is a minimum amount of selected items in this input.
+	 * @type {number}
+	 * @attr
+	 * @default
+	 */
 	@property({ type: Number })
 	public set min(value: number) {
-		this.#pickerContext.min = value;
+		this.#pickerInputContext.min = value;
 	}
 	public get min(): number {
-		return this.#pickerContext.min;
+		return this.#pickerInputContext.min;
 	}
 
 	/**
@@ -54,10 +70,10 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
-		this.#pickerContext.max = value;
+		this.#pickerInputContext.max = value;
 	}
 	public get max(): number {
-		return this.#pickerContext.max;
+		return this.#pickerInputContext.max;
 	}
 
 	/**
@@ -74,11 +90,11 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 
 	@property({ type: Array })
 	public set selection(uniques: Array<string>) {
-		this.#pickerContext.setSelection(uniques);
+		this.#pickerInputContext.setSelection(uniques);
 		this.#sorter.setModel(uniques);
 	}
 	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
+		return this.#pickerInputContext.getSelection();
 	}
 
 	@property()
@@ -113,7 +129,8 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 	@state()
 	private _items: Array<UmbEntityDataItemModel> = [];
 
-	#pickerContext = new UmbPropertyEditorDataSourcePickerInputContext(this);
+	#pickerInputContext = new UmbEntityDataPickerInputContext(this);
+	#type: 'collection' | 'tree';
 
 	constructor() {
 		super();
@@ -121,17 +138,25 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => !!this.min && this.#pickerInputContext.getSelection().length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
+			() => !!this.max && this.#pickerInputContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
+		this.observe(
+			this.#pickerInputContext.selection,
+			(selection) => (this.value = selection.join(',')),
+			'_observeSelection',
+		);
+		this.observe(
+			this.#pickerInputContext.selectedItems,
+			(selectedItems) => (this._items = selectedItems),
+			'_observerItems',
+		);
 	}
 
 	protected override getFormElement() {
@@ -139,14 +164,14 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 	}
 
 	#openPicker() {
-		this.#pickerContext.openPicker({
+		this.#pickerInputContext.openPicker({
 			filter: this.filter,
 			multiple: this.max > 1 ? true : false,
 		});
 	}
 
-	#onRemove(item: UmbPropertyEditorDataSourceItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+	#onRemove(item: UmbEntityDataItemModel) {
+		this.#pickerInputContext.requestRemoveItem(item.unique);
 	}
 
 	override render() {
