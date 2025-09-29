@@ -10,21 +10,8 @@ namespace Umbraco.Extensions;
 public static class ActionDescriptorApiCommonExtensions
 {
     /// <summary>
-    /// Retrieves the <see cref="MapToApiAttribute.ApiName"/> value from the <see cref="ActionDescriptor"/>'s endpoint metadata, if present.
-    /// </summary>
-    /// <param name="actionDescriptor">The action descriptor to inspect.</param>
-    /// <returns>
-    /// The API name specified in the <see cref="MapToApiAttribute"/>, or <c>null</c> if the attribute is not present.
-    /// </returns>
-    private static string? GetMapToApiAttributeValue(this ActionDescriptor actionDescriptor)
-    {
-        IEnumerable<MapToApiAttribute> mapToApiAttributes = actionDescriptor?.EndpointMetadata?.OfType<MapToApiAttribute>() ?? [];
-
-        return mapToApiAttributes.SingleOrDefault()?.ApiName;
-    }
-
-    /// <summary>
     /// Determines whether the <see cref="ActionDescriptor"/> has a <see cref="MapToApiAttribute"/> with the specified API name.
+    /// The check is made in runtime to support attributes added in runtime.
     /// </summary>
     /// <param name="actionDescriptor">The action descriptor to inspect.</param>
     /// <param name="apiName">The API name to check for.</param>
@@ -38,5 +25,12 @@ public static class ActionDescriptorApiCommonExtensions
 
         return value == apiName
                || (value is null && apiName == DefaultApiConfiguration.ApiName);
+    }
+
+    private static string? GetMapToApiAttributeValue(this ActionDescriptor actionDescriptor)
+    {
+        IEnumerable<MapToApiAttribute> mapToApiAttributes = actionDescriptor?.EndpointMetadata?.OfType<MapToApiAttribute>() ?? [];
+
+        return mapToApiAttributes.SingleOrDefault()?.ApiName;
     }
 }
