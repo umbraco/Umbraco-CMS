@@ -2467,6 +2467,7 @@ export default {
 		addSettingsElementType: 'Tilføj instillinger',
 		confirmDeleteBlockTitle: 'Slet %0',
 		confirmDeleteBlockMessage: 'Er du sikker på at du vil slette indholdet <strong>%0%</strong>?',
+		confirmDeleteBlockTypeTitle: 'Slet konfiguration for blokken?',
 		confirmDeleteBlockTypeMessage: 'Er du sikker på at du vil slette konfigurationen <strong>%0%</strong>?',
 		confirmDeleteBlockTypeNotice:
 			'Indholdet vil stadigt eksistere, men redigering af dette indhold vil ikke\n      være muligt. Indholdet vil blive vist som ikke understøttet indhold.\n    ',
