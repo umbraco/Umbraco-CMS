@@ -98,6 +98,16 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 	private _propertyEditorUiAlias?: string;
 
+	@property({ type: String, attribute: 'property-editor-data-source-alias' })
+	public set propertyEditorDataSourceAlias(value: string | undefined) {
+		this._propertyEditorDataSourceAlias = value;
+		debugger;
+	}
+	public get propertyEditorDataSourceAlias(): string | undefined {
+		return this._propertyEditorDataSourceAlias;
+	}
+	private _propertyEditorDataSourceAlias?: string;
+
 	/**
 	 * Config. Configuration to pass to the Property Editor UI. This is also the configuration data stored on the Data Type.
 	 * @public
