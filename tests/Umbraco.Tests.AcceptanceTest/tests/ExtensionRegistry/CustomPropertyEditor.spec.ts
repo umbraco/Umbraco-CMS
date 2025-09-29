@@ -15,9 +15,9 @@ const customPropertyEditorName = 'Custom Text Editor';
 const testValue = 'This is a test value for the custom property editor';
 
 test.afterEach(async ({umbracoApi}) => {
-	await umbracoApi.document.ensureNameNotExists(contentName);
-	await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-	await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+  await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
 test('can add custom property editor to a document type', async ({umbracoApi, umbracoUi}) =>{
