@@ -1,6 +1,6 @@
+import { UmbLitElement } from '../../lit-element/lit-element.element.js';
+import type { ManifestEntitySign } from '../types.js';
 import { customElement, html, nothing, property, repeat, state, css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '../../lit-element/lit-element.element';
-import type { ManifestEntitySign } from '../types';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

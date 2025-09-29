@@ -1,5 +1,5 @@
-import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity';
 import type { UmbMediaEntityType, UmbMediaRootEntityType } from '../entity.js';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type {
 	UmbTreeChildrenOfRequestArgs,

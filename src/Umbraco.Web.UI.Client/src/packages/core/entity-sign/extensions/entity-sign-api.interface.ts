@@ -1,5 +1,5 @@
+import type { MetaEntitySign } from './entity-sign.extension.js';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { MetaEntitySign } from './entity-sign.extension';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 
 export interface UmbEntitySignApi extends UmbApi {

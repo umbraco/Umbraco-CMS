@@ -1,6 +1,6 @@
+import type { UmbEntitySignApi, UmbEntitySignApiArgs } from '../../extensions/entity-sign-api.interface.js';
 import type { MetaEntitySignIconKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntitySignApi, UmbEntitySignApiArgs } from '../../extensions/entity-sign-api.interface.js';
 
 export class UmbCreateEntityAction implements UmbEntitySignApi {
 	#label: string;

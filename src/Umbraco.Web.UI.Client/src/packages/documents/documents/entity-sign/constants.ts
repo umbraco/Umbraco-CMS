@@ -1,2 +1,2 @@
-export * from './has-collection/constants.js';
-export * from './is-draft/constants.js';
+export type * from './has-collection/constants.js';
+export type * from './is-draft/constants.js';
