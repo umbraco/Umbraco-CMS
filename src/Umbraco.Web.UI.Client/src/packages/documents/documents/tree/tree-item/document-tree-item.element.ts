@@ -21,6 +21,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			this.observe(this.#api.name, (name) => (this._name = name || ''));
 			this.observe(this.#api.isDraft, (isDraft) => (this._isDraft = isDraft || false));
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
+			this.observe(this.#api.flags, (flags) => (this._flags = flags || ''));
 		}
 
 		super.api = value;
@@ -30,6 +31,10 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	@state() private _isDraft = false;
 
 	#icon: string | null | undefined;
+
+	protected override _extractFlags(item: UmbDocumentTreeItemModel | undefined) {
+		// Empty on purpose and NOT calling super to prevent doing what the base does. [NL]
+	}
 
 	protected override _getIconName(): string | null | undefined {
 		return this.#icon;

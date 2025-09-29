@@ -4,6 +4,7 @@ import { html, ifDefined, nothing, state, repeat, property, css } from '@umbraco
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbTreeItemElementBase<
 	TreeItemModelType extends UmbTreeItemModel,
@@ -11,11 +12,10 @@ export abstract class UmbTreeItemElementBase<
 > extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	set item(newVal: TreeItemModelType) {
-		this._flagAliases = (newVal?.flags ?? []).map((flag) => flag.alias) ?? [];
 		this._item = newVal;
+		this._extractFlags(newVal);
 
 		if (this._item) {
-			console.log('_item', this._item.flags?.[0]?.alias);
 			this._label = this.localize.string(this._item?.name ?? '');
 			this.#initTreeItem();
 		}
@@ -25,7 +25,17 @@ export abstract class UmbTreeItemElementBase<
 	}
 	protected _item?: TreeItemModelType;
 
-	protected _flagAliases?: Array<string>;
+	/**
+	 * @param item - The item from which to extract flags.
+	 * @description This method is called whenever the `item` property is set. It extracts the flags from the item and assigns them to the `_flags` state property.
+	 * This method is in some cases overridden in subclasses to customize how flags are extracted!
+	 */
+	protected _extractFlags(item: TreeItemModelType | undefined) {
+		this._flags = item?.flags ?? [];
+	}
+
+	@state()
+	protected _flags?: Array<UmbEntityFlag>;
 
 	@state()
 	private _label?: string;
@@ -172,10 +182,7 @@ export abstract class UmbTreeItemElementBase<
 
 	#renderSigns() {
 		return this._item
-			? html`<umb-entity-sign-bundle
-					id="sign-bundle"
-					.entityType=${this._item!.entityType}
-					.entityFlags=${this._flagAliases}
+			? html`<umb-entity-sign-bundle id="sign-bundle" .entityType=${this._item!.entityType} .entityFlags=${this._flags}
 					>${this._item!.entityType}</umb-entity-sign-bundle
 				>`
 			: nothing;

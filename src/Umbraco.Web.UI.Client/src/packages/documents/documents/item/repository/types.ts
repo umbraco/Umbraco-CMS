@@ -17,6 +17,7 @@ export interface UmbDocumentItemModel {
 	parent: { unique: UmbEntityUnique } | null; // TODO: Use UmbReferenceByUnique when it support unique as null
 	unique: string;
 	variants: Array<UmbDocumentItemVariantModel>;
+	flags?: Array<UmbEntityFlag>;
 }
 
 export interface UmbDocumentItemWithFlagsModel extends UmbDocumentItemModel {
@@ -28,6 +29,7 @@ export interface UmbDocumentItemVariantModel {
 	name: string;
 	culture: string | null;
 	state: DocumentVariantStateModel | null;
+	flags?: Array<UmbEntityFlag>;
 }
 
 export interface UmbDocumentItemVariantWithFlagsModel extends UmbDocumentItemVariantModel {

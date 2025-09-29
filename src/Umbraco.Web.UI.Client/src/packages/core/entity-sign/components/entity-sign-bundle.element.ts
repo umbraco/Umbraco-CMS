@@ -4,11 +4,12 @@ import { customElement, html, nothing, property, repeat, state, css } from '@umb
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbEntityFlag } from '../../entity/types.js';
 
 @customElement('umb-entity-sign-bundle')
 export class UmbEntitySignBundleElement extends UmbLitElement {
 	#entityType?: string;
-	#entityFlags?: Array<string>;
+	#entityFlagAliases?: Array<string>;
 
 	@property({ type: String, attribute: 'entity-type', reflect: false })
 	get entityType(): string | undefined {
@@ -21,12 +22,12 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	}
 
 	@property({ type: Array, attribute: false })
-	get entityFlags(): Array<string> | undefined {
-		return this.#entityFlags;
+	get entityFlags(): Array<UmbEntityFlag> | undefined {
+		return this.#entityFlagAliases?.map((x) => ({ alias: x }));
 	}
 
-	set entityFlags(value: Array<string> | undefined) {
-		this.#entityFlags = value;
+	set entityFlags(value: Array<UmbEntityFlag> | undefined) {
+		this.#entityFlagAliases = value?.map((x) => x.alias);
 		this.#gotProperties();
 	}
 
@@ -43,12 +44,13 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 	#manifestFilter = (manifest: ManifestEntitySign) => {
 		if (manifest.forEntityTypes && !manifest.forEntityTypes.includes(this.#entityType!)) return false;
-		if (manifest.forEntityFlags && !manifest.forEntityFlags.some((x) => this.#entityFlags?.includes(x))) return false;
+		if (manifest.forEntityFlags && !manifest.forEntityFlags.some((x) => this.#entityFlagAliases?.includes(x)))
+			return false;
 		return true;
 	};
 
 	#gotProperties() {
-		if (!this.#entityType || !this.#entityFlags) {
+		if (!this.#entityType || !this.#entityFlagAliases) {
 			this.removeUmbControllerByAlias('extensionsInitializer');
 			this._signs = [];
 			return;
@@ -68,10 +70,14 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				// Setup label observers
 				signs.forEach((sign) => {
 					if (sign.api?.label) {
-						const obs = this.observe(sign.api.label, (label) => {
-							this._labels.set(sign.alias, label);
-							this.requestUpdate('_labels');
-						});
+						const obs = this.observe(
+							sign.api.label,
+							(label) => {
+								this._labels.set(sign.alias, label);
+								this.requestUpdate('_labels');
+							},
+							'_observeSignLabelOf_' + sign.alias,
+						);
 						this.#signLabelObservations.push(obs);
 					} else if (sign.api?.getLabel) {
 						this._labels.set(sign.alias, sign.api.getLabel() ?? '');
