@@ -51,6 +51,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 							description=${ifDefined(property.description)}
 							alias=${property.alias}
 							property-editor-ui-alias=${property.propertyEditorUiAlias}
+							property-editor-data-source-alias=${ifDefined(property.propertyEditorDataSourceAlias)}
 							.config=${property.config}></umb-property>`,
 				)
 			: html`<umb-localize key="editdatatype_noConfiguration"
