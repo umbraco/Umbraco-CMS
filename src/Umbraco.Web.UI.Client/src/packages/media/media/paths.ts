@@ -14,4 +14,7 @@ export const UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{
 	mediaTypeUnique: string;
 }>('create/parent/:parentEntityType/:parentUnique/:mediaTypeUnique', UMB_MEDIA_WORKSPACE_PATH);
 
-export const UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ unique: string }>('edit/:unique');
+export const UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ unique: string }>(
+	'edit/:unique',
+	UMB_MEDIA_WORKSPACE_PATH,
+);
