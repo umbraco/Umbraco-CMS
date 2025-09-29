@@ -18,6 +18,7 @@ export const UmbLink = Link.extend({
 	addOptions() {
 		return {
 			...this.parent?.(),
+			protocols: [],
 			HTMLAttributes: {
 				target: '',
 				'data-router-slot': 'disabled',
@@ -44,7 +45,7 @@ export const UmbLink = Link.extend({
 declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
 		umbLink: {
-			setUmbLink: (options: {
+			setUmbLink: (attributes: {
 				type: string;
 				href: string;
 				'data-anchor'?: string | null;
