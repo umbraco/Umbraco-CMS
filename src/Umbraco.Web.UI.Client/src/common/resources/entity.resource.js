@@ -514,10 +514,9 @@ function entityResource($q, $http, umbRequestHelper) {
           *
           */
         getPagedChildren: function (parentId, type, options) {
-
             var defaults = {
-                pageSize: 1,
-                pageNumber: 100,
+                pageSize: 100,
+                pageNumber: 1,
                 filter: '',
                 orderDirection: "Ascending",
                 orderBy: "SortOrder",
