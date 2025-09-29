@@ -116,8 +116,6 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             .Where<ContentType2ContentTypeDto>(c => c.ParentId == contentTypeId.Value);
 
         List<Guid>? contentGuids = Database.Fetch<Guid>(sql);
-
-
         return new PagedModel<Guid>()
         {
             Items = contentGuids,
