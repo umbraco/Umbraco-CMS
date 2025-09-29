@@ -96,11 +96,11 @@ test('can not publish mandatory radiobox with an empty value', {tag: '@release'}
   await umbracoUi.content.goToContentWithName(contentName);
   // Do not select any radiobox values and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Select a radiobox value and the validation error disappears
   await umbracoUi.content.chooseRadioboxOption(optionValues[0]);
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
