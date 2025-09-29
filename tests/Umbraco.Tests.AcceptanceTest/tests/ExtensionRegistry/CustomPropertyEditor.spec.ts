@@ -41,25 +41,25 @@ test('can add custom property editor to a document type', async ({umbracoApi, um
 });
 
 test('can select custom property editor in property editor picker on data type', async ({umbracoApi, umbracoUi}) => {
-	// Arrange
-	await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
-	const dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, editorUiAlias, []); 
-	await umbracoUi.goToBackOffice();
-	await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+  // Arrange
+  await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+  const dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, editorUiAlias, []); 
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
-	// Act
-	await umbracoUi.documentType.goToDocumentType(documentTypeName);
-	await umbracoUi.documentType.clickAddGroupButton();
-	await umbracoUi.documentType.addPropertyEditor(dataTypeName);
-	await umbracoUi.documentType.enterGroupName('Content');
-	await umbracoUi.documentType.clickSaveButton();
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickAddGroupButton();
+  await umbracoUi.documentType.addPropertyEditor(dataTypeName);
+  await umbracoUi.documentType.enterGroupName('Content');
+  await umbracoUi.documentType.clickSaveButton();
 
-	// Assert
-	await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
-	expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
-	const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-	// Checks if the correct property was added to the document type
-	expect(documentTypeData.properties[0].dataType.id).toBe(dataTypeId);
+  // Assert
+  await umbracoUi.documentType.waitForDocumentTypeToBeCreated();
+  expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  // Checks if the correct property was added to the document type
+  expect(documentTypeData.properties[0].dataType.id).toBe(dataTypeId);
 });
 
 test('can write and read value from custom property editor', async({umbracoApi, umbracoUi}) => {
