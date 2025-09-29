@@ -337,6 +337,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	stopPolling() {
 		if (this.#intervalID) {
 			clearInterval(this.#intervalID);
+			this.#intervalID = null;
 		}
 	}
 }
