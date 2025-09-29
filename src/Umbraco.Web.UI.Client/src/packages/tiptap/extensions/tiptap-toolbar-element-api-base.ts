@@ -1,6 +1,6 @@
+import type { Editor } from '../externals.js';
 import type { ManifestTiptapToolbarExtension, UmbTiptapToolbarElementApi } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { Editor } from '@umbraco-cms/backoffice/external/tiptap';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export abstract class UmbTiptapToolbarElementApiBase extends UmbControllerBase implements UmbTiptapToolbarElementApi {

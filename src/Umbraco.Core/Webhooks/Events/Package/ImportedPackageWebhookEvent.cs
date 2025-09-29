@@ -20,7 +20,7 @@ public class ImportedPackageWebhookEvent : WebhookEventBase<ImportedPackageNotif
 
     public override string Alias => Constants.WebhookEvents.Aliases.PackageImported;
 
-    public override object? ConvertNotificationToRequestPayload(ImportedPackageNotification notification)
+    public override object ConvertNotificationToRequestPayload(ImportedPackageNotification notification)
         => new
         {
             PackageName = notification.InstallationSummary.PackageName,

@@ -1,10 +1,10 @@
-﻿using System.Data;
+using System.Data;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2Language)]
+[TableName(TableName)]
 [ExplicitColumns]
 public class UserGroup2LanguageDto
 {

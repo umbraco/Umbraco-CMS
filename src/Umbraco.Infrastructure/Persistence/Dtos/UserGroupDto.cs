@@ -5,11 +5,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.UserGroup)]
+[TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
 public class UserGroupDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.UserGroup;
+
     public UserGroupDto()
     {
         UserGroup2AppDtos = new List<UserGroup2AppDto>();
@@ -44,14 +46,14 @@ public class UserGroupDto
     [Obsolete("Is not used anymore Use UserGroup2PermissionDtos instead. This will be removed in Umbraco 18.")]
     public string? DefaultPermissions { get; set; }
 
-    [Column("createDate", ForceToUtc = false)]
+    [Column("createDate")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
-    [Column("updateDate", ForceToUtc = false)]
+    [Column("updateDate")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime UpdateDate { get; set; }
 
     [Column("icon")]

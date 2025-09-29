@@ -5,11 +5,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.Relation)]
+[TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
 internal sealed class RelationDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.Relation;
+
     [Column("id")]
     [PrimaryKeyColumn]
     public int Id { get; set; }
@@ -27,8 +29,8 @@ internal sealed class RelationDto
     [ForeignKey(typeof(RelationTypeDto))]
     public int RelationType { get; set; }
 
-    [Column("datetime", ForceToUtc = false)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Column("datetime")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime Datetime { get; set; }
 
     [Column("comment")]

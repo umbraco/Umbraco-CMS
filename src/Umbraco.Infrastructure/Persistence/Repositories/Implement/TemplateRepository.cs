@@ -90,25 +90,24 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
     private IEnumerable<IUmbracoEntity> GetAxisDefinitions(params TemplateDto[] templates)
     {
-        //look up the simple template definitions that have a master template assigned, this is used
+        // look up the simple template definitions that have a master template assigned, this is used
         // later to populate the template item's properties
         Sql<ISqlContext> childIdsSql = SqlContext.Sql()
-            .Select("nodeId,alias,parentID")
+            .Select<TemplateDto>(t => t.NodeId, t => t.Alias)
+            .AndSelect<NodeDto>(n => n.ParentId)
             .From<TemplateDto>()
             .InnerJoin<NodeDto>()
-            .On<TemplateDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-            //lookup axis's
-            .Where(
-                "umbracoNode." + SqlContext.SqlSyntax.GetQuotedColumnName("id") +
-                " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
-                new
-                {
-                    parentIds = templates.Select(x => x.NodeDto.ParentId),
-                    childIds = templates.Select(x => x.NodeId)
-                });
+            .On<TemplateDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+
+            // lookup axis's
+            .WhereInOr<NodeDto, NodeDto>(
+                n => n.NodeId,
+                n2 => n2.ParentId,
+                templates.Select(x => x.NodeDto.ParentId),
+                templates.Select(x => x.NodeId));
 
         IEnumerable<EntitySlim> childIds = Database.Fetch<AxisDefintionDto>(childIdsSql)
-            .Select(x => new EntitySlim {Id = x.NodeId, ParentId = x.ParentId, Name = x.Alias});
+            .Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.ParentId, Name = x.Alias });
 
         return childIds;
     }
@@ -308,7 +307,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
         if (ids?.Any() ?? false)
         {
-            sql.Where("umbracoNode.id in (@ids)", new {ids});
+            sql.Where($"{QuoteTableName("umbracoNode")}.id in (@ids)", new { ids });
         }
         else
         {
@@ -326,7 +325,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         // later to populate the template item's properties
         IUmbracoEntity[] childIds = (ids?.Any() ?? false
                 ? GetAxisDefinitions(dtos.ToArray())
-                : dtos.Select(x => new EntitySlim {Id = x.NodeId, ParentId = x.NodeDto.ParentId, Name = x.Alias}))
+                : dtos.Select(x => new EntitySlim { Id = x.NodeId, ParentId = x.NodeDto.ParentId, Name = x.Alias }))
             .ToArray();
 
         return dtos.Select(d => MapFromDto(d, childIds));
@@ -373,18 +372,20 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
+        var nodeId = QuoteColumnName("nodeId");
+        var umbracoNode = QuoteTableName(NodeDto.TableName);
         var list = new List<string>
         {
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "UPDATE " + Constants.DatabaseSchema.Tables.DocumentVersion +
-            " SET templateId = NULL WHERE templateId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentType + " WHERE templateNodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Template + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.User2NodeNotify)} WHERE {nodeId} = @id",
+            $@"UPDATE {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentVersion)}
+                SET {QuoteColumnName("templateId")} = NULL WHERE {QuoteColumnName("templateId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.DocumentType)} WHERE {QuoteColumnName("templateNodeId")} = @id",
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Template)} WHERE {nodeId} = @id",
+            $"DELETE FROM {umbracoNode} WHERE id = @id",
         };
         return list;
     }
@@ -474,10 +475,10 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         }
 
         //Get TemplateDto from db to get the Primary key of the entity
-        TemplateDto templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new {entity.Id});
+        TemplateDto templateDto = Database.Single<TemplateDto>($"WHERE {QuoteColumnName("nodeId")} = @Id", new { entity.Id });
 
         //Save updated entity to db
-        template.UpdateDate = DateTime.Now;
+        template.UpdateDate = DateTime.UtcNow;
         TemplateDto dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, templateDto.PrimaryKey);
         Database.Update(dto.NodeDto);
         Database.Update(dto);
@@ -538,20 +539,20 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         {
             foreach (var delete in deletes)
             {
-                Database.Execute(delete, new {id = GetEntityId(descendant)});
+                Database.Execute(delete, new { id = GetEntityId(descendant) });
             }
         }
 
         //now we can delete this one
         foreach (var delete in deletes)
         {
-            Database.Execute(delete, new {id = GetEntityId(entity)});
+            Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
         var viewName = string.Concat(entity.Alias, ".cshtml");
         _viewsFileSystem?.DeleteFile(viewName);
 
-        entity.DeleteDate = DateTime.Now;
+        entity.DeleteDate = DateTime.UtcNow;
     }
 
     #endregion

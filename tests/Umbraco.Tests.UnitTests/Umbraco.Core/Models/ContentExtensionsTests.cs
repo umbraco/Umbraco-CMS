@@ -101,7 +101,7 @@ public class ContentExtensionsTests
         Assert.IsFalse(content.IsEntityDirty());
         Assert.AreEqual(d, content.UpdateDate);
 
-        content.UpdateDate = DateTime.Now;
+        content.UpdateDate = DateTime.UtcNow;
         Assert.IsTrue(content.IsEntityDirty());
         Assert.AreNotEqual(d, content.UpdateDate);
 

@@ -16,7 +16,7 @@ public class FlexibleDropdownPropertyValueConverter : PropertyValueConverterBase
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
         propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.DropDownListFlexible);
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source is null)
         {

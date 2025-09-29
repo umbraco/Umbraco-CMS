@@ -278,7 +278,12 @@ public class BackOfficeUserStore :
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => ids.Contains(x.Id));
+
+        // Need to use a List here because the expression tree cannot convert the array when used in Contains.
+        // See ExpressionTests.Sql_In().
+        List<int> idsAsList = [.. ids];
+        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => idsAsList.Contains(x.Id));
+
         IEnumerable<IUser> users = _userRepository.Get(query);
 
         return Task.FromResult(users);
@@ -775,33 +780,31 @@ public class BackOfficeUserStore :
         var anythingChanged = false;
 
         // don't assign anything if nothing has changed as this will trigger the track changes of the model
-        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastLoginDateUtc))
-            || (user.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
-            || (identityUser.LastLoginDateUtc.HasValue &&
-                user.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
+        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastLoginDate))
+            || (user.LastLoginDate != default && identityUser.LastLoginDate.HasValue == false)
+            || (identityUser.LastLoginDate.HasValue &&
+                user.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDate.Value))
         {
             anythingChanged = true;
 
-            // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-            DateTime? dt = identityUser.LastLoginDateUtc?.ToLocalTime();
-            user.LastLoginDate = dt;
+            user.LastLoginDate = identityUser.LastLoginDate;
         }
 
-        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.InviteDateUtc))
-            || user.InvitedDate?.ToUniversalTime() != identityUser.InviteDateUtc)
+        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.InviteDate))
+            || user.InvitedDate?.ToUniversalTime() != identityUser.InviteDate)
         {
             anythingChanged = true;
-            user.InvitedDate = identityUser.InviteDateUtc?.ToLocalTime();
+            user.InvitedDate = identityUser.InviteDate;
         }
 
-        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDateUtc))
+        if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDate))
             || (user.LastPasswordChangeDate.HasValue && user.LastPasswordChangeDate.Value != default &&
-                identityUser.LastPasswordChangeDateUtc.HasValue == false)
-            || (identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate?.ToUniversalTime() !=
-                identityUser.LastPasswordChangeDateUtc.Value))
+                identityUser.LastPasswordChangeDate.HasValue == false)
+            || (identityUser.LastPasswordChangeDate.HasValue && user.LastPasswordChangeDate?.ToUniversalTime() !=
+                identityUser.LastPasswordChangeDate.Value))
         {
             anythingChanged = true;
-            user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
+            user.LastPasswordChangeDate = identityUser.LastPasswordChangeDate ?? DateTime.UtcNow;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.EmailConfirmed))
@@ -811,7 +814,7 @@ public class BackOfficeUserStore :
                 identityUser.EmailConfirmed))
         {
             anythingChanged = true;
-            user.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.Now : null;
+            user.EmailConfirmedDate = identityUser.EmailConfirmed ? DateTime.UtcNow : null;
         }
 
         if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Name))
@@ -849,7 +852,7 @@ public class BackOfficeUserStore :
             if (user.IsLockedOut)
             {
                 // need to set the last lockout date
-                user.LastLockoutDate = DateTime.Now;
+                user.LastLockoutDate = DateTime.UtcNow;
             }
         }
 

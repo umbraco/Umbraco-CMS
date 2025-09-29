@@ -10,7 +10,7 @@ public static class DictionaryItemExtensions
     /// <param name="d"></param>
     /// <param name="isoCode"></param>
     /// <returns></returns>
-    public static string? GetTranslatedValue(this IDictionaryItem d, string isoCode)
+    public static string GetTranslatedValue(this IDictionaryItem d, string isoCode)
     {
         IDictionaryTranslation? trans = d.Translations.FirstOrDefault(x => x.LanguageIsoCode == isoCode);
         return trans == null ? string.Empty : trans.Value;

@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Web.Common.Filters;
 ///     In which case it returns a redirect to the same page after 1 sec if not in debug mode.
 /// </summary>
 /// <remarks>
-///     This is only enabled when using <see cref="ModelsMode.InMemoryAuto" /> mode
+///     This is only enabled when using InMemoryAuto mode.
 /// </remarks>
 public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
 {

@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
@@ -40,23 +41,15 @@ internal static class UserFactory
             user.SecurityStamp = dto.SecurityStampToken;
             user.FailedPasswordAttempts = dto.FailedLoginAttempts ?? 0;
             user.Avatar = dto.Avatar;
-            user.EmailConfirmedDate = dto.EmailConfirmedDate;
-            user.InvitedDate = dto.InvitedDate;
+            user.EmailConfirmedDate = dto.EmailConfirmedDate?.EnsureUtc();
+            user.InvitedDate = dto.InvitedDate?.EnsureUtc();
             user.Kind = (UserKind)dto.Kind;
 
-            // Dates stored in the database are local server time, but for SQL Server, will be considered
-            // as DateTime.Kind = Utc. Fix this so we are consistent when later mapping to DataTimeOffset.
-            user.LastLockoutDate = dto.LastLockoutDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLockoutDate.Value, DateTimeKind.Local)
-                : null;
-            user.LastLoginDate = dto.LastLoginDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastLoginDate.Value, DateTimeKind.Local)
-                : null;
-            user.LastPasswordChangeDate = dto.LastPasswordChangeDate.HasValue
-                ? DateTime.SpecifyKind(dto.LastPasswordChangeDate.Value, DateTimeKind.Local)
-                : null;
-            user.CreateDate = DateTime.SpecifyKind(dto.CreateDate, DateTimeKind.Local);
-            user.UpdateDate = DateTime.SpecifyKind(dto.UpdateDate, DateTimeKind.Local);
+            user.LastLockoutDate = dto.LastLockoutDate?.EnsureUtc();
+            user.LastLoginDate = dto.LastLoginDate?.EnsureUtc();
+            user.LastPasswordChangeDate = dto.LastPasswordChangeDate?.EnsureUtc();
+            user.CreateDate = dto.CreateDate.EnsureUtc();
+            user.UpdateDate = dto.UpdateDate.EnsureUtc();
 
             // reset dirty initial properties (U4-1946)
             user.ResetDirtyProperties(false);
@@ -123,7 +116,7 @@ internal static class UserFactory
 
         if (entity.HasIdentity)
         {
-            dto.Id = entity.Id.SafeCast<int>();
+            dto.Id = entity.Id;
         }
 
         return dto;

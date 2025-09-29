@@ -21,6 +21,6 @@ public class UserSavedWebhookEvent : WebhookEventBase<UserSavedNotification>
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserSaved;
 
-    public override object? ConvertNotificationToRequestPayload(UserSavedNotification notification)
+    public override object ConvertNotificationToRequestPayload(UserSavedNotification notification)
     => notification.SavedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

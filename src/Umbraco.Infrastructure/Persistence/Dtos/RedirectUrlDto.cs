@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.RedirectUrl)]
+[TableName(TableName)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
 internal sealed class RedirectUrlDto
@@ -28,7 +28,7 @@ internal sealed class RedirectUrlDto
 
     [Column("contentKey")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [ForeignKey(typeof(NodeDto), Column = "uniqueID")]
+    [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
     public Guid ContentKey { get; set; }
 
     [Column("createDateUtc")]

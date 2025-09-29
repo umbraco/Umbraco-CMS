@@ -243,7 +243,7 @@ public static partial class NPocoDatabaseExtensions
     /// <typeparam name="TConnection"></typeparam>
     /// <param name="connection"></param>
     /// <returns></returns>
-    public static TConnection GetTypedConnection<TConnection>(IDbConnection connection)
+    public static TConnection GetTypedConnection<TConnection>(IDbConnection? connection)
         where TConnection : class, IDbConnection
     {
         IDbConnection? c = connection;
@@ -260,7 +260,7 @@ public static partial class NPocoDatabaseExtensions
                     c = profiled.WrappedConnection;
                     break;
                 default:
-                    throw new NotSupportedException(connection.GetType().FullName);
+                    throw new NotSupportedException(connection?.GetType().FullName);
             }
         }
     }

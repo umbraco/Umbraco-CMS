@@ -26,12 +26,6 @@ public abstract class MediaCollectionControllerBase : ContentCollectionControlle
     {
     }
 
-    [Obsolete("Please use the constructor with all parameters. Scheduled to be removed in Umbraco 18")]
-    protected MediaCollectionControllerBase(IUmbracoMapper mapper)
-        : base(mapper)
-    {
-    }
-
     protected IActionResult CollectionOperationStatusResult(ContentCollectionOperationStatus status)
         => ContentCollectionOperationStatusResult(status, "media");
 }

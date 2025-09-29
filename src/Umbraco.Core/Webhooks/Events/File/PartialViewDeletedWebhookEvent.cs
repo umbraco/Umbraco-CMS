@@ -21,6 +21,6 @@ public class PartialViewDeletedWebhookEvent : WebhookEventBase<PartialViewDelete
 
     public override string Alias => Constants.WebhookEvents.Aliases.PartialViewDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(PartialViewDeletedNotification notification)
+    public override object ConvertNotificationToRequestPayload(PartialViewDeletedNotification notification)
         => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }
