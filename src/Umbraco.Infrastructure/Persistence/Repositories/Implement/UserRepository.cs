@@ -437,6 +437,12 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                     .WhereIn<User2UserGroupDto>(x => x.UserId, batch),
             Database);
 
+        if (groupIds.Any() is false)
+        {
+            //this can happen if we are upgrading, so we try do read from this table, as we counn't because of the key earlier
+            groupIds = user2Groups.Select(x => x.UserGroupId).Distinct().ToList();
+        }
+
         // get groups
         // We wrap this in a try-catch, as this might throw errors when you try to login before having migrated your database
         Dictionary<int, UserGroupDto> groups;
@@ -607,11 +613,11 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
     }
 
-    private static List<TDto> BatchFetch<TDto>(IEnumerable<int> userIds, Func<IEnumerable<int>, Sql> buildSql, IUmbracoDatabase database, int batchSize = Constants.Sql.MaxParameterCount)
+    private static List<TDto> BatchFetch<TDto>(IEnumerable<int> userIds, Func<IEnumerable<int>, Sql> buildSql, IUmbracoDatabase database)
     {
         var results = new List<TDto>();
 
-        foreach (IEnumerable<int> batch in userIds.InGroupsOf(batchSize))
+        foreach (IEnumerable<int> batch in userIds.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
             Sql sql = buildSql(batch);
             List<TDto> fetched = database.Fetch<TDto>(sql);
