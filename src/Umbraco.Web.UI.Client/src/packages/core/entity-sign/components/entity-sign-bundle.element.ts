@@ -69,7 +69,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		);
 	}
 
-	#armOpen = () => {
+	#openTooltip = () => {
 		if (this._hoverTimer) clearTimeout(this._hoverTimer);
 		this._hoverTimer = window.setTimeout(() => {
 			this._open = true;
@@ -98,7 +98,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		return html`
 			<div
 				class="infobox ${this._open ? 'is-open' : ''}"
-				@mouseenter=${this.#armOpen}
+				@mouseenter=${this.#openTooltip}
 				@mouseleave=${this.#cancelOpen}
 				style=${`--count:${this._signs.length}`}>
 				${this.#renderOptions()}
@@ -123,18 +123,17 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		css`
 			:host {
 				anchor-name: --entity-sign;
+				position: relative; /* fallback for when anchors are not supported */
 				--row-h: 22px;
 				--icon-w: 12px;
 				--pad-x: 4px;
 				--ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 			}
 
-			/* CLOSE STATE */
 			.infobox {
-				position: fixed;
-				position-anchor: --entity-sign;
-				bottom: anchor(bottom);
-				left: anchor(right);
+				position: absolute; /* fallback for when anchors are not supported */
+				left: 100%; /* fallback for when anchors are not supported */
+				bottom: 0; /* fallback for when anchors are not supported */
 				background: transparent;
 				padding: 0;
 				font-size: 8px;
@@ -142,6 +141,17 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				transition: clip-path 220ms var(--ease);
 				will-change: clip-path;
 			}
+
+			/* CLOSE STATE */
+			@supports (position-anchor: --any-check) {
+				.infobox {
+					position: fixed;
+					position-anchor: --entity-sign;
+					bottom: anchor(bottom);
+					left: anchor(right);
+				}
+			}
+
 			.infobox > .sign-container {
 				display: flex;
 				align-items: end;
@@ -166,32 +176,34 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 				transition: opacity 160ms ease;
 			}
 
-			/*OPEN STATE*/
-			.infobox.is-open {
-				background: var(--uui-color-surface);
-				font-size: 12px;
-				border-radius: 3px;
-				color: var(--uui-color-text);
-				padding: 4px;
-				box-shadow:
-					0px 0px 15px 0px rgba(0, 0, 0, 0.1),
-					0px 10px 15px -3px rgba(0, 0, 0, 0.1);
-				clip-path: inset(0);
-			}
-
-			.infobox.is-open > .sign-container {
-				transform: none;
-				align-items: center;
-			}
-			.infobox.is-open > .sign-container.first-icon {
-				margin-left: 0;
-			}
-			.infobox.is-open .sign-container .label {
-				opacity: 1;
-				pointer-events: auto;
-			}
-			.infobox.is-open .sign-container .badge-icon {
-				background: transparent;
+			/*OPEN STATE -- Prevent the hover state in firefox(until support of the position-anchor)*/
+			@supports (position-anchor: --any-check) {
+				.infobox.is-open {
+					background: var(--uui-color-surface);
+					font-size: 12px;
+					border-radius: 3px;
+					color: var(--uui-color-text);
+					padding: 4px;
+					box-shadow:
+						0px 0px 15px 0px rgba(0, 0, 0, 0.1),
+						0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+					clip-path: inset(0);
+					--sign-bundle-bg: var(--uui-color-surface);
+				}
+				.infobox.is-open > .sign-container {
+					transform: none;
+					align-items: center;
+				}
+				.infobox.is-open > .sign-container.first-icon {
+					margin-left: 0;
+				}
+				.infobox.is-open .sign-container .label {
+					opacity: 1;
+					pointer-events: auto;
+				}
+				.infobox.is-open .sign-container .badge-icon {
+					background: transparent;
+				}
 			}
 		`,
 	];

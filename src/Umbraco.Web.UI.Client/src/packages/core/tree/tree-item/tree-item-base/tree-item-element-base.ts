@@ -249,8 +249,6 @@ export abstract class UmbTreeItemElementBase<
 
 			uui-menu-item {
 				--sign-bundle-bg: var(--uui-color-surface);
-				--sign-bundle-border: var(--uui-color-divider);
-				--sign-bundle-shadow: var(--uui-shadow-level-1);
 			}
 
 			uui-menu-item:hover {
@@ -262,29 +260,15 @@ export abstract class UmbTreeItemElementBase<
 				--sign-bundle-bg: var(--uui-color-current);
 			}
 
-			uui-menu-item[selected]:hover {
-				--sign-bundle-bg: var(--uui-color-current-emphasis);
-			}
-
+			uui-menu-item[selected]:hover,
 			uui-menu-item[active]:hover {
 				--sign-bundle-bg: var(--uui-color-current-emphasis);
 			}
 
-			/* uui-menu-item {
-				--umb-entity-bundle-background: red;
-			} */
-			/* uui-menu-item:hover {
-				--umb-entity-bundle-background: pink;
-			}
-
-			uui-menu-item[active] {
-				--umb-entity-bundle-background: red;
-			} */
-
 			#sign-bundle {
 				position: absolute;
 				bottom: -4px;
-				right: 5px;
+				right: 7px;
 			}
 
 			#label {
