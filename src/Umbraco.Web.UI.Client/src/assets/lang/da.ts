@@ -2464,7 +2464,7 @@ export default {
 		labelSettingsElementType: 'Indstillings model',
 		labelEditorSize: 'Rederings lagets størrelse',
 		addCustomView: 'Tilføj speciel visning',
-		addSettingsElementType: 'Tilføj instillinger',
+		addSettingsElementType: 'Tilføj indstillinger',
 		confirmDeleteBlockTitle: 'Slet %0',
 		confirmDeleteBlockMessage: 'Er du sikker på at du vil slette indholdet <strong>%0%</strong>?',
 		confirmDeleteBlockTypeTitle: 'Slet konfiguration for blokken?',
