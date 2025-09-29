@@ -1,6 +1,7 @@
 import type { UmbDataTypeEntityType } from './entity.js';
 
 export type * from './entity.js';
+export type * from './property-editor-data-source/types.js';
 export interface UmbDataTypeDetailModel {
 	entityType: UmbDataTypeEntityType;
 	unique: string;
