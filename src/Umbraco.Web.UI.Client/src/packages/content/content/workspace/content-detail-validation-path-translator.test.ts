@@ -36,6 +36,7 @@ describe('UmbValidationPropertyPathTranslationController', () => {
 				},
 			],
 			variants: [],
+			flags: [],
 		};
 
 		beforeEach(async () => {

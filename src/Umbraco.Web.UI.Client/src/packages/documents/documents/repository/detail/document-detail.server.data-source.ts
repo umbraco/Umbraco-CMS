@@ -55,6 +55,7 @@ export class UmbDocumentServerDataSource
 			isTrashed: false,
 			values: [],
 			variants: [],
+			flags: [],
 		};
 
 		const scaffold = umbDeepMerge(preset, defaultData);
@@ -102,6 +103,7 @@ export class UmbDocumentServerDataSource
 					updateDate: variant.updateDate,
 					scheduledPublishDate: variant.scheduledPublishDate || null,
 					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
+					flags: variant.flags,
 				};
 			}),
 			template: data.template ? { unique: data.template.id } : null,
@@ -111,6 +113,7 @@ export class UmbDocumentServerDataSource
 				icon: data.documentType.icon,
 			},
 			isTrashed: data.isTrashed,
+			flags: data.flags,
 		};
 
 		return { data: document };

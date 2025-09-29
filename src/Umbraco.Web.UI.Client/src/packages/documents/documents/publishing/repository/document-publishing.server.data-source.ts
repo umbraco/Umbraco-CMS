@@ -180,6 +180,7 @@ export class UmbDocumentPublishingServerDataSource {
 					updateDate: variant.updateDate,
 					scheduledPublishDate: variant.scheduledPublishDate || null,
 					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
+					flags: variant.flags,
 				};
 			}),
 			template: data.template ? { unique: data.template.id } : null,
@@ -189,6 +190,7 @@ export class UmbDocumentPublishingServerDataSource {
 				icon: data.documentType.icon,
 			},
 			isTrashed: data.isTrashed,
+			flags: data.flags,
 		};
 
 		return { data: document };

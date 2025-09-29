@@ -11,9 +11,11 @@ export abstract class UmbTreeItemElementBase<
 > extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	set item(newVal: TreeItemModelType) {
+		this._flagAliases = (newVal?.flags ?? []).map((flag) => flag.alias) ?? [];
 		this._item = newVal;
 
 		if (this._item) {
+			console.log('_item', this._item.flags?.[0]?.alias);
 			this._label = this.localize.string(this._item?.name ?? '');
 			this.#initTreeItem();
 		}
@@ -22,6 +24,8 @@ export abstract class UmbTreeItemElementBase<
 		return this._item;
 	}
 	protected _item?: TreeItemModelType;
+
+	protected _flagAliases?: Array<string>;
 
 	@state()
 	private _label?: string;
@@ -168,7 +172,10 @@ export abstract class UmbTreeItemElementBase<
 
 	#renderSigns() {
 		return this._item
-			? html`<umb-entity-sign-bundle id="sign-bundle" .entityType=${this._item!.entityType}
+			? html`<umb-entity-sign-bundle
+					id="sign-bundle"
+					.entityType=${this._item!.entityType}
+					.entityFlags=${this._flagAliases}
 					>${this._item!.entityType}</umb-entity-sign-bundle
 				>`
 			: nothing;

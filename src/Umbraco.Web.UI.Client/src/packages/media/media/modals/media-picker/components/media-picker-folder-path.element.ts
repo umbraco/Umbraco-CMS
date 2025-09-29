@@ -117,6 +117,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 					name: newName,
 					createDate: null,
 					updateDate: null,
+					flags: [],
 				},
 			],
 		};

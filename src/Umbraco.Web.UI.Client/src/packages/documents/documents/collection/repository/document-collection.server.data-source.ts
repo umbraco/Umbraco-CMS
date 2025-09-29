@@ -58,6 +58,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					name: variant.name,
 					sortOrder: item.sortOrder,
 					state: variant.state,
+					flags: variant.flags,
 					updateDate: item.variants
 						.map((v) => new Date(v.updateDate))
 						.reduce((latest, current) => (current > latest ? current : latest)),
@@ -75,6 +76,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 							name: item.name,
 							culture: item.culture ?? null,
 							state: item.state,
+							flags: item.flags,
 						};
 					}),
 				};

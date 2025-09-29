@@ -53,6 +53,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 			lastPasswordChangeDate: null,
 			groups: [],
 			values: [],
+			flags: [],
 			variants: [
 				{
 					name: '',
@@ -60,6 +61,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 					segment: null,
 					createDate: new Date().toISOString(),
 					updateDate: new Date().toISOString(),
+					flags: [],
 				},
 			],
 		};
@@ -120,8 +122,11 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 					name: variant.name,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
+					// TODO: Transfer member flags when available in the API: [NL]
+					flags: [], //variant.flags,
 				};
 			}),
+			flags: data.flags,
 		};
 
 		return { data: Member };

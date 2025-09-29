@@ -7,18 +7,28 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 
 @customElement('umb-entity-sign-bundle')
 export class UmbEntitySignBundleElement extends UmbLitElement {
+	#entityType?: string;
+	#entityFlags?: Array<string>;
+
 	@property({ type: String, attribute: 'entity-type', reflect: false })
 	get entityType(): string | undefined {
-		return this._entityType;
+		return this.#entityType;
 	}
 
 	set entityType(value: string | undefined) {
-		this._entityType = value ?? undefined;
+		this.#entityType = value;
 		this.#gotEntityType();
 	}
 
-	@state()
-	private _entityType?: string;
+	@property({ type: Array, attribute: false })
+	get entityFlags(): Array<string> | undefined {
+		return this.#entityFlags;
+	}
+
+	set entityFlags(value: Array<string> | undefined) {
+		this.#entityFlags = value;
+		//this.#gotEntityType();
+	}
 
 	@state()
 	private _signs?: Array<any>;
@@ -32,12 +42,13 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 	#signLabelObservations: Array<UmbObserverController<string>> = [];
 
 	#manifestFilter = (manifest: ManifestEntitySign) => {
-		if (manifest.forEntityTypes && !manifest.forEntityTypes.includes(this._entityType!)) return false;
+		if (manifest.forEntityTypes && !manifest.forEntityTypes.includes(this.#entityType!)) return false;
+		if (manifest.forEntityFlags && !manifest.forEntityFlags.some((x) => this.#entityFlags?.includes(x))) return false;
 		return true;
 	};
 
 	#gotEntityType() {
-		if (!this._entityType) {
+		if (!this.#entityType) {
 			this.removeUmbControllerByAlias('extensionsInitializer');
 			this._signs = [];
 			return;

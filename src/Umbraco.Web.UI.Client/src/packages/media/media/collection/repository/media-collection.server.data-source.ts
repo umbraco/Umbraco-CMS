@@ -45,6 +45,7 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 					values: item.values.map((item) => {
 						return { alias: item.alias, value: item.value as string };
 					}),
+					flags: item.flags,
 				};
 				return model;
 			});
