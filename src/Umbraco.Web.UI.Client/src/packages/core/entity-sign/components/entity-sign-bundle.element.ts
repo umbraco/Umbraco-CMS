@@ -17,7 +17,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 	set entityType(value: string | undefined) {
 		this.#entityType = value;
-		this.#gotEntityType();
+		this.#gotProperties();
 	}
 
 	@property({ type: Array, attribute: false })
@@ -27,7 +27,7 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 
 	set entityFlags(value: Array<string> | undefined) {
 		this.#entityFlags = value;
-		//this.#gotEntityType();
+		this.#gotProperties();
 	}
 
 	@state()
@@ -47,8 +47,8 @@ export class UmbEntitySignBundleElement extends UmbLitElement {
 		return true;
 	};
 
-	#gotEntityType() {
-		if (!this.#entityType) {
+	#gotProperties() {
+		if (!this.#entityType || !this.#entityFlags) {
 			this.removeUmbControllerByAlias('extensionsInitializer');
 			this._signs = [];
 			return;
