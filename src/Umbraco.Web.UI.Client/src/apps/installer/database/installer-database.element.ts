@@ -9,7 +9,7 @@ import type {
 	DatabaseSettingsPresentationModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { InstallService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
@@ -238,6 +238,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		<uui-form-layout-item>
 			<uui-label for="server" slot="label" required>Server address</uui-label>
 			<uui-input
+				${umbFocus()}
 				type="text"
 				id="server"
 				name="server"
@@ -254,6 +255,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		html` <uui-form-layout-item>
 			<uui-label for="database-name" slot="label" required>Database Name</uui-label>
 			<uui-input
+				${umbFocus()}
 				type="text"
 				.value=${value}
 				id="database-name"

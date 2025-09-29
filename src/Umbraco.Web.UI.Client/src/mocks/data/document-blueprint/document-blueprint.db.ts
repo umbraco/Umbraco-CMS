@@ -39,7 +39,7 @@ const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprint
 		isFolder: model.isFolder,
 		name: model.name,
 		parent: model.parent,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 
@@ -72,9 +72,11 @@ const createMockDocumentBlueprintMapper = (
 				updateDate: now,
 				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
+				id: UmbId.new(),
+				flags: [],
 			};
 		}),
-		signs: [],
+		flags: [],
 	};
 };
 
@@ -84,7 +86,7 @@ const detailResponseMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlu
 		id: model.id,
 		values: model.values,
 		variants: model.variants,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 
@@ -97,7 +99,7 @@ const itemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprintItem
 		},
 		id: model.id,
 		name: model.name,
-		signs: model.signs,
+		flags: model.flags,
 	};
 };
 
