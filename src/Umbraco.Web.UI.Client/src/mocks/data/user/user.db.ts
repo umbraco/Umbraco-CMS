@@ -246,7 +246,7 @@ const itemMapper = (item: UmbMockUserModel): UserItemResponseModel => {
 		id: item.id,
 		kind: item.kind,
 		name: item.name,
-		signs: item.signs,
+		flags: item.flags,
 	};
 };
 
@@ -272,7 +272,7 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		lastPasswordChangeDate: null,
 		isAdmin: item.userGroupIds.map((reference) => reference.id).includes(umbUserGroupMockDb.getAll()[0].id),
 		kind: item.kind,
-		signs: [],
+		flags: [],
 	};
 };
 
