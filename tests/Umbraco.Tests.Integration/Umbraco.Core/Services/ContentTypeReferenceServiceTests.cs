@@ -27,21 +27,44 @@ internal class ContentTypeReferenceServiceTests : ContentTypeEditingServiceTests
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 
     [Test]
-    public async Task Get_Referenced_DocumentKeys()
+    public async Task Can_Get_Referenced_DocumentKeys()
     {
         var contentTypeCreateModel = ContentTypeEditingBuilder.CreateSimpleContentType();
-        var compositionContentType =
-            (await ContentTypeEditingService.CreateAsync(contentTypeCreateModel, Constants.Security.SuperUserKey))
-            .Result!;
-        var contentCreateModel = ContentEditingBuilder.CreateSimpleContent(compositionContentType.Key);
+        var contentType = (await ContentTypeEditingService.CreateAsync(contentTypeCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var contentCreateModel = ContentEditingBuilder.CreateSimpleContent(contentType.Key);
         var content = await ContentEditingService.CreateAsync(contentCreateModel, Constants.Security.SuperUserKey);
-        var keys = await ContentTypeReferenceService.GetReferencedDocumentKeysAsync(compositionContentType.Key,
-            CancellationToken.None, 0, 100);
+        var keys = await ContentTypeReferenceService.GetReferencedDocumentKeysAsync(contentType.Key, CancellationToken.None, 0, 100);
 
         // Assert
         Assert.Multiple(() =>
         {
             Assert.That(keys.Items.Count(), Is.EqualTo(1));
+            Assert.That(keys.Items.First(), Is.EqualTo(content.Result.Content.Key));
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Multiple_Referenced_DocumentKeys()
+    {
+        var contentTypeCreateModel = ContentTypeEditingBuilder.CreateSimpleContentType();
+        var contentTypeCreateModel2 = ContentTypeEditingBuilder.CreateSimpleContentType("otherTextPage", "Other text page");
+        var contentType = (await ContentTypeEditingService.CreateAsync(contentTypeCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var contentType2 = (await ContentTypeEditingService.CreateAsync(contentTypeCreateModel2, Constants.Security.SuperUserKey)).Result!;
+        var contentCreateModel = ContentEditingBuilder.CreateSimpleContent(contentType.Key);
+        var contentCreateModel1 = ContentEditingBuilder.CreateSimpleContent(contentType.Key);
+        var contentCreateModel2 = ContentEditingBuilder.CreateSimpleContent(contentType2.Key);
+        var contentCreateModel3 = ContentEditingBuilder.CreateSimpleContent(contentType2.Key);
+        var content = await ContentEditingService.CreateAsync(contentCreateModel, Constants.Security.SuperUserKey);
+        await ContentEditingService.CreateAsync(contentCreateModel, Constants.Security.SuperUserKey);
+        await ContentEditingService.CreateAsync(contentCreateModel1, Constants.Security.SuperUserKey);
+        await ContentEditingService.CreateAsync(contentCreateModel2, Constants.Security.SuperUserKey);
+        await ContentEditingService.CreateAsync(contentCreateModel3, Constants.Security.SuperUserKey);
+        var keys = await ContentTypeReferenceService.GetReferencedDocumentKeysAsync(contentType.Key, CancellationToken.None, 0, 100);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(keys.Items.Count(), Is.EqualTo(2));
             Assert.That(keys.Items.First(), Is.EqualTo(content.Result.Content.Key));
         });
     }
@@ -154,14 +177,81 @@ internal class ContentTypeReferenceServiceTests : ContentTypeEditingServiceTests
     }
 
     [Test]
-    public async Task Get_Referenced_DocumentTypes_From_RichText()
+    public async Task Get_Referenced_DocumentTypes_From_RichText_ContentElementTypeKey()
     {
         var elementTypeCreateModel = ContentTypeEditingBuilder.CreateElementType();
-        var elementType = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var elementTypeCreateModel2 = ContentTypeEditingBuilder.CreateElementType("otherElement", "Other Element");
+        var elementType1 = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var elementType2 = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel2, Constants.Security.SuperUserKey)).Result!;
+
+        var dataType = await CreateRichText(elementType1.Key, elementType2.Key);
+
+        var keys = await ContentTypeReferenceService.GetReferencedElementsFromDataTypesAsync(elementType1.Key, CancellationToken.None, 0, 100);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(keys.Items.Count(), Is.EqualTo(1));
+            Assert.That(keys.Items.First(), Is.EqualTo(dataType.Key));
+        });
+    }
+
+    [Test]
+    public async Task Get_Referenced_DocumentTypes_From_RichText_SettingsElementTypeKey()
+    {
+        var elementTypeCreateModel = ContentTypeEditingBuilder.CreateElementType();
+        var elementTypeCreateModel2 = ContentTypeEditingBuilder.CreateElementType("otherElement", "Other Element");
+        var elementType1 = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var elementType2 = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel2, Constants.Security.SuperUserKey)).Result!;
+
+        var dataType = await CreateRichText(elementType1.Key, elementType2.Key);
+
+        var keys = await ContentTypeReferenceService.GetReferencedElementsFromDataTypesAsync(elementType2.Key, CancellationToken.None, 0, 100);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(keys.Items.Count(), Is.EqualTo(1));
+            Assert.That(keys.Items.First(), Is.EqualTo(dataType.Key));
+        });
+    }
+
+    [Test]
+    public async Task Get_Referenced_DocumentTypes_From_Each_Editor_With_Multiple_Elements()
+    {
+        var elementTypeCreateModel = ContentTypeEditingBuilder.CreateElementType("blocklistElement", "Blocklist Element");
+        var elementTypeCreateModel2 = ContentTypeEditingBuilder.CreateElementType("blockgridElement", "Blockgrid Element");
+        var elementTypeCreateModel3 = ContentTypeEditingBuilder.CreateElementType("richtextElement", "RichTexts Element");
+        var blockListElement = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel, Constants.Security.SuperUserKey)).Result!;
+        var blockGridElement = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel2, Constants.Security.SuperUserKey)).Result!;
+        var richTextElement = (await ContentTypeEditingService.CreateAsync(elementTypeCreateModel3, Constants.Security.SuperUserKey)).Result!;
+
+        var blockList = await CreateBlockList(blockListElement.Key);
+        var blockGrid = await CreateBlockGrid(blockGridElement.Key);
+        var richText = await CreateRichText(richTextElement.Key);
+
+        var blockListkeys = await ContentTypeReferenceService.GetReferencedElementsFromDataTypesAsync(blockListElement.Key, CancellationToken.None, 0, 100);
+        var blockGridKeys = await ContentTypeReferenceService.GetReferencedElementsFromDataTypesAsync(blockGridElement.Key, CancellationToken.None, 0, 100);
+        var richTextKeys = await ContentTypeReferenceService.GetReferencedElementsFromDataTypesAsync(richTextElement.Key, CancellationToken.None, 0, 100);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(blockListkeys.Total, Is.EqualTo(1));
+            Assert.That(blockListkeys.Items.First(), Is.EqualTo(blockList.Key));
+            Assert.That(blockGridKeys.Total, Is.EqualTo(1));
+            Assert.That(blockGridKeys.Items.First(), Is.EqualTo(blockGrid.Key));
+            Assert.That(richTextKeys.Total, Is.EqualTo(1));
+            Assert.That(richTextKeys.Items.First(), Is.EqualTo(richText.Key));
+        });
+    }
+
+    private async Task<IDataType> CreateRichText(Guid contentElementTypeKey, Guid? settingsElementTypeKey = null)
+    {
         var blockListConfig = new RichTextConfiguration.RichTextBlockConfiguration[] {
             new()
             {
-                ContentElementTypeKey = elementType.Key, SettingsElementTypeKey = elementType.Key
+                ContentElementTypeKey = contentElementTypeKey, SettingsElementTypeKey = settingsElementTypeKey
             }
         };
 
@@ -175,14 +265,8 @@ internal class ContentTypeReferenceServiceTests : ContentTypeEditingServiceTests
         };
 
         await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-        var keys = await ContentTypeReferenceService.GetReferencedElementsFromDataTypesAsync(elementType.Key, CancellationToken.None, 0, 100);
 
-        // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.That(keys.Items.Count(), Is.EqualTo(1));
-            Assert.That(keys.Items.First(), Is.EqualTo(dataType.Key));
-        });
+        return dataType;
     }
 
     private async Task<IDataType> CreateBlockList(Guid contentElementTypeKey, Guid? settingsElementTypeKey = null)
