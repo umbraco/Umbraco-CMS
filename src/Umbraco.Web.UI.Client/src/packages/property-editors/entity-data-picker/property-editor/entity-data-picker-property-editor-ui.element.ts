@@ -7,7 +7,6 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 // import of local component
 import '../input/input-entity-data.element.js';
@@ -20,6 +19,14 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	)
 	implements UmbPropertyEditorUiElement
 {
+	/**
+	 * The data source alias to use for this property editor.
+	 * @type {string}
+	 * @memberof UmbEntityDataPickerPropertyEditorUIElement
+	 */
+	@property({ type: String })
+	dataSourceAlias?: string;
+
 	/**
 	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
 	 * @type {boolean}
@@ -41,14 +48,8 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	@state()
 	private _maxMessage = '';
 
-	#dataSourceAlias: string | null = null;
-	#dataSourceManifest: UmbPropertyEditorDataSourceManifest | null = null;
-
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-
-		this.#dataSourceAlias = config.getValueByAlias<string | null>('editorDataSourceAlias') ?? null;
-		this.#getDataSourceManifest();
 
 		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
@@ -62,11 +63,6 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		}
 	}
 
-	#getDataSourceManifest() {
-		const manifest = umbExtensionsRegistry.getByAlias<UmbPropertyEditorDataSourceManifest>(this.#dataSourceAlias ?? '');
-		debugger;
-	}
-
 	#parseInt(value: unknown, fallback: number): number {
 		const num = Number(value);
 		return !isNaN(num) && num > 0 ? num : fallback;
@@ -77,7 +73,7 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	}
 
 	override render() {
-		return html`<umb-input-entity-data></umb-input-entity-data>`;
+		return html`<umb-input-entity-data .dataSourceAlias="${this.dataSourceAlias}"></umb-input-entity-data>`;
 	}
 }
 
