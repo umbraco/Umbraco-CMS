@@ -1560,7 +1560,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
         List<Guid>? contentGuids = Database.Fetch<Guid>(sql);
 
-
         return new PagedModel<Guid>()
         {
             Items = contentGuids,
