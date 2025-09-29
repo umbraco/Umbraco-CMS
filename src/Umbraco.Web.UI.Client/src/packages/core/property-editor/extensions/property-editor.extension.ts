@@ -37,7 +37,7 @@ export interface MetaPropertyEditorUi {
 		 * @example ["pickerPropertyEditorCollectionDataSource", "pickerPropertyEditorTreeDataSource"]
 		 */
 		forDataSourceTypes: string[];
-	}
+	};
 }
 
 // Model
@@ -66,6 +66,7 @@ export interface PropertyEditorSettingsProperty {
 	description?: string;
 	alias: string;
 	propertyEditorUiAlias: string;
+	propertyEditorDataSourceAlias?: string;
 	config?: UmbPropertyEditorConfig;
 	weight?: number;
 }
