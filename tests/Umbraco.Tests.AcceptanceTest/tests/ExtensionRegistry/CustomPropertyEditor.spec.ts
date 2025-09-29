@@ -79,7 +79,7 @@ test('can write and read value from custom property editor', async({umbracoApi, 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.enterPropertyValue(dataTypeName, testValue);
-  await umbracoUi.content.clickEntityActionButton();
+  await umbracoUi.content.clickSaveButton();
 
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
