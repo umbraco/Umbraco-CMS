@@ -18,7 +18,7 @@ public class CopyDocumentControllerTests : ManagementApiUserGroupTestBase<CopyDo
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
-    private Guid _targetId;
+    private Guid _originalId;
 
     [SetUp]
     public async Task Setup()
@@ -26,7 +26,8 @@ public class CopyDocumentControllerTests : ManagementApiUserGroupTestBase<CopyDo
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
-        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id,
+            name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
@@ -36,27 +37,27 @@ public class CopyDocumentControllerTests : ManagementApiUserGroupTestBase<CopyDo
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
             InvariantName = Guid.NewGuid().ToString(),
-            InvariantProperties = new[]
-            {
+            InvariantProperties =
+            [
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
                 new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            }
+            ]
         };
         var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        _targetId = response.Result.Content.Key;
+        _originalId = response.Result.Content.Key;
     }
 
     protected override Expression<Func<CopyDocumentController, object>> MethodSelector =>
-        x => x.Copy(CancellationToken.None, Guid.NewGuid(), null);
+        x => x.Copy(CancellationToken.None, _originalId, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -83,7 +84,7 @@ public class CopyDocumentControllerTests : ManagementApiUserGroupTestBase<CopyDo
     {
         CopyDocumentRequestModel copyDocumentRequestModel = new()
         {
-            Target = new ReferenceByIdModel(_targetId), RelateToOriginal = true, IncludeDescendants = true,
+            Target = null, RelateToOriginal = true, IncludeDescendants = true,
         };
 
         return await Client.PostAsync(Url, JsonContent.Create(copyDocumentRequestModel));

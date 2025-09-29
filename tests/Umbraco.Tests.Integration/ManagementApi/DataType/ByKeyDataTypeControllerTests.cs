@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 public class ByKeyDataTypeControllerTests : ManagementApiUserGroupTestBase<ByKeyDataTypeController>
 {
     protected override Expression<Func<ByKeyDataTypeController, object>> MethodSelector =>
-            x => x.ByKey(CancellationToken.None, Guid.NewGuid());
+        x => x.ByKey(CancellationToken.None, Guid.NewGuid());
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

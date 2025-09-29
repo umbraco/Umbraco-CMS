@@ -77,4 +77,5 @@ public class DeletePublicAccessDocumentControllerTests : ManagementApiUserGroupT
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest() => await Client.DeleteAsync(Url);
+
 }

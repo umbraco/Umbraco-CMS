@@ -20,10 +20,10 @@ public class MoveDataTypeControllerTests : ManagementApiUserGroupTestBase<MoveDa
     [SetUp]
     public async Task Setup()
     {
-        var response1 = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "OriginalFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
-        var response2 = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "TargetFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
-        _originalId = response1.Result.Key;
-        _targetId = response2.Result.Key;
+        var originalResponse = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "OriginalFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
+        var targetResponse = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "TargetFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
+        _originalId = originalResponse.Result.Key;
+        _targetId = targetResponse.Result.Key;
     }
 
     protected override Expression<Func<MoveDataTypeController, object>> MethodSelector =>

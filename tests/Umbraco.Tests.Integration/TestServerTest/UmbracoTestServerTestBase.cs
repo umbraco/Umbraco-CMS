@@ -195,7 +195,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             return url;
         }
 
-
         private IHostBuilder CreateHostBuilder()
         {
             IHostBuilder hostBuilder = Host.CreateDefaultBuilder()

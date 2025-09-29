@@ -9,7 +9,6 @@ public class ChildrenDictionaryTreeControllerTests : ManagementApiUserGroupTestB
     protected override Expression<Func<ChildrenDictionaryTreeController, object>> MethodSelector =>
         x => x.Children(CancellationToken.None, Guid.NewGuid(), 0, 100);
 
-
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.OK

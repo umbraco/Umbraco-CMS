@@ -8,8 +8,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Dictionary;
 
 public class UpdateDictionaryControllerTests : ManagementApiUserGroupTestBase<UpdateDictionaryController>
 {
-    protected override Expression<Func<UpdateDictionaryController, object>> MethodSelector =>
-            x => x.Update(CancellationToken.None, Guid.NewGuid(), null);
+    protected override Expression<Func<UpdateDictionaryController, object>> MethodSelector => x => x.Update(CancellationToken.None, Guid.NewGuid(), null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

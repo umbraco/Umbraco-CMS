@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Dictionary;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -14,25 +15,28 @@ public class MoveDictionaryControllerTests : ManagementApiUserGroupTestBase<Move
 {
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
-    private Guid _originalId = new Guid();
-    private Guid _targetId = new Guid();
+    private Guid _originalId;
+    private Guid _targetId;
 
     [SetUp]
     public async Task Setup()
     {
-        var original = new DictionaryItem(Constants.System.RootKey, _originalId.ToString());
-        var target = new DictionaryItem(Constants.System.RootKey, _targetId.ToString());
+        var originalResponse = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
+        var targetResponse = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
 
-        await DictionaryItemService.CreateAsync(original, Constants.Security.SuperUserKey);
-        await DictionaryItemService.CreateAsync(target, Constants.Security.SuperUserKey);
+        _originalId = originalResponse.Key;
+        _targetId = targetResponse.Key;
+
+        await DictionaryItemService.CreateAsync(originalResponse, Constants.Security.SuperUserKey);
+        await DictionaryItemService.CreateAsync(targetResponse, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<MoveDictionaryController, object>> MethodSelector =>
-        x => x.Move(CancellationToken.None, Guid.NewGuid(), null);
+        x => x.Move(CancellationToken.None, _originalId, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -47,7 +51,7 @@ public class MoveDictionaryControllerTests : ManagementApiUserGroupTestBase<Move
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
@@ -63,7 +67,7 @@ public class MoveDictionaryControllerTests : ManagementApiUserGroupTestBase<Move
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
         MoveDictionaryRequestModel moveDictionaryRequestModel =
-            new() { Target = null };
+            new() { Target = new ReferenceByIdModel(_targetId) };
         return await Client.PutAsync(Url, JsonContent.Create(moveDictionaryRequestModel));
     }
 }

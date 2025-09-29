@@ -16,7 +16,7 @@ public class ByKeyDataTypeFolderControllerTests : ManagementApiUserGroupTestBase
     [SetUp]
     public async Task Setup()
     {
-        var response = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "TestFolder", Guid.Empty, Constants.Security.SuperUserKey);
+        var response = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "TestFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
         _folderId = response.Result.Key;
     }
 
@@ -25,7 +25,7 @@ public class ByKeyDataTypeFolderControllerTests : ManagementApiUserGroupTestBase
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()

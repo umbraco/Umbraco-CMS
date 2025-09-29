@@ -9,7 +9,6 @@ public class ItemDictionaryItemControllerTests : ManagementApiUserGroupTestBase<
     protected override Expression<Func<ItemDictionaryItemController, object>> MethodSelector =>
         x => x.Item(CancellationToken.None, new HashSet<Guid> { Guid.NewGuid() });
 
-
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.OK
