@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Controllers.Document;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -16,9 +17,13 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 public class MoveDocumentControllerTests : ManagementApiUserGroupTestBase<MoveDocumentController>
 {
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
-    private Guid _targetId;
+
+    private Guid _targetKey;
+    private Guid _originalId;
 
     [SetUp]
     public async Task Setup()
@@ -28,35 +33,45 @@ public class MoveDocumentControllerTests : ManagementApiUserGroupTestBase<MoveDo
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var createModel = new ContentCreateModel
+        // Target
+        var parentCreateModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
             InvariantName = Guid.NewGuid().ToString(),
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            }
         };
-        var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        _targetId = response.Result.Content.Key;
+        var responseParent = await ContentEditingService.CreateAsync(parentCreateModel, Constants.Security.SuperUserKey);
+        _targetKey = responseParent.Result.Content.Key;
+
+        // Original
+        var childCreateModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = Guid.NewGuid().ToString(),
+        };
+        var responseChild = await ContentEditingService.CreateAsync(childCreateModel, Constants.Security.SuperUserKey);
+        _originalId = responseChild.Result.Content.Key;
+
+        await ContentEditingService.MoveToRecycleBinAsync(_originalId, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<MoveDocumentController, object>> MethodSelector =>
-        x => x.Move(CancellationToken.None, Guid.NewGuid(), null);
+        x => x.Move(CancellationToken.None, _originalId, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -66,22 +81,22 @@ public class MoveDocumentControllerTests : ManagementApiUserGroupTestBase<MoveDo
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized,
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        MoveDocumentRequestModel moveDocumentRequestModel = new() { Target = new ReferenceByIdModel(_targetId), };
+        MoveDocumentRequestModel moveDocumentRequestModel = new() { Target = new ReferenceByIdModel(_targetKey), };
 
         return await Client.PutAsync(Url, JsonContent.Create(moveDocumentRequestModel));
     }

@@ -12,17 +12,22 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 
-public class CreatePublicAccessDocumentControllerTests : ManagementApiUserGroupTestBase<CreatePublicAccessDocumentController>
+public class
+    CreatePublicAccessDocumentControllerTests : ManagementApiUserGroupTestBase<CreatePublicAccessDocumentController>
 {
-
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    protected IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
-    protected IMemberService MemberService => GetRequiredService<IMemberService>();
-    protected IMemberEditingService MemberEditingService => GetRequiredService<IMemberEditingService>();
-    private Guid _key;
+    private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
+    private IMemberService MemberService => GetRequiredService<IMemberService>();
+
+    private Guid _contentDefaultPageKey;
+    private Guid _contentLoginPageKey;
+    private Guid _contentErrorPageKey;
 
     [SetUp]
     public async Task Setup()
@@ -34,50 +39,57 @@ public class CreatePublicAccessDocumentControllerTests : ManagementApiUserGroupT
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var createModel = new ContentCreateModel
+        // Create default page
+        var createDefaultPageModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
             InvariantName = Guid.NewGuid().ToString(),
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            }
         };
-        var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        _key = response.Result.Content.Key;
+        var responseDefaultPage = await ContentEditingService.CreateAsync(createDefaultPageModel, Constants.Security.SuperUserKey);
+        _contentDefaultPageKey = responseDefaultPage.Result.Content.Key;
 
-
-
-        MemberCreateModel memberCreateModel = new()
+        // Create login page
+        var createLoginPageModel = new ContentCreateModel
         {
-            Username = "member",
-            Email = "",
-            ContentTypeKey = Guid.NewGuid(),
-            Password = "password",
-            IsApproved = true,
-            InvariantProperties = new List<PropertyValueModel>(),
-
-
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = Guid.NewGuid().ToString(),
         };
+        var responseLoginPage = await ContentEditingService.CreateAsync(createLoginPageModel, Constants.Security.SuperUserKey);
+        _contentLoginPageKey = responseLoginPage.Result.Content.Key;
 
-        await MemberEditingService.CreateAsync(memberCreateModel, Constants.Security.SuperUserKey);
+        // Create error page
+        var createErrorPageModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = Guid.NewGuid().ToString(),
+        };
+        var responseErrorPage = await ContentEditingService.CreateAsync(createErrorPageModel, Constants.Security.SuperUserKey);
+        _contentErrorPageKey = responseErrorPage.Result.Content.Key;
 
+        // Member setup
+        var memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        var member = MemberService.CreateMember("test", "test@test.com", "T. Est", memberType.Alias);
+        MemberService.Save(member);
     }
 
     protected override Expression<Func<CreatePublicAccessDocumentController, object>> MethodSelector =>
-        x => x.Create(CancellationToken.None, Guid.NewGuid(), null);
+        x => x.Create(CancellationToken.None, _contentDefaultPageKey, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.BadRequest
+        ExpectedStatusCode = HttpStatusCode.Created,
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.BadRequest
+        ExpectedStatusCode = HttpStatusCode.Created,
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -87,22 +99,28 @@ public class CreatePublicAccessDocumentControllerTests : ManagementApiUserGroupT
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.BadRequest
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized,
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        PublicAccessRequestModel publicAccessRequestModel = new() { MemberUserNames = null, MemberGroupNames = null , LoginDocument = new ReferenceByIdModel(Guid.Empty), ErrorDocument = new ReferenceByIdModel(Guid.Empty) };
+        PublicAccessRequestModel publicAccessRequestModel = new()
+        {
+            MemberUserNames = ["test@test.com"],
+            MemberGroupNames = [],
+            LoginDocument = new ReferenceByIdModel(_contentLoginPageKey),
+            ErrorDocument = new ReferenceByIdModel(_contentErrorPageKey),
+        };
 
         return await Client.PostAsync(Url, JsonContent.Create(publicAccessRequestModel));
     }

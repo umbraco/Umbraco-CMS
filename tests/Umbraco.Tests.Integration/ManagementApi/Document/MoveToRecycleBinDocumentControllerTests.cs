@@ -13,9 +13,12 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 public class MoveToRecycleBinDocumentControllerTests : ManagementApiUserGroupTestBase<MoveToRecycleBinDocumentController>
 {
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
-    private Guid _key;
+
+    private Guid _documentKey;
 
     [SetUp]
     public async Task Setup()
@@ -33,27 +36,22 @@ public class MoveToRecycleBinDocumentControllerTests : ManagementApiUserGroupTes
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
             InvariantName = Guid.NewGuid().ToString(),
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            }
         };
         var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        _key = response.Result.Content.Key;
+        _documentKey = response.Result.Content.Key;
     }
 
     protected override Expression<Func<MoveToRecycleBinDocumentController, object>> MethodSelector =>
-        x => x.MoveToRecycleBin(CancellationToken.None, _key);
+        x => x.MoveToRecycleBin(CancellationToken.None, _documentKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -63,17 +61,17 @@ public class MoveToRecycleBinDocumentControllerTests : ManagementApiUserGroupTes
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized,
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest() => await Client.PutAsync(Url, null);

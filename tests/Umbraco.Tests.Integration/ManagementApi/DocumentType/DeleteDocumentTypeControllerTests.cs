@@ -10,15 +10,15 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.DocumentType;
 
 public class DeleteDocumentTypeControllerTests : ManagementApiUserGroupTestBase<DeleteDocumentTypeController>
 {
-    private IContentTypeEditingService _contentTypeEditingService;
+    private IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
+
     private Guid _key;
 
     [SetUp]
     public async Task Setup()
     {
-        _contentTypeEditingService = GetRequiredService<IContentTypeEditingService>();
         _key = Guid.NewGuid();
-        await _contentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key, Name = "Test", Alias = "test" }, Constants.Security.SuperUserKey);
+        await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key, Name = "Test", Alias = "test" }, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<DeleteDocumentTypeController, object>> MethodSelector =>
@@ -26,12 +26,12 @@ public class DeleteDocumentTypeControllerTests : ManagementApiUserGroupTestBase<
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -41,17 +41,17 @@ public class DeleteDocumentTypeControllerTests : ManagementApiUserGroupTestBase<
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized,
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest() => await Client.DeleteAsync(Url);

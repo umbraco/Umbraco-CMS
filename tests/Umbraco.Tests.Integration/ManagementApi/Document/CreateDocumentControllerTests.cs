@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<CreateDocumentController>
 {
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private Guid _templateKey;
@@ -26,8 +27,7 @@ public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<Crea
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         _templateKey = template.Key;
 
-        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id,
-            name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         _contentTypeKey = contentType.Key;
@@ -38,12 +38,12 @@ public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<Crea
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.Created,
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.Created,
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -53,17 +53,17 @@ public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<Crea
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.Created,
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized,
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest()

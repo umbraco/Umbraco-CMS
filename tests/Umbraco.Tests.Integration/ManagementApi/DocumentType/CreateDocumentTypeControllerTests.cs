@@ -2,8 +2,8 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
 using Umbraco.Cms.Api.Management.Controllers.DocumentType;
-using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
+
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DocumentType;
 
@@ -14,12 +14,12 @@ public class CreateDocumentTypeControllerTests : ManagementApiUserGroupTestBase<
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.BadRequest
+        ExpectedStatusCode = HttpStatusCode.Created,
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -29,27 +29,26 @@ public class CreateDocumentTypeControllerTests : ManagementApiUserGroupTestBase<
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized,
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreateDocumentRequestModel createDocumentRequestModel = new()
+        CreateDocumentTypeRequestModel createDocumentTypeRequestModel = new()
         {
-            Template = new ReferenceByIdModel(Guid.Empty),
-            DocumentType = null,
+            Alias = "test", Name = "Test", Id = Guid.NewGuid(), Icon = "icon-document",
         };
 
-        return await Client.PostAsync(Url, JsonContent.Create(createDocumentRequestModel));
+        return await Client.PostAsync(Url, JsonContent.Create(createDocumentTypeRequestModel));
     }
 }

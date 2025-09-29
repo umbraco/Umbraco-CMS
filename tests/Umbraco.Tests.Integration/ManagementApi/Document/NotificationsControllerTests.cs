@@ -3,6 +3,7 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Document;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -12,9 +13,16 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 public class NotificationsControllerTests : ManagementApiUserGroupTestBase<NotificationsController>
 {
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
-    private Guid _key;
+
+    private IUserService UserService => GetRequiredService<IUserService>();
+
+    private INotificationService NotificationService => GetRequiredService<INotificationService>();
+
+    private Guid _contentKey;
 
     [SetUp]
     public async Task Setup()
@@ -32,27 +40,26 @@ public class NotificationsControllerTests : ManagementApiUserGroupTestBase<Notif
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
             InvariantName = Guid.NewGuid().ToString(),
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            }
         };
         var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        _key = response.Result.Content.Key;
+        _contentKey = response.Result.Content.Key;
+
+        var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
+
+        NotificationService.CreateNotification(user, contentType, "X");
     }
 
     protected override Expression<Func<NotificationsController, object>> MethodSelector =>
-        x => x.Notifications(CancellationToken.None, _key);
+        x => x.Notifications(CancellationToken.None, _contentKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -62,16 +69,16 @@ public class NotificationsControllerTests : ManagementApiUserGroupTestBase<Notif
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized,
     };
 }

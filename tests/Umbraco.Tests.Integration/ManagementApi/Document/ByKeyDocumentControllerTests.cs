@@ -18,7 +18,7 @@ public class ByKeyDocumentControllerTests : ManagementApiUserGroupTestBase<ByKey
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private Guid _key;
+    private Guid _documentKey;
 
     [SetUp]
     public async Task Setup()
@@ -36,18 +36,13 @@ public class ByKeyDocumentControllerTests : ManagementApiUserGroupTestBase<ByKey
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
             InvariantName = Guid.NewGuid().ToString(),
-            InvariantProperties =
-            [
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            ],
         };
         var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        _key = response.Result.Content.Key;
+        _documentKey = response.Result.Content.Key;
     }
 
     protected override Expression<Func<ByKeyDocumentController, object>> MethodSelector =>
-        x => x.ByKey(CancellationToken.None, _key);
+        x => x.ByKey(CancellationToken.None, _documentKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

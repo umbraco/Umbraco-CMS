@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Controllers.Document;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.PublicAccess;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -15,9 +16,21 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 public class UpdatePublicAccessDocumentControllerTests : ManagementApiUserGroupTestBase<UpdatePublicAccessDocumentController>
 {
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
-    private Guid _key;
+
+    private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
+    private IMemberService MemberService => GetRequiredService<IMemberService>();
+
+    private IPublicAccessService PublicAccessService => GetRequiredService<IPublicAccessService>();
+
+    private Guid _contentDefaultPageKey;
+    private Guid _contentLoginPageKey;
+    private Guid _contentErrorPageKey;
+    private Guid _newContentErrorPageKey;
 
     [SetUp]
     public async Task Setup()
@@ -29,33 +42,79 @@ public class UpdatePublicAccessDocumentControllerTests : ManagementApiUserGroupT
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var createModel = new ContentCreateModel
+        // Create default page
+        var createDefaultPageModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
             InvariantName = Guid.NewGuid().ToString(),
-            InvariantProperties = new[]
-            {
-                new PropertyValueModel { Alias = "title", Value = "The title value" },
-                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
-            }
         };
-        var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        _key = response.Result.Content.Key;
+        var responseDefaultPage = await ContentEditingService.CreateAsync(createDefaultPageModel, Constants.Security.SuperUserKey);
+        _contentDefaultPageKey = responseDefaultPage.Result.Content.Key;
+
+        // Create login page
+        var createLoginPageModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = Guid.NewGuid().ToString(),
+        };
+        var responseLoginPage = await ContentEditingService.CreateAsync(createLoginPageModel, Constants.Security.SuperUserKey);
+        _contentLoginPageKey = responseLoginPage.Result.Content.Key;
+
+        // Create error page
+        var createErrorPageModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = Guid.NewGuid().ToString(),
+        };
+        var responseErrorPage = await ContentEditingService.CreateAsync(createErrorPageModel, Constants.Security.SuperUserKey);
+        _contentErrorPageKey = responseErrorPage.Result.Content.Key;
+
+        // Create new error page
+        var createNewErrorPageModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = Guid.NewGuid().ToString(),
+        };
+        var responseNewErrorPage = await ContentEditingService.CreateAsync(createNewErrorPageModel, Constants.Security.SuperUserKey);
+        _newContentErrorPageKey = responseNewErrorPage.Result.Content.Key;
+
+        // Member setup
+        var memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        var member = MemberService.CreateMember("test", "test@test.com", "T. Est", memberType.Alias);
+        MemberService.Save(member);
+
+        // Create Public Access
+        PublicAccessEntrySlim publicAccessEntry = new()
+        {
+            ContentId = _contentDefaultPageKey,
+            ErrorPageId = _contentErrorPageKey,
+            LoginPageId = _contentLoginPageKey,
+            MemberUserNames = [member.Email],
+            MemberGroupNames = [],
+        };
+        await PublicAccessService.CreateAsync(publicAccessEntry);
     }
 
     protected override Expression<Func<UpdatePublicAccessDocumentController, object>> MethodSelector =>
-        x => x.Update(CancellationToken.None, _key, null);
+        x => x.Update(CancellationToken.None, _contentDefaultPageKey, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.BadRequest
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.BadRequest
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -65,27 +124,27 @@ public class UpdatePublicAccessDocumentControllerTests : ManagementApiUserGroupT
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized,
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
         PublicAccessRequestModel publicAccessRequestModel = new()
         {
-            MemberUserNames = Array.Empty<string>(),
-            MemberGroupNames = Array.Empty<string>(),
-            LoginDocument = new ReferenceByIdModel(Guid.NewGuid()),
-            ErrorDocument = new ReferenceByIdModel(Guid.NewGuid()),
+            MemberUserNames = ["test@test.com"],
+            MemberGroupNames = [],
+            LoginDocument = new ReferenceByIdModel(_contentDefaultPageKey),
+            ErrorDocument = new ReferenceByIdModel(_newContentErrorPageKey),
         };
 
         return await Client.PutAsync(Url, JsonContent.Create(publicAccessRequestModel));

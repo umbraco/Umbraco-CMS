@@ -1,22 +1,54 @@
 using System.Linq.Expressions;
 using System.Net;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Document.Tree;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document.Tree;
 
 public class RootDocumentTreeControllerTests : ManagementApiUserGroupTestBase<RootDocumentTreeController>
 {
+    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    [SetUp]
+    public async Task Setup()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = Guid.NewGuid().ToString(),
+        };
+
+        await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+    }
+
     protected override Expression<Func<RootDocumentTreeController, object>> MethodSelector =>
         x => x.Root(CancellationToken.None, 0, 100, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -26,16 +58,16 @@ public class RootDocumentTreeControllerTests : ManagementApiUserGroupTestBase<Ro
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK,
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized,
     };
 }
