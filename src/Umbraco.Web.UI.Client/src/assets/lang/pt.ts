@@ -847,6 +847,7 @@ export default {
 		email: 'Email',
 		error: 'Erro',
 		field: 'Campo',
+		fields: 'Campos',
 		fieldFor: 'Campo para %0%',
 		toggleFor: 'Alternar para %0%',
 		findDocument: 'Encontrar',
@@ -2407,6 +2408,7 @@ export default {
 		searchContentTree: 'Pesquisar Árvore de Conteúdo',
 		maxAmount: 'Quantidade máxima',
 		expandChildItems: 'Expandir itens filhos para',
+		collapseChildItems: 'Fechar itens filhos para',
 		openContextNode: 'Abrir nó de contexto para',
 	},
 	references: {
@@ -2832,9 +2834,16 @@ export default {
 		resetUrlLabel: 'Redefinir',
 	},
 	missingEditor: {
+		title: 'Este tipo de propriedade já não se encontra disponível.',
 		description:
-			'<p><strong>Erro!</strong> Este tipo de propriedade já não se encontra disponível. Por favor, contacte o administrador.</p>',
+			'Não se preocupe, o seu conteúdo está seguro e a publicação deste documento não o substituirá nem removerá.<br/>Entre em contacto com o administrador do site para resolver o problema.',
+		detailsTitle: 'Detalhes adicionais',
 		detailsDescription:
-			'<p>Este tipo de propriedade já não se encontra disponível.<br/>Por favor, contacte o administrador para que ele possa apagar a propriedade ou restaurar o tipo de propriedade.</p><p><strong>Dados:</strong></p>',
+			'Para resolver o problema, deverá ou restaurar o editor de propriedades, ou alterar a propriedade para usar um tipo de dados compatível ou remover a propriedade se ela não for mais necessária.',
+		detailsDataType: 'Tipo de dados',
+		detailsPropertyEditor: 'Editor de propriedades',
+		detailsData: 'Dados',
+		detailsHide: 'Esconder detalhes',
+		detailsShow: 'Mostrar detalhes',
 	},
 } as UmbLocalizationDictionary;

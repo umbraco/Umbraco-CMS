@@ -155,7 +155,6 @@ export class UmbDefaultTreeContext<
 	#debouncedLoadTree(reload = false) {
 		const hasStartNode = this.getStartNode();
 		const hideTreeRoot = this.getHideTreeRoot();
-
 		if (hasStartNode || hideTreeRoot) {
 			if (reload) {
 				this.#treeItemChildrenManager.reloadChildren();

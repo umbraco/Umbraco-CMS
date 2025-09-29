@@ -41,7 +41,7 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
         var sourceString = source.ToString()!;
 
         // ensures string is parsed for {localLink} and URLs are resolved correctly
-        sourceString = _localLinkParser.EnsureInternalLinks(sourceString, preview);
+        sourceString = _localLinkParser.EnsureInternalLinks(sourceString);
         sourceString = _urlParser.EnsureUrls(sourceString);
 
         return sourceString;

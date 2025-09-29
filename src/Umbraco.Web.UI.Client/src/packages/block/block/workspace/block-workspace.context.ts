@@ -26,6 +26,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
+
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
 	extends UmbSubmittableWorkspaceContextBase<LayoutDataType>
 	implements UmbRoutableWorkspaceContext
@@ -470,7 +471,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	getName() {
-		return 'block name content element type here...';
+		return '';
 	}
 
 	/**

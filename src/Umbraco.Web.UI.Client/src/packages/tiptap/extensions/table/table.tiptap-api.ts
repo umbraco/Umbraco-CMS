@@ -1,11 +1,10 @@
 import { UmbTiptapExtensionApiBase } from '../tiptap-extension-api-base.js';
+import { UmbTable, UmbTableHeader, UmbTableRow, UmbTableCell } from './table.tiptap-extension.js';
 import { css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTable, UmbTableHeader, UmbTableRow, UmbTableCell } from '@umbraco-cms/backoffice/external/tiptap';
 
 import '../../components/menu/tiptap-menu.element.js';
 
 export default class UmbTiptapTableExtensionApi extends UmbTiptapExtensionApiBase {
-	// eslint-disable-next-line @typescript-eslint/no-deprecated
 	getTiptapExtensions = () => [UmbTable, UmbTableHeader, UmbTableRow, UmbTableCell];
 
 	override getStyles = () => css`

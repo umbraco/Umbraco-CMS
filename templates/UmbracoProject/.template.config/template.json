@@ -82,7 +82,7 @@
       "replaces": "CUSTOM_VERSION",
       "isRequired": false
     },
-    "FinalVersion" : {
+    "FinalVersion": {
       "type": "generated",
       "generator": "switch",
       "datatype": "text",
@@ -103,8 +103,7 @@
         ]
       }
     },
-    "DotnetVersion":
-    {
+    "DotnetVersion": {
       "type": "generated",
       "generator": "switch",
       "datatype": "text",
@@ -299,6 +298,33 @@
         ]
       },
       "replaces": "UNATTENDED_USER_PASSWORD_FROM_TEMPLATE"
+    },
+    "UnattendedTelemetryLevel": {
+      "displayName": "Unattended telemetry level",
+      "description": "Specifies the level of telemetry information the installation will report.",
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Detailed",
+      "choices": [
+        {
+          "choice": "Minimal",
+          "description": "Minimal information"
+        },
+        {
+          "choice": "Basic",
+          "description": "Basic information"
+        },
+        {
+          "choice": "Detailed",
+          "description": "Detailed information"
+        }
+      ],
+      "forms": {
+        "global": [
+          "jsonEncode"
+        ]
+      },
+      "replaces": "UNATTENDED_TELEMETRY_LEVEL_FROM_TEMPLATE"
     },
     "UsingUnattenedInstall": {
       "type": "computed",
