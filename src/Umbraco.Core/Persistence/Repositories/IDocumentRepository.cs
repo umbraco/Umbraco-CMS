@@ -104,5 +104,5 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     /// </summary>
     bool RecycleBinSmells();
 
-    PagedModel<Guid> GetReferencingDocumentsByDocumentTypeKey(Guid documentTypeKey);
+    PagedModel<Guid> GetReferencingDocumentsByDocumentTypeKey(Guid documentTypeKey) => throw new NotImplementedException();
 }

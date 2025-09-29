@@ -1537,7 +1537,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
     public PagedModel<Guid> GetReferencingDocumentsByDocumentTypeKey(Guid documentTypeKey)
     {
-        // TODO: Make this one query.
         Sql<ISqlContext> sqlContentTypeId = Sql()
             .Select<ContentTypeDto>(x => x.NodeId)
             .From<ContentTypeDto>()

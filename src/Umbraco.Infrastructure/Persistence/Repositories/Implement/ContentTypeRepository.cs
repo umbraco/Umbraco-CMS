@@ -93,8 +93,6 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
 
     public PagedModel<Guid> GetChildren(Guid parentKey)
     {
-
-        // TODO: Make this one query.
         // Get content type id
         Sql<ISqlContext> sqlContentTypeId = Sql()
             .Select<ContentTypeDto>(x => x.NodeId)

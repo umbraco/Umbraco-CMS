@@ -30,5 +30,5 @@ public interface IContentTypeRepository : IContentTypeRepositoryBase<IContentTyp
 
     IEnumerable<int> GetAllContentTypeIds(string[] aliases);
 
-    PagedModel<Guid> GetChildren(Guid parentKey);
+    PagedModel<Guid> GetChildren(Guid parentKey) => throw new NotImplementedException();
 }
