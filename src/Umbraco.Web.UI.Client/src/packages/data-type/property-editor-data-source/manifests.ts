@@ -59,4 +59,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 			description: 'Pick a webhook',
 		},
 	},
+	{
+		type: 'pickerPropertyEditorCollectionDataSource',
+		alias: 'Umb.PickerPropertyEditorCollectionDataSource.User',
+		name: 'User Picker Collection Data Source',
+		api: () => import('./test-user-picker-data-source.js'),
+		meta: {
+			label: 'Users',
+			icon: 'icon-user',
+			description: 'Pick a user',
+		},
+	},
 ];
