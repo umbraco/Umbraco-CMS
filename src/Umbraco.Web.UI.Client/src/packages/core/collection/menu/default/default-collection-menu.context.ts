@@ -103,7 +103,7 @@ export class UmbDefaultCollectionMenuContext extends UmbContextBase {
 	}
 
 	#observeRepository(repositoryAlias?: string) {
-		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
+		if (!repositoryAlias) throw new Error('Collection Menu must have a repository alias.');
 
 		new UmbExtensionApiInitializer<ManifestRepository<UmbCollectionRepository>>(
 			this,
