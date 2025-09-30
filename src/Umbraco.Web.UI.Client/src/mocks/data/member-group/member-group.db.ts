@@ -42,7 +42,7 @@ const createDetailMockMapper = (request: any): UmbMockMemberGroupModel => {
 	return {
 		id: request.id ? request.id : UmbId.new(),
 		name: request.name,
-		signs: [],
+		flags: [],
 	};
 };
 
@@ -57,7 +57,7 @@ const itemResponseMapper = (item: UmbMockMemberGroupModel): MemberGroupItemRespo
 	return {
 		id: item.id,
 		name: item.name,
-		signs: item.signs,
+		flags: item.flags,
 	};
 };
 

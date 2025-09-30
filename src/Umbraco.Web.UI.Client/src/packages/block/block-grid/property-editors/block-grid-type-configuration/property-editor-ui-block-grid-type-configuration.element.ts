@@ -182,7 +182,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		const groupName = this.#blockGroups?.find((group) => group.key === groupKey)?.name ?? '';
 		await umbConfirmModal(this, {
 			headline: '#blockEditor_confirmDeleteBlockGroupTitle',
-			content: this.localize.term('#blockEditor_confirmDeleteBlockGroupMessage', [groupName]),
+			content: this.localize.term('blockEditor_confirmDeleteBlockGroupMessage', [groupName]),
 			color: 'danger',
 			confirmLabel: '#general_delete',
 		});
