@@ -1,20 +1,33 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.HealthCheck;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
+using Umbraco.Cms.Core.HealthChecks;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.HealthCheck;
 
 public class ExecuteActionHealthCheckControllerTests : ManagementApiUserGroupTestBase<ExecuteActionHealthCheckController>
 {
+    private Guid _dataIntegrityHealthCheckId;
+
+    private HealthCheckCollection HealthChecks => GetRequiredService<HealthCheckCollection>();
+
+    [SetUp]
+    public async Task Setup()
+    {
+        var dataIntegrityCheck = HealthChecks.FirstOrDefault(x => x.Name.Contains("Data Integrity", StringComparison.OrdinalIgnoreCase));
+        _dataIntegrityHealthCheckId = dataIntegrityCheck.Id;
+    }
+
     protected override Expression<Func<ExecuteActionHealthCheckController, object>> MethodSelector =>
         x => x.ExecuteAction(CancellationToken.None, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.BadRequest
+        ExpectedStatusCode = HttpStatusCode.InternalServerError
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -45,7 +58,7 @@ public class ExecuteActionHealthCheckControllerTests : ManagementApiUserGroupTes
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
         HealthCheckActionRequestModel healthCheckActionRequest =
-            new() { HealthCheck = new ReferenceByIdModel(Guid.NewGuid()), ValueRequired = false };
+            new() { HealthCheck = new ReferenceByIdModel(_dataIntegrityHealthCheckId), ValueRequired = false };
         return await Client.PostAsync(Url, JsonContent.Create(healthCheckActionRequest));
     }
 }
