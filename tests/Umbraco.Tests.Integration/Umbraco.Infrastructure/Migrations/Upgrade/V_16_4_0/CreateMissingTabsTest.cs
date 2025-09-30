@@ -3,7 +3,9 @@
 
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_4_0;
@@ -12,22 +14,23 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.TestServerTest;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrade.V16_4_0;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class CreateMissingTabsTest : UmbracoIntegrationTest
+internal sealed class CreateMissingTabsTest : UmbracoTestServerTestBase
 {
     private IScopeProvider ScopeProvider => GetRequiredService<IScopeProvider>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
+    private IUmbracoMapper UmbracoMapper => GetRequiredService<IUmbracoMapper>();
+
     /// <summary>
     /// A verification integration test for the solution to https://github.com/umbraco/Umbraco-CMS/issues/20058
     /// provided in https://github.com/umbraco/Umbraco-CMS/pull/20303.
+    /// </summary>
     [Test]
     public async Task Can_Create_Missing_Tabs()
     {
@@ -35,7 +38,6 @@ internal sealed class CreateMissingTabsTest : UmbracoIntegrationTest
         // - Create a new composition with a tab "Content" and inside add a group "Header" with a "Text 1" property inside.
         // - Save the composition.
         // - Create a new document type and inherit the composition created in step 2.
-        // - Save the document type.
         // - Add a new property "Text 2" to the Content > Header group.
         // - Create a new group "Home Content", inside the "Content" tab, and add a property "Text 3".
         // - Save the document type.
@@ -62,58 +64,124 @@ internal sealed class CreateMissingTabsTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(baseContentType, Constants.Security.SuperUserKey);
         baseContentType = await ContentTypeService.GetAsync(baseContentType.Key);
 
-        // Get ID of "Header" group.
-        var headerGroupId = baseContentType.PropertyGroups.First(x => x.Alias == "content/header").Id;
-
         // Create composed content type.
         var composedContentType = new ContentTypeBuilder()
             .WithAlias("composedType")
             .WithName("Composed Type")
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithType(PropertyGroupType.Tab)
+                .Done()
+            .AddPropertyGroup()
+                .WithAlias("content/header")
+                .WithName("Header")
+                .WithType(PropertyGroupType.Group)
+                .AddPropertyType()
+                    .WithAlias("text2")
+                    .WithName("Text 2")
+                    .Done()
+                .Done()
+            .AddPropertyGroup()
+                .WithAlias("content/homeContent")
+                .WithName("Home Content")
+                .WithType(PropertyGroupType.Group)
+                .AddPropertyType()
+                    .WithAlias("text3")
+                    .WithName("Text 3")
+                    .Done()
+                .Done()
             .Build();
         composedContentType.ContentTypeComposition = [baseContentType];
         await ContentTypeService.CreateAsync(composedContentType, Constants.Security.SuperUserKey);
         composedContentType = await ContentTypeService.GetAsync(composedContentType.Key);
 
-        // Add further groups and properties to composed content type.
-        var propertyType1 = new PropertyTypeBuilder()
-            .WithAlias("text2")
-            .WithName("Text 2")
-            .WithPropertyGroupId(headerGroupId)
-            .Build();
-        composedContentType.AddPropertyType(propertyType1);
+        // Assert the groups and properties are created in the database and that the content type model is as expected.
+        await AssertValidDbGroupsAndProperties(baseContentType.Id, composedContentType.Id);
+        await AssertValidContentTypeModel(composedContentType.Key);
 
-        var propertyType2 = new PropertyTypeBuilder()
-            .WithAlias("text3")
-            .WithName("Text 3")
-            .Build();
-        composedContentType.AddPropertyType(propertyType2, "content/homeContent", "Home Content");
-
-        await ContentTypeService.UpdateAsync(composedContentType, Constants.Security.SuperUserKey);
-
-        // TODO: Assert the groups and types created in the database.
-
+        // Delete one of the tab records so we get to the 13 state.
         using IScope scope = ScopeProvider.CreateScope();
+        Sql<ISqlContext> deleteTabSql = scope.Database.SqlContext.Sql()
+            .Delete<PropertyTypeGroupDto>()
+            .Where<PropertyTypeGroupDto>(x => x.Type == (int)PropertyGroupType.Tab && x.ContentTypeNodeId == composedContentType.Id);
+        var deletedCount = await scope.Database.ExecuteAsync(deleteTabSql);
+        scope.Complete();
+        Assert.AreEqual(1, deletedCount);
+
+        // Assert that the content type groups are now without a parent tab.
+        await AssertInvalidContentTypeModel(composedContentType.Key);
+
+        // Run the migration to add the missing tab back.
+        await ExecuteMigration();
+
+        // Re-retrieve the content types and assert that the groups and types are as expected.
+        await AssertValidContentTypeModel(composedContentType.Key);
+
+        // Verify in the database that the migration has re-added only the record we removed in the setup.
+        await AssertValidDbGroupsAndProperties(baseContentType.Id, composedContentType.Id);
+    }
+
+    private async Task AssertValidContentTypeModel(Guid contentTypeKey)
+    {
+        var contentType = await ContentTypeService.GetAsync(contentTypeKey);
+        DocumentTypeResponseModel model = UmbracoMapper.Map<DocumentTypeResponseModel>(contentType)!;
+        Assert.AreEqual(3, model.Containers.Count());
+
+        var contentTab = model.Containers.FirstOrDefault(c => c.Name == "Content" && c.Type == nameof(PropertyGroupType.Tab));
+        Assert.IsNotNull(contentTab);
+
+        var headerGroup = model.Containers.FirstOrDefault(c => c.Name == "Header" && c.Type == nameof(PropertyGroupType.Group));
+        Assert.IsNotNull(headerGroup);
+        Assert.IsNotNull(headerGroup.Parent);
+        Assert.AreEqual(contentTab.Id, headerGroup.Parent.Id);
+
+        var homeContentGroup = model.Containers.FirstOrDefault(c => c.Name == "Home Content" && c.Type == nameof(PropertyGroupType.Group));
+        Assert.IsNotNull(homeContentGroup);
+        Assert.IsNotNull(homeContentGroup.Parent);
+        Assert.AreEqual(contentTab.Id, homeContentGroup.Parent.Id);
+    }
+
+    private async Task AssertInvalidContentTypeModel(Guid contentTypeKey)
+    {
+        var contentType = await ContentTypeService.GetAsync(contentTypeKey);
+        DocumentTypeResponseModel model = UmbracoMapper.Map<DocumentTypeResponseModel>(contentType)!;
+        Assert.AreEqual(2, model.Containers.Count());
+
+        var contentTab = model.Containers.FirstOrDefault(c => c.Name == "Content" && c.Type == nameof(PropertyGroupType.Tab));
+        Assert.IsNull(contentTab);
+
+        var headerGroup = model.Containers.FirstOrDefault(c => c.Name == "Header" && c.Type == nameof(PropertyGroupType.Group));
+        Assert.IsNotNull(headerGroup);
+        Assert.IsNull(headerGroup.Parent);
+
+        var homeContentGroup = model.Containers.FirstOrDefault(c => c.Name == "Home Content" && c.Type == nameof(PropertyGroupType.Group));
+        Assert.IsNotNull(homeContentGroup);
+        Assert.IsNull(homeContentGroup.Parent);
+    }
+
+    private async Task AssertValidDbGroupsAndProperties(int baseContentTypeId, int composedContentTypeId)
+    {
+        using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
         Sql<ISqlContext> groupsSql = scope.Database.SqlContext.Sql()
             .Select<PropertyTypeGroupDto>()
             .From<PropertyTypeGroupDto>()
-            .WhereIn<PropertyTypeGroupDto>(x => x.ContentTypeNodeId, new[] { baseContentType.Id, composedContentType.Id });
-        var groups = await scope.Database.FetchAsync<PropertyTypeGroupDto>(groupsSql); // <-- this doesn't seem correct, we have 3 groups, but from the issue description would expect 5
+            .WhereIn<PropertyTypeGroupDto>(x => x.ContentTypeNodeId, new[] { baseContentTypeId, composedContentTypeId });
+        var groups = await scope.Database.FetchAsync<PropertyTypeGroupDto>(groupsSql);
         Assert.AreEqual(5, groups.Count);
 
-        Sql<ISqlContext> typesSql = scope.Database.SqlContext.Sql()
+        Assert.AreEqual(1, groups.Count(x => x.ContentTypeNodeId == baseContentTypeId && x.Type == (int)PropertyGroupType.Tab));
+        Assert.AreEqual(1, groups.Count(x => x.ContentTypeNodeId == baseContentTypeId && x.Type == (int)PropertyGroupType.Group));
+
+        Assert.AreEqual(1, groups.Count(x => x.ContentTypeNodeId == composedContentTypeId && x.Type == (int)PropertyGroupType.Tab));
+        Assert.AreEqual(2, groups.Count(x => x.ContentTypeNodeId == composedContentTypeId && x.Type == (int)PropertyGroupType.Group));
+
+        Sql<ISqlContext> propertiesSql = scope.Database.SqlContext.Sql()
             .Select<PropertyTypeDto>()
             .From<PropertyTypeDto>()
-            .WhereIn<PropertyTypeDto>(x => x.ContentTypeId, new[] { baseContentType.Id, composedContentType.Id });
-        var types = await scope.Database.FetchAsync<PropertyTypeDto>(typesSql);
+            .WhereIn<PropertyTypeDto>(x => x.ContentTypeId, new[] { baseContentTypeId, composedContentTypeId });
+        var types = await scope.Database.FetchAsync<PropertyTypeDto>(propertiesSql);
         Assert.AreEqual(3, types.Count);
-        scope.Complete();
-
-        // TODO: Delete one of the group records so we get to the 13 state.
-
-        await ExecuteMigration();
-
-        // TODO: Re-retrieve the content types and assert that the groups and types are as expected.
-        // TODO: Verify in the database that the migration has re-added the record we removed in the setup.
     }
 
     private async Task ExecuteMigration()
