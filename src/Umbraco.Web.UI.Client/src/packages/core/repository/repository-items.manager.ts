@@ -17,6 +17,8 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	#getUnique: (entry: ItemType) => string | undefined;
 
 	#init: Promise<unknown>;
+	#initResolve!: (value: unknown) => void;
+
 	#currentRequest?: Promise<unknown>;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
@@ -44,10 +46,18 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	 */
 	constructor(
 		host: UmbControllerHost,
-		repositoryAlias: string,
+		repositoryAlias?: string,
 		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
 		super(host);
+
+		this.#init = new Promise((resolve) => {
+			this.#initResolve = resolve;
+		});
+
+		if (repositoryAlias) {
+			this.#initItemRepository(repositoryAlias);
+		}
 
 		this.#getUnique = getUniqueMethod
 			? (entry: ItemType) => {
@@ -59,16 +69,6 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 					return getUniqueMethod(entry);
 				}
 			: (entry) => entry.unique;
-
-		this.#init = new UmbExtensionApiInitializer<ManifestRepository<UmbItemRepository<ItemType>>>(
-			this,
-			umbExtensionsRegistry,
-			repositoryAlias,
-			[this],
-			(permitted, repository) => {
-				this.repository = permitted ? repository.api : undefined;
-			},
-		).asPromise();
 
 		this.observe(
 			this.uniques,
@@ -106,6 +106,25 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 				this.#onEntityUpdatedEvent as unknown as EventListener,
 			);
 		});
+	}
+
+	/**
+	 * Sets the item repository to use for this manager.
+	 * @param {(UmbItemRepository<ItemType> | undefined)} itemRepository - The item repository to set.
+	 * @memberof UmbRepositoryItemsManager
+	 */
+	setItemRepository(itemRepository: UmbItemRepository<ItemType> | undefined) {
+		this.repository = itemRepository;
+		this.#initResolve(undefined);
+	}
+
+	/**
+	 * Gets the item repository used by this manager.
+	 * @returns {(UmbItemRepository<ItemType> | undefined)} The item repository.
+	 * @memberof UmbRepositoryItemsManager
+	 */
+	getItemRepository(): UmbItemRepository<ItemType> | undefined {
+		return this.repository;
 	}
 
 	getUniques(): Array<string> {
@@ -265,6 +284,19 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 
 		this.#reloadItem(item.unique);
 	};
+
+	async #initItemRepository(itemRepositoryAlias: string) {
+		new UmbExtensionApiInitializer<ManifestRepository<UmbItemRepository<ItemType>>>(
+			this,
+			umbExtensionsRegistry,
+			itemRepositoryAlias,
+			[this],
+			(permitted, repository) => {
+				this.repository = permitted ? repository.api : undefined;
+				this.#initResolve(undefined);
+			},
+		);
+	}
 
 	override destroy(): void {
 		this.#eventContext?.removeEventListener(
