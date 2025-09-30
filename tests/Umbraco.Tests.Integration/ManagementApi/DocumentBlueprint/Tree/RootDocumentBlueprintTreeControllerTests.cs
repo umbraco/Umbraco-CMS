@@ -11,40 +11,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.DocumentBlueprint.Tree;
 
 public class RootDocumentBlueprintTreeControllerTests : ManagementApiUserGroupTestBase<RootDocumentBlueprintTreeController>
 {
-    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
-
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
-
-    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
-
-    private IContentBlueprintEditingService ContentBlueprintEditingService => GetRequiredService<IContentBlueprintEditingService>();
-
-    private Guid _contentKey;
-    private Guid _blueprintKey;
-
-    [SetUp]
-    public async Task Setup()
-    {
-        var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
-
-        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
-        contentType.AllowedAsRoot = true;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-
-        var createModel = new ContentCreateModel
-        {
-            ContentTypeKey = contentType.Key,
-            TemplateKey = template.Key,
-            ParentKey = Constants.System.RootKey,
-            InvariantName = Guid.NewGuid().ToString(),
-        };
-        var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        _contentKey = response.Result.Content.Key;
-
-        _blueprintKey = Guid.NewGuid();
-        await ContentBlueprintEditingService.CreateFromContentAsync(_contentKey, createModel.InvariantName, _blueprintKey, Constants.Security.SuperUserKey);
-    }
 
     protected override Expression<Func<RootDocumentBlueprintTreeController, object>> MethodSelector =>
         x => x.Root(CancellationToken.None, 0, 100, false);

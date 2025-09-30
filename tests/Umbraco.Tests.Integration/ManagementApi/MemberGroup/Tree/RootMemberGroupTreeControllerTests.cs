@@ -2,11 +2,13 @@ using System.Linq.Expressions;
 using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.MemberGroup.Tree;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.MemberGroup.Tree;
 
 public class RootMemberGroupTreeControllerTests : ManagementApiUserGroupTestBase<RootMemberGroupTreeController>
 {
+
     protected override Expression<Func<RootMemberGroupTreeController, object>> MethodSelector =>
         x => x.Root(CancellationToken.None, 0, 100);
 

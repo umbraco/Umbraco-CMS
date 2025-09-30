@@ -10,16 +10,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Dictionary.Tree;
 
 public class RootDictionaryTreeControllerTests : ManagementApiUserGroupTestBase<RootDictionaryTreeController>
 {
-    private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
-
-    [SetUp]
-    public async Task Setup()
-    {
-        var response = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
-
-        await DictionaryItemService.CreateAsync(response, Constants.Security.SuperUserKey);
-    }
-
     protected override Expression<Func<RootDictionaryTreeController, object>> MethodSelector =>
         x => x.Root(CancellationToken.None, 0, 100);
 

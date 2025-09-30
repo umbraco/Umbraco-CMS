@@ -11,32 +11,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document.Tree;
 
 public class RootDocumentTreeControllerTests : ManagementApiUserGroupTestBase<RootDocumentTreeController>
 {
-    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
-
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
-
-    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
-
-    [SetUp]
-    public async Task Setup()
-    {
-        var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
-
-        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
-        contentType.AllowedAsRoot = true;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-
-        var createModel = new ContentCreateModel
-        {
-            ContentTypeKey = contentType.Key,
-            TemplateKey = template.Key,
-            ParentKey = Constants.System.RootKey,
-            InvariantName = Guid.NewGuid().ToString(),
-        };
-
-        await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-    }
 
     protected override Expression<Func<RootDocumentTreeController, object>> MethodSelector =>
         x => x.Root(CancellationToken.None, 0, 100, null);

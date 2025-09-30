@@ -6,35 +6,48 @@ using Umbraco.Cms.Api.Management.Controllers.Media;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Media;
 
-[TestFixture]
 public class MoveMediaControllerTests : ManagementApiUserGroupTestBase<MoveMediaController>
 {
-    private Guid _mediaKey = Guid.Empty;
+    private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
 
-    // We need to setup a media item. The reason for this is that the permission MediaPermissionByResource requires a media item to be present otherwise you will get the forbidden response.
+    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
+
+    private Guid _moveFolderKey;
+    private Guid _targetFolderKey;
+
     [SetUp]
-    public async Task Setup()
+    public async Task SetUp()
     {
-        var mediaService = GetRequiredService<IMediaService>();
-        var media = mediaService.CreateMedia("Test", -1, Constants.Conventions.MediaTypes.Folder);
-        mediaService.Save(media);
-        _mediaKey = media.Key;
+        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0,100);
+        var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
+
+        // MoveFolder
+        MediaCreateModel moveCreateModel = new() { InvariantName = "MediaTest", ContentTypeKey = folderMediaType.Key, ParentKey = Constants.System.RootKey};
+        var responseMove = await MediaEditingService.CreateAsync(moveCreateModel, Constants.Security.SuperUserKey);
+        _moveFolderKey = responseMove.Result.Content.Key;
+
+        // TargetFolder
+        MediaCreateModel targetCreateModel = new() { InvariantName = "MediaFolder", ContentTypeKey = folderMediaType.Key,  ParentKey = Constants.System.RootKey };
+        var responseTarget = await MediaEditingService.CreateAsync(targetCreateModel, Constants.Security.SuperUserKey);
+        _targetFolderKey = responseTarget.Result.Content.Key;
     }
 
-    protected override Expression<Func<MoveMediaController, object>> MethodSelector => x => x.Move(CancellationToken.None, _mediaKey, null);
+    protected override Expression<Func<MoveMediaController, object>> MethodSelector => x => x.Move(CancellationToken.None, _moveFolderKey, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -59,7 +72,7 @@ public class MoveMediaControllerTests : ManagementApiUserGroupTestBase<MoveMedia
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        MoveMediaRequestModel updateMediaModel = new() { Target = new ReferenceByIdModel(Guid.Empty) };
+        MoveMediaRequestModel updateMediaModel = new() { Target = new ReferenceByIdModel(_targetFolderKey) };
         return await Client.PutAsync(Url, JsonContent.Create(updateMediaModel));
     }
 }

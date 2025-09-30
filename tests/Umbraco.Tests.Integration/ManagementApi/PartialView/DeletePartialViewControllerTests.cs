@@ -1,17 +1,32 @@
 using System.Linq.Expressions;
 using System.Net;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.PartialView;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.PartialView;
 
 public class DeletePartialViewControllerTests : ManagementApiUserGroupTestBase<DeletePartialViewController>
 {
+    private IPartialViewService PartialViewService => GetRequiredService<IPartialViewService>();
+
+    private string _partialViewPath;
+
+    [SetUp]
+    public async Task SetUp()
+    {
+        var model = new PartialViewCreateModel { Name = Guid.NewGuid() + ".cshtml" };
+        var response = await PartialViewService.CreateAsync(model, Constants.Security.SuperUserKey);
+        _partialViewPath = response.Result.Path;
+    }
     protected override Expression<Func<DeletePartialViewController, object>> MethodSelector =>
-        x => x.Delete(CancellationToken.None, "TestDeletedPartialView.cshtml");
+        x => x.Delete(CancellationToken.None, _partialViewPath);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()

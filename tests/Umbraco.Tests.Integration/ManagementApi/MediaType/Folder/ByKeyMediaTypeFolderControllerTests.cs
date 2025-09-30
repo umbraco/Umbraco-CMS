@@ -7,21 +7,21 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.MediaType.Folder;
 
-[TestFixture]
 public class ByKeyMediaTypeFolderControllerTests : ManagementApiUserGroupTestBase<ByKeyMediaTypeFolderController>
 {
-    private IMediaTypeContainerService _mediaTypeContainerService;
-    private Guid _mediaTypeKey;
+    private IMediaTypeContainerService MediaTypeContainerService => GetRequiredService<IMediaTypeContainerService>();
+
+    private Guid _mediaTypeContainerKey;
 
     [SetUp]
-    public async Task Setup()
+    public async Task SetUp()
     {
-        _mediaTypeKey = Guid.NewGuid();
-        _mediaTypeContainerService = GetRequiredService<IMediaTypeContainerService>();
-        await _mediaTypeContainerService.CreateAsync(_mediaTypeKey, "TestFolder", null, Constants.Security.SuperUserKey);
+        _mediaTypeContainerKey = Guid.NewGuid();
+        await MediaTypeContainerService.CreateAsync(_mediaTypeContainerKey, "TestFolder", Constants.System.RootKey , Constants.Security.SuperUserKey);
     }
 
-    protected override Expression<Func<ByKeyMediaTypeFolderController, object>> MethodSelector => x => x.ByKey(CancellationToken.None, _mediaTypeKey);
+
+    protected override Expression<Func<ByKeyMediaTypeFolderController, object>> MethodSelector => x => x.ByKey(CancellationToken.None, _mediaTypeContainerKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

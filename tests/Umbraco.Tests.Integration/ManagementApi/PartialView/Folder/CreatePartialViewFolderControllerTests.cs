@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView.Folder;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.PartialView.Folder;
 
@@ -15,7 +16,7 @@ public class CreatePartialViewFolderControllerTests : ManagementApiUserGroupTest
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -45,7 +46,7 @@ public class CreatePartialViewFolderControllerTests : ManagementApiUserGroupTest
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreatePartialViewFolderRequestModel createPartialViewFolderRequestModel = new() { Name = "TestCreatedPartialViewFolder", Parent = new FileSystemFolderModel() { Path = "test" } };
+        CreatePartialViewFolderRequestModel createPartialViewFolderRequestModel = new() { Name = Guid.NewGuid().ToString()};
 
         return await Client.PostAsync(Url, JsonContent.Create(createPartialViewFolderRequestModel));
     }

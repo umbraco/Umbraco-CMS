@@ -14,7 +14,7 @@ public class CreatePartialViewControllerTests : ManagementApiUserGroupTestBase<C
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -44,7 +44,11 @@ public class CreatePartialViewControllerTests : ManagementApiUserGroupTestBase<C
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreatePartialViewRequestModel createPartialViewRequestModel = new() { Name = "TestPartialView.cshtml", Content = string.Empty, Parent = new FileSystemFolderModel() { Path = "test" } };
+        CreatePartialViewRequestModel createPartialViewRequestModel = new()
+        {
+            Name = Guid.NewGuid() + ".cshtml",
+            Content = string.Empty,
+        };
 
         return await Client.PostAsync(Url, JsonContent.Create(createPartialViewRequestModel));
     }

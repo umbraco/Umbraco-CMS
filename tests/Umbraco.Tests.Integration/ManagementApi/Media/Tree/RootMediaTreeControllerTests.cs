@@ -1,6 +1,11 @@
 using System.Linq.Expressions;
 using System.Net;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Media.Tree;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Media.Tree;
 

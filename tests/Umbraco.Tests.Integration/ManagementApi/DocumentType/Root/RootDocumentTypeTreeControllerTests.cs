@@ -10,16 +10,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.DocumentType.Root;
 
 public class RootDocumentTypeTreeControllerTests : ManagementApiUserGroupTestBase<RootDocumentTypeTreeController>
 {
-    private IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
-
-    private Guid _key;
-
-    [SetUp]
-    public async Task Setup()
-    {
-        _key = Guid.NewGuid();
-        await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key, Name = "Test", Alias = "test" }, Constants.Security.SuperUserKey);
-    }
 
     protected override Expression<Func<RootDocumentTypeTreeController, object>> MethodSelector =>
         x => x.Root(CancellationToken.None, 0, 100, false);

@@ -3,23 +3,30 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Media;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Media;
 
-[TestFixture]
 public class ByKeyMediaControllerTests : ManagementApiUserGroupTestBase<ByKeyMediaController>
 {
-    private Guid _mediaKey = Guid.Empty;
+    private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
 
-    // We need to setup a media item. The reason for this is that the permission MediaPermissionByResource requires a media item to be present otherwise you will get the forbidden response.
+    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
+
+
+    private Guid _mediaKey;
+
     [SetUp]
-    public async Task Setup()
+    public async Task SetUp()
     {
-        var mediaService = GetRequiredService<IMediaService>();
-        var media = mediaService.CreateMedia("Test", -1, Constants.Conventions.MediaTypes.Folder);
-        mediaService.Save(media);
-        _mediaKey = media.Key;
+        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0,100);
+        var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
+
+        MediaCreateModel mediaCreateModel = new() { InvariantName = "MediaTest", ContentTypeKey = folderMediaType.Key };
+        var response = await MediaEditingService.CreateAsync(mediaCreateModel, Constants.Security.SuperUserKey);
+        _mediaKey = response.Result.Content.Key;
     }
 
     protected override Expression<Func<ByKeyMediaController, object>> MethodSelector => x => x.ByKey(CancellationToken.None, _mediaKey);

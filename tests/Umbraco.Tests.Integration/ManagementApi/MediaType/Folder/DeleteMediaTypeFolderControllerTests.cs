@@ -4,25 +4,25 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.MediaType.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.MediaType.Folder;
 
-[TestFixture]
 public class DeleteMediaTypeFolderControllerTests : ManagementApiUserGroupTestBase<DeleteMediaTypeFolderController>
 {
-    private IMediaTypeContainerService _mediaTypeContainerService;
-    private Guid _mediaTypeKey;
+    private IMediaTypeContainerService MediaTypeContainerService => GetRequiredService<IMediaTypeContainerService>();
+
+    private Guid _mediaTypeContainerKey;
 
     [SetUp]
-    public async Task Setup()
+    public async Task SetUp()
     {
-        _mediaTypeKey = Guid.NewGuid();
-        _mediaTypeContainerService = GetRequiredService<IMediaTypeContainerService>();
-        await _mediaTypeContainerService.CreateAsync(_mediaTypeKey, "TestFolder", null, Constants.Security.SuperUserKey);
+        _mediaTypeContainerKey = Guid.NewGuid();
+        await MediaTypeContainerService.CreateAsync(_mediaTypeContainerKey, "TestFolder", Constants.System.RootKey , Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<DeleteMediaTypeFolderController, object>> MethodSelector =>
-        x => x.Delete(CancellationToken.None, _mediaTypeKey);
+        x => x.Delete(CancellationToken.None, _mediaTypeContainerKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

@@ -13,16 +13,15 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.MediaType;
 [TestFixture]
 public class UpdateMediaTypeControllerTests : ManagementApiUserGroupTestBase<UpdateMediaTypeController>
 {
-    private IMediaTypeEditingService _mediaTypeEditingService;
+    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService >();
     private Guid _mediaTypeKey;
 
     [SetUp]
     public async Task Setup()
     {
         _mediaTypeKey = Guid.NewGuid();
-        _mediaTypeEditingService = GetRequiredService<IMediaTypeEditingService>();
         MediaTypeCreateModel mediaTypeCreateModel = new() { Name = "Test", Alias = "test", Key = _mediaTypeKey };
-        await _mediaTypeEditingService.CreateAsync(mediaTypeCreateModel, Constants.Security.SuperUserKey);
+        await MediaTypeEditingService.CreateAsync(mediaTypeCreateModel, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<UpdateMediaTypeController, object>> MethodSelector =>

@@ -1,23 +1,59 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Media;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Sorting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Media;
 
 public class SortMediaControllerTests : ManagementApiUserGroupTestBase<SortMediaController>
 {
+    private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
+
+    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
+
+    private Guid _parentFolderKey;
+    private Guid _childFolderKey;
+
+    [SetUp]
+    public async Task SetUp()
+    {
+        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0,100);
+        var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
+
+        // ParentFolder
+        MediaCreateModel parentCreateModel = new()
+        {
+            InvariantName = "MediaTest", ContentTypeKey = folderMediaType.Key, ParentKey = Constants.System.RootKey
+        };
+        var responseParent = await MediaEditingService.CreateAsync(parentCreateModel, Constants.Security.SuperUserKey);
+        _parentFolderKey = responseParent.Result.Content.Key;
+
+        // ChildFolder
+        MediaCreateModel childCreateModel = new()
+        {
+            InvariantName = "MediaFolder", ContentTypeKey = folderMediaType.Key, ParentKey = _parentFolderKey
+        };
+        var responseChild = await MediaEditingService.CreateAsync(childCreateModel, Constants.Security.SuperUserKey);
+        _childFolderKey = responseChild.Result.Content.Key;
+    }
+
     protected override Expression<Func<SortMediaController, object>> MethodSelector => x => x.Sort(CancellationToken.None, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.BadRequest
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.BadRequest
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -44,7 +80,7 @@ public class SortMediaControllerTests : ManagementApiUserGroupTestBase<SortMedia
     {
         SortingRequestModel sortingRequestModel = new()
         {
-            Parent = null, Sorting = new[] { new ItemSortingRequestModel { Id = Guid.Empty, SortOrder = 1 } }
+            Parent = new ReferenceByIdModel(_parentFolderKey), Sorting = new[] { new ItemSortingRequestModel { Id = _childFolderKey, SortOrder = 0 } },
         };
         return await Client.PutAsync(Url, JsonContent.Create(sortingRequestModel));
     }
