@@ -96,11 +96,11 @@ test('can not publish a mandatory dropdown with an empty value', {tag: '@release
   await umbracoUi.content.goToContentWithName(contentName);
   // Do not select any dropdown values and the validation error appears
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   // Select a dropdown value and the validation error disappears
   await umbracoUi.content.chooseDropdownOption([optionValues[0]]);
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
