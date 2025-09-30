@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'repository',
 		alias: collectionRepositoryAlias,
 		name: 'Entity Data Picker Collection Repository',
-		api: () => import('./entity-data-collection.repository.js'),
+		api: () => import('./entity-data-picker-collection.repository.js'),
 	},
 	{
 		type: 'collectionMenu',

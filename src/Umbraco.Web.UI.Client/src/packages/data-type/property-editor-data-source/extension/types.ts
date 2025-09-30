@@ -7,6 +7,7 @@ import type { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 export type * from './picker-property-editor-collection-data-source.extension.js';
 export type * from './picker-property-editor-tree-data-source.extension.js';
 
+// TODO: should these interface be renamed to Repository instead of DataSource?
 export interface UmbPickerPropertyEditorTreeDataSource extends UmbApi {
 	tree: UmbTreeRepository;
 	// TODO: Change 'any' to a more specific type

@@ -1,6 +1,7 @@
 import type { UmbEntityDataItemModel } from '../types.js';
-import { UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS } from '../collection/constants.js';
-import { UMB_ENTITY_DATA_PICKER_TREE_ALIAS } from '../tree/constants.js';
+import { UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS } from '../picker-collection/constants.js';
+import { UMB_ENTITY_DATA_PICKER_TREE_ALIAS } from '../picker-tree/constants.js';
+import { UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS } from '../picker-search/constants.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS,
@@ -10,6 +11,7 @@ import {
 import type {
 	ManifestPickerPropertyEditorCollectionDataSource,
 	ManifestPickerPropertyEditorTreeDataSource,
+	UmbPickerPropertyEditorTreeDataSource,
 } from '@umbraco-cms/backoffice/data-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -164,15 +166,15 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 
 				// Choose the picker type based on what the data source supports
 				if (ctrl.api.tree) {
-					this.#pickerModalToken = this.#createTreeItemPickerModalToken();
+					this.#pickerModalToken = this.#createTreeItemPickerModalToken(ctrl.api);
 				} else {
-					this.#pickerModalToken = this.#createCollectionItemPickerModalToken();
+					this.#pickerModalToken = this.#createCollectionItemPickerModalToken(ctrl.api);
 				}
 			},
 		);
 	}
 
-	#createTreeItemPickerModalToken() {
+	#createTreeItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
 		return new UmbModalToken<UmbTreePickerModalData<UmbEntityDataItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
 			{
@@ -182,12 +184,18 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 				},
 				data: {
 					treeAlias: UMB_ENTITY_DATA_PICKER_TREE_ALIAS,
+					expandTreeRoot: true,
+					search: api.search
+						? {
+								providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
+							}
+						: undefined,
 				},
 			},
 		);
 	}
 
-	#createCollectionItemPickerModalToken() {
+	#createCollectionItemPickerModalToken(api: UmbPickerPropertyEditorTreeDataSource) {
 		return new UmbModalToken<
 			UmbCollectionItemPickerModalData<UmbEntityDataItemModel>,
 			UmbCollectionItemPickerModalValue
@@ -198,6 +206,11 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 			},
 			data: {
 				collectionMenuAlias: UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS,
+				search: api.search
+					? {
+							providerAlias: UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS,
+						}
+					: undefined,
 			},
 		});
 	}
