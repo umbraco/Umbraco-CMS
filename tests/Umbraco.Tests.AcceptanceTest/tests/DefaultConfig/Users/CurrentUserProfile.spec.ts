@@ -1,44 +1,34 @@
 import {NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
-import {expect} from '@playwright/test';
 
-const nameOfTheUser = 'TestUser';
-const userEmail = 'TestUser@EmailTest.test';
-const defaultUserGroupName = 'Writers';
-let userCount = null;
+const userPassword = '0123456789';
+let testUserCookieAndToken = {cookie: "", accessToken: "", refreshToken: ""};
 
-test.beforeEach(async ({umbracoUi, umbracoApi}) => {
-  await umbracoUi.goToBackOffice();
-  await umbracoApi.user.ensureNameNotExists(nameOfTheUser);
+test.afterEach(async ({umbracoApi}) => {
+  // Ensure we are logged in to admin
+  await umbracoApi.loginToAdminUser(testUserCookieAndToken.cookie, testUserCookieAndToken.accessToken, testUserCookieAndToken.refreshToken);
 });
 
-test.afterEach(async ({umbracoApi, umbracoUi}) => {
-  // Waits so we can try to avoid db locks
-  await umbracoUi.waitForTimeout(500);
-  await umbracoApi.user.ensureNameNotExists(nameOfTheUser);
-});
+const userGroups = ['Administrators', 'Editors', 'Sensitive data', 'Translators', 'Writers'];
+for (const userGroup of userGroups) {
+  test(`${userGroup} user can access the user profile and change the password`, async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const crypto = require('crypto');
+    const userName = 'TestUser' + crypto.randomUUID();
+    const userEmail = userName + '@test.com';
+    const newPassword = 'TestNewPassword';
+    const userGroupData = await umbracoApi.userGroup.getByName(userGroup);
+    const userId = await umbracoApi.user.createDefaultUser(userName, userEmail, [userGroupData.id]);
+    await umbracoApi.user.updatePassword(userId, userPassword);
+    testUserCookieAndToken = await umbracoApi.user.loginToUser(userName, userEmail, userPassword);
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.currentUserProfile.waitForNetworkToBeIdle();
 
-test('admin user can change own password', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const userPassword = 'TestPassword';
-  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-  const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
-  await umbracoUi.user.goToUsers();
+    // Act
+    await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
+    await umbracoUi.currentUserProfile.clickChangePasswordButton();
+    await umbracoUi.currentUserProfile.changePassword(userPassword, newPassword);
 
-  // Act
-  await umbracoUi.user.clickUserWithName(nameOfTheUser);
-  await umbracoUi.user.clickActionButton();
-  await umbracoUi.user.clickChangePasswordButton();
-  await umbracoUi.user.updatePassword(userPassword);
-
-  // Assert
-  await umbracoUi.user.isPasswordUpdatedForUserWithId(userId);
-});
-
-test('non-admin can change own password', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-
-  // Act
-
-  // Assert
-
-});
+    // Assert
+    await umbracoUi.currentUserProfile.doesSuccessNotificationHaveText(NotificationConstantHelper.success.passwordChanged);
+  });
+}
