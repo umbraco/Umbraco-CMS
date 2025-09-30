@@ -103,8 +103,8 @@ public static partial class Constants
             public const string Webhook2Headers = Webhook + "2Headers";
             public const string WebhookLog = Webhook + "Log";
             public const string WebhookRequest = Webhook + "Request";
-
             public const string LongRunningOperation = TableNamePrefix + "LongRunningOperation";
+            public const string DistributedJob = TableNamePrefix + "DistributedJob";
         }
     }
 }
