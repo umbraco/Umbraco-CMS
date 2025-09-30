@@ -36,7 +36,7 @@ public class CreateMissingTabs : UnscopedAsyncMigrationBase
                 aliasLeft: "p",
                 "g")
             .Where<PropertyTypeGroupDto>(x => x.Type == 0, alias: "g")
-            .Where(CheckContainsTabAliasQuery("g.alias"));
+            .Where(CheckIfContainsTabAliasQuery("g.alias"));
 
         // 2. Get all existing tabs (type 1) for all content types.
         Sql<ISqlContext> tabsSql = Database.SqlContext.Sql()
@@ -58,8 +58,9 @@ public class CreateMissingTabs : UnscopedAsyncMigrationBase
         // 4. For each missing tab, find the corresponding tab details (text, alias, sort order)
         //    from the parent content type (composition) that already has this tab.
         Sql<ISqlContext> missingTabsWithDetailsSql = Database.SqlContext.Sql()
-            .SelectDistinct<PropertyTypeGroupDto>("missingTabs", ptg => ptg.ContentTypeNodeId)
-            .AndSelect<PropertyTypeGroupDto>("tg", ptg => ptg.Text, ptg => ptg.Alias, ptg => ptg.SortOrder)
+            .Select<PropertyTypeGroupDto>("missingTabs", ptg => ptg.ContentTypeNodeId)
+            .AndSelect<PropertyTypeGroupDto>("tg", ptg => ptg.Alias)
+            .AndSelect("MIN(text) AS text", "MIN(sortorder) AS sortOrder")
             .From()
             .AppendSubQuery(missingTabsSql, "missingTabs")
             .InnerJoin<ContentType2ContentTypeDto>(alias: "ct2ct")
@@ -72,7 +73,9 @@ public class CreateMissingTabs : UnscopedAsyncMigrationBase
                 (ct2Ct, ptg) => ct2Ct.ParentId == ptg.ContentTypeNodeId,
                 "ct2ct",
                 "tg")
-            .Append("AND tg.alias = missingTabs.tabAlias");
+            .Append("AND tg.alias = missingTabs.tabAlias")
+            .GroupBy<PropertyTypeGroupDto>("missingTabs", ptg => ptg.ContentTypeNodeId)
+            .AndBy<PropertyTypeGroupDto>("tg", ptg => ptg.Alias);
 
         List<MissingTabWithDetails> missingTabsWithDetails =
             await Database.FetchAsync<MissingTabWithDetails>(missingTabsWithDetailsSql);
@@ -97,10 +100,10 @@ public class CreateMissingTabs : UnscopedAsyncMigrationBase
 
     private string GetTabAliasQuery(string columnName) =>
         DatabaseType == DatabaseType.SQLite
-            ? $"substr({columnName}, 0, INSTR({columnName},'/'))"
+            ? $"substr({columnName}, 1, INSTR({columnName},'/') - 1)"
             : $"SUBSTRING({columnName}, 1, CHARINDEX('/', {columnName}) - 1)";
 
-    private string CheckContainsTabAliasQuery(string columnName) =>
+    private string CheckIfContainsTabAliasQuery(string columnName) =>
         DatabaseType == DatabaseType.SQLite
             ? $"INSTR({columnName}, '/') > 0"
             : $"CHARINDEX('/', {columnName}) > 0";

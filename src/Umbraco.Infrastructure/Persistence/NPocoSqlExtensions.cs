@@ -394,6 +394,26 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Appends a GROUP BY clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="tableAlias">A table alias.</param>
+        /// <param name="fields">Expression specifying the fields.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> GroupBy<TDto>(
+            this Sql<ISqlContext> sql,
+            string tableAlias,
+            params Expression<Func<TDto, object?>>[] fields)
+        {
+            ISqlSyntaxProvider sqlSyntax = sql.SqlContext.SqlSyntax;
+            var columns = fields.Length == 0
+                ? sql.GetColumns<TDto>(withAlias: false)
+                : fields.Select(x => sqlSyntax.GetFieldName(x, tableAlias)).ToArray();
+            return sql.GroupBy(columns);
+        }
+
+        /// <summary>
         /// Appends more ORDER BY or GROUP BY fields to the Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
