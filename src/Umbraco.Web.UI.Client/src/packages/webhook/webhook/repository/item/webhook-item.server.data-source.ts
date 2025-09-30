@@ -43,7 +43,7 @@ export class UmbWebhookItemServerDataSource extends UmbItemServerDataSourceBase<
 
 const mapper = (item: WebhookItemResponseModel): UmbWebhookItemModel => {
 	return {
-		unique: item.name,
+		unique: item.id,
 		name: item.name,
 		entityType: UMB_WEBHOOK_ENTITY_TYPE,
 	};
