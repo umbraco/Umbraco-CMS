@@ -32,6 +32,11 @@ public class PublishedValueFallback : IPublishedValueFallback
     {
         _variationContextAccessor.ContextualizeVariation(property.PropertyType.Variations, property.Alias, ref culture, ref segment);
 
+        if (TryGetValueForDefaultSegment(property, culture, segment, out value))
+        {
+            return true;
+        }
+
         foreach (var f in fallback)
         {
             switch (f)
@@ -80,6 +85,11 @@ public class PublishedValueFallback : IPublishedValueFallback
 
         _variationContextAccessor.ContextualizeVariation(propertyType.Variations, alias, ref culture, ref segment);
 
+        if (TryGetValueForDefaultSegment(content, alias, culture, segment, out value))
+        {
+            return true;
+        }
+
         foreach (var f in fallback)
         {
             switch (f)
@@ -126,6 +136,11 @@ public class PublishedValueFallback : IPublishedValueFallback
         {
             _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, alias, ref culture, ref segment);
             noValueProperty = content.GetProperty(alias);
+        }
+
+        if (propertyType != null && TryGetValueForDefaultSegment(content, alias, culture, segment, out value))
+        {
+            return true;
         }
 
         // note: we don't support "recurse & language" which would walk up the tree,
@@ -178,6 +193,30 @@ public class PublishedValueFallback : IPublishedValueFallback
     private NotSupportedException NotSupportedFallbackMethod(int fallback, string level) =>
         new NotSupportedException(
             $"Fallback {GetType().Name} does not support fallback code '{fallback}' at {level} level.");
+
+    private bool TryGetValueForDefaultSegment<T>(IPublishedElement content, string alias, string? culture, string? segment, out T? value)
+    {
+        IPublishedProperty? property = content.GetProperty(alias);
+        if (property is not null)
+        {
+            return TryGetValueForDefaultSegment(property, culture, segment, out value);
+        }
+
+        value = default;
+        return false;
+    }
+
+    private bool TryGetValueForDefaultSegment<T>(IPublishedProperty property, string? culture, string? segment, out T? value)
+    {
+        if (segment.IsNullOrWhiteSpace() is false && property.HasValue(culture, segment: string.Empty))
+        {
+            value = property.Value<T>(this, culture, segment: string.Empty);
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
 
     // tries to get a value, recursing the tree
     // because we recurse, content may not even have the a property with the specified alias (but only some ancestor)

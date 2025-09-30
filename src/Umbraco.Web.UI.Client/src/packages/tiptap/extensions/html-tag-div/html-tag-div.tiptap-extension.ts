@@ -1,7 +1,6 @@
-import { Node, mergeAttributes } from '@tiptap/core';
+import { Node, mergeAttributes } from '../../externals.js';
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export interface DivOptions {
+export interface UmbTiptapHtmlTagDivOptions {
 	/**
 	 * HTML attributes to add to the element.
 	 * @default {}
@@ -10,8 +9,7 @@ export interface DivOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export const Div = Node.create<DivOptions>({
+export const Div = Node.create<UmbTiptapHtmlTagDivOptions>({
 	name: 'div',
 
 	priority: 50,

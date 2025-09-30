@@ -1,3 +1,4 @@
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
 /* This Source Code has been derived from Tiptap.
  * https://github.com/ueberdosis/tiptap/blob/v2.11.5/demos/src/Experiments/TrailingNode/Vue/trailing-node.ts
  * SPDX-License-Identifier: MIT
@@ -5,22 +6,22 @@
  * Modifications are licensed under the MIT License.
  */
 
-import { Extension } from '@tiptap/core';
+import { Extension } from '../../externals.js';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
+// eslint-disable-next-line jsdoc/require-jsdoc
 function nodeEqualsType({ types, node }) {
 	return (Array.isArray(types) && types.includes(node.type)) || node.type === types;
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export interface TrailingNodeOptions {
+export interface UmbTiptapTrailingNodeOptions {
 	node: string;
 	notAfter: string[];
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export const TrailingNode = Extension.create<TrailingNodeOptions>({
+export const TrailingNode = Extension.create<UmbTiptapTrailingNodeOptions>({
 	name: 'trailingNode',
 
 	addOptions() {

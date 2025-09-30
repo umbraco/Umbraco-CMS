@@ -63,7 +63,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
-		signs: [],
+		flags: [],
 	},
 
 	{
@@ -81,7 +81,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '1_tipTap',
@@ -872,7 +872,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '6',
@@ -951,7 +951,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '5b4ca208-134e-4865-b423-06e5e97adf3c',
@@ -1123,7 +1123,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '5e5f7456-c751-4846-9f2b-47965cc96ec6',
@@ -1178,7 +1178,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: 'b92de6ac-1a22-4a45-a481-b6cae1cccbbf',
@@ -1280,7 +1280,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: 'b92de6ac-1a22-4a45-a481-b6cae1cccbb0',
@@ -1345,7 +1345,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',
@@ -1403,7 +1403,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '82d4b050-b128-42fe-ac8e-d5586e533592',
@@ -1487,7 +1487,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 		properties: [],
 		containers: [],
-		signs: [],
+		flags: [],
 	},
 	{
 		allowedTemplates: [],
@@ -1511,7 +1511,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: 'coffee-name-id',
@@ -1586,7 +1586,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: 'headline-id',
@@ -1641,7 +1641,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: 'block-alignment-id',
@@ -1696,7 +1696,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: 'image-id',
@@ -1751,7 +1751,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: 'rich-text-id',
@@ -1810,7 +1810,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 		properties: [],
 		containers: [],
-		signs: [],
+		flags: [],
 	},
 	{
 		allowedTemplates: [],
@@ -1834,7 +1834,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
-		signs: [],
+		flags: [],
 		properties: [],
 		containers: [],
 	},
@@ -1853,7 +1853,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '1dd0d4d2-cda8-4ac2-affd-a69fc10382b1',
@@ -1909,7 +1909,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '18',
@@ -1984,7 +1984,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		parent: null,
 		isFolder: false,
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',

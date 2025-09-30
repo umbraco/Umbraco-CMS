@@ -25,7 +25,7 @@ public static class InstallerBuilderExtensions
 
         builder.AddInstallSteps();
         services.AddTransient<IInstallService, InstallService>();
-        builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UnattendedInstallNotification, PostUnattendedInstallNotificationHandler>();
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<InstallerViewModelsMapDefinition>();
 
         return builder;

@@ -1,7 +1,6 @@
-import { Node } from '@tiptap/core';
+import { Node } from '../../externals.js';
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export interface FigcaptionOptions {
+export interface UmbTiptapFigcaptionOptions {
 	/**
 	 * HTML attributes to add to the image element.
 	 * @default {}
@@ -10,8 +9,7 @@ export interface FigcaptionOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export const Figcaption = Node.create<FigcaptionOptions>({
+export const Figcaption = Node.create<UmbTiptapFigcaptionOptions>({
 	name: 'figcaption',
 
 	addOptions() {

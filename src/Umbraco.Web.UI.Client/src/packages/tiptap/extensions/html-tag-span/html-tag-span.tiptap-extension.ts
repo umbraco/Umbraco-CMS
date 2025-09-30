@@ -1,7 +1,6 @@
-import { Mark, mergeAttributes } from '@tiptap/core';
+import { Mark, mergeAttributes } from '../../externals.js';
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export interface SpanOptions {
+export interface UmbTiptapHtmlTagSpanOptions {
 	/**
 	 * HTML attributes to add to the span element.
 	 * @default {}
@@ -10,6 +9,7 @@ export interface SpanOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 function parseStyles(style: string | undefined): Record<string, string> {
 	const items: Record<string, string> = {};
 
@@ -27,6 +27,7 @@ function parseStyles(style: string | undefined): Record<string, string> {
 	return items;
 }
 
+// eslint-disable-next-line jsdoc/require-jsdoc
 function serializeStyles(items: Record<string, string>): string {
 	return (
 		Object.entries(items)
@@ -35,8 +36,7 @@ function serializeStyles(items: Record<string, string>): string {
 	);
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export const Span = Mark.create<SpanOptions>({
+export const Span = Mark.create<UmbTiptapHtmlTagSpanOptions>({
 	name: 'span',
 
 	priority: 50,

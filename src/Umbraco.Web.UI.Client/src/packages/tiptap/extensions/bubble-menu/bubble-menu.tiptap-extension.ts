@@ -1,18 +1,18 @@
-import type { UUIPopoverContainerElement } from '../../uui/index.js';
-import { Extension } from '@tiptap/core';
-import { Editor } from '@tiptap/core';
-import { EditorState, Plugin, PluginKey } from '@tiptap/pm/state';
-import { EditorView } from '@tiptap/pm/view';
-import type { PluginView } from '@tiptap/pm/state';
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
+import { Extension } from '../../externals.js';
+import type { Editor } from '../../externals.js';
+import { Plugin } from '@tiptap/pm/state';
+import type { EditorState, PluginView } from '@tiptap/pm/state';
+import type { EditorView } from '@tiptap/pm/view';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+
 export interface UmbTiptapBubbleMenuElement extends HTMLElement {
 	editor?: Editor;
 	menuAlias?: string;
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export type UmbBubbleMenuPluginProps = {
+export type UmbTiptapBubbleMenuPluginProps = {
 	unique: string;
 	placement?: UUIPopoverContainerElement['placement'];
 	elementName?: string | null;
@@ -22,10 +22,8 @@ export type UmbBubbleMenuPluginProps = {
 		| null;
 };
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export type UmbBubbleMenuOptions = UmbBubbleMenuPluginProps;
+export type UmbBubbleMenuOptions = UmbTiptapBubbleMenuPluginProps;
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
 export const UmbBubbleMenu = Extension.create<UmbBubbleMenuOptions>({
 	name: 'umbBubbleMenu',
 
@@ -60,9 +58,9 @@ class UmbBubbleMenuPluginView implements PluginView {
 
 	#popover: UUIPopoverContainerElement;
 
-	#shouldShow: UmbBubbleMenuPluginProps['shouldShow'];
+	#shouldShow: UmbTiptapBubbleMenuPluginProps['shouldShow'];
 
-	constructor(editor: Editor, view: EditorView, props: UmbBubbleMenuPluginProps) {
+	constructor(editor: Editor, view: EditorView, props: UmbTiptapBubbleMenuPluginProps) {
 		this.#editor = editor;
 
 		this.#shouldShow = props.shouldShow ?? null;
@@ -84,6 +82,7 @@ class UmbBubbleMenuPluginView implements PluginView {
 		this.update(view, null);
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	update(view: EditorView, prevState: EditorState | null) {
 		const editor = this.#editor;
 
@@ -108,8 +107,7 @@ class UmbBubbleMenuPluginView implements PluginView {
 	}
 }
 
-/** @deprecated This will be relocated in Umbraco 17 to the "@umbraco-cms/backoffice/tiptap" module. [LK] */
-export const UmbBubbleMenuPlugin = (editor: Editor, props: UmbBubbleMenuPluginProps) => {
+export const UmbBubbleMenuPlugin = (editor: Editor, props: UmbTiptapBubbleMenuPluginProps) => {
 	return new Plugin({
 		view(editorView) {
 			return new UmbBubbleMenuPluginView(editor, editorView, props);

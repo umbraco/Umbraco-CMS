@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Title>Umbraco CMS - Delivery API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Delivery API.</Description>
