@@ -22,8 +22,8 @@ export class UmbDefaultItemRefElement extends UmbLitElement {
 	}
 
 	#renderIcon(item: UmbDefaultItemModel) {
-		if (!item.icon) return;
-		return html`<umb-icon slot="icon" name=${item.icon}></umb-icon>`;
+		const icon = item.icon || 'icon-shape-triangle';
+		return html`<umb-icon slot="icon" name=${icon}></umb-icon>`;
 	}
 }
 
