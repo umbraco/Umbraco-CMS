@@ -45,6 +45,7 @@ public class PropertyGroupBuilder<TParent>
     private int? _sortOrder;
     private bool? _supportsPublishing;
     private DateTime? _updateDate;
+    private PropertyGroupType? _type;
 
     public PropertyGroupBuilder(TParent parentBuilder)
         : base(parentBuilder)
@@ -99,6 +100,12 @@ public class PropertyGroupBuilder<TParent>
         set => _updateDate = value;
     }
 
+    public PropertyGroupBuilder<TParent> WithType(PropertyGroupType type)
+    {
+        _type = type;
+        return this;
+    }
+
     public PropertyGroupBuilder<TParent> WithPropertyTypeCollection(PropertyTypeCollection propertyTypeCollection)
     {
         _propertyTypeCollection = propertyTypeCollection;
@@ -122,6 +129,7 @@ public class PropertyGroupBuilder<TParent>
         var name = _name ?? Guid.NewGuid().ToString();
         var sortOrder = _sortOrder ?? 0;
         var supportsPublishing = _supportsPublishing ?? false;
+        var type = _type ?? PropertyGroupType.Group;
 
         PropertyTypeCollection propertyTypeCollection;
         if (_propertyTypeCollection != null)
@@ -145,7 +153,8 @@ public class PropertyGroupBuilder<TParent>
             Name = name,
             SortOrder = sortOrder,
             CreateDate = createDate,
-            UpdateDate = updateDate
+            UpdateDate = updateDate,
+            Type = type,
         };
     }
 }
