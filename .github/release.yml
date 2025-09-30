@@ -7,19 +7,15 @@ changelog:
       - duplicate
       - wontfix
   categories:
-    - title: 🙌 Notable Changes
+    - title: 🙌 Notable Changes 
       labels:
         - category/notable
     - title: 💥 Breaking Changes
       labels:
         - category/breaking
-    - title: 🐛 Bug Fixes
-      labels:
-        - type/bug
-        - category/bug
-        - type/improvement
     - title: 📄 Documentation
       labels:
+        - documentation
         - category/documentation
     - title: 🏠 Internal
       labels:
@@ -27,12 +23,16 @@ changelog:
     - title: 📦 Dependencies
       labels:
         - dependencies
-    - title: 🌈 A11Y
+    - title: 🌈 Accessibility Improvements
       labels:
+        - accessibility
         - category/accessibility
     - title: 🚀 New Features
       labels:
         - type/feature
-    - title: Other Changes
+        - category/feature
+        - type/enhancement
+        - category/enhancement
+    - title: 🐛 Bug Fixes
       labels:
         - '*'

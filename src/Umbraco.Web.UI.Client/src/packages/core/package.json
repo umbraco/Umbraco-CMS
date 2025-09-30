@@ -1,0 +1,20 @@
+{
+	"name": "@umbraco-backoffice/core",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build",
+		"generate:server-api": "openapi-ts --file openapi-ts.config.js"
+	},
+	"dependencies": {
+		"@types/diff": "^7.0.2",
+		"diff": "^7.0.0",
+		"uuid": "^11.1.0",
+		"@hey-api/openapi-ts": "0.81.1"
+	},
+	"devDependencies": {
+		"lucide-static": "^0.542.0",
+		"simple-icons": "^15.13.0",
+		"svgo": "^4.0.0"
+	}
+}

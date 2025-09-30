@@ -3,7 +3,6 @@
     <Title>Umbraco CMS - Persistence - Entity Framework Core - SQLite migrations</Title>
     <Description>Adds support for Entity Framework Core SQLite migrations to Umbraco CMS.</Description>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
   </ItemGroup>

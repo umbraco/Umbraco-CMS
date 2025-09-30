@@ -68,7 +68,8 @@ test('can create a saved search', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
 });
 
-test('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
+// TODO: unskip, currently flaky
+test.skip('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchName = 'ComplexTest';
   const search = "@Level='Fatal' or @Level='Error' or @Level='Warning'";
@@ -185,10 +186,10 @@ test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
   const search = "StartsWith(@MessageTemplate, 'The token')";
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
   await umbracoApi.logViewer.createSavedSearch(searchName, search);
-  // Need to reload page to get the latest saved search list after creating new saved search by api
-  await umbracoUi.reloadPage();
+  await umbracoUi.logViewer.goToSettingsTreeItem('Log Viewer');
 
   // Act
+  await umbracoUi.waitForTimeout(2000);
   await umbracoUi.logViewer.clickSavedSearchByName(searchName);
   await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
 

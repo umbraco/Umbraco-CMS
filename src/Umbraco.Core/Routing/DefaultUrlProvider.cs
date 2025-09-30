@@ -5,7 +5,9 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -21,25 +23,57 @@ public class DefaultUrlProvider : IUrlProvider
     private readonly ILogger<DefaultUrlProvider> _logger;
     private readonly ISiteDomainMapper _siteDomainMapper;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
+    private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestSettings;
 
-        public DefaultUrlProvider(
-            IOptionsMonitor<RequestHandlerSettings> requestSettings,
-            ILogger<DefaultUrlProvider> logger,
-            ISiteDomainMapper siteDomainMapper,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            UriUtility uriUtility,
-            ILocalizationService localizationService)
-        {
-            _requestSettings = requestSettings.CurrentValue;
-            _logger = logger;
-            _siteDomainMapper = siteDomainMapper;
-            _umbracoContextAccessor = umbracoContextAccessor;
-            _uriUtility = uriUtility;
-            _localizationService = localizationService;
+    public DefaultUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        ILogger<DefaultUrlProvider> logger,
+        ISiteDomainMapper siteDomainMapper,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        UriUtility uriUtility,
+        ILocalizationService localizationService,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService,
+        IPublishedUrlProvider publishedUrlProvider)
+    {
+        _requestSettings = requestSettings.CurrentValue;
+        _logger = logger;
+        _siteDomainMapper = siteDomainMapper;
+        _umbracoContextAccessor = umbracoContextAccessor;
+        _uriUtility = uriUtility;
+        _localizationService = localizationService;
+        _navigationQueryService = navigationQueryService;
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
+        _publishedUrlProvider = publishedUrlProvider;
 
         requestSettings.OnChange(x => _requestSettings = x);
+    }
+
+    [Obsolete("Use the other constructor - Scheduled for removal in V18")]
+    public DefaultUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        ILogger<DefaultUrlProvider> logger,
+        ISiteDomainMapper siteDomainMapper,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        UriUtility uriUtility,
+        ILocalizationService localizationService,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
+    : this(
+        requestSettings,
+        logger,
+        siteDomainMapper,
+        umbracoContextAccessor,
+        uriUtility,
+        localizationService,
+        navigationQueryService,
+        publishedContentStatusFilteringService,
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>())
+    {
     }
 
     #region GetOtherUrls
@@ -68,15 +102,15 @@ public class DefaultUrlProvider : IUrlProvider
         // look for domains, walking up the tree
         IPublishedContent? n = node;
         IEnumerable<DomainAndUri>? domainUris =
-            DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
+            DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current, false);
 
         // n is null at root
         while (domainUris == null && n != null)
         {
-            n = n.Parent; // move to parent node
+            n = n.Parent<IPublishedContent>(_navigationQueryService, _publishedContentStatusFilteringService); // move to parent node
             domainUris = n == null
                 ? null
-                : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current);
+                : DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current);
         }
 
         // no domains = exit
@@ -90,7 +124,7 @@ public class DefaultUrlProvider : IUrlProvider
             var culture = d.Culture;
 
             // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
-            var route = umbracoContext.Content?.GetRouteById(id, culture);
+            var route = _publishedUrlProvider.GetUrl(d.Id, UrlMode.Default, culture, current);
             if (route == null)
             {
                 continue;
@@ -98,7 +132,7 @@ public class DefaultUrlProvider : IUrlProvider
 
             // need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
             var pos = route.IndexOf('/');
-            var path = pos == 0 ? route : route.Substring(pos);
+            var path = pos == 0 ? route : route[pos..];
 
             var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
             uri = _uriUtility.UriFromUmbraco(uri, _requestSettings);
@@ -121,7 +155,7 @@ public class DefaultUrlProvider : IUrlProvider
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
         // will not use cache if previewing
-        var route = umbracoContext.Content?.GetRouteById(content.Id, culture);
+        var route = _publishedUrlProvider.GetUrl(content.Id, mode, culture, current);
 
         return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
     }
@@ -152,7 +186,7 @@ public class DefaultUrlProvider : IUrlProvider
         DomainAndUri? domainUri = pos == 0
             ? null
             : DomainUtilities.DomainForNode(
-                umbracoContext.PublishedSnapshot.Domains,
+                umbracoContext.Domains,
                 _siteDomainMapper,
                 int.Parse(route[..pos], CultureInfo.InvariantCulture),
                 current,

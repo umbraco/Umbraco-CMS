@@ -51,6 +51,12 @@ public class WebhookFiring : IRecurringBackgroundJob
 
     public async Task RunJobAsync()
     {
+        if (_webhookSettings.Enabled is false)
+        {
+            _logger.LogInformation("WebhookFiring task will not run as it has been globally disabled via configuration");
+            return;
+        }
+
         IEnumerable<WebhookRequest> requests;
         using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
@@ -59,6 +65,7 @@ public class WebhookFiring : IRecurringBackgroundJob
             scope.Complete();
         }
 
+        // Send webhook requests in parallel on a suppressed ExecutionContext to avoid deadlocks (each task will create its own root IScope)
         await Task.WhenAll(requests.Select(request =>
         {
             using (ExecutionContext.SuppressFlow())

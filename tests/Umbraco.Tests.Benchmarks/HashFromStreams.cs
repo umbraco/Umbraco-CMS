@@ -18,7 +18,7 @@ public class HashFromStreams
     // the SHA1CryptoServiceProvider is faster, but that is not reflected in these benchmarks.
 
     /*
-    
+
     BenchmarkDotNet=v0.13.0, OS=Windows 10.0.19042.1052 (20H2/October2020Update)
     Intel Core i7-7700HQ CPU 2.80GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
     .NET SDK=5.0.300-preview.21258.4

@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class LanguageServiceTests : UmbracoIntegrationTest
+internal sealed class LanguageServiceTests : UmbracoIntegrationTest
 {
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
@@ -191,6 +191,11 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
         Assert.AreEqual(LanguageOperationStatus.Success, result.Status);
 
+        // Verify that the create and update dates can be used to distinguish between creates
+        // and updates (as these fields are used in ServerEventSender to emit a "Created" or "Updated"
+        // event.
+        Assert.Greater(result.Result.UpdateDate, result.Result.CreateDate);
+
         // re-get
         languageDaDk = await LanguageService.GetAsync(languageDaDk.IsoCode);
         Assert.NotNull(languageDaDk);
@@ -262,7 +267,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallbackIsoCode, result.Status);
     }
-    
+
     [Test]
     public async Task Cannot_Create_Language_With_NonExisting_Fallback_Language()
     {
@@ -332,7 +337,7 @@ public class LanguageServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(result.Success);
         Assert.AreEqual(LanguageOperationStatus.InvalidFallbackIsoCode, result.Status);
     }
-    
+
     [Test]
     public async Task Cannot_Create_Direct_Cyclic_Fallback_Language()
     {

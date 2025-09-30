@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -18,6 +19,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -30,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class EntityXmlSerializerTests : UmbracoIntegrationTest
+internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
 {
     private IEntityXmlSerializer Serializer => GetRequiredService<IEntityXmlSerializer>();
     private IContentService ContentService => GetRequiredService<IContentService>();
@@ -120,7 +122,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         Assert.AreEqual(content.Name, (string)element.Attribute("nodeName"));
         Assert.AreEqual(urlName, (string)element.Attribute("urlName"));
         Assert.AreEqual(content.Path, (string)element.Attribute("path"));
-        Assert.AreEqual("", (string)element.Attribute("isDoc"));
+        Assert.AreEqual(string.Empty, (string)element.Attribute("isDoc"));
         Assert.AreEqual(content.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
         Assert.AreEqual(content.GetCreatorProfile(UserService).Name, (string)element.Attribute("creatorName"));
         Assert.AreEqual(content.GetWriterProfile(UserService).Name, (string)element.Attribute("writerName"));
@@ -128,11 +130,14 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         Assert.AreEqual(content.TemplateId.ToString(), (string)element.Attribute("template"));
 
         Assert.AreEqual(content.Properties["title"].GetValue().ToString(), element.Elements("title").Single().Value);
-        Assert.AreEqual(content.Properties["bodyText"].GetValue().ToString(),
+        Assert.AreEqual(
+            content.Properties["bodyText"].GetValue().ToString(),
             element.Elements("bodyText").Single().Value);
-        Assert.AreEqual(content.Properties["keywords"].GetValue().ToString(),
+        Assert.AreEqual(
+            content.Properties["keywords"].GetValue().ToString(),
             element.Elements("keywords").Single().Value);
-        Assert.AreEqual(content.Properties["description"].GetValue().ToString(),
+        Assert.AreEqual(
+            content.Properties["description"].GetValue().ToString(),
             element.Elements("description").Single().Value);
     }
 
@@ -159,10 +164,6 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
 
         var ignored = new FileUploadPropertyEditor(
             DataValueEditorFactory,
-            mediaFileManager,
-            Mock.Of<IOptionsMonitor<ContentSettings>>(x => x.CurrentValue == contentSettings),
-            Services.GetRequiredService<UploadAutoFillProperties>(),
-            ContentService,
             IOHelper);
 
         var media = MediaBuilder.CreateMediaImage(mediaType, -1);
@@ -193,7 +194,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         Assert.AreEqual(media.Name, (string)element.Attribute("nodeName"));
         Assert.AreEqual(urlName, (string)element.Attribute("urlName"));
         Assert.AreEqual(media.Path, (string)element.Attribute("path"));
-        Assert.AreEqual("", (string)element.Attribute("isDoc"));
+        Assert.AreEqual(string.Empty, (string)element.Attribute("isDoc"));
         Assert.AreEqual(media.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
         Assert.AreEqual(media.GetCreatorProfile(UserService).Name, (string)element.Attribute("writerName"));
         Assert.AreEqual(media.CreatorId.ToString(), (string)element.Attribute("writerID"));

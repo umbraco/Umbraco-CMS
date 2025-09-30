@@ -1,23 +1,20 @@
 using System.Text;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder;
 
 public sealed class ModelsGenerationError
 {
-    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IHostEnvironment _hostEnvironment;
     private ModelsBuilderSettings _config;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ModelsGenerationError" /> class.
-    /// </summary>
-    public ModelsGenerationError(IOptionsMonitor<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
+    public ModelsGenerationError(IOptionsMonitor<ModelsBuilderSettings> config, IHostEnvironment hostEnvironment)
     {
         _config = config.CurrentValue;
-        _hostingEnvironment = hostingEnvironment;
+        _hostEnvironment = hostEnvironment;
         config.OnChange(x => _config = x);
     }
 
@@ -73,7 +70,7 @@ public sealed class ModelsGenerationError
 
     private string? GetErrFile()
     {
-        var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
+        var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostEnvironment);
         if (!Directory.Exists(modelsDirectory))
         {
             return null;

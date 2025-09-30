@@ -1,6 +1,7 @@
 using System.Data.Common;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
@@ -30,6 +31,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
@@ -117,8 +119,7 @@ public static partial class UmbracoBuilderExtensions
 
         TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), loggerFactory, config);
 
-        IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
-        return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches, tempHostingEnvironment);
+        return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches);
     }
 
     /// <summary>
@@ -188,11 +189,14 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddRecurringBackgroundJob<WebhookFiring>();
         builder.Services.AddRecurringBackgroundJob<WebhookLoggingCleanup>();
         builder.Services.AddRecurringBackgroundJob<ReportSiteJob>();
-
+        builder.Services.AddRecurringBackgroundJob<CacheInstructionsPruningJob>();
+        builder.Services.AddRecurringBackgroundJob<LongRunningOperationsCleanupJob>();
 
         builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
         builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
         builder.Services.AddHostedService<QueuedHostedService>();
+        builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, NavigationInitializationNotificationHandler>();
+        builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, PublishStatusInitializationNotificationHandler>();
 
         return builder;
     }
@@ -236,11 +240,6 @@ public static partial class UmbracoBuilderExtensions
         // this will directly affect developers who need to call that themselves.
         IMvcBuilder mvcBuilder = builder.Services.AddControllersWithViews();
 
-        if (builder.Config.GetRuntimeMode() != RuntimeMode.Production)
-        {
-            mvcBuilder.AddRazorRuntimeCompilation();
-        }
-
         mvcBuilding?.Invoke(mvcBuilder);
 
         return builder;
@@ -263,6 +262,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
         builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
         builder.Services.AddApiVersioning().AddApiExplorer();
+        builder.Services.AddEndpointsApiExplorer();
         builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
         builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
         builder.Services.TryAddEnumerable(ServiceDescriptor
@@ -318,23 +318,6 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddHelpers(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<OAuthOptionsHelper>();
-
-        return builder;
-    }
-
-    // TODO: Does this need to exist and/or be public?
-    public static IUmbracoBuilder AddWebServer(this IUmbracoBuilder builder)
-    {
-        // TODO: We need to figure out why this is needed and fix those endpoints to not need them, we don't want to change global things
-        // If using Kestrel: https://stackoverflow.com/a/55196057
-        builder.Services.Configure<KestrelServerOptions>(options =>
-        {
-            options.AllowSynchronousIO = true;
-        });
-        builder.Services.Configure<IISServerOptions>(options =>
-        {
-            options.AllowSynchronousIO = true;
-        });
 
         return builder;
     }

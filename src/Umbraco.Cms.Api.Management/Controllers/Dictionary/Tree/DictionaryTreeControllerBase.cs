@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -18,8 +21,17 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
 public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public DictionaryTreeControllerBase(IEntityService entityService, IDictionaryItemService dictionaryItemService)
-        : base(entityService) =>
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+              dictionaryItemService)
+    {
+    }
+
+    public DictionaryTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
+        : base(entityService, flagProviders) =>
         DictionaryItemService = dictionaryItemService;
 
     // dictionary items do not currently have a known UmbracoObjectType, so we'll settle with Unknown for now
@@ -28,7 +40,7 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
     protected IDictionaryItemService DictionaryItemService { get; }
 
     protected async Task<IEnumerable<NamedEntityTreeItemResponseModel>> MapTreeItemViewModels(IEnumerable<IDictionaryItem> dictionaryItems)
-        => await Task.WhenAll(dictionaryItems.Select(CreateEntityTreeItemViewModelAsync));
+        => await MapTreeItemViewModelsAsync(dictionaryItems).ToArrayAsync();
 
     protected override async Task<ActionResult<IEnumerable<NamedEntityTreeItemResponseModel>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
     {
@@ -54,8 +66,17 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
             }
         }
 
-        NamedEntityTreeItemResponseModel[] viewModels = await Task.WhenAll(ancestors.Select(CreateEntityTreeItemViewModelAsync));
+        NamedEntityTreeItemResponseModel[] viewModels = await MapTreeItemViewModelsAsync(ancestors).ToArrayAsync();
+
         return Ok(viewModels.Reverse());
+    }
+
+    private async IAsyncEnumerable<NamedEntityTreeItemResponseModel> MapTreeItemViewModelsAsync(IEnumerable<IDictionaryItem> dictionaryItems)
+    {
+        foreach (IDictionaryItem dictionaryItem in dictionaryItems)
+        {
+            yield return await CreateEntityTreeItemViewModelAsync(dictionaryItem);
+        }
     }
 
     private async Task<NamedEntityTreeItemResponseModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)

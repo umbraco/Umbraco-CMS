@@ -1,6 +1,5 @@
 using Serilog;
 using Serilog.Extensions.Hosting;
-using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 namespace Umbraco.Cms.Web.Common.Logging;
 
@@ -9,10 +8,10 @@ namespace Umbraco.Cms.Web.Common.Logging;
 ///     Ensures freeze is only called a single time even when resolving a logger from the snapshot container
 ///     built for <see cref="RefreshingRazorViewEngine" />.
 /// </remarks>
-internal class RegisteredReloadableLogger
+internal sealed class RegisteredReloadableLogger
 {
-    private static readonly object FrozenLock = new();
-    private static bool frozen;
+    private static readonly Lock _frozenLock = new();
+    private static bool _frozen;
     private readonly ReloadableLogger _logger;
 
     public RegisteredReloadableLogger(ReloadableLogger? logger) =>
@@ -22,9 +21,9 @@ internal class RegisteredReloadableLogger
 
     public void Reload(Func<LoggerConfiguration, LoggerConfiguration> cfg)
     {
-        lock (FrozenLock)
+        lock (_frozenLock)
         {
-            if (frozen)
+            if (_frozen)
             {
                 Logger.Debug("ReloadableLogger has already been frozen, unable to reload, NOOP.");
                 return;
@@ -33,7 +32,7 @@ internal class RegisteredReloadableLogger
             _logger.Reload(cfg);
             _logger.Freeze();
 
-            frozen = true;
+            _frozen = true;
         }
     }
 }

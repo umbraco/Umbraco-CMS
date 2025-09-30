@@ -22,7 +22,7 @@ namespace Umbraco.Extensions
         /// Such as adding ProcessID, Thread, AppDomain etc
         /// It is highly recommended that you keep/use this default in your own logging config customizations
         /// </summary>
-        [Obsolete("Please use an alternative method. This will be removed in Umbraco 13.")]
+        [Obsolete("Please use an alternative method. Scheduled for removal from Umbraco 13.")]
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -37,7 +37,7 @@ namespace Umbraco.Extensions
         /// Such as adding ProcessID, Thread, AppDomain etc
         /// It is highly recommended that you keep/use this default in your own logging config customizations
         /// </summary>
-        [Obsolete("Please use an alternative method. This will be removed in Umbraco 13.")]
+        [Obsolete("Please use an alternative method. Scheduled for removal from Umbraco 13.")]
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -68,7 +68,7 @@ namespace Umbraco.Extensions
             umbFileConfiguration = umbracoFileConfiguration;
 
             logConfig.WriteTo.UmbracoFile(
-                path : umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
+                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
                 fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
                 restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
                 rollingInterval: umbracoFileConfiguration.RollingInterval,
@@ -78,7 +78,6 @@ namespace Umbraco.Extensions
 
             return logConfig;
         }
-
 
         /// <summary>
         /// This configures Serilog with some defaults
@@ -108,14 +107,17 @@ namespace Umbraco.Extensions
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.FromLogContext(); // allows us to dynamically enrich
 
-            logConfig.WriteTo.UmbracoFile(
-                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
-                fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
-                restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
-                rollingInterval: umbracoFileConfiguration.RollingInterval,
-                flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
-                rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
+            if (umbracoFileConfiguration.Enabled)
+            {
+                logConfig.WriteTo.UmbracoFile(
+                    path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory, loggingConfiguration.LogFileNameFormat, loggingConfiguration.GetLogFileNameFormatArguments()),
+                    fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
+                    restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
+                    rollingInterval: umbracoFileConfiguration.RollingInterval,
+                    flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
+                    rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
+                    retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
+            }
 
             return logConfig;
         }
@@ -127,7 +129,7 @@ namespace Umbraco.Extensions
         /// <param name="hostingEnvironment"></param>
         /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
         ///
-        [Obsolete("Will be removed in Umbraco 13.")]
+        [Obsolete("Scheduled for removal from Umbraco 13.")]
         public static LoggerConfiguration OutputDefaultTextFile(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -136,7 +138,7 @@ namespace Umbraco.Extensions
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(
-                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles),  $"UmbracoTraceLog.{Environment.MachineName}..txt"),
+                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles), $"UmbracoTraceLog.{Environment.MachineName}..txt"),
                 shared: true,
                 rollingInterval: RollingInterval.Day,
                 restrictedToMinimumLevel: minimumLevel,
@@ -213,7 +215,6 @@ namespace Umbraco.Extensions
                         null));
         }
 
-
         /// <summary>
         /// Outputs a CLEF format JSON log at /App_Data/Logs/
         /// </summary>
@@ -222,7 +223,7 @@ namespace Umbraco.Extensions
         /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="retainedFileCount">The number of days to keep log files. Default is set to null which means all logs are kept</param>
-        [Obsolete("Will be removed in Umbraco 13.")]
+        [Obsolete("Scheduled for removal from Umbraco 13.")]
         public static LoggerConfiguration OutputDefaultJsonFile(
             this LoggerConfiguration logConfig,
             Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
@@ -234,7 +235,7 @@ namespace Umbraco.Extensions
             // Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(
                 new CompactJsonFormatter(),
-                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles) ,$"UmbracoTraceLog.{Environment.MachineName}..json"),
+                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles), $"UmbracoTraceLog.{Environment.MachineName}..json"),
                 shared: true,
                 rollingInterval: RollingInterval.Day, // Create a new JSON file every day
                 retainedFileCountLimit: retainedFileCount, // Setting to null means we keep all files - default is 31 days
@@ -270,6 +271,5 @@ namespace Umbraco.Extensions
 
             return logConfig;
         }
-
     }
 }

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
@@ -27,21 +27,21 @@ public class SearchMediaTypeItemController : MediaTypeItemControllerBase
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MediaTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
     {
         PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.MediaType, query, skip, take);
         if (searchResult.Items.Any() is false)
         {
-            return await Task.FromResult(Ok(new PagedModel<MediaTypeItemResponseModel> { Total = searchResult.Total }));
+            return Task.FromResult<IActionResult>(Ok(new PagedModel<MediaTypeItemResponseModel> { Total = searchResult.Total }));
         }
 
-        IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetAll(searchResult.Items.Select(item => item.Key).ToArray().EmptyNull());
+        IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetMany(searchResult.Items.Select(item => item.Key).ToArray().EmptyNull());
         var result = new PagedModel<MediaTypeItemResponseModel>
         {
             Items = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(mediaTypes),
             Total = searchResult.Total
         };
 
-        return Ok(result);
+        return Task.FromResult<IActionResult>(Ok(result));
     }
 }

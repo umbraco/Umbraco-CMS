@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -17,7 +17,6 @@ namespace Umbraco.Cms.Core.Services;
 [Obsolete("Please use ILanguageService and IDictionaryItemService for localization. Will be removed in V15.")]
 internal class LocalizationService : RepositoryService, ILocalizationService
 {
-    private readonly IAuditRepository _auditRepository;
     private readonly IDictionaryRepository _dictionaryRepository;
     private readonly ILanguageRepository _languageRepository;
     private readonly ILanguageService _languageService;
@@ -30,14 +29,12 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDictionaryRepository dictionaryRepository,
-        IAuditRepository auditRepository,
         ILanguageRepository languageRepository)
         : this(
             provider,
             loggerFactory,
             eventMessagesFactory,
             dictionaryRepository,
-            auditRepository,
             languageRepository,
             StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
             StaticServiceProvider.Instance.GetRequiredService<IDictionaryItemService>(),
@@ -51,7 +48,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDictionaryRepository dictionaryRepository,
-        IAuditRepository auditRepository,
         ILanguageRepository languageRepository,
         ILanguageService languageService,
         IDictionaryItemService dictionaryItemService,
@@ -59,7 +55,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _dictionaryRepository = dictionaryRepository;
-        _auditRepository = auditRepository;
         _languageRepository = languageRepository;
         _languageService = languageService;
         _dictionaryItemService = dictionaryItemService;
@@ -220,7 +215,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="userId">Optional id of the user saving the dictionary item</param>
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
-    { ;
+    {
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         if (dictionaryItem.Id > 0)
         {

@@ -2,15 +2,9 @@ using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.User.Current;
 
-public class CurrentUserResponseModel
+public class CurrentUserResponseModel : UserPresentationBase
 {
     public required Guid Id { get; init; }
-
-    public required string Email { get; init; } = string.Empty;
-
-    public required string UserName { get; init; } = string.Empty;
-
-    public required string Name { get; init; } = string.Empty;
 
     public required string? LanguageIsoCode { get; init; }
 
@@ -35,5 +29,6 @@ public class CurrentUserResponseModel
     public required ISet<IPermissionPresentationModel> Permissions { get; init; }
 
     public required ISet<string> AllowedSections { get; init; }
+
     public bool IsAdmin { get; set; }
 }

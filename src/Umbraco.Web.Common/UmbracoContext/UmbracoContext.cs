@@ -20,7 +20,7 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IWebProfilerService _webProfilerService;
-    private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
+    private readonly ICacheManager _cacheManager;
     private readonly UmbracoRequestPaths _umbracoRequestPaths;
     private readonly UriUtility _uriUtility;
     private Uri? _cleanedUmbracoUrl;
@@ -34,31 +34,24 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
     // otherwise it's used by EnsureContext above
     // warn: does *not* manage setting any IUmbracoContextAccessor
     internal UmbracoContext(
-        IPublishedSnapshotService publishedSnapshotService,
         UmbracoRequestPaths umbracoRequestPaths,
         IHostingEnvironment hostingEnvironment,
         UriUtility uriUtility,
         ICookieManager cookieManager,
         IHttpContextAccessor httpContextAccessor,
-        IWebProfilerService webProfilerService)
+        IWebProfilerService webProfilerService,
+        ICacheManager cacheManager)
     {
-        if (publishedSnapshotService == null)
-        {
-            throw new ArgumentNullException(nameof(publishedSnapshotService));
-        }
 
         _uriUtility = uriUtility;
         _hostingEnvironment = hostingEnvironment;
         _cookieManager = cookieManager;
         _httpContextAccessor = httpContextAccessor;
         _webProfilerService = webProfilerService;
+        _cacheManager = cacheManager;
         ObjectCreated = DateTime.Now;
         UmbracoRequestId = Guid.NewGuid();
         _umbracoRequestPaths = umbracoRequestPaths;
-
-        // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
-        _publishedSnapshot =
-            new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
     }
 
     /// <inheritdoc />
@@ -106,16 +99,13 @@ _originalRequestUrl ??= RequestUrl ?? new Uri("http://localhost");
 _cleanedUmbracoUrl ??= _uriUtility.UriToUmbraco(OriginalRequestUrl);
 
     /// <inheritdoc />
-    public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
+    public IPublishedContentCache Content => _cacheManager.Content;
 
     /// <inheritdoc />
-    public IPublishedContentCache? Content => PublishedSnapshot.Content;
+    public IPublishedMediaCache Media => _cacheManager.Media;
 
     /// <inheritdoc />
-    public IPublishedMediaCache? Media => PublishedSnapshot.Media;
-
-    /// <inheritdoc />
-    public IDomainCache? Domains => PublishedSnapshot.Domains;
+    public IDomainCache Domains => _cacheManager.Domains;
 
     /// <inheritdoc />
     public IPublishedRequest? PublishedRequest { get; set; }
@@ -161,30 +151,6 @@ _cleanedUmbracoUrl ??= _uriUtility.UriToUmbraco(OriginalRequestUrl);
         private set => _previewing = value;
     }
 
-    /// <inheritdoc />
-    public IDisposable ForcedPreview(bool preview)
-    {
-        // say we render an RTE in a give 'preview' mode that might not be the 'current' one,
-        // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
-        // default 'preview' mode - somehow we have to force it. and that could be recursive.
-        InPreviewMode = preview;
-        return PublishedSnapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
-    }
-
-    /// <inheritdoc />
-    protected override void DisposeResources()
-    {
-        // DisposableObject ensures that this runs only once
-
-        // help caches release resources
-        // (but don't create caches just to dispose them)
-        // context is not multi-threaded
-        if (_publishedSnapshot.IsValueCreated)
-        {
-            _publishedSnapshot.Value.Dispose();
-        }
-    }
-
     private void DetectPreviewMode()
     {
         if (RequestUrl != null
@@ -197,5 +163,10 @@ _cleanedUmbracoUrl ??= _uriUtility.UriToUmbraco(OriginalRequestUrl);
         }
 
         _previewing = _previewToken.IsNullOrWhiteSpace() == false;
+    }
+
+    // TODO: Remove this
+    protected override void DisposeResources()
+    {
     }
 }

@@ -1,0 +1,37 @@
+<svg width="370" height="250" viewBox="0 0 370 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="9" y="9" width="352" height="232" rx="7" fill="white" stroke="black" stroke-width="2"/>
+<path d="M354 10C357.314 10 360 12.6863 360 16L360 40L10 40L10 16C10 12.6863 12.6863 10 16 10L354 10Z" fill="#1B264F"/>
+<path d="M10 40H360V234C360 237.314 357.314 240 354 240H10V40Z" fill="white"/>
+<mask id="path-4-inside-1_57_228" fill="white">
+<path d="M10 217H360V240H10V217Z"/>
+</mask>
+<path d="M10 218H360V216H10V218Z" fill="black" mask="url(#path-4-inside-1_57_228)"/>
+<mask id="path-6-inside-2_57_228" fill="white">
+<path d="M10 40H360V63H10V40Z"/>
+</mask>
+<path d="M360 62H10V64H360V62Z" fill="black" mask="url(#path-6-inside-2_57_228)"/>
+<path opacity="0.8" d="M10 40H360V234C360 237.314 357.314 240 354 240H16C12.6863 240 10 237.314 10 234V40Z" fill="#D9D9D9"/>
+<mask id="path-9-inside-3_57_228" fill="white">
+<path d="M338 40H360V63H338V40Z"/>
+</mask>
+<path d="M338 40H360V63H338V40Z" fill="white"/>
+<path d="M339 63V40H337V63H339Z" fill="#D9D9D9" mask="url(#path-9-inside-3_57_228)"/>
+<rect x="342" y="56.7273" width="15" height="2.09091" fill="#848484"/>
+<path d="M349.5 46.2727L350.286 48.8011H352.829L350.771 50.3637L351.557 52.8921L349.5 51.3295L347.443 52.8921L348.229 50.3637L346.171 48.8011H348.714L349.5 46.2727Z" fill="#848484"/>
+<mask id="path-13-inside-4_57_228" fill="white">
+<path d="M316 40H338V63H316V40Z"/>
+</mask>
+<path d="M316 40H338V63H316V40Z" fill="white"/>
+<path d="M317 63V40H315V63H317Z" fill="#D9D9D9" mask="url(#path-13-inside-4_57_228)"/>
+<rect x="320" y="56.7273" width="15" height="2.09091" fill="#848484"/>
+<path d="M327.5 46.2727L328.286 48.8011H330.829L328.771 50.3637L329.557 52.8921L327.5 51.3295L325.443 52.8921L326.229 50.3637L324.171 48.8011H326.714L327.5 46.2727Z" fill="#848484"/>
+<mask id="path-17-inside-5_57_228" fill="white">
+<path d="M294 40H316V63H294V40Z"/>
+</mask>
+<path d="M294 40H316V63H294V40Z" fill="white"/>
+<path d="M295 63V40H293V63H295Z" fill="#D9D9D9" mask="url(#path-17-inside-5_57_228)"/>
+<rect x="298" y="56.7273" width="15" height="2.09091" fill="#848484"/>
+<path d="M305.5 46.2727L306.286 48.8011H308.829L306.771 50.3637L307.557 52.8921L305.5 51.3295L303.443 52.8921L304.229 50.3637L302.171 48.8011H304.714L305.5 46.2727Z" fill="#848484"/>
+<rect x="10" y="63" width="350" height="154" fill="white"/>
+<path opacity="0.8" d="M316 40H360V63H316V40Z" fill="#D9D9D9"/>
+</svg>

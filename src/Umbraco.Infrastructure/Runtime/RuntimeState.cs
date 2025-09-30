@@ -31,6 +31,7 @@ public class RuntimeState : IRuntimeState
     private readonly IConflictingRouteService _conflictingRouteService = null!;
     private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata = null!;
     private readonly IRuntimeModeValidationService _runtimeModeValidationService = null!;
+    private readonly IDatabaseAvailabilityCheck _databaseAvailabilityCheck = null!;
 
     /// <summary>
     /// The initial <see cref="RuntimeState"/>
@@ -46,6 +47,7 @@ public class RuntimeState : IRuntimeState
     /// <summary>
     /// Initializes a new instance of the <see cref="RuntimeState" /> class.
     /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public RuntimeState(
        IOptions<GlobalSettings> globalSettings,
        IOptions<UnattendedSettings> unattendedSettings,
@@ -56,6 +58,34 @@ public class RuntimeState : IRuntimeState
        IConflictingRouteService conflictingRouteService,
        IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
        IRuntimeModeValidationService runtimeModeValidationService)
+       : this(
+             globalSettings,
+             unattendedSettings,
+             umbracoVersion,
+             databaseFactory,
+             logger,
+             packageMigrationState,
+             conflictingRouteService,
+             databaseProviderMetadata,
+             runtimeModeValidationService,
+             StaticServiceProvider.Instance.GetRequiredService<IDatabaseAvailabilityCheck>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+    /// </summary>
+    public RuntimeState(
+       IOptions<GlobalSettings> globalSettings,
+       IOptions<UnattendedSettings> unattendedSettings,
+       IUmbracoVersion umbracoVersion,
+       IUmbracoDatabaseFactory databaseFactory,
+       ILogger<RuntimeState> logger,
+       PendingPackageMigrations packageMigrationState,
+       IConflictingRouteService conflictingRouteService,
+       IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
+       IRuntimeModeValidationService runtimeModeValidationService,
+       IDatabaseAvailabilityCheck databaseAvailabilityCheck)
     {
         _globalSettings = globalSettings;
         _unattendedSettings = unattendedSettings;
@@ -66,6 +96,7 @@ public class RuntimeState : IRuntimeState
         _conflictingRouteService = conflictingRouteService;
         _databaseProviderMetadata = databaseProviderMetadata;
         _runtimeModeValidationService = runtimeModeValidationService;
+        _databaseAvailabilityCheck = databaseAvailabilityCheck;
     }
 
     /// <inheritdoc />
@@ -149,7 +180,7 @@ public class RuntimeState : IRuntimeState
                         _logger.LogDebug("Could not connect to database.");
                     }
 
-                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
+                    if (_databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
                     {
                         // ok to install on a configured but missing database
                         Level = RuntimeLevel.BootFailed;
@@ -242,7 +273,7 @@ public class RuntimeState : IRuntimeState
     {
         try
         {
-            if (!TryDbConnect(databaseFactory))
+            if (_databaseAvailabilityCheck.IsDatabaseAvailable(databaseFactory) is false)
             {
                 return UmbracoDatabaseState.CannotConnect;
             }
@@ -259,18 +290,17 @@ public class RuntimeState : IRuntimeState
                 // All will be prefixed with the same key.
                 IReadOnlyDictionary<string, string?>? keyValues = database.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
 
-                // This could need both an upgrade AND package migrations to execute but
-                // we will process them one at a time, first the upgrade, then the package migrations.
+                // This could need both an upgrade AND package migrations to execute, so always add any pending package migrations
+                IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetPendingPackageMigrations(keyValues);
+                _startupState[PendingPackageMigrationsStateKey] = packagesRequiringMigration;
+
                 if (DoesUmbracoRequireUpgrade(keyValues))
                 {
                     return UmbracoDatabaseState.NeedsUpgrade;
                 }
 
-                IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetPendingPackageMigrations(keyValues);
                 if (packagesRequiringMigration.Count > 0)
                 {
-                    _startupState[PendingPackageMigrationsStateKey] = packagesRequiringMigration;
-
                     return UmbracoDatabaseState.NeedsPackageMigration;
                 }
             }
@@ -305,28 +335,5 @@ public class RuntimeState : IRuntimeState
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
         }
         return CurrentMigrationState != FinalMigrationState;
-    }
-
-    private bool TryDbConnect(IUmbracoDatabaseFactory databaseFactory)
-    {
-        // anything other than install wants a database - see if we can connect
-        // (since this is an already existing database, assume localdb is ready)
-        bool canConnect;
-        var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
-        for (var i = 0; ;)
-        {
-            canConnect = databaseFactory.CanConnect;
-            if (canConnect || ++i == tries)
-            {
-                break;
-            }
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-            {
-                _logger.LogDebug("Could not immediately connect to database, trying again.");
-            }
-            Thread.Sleep(1000);
-        }
-
-        return canConnect;
     }
 }

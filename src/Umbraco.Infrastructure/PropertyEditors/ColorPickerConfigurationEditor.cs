@@ -4,12 +4,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
+internal sealed class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
 {
     public ColorPickerConfigurationEditor(IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         : base(ioHelper)
@@ -18,14 +19,14 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
         items.Validators.Add(new ColorListValidator(configurationEditorJsonSerializer));
     }
 
-    internal class ColorListValidator : IValueValidator
+    internal sealed class ColorListValidator : IValueValidator
     {
         private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
         public ColorListValidator(IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
 
-        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
         {
             var stringValue = value?.ToString();
             if (stringValue.IsNullOrWhiteSpace())

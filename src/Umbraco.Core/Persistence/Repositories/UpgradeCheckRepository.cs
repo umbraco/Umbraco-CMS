@@ -16,14 +16,10 @@ public class UpgradeCheckRepository : IUpgradeCheckRepository
     {
         try
         {
-            if (_httpClient == null)
-            {
-                _httpClient = new HttpClient();
-            }
+            _httpClient ??= new HttpClient { Timeout = TimeSpan.FromSeconds(1) };
 
             using var content = new StringContent(_jsonSerializer.Serialize(new CheckUpgradeDto(version)), Encoding.UTF8, "application/json");
 
-            _httpClient.Timeout = TimeSpan.FromSeconds(1);
             using HttpResponseMessage task = await _httpClient.PostAsync(RestApiUpgradeChecklUrl, content);
             var json = await task.Content.ReadAsStringAsync();
             UpgradeResult? result = _jsonSerializer.Deserialize<UpgradeResult>(json);
@@ -37,7 +33,7 @@ public class UpgradeCheckRepository : IUpgradeCheckRepository
         }
     }
 
-    private class CheckUpgradeDto
+    private sealed class CheckUpgradeDto
     {
         public CheckUpgradeDto(SemVersion version)
         {

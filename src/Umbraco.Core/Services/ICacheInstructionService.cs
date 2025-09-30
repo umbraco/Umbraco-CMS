@@ -34,19 +34,16 @@ public interface ICacheInstructionService
     void DeliverInstructionsInBatches(IEnumerable<RefreshInstruction> instructions, string localIdentity);
 
     /// <summary>
-    ///     Processes and then prunes pending database cache instructions.
+    ///     Processes pending database cache instructions.
     /// </summary>
     /// <param name="cacheRefreshers">Cache refreshers.</param>
-    /// <param name="serverRole">Server role.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <param name="localIdentity">Local identity of the executing AppDomain.</param>
-    /// <param name="lastPruned">Date of last prune operation.</param>
-    /// <param name="lastId">Id of the latest processed instruction</param>
+    /// <param name="lastId">Id of the latest processed instruction.</param>
+    /// <returns>The processing result.</returns>
     ProcessInstructionsResult ProcessInstructions(
         CacheRefresherCollection cacheRefreshers,
-        ServerRole serverRole,
         CancellationToken cancellationToken,
         string localIdentity,
-        DateTime lastPruned,
         int lastId);
 }

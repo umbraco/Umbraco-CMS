@@ -31,5 +31,8 @@ public class UserResponseModel : UserPresentationBase
     public DateTimeOffset? LastLockoutDate { get; set; }
 
     public DateTimeOffset? LastPasswordChangeDate { get; set; }
+
     public bool IsAdmin { get; set; }
+
+    public UserKind Kind { get; set; }
 }

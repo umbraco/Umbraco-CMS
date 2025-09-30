@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DictionaryItemServiceTests : UmbracoIntegrationTest
+internal sealed class DictionaryItemServiceTests : UmbracoIntegrationTest
 {
     private Guid _parentItemId;
     private Guid _childItemId;
@@ -238,7 +238,8 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("Testing12345", item.ItemKey);
         foreach (var language in allLangs)
         {
-            Assert.AreEqual($"Translation for: {language.IsoCode}",
+            Assert.AreEqual(
+                $"Translation for: {language.IsoCode}",
                 item.Translations.Single(x => x.LanguageIsoCode == language.IsoCode).Value);
         }
     }
@@ -360,6 +361,11 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
 
         var result = await DictionaryItemService.UpdateAsync(item, Constants.Security.SuperUserKey);
         Assert.True(result.Success);
+
+        // Verify that the create and update dates can be used to distinguish between creates
+        // and updates (as these fields are used in ServerEventSender to emit a "Created" or "Updated"
+        // event.
+        Assert.Greater(result.Result.UpdateDate, result.Result.CreateDate);
 
         var updatedItem = await DictionaryItemService.GetAsync("Child");
         Assert.NotNull(updatedItem);
@@ -627,8 +633,7 @@ public class DictionaryItemServiceTests : UmbracoIntegrationTest
         dictionaryResult = await DictionaryItemService.CreateAsync(
             new DictionaryItem(
                 parentItem.Key,
-                "Child"
-            )
+                "Child")
             {
                 Translations = new List<IDictionaryTranslation>
                 {

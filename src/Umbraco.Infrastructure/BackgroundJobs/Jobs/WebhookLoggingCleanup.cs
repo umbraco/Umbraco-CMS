@@ -53,7 +53,7 @@ public class WebhookLoggingCleanup : IRecurringBackgroundJob
         using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(Constants.Locks.WebhookLogs);
-            webhookLogs = await _webhookLogRepository.GetOlderThanDate(DateTime.Now - TimeSpan.FromDays(_webhookSettings.KeepLogsForDays));
+            webhookLogs = await _webhookLogRepository.GetOlderThanDate(DateTime.UtcNow - TimeSpan.FromDays(_webhookSettings.KeepLogsForDays));
             scope.Complete();
         }
 

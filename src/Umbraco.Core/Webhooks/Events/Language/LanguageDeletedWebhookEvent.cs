@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -20,6 +21,6 @@ public class LanguageDeletedWebhookEvent : WebhookEventBase<LanguageDeletedNotif
 
     public override string Alias => Constants.WebhookEvents.Aliases.LanguageDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(LanguageDeletedNotification notification)
-        => notification.DeletedEntities;
+    public override object ConvertNotificationToRequestPayload(LanguageDeletedNotification notification)
+        => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

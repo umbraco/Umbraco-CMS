@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -22,7 +22,7 @@ public class ReferencedByDocumentController : DocumentControllerBase
     }
 
     /// <summary>
-    ///     Gets a page list of tracked references for the current item, so you can see where an item is being used.
+    ///     Gets a paged list of tracked references for the current item, so you can see where an item is being used.
     /// </summary>
     /// <remarks>
     ///     Used by info tabs on content, media etc. and for the delete and unpublish of single items.
@@ -37,7 +37,7 @@ public class ReferencedByDocumentController : DocumentControllerBase
         int skip = 0,
         int take = 20)
     {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, false);
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
 
         var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
         {
@@ -45,6 +45,6 @@ public class ReferencedByDocumentController : DocumentControllerBase
             Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
         };
 
-        return await Task.FromResult(pagedViewModel);
+        return pagedViewModel;
     }
 }

@@ -120,6 +120,7 @@ public static partial class NPocoDatabaseExtensions
     ///         once T1 and T2 have completed. Whereas here, it could contain T1's value.
     ///     </para>
     /// </remarks>
+    [Obsolete("Use InsertOrUpdateAsync instead")]
     public static RecordPersistenceType InsertOrUpdate<T>(this IUmbracoDatabase db, T poco)
         where T : class =>
         db.InsertOrUpdate(poco, null, null);
@@ -150,7 +151,7 @@ public static partial class NPocoDatabaseExtensions
     ///         once T1 and T2 have completed. Whereas here, it could contain T1's value.
     ///     </para>
     /// </remarks>
-    public static RecordPersistenceType InsertOrUpdate<T>(
+    public static async Task<RecordPersistenceType> InsertOrUpdateAsync<T>(
         this IUmbracoDatabase db,
         T poco,
         string? updateCommand,
@@ -167,7 +168,7 @@ public static partial class NPocoDatabaseExtensions
 
         // try to update
         var rowCount = updateCommand.IsNullOrWhiteSpace() || updateArgs is null
-            ? db.Update(poco)
+            ? await db.UpdateAsync(poco)
             : db.Update<T>(updateCommand!, updateArgs);
         if (rowCount > 0)
         {
@@ -182,7 +183,7 @@ public static partial class NPocoDatabaseExtensions
             try
             {
                 // try to insert
-                db.Insert(poco);
+                await db.InsertAsync(poco);
                 return RecordPersistenceType.Insert;
             }
             catch (DbException)
@@ -193,7 +194,7 @@ public static partial class NPocoDatabaseExtensions
 
                 // try to update
                 rowCount = updateCommand.IsNullOrWhiteSpace() || updateArgs is null
-                    ? db.Update(poco)
+                    ? await db.UpdateAsync(poco)
                     : db.Update<T>(updateCommand!, updateArgs);
                 if (rowCount > 0)
                 {
@@ -209,6 +210,14 @@ public static partial class NPocoDatabaseExtensions
         throw new DataException("Record could not be inserted or updated.");
     }
 
+    public static RecordPersistenceType InsertOrUpdate<T>(
+        this IUmbracoDatabase db,
+        T poco,
+        string? updateCommand,
+        object? updateArgs)
+        where T : class =>
+        db.InsertOrUpdateAsync(poco, updateCommand, updateArgs).GetAwaiter().GetResult();
+
     /// <summary>
     ///     This will escape single @ symbols for npoco values so it doesn't think it's a parameter
     /// </summary>
@@ -216,15 +225,17 @@ public static partial class NPocoDatabaseExtensions
     /// <returns></returns>
     public static string EscapeAtSymbols(string value)
     {
-        if (value.Contains("@") == false)
+        if (value.Contains('@') == false)
         {
             return value;
         }
 
         // this fancy regex will only match a single @ not a double, etc...
-        var regex = new Regex("(?<!@)@(?!@)");
-        return regex.Replace(value, "@@");
+        return AtRegex().Replace(value, "@@");
     }
+
+    [GeneratedRegex("(?<!@)@(?!@)")]
+    private static partial Regex AtRegex();
 
     /// <summary>
     ///     Returns the underlying connection as a typed connection - this is used to unwrap the profiled mini profiler stuff
@@ -232,7 +243,7 @@ public static partial class NPocoDatabaseExtensions
     /// <typeparam name="TConnection"></typeparam>
     /// <param name="connection"></param>
     /// <returns></returns>
-    public static TConnection GetTypedConnection<TConnection>(IDbConnection connection)
+    public static TConnection GetTypedConnection<TConnection>(IDbConnection? connection)
         where TConnection : class, IDbConnection
     {
         IDbConnection? c = connection;
@@ -249,7 +260,7 @@ public static partial class NPocoDatabaseExtensions
                     c = profiled.WrappedConnection;
                     break;
                 default:
-                    throw new NotSupportedException(connection.GetType().FullName);
+                    throw new NotSupportedException(connection?.GetType().FullName);
             }
         }
     }

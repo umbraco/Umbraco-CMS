@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 namespace Umbraco.Cms.Infrastructure.Install;
 
 /// <summary>
-///     Handles <see cref="RuntimeUnattendedUpgradeNotification" /> to execute the unattended Umbraco upgrader
+///     Handles <see cref="RuntimePremigrationsUpgradeNotification" /> to execute the unattended Umbraco upgrader
 ///     or the unattended Package migrations runner.
 /// </summary>
 public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigrationsUpgradeNotification>
@@ -36,42 +36,36 @@ public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigratio
         _keyValueService = keyValueService;
     }
 
-    public Task HandleAsync(RuntimePremigrationsUpgradeNotification notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(RuntimePremigrationsUpgradeNotification notification, CancellationToken cancellationToken)
     {
         // no connection string set
         if (_umbracoDatabaseFactory.Configured is false)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         if (_databaseBuilder.IsUmbracoInstalled() is false)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         var plan = new UmbracoPremigrationPlan();
         if (HasMissingPremigrations(plan) is false)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        using (_profilingLogger.IsEnabled(LogLevel.Verbose) is false ? null : _profilingLogger.TraceDuration<UnattendedUpgrader>(
-                   "Starting premigration upgrade.",
-                   "Unattended premigration completed."))
+        using (_profilingLogger.IsEnabled(LogLevel.Verbose) is false ? null : _profilingLogger.TraceDuration<UnattendedUpgrader>("Starting premigration upgrade.", "Unattended premigration completed."))
         {
-            DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
+            DatabaseBuilder.Result? result = await _databaseBuilder.UpgradeSchemaAndDataAsync(plan).ConfigureAwait(false);
             if (result?.Success is false)
             {
-                var innerException = new IOException(
-                    "An error occurred while running the premigration upgrade.\n" + result.Message);
+                var innerException = new IOException("An error occurred while running the premigration upgrade.\n" + result.Message);
                 _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, innerException);
             }
 
-            notification.UpgradeResult =
-                RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.CoreUpgradeComplete;
+            notification.UpgradeResult = RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.CoreUpgradeComplete;
         }
-
-        return Task.CompletedTask;
     }
 
     private bool HasMissingPremigrations(UmbracoPremigrationPlan umbracoPremigrationPlan)

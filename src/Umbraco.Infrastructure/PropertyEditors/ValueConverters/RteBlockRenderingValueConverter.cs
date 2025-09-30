@@ -8,14 +8,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Blocks;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
-using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Extensions;
 
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     used dynamically.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDeliveryApiPropertyValueConverter
+public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDeliveryApiPropertyValueConverter
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly HtmlLocalLinkParser _linkParser;
@@ -39,13 +39,15 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     private readonly ILogger<RteBlockRenderingValueConverter> _logger;
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
+    private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private DeliveryApiSettings _deliveryApiSettings;
 
     public RteBlockRenderingValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
         IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
         IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
         IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteBlockRenderingValueConverter> logger,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
+        IVariationContextAccessor variationContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
     {
         _linkParser = linkParser;
         _urlParser = urlParser;
@@ -58,6 +60,8 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         _apiElementBuilder = apiElementBuilder;
         _constructorCache = constructorCache;
         _logger = logger;
+        _variationContextAccessor = variationContextAccessor;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
         deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
@@ -78,7 +82,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
         // the reference cache level is .Element here, as is also the case when rendering at property level.
         RichTextBlockModel? richTextBlockModel = richTextEditorValue.Blocks is not null
-            ? ParseRichTextBlockModel(richTextEditorValue.Blocks, propertyType, PropertyCacheLevel.Element, preview)
+            ? ParseRichTextBlockModel(owner, richTextEditorValue.Blocks, propertyType, PropertyCacheLevel.Element, preview)
             : null;
 
         return new RichTextEditorIntermediateValue
@@ -131,7 +135,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         var sourceString = intermediateValue.Markup;
 
         // ensures string is parsed for {localLink} and URLs and media are resolved correctly
-        sourceString = _linkParser.EnsureInternalLinks(sourceString, preview);
+        sourceString = _linkParser.EnsureInternalLinks(sourceString);
         sourceString = _urlParser.EnsureUrls(sourceString);
         sourceString = _imageSourceParser.EnsureImageSources(sourceString);
 
@@ -181,7 +185,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         return sourceString;
     }
 
-    private RichTextBlockModel? ParseRichTextBlockModel(RichTextBlockValue blocks, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, bool preview)
+    private RichTextBlockModel? ParseRichTextBlockModel(IPublishedElement owner, RichTextBlockValue blocks, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, bool preview)
     {
         RichTextConfiguration? configuration = propertyType.DataType.ConfigurationAs<RichTextConfiguration>();
         if (configuration?.Blocks?.Any() is not true)
@@ -189,8 +193,8 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             return null;
         }
 
-        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _jsonSerializer, _constructorCache);
-        return creator.CreateBlockModel(referenceCacheLevel, blocks, preview, configuration.Blocks);
+        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _variationContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache);
+        return creator.CreateBlockModel(owner, referenceCacheLevel, blocks, preview, configuration.Blocks);
     }
 
     private string RenderRichTextBlockModel(string source, RichTextBlockModel? richTextBlockModel)
@@ -200,10 +204,10 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             return source;
         }
 
-        var blocksByUdi = richTextBlockModel.ToDictionary(block => block.ContentUdi);
+        var blocksByKey = richTextBlockModel.ToDictionary(block => block.ContentKey);
 
         string RenderBlock(Match match) =>
-            UdiParser.TryParse(match.Groups["udi"].Value, out Udi? udi) && blocksByUdi.TryGetValue(udi, out RichTextBlockItem? richTextBlockItem)
+            Guid.TryParse(match.Groups["key"].Value, out Guid key) && blocksByKey.TryGetValue(key, out RichTextBlockItem? richTextBlockItem)
                 ? _partialViewBlockEngine.ExecuteAsync(richTextBlockItem).GetAwaiter().GetResult()
                 : string.Empty;
 
@@ -227,7 +231,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         };
     }
 
-    private class RichTextEditorIntermediateValue : IRichTextEditorIntermediateValue
+    private sealed class RichTextEditorIntermediateValue : IRichTextEditorIntermediateValue
     {
         public required string Markup { get; set; }
 

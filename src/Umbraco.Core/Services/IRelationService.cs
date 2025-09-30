@@ -177,9 +177,8 @@ public interface IRelationService : IService
     ///     Gets a paged result of <see cref="IRelation" />
     /// </summary>
     /// <param name="key"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
     /// <param name="ordering"></param>
     /// <returns></returns>
     Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null);
@@ -294,11 +293,12 @@ public interface IRelationService : IService
     bool HasRelations(IRelationType relationType);
 
     /// <summary>
-    ///     Checks whether any relations exists for the passed in Id.
+    ///     Checks whether any relations exists for the passed in Id and direction.
     /// </summary>
     /// <param name="id">Id of an object to check relations for</param>
+    /// <param name="directionFilter">Indicates whether to check for relations as parent, child or in either direction.</param>
     /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c></returns>
-    bool IsRelated(int id);
+    bool IsRelated(int id, RelationDirectionFilter directionFilter);
 
     /// <summary>
     ///     Checks whether two items are related
@@ -403,6 +403,8 @@ public interface IRelationService : IService
     /// Gets the Relation types in a paged manner.
     /// Currently implements the paging in memory on the name attribute because the underlying repository does not support paging yet
     /// </summary>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
     /// <param name="ids"></param>
     /// <returns></returns>
     Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids);

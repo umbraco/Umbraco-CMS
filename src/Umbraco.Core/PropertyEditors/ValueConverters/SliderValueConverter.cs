@@ -19,21 +19,6 @@ public class SliderValueConverter : PropertyValueConverterBase
     public SliderValueConverter()
     { }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SliderValueConverter" /> class.
-    /// </summary>
-    /// <param name="dataTypeService">The data type service.</param>
-    [Obsolete("The IDataTypeService is not used anymore. This constructor will be removed in a future version.")]
-    public SliderValueConverter(IDataTypeService dataTypeService)
-    { }
-
-    /// <summary>
-    /// Clears the data type configuration caches.
-    /// </summary>
-    [Obsolete("Caching of data type configuration is not done anymore. This method will be removed in a future version.")]
-    public static void ClearCaches()
-    { }
-
     /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Slider);
@@ -47,7 +32,7 @@ public class SliderValueConverter : PropertyValueConverterBase
         => PropertyCacheLevel.Element;
 
     /// <inheritdoc />
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
+    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
     {
         bool isRange = IsRange(propertyType);
 
@@ -122,6 +107,7 @@ public class SliderValueConverter : PropertyValueConverterBase
     /// </summary>
     private static bool TryParseDecimal(string? representation, out decimal value)
         => decimal.TryParse(representation, NumberStyles.Number, CultureInfo.InvariantCulture, out value);
+
 
     private static bool IsRange(IPublishedPropertyType propertyType)
         => propertyType.DataType.ConfigurationAs<SliderConfiguration>()?.EnableRange == true;

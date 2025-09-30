@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class TelemetryProviderTests : UmbracoIntegrationTest
+internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -48,9 +48,13 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
 
     private IUserService UserService => GetRequiredService<IUserService>();
 
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+
+    private IContentBlueprintEditingService ContentBlueprintEditingService => GetRequiredService<IContentBlueprintEditingService>();
 
     private readonly LanguageBuilder _languageBuilder = new();
 
@@ -97,7 +101,7 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SectionService_Can_Get_Allowed_Sections_For_User()
+    public async Task SectionService_Can_Get_Allowed_Sections_For_User()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
@@ -112,9 +116,11 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
         blueprint.SetValue("keywords", "blueprint 3");
         blueprint.SetValue("description", "blueprint 4");
 
-        ContentService.SaveBlueprint(blueprint);
+        ContentService.SaveBlueprint(blueprint, null);
 
-        var fromBlueprint = ContentService.CreateContentFromBlueprint(blueprint, "My test content");
+        var fromBlueprint = await ContentBlueprintEditingService.GetScaffoldedAsync(blueprint.Key);
+        Assert.IsNotNull(fromBlueprint);
+        fromBlueprint.Name = "My test content";
         ContentService.Save(fromBlueprint);
 
         IEnumerable<UsageInformation> result = null;
@@ -266,11 +272,11 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void UserTelemetry_Can_Get_With_Saved_UserGroups()
+    public async Task UserTelemetry_Can_Get_With_Saved_UserGroups()
     {
         var userGroup = BuildUserGroup("testGroup");
 
-        UserService.Save(userGroup);
+        await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
         var result = UserTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.UserGroupCount);
 
@@ -278,14 +284,13 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void UserTelemetry_Can_Get_More_UserGroups()
+    public async Task UserTelemetry_Can_Get_More_UserGroups()
     {
         var userGroups = BuildUserGroups(100);
 
-
         foreach (var userGroup in userGroups)
         {
-            UserService.Save(userGroup);
+            await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
         }
 
         var result = UserTelemetryProvider.GetInformation()

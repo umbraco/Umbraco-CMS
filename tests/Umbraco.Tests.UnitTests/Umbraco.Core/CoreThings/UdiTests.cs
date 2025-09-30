@@ -293,44 +293,5 @@ public class UdiTests
         Assert.IsFalse(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
         Assert.AreEqual(Constants.UdiEntityType.Unknown, udi.EntityType);
         Assert.AreEqual("Umbraco.Cms.Core.UnknownTypeUdi", udi.GetType().FullName);
-
-        // scanned
-        UdiParserServiceConnectors
-            .RegisterServiceConnector<
-                FooConnector>(); // this is the equivalent of scanning but we'll just manually register this one
-        Assert.IsTrue(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", out udi));
-        Assert.IsInstanceOf<GuidUdi>(udi);
-
-        // known
-        Assert.IsTrue(UdiParser.TryParse("umb://foo/A87F65C8D6B94E868F6949BA92C93045", true, out udi));
-        Assert.IsInstanceOf<GuidUdi>(udi);
-
-        // can get method for Deploy compatibility
-        var method = typeof(UdiParser).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string), typeof(bool) }, null);
-        Assert.IsNotNull(method);
-    }
-
-    [UdiDefinition("foo", UdiType.GuidUdi)]
-    public class FooConnector : IServiceConnector
-    {
-        public IArtifact GetArtifact(Udi udi, IContextCache contextCache) => throw new NotImplementedException();
-
-        public IArtifact GetArtifact(object entity, IContextCache contextCache) => throw new NotImplementedException();
-
-        public ArtifactDeployState ProcessInit(IArtifact art, IDeployContext context) =>
-            throw new NotImplementedException();
-
-        public void Process(ArtifactDeployState dart, IDeployContext context, int pass) =>
-            throw new NotImplementedException();
-
-        public void Explode(UdiRange range, List<Udi> udis) => throw new NotImplementedException();
-
-        public NamedUdiRange GetRange(Udi udi, string selector) => throw new NotImplementedException();
-
-        public NamedUdiRange GetRange(string entityType, string sid, string selector) =>
-            throw new NotImplementedException();
-
-        public bool Compare(IArtifact art1, IArtifact art2, ICollection<Difference> differences = null) =>
-            throw new NotImplementedException();
     }
 }

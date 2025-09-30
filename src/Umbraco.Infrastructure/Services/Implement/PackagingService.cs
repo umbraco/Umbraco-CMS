@@ -1,12 +1,14 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Xml.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
@@ -34,30 +36,6 @@ public class PackagingService : IPackagingService
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly IUserService _userService;
-
-    [Obsolete("Use the constructor with IPackageManifestReader instead.")]
-    public PackagingService(
-        IAuditService auditService,
-        ICreatedPackagesRepository createdPackages,
-        IPackageInstallation packageInstallation,
-        IEventAggregator eventAggregator,
-        IKeyValueService keyValueService,
-        ICoreScopeProvider coreScopeProvider,
-        PackageMigrationPlanCollection packageMigrationPlans,
-        IHostEnvironment hostEnvironment,
-        IUserService userService)
-        : this(
-            auditService,
-            createdPackages,
-            packageInstallation,
-            eventAggregator,
-            keyValueService,
-            coreScopeProvider,
-            packageMigrationPlans,
-            StaticServiceProvider.Instance.GetRequiredService<IPackageManifestReader>(),
-            hostEnvironment,
-            userService)
-    { }
 
     public PackagingService(
         IAuditService auditService,
@@ -105,7 +83,13 @@ public class PackagingService : IPackagingService
 
         InstallationSummary summary = _packageInstallation.InstallPackageData(compiledPackage, userId, out _);
 
-        _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
+        IUser? user = _userService.GetUserById(userId);
+        _auditService.AddAsync(
+            AuditType.PackagerInstall,
+            user?.Key ?? Constants.Security.SuperUserKey,
+            -1,
+            "Package",
+            $"Package data installed for package '{compiledPackage.Name}'.").GetAwaiter().GetResult();
 
         // trigger the ImportedPackage event
         _eventAggregator.Publish(new ImportedPackageNotification(summary).WithStateFrom(importingPackageNotification));
@@ -128,21 +112,6 @@ public class PackagingService : IPackagingService
 
     #region Created/Installed Package Repositories
 
-    [Obsolete("Use DeleteCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
-    public void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId)
-    {
-        Guid key, currentUserKey;
-
-        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            PackageDefinition? package = GetCreatedPackageById(id);
-            key = package?.PackageId ?? Guid.Empty;
-            currentUserKey = _userService.GetUserById(id)?.Key ?? Constants.Security.SuperUserKey;
-        }
-
-        DeleteCreatedPackageAsync(key, currentUserKey).GetAwaiter().GetResult();
-    }
-
     /// <inheritdoc/>
     public async Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, Guid userKey)
     {
@@ -153,8 +122,12 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.NotFound, null);
         }
 
-        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
-        _auditService.Add(AuditType.Delete, currentUserId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
+        Attempt<AuditLogOperationStatus> result = await _auditService.AddAsync(AuditType.Delete, userKey, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
+        if (result is { Success: false, Result: AuditLogOperationStatus.UserNotFound })
+        {
+            throw new InvalidOperationException($"Could not find user with key: {userKey}");
+        }
+
         _createdPackages.Delete(package.Id);
 
         scope.Complete();
@@ -162,14 +135,6 @@ public class PackagingService : IPackagingService
         return Attempt.SucceedWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.Success, package);
     }
 
-    public IEnumerable<PackageDefinition?> GetAllCreatedPackages()
-    {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
-
-        return _createdPackages.GetAll();
-    }
-
-    [Obsolete("Use GetCreatedPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
     public PackageDefinition? GetCreatedPackageById(int id)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
@@ -178,13 +143,13 @@ public class PackagingService : IPackagingService
     }
 
     /// <inheritdoc/>
-    public async Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take)
+    public Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         PackageDefinition[] packages = _createdPackages.GetAll().WhereNotNull().ToArray();
         var pagedModel = new PagedModel<PackageDefinition>(packages.Length, packages.Skip(skip).Take(take));
 
-        return pagedModel;
+        return Task.FromResult(pagedModel);
     }
 
     /// <inheritdoc/>
@@ -193,17 +158,6 @@ public class PackagingService : IPackagingService
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
         return Task.FromResult(_createdPackages.GetByKey(key));
-    }
-
-    [Obsolete("Use CreateCreatedPackageAsync or UpdateCreatedPackageAsync instead. Scheduled for removal in Umbraco 15.")]
-    public bool SaveCreatedPackage(PackageDefinition definition)
-    {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-
-        var success = _createdPackages.SavePackage(definition);
-        scope.Complete();
-
-        return success;
     }
 
     /// <inheritdoc/>
@@ -220,8 +174,11 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus(PackageOperationStatus.DuplicateItemName, package);
         }
 
-        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
-        _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
+        Attempt<AuditLogOperationStatus> result = await _auditService.AddAsync(AuditType.New, userKey, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
+        if (result is { Success: false, Result: AuditLogOperationStatus.UserNotFound })
+        {
+            throw new InvalidOperationException($"Could not find user with key: {userKey}");
+        }
 
         scope.Complete();
 
@@ -237,8 +194,11 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus(PackageOperationStatus.NotFound, package);
         }
 
-        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
-        _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
+        Attempt<AuditLogOperationStatus> result = await _auditService.AddAsync(AuditType.New, userKey, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
+        if (result is { Success: false, Result: AuditLogOperationStatus.UserNotFound })
+        {
+            throw new InvalidOperationException($"Could not find user with key: {userKey}");
+        }
 
         scope.Complete();
 
@@ -253,11 +213,7 @@ public class PackagingService : IPackagingService
     }
 
     public InstalledPackage? GetInstalledPackageByName(string packageName)
-        => GetAllInstalledPackages().Where(x => x.PackageName?.InvariantEquals(packageName) ?? false).FirstOrDefault();
-
-    [Obsolete("Use GetAllInstalledPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
-    public IEnumerable<InstalledPackage> GetAllInstalledPackages()
-        => GetAllInstalledPackagesAsync().GetAwaiter().GetResult();
+        => GetAllInstalledPackagesAsync().GetAwaiter().GetResult().Where(x => x.PackageName?.InvariantEquals(packageName) ?? false).FirstOrDefault();
 
     public async Task<IEnumerable<InstalledPackage>> GetAllInstalledPackagesAsync()
     {
@@ -350,11 +306,19 @@ public class PackagingService : IPackagingService
             }
 
             // Set additional values
-            installedPackage.AllowPackageTelemetry = packageManifest.AllowTelemetry;
+            installedPackage.AllowPackageTelemetry = packageManifest is { AllowTelemetry: true, AllowPackageTelemetry: true };
 
             if (!string.IsNullOrEmpty(packageManifest.Version))
             {
+                // Always use package version from manifest
                 installedPackage.Version = packageManifest.Version;
+            }
+            else if (string.IsNullOrEmpty(installedPackage.Version) &&
+                string.IsNullOrEmpty(installedPackage.PackageId) is false &&
+                TryGetAssemblyInformationalVersion(installedPackage.PackageId, out string? version))
+            {
+                // Use version of the assembly with the same name as the package ID
+                installedPackage.Version = version;
             }
         }
 
@@ -367,26 +331,34 @@ public class PackagingService : IPackagingService
     /// <inheritdoc/>
     public Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
     {
-        IReadOnlyDictionary<string, string?>? keyValues =
-            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+        IReadOnlyDictionary<string, string?> keyValues =
+            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix)
+            ?? new Dictionary<string, string?>();
 
         InstalledPackage[] installedPackages = _packageMigrationPlans
-            .GroupBy(plan => plan.PackageName)
+            .GroupBy(plan => (plan.PackageName, plan.PackageId))
             .Select(group =>
             {
                 var package = new InstalledPackage
                 {
-                    PackageName = group.Key,
+                    PackageName = group.Key.PackageName,
                 };
 
-                var currentState = keyValues?
-                    .GetValueOrDefault(Constants.Conventions.Migrations.KeyValuePrefix + package.PackageName);
-
                 package.PackageMigrationPlans = group
-                    .Select(plan => new InstalledPackageMigrationPlans
+                    .Select(plan =>
                     {
-                        CurrentMigrationId = currentState,
-                        FinalMigrationId = plan.FinalState,
+                        // look for migration states in this order:
+                        // - plan name
+                        // - package identifier
+                        // - package name
+                        var currentState =
+                            keyValues.GetValueOrDefault($"{Constants.Conventions.Migrations.KeyValuePrefix}{plan.Name}")
+                            ?? keyValues.GetValueOrDefault($"{Constants.Conventions.Migrations.KeyValuePrefix}{plan.PackageId ?? plan.PackageName}");
+
+                        return new InstalledPackageMigrationPlans
+                        {
+                            CurrentMigrationId = currentState, FinalMigrationId = plan.FinalState,
+                        };
                     });
 
                 return package;
@@ -413,5 +385,21 @@ public class PackagingService : IPackagingService
         }
 
         return packageFile.CreateReadStream();
+    }
+
+    private static bool TryGetAssemblyInformationalVersion(string name, [NotNullWhen(true)] out string? version)
+    {
+        foreach (Assembly assembly in AssemblyLoadContext.Default.Assemblies)
+        {
+            AssemblyName assemblyName = assembly.GetName();
+            if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase) &&
+                assembly.TryGetInformationalVersion(out version))
+            {
+                return true;
+            }
+        }
+
+        version = null;
+        return false;
     }
 }

@@ -171,6 +171,60 @@ public interface IEntityService
     IEntitySlim? GetParent(int id, UmbracoObjectTypes objectType);
 
     /// <summary>
+    /// Gets non-trashed sibling entities of a specified target entity, within a given range before and after the target, ordered as specified.
+    /// </summary>
+    /// <param name="key">The key of the target entity whose siblings are to be retrieved.</param>
+    /// <param name="objectTypes">The object types of the entities.</param>
+    /// <param name="before">The number of siblings to retrieve before the target entity. Needs to be greater or equal to 0.</param>
+    /// <param name="after">The number of siblings to retrieve after the target entity. Needs to be greater or equal to 0.</param>
+    /// <param name="filter">An optional filter to apply to the result set.</param>
+    /// <param name="ordering">The ordering to apply to the siblings.</param>
+    /// <param name="totalBefore">Outputs the total number of siblings before the target entity.</param>
+    /// <param name="totalAfter">Outputs the total number of siblings after the target entity.</param>
+    /// <returns>Enumerable of non-trashed sibling entities.</returns>
+    IEnumerable<IEntitySlim> GetSiblings(
+        Guid key,
+        IEnumerable<UmbracoObjectTypes> objectTypes,
+        int before,
+        int after,
+        out long totalBefore,
+        out long totalAfter,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        totalBefore = 0;
+        totalAfter = 0;
+        return [];
+    }
+
+    /// <summary>
+    /// Gets trashed sibling entities of a specified target entity, within a given range before and after the target, ordered as specified.
+    /// </summary>
+    /// <param name="key">The key of the target entity whose siblings are to be retrieved.</param>
+    /// <param name="objectTypes">The object types of the entities.</param>
+    /// <param name="before">The number of siblings to retrieve before the target entity. Needs to be greater or equal to 0.</param>
+    /// <param name="after">The number of siblings to retrieve after the target entity. Needs to be greater or equal to 0.</param>
+    /// <param name="filter">An optional filter to apply to the result set.</param>
+    /// <param name="ordering">The ordering to apply to the siblings.</param>
+    /// <param name="totalBefore">Outputs the total number of siblings before the target entity.</param>
+    /// <param name="totalAfter">Outputs the total number of siblings after the target entity.</param>
+    /// <returns>Enumerable of trashed sibling entities.</returns>
+    IEnumerable<IEntitySlim> GetTrashedSiblings(
+        Guid key,
+        IEnumerable<UmbracoObjectTypes> objectTypes,
+        int before,
+        int after,
+        out long totalBefore,
+        out long totalAfter,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        totalBefore = 0;
+        totalAfter = 0;
+        return [];
+    }
+
+    /// <summary>
     ///     Gets the children of an entity.
     /// </summary>
     /// <param name="id">The identifier of the entity.</param>
@@ -382,4 +436,12 @@ public interface IEntityService
     /// <returns>The identifier.</returns>
     /// <remarks>When a new content or a media is saved with the key, it will have the reserved identifier.</remarks>
     int ReserveId(Guid key);
+
+    /// <summary>
+    /// Gets the GUID keys for an entity's path (provided as a comma separated list of integer Ids).
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <param name="omitSelf">A value indicating whether to omit the entity's own key from the result.</param>
+    /// <returns>The path with each ID converted to a GUID.</returns>
+    Guid[] GetPathKeys(ITreeEntity entity, bool omitSelf = false) => [];
 }

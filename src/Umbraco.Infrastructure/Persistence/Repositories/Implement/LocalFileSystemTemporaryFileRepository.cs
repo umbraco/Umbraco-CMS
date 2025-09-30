@@ -71,8 +71,6 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
 
     public async Task SaveAsync(TemporaryFileModel model)
     {
-        ArgumentNullException.ThrowIfNull(nameof(model));
-
         // Ensure folder does not exist
         await DeleteAsync(model.Key);
 
@@ -83,12 +81,11 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         var fullFileName = Path.Combine(fileDirectory.FullName, model.FileName);
         var metadataFileName = Path.Combine(fileDirectory.FullName, MetaDataFileName);
 
-        await Task.WhenAll(
-            CreateActualFile(model, fullFileName),
-            CreateMetadataFile(metadataFileName, new FileMetaData()
-            {
-                AvailableUntil = model.AvailableUntil
-            }));
+        await CreateActualFile(model, fullFileName);
+        await CreateMetadataFile(metadataFileName, new FileMetaData()
+        {
+            AvailableUntil = model.AvailableUntil
+        });
     }
 
     public Task DeleteAsync(Guid key)
@@ -122,7 +119,10 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
             }
         }
 
-        await Task.WhenAll(keysToDelete.Select(DeleteAsync).ToArray());
+        foreach (Guid keyToDelete in keysToDelete)
+        {
+            await DeleteAsync(keyToDelete);
+        }
 
         return keysToDelete;
     }
@@ -158,7 +158,7 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         throw new InvalidOperationException("Unexpected content");
     }
 
-    private class FileMetaData
+    private sealed class FileMetaData
     {
         public DateTime AvailableUntil { get; init; }
     }

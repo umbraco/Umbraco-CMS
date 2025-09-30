@@ -20,7 +20,12 @@ public static partial class Constants
             public const string ContentType = /*TableNamePrefix*/ "cms" + "ContentType";
             public const string ContentChildType = /*TableNamePrefix*/ "cms" + "ContentTypeAllowedContentType";
             public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType";
+
+            [Obsolete("Please use ContentTypeTree instead. Scheduled for removal in Umbraco 18.")]
             public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType";
+
+            public const string ContentTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType";
+
             public const string DataType = TableNamePrefix + "DataType";
             public const string Template = /*TableNamePrefix*/ "cms" + "Template";
 
@@ -32,6 +37,7 @@ public static partial class Constants
             public const string Document = TableNamePrefix + "Document";
             public const string DocumentCultureVariation = TableNamePrefix + "DocumentCultureVariation";
             public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
+            public const string DocumentUrl = TableNamePrefix + "DocumentUrl";
             public const string MediaVersion = TableNamePrefix + "MediaVersion";
             public const string ContentSchedule = TableNamePrefix + "ContentSchedule";
 
@@ -52,6 +58,7 @@ public static partial class Constants
             public const string UserStartNode = TableNamePrefix + "UserStartNode";
             public const string User2UserGroup = TableNamePrefix + "User2UserGroup";
             public const string User2NodeNotify = TableNamePrefix + "User2NodeNotify";
+            public const string User2ClientId = TableNamePrefix + "User2ClientId";
             public const string UserGroup2App = TableNamePrefix + "UserGroup2App";
             public const string UserData = TableNamePrefix + "UserData";
 
@@ -96,6 +103,8 @@ public static partial class Constants
             public const string Webhook2Headers = Webhook + "2Headers";
             public const string WebhookLog = Webhook + "Log";
             public const string WebhookRequest = Webhook + "Request";
+
+            public const string LongRunningOperation = TableNamePrefix + "LongRunningOperation";
         }
     }
 }

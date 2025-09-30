@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class UserDataRepository : IUserDataRepository
+internal sealed class UserDataRepository : IUserDataRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
@@ -17,13 +17,18 @@ internal class UserDataRepository : IUserDataRepository
 
     public async Task<IUserData?> GetAsync(Guid key)
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return null;
+        }
+
+        Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
             .Select<UserDataDto>()
             .From<UserDataDto>()
             .Where<UserDataDto>(dataDto => dataDto.Key == key)
             .OrderBy<UserDataDto>(dto => dto.Identifier); // need to order to skiptake;
 
-        UserDataDto? dto = await _scopeAccessor.AmbientScope?.Database.FirstOrDefaultAsync<UserDataDto>(sql)!;
+        UserDataDto? dto = await _scopeAccessor.AmbientScope.Database.FirstOrDefaultAsync<UserDataDto>(sql)!;
 
         return dto is null ? null : Map(dto);
     }
@@ -44,12 +49,13 @@ internal class UserDataRepository : IUserDataRepository
             sql = ApplyFilter(sql, filter);
         }
 
+        // Fetching the total before applying OrderBy to avoid issue with count subquery.
+        var totalItems = _scopeAccessor.AmbientScope?.Database.Count(sql!) ?? 0;
+
         sql = sql.OrderBy<UserDataDto>(dto => dto.Identifier); // need to order to skiptake
 
         List<UserDataDto>? userDataDtos =
             await _scopeAccessor.AmbientScope?.Database.SkipTakeAsync<UserDataDto>(skip, take, sql)!;
-
-        var totalItems = _scopeAccessor.AmbientScope?.Database.Count(sql!) ?? 0;
 
         return new PagedModel<IUserData> { Total = totalItems, Items = DtosToModels(userDataDtos) };
     }
@@ -75,7 +81,7 @@ internal class UserDataRepository : IUserDataRepository
         await _scopeAccessor.AmbientScope?.Database.ExecuteAsync(sql)!;
     }
 
-    private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, IUserDataFilter filter)
+    private static Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, IUserDataFilter filter)
     {
         if (filter.Groups?.Count > 0)
         {
@@ -95,10 +101,10 @@ internal class UserDataRepository : IUserDataRepository
         return sql;
     }
 
-    private IEnumerable<IUserData> DtosToModels(IEnumerable<UserDataDto> dtos)
+    private static IEnumerable<IUserData> DtosToModels(IEnumerable<UserDataDto> dtos)
         => dtos.Select(Map);
 
-    private IUserData Map(UserDataDto dto)
+    private static IUserData Map(UserDataDto dto)
         => new UserData
         {
             Key = dto.Key,
@@ -108,7 +114,7 @@ internal class UserDataRepository : IUserDataRepository
             UserKey = dto.UserKey,
         };
 
-    private UserDataDto Map(IUserData userData)
+    private static UserDataDto Map(IUserData userData)
         => new()
         {
             Key = userData.Key,

@@ -1,11 +1,10 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -16,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DataTypeContainerServiceTests : UmbracoIntegrationTest
+internal sealed class DataTypeContainerServiceTests : UmbracoIntegrationTest
 {
     private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
 
@@ -52,6 +51,26 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
         Assert.NotNull(created);
         Assert.AreEqual("Child Container", created.Name);
         Assert.AreEqual(root.Id, created.ParentId);
+    }
+
+    [TestCase("Existing Child Container", false)]
+    [TestCase("New Child Container", true)]
+    [TestCase("Root Container", true)]
+    public async Task Can_Create_Child_Container_Without_Duplicate_Name_At_Level(string containerName, bool expectSuccess)
+    {
+        EntityContainer root = (await DataTypeContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
+        EntityContainer existingChild = (await DataTypeContainerService.CreateAsync(null, "Existing Child Container", root.Key, Constants.Security.SuperUserKey)).Result;
+
+        var result = await DataTypeContainerService.CreateAsync(null, containerName, root.Key, Constants.Security.SuperUserKey);
+        Assert.AreEqual(expectSuccess, result.Success);
+        if (expectSuccess)
+        {
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        }
+        else
+        {
+            Assert.AreEqual(EntityContainerOperationStatus.DuplicateName, result.Status);
+        }
     }
 
     [Test]

@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Routing
             }
         }
 
-        private IEnumerable<string> ValidateDomains(IEnumerable<string> domains) =>
+        private static IEnumerable<string> ValidateDomains(IEnumerable<string> domains) =>
             // must use authority format w/optional scheme and port, but no path
             // any domain should appear only once
             domains.Select(domain =>
@@ -149,9 +149,9 @@ namespace Umbraco.Cms.Core.Routing
                     Sites = null;
                 }
 
-                if (Bindings != null && Bindings.ContainsKey(key))
+                if (Bindings != null && Bindings.TryGetValue(key, out List<string>? binding))
                 {
-                    foreach (var b in Bindings[key])
+                    foreach (var b in binding)
                     {
                         Bindings[b].Remove(key);
                         if (Bindings[b].Count == 0)
@@ -292,10 +292,10 @@ namespace Umbraco.Cms.Core.Routing
                 if (!currentSite.Equals(default(KeyValuePair<string, string[]>)))
                 {
                     candidateSites = new[] { currentSite };
-                    if (Bindings != null && Bindings.ContainsKey(currentSite.Key))
+                    if (Bindings != null && Bindings.TryGetValue(currentSite.Key, out List<string>? bindingForSite))
                     {
                         IEnumerable<KeyValuePair<string, string[]>> boundSites =
-                            qualifiedSites.Where(site => Bindings[currentSite.Key].Contains(site.Key));
+                            qualifiedSites.Where(site => bindingForSite.Contains(site.Key));
                         candidateSites = candidateSites.Union(boundSites).ToArray();
 
                         // .ToArray ensures it is evaluated before the configuration lock is exited
@@ -346,9 +346,9 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             // cached?
-            if (_qualifiedSites != null && _qualifiedSites.ContainsKey(current.Scheme))
+            if (_qualifiedSites != null && _qualifiedSites.TryGetValue(current.Scheme, out Dictionary<string, string[]>? qualifiedSite))
             {
-                return _qualifiedSites[current.Scheme];
+                return qualifiedSite;
             }
 
             _qualifiedSites = _qualifiedSites ?? new Dictionary<string, Dictionary<string, string[]>>();
@@ -368,7 +368,7 @@ namespace Umbraco.Cms.Core.Routing
             // therefore it is safe to return and exit the configuration lock
         }
 
-        private DomainAndUri? MapDomain(
+        private static DomainAndUri? MapDomain(
             IReadOnlyCollection<DomainAndUri> domainAndUris,
             Dictionary<string, string[]>? qualifiedSites,
             string currentAuthority,

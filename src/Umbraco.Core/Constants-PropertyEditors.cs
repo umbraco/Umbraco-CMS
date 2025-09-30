@@ -41,6 +41,11 @@ public static partial class Constants
             public const string BlockList = "Umbraco.BlockList";
 
             /// <summary>
+            ///     Block List.
+            /// </summary>
+            public const string SingleBlock = "Umbraco.SingleBlock";
+
+            /// <summary>
             /// Block Grid.
             /// </summary>
             public const string BlockGrid = "Umbraco.BlockGrid";
@@ -169,12 +174,6 @@ public static partial class Constants
             ///     Rich Text Editor.
             /// </summary>
             public const string RichText = "Umbraco.RichText";
-
-            /// <summary>
-            ///     TinyMCE
-            /// </summary>
-            [Obsolete("Please use RichText constant instead, scheduled for removal in v16")]
-            public const string TinyMce = "Umbraco.TinyMCE";
 
             /// <summary>
             ///     Boolean.

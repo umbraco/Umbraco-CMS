@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.DependencyInjection;
 
@@ -43,6 +43,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<ContentSettings>, ContentSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<LoggingSettings>, LoggingSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<SecuritySettings>, SecuritySettingsValidator>();
@@ -68,6 +69,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ImagingSettings>()
             .AddUmbracoOptions<IndexingSettings>()
             .AddUmbracoOptions<LoggingSettings>()
+            .AddUmbracoOptions<LongRunningOperationsSettings>()
             .AddUmbracoOptions<MemberPasswordConfigurationSettings>()
             .AddUmbracoOptions<NuCacheSettings>()
             .AddUmbracoOptions<RequestHandlerSettings>()
@@ -79,13 +81,13 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<UmbracoPluginSettings>()
             .AddUmbracoOptions<UnattendedSettings>()
             .AddUmbracoOptions<BasicAuthSettings>()
-            .AddUmbracoOptions<RuntimeMinificationSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
-            .AddUmbracoOptions<ContentDashboardSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
             .AddUmbracoOptions<DataTypesSettings>()
-            .AddUmbracoOptions<WebhookSettings>();
+            .AddUmbracoOptions<WebhookSettings>()
+            .AddUmbracoOptions<CacheSettings>()
+            .AddUmbracoOptions<SystemDateMigrationSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
@@ -104,19 +106,7 @@ public static partial class UmbracoBuilderExtensions
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
             builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
 
-        // TODO: Remove this in V12
-        // This is to make the move of the AllowEditInvariantFromNonDefault setting from SecuritySettings to ContentSettings backwards compatible
-        // If there is a value in security settings, but no value in content setting we'll use that value, otherwise content settings always wins.
-        builder.Services.Configure<ContentSettings>(settings =>
-        {
-            var securitySettingsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigSecurity}").GetValue<bool?>(nameof(SecuritySettings.AllowEditInvariantFromNonDefault));
-            var contentSettingsValue = builder.Config.GetSection($"{Constants.Configuration.ConfigContent}").GetValue<bool?>(nameof(ContentSettings.AllowEditInvariantFromNonDefault));
-
-            if (securitySettingsValue is not null && contentSettingsValue is null)
-            {
-                settings.AllowEditInvariantFromNonDefault = securitySettingsValue.Value;
-            }
-        });
+        builder.Services.AddOptions<TinyMceToTiptapMigrationSettings>();
 
         return builder;
     }

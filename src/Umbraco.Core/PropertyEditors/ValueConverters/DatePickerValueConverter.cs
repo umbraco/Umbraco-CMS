@@ -15,28 +15,21 @@ public class DatePickerValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         => ParseDateTimeValue(source);
 
     internal static DateTime ParseDateTimeValue(object? source)
     {
-        if (source == null)
+        if (source is DateTime dateTimeValue)
         {
-            return DateTime.MinValue;
+            return DateTime.SpecifyKind(dateTimeValue, DateTimeKind.Unspecified);
         }
 
-        // in XML a DateTime is: string - format "yyyy-MM-ddTHH:mm:ss"
-        // Actually, not always sometimes it is formatted in UTC style with 'Z' suffixed on the end but that is due to this bug:
-        // http://issues.umbraco.org/issue/U4-4145, http://issues.umbraco.org/issue/U4-3894
-        // We should just be using TryConvertTo instead.
-        if (source is string sourceString)
+        if (source.TryConvertTo<DateTime>() is { Success: true } attempt)
         {
-            Attempt<DateTime> attempt = sourceString.TryConvertTo<DateTime>();
-            return attempt.Success == false ? DateTime.MinValue : attempt.Result;
+            return DateTime.SpecifyKind(attempt.Result, DateTimeKind.Unspecified);
         }
 
-        // in the database a DateTime is: DateTime
-        // default value is: DateTime.MinValue
-        return source is DateTime dateTimeValue ? dateTimeValue : DateTime.MinValue;
+        return DateTime.MinValue;
     }
 }

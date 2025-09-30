@@ -43,14 +43,14 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
         _urlProviderMode = _webRoutingSettings.CurrentValue.UrlProviderMode;
 
-        SetSiteName(hostingSettings.CurrentValue.SiteName);
+        SetSiteNameAndDebugMode(hostingSettings.CurrentValue);
 
         // We have to ensure that the OptionsMonitor is an actual options monitor since we have a hack
         // where we initially use an OptionsMonitorAdapter, which doesn't implement OnChange.
         // See summery of OptionsMonitorAdapter for more information.
         if (hostingSettings is OptionsMonitor<HostingSettings>)
         {
-            hostingSettings.OnChange(settings => SetSiteName(settings.SiteName));
+            hostingSettings.OnChange(settings => SetSiteNameAndDebugMode(settings));
         }
 
         ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
@@ -95,7 +95,7 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         _hostingSettings.CurrentValue.ApplicationVirtualPath?.EnsureStartsWith('/') ?? "/";
 
     /// <inheritdoc />
-    public bool IsDebugMode => _hostingSettings.CurrentValue.Debug;
+    public bool IsDebugMode { get; private set; }
 
     public string LocalTempPath
     {
@@ -188,8 +188,12 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
         }
     }
 
-    private void SetSiteName(string? siteName) =>
-        SiteName = string.IsNullOrWhiteSpace(siteName)
+    private void SetSiteNameAndDebugMode(HostingSettings hostingSettings)
+    {
+        SiteName = string.IsNullOrWhiteSpace(hostingSettings.SiteName)
             ? _webHostEnvironment.ApplicationName
-            : siteName;
+            : hostingSettings.SiteName;
+
+        IsDebugMode = hostingSettings.Debug;
+    }
 }

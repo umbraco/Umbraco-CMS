@@ -1,7 +1,10 @@
-﻿using Umbraco.Cms.Api.Management.Models.Entities;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Api.Management.Models.Entities;
 using Umbraco.Cms.Api.Management.Services.Entities;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -19,11 +22,25 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
     private Dictionary<Guid, bool> _accessMap = new();
     private Guid? _dataTypeKey;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected UserStartNodeTreeControllerBase(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService)
-        : base(entityService)
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+              userStartNodeEntitiesService,
+              dataTypeService)
+    {
+    }
+
+    protected UserStartNodeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService)
+        : base(entityService, flagProviders)
     {
         _userStartNodeEntitiesService = userStartNodeEntitiesService;
         _dataTypeService = dataTypeService;
@@ -42,11 +59,41 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
 
     protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems)
     {
-        IEntitySlim[] children = base.GetPagedChildEntities(parentKey, skip, take, out totalItems);
-        return UserHasRootAccess() || IgnoreUserStartNodes()
-            ? children
-            // Keeping the correct totalItems amount from GetPagedChildEntities
-            : CalculateAccessMap(() => _userStartNodeEntitiesService.ChildUserAccessEntities(children, UserStartNodePaths), out _);
+        if (UserHasRootAccess() || IgnoreUserStartNodes())
+        {
+            return base.GetPagedChildEntities(parentKey, skip, take, out totalItems);
+        }
+
+        IEnumerable<UserAccessEntity> userAccessEntities = _userStartNodeEntitiesService.ChildUserAccessEntities(
+            ItemObjectType,
+            UserStartNodePaths,
+            parentKey,
+            skip,
+            take,
+            ItemOrdering,
+            out totalItems);
+
+        return CalculateAccessMap(() => userAccessEntities, out _);
+    }
+
+    protected override IEntitySlim[] GetSiblingEntities(Guid target, int before, int after, out long totalBefore, out long totalAfter)
+    {
+        if (UserHasRootAccess() || IgnoreUserStartNodes())
+        {
+            return base.GetSiblingEntities(target, before, after, out totalBefore, out totalAfter);
+        }
+
+        IEnumerable<UserAccessEntity> userAccessEntities = _userStartNodeEntitiesService.SiblingUserAccessEntities(
+            ItemObjectType,
+            UserStartNodePaths,
+            target,
+            before,
+            after,
+            ItemOrdering,
+            out totalBefore,
+            out totalAfter);
+
+        return CalculateAccessMap(() => userAccessEntities, out _);
     }
 
     protected override TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)

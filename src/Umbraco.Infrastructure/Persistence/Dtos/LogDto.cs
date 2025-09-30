@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class LogDto
+internal sealed class LogDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Log;
 
@@ -36,7 +36,7 @@ internal class LogDto
     public string? EntityType { get; set; }
 
     [Column("Datestamp")]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_datestamp", ForColumns = "Datestamp,userId,NodeId")]
     public DateTime Datestamp { get; set; }
 
@@ -55,6 +55,6 @@ internal class LogDto
     /// </summary>
     [Column("parameters")]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [Length(500)]
+    [Length(4000)]
     public string? Parameters { get; set; }
 }

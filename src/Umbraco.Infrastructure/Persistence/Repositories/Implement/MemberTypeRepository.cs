@@ -5,19 +5,21 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IMemberType" />
 /// </summary>
-internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
+internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
 {
     private readonly IShortStringHelper _shortStringHelper;
 
@@ -27,9 +29,10 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
         ILogger<MemberTypeRepository> logger,
         IContentTypeCommonRepository commonRepository,
         ILanguageRepository languageRepository,
-        IShortStringHelper shortStringHelper)
-        : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper) =>
-        _shortStringHelper = shortStringHelper;
+        IShortStringHelper shortStringHelper,
+        IIdKeyMap idKeyMap)
+        : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper, idKeyMap)
+         => _shortStringHelper = shortStringHelper;
 
     protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;
 
@@ -106,7 +109,7 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
     protected Sql<ISqlContext> GetSubquery()
     {
         Sql<ISqlContext> sql = Sql()
-            .Select("DISTINCT(umbracoNode.id)")
+            .Select($"DISTINCT({QuoteTableName("umbracoNode")}.id)")
             .From<NodeDto>()
             .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
             .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
@@ -119,14 +122,14 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
         var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add("DELETE FROM cmsMemberType WHERE NodeId = @id");
-        l.Add("DELETE FROM cmsContentType WHERE nodeId = @id");
-        l.Add("DELETE FROM umbracoNode WHERE id = @id");
+        l.Add($"DELETE FROM {QuoteTableName("cmsMemberType")} WHERE NodeId = @id");
+        l.Add($"DELETE FROM {QuoteTableName("cmsContentType")} WHERE nodeId = @id");
+        l.Add($"DELETE FROM {QuoteTableName("umbracoNode")} WHERE id = @id");
         return l;
     }
 
@@ -173,16 +176,18 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
         // Updates Modified date
         entity.UpdatingEntity();
 
+        Sql<ISqlContext> sql;
         // Look up parent to get and set the correct Path if ParentId has changed
         if (entity.IsPropertyDirty("ParentId"))
         {
             NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
-            var maxSortOrder =
-                Database.ExecuteScalar<int>(
-                    "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                    new { entity.ParentId, NodeObjectType = NodeObjectTypeId });
+            sql = Sql()
+                .SelectMax<NodeDto>(c => c.SortOrder, 0)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
+            var maxSortOrder = Database.ExecuteScalar<int>(sql);
             entity.SortOrder = maxSortOrder + 1;
         }
 
@@ -190,7 +195,8 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
         PersistUpdatedBaseContentType(entity);
 
         // remove and insert - handle cmsMemberType table
-        Database.Delete<MemberPropertyTypeDto>("WHERE NodeId = @Id", new { entity.Id });
+        sql = Sql().Delete<MemberPropertyTypeDto>(c => c.NodeId == entity.Id);
+        _ = Database.Execute(sql);
         IEnumerable<MemberPropertyTypeDto> memberTypeDtos = ContentTypeFactory.BuildMemberPropertyTypeDtos(entity);
         foreach (MemberPropertyTypeDto memberTypeDto in memberTypeDtos)
         {
@@ -228,19 +234,11 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
             ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
         foreach (IPropertyType propertyType in memberType.PropertyTypes)
         {
-            if (builtinProperties.ContainsKey(propertyType.Alias))
+            // this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
+            if (builtinProperties.TryGetValue(propertyType.Alias, out PropertyType? propDefinition))
             {
-                // this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
-                if (builtinProperties.TryGetValue(propertyType.Alias, out PropertyType? propDefinition))
-                {
-                    propertyType.DataTypeId = propDefinition.DataTypeId;
-                    propertyType.DataTypeKey = propDefinition.DataTypeKey;
-                }
-                else
-                {
-                    propertyType.DataTypeId = 0;
-                    propertyType.DataTypeKey = default;
-                }
+                propertyType.DataTypeId = propDefinition.DataTypeId;
+                propertyType.DataTypeKey = propDefinition.DataTypeKey;
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class UserServiceCrudTests
+internal sealed partial class UserServiceCrudTests
 {
     private ISet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
     {
@@ -151,7 +151,21 @@ public partial class UserServiceCrudTests
             Assert.AreEqual(email, updatedUser.Email);
             Assert.AreEqual(name, updatedUser.Name);
         });
+    }
 
+    [Test]
+    public async Task Cannot_Update_User_To_Have_No_Groups()
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+
+        var (updateModel, createdUser) = await CreateUserForUpdate(userService);
+
+        updateModel.UserGroupKeys.Clear();
+
+        var updateAttempt = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        Assert.IsFalse(updateAttempt.Success);
+        Assert.AreEqual(UserOperationStatus.NoUserGroup, updateAttempt.Status);
     }
 
     [Test]
@@ -383,5 +397,36 @@ public partial class UserServiceCrudTests
 
         Assert.IsNotNull(updatedUser.StartMediaIds);
         Assert.IsEmpty(updatedUser.StartMediaIds);
+    }
+
+    [TestCase(false, false)]
+    [TestCase(true, true)]
+    public async Task Cannot_Remove_Admin_Group_From_Only_Admin_User(bool createAdditionalAdminUser, bool expectSuccess)
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+
+        if (createAdditionalAdminUser)
+        {
+            var (updateModel, _) = await CreateUserForUpdate(userService);
+            updateModel.UserGroupKeys = new HashSet<Guid> { Constants.Security.AdminGroupKey };
+            var updateResult = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+            Assert.IsTrue(updateResult.Success);
+        }
+
+        var adminUser = await userService.GetAsync(Constants.Security.SuperUserKey);
+        var adminUserUpdateModel = await MapUserToUpdateModel(adminUser);
+        adminUserUpdateModel.Email = "admin@test.com";
+        adminUserUpdateModel.UserGroupKeys = new HashSet<Guid> { Constants.Security.EditorGroupKey };
+        var adminUserUpdateResult = await userService.UpdateAsync(Constants.Security.SuperUserKey, adminUserUpdateModel);
+
+        if (expectSuccess)
+        {
+            Assert.IsTrue(adminUserUpdateResult.Success);
+        }
+        else
+        {
+            Assert.IsFalse(adminUserUpdateResult.Success);
+            Assert.AreEqual(UserOperationStatus.AdminUserGroupMustNotBeEmpty, adminUserUpdateResult.Status);
+        }
     }
 }

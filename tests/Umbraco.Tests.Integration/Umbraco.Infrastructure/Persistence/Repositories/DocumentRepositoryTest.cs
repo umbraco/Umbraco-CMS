@@ -3,7 +3,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -31,7 +33,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class DocumentRepositoryTest : UmbracoIntegrationTest
+internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUpData()
@@ -59,6 +61,8 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
+
+    private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
         GetRequiredService<IConfigurationEditorJsonSerializer>();
@@ -100,7 +104,14 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
 
         var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out TemplateRepository tr);
         var editors = new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
-        dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, editors, LoggerFactory.CreateLogger<DataTypeRepository>(), LoggerFactory, ConfigurationEditorJsonSerializer);
+        dtdRepository = new DataTypeRepository(
+            scopeAccessor,
+            appCaches,
+            editors,
+            LoggerFactory.CreateLogger<DataTypeRepository>(),
+            LoggerFactory,
+            ConfigurationEditorJsonSerializer,
+            Services.GetRequiredService<IDataValueEditorFactory>());
         return ctRepository;
     }
 
@@ -114,20 +125,20 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         var runtimeSettingsMock = new Mock<IOptionsMonitor<RuntimeSettings>>();
         runtimeSettingsMock.Setup(x => x.CurrentValue).Returns(new RuntimeSettings());
 
-        templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, Mock.Of<IViewHelper>(), runtimeSettingsMock.Object);
+        templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, ShortStringHelper, Mock.Of<IViewHelper>(), runtimeSettingsMock.Object);
         var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>());
         var commonRepository =
             new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
         var languageRepository =
             new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>());
-        contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+        contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, IdKeyMap);
         var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
         var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
         var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
         var propertyEditors =
             new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
         var dataValueReferences =
-            new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
+            new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
         var repository = new DocumentRepository(
             scopeAccessor,
             appCaches,
@@ -224,7 +235,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
 
             // publish = new edit version
             content1.SetValue("title", "title");
-            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, PropertyEditorCollection);
             content1.PublishedState = PublishedState.Publishing;
             repository.Save(content1);
 
@@ -300,7 +311,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
                     new { id = content1.Id }));
 
             // publish = version
-            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, PropertyEditorCollection);
             content1.PublishedState = PublishedState.Publishing;
             repository.Save(content1);
 
@@ -344,7 +355,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             // publish = new version
             content1.Name = "name-4";
             content1.SetValue("title", "title-4");
-            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, PropertyEditorCollection);
             content1.PublishedState = PublishedState.Publishing;
             repository.Save(content1);
 
@@ -764,7 +775,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             // publish them all
             foreach (var content in result)
             {
-                content.PublishCulture(CultureImpact.Invariant);
+                content.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, PropertyEditorCollection);
                 repository.Save(content);
             }
 

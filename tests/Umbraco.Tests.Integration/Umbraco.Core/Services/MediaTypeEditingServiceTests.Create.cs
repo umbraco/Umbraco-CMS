@@ -1,11 +1,11 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
-public partial class MediaTypeEditingServiceTests
+internal sealed partial class MediaTypeEditingServiceTests
 {
     [Test]
     public async Task Can_Create_With_All_Basic_Settings()
@@ -137,8 +137,7 @@ public partial class MediaTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         var result = await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -176,8 +175,7 @@ public partial class MediaTypeEditingServiceTests
             compositions: new[]
             {
                 new Composition { CompositionType = CompositionType.Composition, Key = compositionType.Key, },
-            }
-        );
+            });
 
         var result = await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);

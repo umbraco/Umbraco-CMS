@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core;
 /// <summary>
 ///     Currently just used to get the machine name for use with file names
 /// </summary>
-internal class EnvironmentHelper
+internal static class EnvironmentHelper
 {
     /// <summary>
     ///     Returns the machine name that is safe to use in file paths.

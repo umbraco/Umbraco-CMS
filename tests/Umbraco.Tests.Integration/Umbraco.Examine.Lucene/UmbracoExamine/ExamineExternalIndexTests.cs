@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ExamineExternalIndexTests : ExamineBaseTest
+internal sealed class ExamineExternalIndexTests : ExamineBaseTest
 {
     private const string ContentName = "TestContent";
 
@@ -37,6 +37,8 @@ public class ExamineExternalIndexTests : ExamineBaseTest
         var httpContext = new DefaultHttpContext();
         httpContext.RequestServices = Services;
         Mock.Get(TestHelper.GetHttpContextAccessor()).Setup(x => x.HttpContext).Returns(httpContext);
+
+        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     [TearDown]
@@ -45,12 +47,14 @@ public class ExamineExternalIndexTests : ExamineBaseTest
         // When disposing examine, it does a final write, which ends up locking the file if the indexing is not done yet. So we have this wait to circumvent that.
         Thread.Sleep(1500);
         // Sometimes we do not dispose all services in time and the test fails because the log file is locked. Resulting in all other tests failing as well
-        Services.DisposeIfDisposable();
+        (Services as IDisposable)?.Dispose();
     }
+
 
     private IExamineExternalIndexSearcherTest ExamineExternalIndexSearcher =>
         GetRequiredService<IExamineExternalIndexSearcherTest>();
 
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
@@ -66,11 +70,8 @@ public class ExamineExternalIndexTests : ExamineBaseTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
+        base.CustomTestSetup(builder);
         builder.Services.AddUnique<IExamineExternalIndexSearcherTest, ExamineExternalIndexSearcherTest>();
-        builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
-        builder
-            .AddNotificationHandler<ContentTreeChangeNotification,
-                ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddExamineIndexes();
         builder.Services.AddHostedService<QueuedHostedService>();

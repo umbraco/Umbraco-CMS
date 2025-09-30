@@ -49,7 +49,5 @@ public class LogViewerConfig : ILogViewerConfig
         IReadOnlyList<SavedLogSearch> result =  GetSavedSearches()!;
         scope.Complete();
         return result;
-        scope.Complete();
-        return result;
     }
 }

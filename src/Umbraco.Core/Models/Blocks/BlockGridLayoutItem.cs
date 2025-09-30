@@ -6,12 +6,8 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// <summary>
 /// Used for deserializing the block grid layout
 /// </summary>
-public class BlockGridLayoutItem : IBlockLayoutItem
+public class BlockGridLayoutItem : BlockLayoutItemBase
 {
-    public Udi? ContentUdi { get; set; }
-
-    public Udi? SettingsUdi { get; set; }
-
     public int? ColumnSpan { get; set; }
 
     public int? RowSpan { get; set; }
@@ -21,10 +17,31 @@ public class BlockGridLayoutItem : IBlockLayoutItem
     public BlockGridLayoutItem()
     { }
 
+    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
     public BlockGridLayoutItem(Udi contentUdi)
-        => ContentUdi = contentUdi;
+        : base(contentUdi)
+    {
+    }
 
+    [Obsolete("Use constructor that accepts GUIDs instead. Will be removed in V18.")]
     public BlockGridLayoutItem(Udi contentUdi, Udi settingsUdi)
-        : this(contentUdi)
-        => SettingsUdi = settingsUdi;
+        : base(contentUdi, settingsUdi)
+    {
+    }
+
+    public BlockGridLayoutItem(Guid contentKey)
+        : base(contentKey)
+    {
+    }
+
+    public BlockGridLayoutItem(Guid contentKey, Guid settingsKey)
+        : base(contentKey, settingsKey)
+    {
+    }
+
+    public override bool ReferencesContent(Guid key)
+        => ContentKey == key || Areas.Any(area => area.ContainsContent(key));
+
+    public override bool ReferencesSetting(Guid key)
+        => SettingsKey == key || Areas.Any(area => area.ContainsSetting(key));
 }

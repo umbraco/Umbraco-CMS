@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Extensions;
 
@@ -51,7 +52,7 @@ public static class ContentRepositoryExtensions
             return;
         }
 
-        content.CultureInfos?.AddOrUpdate(culture!, infos.Name, DateTime.Now);
+        content.CultureInfos?.AddOrUpdate(culture!, infos.Name, DateTime.UtcNow);
     }
 
     /// <summary>
@@ -206,7 +207,7 @@ public static class ContentRepositoryExtensions
             {
                 foreach (IPropertyValue pvalue in otherProperty.Values)
                 {
-                    if (((otherProperty?.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, true) ?? false) &&
+                    if (((otherProperty?.PropertyType?.SupportsVariation(pvalue.Culture, pvalue.Segment, true) ?? false) &&
                         (culture == "*" ||(pvalue.Culture?.InvariantEquals(culture) ?? false))) ||
                          otherProperty?.PropertyType?.Variations == ContentVariation.Nothing)
                     {
@@ -234,7 +235,7 @@ public static class ContentRepositoryExtensions
         {
             foreach (ContentCultureInfos cultureInfo in other.CultureInfos)
             {
-                if (culture == "*" || culture == cultureInfo.Culture)
+                if (culture == "*" || culture.InvariantEquals(cultureInfo.Culture))
                 {
                     content.SetCultureName(cultureInfo.Name, cultureInfo.Culture);
                 }
@@ -292,11 +293,13 @@ public static class ContentRepositoryExtensions
     /// </summary>
     /// <param name="content"></param>
     /// <param name="impact"></param>
+    /// <param name="publishTime"></param>
+    /// <param name="propertyEditorCollection"></param>
     /// <returns>
     ///     A value indicating whether it was possible to publish the names and values for the specified
     ///     culture(s). The method may fail if required names are not set, but it does NOT validate property data
     /// </returns>
-    public static bool PublishCulture(this IContent content, CultureImpact? impact)
+    public static bool PublishCulture(this IContent content, CultureImpact? impact, DateTime publishTime, PropertyEditorCollection propertyEditorCollection)
     {
         if (impact == null)
         {
@@ -323,7 +326,7 @@ public static class ContentRepositoryExtensions
                     return false;
                 }
 
-                content.SetPublishInfo(culture, name, DateTime.Now);
+                content.SetPublishInfo(culture, name, publishTime);
             }
         }
         else if (impact.ImpactsOnlyInvariantCulture)
@@ -342,7 +345,7 @@ public static class ContentRepositoryExtensions
                 return false;
             }
 
-            content.SetPublishInfo(impact.Culture, name, DateTime.Now);
+            content.SetPublishInfo(impact.Culture, name, publishTime);
         }
 
         // set values
@@ -351,18 +354,34 @@ public static class ContentRepositoryExtensions
         foreach (IProperty property in content.Properties)
         {
             // for the specified culture (null or all or specific)
-            property.PublishValues(impact.Culture);
+            PublishPropertyValues(content, property, impact.Culture, propertyEditorCollection);
 
             // maybe the specified culture did not impact the invariant culture, so PublishValues
             // above would skip it, yet it *also* impacts invariant properties
             if (impact.ImpactsAlsoInvariantProperties && (property.PropertyType.VariesByCulture() is false || impact.ImpactsOnlyDefaultCulture))
             {
-                property.PublishValues(null);
+                PublishPropertyValues(content, property, null, propertyEditorCollection);
             }
         }
 
         content.PublishedState = PublishedState.Publishing;
         return true;
+    }
+
+    private static void PublishPropertyValues(IContent content, IProperty property, string? culture, PropertyEditorCollection propertyEditorCollection)
+    {
+        // if the content varies by culture, let data editor opt-in to perform partial property publishing (per culture)
+        if (content.ContentType.VariesByCulture()
+            && propertyEditorCollection.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor)
+            && dataEditor.CanMergePartialPropertyValues(property.PropertyType))
+        {
+            // perform partial publishing for the current culture
+            property.PublishPartialValues(dataEditor, culture);
+            return;
+        }
+
+        // for the specified culture (null or all or specific)
+        property.PublishValues(culture);
     }
 
     /// <summary>

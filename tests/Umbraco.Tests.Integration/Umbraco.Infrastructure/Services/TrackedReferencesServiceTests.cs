@@ -3,7 +3,9 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -13,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class TrackedReferencesServiceTests : UmbracoIntegrationTest
+internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -24,6 +26,13 @@ public class TrackedReferencesServiceTests : UmbracoIntegrationTest
     private Content Root2 { get; set; }
 
     private IContentType ContentType { get; set; }
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder
+            .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>();
+    }
 
     [SetUp]
     public void Setup() => CreateTestData();
@@ -80,12 +89,30 @@ public class TrackedReferencesServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Does_not_return_references_if_item_is_not_referenced()
+    public async Task Does_Not_Return_References_If_Item_Is_Not_Referenced()
     {
         var sut = GetRequiredService<ITrackedReferencesService>();
 
         var actual = await sut.GetPagedRelationsForItemAsync(Root2.Key, 0, 10, true);
 
         Assert.AreEqual(0, actual.Total);
+    }
+
+    [Test]
+    public async Task Get_Pages_That_Reference_Recycle_Bin_Contents()
+    {
+        ContentService.MoveToRecycleBin(Root1);
+
+        var sut = GetRequiredService<ITrackedReferencesService>();
+
+        var actual = await sut.GetPagedRelationsForRecycleBinAsync(UmbracoObjectTypes.Document, 0, 10, true);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, actual.Total);
+            var item = actual.Items.FirstOrDefault();
+            Assert.AreEqual(Root2.ContentType.Alias, item?.ContentTypeAlias);
+            Assert.AreEqual(Root2.Key, item?.NodeKey);
+        });
     }
 }

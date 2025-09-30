@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [ExplicitColumns]
 [PrimaryKey("Id")]
-internal class ExternalLoginDto
+internal sealed class ExternalLoginDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ExternalLogin;
 
@@ -43,7 +43,7 @@ internal class ExternalLoginDto
     public string ProviderKey { get; set; } = null!;
 
     [Column("createDate")]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }
 
     /// <summary>

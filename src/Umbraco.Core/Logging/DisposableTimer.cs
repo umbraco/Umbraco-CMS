@@ -44,7 +44,7 @@ public class DisposableTimer : DisposableObjectSlim
         _endMessageArgs = endMessageArgs;
         _failMessageArgs = failMessageArgs;
         _thresholdMilliseconds = thresholdMilliseconds < 0 ? 0 : thresholdMilliseconds;
-        _timingId = Guid.NewGuid().ToString("N").Substring(0, 7); // keep it short-ish
+        _timingId = Guid.NewGuid().ToString("N")[..7]; // keep it short-ish
 
         if (thresholdMilliseconds == 0)
         {
@@ -63,7 +63,7 @@ public class DisposableTimer : DisposableObjectSlim
                         var args = new object[startMessageArgs.Length + 1];
                         startMessageArgs.CopyTo(args, 0);
                         args[^1] = _timingId;
-                        
+
                         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                         {
                           logger.LogDebug(startMessage + " [Timing {TimingId}]", args);

@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Web.Common.Templates;
 ///     This allows you to render an MVC template based purely off of a node id and an optional alttemplate id as string
 ///     output.
 /// </remarks>
-internal class TemplateRenderer : ITemplateRenderer
+internal sealed class TemplateRenderer : ITemplateRenderer
 {
     private readonly IFileService _fileService;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -101,6 +101,7 @@ internal class TemplateRenderer : ITemplateRenderer
         else
         {
             requestBuilder.SetCulture(umbracoContext.PublishedRequest.Culture);
+            requestBuilder.SetSegment(umbracoContext.PublishedRequest.Segment);
         }
 
         // set the doc that was found by id

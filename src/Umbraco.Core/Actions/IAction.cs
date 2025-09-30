@@ -35,21 +35,8 @@ public interface IAction : IDiscoverable
     bool CanBePermissionAssigned { get; }
 
     /// <summary>
-    ///     Gets the icon to display for this action
-    /// </summary>
-    string Icon { get; }
-
-    /// <summary>
     ///     Gets the alias for this action (must be unique).
     ///     This is all lower-case because of case sensitive filesystems, see issue: https://github.com/umbraco/Umbraco-CMS/issues/11670.
     /// </summary>
     string Alias { get; }
-
-    /// <summary>
-    ///     Gets the category used for this action
-    /// </summary>
-    /// <remarks>
-    ///     Used in the UI when assigning permissions
-    /// </remarks>
-    string? Category { get; }
 }

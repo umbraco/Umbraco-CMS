@@ -19,4 +19,9 @@ public static class CacheKeys
 
     public const string ContentRecycleBinCacheKey = "recycleBin_content";
     public const string MediaRecycleBinCacheKey = "recycleBin_media";
+
+    public const string PreviewPropertyCacheKeyPrefix = "Cache.Property.CacheValues[D:";
+    public const string PropertyCacheKeyPrefix = "Cache.Property.CacheValues[P:";
+
+    public const string MemberUserNameCachePrefix = "uRepo_userNameKey+";
 }

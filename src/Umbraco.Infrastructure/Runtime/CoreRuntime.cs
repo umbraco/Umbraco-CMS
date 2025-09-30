@@ -1,5 +1,3 @@
-using System.ComponentModel;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -67,64 +65,6 @@ public class CoreRuntime : IRuntime
         _serviceProvider = serviceProvider;
         _hostApplicationLifetime = hostApplicationLifetime;
         _logger = _loggerFactory.CreateLogger<CoreRuntime>();
-    }
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete]
-    public CoreRuntime(
-        ILoggerFactory loggerFactory,
-        IRuntimeState state,
-        ComponentCollection components,
-        IApplicationShutdownRegistry applicationShutdownRegistry,
-        IProfilingLogger profilingLogger,
-        IMainDom mainDom,
-        IUmbracoDatabaseFactory databaseFactory,
-        IEventAggregator eventAggregator,
-        IHostingEnvironment hostingEnvironment,
-        IUmbracoVersion umbracoVersion,
-        IServiceProvider? serviceProvider)
-        : this(
-            state,
-            loggerFactory,
-            components,
-            applicationShutdownRegistry,
-            profilingLogger,
-            mainDom,
-            databaseFactory,
-            eventAggregator,
-            hostingEnvironment,
-            umbracoVersion,
-            serviceProvider,
-            serviceProvider?.GetRequiredService<IHostApplicationLifetime>())
-    {
-    }
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete]
-    public CoreRuntime(
-        ILoggerFactory loggerFactory,
-        IRuntimeState state,
-        ComponentCollection components,
-        IApplicationShutdownRegistry applicationShutdownRegistry,
-        IProfilingLogger profilingLogger,
-        IMainDom mainDom,
-        IUmbracoDatabaseFactory databaseFactory,
-        IEventAggregator eventAggregator,
-        IHostingEnvironment hostingEnvironment,
-        IUmbracoVersion umbracoVersion)
-        : this(
-            loggerFactory,
-            state,
-            components,
-            applicationShutdownRegistry,
-            profilingLogger,
-            mainDom,
-            databaseFactory,
-            eventAggregator,
-            hostingEnvironment,
-            umbracoVersion,
-            null)
-    {
     }
 
     /// <summary>
@@ -199,6 +139,10 @@ public class CoreRuntime : IRuntime
                 break;
         }
 
+        //
+        var postRuntimePremigrationsUpgradeNotification = new PostRuntimePremigrationsUpgradeNotification();
+        await _eventAggregator.PublishAsync(postRuntimePremigrationsUpgradeNotification, cancellationToken);
+
         // If level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
         var unattendedUpgradeNotification = new RuntimeUnattendedUpgradeNotification();
         await _eventAggregator.PublishAsync(unattendedUpgradeNotification, cancellationToken);
@@ -222,7 +166,7 @@ public class CoreRuntime : IRuntime
         }
 
         // Initialize the components
-        _components.Initialize();
+        await _components.InitializeAsync(isRestarting, cancellationToken);
 
         await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level, isRestarting), cancellationToken);
 
@@ -236,7 +180,7 @@ public class CoreRuntime : IRuntime
 
     private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
     {
-        _components.Terminate();
+        await _components.TerminateAsync(isRestarting, cancellationToken);
         await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(isRestarting), cancellationToken);
     }
 

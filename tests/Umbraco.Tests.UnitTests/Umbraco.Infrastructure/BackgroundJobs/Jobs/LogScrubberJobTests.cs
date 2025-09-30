@@ -68,5 +68,5 @@ public class LogScrubberJobTests
     private void VerifyLogsScrubbed() => VerifyLogsScrubbed(Times.Once());
 
     private void VerifyLogsScrubbed(Times times) =>
-        _mockAuditService.Verify(x => x.CleanLogs(It.Is<int>(y => y == MaxLogAgeInMinutes)), times);
+        _mockAuditService.Verify(x => x.CleanLogsAsync(It.Is<int>(y => y == MaxLogAgeInMinutes)), times);
 }

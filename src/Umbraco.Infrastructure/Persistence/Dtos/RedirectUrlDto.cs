@@ -4,10 +4,10 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.RedirectUrl)]
+[TableName(TableName)]
 [PrimaryKey("id", AutoIncrement = false)]
 [ExplicitColumns]
-internal class RedirectUrlDto
+internal sealed class RedirectUrlDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.RedirectUrl;
 
@@ -28,7 +28,7 @@ internal class RedirectUrlDto
 
     [Column("contentKey")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [ForeignKey(typeof(NodeDto), Column = "uniqueID")]
+    [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
     public Guid ContentKey { get; set; }
 
     [Column("createDateUtc")]
@@ -38,6 +38,7 @@ internal class RedirectUrlDto
 
     [Column("url")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     public string Url { get; set; } = null!;
 
     [Column("culture")]

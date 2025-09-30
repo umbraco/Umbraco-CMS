@@ -4,10 +4,12 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.ElementTypeTree)]
+[TableName(TableName)]
 [ExplicitColumns]
-internal class ContentType2ContentTypeDto
+internal sealed class ContentType2ContentTypeDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.ContentTypeTree;
+
     [Column("parentContentTypeId")]
     [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentType2ContentType", OnColumns = "parentContentTypeId, childContentTypeId")]
     [ForeignKey(typeof(NodeDto), Name = "FK_cmsContentType2ContentType_umbracoNode_parent")]

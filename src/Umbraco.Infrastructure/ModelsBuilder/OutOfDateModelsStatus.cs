@@ -1,9 +1,12 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder;
 
@@ -13,8 +16,8 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder;
 public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCacheRefresherNotification>,
     INotificationHandler<DataTypeCacheRefresherNotification>
 {
-    private readonly IHostingEnvironment _hostingEnvironment;
     private ModelsBuilderSettings _config;
+    private readonly IHostEnvironment _hostEnvironment;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="OutOfDateModelsStatus" /> class.
@@ -22,7 +25,24 @@ public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCach
     public OutOfDateModelsStatus(IOptionsMonitor<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
     {
         _config = config.CurrentValue;
-        _hostingEnvironment = hostingEnvironment;
+        _hostEnvironment = StaticServiceProvider.Instance.GetRequiredService<IHostEnvironment>();
+        config.OnChange(x => _config = x);
+    }
+
+    public OutOfDateModelsStatus(
+        IOptionsMonitor<ModelsBuilderSettings> config,
+        IHostingEnvironment hostingEnvironment,
+        IHostEnvironment hostEnvironment)
+    {
+        _config = config.CurrentValue;
+        _hostEnvironment = hostEnvironment;
+        config.OnChange(x => _config = x);
+    }
+
+    public OutOfDateModelsStatus(IOptionsMonitor<ModelsBuilderSettings> config, IHostEnvironment hostEnvironment)
+    {
+        _config = config.CurrentValue;
+        _hostEnvironment = hostEnvironment;
         config.OnChange(x => _config = x);
     }
 
@@ -70,7 +90,7 @@ public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCach
 
     private string GetFlagPath()
     {
-        var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
+        var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostEnvironment);
         if (!Directory.Exists(modelsDirectory))
         {
             Directory.CreateDirectory(modelsDirectory);

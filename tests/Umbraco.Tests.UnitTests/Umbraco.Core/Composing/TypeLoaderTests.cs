@@ -43,13 +43,7 @@ public class TypeLoaderTests
         };
         _typeLoader = new TypeLoader(
             typeFinder,
-            new VaryingRuntimeHash(),
-            NoAppCache.Instance,
-            new DirectoryInfo(TestHelper.GetHostingEnvironment()
-                .MapPathContentRoot(Constants.SystemDirectories.TempData)),
             Mock.Of<ILogger<TypeLoader>>(),
-            Mock.Of<IProfiler>(),
-            false,
             assemblies);
     }
 
@@ -138,7 +132,7 @@ public class TypeLoaderTests
     public void GetDataEditors()
     {
         var types = _typeLoader.GetDataEditors();
-        Assert.AreEqual(36, types.Count());
+        Assert.AreEqual(37, types.Count());
     }
 
     /// <summary>

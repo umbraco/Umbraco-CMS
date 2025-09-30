@@ -35,6 +35,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Mail;
+using Umbraco.Cms.Infrastructure.Mail.Interfaces;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Persistence.SqlServer.Services;
@@ -80,7 +81,7 @@ public static class TestHelper
 
     public static UriUtility UriUtility => s_testHelperInternal.UriUtility;
 
-    public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()), Mock.Of<IEventAggregator>());
+    public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()), Mock.Of<IEventAggregator>(), Mock.Of<IEmailSenderClient>(), null,null);
 
     public static ITypeFinder GetTypeFinder() => s_testHelperInternal.GetTypeFinder();
 

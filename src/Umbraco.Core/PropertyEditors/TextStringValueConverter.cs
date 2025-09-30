@@ -40,7 +40,7 @@ public class TextStringValueConverter : PropertyValueConverterBase, IDeliveryApi
         var sourceString = source.ToString();
 
         // ensures string is parsed for {localLink} and URLs are resolved correctly
-        sourceString = _linkParser.EnsureInternalLinks(sourceString!, preview);
+        sourceString = _linkParser.EnsureInternalLinks(sourceString!);
         sourceString = _urlParser.EnsureUrls(sourceString);
 
         return sourceString;
@@ -57,6 +57,6 @@ public class TextStringValueConverter : PropertyValueConverterBase, IDeliveryApi
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => GetPropertyValueType(propertyType);
 
-    public object ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         => ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
 }

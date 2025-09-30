@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Entities;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
@@ -24,6 +27,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public MediaTreeControllerBase(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
@@ -31,7 +35,27 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService)
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+              userStartNodeEntitiesService,
+              dataTypeService,
+              appCaches,
+              backofficeSecurityAccessor,
+              mediaPresentationFactory)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public MediaTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
+        AppCaches appCaches,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IMediaPresentationFactory mediaPresentationFactory)
+        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
     {
         _appCaches = appCaches;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
@@ -50,6 +74,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         {
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
+            responseModel.CreateDate = entity.CreateDate;
 
             responseModel.Variants = _mediaPresentationFactory.CreateVariantsItemResponseModels(mediaEntitySlim);
             responseModel.MediaType = _mediaPresentationFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);

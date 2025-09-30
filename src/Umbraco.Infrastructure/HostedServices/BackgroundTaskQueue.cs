@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Umbraco.Cms.Core.HostedServices;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 

@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Implements <see cref="IContentTypeCommonRepository" />.
 /// </summary>
-internal class ContentTypeCommonRepository : IContentTypeCommonRepository
+internal sealed class ContentTypeCommonRepository : IContentTypeCommonRepository
 {
     private const string CacheKey =
         "Umbraco.Core.Persistence.Repositories.Implement.ContentTypeCommonRepository::AllTypes";
@@ -29,8 +29,11 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
     /// <summary>
     ///     Initializes a new instance of the <see cref="IContentTypeCommonRepository" /> class.
     /// </summary>
-    public ContentTypeCommonRepository(IScopeAccessor scopeAccessor, ITemplateRepository templateRepository,
-        AppCaches appCaches, IShortStringHelper shortStringHelper)
+    public ContentTypeCommonRepository(
+        IScopeAccessor scopeAccessor,
+        ITemplateRepository templateRepository,
+        AppCaches appCaches,
+        IShortStringHelper shortStringHelper)
     {
         _scopeAccessor = scopeAccessor;
         _templateRepository = templateRepository;
@@ -57,14 +60,17 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
     /// <inheritdoc />
     public void ClearCache() => _appCaches.RuntimeCache.Clear(CacheKey);
 
-    private Sql<ISqlContext>? Sql() => SqlContext?.Sql();
-
     private IEnumerable<IContentTypeComposition> GetAllTypesInternal()
     {
         var contentTypes = new Dictionary<int, IContentTypeComposition>();
 
+        if (SqlContext is null)
+        {
+            return contentTypes.Values;
+        }
+
         // get content types
-        Sql<ISqlContext>? sql1 = Sql()?
+        Sql<ISqlContext> sql1 = SqlContext.Sql()
             .Select<ContentTypeDto>(r => r.Select(x => x.NodeDto))
             .From<ContentTypeDto>()
             .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>((ct, n) => ct.NodeId == n.NodeId)
@@ -73,7 +79,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
         List<ContentTypeDto>? contentTypeDtos = Database?.Fetch<ContentTypeDto>(sql1);
 
         // get allowed content types
-        Sql<ISqlContext>? sql2 = Sql()?
+        Sql<ISqlContext> sql2 = SqlContext.Sql()
             .Select<ContentTypeAllowedContentTypeDto>()
             .From<ContentTypeAllowedContentTypeDto>()
             .OrderBy<ContentTypeAllowedContentTypeDto>(x => x.Id);
@@ -153,8 +159,13 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
 
     private void MapHistoryCleanup(Dictionary<int, IContentTypeComposition> contentTypes)
     {
+        if (SqlContext is null)
+        {
+            return;
+        }
+
         // get templates
-        Sql<ISqlContext>? sql1 = Sql()?
+        Sql<ISqlContext> sql1 = SqlContext.Sql()
             .Select<ContentVersionCleanupPolicyDto>()
             .From<ContentVersionCleanupPolicyDto>()
             .OrderBy<ContentVersionCleanupPolicyDto>(x => x.ContentTypeId);
@@ -189,8 +200,13 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
 
     private void MapTemplates(Dictionary<int, IContentTypeComposition> contentTypes)
     {
+        if (SqlContext is null)
+        {
+            return;
+        }
+
         // get templates
-        Sql<ISqlContext>? sql1 = Sql()?
+        Sql<ISqlContext> sql1 = SqlContext.Sql()
             .Select<ContentTypeTemplateDto>()
             .From<ContentTypeTemplateDto>()
             .OrderBy<ContentTypeTemplateDto>(x => x.ContentTypeNodeId);
@@ -205,7 +221,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
 
         foreach (IContentTypeComposition c in contentTypes.Values)
         {
-            if (!(c is IContentType contentType))
+            if (c is not IContentType contentType)
             {
                 continue;
             }
@@ -238,8 +254,13 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
 
     private void MapComposition(IDictionary<int, IContentTypeComposition> contentTypes)
     {
+        if (SqlContext is null)
+        {
+            return;
+        }
+
         // get parent/child
-        Sql<ISqlContext>? sql1 = Sql()?
+        Sql<ISqlContext> sql1 = SqlContext.Sql()
             .Select<ContentType2ContentTypeDto>()
             .From<ContentType2ContentTypeDto>()
             .OrderBy<ContentType2ContentTypeDto>(x => x.ChildId);
@@ -268,7 +289,12 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
 
     private void MapGroupsAndProperties(IDictionary<int, IContentTypeComposition> contentTypes)
     {
-        Sql<ISqlContext>? sql1 = Sql()?
+        if (SqlContext is null)
+        {
+            return;
+        }
+
+        Sql<ISqlContext> sql1 = SqlContext.Sql()
             .Select<PropertyTypeGroupDto>()
             .From<PropertyTypeGroupDto>()
             .InnerJoin<ContentTypeDto>()
@@ -278,7 +304,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
 
         List<PropertyTypeGroupDto>? groupDtos = Database?.Fetch<PropertyTypeGroupDto>(sql1);
 
-        Sql<ISqlContext>? sql2 = Sql()?
+        Sql<ISqlContext> sql2 = SqlContext.Sql()
             .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto, r1 => r1.Select(x => x.NodeDto)))
             .AndSelect<MemberPropertyTypeDto>()
             .From<PropertyTypeDto>()
@@ -329,8 +355,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
                        propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
                        propertyDtos[propertyIx].PropertyTypeGroupId == group.Id)
                 {
-                    group.PropertyTypes?.Add(MapPropertyType(contentType, propertyDtos[propertyIx],
-                        builtinProperties));
+                    group.PropertyTypes?.Add(MapPropertyType(contentType, propertyDtos[propertyIx], builtinProperties));
                     propertyIx++;
                 }
             }
@@ -369,7 +394,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
         }
     }
 
-    private PropertyGroup MapPropertyGroup(PropertyTypeGroupDto dto, bool isPublishing) =>
+    private static PropertyGroup MapPropertyGroup(PropertyTypeGroupDto dto, bool isPublishing) =>
         new(new PropertyTypeCollection(isPublishing))
         {
             Id = dto.Id,
@@ -380,7 +405,9 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             SortOrder = dto.SortOrder,
         };
 
-    private PropertyType MapPropertyType(IContentTypeComposition contentType, PropertyTypeCommonDto dto,
+    private PropertyType MapPropertyType(
+        IContentTypeComposition contentType,
+        PropertyTypeCommonDto dto,
         IDictionary<string, PropertyType> builtinProperties)
     {
         var groupId = dto.PropertyTypeGroupId;
@@ -397,9 +424,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             memberType.SetMemberCanViewProperty(dto.Alias, dto.ViewOnProfile);
         }
 
-        return new
-            PropertyType(_shortStringHelper, dto.DataTypeDto.EditorAlias, storageType, readonlyStorageType,
-                dto.Alias)
+        return new PropertyType(_shortStringHelper, dto.DataTypeDto.EditorAlias, storageType, readonlyStorageType, dto.Alias)
         {
             Description = dto.Description,
             DataTypeId = dto.DataTypeId,

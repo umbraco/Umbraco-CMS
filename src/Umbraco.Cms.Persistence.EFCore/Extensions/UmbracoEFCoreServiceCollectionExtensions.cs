@@ -14,74 +14,53 @@ public static class UmbracoEFCoreServiceCollectionExtensions
 {
     public delegate void DefaultEFCoreOptionsAction(DbContextOptionsBuilder options, string? providerName, string? connectionString);
 
-    [Obsolete("Use AddUmbracoDbContext<T>(this IServiceCollection services, Action<DbContextOptionsBuilder>? optionsAction = null) instead.")]
-    public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction = null)
+    /// <summary>
+    /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
+    /// </summary>
+    [Obsolete("Please use the method overload that takes all parameters for the optionsAction. Scheduled for removal in Umbraco 18.")]
+    public static IServiceCollection AddUmbracoDbContext<T>(
+        this IServiceCollection services,
+        Action<DbContextOptionsBuilder>? optionsAction = null)
         where T : DbContext
-    {
-        services.AddPooledDbContextFactory<T>((provider, builder) => SetupDbContext(defaultEFCoreOptionsAction, provider, builder));
-        services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
-
-        services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
-        services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
-        services.AddUnique<IEFCoreScopeProvider<T>, EFCoreScopeProvider<T>>();
-        services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism<T>>();
-        services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<T>>();
-
-        return services;
-    }
-
-    [Obsolete("Use AddUmbracoDbContext<T>(this IServiceCollection services, Action<DbContextOptionsBuilder>? optionsAction = null) instead.")]
-    public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, string connectionString, string providerName, DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction = null)
-        where T : DbContext
-    {
-        // Replace data directory
-        string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
-        if (string.IsNullOrEmpty(dataDirectory) is false)
-        {
-            connectionString = connectionString.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
-        }
-
-        services.AddPooledDbContextFactory<T>(options => defaultEFCoreOptionsAction?.Invoke(options, providerName, connectionString));
-        services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
-
-        services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
-        services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
-        services.AddUnique<IEFCoreScopeProvider<T>, EFCoreScopeProvider<T>>();
-        services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism<T>>();
-        services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<T>>();
-
-        return services;
-    }
+        => AddUmbracoDbContext<T>(services, (sp, optionsBuilder, connectionString, providerName) => optionsAction?.Invoke(optionsBuilder));
 
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="services"></param>
-    /// <param name="optionsAction"></param>
-    /// <returns></returns>
-    public static IServiceCollection AddUmbracoDbContext<T>(this IServiceCollection services, Action<DbContextOptionsBuilder>? optionsAction = null)
+    public static IServiceCollection AddUmbracoDbContext<T>(
+        this IServiceCollection services,
+        Action<DbContextOptionsBuilder, string?, string?, IServiceProvider?>? optionsAction = null)
         where T : DbContext
     {
-        return AddUmbracoDbContext<T>(services, (IServiceProvider _, DbContextOptionsBuilder options) =>
+        return AddUmbracoDbContext<T>(services, (IServiceProvider provider, DbContextOptionsBuilder optionsBuilder, string? providerName, string? connectionString) =>
         {
-            optionsAction?.Invoke(options);
+            ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
+            optionsAction?.Invoke(optionsBuilder, connectionStrings.ConnectionString, connectionStrings.ProviderName, provider);
         });
     }
 
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="services"></param>
-    /// <param name="optionsAction"></param>
-    /// <returns></returns>
-    public static IServiceCollection AddUmbracoDbContext<T>(this IServiceCollection services, Action<IServiceProvider, DbContextOptionsBuilder>? optionsAction = null)
+    [Obsolete("Please use the method overload that takes all parameters for the optionsAction. Scheduled for removal in Umbraco 18.")]
+    public static IServiceCollection AddUmbracoDbContext<T>(
+        this IServiceCollection services,
+        Action<IServiceProvider, DbContextOptionsBuilder>? optionsAction = null)
+        where T : DbContext
+        => AddUmbracoDbContext<T>(services, (sp, optionsBuilder, connectionString, providerName) => optionsAction?.Invoke(sp, optionsBuilder));
+
+    /// <summary>
+    /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
+    /// </summary>
+    public static IServiceCollection AddUmbracoDbContext<T>(
+        this IServiceCollection services,
+        Action<IServiceProvider, DbContextOptionsBuilder, string?, string?>? optionsAction = null)
         where T : DbContext
     {
-        optionsAction ??= (sp, options) => { };
+        optionsAction ??= (sp, optionsBuilder, connectionString, providerName) => { };
 
-        services.AddPooledDbContextFactory<T>(optionsAction);
+
+        services.AddPooledDbContextFactory<T>((provider, optionsBuilder) => SetupDbContext(optionsAction, provider, optionsBuilder));
         services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
 
         services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
@@ -150,14 +129,13 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         builder.UseDatabaseProvider(connectionStrings.ProviderName, connectionStrings.ConnectionString);
     }
 
-    [Obsolete]
-    private static void SetupDbContext(DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction, IServiceProvider provider, DbContextOptionsBuilder builder)
+    private static void SetupDbContext(Action<IServiceProvider, DbContextOptionsBuilder, string?, string?>? optionsAction, IServiceProvider provider, DbContextOptionsBuilder builder)
     {
         ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
-        defaultEFCoreOptionsAction?.Invoke(builder, connectionStrings.ConnectionString, connectionStrings.ProviderName);
+
+        optionsAction?.Invoke(provider, builder, connectionStrings.ConnectionString, connectionStrings.ProviderName);
     }
 
-    [Obsolete]
     private static ConnectionStrings GetConnectionStringAndProviderName(IServiceProvider serviceProvider)
     {
         ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;

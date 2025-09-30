@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Web.Common.Filters;
 ///     In which case it returns a redirect to the same page after 1 sec if not in debug mode.
 /// </summary>
 /// <remarks>
-///     This is only enabled when using <see cref="ModelsMode.InMemoryAuto" /> mode
+///     This is only enabled when using InMemoryAuto mode.
 /// </remarks>
 public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
 {
@@ -30,7 +30,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
     {
     }
 
-    private class ModelBindingExceptionFilter : IExceptionFilter
+    private sealed class ModelBindingExceptionFilter : IExceptionFilter
     {
         private static readonly Regex GetPublishedModelsTypesRegex =
             new("Umbraco.Web.PublishedModels.(\\w+)", RegexOptions.Compiled);
@@ -85,7 +85,7 @@ public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
         ///         The application is in an unstable state and is going to be restarted. The application is restarting now.
         ///     </para>
         /// </remarks>
-        private bool IsMessageAboutTheSameModelType(string exceptionMessage)
+        private static bool IsMessageAboutTheSameModelType(string exceptionMessage)
         {
             MatchCollection matches = GetPublishedModelsTypesRegex.Matches(exceptionMessage);
 

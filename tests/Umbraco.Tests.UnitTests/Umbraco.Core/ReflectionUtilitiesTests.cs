@@ -660,7 +660,9 @@ public class ReflectionUtilitiesTests
         public readonly int Field3 = 22;
 
         public int Field1 = 33;
+#pragma warning disable SA1306 // Field names should begin with lower-case letter
         private readonly int Field2 = 66;
+#pragma warning restore SA1306 // Field names should begin with lower-case letter
 
         public Class1()
         {

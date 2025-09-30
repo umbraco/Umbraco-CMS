@@ -12,6 +12,7 @@ internal sealed class MemberValidationService : ContentValidationServiceBase<IMe
 
     public async Task<ContentValidationResult> ValidatePropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
-        IMemberType memberType)
-        => await HandlePropertiesValidationAsync(contentEditingModelBase, memberType);
+        IMemberType memberType,
+        IEnumerable<string?>? culturesToValidate = null)
+        => await HandlePropertiesValidationAsync(contentEditingModelBase, memberType, culturesToValidate);
 }

@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -18,8 +21,17 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
 {
     private readonly IContentTypeService _contentTypeService;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentTypeTreeControllerBase(IEntityService entityService, IContentTypeService contentTypeService)
-        : base(entityService) =>
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+              contentTypeService)
+    {
+    }
+
+    public DocumentTypeTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
+        : base(entityService, flagProviders) =>
         _contentTypeService = contentTypeService;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DocumentType;
@@ -29,7 +41,7 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
     protected override DocumentTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var contentTypes = _contentTypeService
-            .GetAll(entities.Select(entity => entity.Id).ToArray())
+            .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
         return entities.Select(entity =>

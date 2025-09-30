@@ -15,7 +15,7 @@ public class DecimalValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         => ParseDecimalValue(source);
 
     internal static decimal ParseDecimalValue(object? source)
@@ -35,6 +35,12 @@ public class DecimalValueConverter : PropertyValueConverterBase
         if (source is double sourceDouble)
         {
             return Convert.ToDecimal(sourceDouble);
+        }
+
+        // is it an integer?
+        if (source is int sourceInteger)
+        {
+            return Convert.ToDecimal(sourceInteger);
         }
 
         // is it a string?

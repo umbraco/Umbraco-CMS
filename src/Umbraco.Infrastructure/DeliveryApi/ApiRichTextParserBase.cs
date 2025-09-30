@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Templates;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
@@ -13,27 +13,29 @@ internal abstract partial class ApiRichTextParserBase
     private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
     private readonly IApiMediaUrlProvider _apiMediaUrlProvider;
 
+    protected const string BlockContentKeyAttribute = "data-content-key";
+
     protected ApiRichTextParserBase(IApiContentRouteBuilder apiContentRouteBuilder, IApiMediaUrlProvider apiMediaUrlProvider)
     {
         _apiContentRouteBuilder = apiContentRouteBuilder;
         _apiMediaUrlProvider = apiMediaUrlProvider;
     }
 
-    protected void ReplaceLocalLinks(IPublishedSnapshot publishedSnapshot, string href, string type, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl, Action handleInvalidLink)
+    protected void ReplaceLocalLinks(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl, Action handleInvalidLink)
     {
-        ReplaceStatus replaceAttempt = ReplaceLocalLink(publishedSnapshot, href, type, handleContentRoute, handleMediaUrl);
+        ReplaceStatus replaceAttempt = ReplaceLocalLink(contentCache, mediaCache, href, type, handleContentRoute, handleMediaUrl);
         if (replaceAttempt == ReplaceStatus.Success)
         {
             return;
         }
 
-        if (replaceAttempt == ReplaceStatus.InvalidEntityType || ReplaceLegacyLocalLink(publishedSnapshot, href, handleContentRoute, handleMediaUrl) == ReplaceStatus.InvalidEntityType)
+        if (replaceAttempt == ReplaceStatus.InvalidEntityType || ReplaceLegacyLocalLink(contentCache, mediaCache, href, handleContentRoute, handleMediaUrl) == ReplaceStatus.InvalidEntityType)
         {
             handleInvalidLink();
         }
     }
 
-    private ReplaceStatus ReplaceLocalLink(IPublishedSnapshot publishedSnapshot, string href, string type, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl)
+    private ReplaceStatus ReplaceLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, string type, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl)
     {
         Match match = LocalLinkRegex().Match(href);
         if (match.Success is false)
@@ -51,19 +53,20 @@ internal abstract partial class ApiRichTextParserBase
         switch (udi.EntityType)
         {
             case Constants.UdiEntityType.Document:
-                IPublishedContent? content = publishedSnapshot.Content?.GetById(udi);
+                IPublishedContent? content = contentCache.GetById(guid);
                 IApiContentRoute? route = content != null
                     ? _apiContentRouteBuilder.Build(content)
                     : null;
                 if (route != null)
                 {
+                    route.QueryString = match.Groups["query"].Value.NullOrWhiteSpaceAsNull();
                     handleContentRoute(route);
                     return ReplaceStatus.Success;
                 }
 
                 break;
             case Constants.UdiEntityType.Media:
-                IPublishedContent? media = publishedSnapshot.Media?.GetById(udi);
+                IPublishedContent? media = mediaCache.GetById(guid);
                 if (media != null)
                 {
                     handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
@@ -76,7 +79,7 @@ internal abstract partial class ApiRichTextParserBase
         return ReplaceStatus.InvalidEntityType;
     }
 
-    private ReplaceStatus ReplaceLegacyLocalLink(IPublishedSnapshot publishedSnapshot, string href, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl)
+    private ReplaceStatus ReplaceLegacyLocalLink(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache, string href, Action<IApiContentRoute> handleContentRoute, Action<string> handleMediaUrl)
     {
         Match match = LegacyLocalLinkRegex().Match(href);
         if (match.Success is false)
@@ -89,23 +92,29 @@ internal abstract partial class ApiRichTextParserBase
             return ReplaceStatus.NoMatch;
         }
 
+        // Looking at the old NuCache implementation, Udi's HAD to be GuidUdi's, so we'll assume that here too
+        if(udi is not GuidUdi guidUdi)
+        {
+            return ReplaceStatus.NoMatch;
+        }
 
         switch (udi.EntityType)
         {
             case Constants.UdiEntityType.Document:
-                IPublishedContent? content = publishedSnapshot.Content?.GetById(udi);
+                IPublishedContent? content = contentCache.GetById(guidUdi.Guid);
                 IApiContentRoute? route = content != null
                     ? _apiContentRouteBuilder.Build(content)
                     : null;
                 if (route != null)
                 {
+                    route.QueryString = match.Groups["query"].Value.NullOrWhiteSpaceAsNull();
                     handleContentRoute(route);
                     return ReplaceStatus.Success;
                 }
 
                 break;
             case Constants.UdiEntityType.Media:
-                IPublishedContent? media = publishedSnapshot.Media?.GetById(udi);
+                IPublishedContent? media = mediaCache.GetById(guidUdi.Guid);
                 if (media != null)
                 {
                     handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
@@ -118,14 +127,14 @@ internal abstract partial class ApiRichTextParserBase
         return ReplaceStatus.InvalidEntityType;
     }
 
-    protected void ReplaceLocalImages(IPublishedSnapshot publishedSnapshot, string udi, Action<string> handleMediaUrl)
+    protected void ReplaceLocalImages(IPublishedMediaCache mediaCache, string udi, Action<string> handleMediaUrl)
     {
-        if (UdiParser.TryParse(udi, out Udi? udiValue) is false)
+        if (UdiParser.TryParse(udi, out Udi? udiValue) is false || udiValue is not GuidUdi guidUdi)
         {
             return;
         }
 
-        IPublishedContent? media = publishedSnapshot.Media?.GetById(udiValue);
+        IPublishedContent? media = mediaCache.GetById(guidUdi.Guid);
         if (media is null)
         {
             return;
@@ -134,10 +143,10 @@ internal abstract partial class ApiRichTextParserBase
         handleMediaUrl(_apiMediaUrlProvider.GetUrl(media));
     }
 
-    [GeneratedRegex("{localLink:(?<udi>umb:.+)}")]
+    [GeneratedRegex("{localLink:(?<udi>umb:.+)}(?<query>[^\"]*)")]
     private static partial Regex LegacyLocalLinkRegex();
 
-    [GeneratedRegex("{localLink:(?<guid>.+)}")]
+    [GeneratedRegex("{localLink:(?<guid>.+)}(?<query>[^\"]*)")]
     private static partial Regex LocalLinkRegex();
 
     private enum ReplaceStatus

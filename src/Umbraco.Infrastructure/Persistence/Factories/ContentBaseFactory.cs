@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -6,7 +7,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
-internal class ContentBaseFactory
+internal sealed class ContentBaseFactory
 {
     /// <summary>
     ///     Builds an IContent item from a dto and content type.
@@ -39,8 +40,9 @@ internal class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
+
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
 
             content.Published = dto.Published;
             content.Edited = dto.Edited;
@@ -52,7 +54,7 @@ internal class ContentBaseFactory
                 content.PublishedVersionId = publishedVersionDto.Id;
                 if (dto.Published)
                 {
-                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
+                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate.EnsureUtc();
                     content.PublishName = publishedVersionDto.ContentVersionDto.Text;
                     content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
                 }
@@ -71,7 +73,7 @@ internal class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds an IMedia item from a dto and content type.
+    ///     Builds a Media item from a dto and content type.
     /// </summary>
     public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType? contentType)
     {
@@ -97,8 +99,8 @@ internal class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
 
             // reset dirty initial properties (U4-1946)
             content.ResetDirtyProperties(false);
@@ -111,7 +113,7 @@ internal class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds an IMedia item from a dto and content type.
+    ///     Builds a Member item from a dto and member type.
     /// </summary>
     public static Member BuildEntity(MemberDto dto, IMemberType? contentType)
     {
@@ -126,7 +128,9 @@ internal class ContentBaseFactory
 
             content.Id = dto.NodeId;
             content.SecurityStamp = dto.SecurityStampToken;
-            content.EmailConfirmedDate = dto.EmailConfirmedDate;
+            content.EmailConfirmedDate = dto.EmailConfirmedDate.HasValue
+                ? dto.EmailConfirmedDate.Value.EnsureUtc()
+                : null;
             content.PasswordConfiguration = dto.PasswordConfig;
             content.Key = nodeDto.UniqueId;
             content.VersionId = contentVersionDto.Id;
@@ -140,14 +144,20 @@ internal class ContentBaseFactory
 
             content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
             content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
             content.FailedPasswordAttempts = dto.FailedPasswordAttempts ?? default;
             content.IsLockedOut = dto.IsLockedOut;
             content.IsApproved = dto.IsApproved;
-            content.LastLoginDate = dto.LastLoginDate;
-            content.LastLockoutDate = dto.LastLockoutDate;
-            content.LastPasswordChangeDate = dto.LastPasswordChangeDate;
+            content.LastLockoutDate = dto.LastLockoutDate.HasValue
+                ? dto.LastLockoutDate.Value.EnsureUtc()
+                : null;
+            content.LastLoginDate = dto.LastLoginDate.HasValue
+                ? dto.LastLoginDate.Value.EnsureUtc()
+                : null;
+            content.LastPasswordChangeDate = dto.LastPasswordChangeDate.HasValue
+                ? dto.LastPasswordChangeDate.Value.EnsureUtc()
+                : null;
 
             // reset dirty initial properties (U4-1946)
             content.ResetDirtyProperties(false);

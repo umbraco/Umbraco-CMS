@@ -1,31 +1,31 @@
 using System.Text;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
 public class ModelsGenerator : IModelsGenerator
 {
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly OutOfDateModelsStatus _outOfDateModels;
+    private readonly IHostEnvironment _hostEnvironment;
     private readonly UmbracoServices _umbracoService;
     private ModelsBuilderSettings _config;
 
     public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config,
-        OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment)
+        OutOfDateModelsStatus outOfDateModels, IHostEnvironment hostEnvironment)
     {
         _umbracoService = umbracoService;
         _config = config.CurrentValue;
         _outOfDateModels = outOfDateModels;
-        _hostingEnvironment = hostingEnvironment;
+        _hostEnvironment = hostEnvironment;
         config.OnChange(x => _config = x);
     }
 
     public void GenerateModels()
     {
-        var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
+        var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostEnvironment);
         if (!Directory.Exists(modelsDirectory))
         {
             Directory.CreateDirectory(modelsDirectory);

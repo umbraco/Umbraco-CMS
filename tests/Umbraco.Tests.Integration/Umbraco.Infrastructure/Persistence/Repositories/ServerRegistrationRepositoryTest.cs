@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
+internal sealed class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp()
@@ -39,7 +39,7 @@ public class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.Now);
+            var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.UtcNow);
 
             Assert.That(() => repository.Save(server), Throws.InstanceOf<DbException>());
         }
@@ -156,7 +156,7 @@ public class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var server = new ServerRegistration("http://shazwazza.com", "COMPUTER4", DateTime.Now);
+            var server = new ServerRegistration("http://shazwazza.com", "COMPUTER4", DateTime.UtcNow);
             repository.Save(server);
 
             // Assert
@@ -237,9 +237,9 @@ public class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            repository.Save(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
-            repository.Save(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));
-            repository.Save(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.Now));
+            repository.Save(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.UtcNow) { IsActive = true });
+            repository.Save(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.UtcNow));
+            repository.Save(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.UtcNow));
             scope.Complete();
         }
     }

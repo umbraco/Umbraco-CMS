@@ -8,12 +8,15 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </summary>
 public interface IBackOfficeExamineSearcher
 {
+    // default implementation to avoid breaking changes falls back to old behaviour
     IEnumerable<ISearchResult> Search(
         string query,
         UmbracoEntityTypes entityType,
         int pageSize,
         long pageIndex,
         out long totalFound,
+        string[]? contentTypeAliases,
+        bool? trashed,
         string? searchFrom = null,
         bool ignoreUserStartNodes = false);
 }

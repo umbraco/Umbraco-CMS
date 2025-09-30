@@ -2,32 +2,35 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase<RichTextBlockModel, RichTextBlockItem, RichTextBlockLayoutItem, RichTextConfiguration.RichTextBlockConfiguration, RichTextBlockValue>
+internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase<RichTextBlockModel, RichTextBlockItem, RichTextBlockLayoutItem, RichTextConfiguration.RichTextBlockConfiguration, RichTextBlockValue>
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
 
     public RichTextBlockPropertyValueCreator(
         BlockEditorConverter blockEditorConverter,
+        IVariationContextAccessor variationContextAccessor,
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
         IJsonSerializer jsonSerializer,
         RichTextBlockPropertyValueConstructorCache constructorCache)
-        : base(blockEditorConverter)
+        : base(blockEditorConverter, variationContextAccessor, blockEditorVarianceHandler)
     {
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;
     }
 
-    public RichTextBlockModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
+    public RichTextBlockModel CreateBlockModel(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
     {
         RichTextBlockModel CreateEmptyModel() => RichTextBlockModel.Empty;
 
         RichTextBlockModel CreateModel(IList<RichTextBlockItem> items) => new RichTextBlockModel(items);
 
-        RichTextBlockModel blockModel = CreateBlockModel(referenceCacheLevel, blockValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
+        RichTextBlockModel blockModel = CreateBlockModel(owner, referenceCacheLevel, blockValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
 
         return blockModel;
     }
@@ -36,7 +39,7 @@ internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase
 
     protected override BlockItemActivator<RichTextBlockItem> CreateBlockItemActivator() => new RichTextBlockItemActivator(BlockEditorConverter, _constructorCache);
 
-    private class RichTextBlockItemActivator : BlockItemActivator<RichTextBlockItem>
+    private sealed class RichTextBlockItemActivator : BlockItemActivator<RichTextBlockItem>
     {
         public RichTextBlockItemActivator(BlockEditorConverter blockConverter, RichTextBlockPropertyValueConstructorCache constructorCache)
             : base(blockConverter, constructorCache)

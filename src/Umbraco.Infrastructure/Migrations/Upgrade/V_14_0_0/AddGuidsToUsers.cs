@@ -26,6 +26,12 @@ internal class AddGuidsToUsers : UnscopedMigrationBase
 
     protected override void Migrate()
     {
+        if (ColumnExists(Constants.DatabaseSchema.Tables.User, NewColumnName))
+        {
+            Context.Complete();
+            return;
+        }
+
         InvalidateBackofficeUserAccess = true;
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
@@ -75,11 +81,6 @@ internal class AddGuidsToUsers : UnscopedMigrationBase
 
     private void MigrateSqlite()
     {
-        if (ColumnExists(Constants.DatabaseSchema.Tables.User, NewColumnName))
-        {
-            return;
-        }
-
         /*
          * We commit the initial transaction started by the scope. This is required in order to disable the foreign keys.
          * We then begin a new transaction, this transaction will be committed or rolled back by the scope, like normal.

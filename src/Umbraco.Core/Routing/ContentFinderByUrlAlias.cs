@@ -1,6 +1,10 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -21,20 +25,22 @@ public class ContentFinderByUrlAlias : IContentFinder
     private readonly ILogger<ContentFinderByUrlAlias> _logger;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly IVariationContextAccessor _variationContextAccessor;
-
+    private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
     /// </summary>
     public ContentFinderByUrlAlias(
         ILogger<ContentFinderByUrlAlias> logger,
         IPublishedValueFallback publishedValueFallback,
-        IVariationContextAccessor variationContextAccessor,
-        IUmbracoContextAccessor umbracoContextAccessor)
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
     {
         _publishedValueFallback = publishedValueFallback;
-        _variationContextAccessor = variationContextAccessor;
         _umbracoContextAccessor = umbracoContextAccessor;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
         _logger = logger;
     }
 
@@ -138,14 +144,19 @@ public class ContentFinderByUrlAlias : IContentFinder
         if (rootNodeId > 0)
         {
             IPublishedContent? rootNode = cache?.GetById(rootNodeId);
-            return rootNode?.Descendants(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
+            return rootNode?.Descendants(_documentNavigationQueryService, _publishedContentStatusFilteringService).FirstOrDefault(x => IsMatch(x, test1, test2));
         }
 
         if (cache is not null)
         {
-            foreach (IPublishedContent rootContent in cache.GetAtRoot())
+            if (_documentNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
             {
-                IPublishedContent? c = rootContent.DescendantsOrSelf(_variationContextAccessor)
+                return null;
+            }
+
+            foreach (IPublishedContent rootContent in rootKeys.Select(x => cache.GetById(false, x)).WhereNotNull())
+            {
+                IPublishedContent? c = rootContent.DescendantsOrSelf(_documentNavigationQueryService, _publishedContentStatusFilteringService)
                     .FirstOrDefault(x => IsMatch(x, test1, test2));
                 if (c != null)
                 {

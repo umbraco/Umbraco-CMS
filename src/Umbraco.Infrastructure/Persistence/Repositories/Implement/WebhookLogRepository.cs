@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -37,10 +37,17 @@ public class WebhookLogRepository : IWebhookLogRepository
     }
 
     public async Task<PagedModel<WebhookLog>> GetPagedAsync(int skip, int take)
+        => await GetPagedAsyncInternal(null, skip, take);
+
+    public async Task<PagedModel<WebhookLog>> GetPagedAsync(Guid webhookKey, int skip, int take)
+        => await GetPagedAsyncInternal(webhookKey, skip, take);
+
+    private async Task<PagedModel<WebhookLog>> GetPagedAsyncInternal(Guid? webhookKey, int skip, int take)
     {
         Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Select<WebhookLogDto>()
             .From<WebhookLogDto>()
+            .Where<WebhookLogDto>(x => !webhookKey.HasValue || x.WebhookKey == webhookKey)
             .OrderByDescending<WebhookLogDto>(x => x.Date);
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);

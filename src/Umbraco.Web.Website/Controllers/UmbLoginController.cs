@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.Filters;
@@ -20,8 +23,9 @@ public class UmbLoginController : SurfaceController
     private readonly IMemberManager _memberManager;
     private readonly IMemberSignInManager _signInManager;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
 
-    [ActivatorUtilitiesConstructor]
     public UmbLoginController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IUmbracoDatabaseFactory databaseFactory,
@@ -31,12 +35,16 @@ public class UmbLoginController : SurfaceController
         IPublishedUrlProvider publishedUrlProvider,
         IMemberSignInManager signInManager,
         IMemberManager memberManager,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
         : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
     {
         _signInManager = signInManager;
         _memberManager = memberManager;
         _twoFactorLoginService = twoFactorLoginService;
+        _navigationQueryService = navigationQueryService;
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
     }
 
     [HttpPost]
@@ -67,7 +75,7 @@ public class UmbLoginController : SurfaceController
                 // If it's not a local URL we'll redirect to the root of the current site.
                 return Redirect(Url.IsLocalUrl(model.RedirectUrl)
                     ? model.RedirectUrl
-                    : CurrentPage!.AncestorOrSelf(1)!.Url(PublishedUrlProvider));
+                    : CurrentPage!.AncestorOrSelf(_navigationQueryService, _publishedContentStatusFilteringService, 1)!.Url(PublishedUrlProvider));
             }
 
             // Redirect to current URL by default.

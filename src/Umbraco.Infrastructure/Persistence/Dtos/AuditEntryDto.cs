@@ -5,11 +5,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.AuditEntry)]
+[TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class AuditEntryDto
+internal sealed class AuditEntryDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.AuditEntry;
+
     [Column("id")]
     [PrimaryKeyColumn]
     public int Id { get; set; }
@@ -19,6 +21,10 @@ internal class AuditEntryDto
     // users can still be identified via the details free-form text fields.
     [Column("performingUserId")]
     public int PerformingUserId { get; set; }
+
+    [Column("performingUserKey")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public Guid? PerformingUserKey { get; set; }
 
     [Column("performingDetails")]
     [NullSetting(NullSetting = NullSettings.Null)]
@@ -31,11 +37,15 @@ internal class AuditEntryDto
     public string? PerformingIp { get; set; }
 
     [Column("eventDateUtc")]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
-    public DateTime EventDateUtc { get; set; }
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+    public DateTime EventDate { get; set; }
 
     [Column("affectedUserId")]
     public int AffectedUserId { get; set; }
+
+    [Column("affectedUserKey")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public Guid? AffectedUserKey { get; set; }
 
     [Column("affectedDetails")]
     [NullSetting(NullSetting = NullSettings.Null)]

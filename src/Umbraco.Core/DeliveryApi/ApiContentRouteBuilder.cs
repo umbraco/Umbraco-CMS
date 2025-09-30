@@ -5,7 +5,8 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
@@ -15,47 +16,31 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly IApiContentPathProvider _apiContentPathProvider;
     private readonly GlobalSettings _globalSettings;
     private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IRequestPreviewService _requestPreviewService;
+    private readonly IPublishedContentCache _contentCache;
+    private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentUrlService _documentUrlService;
     private RequestHandlerSettings _requestSettings;
 
-    [Obsolete($"Use the constructor that does not accept {nameof(IPublishedUrlProvider)}. Will be removed in V15.")]
-    public ApiContentRouteBuilder(
-        IPublishedUrlProvider publishedUrlProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IRequestPreviewService requestPreviewService,
-        IOptionsMonitor<RequestHandlerSettings> requestSettings)
-        : this(StaticServiceProvider.Instance.GetRequiredService<IApiContentPathProvider>(), globalSettings, variationContextAccessor, publishedSnapshotAccessor, requestPreviewService, requestSettings)
-    {
-    }
-
-    [Obsolete($"Use the constructor that does not accept {nameof(IPublishedUrlProvider)}. Will be removed in V15.")]
-    public ApiContentRouteBuilder(
-        IPublishedUrlProvider publishedUrlProvider,
-        IApiContentPathProvider apiContentPathProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IVariationContextAccessor variationContextAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IRequestPreviewService requestPreviewService,
-        IOptionsMonitor<RequestHandlerSettings> requestSettings)
-        : this(apiContentPathProvider, globalSettings, variationContextAccessor, publishedSnapshotAccessor, requestPreviewService, requestSettings)
-    {
-    }
-
     public ApiContentRouteBuilder(
         IApiContentPathProvider apiContentPathProvider,
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor variationContextAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IRequestPreviewService requestPreviewService,
-        IOptionsMonitor<RequestHandlerSettings> requestSettings)
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentUrlService documentUrlService)
     {
         _apiContentPathProvider = apiContentPathProvider;
         _variationContextAccessor = variationContextAccessor;
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _requestPreviewService = requestPreviewService;
+        _contentCache = contentCache;
+        _navigationQueryService = navigationQueryService;
+        _publishStatusQueryService = publishStatusQueryService;
+        _documentUrlService = documentUrlService;
         _globalSettings = globalSettings.Value;
         _requestSettings = requestSettings.CurrentValue;
         requestSettings.OnChange(settings => _requestSettings = settings);
@@ -78,7 +63,12 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
         contentPath = contentPath.EnsureStartsWith("/");
 
-        IPublishedContent root = GetRoot(content, isPreview);
+        IPublishedContent? root = GetRoot(content, isPreview);
+        if (root is null)
+        {
+            return null;
+        }
+
         var rootPath = root.UrlSegment(_variationContextAccessor, culture) ?? string.Empty;
 
         if (_globalSettings.HideTopLevelNodeFromPath == false)
@@ -93,7 +83,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     {
         // entirely unpublished content does not resolve any route, but we need one i.e. for preview to work,
         // so we'll use the content key as path.
-        if (isPreview && content.IsPublished(culture) is false)
+        if (isPreview && _publishStatusQueryService.IsDocumentPublished(content.Key, culture ?? string.Empty) is false)
         {
             return ContentPreviewPath(content);
         }
@@ -106,7 +96,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         // we can perform fallback to the content route.
         if (IsInvalidContentPath(contentPath))
         {
-            contentPath = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content?.GetRouteById(content.Id, culture) ?? contentPath;
+            contentPath = _documentUrlService.GetLegacyRouteFormat(content.Key, culture ?? _variationContextAccessor.VariationContext?.Culture, isPreview);
         }
 
         // if the content path has still not been resolved as a valid path, the content is un-routable in this culture
@@ -118,27 +108,30 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
                 : null;
         }
 
-        return contentPath;
+        return _requestSettings.AddTrailingSlash
+            ? contentPath?.EnsureEndsWith('/')
+            : contentPath?.TrimEnd('/');
     }
 
     private string ContentPreviewPath(IPublishedContent content) => $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
 
     private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
 
-    private IPublishedContent GetRoot(IPublishedContent content, bool isPreview)
+    private IPublishedContent? GetRoot(IPublishedContent content, bool isPreview)
     {
-        if (isPreview is false)
+        if (content.Level == 1)
         {
-            return content.Root();
+            return content;
         }
 
-        // in very edge case scenarios during preview, content.Root() does not map to the root.
-        // we'll code our way around it for the time being.
-        return _publishedSnapshotAccessor
-                   .GetRequiredPublishedSnapshot()
-                   .Content?
-                   .GetAtRoot(true)
-                   .FirstOrDefault(root => root.IsAncestorOrSelf(content))
-               ?? content.Root();
+        if (_navigationQueryService.TryGetAncestorsKeys(content.Key, out IEnumerable<Guid> ancestorKeys) is false)
+        {
+            return null;
+        }
+
+        Guid[] ancestorKeysAsArray = ancestorKeys as Guid[] ?? ancestorKeys.ToArray();
+        return ancestorKeysAsArray.Length > 0
+            ? _contentCache.GetById(isPreview, ancestorKeysAsArray.Last())
+            : content;
     }
 }

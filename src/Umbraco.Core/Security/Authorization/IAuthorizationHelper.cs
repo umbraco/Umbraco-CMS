@@ -24,5 +24,17 @@ public interface IAuthorizationHelper
     /// <param name="currentUser">The current user's principal.</param>
     /// <param name="user">The resulting <see cref="IUser" />, if the conversion is successful.</param>
     /// <returns>True if the conversion is successful, false otherwise</returns>
-    bool TryGetUmbracoUser(IPrincipal currentUser, [NotNullWhen(true)] out IUser? user);
+    bool TryGetUmbracoUser(IPrincipal currentUser, [NotNullWhen(true)] out IUser? user)
+    {
+        try
+        {
+            user = GetUmbracoUser(currentUser);
+            return true;
+        }
+        catch
+        {
+            user = null;
+            return false;
+        }
+    }
 }

@@ -24,6 +24,7 @@ namespace Umbraco.Cms.Core.Routing;
 ///     </para>
 ///     <para>If successful, then the template of the document request is also assigned.</para>
 /// </remarks>
+[Obsolete("Scheduled for removal in Umbraco 18")]
 public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
 {
     private readonly IContentTypeService _contentTypeService;
@@ -77,8 +78,8 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
 
         // look for template in last position
         var pos = path.LastIndexOf('/');
-        var templateAlias = path.Substring(pos + 1);
-        path = pos == 0 ? "/" : path.Substring(0, pos);;
+        var templateAlias = path[(pos + 1)..];
+        path = pos == 0 ? "/" : path[..pos];
 
         ITemplate? template = _fileService.GetTemplate(templateAlias);
 

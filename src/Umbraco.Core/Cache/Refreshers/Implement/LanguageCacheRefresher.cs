@@ -11,14 +11,18 @@ namespace Umbraco.Cms.Core.Cache;
 public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageCacheRefresherNotification,
     LanguageCacheRefresher.JsonPayload>
 {
+    private readonly IDomainCacheService _domainCacheService;
+
     public LanguageCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
-        IPublishedSnapshotService publishedSnapshotService,
         IEventAggregator eventAggregator,
+        IDomainCacheService domainCache,
         ICacheRefresherNotificationFactory factory)
-        : base(appCaches, serializer, eventAggregator, factory) =>
-        _publishedSnapshotService = publishedSnapshotService;
+        : base(appCaches, serializer, eventAggregator, factory)
+    {
+        _domainCacheService = domainCache;
+    }
 
     /// <summary>
     ///     Clears all domain caches
@@ -34,7 +38,7 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         {
             new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll),
         };
-        _publishedSnapshotService.Notify(payloads);
+        _domainCacheService.Refresh(payloads);
     }
 
     #region Json
@@ -83,7 +87,6 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
     #region Define
 
     public static readonly Guid UniqueId = Guid.Parse("3E0F95D8-0BE5-44B8-8394-2B8750B62654");
-    private readonly IPublishedSnapshotService _publishedSnapshotService;
 
     public override Guid RefresherUniqueId => UniqueId;
 
@@ -141,8 +144,6 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
                     ChangeTypes = TreeChangeTypes.RefreshAll
                 }
             };
-
-            ContentCacheRefresher.NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, clearContentPayload);
         }
 
         // then trigger event

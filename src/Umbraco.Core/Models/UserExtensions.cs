@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -25,7 +26,7 @@ public static class UserExtensions
     {
         if (user.Avatar.IsNullOrWhiteSpace() || user.Avatar == "none")
         {
-            return new string[0];
+            return [];
         }
 
         // use the custom avatar
@@ -136,13 +137,13 @@ public static class UserExtensions
             throw new ArgumentNullException("user");
         }
 
-        return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.SensitiveDataGroupAlias);
+        return user.Groups != null && user.Groups.Any(x => x.Key == Constants.Security.SensitiveDataGroupKey);
     }
 
     /// <summary>
     ///     Calculate start nodes, combining groups' and user's, and excluding what's in the bin
     /// </summary>
-    public static int[]? CalculateAllowedLanguageIds(this IUser user, ILocalizationService localizationService)
+    public static int[] CalculateAllowedLanguageIds(this IUser user, ILocalizationService localizationService)
     {
         var hasAccessToAllLanguages = user.Groups.Any(x => x.HasAccessToAllLanguages);
 
@@ -303,7 +304,7 @@ public static class UserExtensions
             usn.Add(sn);
         }
 
-        foreach (var sn in usn)
+        foreach (var sn in CollectionsMarshal.AsSpan(usn))
         {
             var snp = paths[sn]; // has to be here now
             lsn.RemoveAll(x =>

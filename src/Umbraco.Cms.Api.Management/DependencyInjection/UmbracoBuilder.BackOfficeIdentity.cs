@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.NotificationHandlers;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.Telemetry;
@@ -12,6 +13,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
@@ -52,8 +54,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IUserRepository>(),
                 factory.GetRequiredService<IRuntimeState>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<ILogger<BackOfficeUserStore>>()
-            ))
+                factory.GetRequiredService<ILogger<BackOfficeUserStore>>()))
             .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
             .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
             .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>()
@@ -66,6 +67,7 @@ public static partial class UmbracoBuilderExtensions
         services.AddScoped<IInviteUriProvider, InviteUriProvider>();
         services.AddScoped<IForgotPasswordUriProvider, ForgotPasswordUriProvider>();
         services.AddScoped<IBackOfficePasswordChanger, BackOfficePasswordChanger>();
+        services.AddScoped<IBackOfficeUserClientCredentialsManager, BackOfficeUserClientCredentialsManager>();
 
         services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
 
@@ -73,6 +75,9 @@ public static partial class UmbracoBuilderExtensions
         services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
 
         services.AddScoped<IBackOfficeExternalLoginService, BackOfficeExternalLoginService>();
+
+        // Register a notification handler to interrogate the registered external login providers at startup.
+        builder.AddNotificationHandler<UmbracoApplicationStartingNotification, ExternalLoginProviderStartupHandler>();
 
         return builder;
     }
@@ -94,14 +99,16 @@ public static partial class UmbracoBuilderExtensions
     /// <summary>
     ///     Adds support for external login providers in Umbraco
     /// </summary>
-    public static IUmbracoBuilder AddBackOfficeExternalLogins(this IUmbracoBuilder umbracoBuilder,
+    public static IUmbracoBuilder AddBackOfficeExternalLogins(
+        this IUmbracoBuilder umbracoBuilder,
         Action<BackOfficeExternalLoginsBuilder> builder)
     {
         builder(new BackOfficeExternalLoginsBuilder(umbracoBuilder.Services));
         return umbracoBuilder;
     }
 
-    public static BackOfficeIdentityBuilder AddTwoFactorProvider<T>(this BackOfficeIdentityBuilder identityBuilder,
+    public static BackOfficeIdentityBuilder AddTwoFactorProvider<T>(
+        this BackOfficeIdentityBuilder identityBuilder,
         string providerName) where T : class, ITwoFactorProvider
     {
         identityBuilder.Services.AddSingleton<ITwoFactorProvider, T>();

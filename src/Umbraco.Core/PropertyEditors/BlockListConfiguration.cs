@@ -9,12 +9,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class BlockListConfiguration
 {
     [ConfigurationField("blocks")]
-    public BlockConfiguration[] Blocks { get; set; } = null!;
+    public BlockConfiguration[] Blocks { get; set; } = Array.Empty<BlockConfiguration>();
 
     [ConfigurationField("validationLimit")]
     public NumberRange ValidationLimit { get; set; } = new();
 
     [ConfigurationField("useSingleBlockMode")]
+    [Obsolete("Use SingleBlockPropertyEditor and its configuration instead")]
     public bool UseSingleBlockMode { get; set; }
 
     public class BlockConfiguration : IBlockConfiguration

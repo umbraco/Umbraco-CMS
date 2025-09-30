@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -9,14 +9,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 public class DocumentDto
 {
-    private const string TableName = Constants.DatabaseSchema.Tables.Document;
+    public const string TableName = Constants.DatabaseSchema.Tables.Document;
+
+
+    // Public constants to bind properties between DTOs
+    public const string PublishedColumnName = "published";
 
     [Column("nodeId")]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }
 
-    [Column("published")]
+    [Column(PublishedColumnName)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
     public bool Published { get; set; }
 

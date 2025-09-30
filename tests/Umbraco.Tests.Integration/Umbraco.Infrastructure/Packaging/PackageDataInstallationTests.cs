@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging;
 [TestFixture]
 [Category("Slow")]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
-public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
+internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 {
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
@@ -87,7 +87,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
+    public async Task Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
     {
         // Arrange
         var strXml = ImportResources.uBlogsy_Package;
@@ -98,7 +98,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
         // Act
         var dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), -1);
-        var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), -1);
+        var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), -1);
 
         var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
@@ -135,7 +135,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Can_Import_Inherited_ContentTypes_And_Verify_PropertyTypes_UniqueIds()
+    public async Task Can_Import_Inherited_ContentTypes_And_Verify_PropertyTypes_UniqueIds()
     {
         // Arrange
         var strXml = ImportResources.InheritedDocTypes_Package;
@@ -146,7 +146,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
         // Act
         var dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), -1);
-        var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), -1);
+        var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), -1);
 
         // Assert
@@ -162,7 +162,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Can_Import_Inherited_ContentTypes_And_Verify_PropertyGroups_And_PropertyTypes()
+    public async Task Can_Import_Inherited_ContentTypes_And_Verify_PropertyGroups_And_PropertyTypes()
     {
         // Arrange
         var strXml = ImportResources.InheritedDocTypes_Package;
@@ -173,7 +173,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
         // Act
         var dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), -1);
-        var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), -1);
+        var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), -1);
 
         var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
@@ -202,7 +202,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Can_Import_Template_Package_Xml()
+    public async Task Can_Import_Template_Package_Xml()
     {
         // Arrange
         var strXml = ImportResources.StandardMvc_Package;
@@ -212,7 +212,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         var init = FileService.GetTemplates().Count();
 
         // Act
-        var templates = PackageDataInstallation.ImportTemplates(element.Elements("Template").ToList(), -1);
+        var templates = await PackageDataInstallation.ImportTemplatesAsync(element.Elements("Template").ToList(), -1);
         var numberOfTemplates = (from doc in element.Elements("Template") select doc).Count();
         var allTemplates = FileService.GetTemplates();
 
@@ -226,7 +226,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Import_Single_Template()
+    public async Task Can_Import_Single_Template()
     {
         // Arrange
         var strXml = ImportResources.StandardMvc_Package;
@@ -234,7 +234,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         var element = xml.Descendants("Templates").First();
 
         // Act
-        var templates = PackageDataInstallation.ImportTemplate(element.Elements("Template").First(), -1);
+        var templates = await PackageDataInstallation.ImportTemplateAsync(element.Elements("Template").First(), -1);
 
         // Assert
         Assert.That(templates, Is.Not.Null);
@@ -246,7 +246,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Import_Single_Template_With_Key()
+    public async Task Can_Import_Single_Template_With_Key()
     {
         // Arrange
         var strXml = ImportResources.StandardMvc_Package;
@@ -258,7 +258,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         firstTemplateElement.Add(new XElement("Key", key));
 
         // Act
-        var templates = PackageDataInstallation.ImportTemplate(firstTemplateElement, -1);
+        var templates = await PackageDataInstallation.ImportTemplateAsync(firstTemplateElement, -1);
 
         // Assert
         Assert.That(templates, Is.Not.Null);
@@ -272,7 +272,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Can_Import_StandardMvc_ContentTypes_Package_Xml()
+    public async Task Can_Import_StandardMvc_ContentTypes_Package_Xml()
     {
         // Arrange
         var strXml = ImportResources.StandardMvc_Package;
@@ -284,7 +284,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         // Act
         var dataTypeDefinitions =
             PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), -1);
-        var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), -1);
+        var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), -1);
         var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
@@ -311,7 +311,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Can_Import_StandardMvc_ContentTypes_And_Templates_Xml()
+    public async Task Can_Import_StandardMvc_ContentTypes_And_Templates_Xml()
     {
         // Arrange
         var strXml = ImportResources.StandardMvc_Package;
@@ -323,7 +323,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         // Act
         var dataTypeDefinitions =
             PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), -1);
-        var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), -1);
+        var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), -1);
         var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
@@ -338,7 +338,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Can_Import_Fanoe_Starterkit_ContentTypes_And_Templates_Xml()
+    public async Task Can_Import_Fanoe_Starterkit_ContentTypes_And_Templates_Xml()
     {
         // Arrange
         var strXml = ImportResources.Fanoe_Package;
@@ -350,7 +350,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         // Act
         var dataTypeDefinitions =
             PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), -1);
-        var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), -1);
+        var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), -1);
         var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
@@ -462,7 +462,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Import_Templates_Package_Xml_With_Invalid_Master()
+    public async Task Can_Import_Templates_Package_Xml_With_Invalid_Master()
     {
         // Arrange
         var strXml = ImportResources.XsltSearch_Package;
@@ -470,7 +470,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         var templateElement = xml.Descendants("Templates").First();
 
         // Act
-        var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), -1);
+        var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
 
         // Assert
@@ -544,7 +544,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_ReImport_Templates_To_Update()
+    public async Task Can_ReImport_Templates_To_Update()
     {
         var newPackageXml = XElement.Parse(ImportResources.TemplateOnly_Package);
         var updatedPackageXml = XElement.Parse(ImportResources.TemplateOnly_Updated_Package);
@@ -559,9 +559,9 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
         // Act
         var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
-        var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), -1);
+        var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var templatesAfterUpdate =
-            PackageDataInstallation.ImportTemplates(templateElementUpdated.Elements("Template").ToList(), -1);
+            await PackageDataInstallation.ImportTemplatesAsync(templateElementUpdated.Elements("Template").ToList(), -1);
         var allTemplates = fileService.GetTemplates();
 
         // Assert
@@ -694,7 +694,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     [Test]
     [LongRunning]
-    public void Can_Import_Package_With_Compositions()
+    public async Task Can_Import_Package_With_Compositions()
     {
         // Arrange
         var strXml = ImportResources.CompositionsTestPackage;
@@ -703,7 +703,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         var docTypeElement = xml.Descendants("DocumentTypes").First();
 
         // Act
-        var templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), -1);
+        var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), -1);
         var numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 

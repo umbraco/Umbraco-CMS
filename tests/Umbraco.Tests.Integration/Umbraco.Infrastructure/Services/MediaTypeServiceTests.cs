@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
-public class MediaTypeServiceTests : UmbracoIntegrationTest
+internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
 {
     private MediaService MediaService => (MediaService)GetRequiredService<IMediaService>();
 
@@ -170,9 +170,11 @@ public class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(mediaType.Key, sut.Key);
         Assert.AreNotEqual(mediaType.Path, sut.Path);
         Assert.AreNotEqual(mediaType.SortOrder, sut.SortOrder);
-        Assert.AreNotEqual(mediaType.PropertyTypes.First(x => x.Alias.Equals("umbracoFile")).Id,
+        Assert.AreNotEqual(
+            mediaType.PropertyTypes.First(x => x.Alias.Equals("umbracoFile")).Id,
             sut.PropertyTypes.First(x => x.Alias.Equals("umbracoFile")).Id);
-        Assert.AreNotEqual(mediaType.PropertyGroups.First(x => x.Name.Equals("Media")).Id,
+        Assert.AreNotEqual(
+            mediaType.PropertyGroups.First(x => x.Name.Equals("Media")).Id,
             sut.PropertyGroups.First(x => x.Name.Equals("Media")).Id);
     }
 
@@ -214,9 +216,11 @@ public class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(clonedMediaType.Key, originalMediaType.Key);
         Assert.AreNotEqual(clonedMediaType.Path, originalMediaType.Path);
 
-        Assert.AreNotEqual(clonedMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id,
+        Assert.AreNotEqual(
+            clonedMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id,
             originalMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id);
-        Assert.AreNotEqual(clonedMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id,
+        Assert.AreNotEqual(
+            clonedMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id,
             originalMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id);
     }
 
@@ -248,7 +252,7 @@ public class MediaTypeServiceTests : UmbracoIntegrationTest
         Assert.Throws<InvalidOperationException>(() => mediaType.Alias += "_updated");
     }
 
-    public class ContentNotificationHandler :
+    internal sealed class ContentNotificationHandler :
         INotificationHandler<MediaMovedToRecycleBinNotification>
     {
         public static Action<MediaMovedToRecycleBinNotification> MovedMediaToRecycleBin { get; set; }

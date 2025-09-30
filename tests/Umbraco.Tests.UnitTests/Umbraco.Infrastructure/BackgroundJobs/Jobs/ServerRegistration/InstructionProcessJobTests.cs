@@ -30,7 +30,7 @@ public class InstructionProcessJobTests
 
     private InstructionProcessJob CreateInstructionProcessJob()
     {
-       
+
         var mockLogger = new Mock<ILogger<InstructionProcessJob>>();
 
         _mockDatabaseServerMessenger = new Mock<IServerMessenger>();

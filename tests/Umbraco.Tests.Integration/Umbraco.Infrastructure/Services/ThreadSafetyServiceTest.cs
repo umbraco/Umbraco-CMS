@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     // causing it, getting into __sysObjects locks, no idea why
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
-    public class ThreadSafetyServiceTest : UmbracoIntegrationTest
+    internal sealed class ThreadSafetyServiceTest : UmbracoIntegrationTest
     {
         private IContentService ContentService => GetRequiredService<IContentService>();
 

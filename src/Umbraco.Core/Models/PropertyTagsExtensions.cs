@@ -22,7 +22,7 @@ public static class PropertyTagsExtensions
         }
 
         IDataEditor? editor = propertyEditors[property.PropertyType?.PropertyEditorAlias];
-        TagsPropertyEditorAttribute? tagAttribute = editor?.GetTagAttribute();
+        TagsPropertyEditorAttribute? tagAttribute = GetTagAttribute(editor);
 
         var configurationObject = property.PropertyType is null
             ? null
@@ -36,6 +36,9 @@ public static class PropertyTagsExtensions
 
         return configuration;
     }
+
+    private static TagsPropertyEditorAttribute? GetTagAttribute(IDataEditor? editor)
+        => editor?.GetType().GetCustomAttribute<TagsPropertyEditorAttribute>(false);
 
     /// <summary>
     ///     Assign tags.
@@ -226,12 +229,12 @@ public static class PropertyTagsExtensions
         switch (storageType)
         {
             case TagsStorageType.Csv:
-                return value.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+                return value.Split([delimiter], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             case TagsStorageType.Json:
                 try
                 {
-                    return serializer.Deserialize<string[]>(value)?.Select(x => x.Trim()) ?? Enumerable.Empty<string>();
+                    return serializer.Deserialize<string[]>(value)?.Select(x => x.Trim()) ?? [];
                 }
                 catch (Exception)
                 {

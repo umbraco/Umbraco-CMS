@@ -11,6 +11,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
+using DateTimeOffset = System.DateTimeOffset;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings;
 
@@ -37,24 +38,6 @@ public class ObjectExtensionsTests
         var result = list.TryConvertTo<IEnumerable<string>>();
         Assert.IsTrue(result.Success);
         Assert.AreEqual(3, result.Result.Count());
-    }
-
-    [Test]
-    public void ObjectExtensions_Object_To_Dictionary()
-    {
-        // Arrange
-        var obj = new { Key1 = "value1", Key2 = "value2", Key3 = "value3" };
-
-        // Act
-        var d = obj.ToDictionary<string>();
-
-        // Assert
-        Assert.IsTrue(d.Keys.Contains("Key1"));
-        Assert.IsTrue(d.Keys.Contains("Key2"));
-        Assert.IsTrue(d.Keys.Contains("Key3"));
-        Assert.AreEqual(d["Key1"], "value1");
-        Assert.AreEqual(d["Key2"], "value2");
-        Assert.AreEqual(d["Key3"], "value3");
     }
 
     [Test]
@@ -333,6 +316,50 @@ public class ObjectExtensionsTests
     }
 
     [Test]
+    public void CanConvertDateTimeOffsetToDateTime()
+    {
+        var dateTimeOffset = new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), TimeSpan.Zero);
+        var result = dateTimeOffset.TryConvertTo<DateTime>();
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03)), result.Result);
+            Assert.AreEqual(DateTimeKind.Utc, result.Result.Kind);
+        });
+    }
+
+    [Test]
+    public void CanConvertDateTimeToDateTimeOffset()
+    {
+        var dateTime = new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), DateTimeKind.Utc);
+        var result = dateTime.TryConvertTo<DateTimeOffset>();
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), TimeSpan.Zero), result.Result);
+    }
+
+    [Test]
+    public void DiscardsOffsetWhenConvertingDateTimeOffsetToDateTime()
+    {
+        var dateTimeOffset = new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), TimeSpan.FromHours(2));
+        var result = dateTimeOffset.TryConvertTo<DateTime>();
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03)), result.Result);
+            Assert.AreEqual(DateTimeKind.Utc, result.Result.Kind);
+        });
+    }
+
+    [Test]
+    public void DiscardsDateTimeKindWhenConvertingDateTimeToDateTimeOffset()
+    {
+        var dateTime = new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), DateTimeKind.Local);
+        var result = dateTime.TryConvertTo<DateTimeOffset>();
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30, 01, 02, 03), TimeSpan.Zero), result.Result);
+    }
+
+    [Test]
     public void Value_Editor_Can_Convert_Decimal_To_Decimal_Clr_Type()
     {
         var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Decimal);
@@ -340,6 +367,23 @@ public class ObjectExtensionsTests
         var result = valueEditor.TryConvertValueToCrlType(12.34d);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(12.34d, result.Result);
+    }
+
+    [Test]
+    public void Value_Editor_Can_Convert_DateTimeOffset_To_DateTime_Clr_Type()
+    {
+        var valueEditor = MockedValueEditors.CreateDataValueEditor(ValueTypes.Date);
+
+        var result = valueEditor.TryConvertValueToCrlType(new DateTimeOffset(new DateOnly(2024, 07, 05), new TimeOnly(12, 30), TimeSpan.Zero));
+        Assert.IsTrue(result.Success);
+        Assert.IsTrue(result.Result is DateTime);
+
+        var dateTime = (DateTime)result.Result;
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(new DateTime(new DateOnly(2024, 07, 05), new TimeOnly(12, 30)), dateTime);
+            Assert.AreEqual(DateTimeKind.Utc, dateTime.Kind);
+        });
     }
 
     private class MyTestObject

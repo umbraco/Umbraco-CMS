@@ -9,13 +9,13 @@ public class WebhookRequestService : IWebhookRequestService
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IWebhookRequestRepository _webhookRequestRepository;
-    private readonly IJsonSerializer _jsonSerializer;
+    private readonly IWebhookJsonSerializer _webhookJsonSerializer;
 
-    public WebhookRequestService(ICoreScopeProvider coreScopeProvider, IWebhookRequestRepository webhookRequestRepository, IJsonSerializer jsonSerializer)
+    public WebhookRequestService(ICoreScopeProvider coreScopeProvider, IWebhookRequestRepository webhookRequestRepository, IWebhookJsonSerializer webhookJsonSerializer)
     {
         _coreScopeProvider = coreScopeProvider;
         _webhookRequestRepository = webhookRequestRepository;
-        _jsonSerializer = jsonSerializer;
+        _webhookJsonSerializer = webhookJsonSerializer;
     }
 
     public async Task<WebhookRequest> CreateAsync(Guid webhookKey, string eventAlias, object? payload)
@@ -26,7 +26,7 @@ public class WebhookRequestService : IWebhookRequestService
         {
             WebhookKey = webhookKey,
             EventAlias = eventAlias,
-            RequestObject = _jsonSerializer.Serialize(payload),
+            RequestObject = _webhookJsonSerializer.Serialize(payload),
             RetryCount = 0,
         };
 

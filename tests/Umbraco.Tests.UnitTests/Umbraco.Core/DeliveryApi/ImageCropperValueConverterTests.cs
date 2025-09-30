@@ -16,7 +16,7 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
     [Test]
     public void ImageCropperValueConverter_ConvertsValueToImageCropperValue()
     {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new ImageCropperConfiguration
+        var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new ImageCropperConfiguration
         {
             Crops = new ImageCropperConfiguration.Crop[]
             {
@@ -29,10 +29,10 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = new ImageCropperValueConverter(Mock.Of<ILogger<ImageCropperValueConverter>>(), new SystemTextJsonSerializer());
+        var valueConverter = new ImageCropperValueConverter(Mock.Of<ILogger<ImageCropperValueConverter>>(), new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()));
         Assert.AreEqual(typeof(ApiImageCropperValue), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
 
-        var serializer = new SystemTextJsonSerializer();
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
         var source = serializer.Serialize(new ImageCropperValue
             {
                 Src = "/some/file.jpg",
@@ -45,8 +45,7 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
                     }
                 },
                 FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = .2m, Top = .4m }
-            }
-        );
+            });
         var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, source, false);
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as ApiImageCropperValue;
         Assert.NotNull(result);

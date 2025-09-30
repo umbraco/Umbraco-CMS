@@ -61,6 +61,9 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                     case nameof(BlockValue.Layout):
                         DeserializeAndSetLayout(ref reader, options, typeToConvert, blockValue);
                         break;
+                    case nameof(BlockValue.Expose):
+                        blockValue.Expose = DeserializeBlockVariation(ref reader, options, typeToConvert, nameof(BlockValue.Expose));
+                        break;
                 }
             }
         }
@@ -83,6 +86,9 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
             writer.WritePropertyName(nameof(BlockValue.SettingsData).ToFirstLowerInvariant());
             JsonSerializer.Serialize(writer, value.SettingsData, options);
         }
+
+        writer.WritePropertyName(nameof(BlockValue.Expose).ToFirstLowerInvariant());
+        JsonSerializer.Serialize(writer, value.Expose, options);
 
         Type layoutItemType = GetLayoutItemType(value.GetType());
 
@@ -115,7 +121,13 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
     }
 
     private List<BlockItemData> DeserializeBlockItemData(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
-        => JsonSerializer.Deserialize<List<BlockItemData>>(ref reader, options)
+        => DeserializeListOf<BlockItemData>(ref reader, options, typeToConvert, propertyName);
+
+    private List<BlockItemVariation> DeserializeBlockVariation(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
+        => DeserializeListOf<BlockItemVariation>(ref reader, options, typeToConvert, propertyName);
+
+    private List<T> DeserializeListOf<T>(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, string propertyName)
+        => JsonSerializer.Deserialize<List<T>>(ref reader, options)
            ?? throw new JsonException($"Unable to deserialize {propertyName} from type: {typeToConvert.FullName}.");
 
     private void DeserializeAndSetLayout(ref Utf8JsonReader reader, JsonSerializerOptions options, Type typeToConvert, BlockValue blockValue)
@@ -167,19 +179,46 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                 }
 
                 // did we encounter the concrete block value?
-                if (blockEditorAlias == blockValue.PropertyEditorAlias)
+                if (blockValue.SupportsBlockLayoutAlias(blockEditorAlias))
                 {
                     // yes, deserialize the block layout items as their concrete type (list of layoutItemType)
                     var layoutItems = JsonSerializer.Deserialize(ref reader, layoutItemsType, options);
-                    blockValue.Layout[blockEditorAlias] = layoutItems as IEnumerable<IBlockLayoutItem>
-                                                          ?? throw new JsonException($"Could not deserialize block editor layout items as type: {layoutItemType.FullName} while attempting to deserialize layout items for block editor alias: {blockEditorAlias} for type: {typeToConvert.FullName}.");
+                    blockValue.Layout[blockValue.PropertyEditorAlias] = layoutItems as IEnumerable<IBlockLayoutItem>
+                                                                        ?? throw new JsonException($"Could not deserialize block editor layout items as type: {layoutItemType.FullName} while attempting to deserialize layout items for block editor alias: {blockEditorAlias} for type: {typeToConvert.FullName}.");
                 }
                 else
                 {
                     // ignore this layout - forward the reader to the end of the array and look for the next one
-                    while (reader.TokenType is not JsonTokenType.EndArray)
+
+                    // Read past the current StartArray token before we start counting
+                    _ = reader.Read();
+
+                    // Keep track of the number of open arrays to ensure we find the correct EndArray token
+                    var openCount = 0;
+                    while (true)
                     {
-                        reader.Read();
+                        if (reader.TokenType is JsonTokenType.EndArray && openCount == 0)
+                        {
+                            break;
+                        }
+
+                        if (reader.TokenType is JsonTokenType.StartArray)
+                        {
+                            openCount++;
+                        }
+                        else if (reader.TokenType is JsonTokenType.EndArray)
+                        {
+                            openCount--;
+                            if (openCount < 0)
+                            {
+                                throw new JsonException($"Malformed JSON: Encountered more closing array tokens than opening ones while processing block editor alias: {blockEditorAlias}.");
+                            }
+                        }
+
+                        if (!reader.Read())
+                        {
+                            throw new JsonException($"Unexpected end of JSON while looking for the end of the layout items array for block editor alias: {blockEditorAlias}.");
+                        }
                     }
                 }
             }

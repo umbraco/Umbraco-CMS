@@ -8,4 +8,6 @@ public interface IDocumentEditingPresentationFactory
     ContentCreateModel MapCreateModel(CreateDocumentRequestModel requestModel);
 
     ContentUpdateModel MapUpdateModel(UpdateDocumentRequestModel requestModel);
+
+    ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel);
 }

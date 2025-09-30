@@ -16,6 +16,7 @@ public class PublishedRequest : IPublishedRequest
         ITemplate? template,
         DomainAndUri? domain,
         string? culture,
+        string? segment,
         string? redirectUrl,
         int? responseStatusCode,
         IReadOnlyList<string>? cacheExtensions,
@@ -30,6 +31,7 @@ public class PublishedRequest : IPublishedRequest
         Template = template;
         Domain = domain;
         Culture = culture;
+        Segment = segment;
         RedirectUrl = redirectUrl;
         ResponseStatusCode = responseStatusCode;
         CacheExtensions = cacheExtensions;
@@ -61,6 +63,9 @@ public class PublishedRequest : IPublishedRequest
 
     /// <inheritdoc />
     public string? Culture { get; }
+
+    /// <inheritdoc />
+    public string? Segment { get; }
 
     /// <inheritdoc />
     public string? RedirectUrl { get; }

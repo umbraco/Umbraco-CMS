@@ -15,5 +15,7 @@ public interface IPreviewService
     /// </summary>
     Task EndPreviewAsync();
 
+    bool IsInPreview();
+
     Task<Attempt<ClaimsIdentity>> TryGetPreviewClaimsIdentityAsync();
 }

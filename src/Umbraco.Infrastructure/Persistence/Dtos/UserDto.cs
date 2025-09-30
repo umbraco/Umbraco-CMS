@@ -95,13 +95,18 @@ public class UserDto
 
     [Column("createDate")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
-    public DateTime CreateDate { get; set; } = DateTime.Now;
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+    public DateTime CreateDate { get; set; } = DateTime.UtcNow;
 
     [Column("updateDate")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Constraint(Default = SystemMethods.CurrentDateTime)]
-    public DateTime UpdateDate { get; set; } = DateTime.Now;
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+    public DateTime UpdateDate { get; set; } = DateTime.UtcNow;
+
+    [Column("kind")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Constraint(Default = 0)]
+    public short Kind { get; set; }
 
     /// <summary>
     ///     Will hold the media file system relative path of the users custom avatar if they uploaded one

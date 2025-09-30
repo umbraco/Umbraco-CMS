@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Collections;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Serializable]
-public class ConcurrentHashSet<T> : ICollection<T>
+public class ConcurrentHashSet<T> : ICollection<T>, ISet<T>
 {
     private readonly HashSet<T> _innerSet = new();
     private readonly ReaderWriterLockSlim _instanceLocker = new(LockRecursionPolicy.NoRecursion);
@@ -273,5 +273,181 @@ public class ConcurrentHashSet<T> : ICollection<T>
         }
 
         return clone;
+    }
+
+    public void ExceptWith(IEnumerable<T> other)
+    {
+        try
+        {
+            _instanceLocker.EnterWriteLock();
+            _innerSet.ExceptWith(other);
+        }
+        finally
+        {
+            if (_instanceLocker.IsWriteLockHeld)
+            {
+                _instanceLocker.ExitWriteLock();
+            }
+        }
+    }
+
+    public void IntersectWith(IEnumerable<T> other)
+    {
+        try
+        {
+            _instanceLocker.EnterWriteLock();
+            _innerSet.IntersectWith(other);
+        }
+        finally
+        {
+            if (_instanceLocker.IsWriteLockHeld)
+            {
+                _instanceLocker.ExitWriteLock();
+            }
+        }
+    }
+
+    public bool IsProperSubsetOf(IEnumerable<T> other)
+    {
+        try
+        {
+            _instanceLocker.EnterReadLock();
+            return _innerSet.IsProperSubsetOf(other);
+        }
+        finally
+        {
+            if (_instanceLocker.IsReadLockHeld)
+            {
+                _instanceLocker.ExitReadLock();
+            }
+        }
+    }
+
+    public bool IsProperSupersetOf(IEnumerable<T> other)
+    {
+        try
+        {
+            _instanceLocker.EnterReadLock();
+            return _innerSet.IsProperSupersetOf(other);
+        }
+        finally
+        {
+            if (_instanceLocker.IsReadLockHeld)
+            {
+                _instanceLocker.ExitReadLock();
+            }
+        }
+    }
+
+    public bool IsSubsetOf(IEnumerable<T> other)
+    {
+        try
+        {
+            _instanceLocker.EnterReadLock();
+            return _innerSet.IsSubsetOf(other);
+        }
+        finally
+        {
+            if (_instanceLocker.IsReadLockHeld)
+            {
+                _instanceLocker.ExitReadLock();
+            }
+        }
+    }
+
+    public bool IsSupersetOf(IEnumerable<T> other)
+    {
+        try
+        {
+            _instanceLocker.EnterReadLock();
+            return _innerSet.IsSupersetOf(other);
+        }
+        finally
+        {
+            if (_instanceLocker.IsReadLockHeld)
+            {
+                _instanceLocker.ExitReadLock();
+            }
+        }
+    }
+
+    public bool Overlaps(IEnumerable<T> other)
+    {
+        try
+        {
+            _instanceLocker.EnterReadLock();
+            return _innerSet.Overlaps(other);
+        }
+        finally
+        {
+            if (_instanceLocker.IsReadLockHeld)
+            {
+                _instanceLocker.ExitReadLock();
+            }
+        }
+    }
+
+    public bool SetEquals(IEnumerable<T> other)
+    {
+        try
+        {
+            _instanceLocker.EnterReadLock();
+            return _innerSet.SetEquals(other);
+        }
+        finally
+        {
+            if (_instanceLocker.IsReadLockHeld)
+            {
+                _instanceLocker.ExitReadLock();
+            }
+        }
+    }
+
+    public void SymmetricExceptWith(IEnumerable<T> other)
+    {
+        try
+        {
+            _instanceLocker.EnterWriteLock();
+            _innerSet.IntersectWith(other);
+        }
+        finally
+        {
+            if (_instanceLocker.IsWriteLockHeld)
+            {
+                _instanceLocker.ExitWriteLock();
+            }
+        }
+    }
+
+    public void UnionWith(IEnumerable<T> other)
+    {
+        try
+        {
+            _instanceLocker.EnterWriteLock();
+            _innerSet.UnionWith(other);
+        }
+        finally
+        {
+            if (_instanceLocker.IsWriteLockHeld)
+            {
+                _instanceLocker.ExitWriteLock();
+            }
+        }
+    }
+
+    bool ISet<T>.Add(T item)
+    {
+        try
+        {
+            _instanceLocker.EnterWriteLock();
+            return _innerSet.Add(item);
+        }
+        finally
+        {
+            if (_instanceLocker.IsWriteLockHeld)
+            {
+                _instanceLocker.ExitWriteLock();
+            }
+        }
     }
 }

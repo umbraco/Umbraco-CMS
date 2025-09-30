@@ -32,5 +32,5 @@ public class DictionaryDto // public as required to be accessible from Deploy fo
 
     [ResultColumn]
     [Reference(ReferenceType.Many, ColumnName = "UniqueId", ReferenceMemberName = "UniqueId")]
-    public List<LanguageTextDto>? LanguageTextDtos { get; set; }
+    public List<LanguageTextDto> LanguageTextDtos { get; set; } = [];
 }

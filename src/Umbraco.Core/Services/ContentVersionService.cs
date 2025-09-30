@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
@@ -15,9 +13,9 @@ using Umbraco.Extensions;
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Core.Services;
 
-internal class ContentVersionService : IContentVersionService
+internal sealed class ContentVersionService : IContentVersionService
 {
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IContentVersionCleanupPolicy _contentVersionCleanupPolicy;
     private readonly IDocumentVersionRepository _documentVersionRepository;
     private readonly IEventMessagesFactory _eventMessagesFactory;
@@ -34,7 +32,7 @@ internal class ContentVersionService : IContentVersionService
         IContentVersionCleanupPolicy contentVersionCleanupPolicy,
         ICoreScopeProvider scopeProvider,
         IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         ILanguageRepository languageRepository,
         IEntityService entityService,
         IContentService contentService,
@@ -45,33 +43,11 @@ internal class ContentVersionService : IContentVersionService
         _contentVersionCleanupPolicy = contentVersionCleanupPolicy;
         _scopeProvider = scopeProvider;
         _eventMessagesFactory = eventMessagesFactory;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _languageRepository = languageRepository;
         _entityService = entityService;
         _contentService = contentService;
         _userIdKeyResolver = userIdKeyResolver;
-    }
-
-    [Obsolete("Use the non obsolete constructor instead. Scheduled to be removed in v15")]
-    public ContentVersionService(
-        ILogger<ContentVersionService> logger,
-        IDocumentVersionRepository documentVersionRepository,
-        IContentVersionCleanupPolicy contentVersionCleanupPolicy,
-        ICoreScopeProvider scopeProvider,
-        IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
-        ILanguageRepository languageRepository)
-    {
-        _logger = logger;
-        _documentVersionRepository = documentVersionRepository;
-        _contentVersionCleanupPolicy = contentVersionCleanupPolicy;
-        _scopeProvider = scopeProvider;
-        _eventMessagesFactory = eventMessagesFactory;
-        _auditRepository = auditRepository;
-        _languageRepository = languageRepository;
-        _entityService = StaticServiceProvider.Instance.GetRequiredService<IEntityService>();
-        _contentService = StaticServiceProvider.Instance.GetRequiredService<IContentService>();
-        _userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
     }
 
     /// <inheritdoc />
@@ -80,23 +56,6 @@ internal class ContentVersionService : IContentVersionService
         // Media - ignored
         // Members - ignored
         CleanupDocumentVersions(asAtDate);
-
-    /// <inheritdoc />
-    [Obsolete("Use the async version instead. Scheduled to be removed in v15")]
-    public IEnumerable<ContentVersionMeta>? GetPagedContentVersions(int contentId, long pageIndex, int pageSize, out long totalRecords, string? culture = null)
-    {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
-        return HandleGetPagedContentVersions(contentId, pageIndex, pageSize, out totalRecords, culture);
-    }
 
     public ContentVersionMeta? Get(int versionId)
     {
@@ -107,51 +66,40 @@ internal class ContentVersionService : IContentVersionService
         }
     }
 
-    /// <inheritdoc />
-    [Obsolete("Use the async version instead. Scheduled to be removed in v15")]
-    public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = Constants.Security.SuperUserId)
-        => HandleSetPreventCleanup(versionId, preventCleanup, userId);
-
-    public async Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetPagedContentVersionsAsync(Guid contentId, string? culture, int skip, int take)
+    public Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetPagedContentVersionsAsync(Guid contentId, string? culture, int skip, int take)
     {
-        IEntitySlim? document = await Task.FromResult(_entityService.Get(contentId, UmbracoObjectTypes.Document));
+        IEntitySlim? document = _entityService.Get(contentId, UmbracoObjectTypes.Document);
         if (document is null)
         {
-            return Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.ContentNotFound);
+            return Task.FromResult(Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.ContentNotFound));
         }
 
         if (PaginationConverter.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize) == false)
         {
-            return Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.InvalidSkipTake);
+            return Task.FromResult(Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.InvalidSkipTake));
         }
 
-        IEnumerable<ContentVersionMeta>? versions =
-            await Task.FromResult(HandleGetPagedContentVersions(
+        IEnumerable<ContentVersionMeta> versions =
+            HandleGetPagedContentVersions(
                 document.Id,
                 pageNumber,
                 pageSize,
                 out var total,
-                culture));
+                culture);
 
-        if (versions is null)
-        {
-            return Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound);
-        }
-
-        return Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Succeed(
-            ContentVersionOperationStatus.Success, new PagedModel<ContentVersionMeta>(total, versions));
+        return Task.FromResult(Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Succeed(
+            ContentVersionOperationStatus.Success, new PagedModel<ContentVersionMeta>(total, versions)));
     }
 
-    public async Task<Attempt<IContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId)
+    public Task<Attempt<IContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId)
     {
-        IContent? version = await Task.FromResult(_contentService.GetVersion(versionId.ToInt()));
+        IContent? version = _contentService.GetVersion(versionId.ToInt());
         if (version is null)
         {
-            return Attempt<IContent?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus
-                .NotFound);
+            return Task.FromResult(Attempt<IContent?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound));
         }
 
-        return Attempt<IContent?, ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success, version);
+        return Task.FromResult(Attempt<IContent?, ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success, version));
     }
 
     public async Task<Attempt<ContentVersionOperationStatus>> SetPreventCleanupAsync(Guid versionId, bool preventCleanup, Guid userKey)
@@ -199,8 +147,12 @@ internal class ContentVersionService : IContentVersionService
         }
     }
 
-    private IEnumerable<ContentVersionMeta>? HandleGetPagedContentVersions(int contentId, long pageIndex,
-        int pageSize, out long totalRecords, string? culture = null)
+    private IEnumerable<ContentVersionMeta> HandleGetPagedContentVersions(
+        int contentId,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string? culture = null)
     {
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -268,18 +220,20 @@ internal class ContentVersionService : IContentVersionService
          */
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            IReadOnlyCollection<ContentVersionMeta>? allHistoricVersions =
+            IReadOnlyCollection<ContentVersionMeta> allHistoricVersions =
                 _documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
 
-            if (allHistoricVersions is null)
+            if (allHistoricVersions.Count == 0)
             {
                 scope.Complete();
                 return Array.Empty<ContentVersionMeta>();
             }
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("Discovered {count} candidate(s) for ContentVersion cleanup", allHistoricVersions.Count);
             }
+
             versionsToDelete = new List<ContentVersionMeta>(allHistoricVersions.Count);
 
             IEnumerable<ContentVersionMeta> filteredContentVersions =
@@ -292,7 +246,7 @@ internal class ContentVersionService : IContentVersionService
                 if (scope.Notifications.PublishCancelable(
                         new ContentDeletingVersionsNotification(version.ContentId, messages, version.VersionId)))
                 {
-                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    if (_logger.IsEnabled(LogLevel.Debug))
                     {
                         _logger.LogDebug("Delete cancelled for ContentVersion [{versionId}]", version.VersionId);
                     }
@@ -307,7 +261,7 @@ internal class ContentVersionService : IContentVersionService
 
         if (!versionsToDelete.Any())
         {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("No remaining ContentVersions for cleanup");
             }
@@ -346,16 +300,19 @@ internal class ContentVersionService : IContentVersionService
         return versionsToDelete;
     }
 
-    private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
+    private void Audit(AuditType type, int userId, int objectId, string? message = null, string? parameters = null) =>
+        AuditAsync(type, userId, objectId, message, parameters).GetAwaiter().GetResult();
+
+    private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
     {
-        var entry = new AuditItem(
-            objectId,
+        Guid userKey = await _userIdKeyResolver.GetAsync(userId);
+
+        await _auditService.AddAsync(
             type,
-            userId,
+            userKey,
+            objectId,
             UmbracoObjectTypes.Document.GetName(),
             message,
             parameters);
-
-        _auditRepository.Save(entry);
     }
 }

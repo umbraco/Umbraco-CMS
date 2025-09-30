@@ -7,5 +7,6 @@ public enum DomainOperationStatus
     ContentNotFound,
     LanguageNotFound,
     DuplicateDomainName,
-    ConflictingDomainName
+    ConflictingDomainName,
+    InvalidDomainName
 }

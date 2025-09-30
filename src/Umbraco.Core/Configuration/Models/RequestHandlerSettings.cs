@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
-using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
@@ -15,6 +14,7 @@ public class RequestHandlerSettings
 {
     internal const bool StaticAddTrailingSlash = true;
     internal const string StaticConvertUrlsToAscii = "try";
+    internal const string StaticConvertFileNamesToAscii = "false";
     internal const bool StaticEnableDefaultCharReplacements = true;
 
     internal static readonly CharItem[] DefaultCharCollection =
@@ -74,6 +74,22 @@ public class RequestHandlerSettings
     public bool ShouldTryConvertUrlsToAscii => ConvertUrlsToAscii.InvariantEquals("try");
 
     /// <summary>
+    ///     Gets or sets a value indicating whether to convert file names to ASCII (valid values: "true", "try" or "false").
+    /// </summary>
+    [DefaultValue(StaticConvertFileNamesToAscii)]
+    public string ConvertFileNamesToAscii { get; set; } = StaticConvertFileNamesToAscii;
+
+    /// <summary>
+    ///     Gets a value indicating whether URLs should be converted to ASCII.
+    /// </summary>
+    public bool ShouldConvertFileNamesToAscii => ConvertFileNamesToAscii.InvariantEquals("true");
+
+    /// <summary>
+    ///     Gets a value indicating whether URLs should be tried to be converted to ASCII.
+    /// </summary>
+    public bool ShouldTryConvertFileNamesToAscii => ConvertFileNamesToAscii.InvariantEquals("try");
+
+    /// <summary>
     ///     Disable all default character replacements
     /// </summary>
     [DefaultValue(StaticEnableDefaultCharReplacements)]
@@ -82,5 +98,5 @@ public class RequestHandlerSettings
     /// <summary>
     ///     Add additional character replacements, or override defaults
     /// </summary>
-    public IEnumerable<CharItem>? UserDefinedCharCollection { get; set; }
+    public IEnumerable<CharItem> UserDefinedCharCollection { get; set; } = [];
 }

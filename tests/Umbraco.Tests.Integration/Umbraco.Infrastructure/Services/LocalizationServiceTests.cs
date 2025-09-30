@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class LocalizationServiceTests : UmbracoIntegrationTest
+internal sealed class LocalizationServiceTests : UmbracoIntegrationTest
 {
     [SetUp]
     public void SetUp() => CreateTestData();
@@ -275,7 +275,8 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         Assert.Greater(allLangs.Count(), 0);
         foreach (var language in allLangs)
         {
-            Assert.AreEqual("Hellooooo",
+            Assert.AreEqual(
+                "Hellooooo",
                 item.Translations.Single(x => x.LanguageIsoCode == language.IsoCode).Value);
         }
     }

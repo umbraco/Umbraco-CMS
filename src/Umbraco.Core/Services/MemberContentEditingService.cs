@@ -1,10 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -24,8 +27,11 @@ internal sealed class MemberContentEditingService
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         IMemberValidationService memberValidationService,
-        IUserService userService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService)
+        IUserService userService,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService,
+        ContentTypeFilterCollection contentTypeFilters)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService, optionsMonitor, relationService, contentTypeFilters)
     {
         _logger = logger;
         _userService = userService;
@@ -119,8 +125,7 @@ internal sealed class MemberContentEditingService
 
         var sensitivePropertyAliases = memberType.GetSensitivePropertyTypeAliases().ToArray();
         return updateModel
-            .InvariantProperties
-            .Union(updateModel.Variants.SelectMany(variant => variant.Properties))
+            .Properties
             .Select(property => property.Alias)
             .Intersect(sensitivePropertyAliases, StringComparer.OrdinalIgnoreCase)
             .Any() is false;

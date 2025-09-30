@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class KeyValueRepositoryTests : UmbracoIntegrationTest
+internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
 {
     [Test]
     public void CanSetAndGet()
@@ -25,7 +25,7 @@ public class KeyValueRepositoryTests : UmbracoIntegrationTest
         // Insert new key/value
         using (var scope = provider.CreateCoreScope())
         {
-            var keyValue = new KeyValue { Identifier = "foo", Value = "bar", UpdateDate = DateTime.Now };
+            var keyValue = new KeyValue { Identifier = "foo", Value = "bar", UpdateDate = DateTime.UtcNow };
             var repo = CreateRepository(provider);
             repo.Save(keyValue);
             scope.Complete();
@@ -47,7 +47,7 @@ public class KeyValueRepositoryTests : UmbracoIntegrationTest
             var repo = CreateRepository(provider);
             var keyValue = repo.Get("foo");
             keyValue.Value = "buzz";
-            keyValue.UpdateDate = DateTime.Now;
+            keyValue.UpdateDate = DateTime.UtcNow;
             repo.Save(keyValue);
             scope.Complete();
         }

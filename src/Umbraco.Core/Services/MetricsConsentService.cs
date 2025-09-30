@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -38,9 +38,6 @@ public class MetricsConsentService : IMetricsConsentService
 
         return analyticsLevel;
     }
-
-    [Obsolete("Please use SetConsentLevelAsync instead, scheduled for removal in V15")]
-    public void SetConsentLevel(TelemetryLevel telemetryLevel) => SetConsentLevelAsync(telemetryLevel).GetAwaiter().GetResult();
 
     public async Task SetConsentLevelAsync(TelemetryLevel telemetryLevel)
     {

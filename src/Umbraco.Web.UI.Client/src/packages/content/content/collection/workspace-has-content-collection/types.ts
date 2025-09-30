@@ -1,0 +1,17 @@
+import type { UMB_WORKSPACE_HAS_CONTENT_COLLECTION_CONDITION_ALIAS } from './constants.js';
+import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
+
+export type UmbWorkspaceHasContentCollectionConditionConfig = UmbConditionConfigBase<
+	typeof UMB_WORKSPACE_HAS_CONTENT_COLLECTION_CONDITION_ALIAS
+>;
+/**
+ * @deprecated Use `UmbWorkspaceHasContentCollectionConditionConfig` instead. This will be removed in Umbraco 17.
+ */
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export type WorkspaceHasCollectionConditionConfig = UmbWorkspaceHasContentCollectionConditionConfig;
+
+declare global {
+	interface UmbExtensionConditionConfigMap {
+		umbWorkspaceHasContentCollection: UmbWorkspaceHasContentCollectionConditionConfig;
+	}
+}

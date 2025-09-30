@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class BackOfficeUserStoreTests : UmbracoIntegrationTest
+internal sealed class BackOfficeUserStoreTests : UmbracoIntegrationTest
 {
     private IEntityService EntityService => GetRequiredService<IEntityService>();
 
@@ -38,7 +38,7 @@ public class BackOfficeUserStoreTests : UmbracoIntegrationTest
 
     private IEventMessagesFactory EventMessagesFactory => GetRequiredService<IEventMessagesFactory>();
 
-    private ILogger<BackOfficeUserStore> Logger = NullLogger<BackOfficeUserStore>.Instance;
+    private readonly ILogger<BackOfficeUserStore> _logger = NullLogger<BackOfficeUserStore>.Instance;
 
 
     private BackOfficeUserStore GetUserStore()
@@ -55,7 +55,7 @@ public class BackOfficeUserStoreTests : UmbracoIntegrationTest
             UserRepository,
             RuntimeState,
             EventMessagesFactory,
-            Logger
+            _logger
         );
 
     [Test]

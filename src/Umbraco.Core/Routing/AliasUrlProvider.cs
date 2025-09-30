@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -14,6 +15,8 @@ public class AliasUrlProvider : IUrlProvider
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly ISiteDomainMapper _siteDomainMapper;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IDocumentNavigationQueryService _navigationQueryService;
+    private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestConfig;
 
@@ -22,13 +25,17 @@ public class AliasUrlProvider : IUrlProvider
         ISiteDomainMapper siteDomainMapper,
         UriUtility uriUtility,
         IPublishedValueFallback publishedValueFallback,
-        IUmbracoContextAccessor umbracoContextAccessor)
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
     {
         _requestConfig = requestConfig.CurrentValue;
         _siteDomainMapper = siteDomainMapper;
         _uriUtility = uriUtility;
         _publishedValueFallback = publishedValueFallback;
         _umbracoContextAccessor = umbracoContextAccessor;
+        _navigationQueryService = navigationQueryService;
+        _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
 
         requestConfig.OnChange(x => _requestConfig = x);
     }
@@ -74,16 +81,16 @@ public class AliasUrlProvider : IUrlProvider
 
         // look for domains, walking up the tree
         IPublishedContent? n = node;
-        IEnumerable<DomainAndUri>? domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
+        IEnumerable<DomainAndUri>? domainUris = DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current, false);
 
         // n is null at root
         while (domainUris == null && n != null)
         {
             // move to parent node
-            n = n.Parent;
+            n = n.Parent<IPublishedContent>(_navigationQueryService, _publishedContentStatusFilteringService);
             domainUris = n == null
                 ? null
-                : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
+                : DomainUtilities.DomainsForNode(umbracoContext.Domains, _siteDomainMapper, n.Id, current, false);
         }
 
         // determine whether the alias property varies

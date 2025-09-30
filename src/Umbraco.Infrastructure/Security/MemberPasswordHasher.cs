@@ -1,11 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
@@ -22,16 +20,6 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
 {
     private readonly IOptions<LegacyPasswordMigrationSettings> _legacyMachineKeySettings;
     private readonly ILogger<MemberPasswordHasher> _logger;
-
-    [Obsolete("Use ctor with all params")]
-    public MemberPasswordHasher(LegacyPasswordSecurity legacyPasswordHasher, IJsonSerializer jsonSerializer)
-        : this(
-            legacyPasswordHasher,
-            jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<LegacyPasswordMigrationSettings>>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<MemberPasswordHasher>>())
-    {
-    }
 
     public MemberPasswordHasher(
         LegacyPasswordSecurity legacyPasswordHasher,

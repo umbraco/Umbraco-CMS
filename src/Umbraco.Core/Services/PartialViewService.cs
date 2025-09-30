@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -21,10 +23,55 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         IPartialViewRepository repository,
         ILogger<StylesheetService> logger,
         IUserIdKeyResolver userIdKeyResolver,
+        IAuditService auditService,
+        PartialViewSnippetCollection snippetCollection)
+        : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditService)
+        => _snippetCollection = snippetCollection;
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public PartialViewService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IPartialViewRepository repository,
+        ILogger<StylesheetService> logger,
+        IUserIdKeyResolver userIdKeyResolver,
         IAuditRepository auditRepository,
         PartialViewSnippetCollection snippetCollection)
-        : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditRepository)
-        => _snippetCollection = snippetCollection;
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            logger,
+            userIdKeyResolver,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+            snippetCollection)
+    {
+    }
+
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
+    public PartialViewService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IPartialViewRepository repository,
+        ILogger<StylesheetService> logger,
+        IUserIdKeyResolver userIdKeyResolver,
+        IAuditService auditService,
+        IAuditRepository auditRepository,
+        PartialViewSnippetCollection snippetCollection)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            logger,
+            userIdKeyResolver,
+            auditService,
+            snippetCollection)
+    {
+    }
 
     protected override string[] AllowedFileExtensions { get; } = { ".cshtml" };
 
@@ -62,7 +109,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         => new PartialView(path) { Content = content };
 
     /// <inheritdoc />
-    public async Task<PagedModel<PartialViewSnippetSlim>> GetSnippetsAsync(int skip, int take)
+    public Task<PagedModel<PartialViewSnippetSlim>> GetSnippetsAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         var result = new PagedModel<PartialViewSnippetSlim>(
@@ -72,15 +119,15 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
                 .Take(take)
                 .Select(snippet => new PartialViewSnippetSlim(snippet.Id, snippet.Name))
                 .ToArray());
-        return await Task.FromResult(result);
+        return Task.FromResult(result);
     }
 
     /// <inheritdoc />
-    public async Task<PartialViewSnippet?> GetSnippetAsync(string id)
+    public Task<PartialViewSnippet?> GetSnippetAsync(string id)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         PartialViewSnippet? snippet = _snippetCollection.FirstOrDefault(s => s.Id == id);
-        return await Task.FromResult(snippet);
+        return Task.FromResult(snippet);
     }
 
     /// <inheritdoc />

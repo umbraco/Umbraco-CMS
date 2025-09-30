@@ -9,16 +9,16 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 
 internal abstract class RoutingServiceBase
 {
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IDomainCache _domainCache;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRequestStartItemProviderAccessor _requestStartItemProviderAccessor;
 
     protected RoutingServiceBase(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IDomainCache domainCache,
         IHttpContextAccessor httpContextAccessor,
         IRequestStartItemProviderAccessor requestStartItemProviderAccessor)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _domainCache = domainCache;
         _httpContextAccessor = httpContextAccessor;
         _requestStartItemProviderAccessor = requestStartItemProviderAccessor;
     }
@@ -36,19 +36,13 @@ internal abstract class RoutingServiceBase
     }
 
     protected static string GetContentRoute(DomainAndUri domainAndUri, Uri contentRoute)
-        => $"{domainAndUri.ContentId}{DomainUtilities.PathRelativeToDomain(domainAndUri.Uri, contentRoute.AbsolutePath)}";
+        => $"{domainAndUri.ContentId}{DomainUtilities.PathRelativeToDomain(domainAndUri.Uri, contentRoute.LocalPath)}"; // Use LocalPath over AbsolutePath to keep the path decoded.
 
     protected DomainAndUri? GetDomainAndUriForRoute(Uri contentUrl)
     {
-        IDomainCache? domainCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Domains;
-        if (domainCache == null)
-        {
-            throw new InvalidOperationException("Could not obtain the domain cache in the current context");
-        }
+        IEnumerable<Domain> domains = _domainCache.GetAll(false);
 
-        IEnumerable<Domain> domains = domainCache.GetAll(false);
-
-        return DomainUtilities.SelectDomain(domains, contentUrl, defaultCulture: domainCache.DefaultCulture);
+        return DomainUtilities.SelectDomain(domains, contentUrl, defaultCulture: _domainCache.DefaultCulture);
     }
 
     protected IPublishedContent? GetStartItem()

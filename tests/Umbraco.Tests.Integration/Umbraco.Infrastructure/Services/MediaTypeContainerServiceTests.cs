@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class MediaTypeContainerServiceTests : UmbracoIntegrationTest
+internal sealed class MediaTypeContainerServiceTests : UmbracoIntegrationTest
 {
     private IMediaTypeContainerService MediaTypeContainerService => GetRequiredService<IMediaTypeContainerService>();
 
@@ -177,11 +177,11 @@ public class MediaTypeContainerServiceTests : UmbracoIntegrationTest
     {
         EntityContainer container = (await MediaTypeContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
 
-        IMediaType MediaType = new MediaType(ShortStringHelper, container.Id)
+        IMediaType mediaType = new MediaType(ShortStringHelper, container.Id)
         {
             Alias = "test", Name = "Test"
         };
-        MediaTypeService.Save(MediaType);
+        MediaTypeService.Save(mediaType);
 
         var result = await MediaTypeContainerService.DeleteAsync(container.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
@@ -190,7 +190,7 @@ public class MediaTypeContainerServiceTests : UmbracoIntegrationTest
         var currentContainer = await MediaTypeContainerService.GetAsync(container.Key);
         Assert.IsNotNull(currentContainer);
 
-        var currentMediaType = MediaTypeService.Get(MediaType.Key);
+        var currentMediaType = MediaTypeService.Get(mediaType.Key);
         Assert.IsNotNull(currentMediaType);
     }
 

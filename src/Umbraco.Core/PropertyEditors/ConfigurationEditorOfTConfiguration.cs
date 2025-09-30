@@ -46,7 +46,8 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
         }
     }
 
-    protected TConfiguration? AsConfigurationObject(IDictionary<string, object> configuration,
+    protected TConfiguration? AsConfigurationObject(
+        IDictionary<string, object> configuration,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer) =>
         ToConfigurationObject(configuration, configurationEditorJsonSerializer) is TConfiguration configurationObject
             ? configurationObject

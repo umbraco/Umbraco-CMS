@@ -1,4 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
@@ -27,7 +30,12 @@ public class PublishedValueFallback : IPublishedValueFallback
     /// <inheritdoc />
     public bool TryGetValue<T>(IPublishedProperty property, string? culture, string? segment, Fallback fallback, T? defaultValue, out T? value)
     {
-        _variationContextAccessor.ContextualizeVariation(property.PropertyType.Variations, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(property.PropertyType.Variations, property.Alias, ref culture, ref segment);
+
+        if (TryGetValueForDefaultSegment(property, culture, segment, out value))
+        {
+            return true;
+        }
 
         foreach (var f in fallback)
         {
@@ -75,7 +83,12 @@ public class PublishedValueFallback : IPublishedValueFallback
             return false;
         }
 
-        _variationContextAccessor.ContextualizeVariation(propertyType.Variations, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(propertyType.Variations, alias, ref culture, ref segment);
+
+        if (TryGetValueForDefaultSegment(content, alias, culture, segment, out value))
+        {
+            return true;
+        }
 
         foreach (var f in fallback)
         {
@@ -121,8 +134,13 @@ public class PublishedValueFallback : IPublishedValueFallback
         IPublishedPropertyType? propertyType = content.ContentType.GetPropertyType(alias);
         if (propertyType != null)
         {
-            _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, ref culture, ref segment);
+            _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, alias, ref culture, ref segment);
             noValueProperty = content.GetProperty(alias);
+        }
+
+        if (propertyType != null && TryGetValueForDefaultSegment(content, alias, culture, segment, out value))
+        {
+            return true;
         }
 
         // note: we don't support "recurse & language" which would walk up the tree,
@@ -176,6 +194,30 @@ public class PublishedValueFallback : IPublishedValueFallback
         new NotSupportedException(
             $"Fallback {GetType().Name} does not support fallback code '{fallback}' at {level} level.");
 
+    private bool TryGetValueForDefaultSegment<T>(IPublishedElement content, string alias, string? culture, string? segment, out T? value)
+    {
+        IPublishedProperty? property = content.GetProperty(alias);
+        if (property is not null)
+        {
+            return TryGetValueForDefaultSegment(property, culture, segment, out value);
+        }
+
+        value = default;
+        return false;
+    }
+
+    private bool TryGetValueForDefaultSegment<T>(IPublishedProperty property, string? culture, string? segment, out T? value)
+    {
+        if (segment.IsNullOrWhiteSpace() is false && property.HasValue(culture, segment: string.Empty))
+        {
+            value = property.Value<T>(this, culture, segment: string.Empty);
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+
     // tries to get a value, recursing the tree
     // because we recurse, content may not even have the a property with the specified alias (but only some ancestor)
     // in case no value was found, noValueProperty contains the first property that was found (which does not have a value)
@@ -184,7 +226,7 @@ public class PublishedValueFallback : IPublishedValueFallback
         IPublishedProperty? property; // if we are here, content's property has no value
         do
         {
-            content = content?.Parent;
+            content = content?.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(), StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
 
             IPublishedPropertyType? propertyType = content?.ContentType.GetPropertyType(alias);
 
@@ -192,7 +234,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             {
                 culture = null;
                 segment = null;
-                _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, ref culture, ref segment);
+                _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.Id, alias, ref culture, ref segment);
             }
 
             property = content?.GetProperty(alias);

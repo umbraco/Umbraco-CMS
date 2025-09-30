@@ -57,14 +57,12 @@ public class BackOfficeClaimsPrincipalFactoryTests
         => Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory(
             null,
             new OptionsWrapper<BackOfficeIdentityOptions>(new BackOfficeIdentityOptions()),
-            new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings())
-            ));
+            new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings())));
 
     [Test]
     public void Ctor_When_Options_Are_Null_Expect_ArgumentNullException()
         => Assert.Throws<ArgumentNullException>(() =>
-            new BackOfficeClaimsPrincipalFactory(GetMockedUserManager().Object, null, new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings()))
-            );
+            new BackOfficeClaimsPrincipalFactory(GetMockedUserManager().Object, null, new OptionsWrapper<BackOfficeAuthenticationTypeSettings>(new BackOfficeAuthenticationTypeSettings())));
 
     [Test]
     public void Ctor_When_Options_Value_Is_Null_Expect_ArgumentException()

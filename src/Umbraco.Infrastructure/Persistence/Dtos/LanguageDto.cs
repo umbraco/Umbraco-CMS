@@ -7,9 +7,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id")]
 [ExplicitColumns]
-internal class LanguageDto
+internal sealed class LanguageDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Language;
+
+    // Public constants to bind properties between DTOs
+    public const string IsoCodeColumnName = "languageISOCode";
 
     /// <summary>
     ///     Gets or sets the identifier of the language.
@@ -21,7 +24,7 @@ internal class LanguageDto
     /// <summary>
     ///     Gets or sets the ISO code of the language.
     /// </summary>
-    [Column("languageISOCode")]
+    [Column(IsoCodeColumnName)]
     [Index(IndexTypes.UniqueNonClustered)]
     [NullSetting(NullSetting = NullSettings.Null)]
     [Length(14)]

@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
@@ -90,21 +91,26 @@ public class UserGroupServiceTests
         });
     }
 
-    [TestCase(false,UserGroupOperationStatus.Success)]
-    [TestCase(true,UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
-    public async Task Can_Not_Update_SystemGroup_Alias(bool isSystemGroup, UserGroupOperationStatus status)
+    [TestCase(null, null, UserGroupOperationStatus.Success)]
+    [TestCase(Constants.Security.AdminGroupKeyString, Constants.Security.AdminGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    [TestCase(Constants.Security.SensitiveDataGroupKeyString, DatabaseDataCreator.SensitiveDataGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    [TestCase(Constants.Security.TranslatorGroupString, DatabaseDataCreator.TranslatorGroupAlias, UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup)]
+    public async Task Can_Not_Update_SystemGroup_Alias(string? systemGroupKey, string? systemGroupAlias, UserGroupOperationStatus status)
     {
+        // prep
+        var userGroupAlias = systemGroupAlias ?? "someNonSystemAlias";
+        Guid userGroupKey = systemGroupKey is not null ? new Guid(systemGroupKey) : Guid.NewGuid();
+
         // Arrange
         var actingUserKey = Guid.NewGuid();
         var mockUser = SetupUserWithGroupAccess(actingUserKey, [Constants.Security.AdminGroupAlias]);
         var userService = SetupUserServiceWithGetUserByKey(actingUserKey, mockUser);
         var userGroupRepository = new Mock<IUserGroupRepository>();
-        var userGroupKey = Guid.NewGuid();
         var persistedUserGroup =
             new UserGroup(
                 Mock.Of<IShortStringHelper>(),
                 0,
-                isSystemGroup ? Constants.Security.AdminGroupAlias : "someNonSystemAlias",
+                userGroupAlias,
                 "Administrators",
                 null)
             {

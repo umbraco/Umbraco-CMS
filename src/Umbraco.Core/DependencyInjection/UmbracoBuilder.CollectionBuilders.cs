@@ -21,7 +21,7 @@ public static partial class UmbracoBuilderExtensions
     /// The builder.
     /// </returns>
     public static IUmbracoBuilder AddComponent<T>(this IUmbracoBuilder builder)
-        where T : IComponent
+        where T : IAsyncComponent
     {
         builder.Components().Append<T>();
 

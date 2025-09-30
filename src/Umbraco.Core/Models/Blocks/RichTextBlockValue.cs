@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Umbraco.Cms.Core.Models.Blocks;
 
 /// <summary>
@@ -19,5 +21,6 @@ public class RichTextBlockValue : BlockValue<RichTextBlockLayoutItem>
         => Layout[PropertyEditorAlias] = layouts;
 
     /// <inheritdoc />
-    public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.TinyMce;
+    [JsonIgnore]
+    public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.RichText;
 }

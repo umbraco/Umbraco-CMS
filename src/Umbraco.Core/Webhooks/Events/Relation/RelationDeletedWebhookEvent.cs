@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -20,6 +21,6 @@ public class RelationDeletedWebhookEvent : WebhookEventBase<RelationDeletedNotif
 
     public override string Alias => Constants.WebhookEvents.Aliases.RelationDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(RelationDeletedNotification notification)
-        => notification.DeletedEntities;
+    public override object ConvertNotificationToRequestPayload(RelationDeletedNotification notification)
+        => notification.DeletedEntities.Select(entity => new DefaultPayloadModel { Id = entity.Key });
 }

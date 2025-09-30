@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
@@ -38,6 +37,7 @@ public class PropertyTypeBuilder<TParent>
     private string _alias;
     private DateTime? _createDate;
     private int? _dataTypeId;
+    private Guid? _dataTypeKey;
     private string _description;
     private int? _id;
     private Guid? _key;
@@ -132,6 +132,12 @@ public class PropertyTypeBuilder<TParent>
         return this;
     }
 
+    public PropertyTypeBuilder<TParent> WithDataTypeKey(Guid dataTypeKey)
+    {
+        _dataTypeKey = dataTypeKey;
+        return this;
+    }
+
     public PropertyTypeBuilder<TParent> WithPropertyGroupId(int propertyGroupId)
     {
         _propertyGroupId = new Lazy<int>(() => propertyGroupId);
@@ -172,10 +178,11 @@ public class PropertyTypeBuilder<TParent>
         var valueStorageType = _valueStorageType ?? ValueStorageType.Nvarchar;
         var name = _name ?? Guid.NewGuid().ToString();
         var alias = _alias ?? name.ToCamelCase();
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var sortOrder = _sortOrder ?? 0;
         var dataTypeId = _dataTypeId ?? -88;
+        var dataTypeKey = _dataTypeKey ?? Guid.Empty;
         var description = _description ?? string.Empty;
         var propertyGroupId = _propertyGroupId;
         var mandatory = _mandatory ?? false;
@@ -196,6 +203,7 @@ public class PropertyTypeBuilder<TParent>
             Name = name,
             SortOrder = sortOrder,
             DataTypeId = dataTypeId,
+            DataTypeKey = dataTypeKey,
             Description = description,
             CreateDate = createDate,
             UpdateDate = updateDate,

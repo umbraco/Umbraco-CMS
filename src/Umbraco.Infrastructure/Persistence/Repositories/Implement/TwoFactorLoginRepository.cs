@@ -12,7 +12,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLogin>, ITwoFactorLoginRepository
+internal sealed class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLogin>, ITwoFactorLoginRepository
 {
     public TwoFactorLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache,
         ILogger<TwoFactorLoginRepository> logger)
@@ -64,7 +64,7 @@ internal class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLo
     }
 
     protected override string GetBaseWhereClause() =>
-        Constants.DatabaseSchema.Tables.TwoFactorLogin + ".id = @id";
+        QuoteTableName(Constants.DatabaseSchema.Tables.TwoFactorLogin) + ".id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses() => Enumerable.Empty<string>();
 

@@ -39,8 +39,10 @@ public class DeliveryApiSettings
     ///     Gets or sets the aliases of the content types that may never be exposed through the Delivery API. Content of these
     ///     types will never be returned from any Delivery API endpoint, nor added to the query index.
     /// </summary>
-    /// <value>The content type aliases that are not to be exposed.</value>
-    public string[] DisallowedContentTypeAliases { get; set; } = Array.Empty<string>();
+    /// <value>
+    /// The content type aliases that are not to be exposed.
+    /// </value>
+    public ISet<string> DisallowedContentTypeAliases { get; set; } = new HashSet<string>();
 
     /// <summary>
     ///     Gets or sets a value indicating whether the Delivery API should output rich text values as JSON instead of HTML.
@@ -70,7 +72,8 @@ public class DeliveryApiSettings
     /// <remarks>
     ///     This method is intended for future extension - see remark in <see cref="MemberAuthorizationSettings"/>.
     /// </remarks>
-    public bool MemberAuthorizationIsEnabled() => MemberAuthorization?.AuthorizationCodeFlow?.Enabled is true;
+    public bool MemberAuthorizationIsEnabled() => MemberAuthorization?.AuthorizationCodeFlow?.Enabled is true
+                                                  || MemberAuthorization?.ClientCredentialsFlow?.Enabled is true;
 
     /// <summary>
     ///     Typed configuration options for the Media APIs of the Delivery API.
@@ -116,6 +119,11 @@ public class DeliveryApiSettings
         ///     Gets or sets the Authorization Code Flow configuration for the Delivery API.
         /// </summary>
         public AuthorizationCodeFlowSettings? AuthorizationCodeFlow { get; set; } = null;
+
+        /// <summary>
+        ///     Gets or sets the Client Credentials Flow configuration for the Delivery API.
+        /// </summary>
+        public ClientCredentialsFlowSettings? ClientCredentialsFlow { get; set; } = null;
     }
 
     /// <summary>
@@ -133,15 +141,21 @@ public class DeliveryApiSettings
         /// <summary>
         ///     Gets or sets the URLs allowed to use as redirect targets after a successful login (session authorization).
         /// </summary>
-        /// <value>The URLs allowed as redirect targets.</value>
-        public Uri[] LoginRedirectUrls { get; set; } = Array.Empty<Uri>();
+        /// <value>
+        /// The URLs allowed as redirect targets.
+        /// </value>
+        public IEnumerable<Uri> LoginRedirectUrls { get; set; } = [];
 
         /// <summary>
         ///     Gets or sets the URLs allowed to use as redirect targets after a successful logout (session termination).
         /// </summary>
-        /// <value>The URLs allowed as redirect targets.</value>
-        /// <remarks>These are only required if logout is to be used.</remarks>
-        public Uri[] LogoutRedirectUrls { get; set; } = Array.Empty<Uri>();
+        /// <value>
+        /// The URLs allowed as redirect targets.
+        /// </value>
+        /// <remarks>
+        /// These are only required if logout is to be used.
+        /// </remarks>
+        public IEnumerable<Uri> LogoutRedirectUrls { get; set; } = [];
     }
 
     /// <summary>
@@ -180,5 +194,41 @@ public class DeliveryApiSettings
         /// </remarks>
         [DefaultValue(StaticDuration)]
         public TimeSpan MediaDuration { get; set; } = TimeSpan.Parse(StaticDuration);
+    }
+
+    /// <summary>
+    ///     Typed configuration options for the Client Credentials Flow settings for the Delivery API.
+    /// </summary>
+    public class ClientCredentialsFlowSettings
+    {
+        /// <summary>
+        ///     Gets or sets a value indicating whether Client Credentials Flow should be enabled for the Delivery API.
+        /// </summary>
+        /// <value><c>true</c> if Client Credentials Flow should be enabled; otherwise, <c>false</c>.</value>
+        [DefaultValue(StaticEnabled)]
+        public bool Enabled { get; set; } = StaticEnabled;
+
+        public IEnumerable<ClientCredentialsFlowMemberSettings> AssociatedMembers { get; set; } = [];
+    }
+
+    public class ClientCredentialsFlowMemberSettings
+    {
+        /// <summary>
+        ///     Gets or sets the user name of the member to associate with the session after a successful login.
+        /// </summary>
+        /// <value>The user name of the member.</value>
+        public string UserName { get; set; } = string.Empty;
+
+        /// <summary>
+        ///     Gets or sets the client ID that allows for a successful login.
+        /// </summary>
+        /// <value>The client ID.</value>
+        public string ClientId { get; set; } = string.Empty;
+
+        /// <summary>
+        ///     Gets or sets the client secret that allows for a successful login.
+        /// </summary>
+        /// <value>The client secret.</value>
+        public string ClientSecret { get; set; } = string.Empty;
     }
 }

@@ -1,12 +1,8 @@
-@using Microsoft.Extensions.Options
-@using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Routing
-@using Umbraco.Extensions
-@inject IHostingEnvironment hostingEnvironment
-@inject IOptions<GlobalSettings> globalSettings
+@inject IHostingEnvironment HostingEnvironment
 @{
-    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+    var backOfficePath = HostingEnvironment.GetBackOfficePath();
 }
 <!doctype html>
 <html class="no-js" lang="en">
@@ -17,7 +13,7 @@
 
     <title>Website is Under Maintainance</title>
 
-    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath.TrimStart("~") , "website", "/nonodes.css")" />
+    <link rel="stylesheet" href="@WebPath.Combine(backOfficePath , "website", "/nonodes.css")" />
     <style type="text/css">
         body {
             color:initial;

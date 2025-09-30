@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Scoping;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ScopedNuCacheTests : UmbracoIntegrationTest
+internal sealed class ScopedNuCacheTests : UmbracoIntegrationTest
 {
     private IContentService ContentService => GetRequiredService<IContentService>();
     private Mock<IHttpContextAccessor> MockHttpContextAccessor { get; } = CreateMockHttpContextAccessor();
@@ -37,7 +37,6 @@ public class ScopedNuCacheTests : UmbracoIntegrationTest
         builder.AddNotificationHandler<ContentPublishedNotification, NotificationHandler>();
         builder.Services.AddUnique<IUmbracoContextAccessor, TestUmbracoContextAccessor>();
         builder.Services.AddUnique(MockHttpContextAccessor.Object);
-        builder.AddNuCache();
     }
 
     public class NotificationHandler : INotificationHandler<ContentPublishedNotification>

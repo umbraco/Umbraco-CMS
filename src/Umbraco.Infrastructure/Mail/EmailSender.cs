@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Net.Mail;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,8 +12,7 @@ using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Extensions;
-using SecureSocketOptions = MailKit.Security.SecureSocketOptions;
-using SmtpClient = MailKit.Net.Smtp.SmtpClient;
+using Umbraco.Cms.Infrastructure.Mail.Interfaces;
 
 namespace Umbraco.Cms.Infrastructure.Mail;
 
@@ -28,19 +26,13 @@ public class EmailSender : IEmailSender
     private readonly ILogger<EmailSender> _logger;
     private readonly bool _notificationHandlerRegistered;
     private GlobalSettings _globalSettings;
-
-    public EmailSender(
-        ILogger<EmailSender> logger,
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IEventAggregator eventAggregator)
-        : this(logger, globalSettings, eventAggregator, null, null)
-    {
-    }
+    private readonly IEmailSenderClient _emailSenderClient;
 
     public EmailSender(
         ILogger<EmailSender> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,
         IEventAggregator eventAggregator,
+        IEmailSenderClient emailSenderClient,
         INotificationHandler<SendEmailNotification>? handler1,
         INotificationAsyncHandler<SendEmailNotification>? handler2)
     {
@@ -48,6 +40,7 @@ public class EmailSender : IEmailSender
         _eventAggregator = eventAggregator;
         _globalSettings = globalSettings.CurrentValue;
         _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
+        _emailSenderClient = emailSenderClient;
         globalSettings.OnChange(x => _globalSettings = x);
     }
 
@@ -152,29 +145,7 @@ public class EmailSender : IEmailSender
             while (true);
         }
 
-        using var client = new SmtpClient();
-
-        await client.ConnectAsync(
-            _globalSettings.Smtp!.Host,
-            _globalSettings.Smtp.Port,
-            (SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
-
-        if (!string.IsNullOrWhiteSpace(_globalSettings.Smtp.Username) &&
-            !string.IsNullOrWhiteSpace(_globalSettings.Smtp.Password))
-        {
-            await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
-        }
-
-        var mailMessage = message.ToMimeMessage(_globalSettings.Smtp.From);
-        if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
-        {
-            await client.SendAsync(mailMessage);
-        }
-        else
-        {
-            client.Send(mailMessage);
-        }
-
-        await client.DisconnectAsync(true);
+        await _emailSenderClient.SendAsync(message);
     }
+
 }

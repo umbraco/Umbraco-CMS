@@ -3,6 +3,7 @@
 
 using System.Text.Json.Nodes;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -13,7 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 public class ColorListValidatorTest
 {
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer()
-        => new SystemTextConfigurationEditorJsonSerializer();
+        => new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
     [Test]
     public void Expects_Array_Of_ColorPickerItems_Not_Single_String()
@@ -23,7 +24,8 @@ public class ColorListValidatorTest
             validator.Validate(
                 "hello",
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(1, result.Count());
     }
 
@@ -35,7 +37,8 @@ public class ColorListValidatorTest
             validator.Validate(
                 new JsonArray("hello", "world"),
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(1, result.Count());
     }
 
@@ -51,7 +54,8 @@ public class ColorListValidatorTest
                     JsonNode.Parse("""{"value": "ABC", "label": "Three"}"""),
                     JsonNode.Parse("""{"value": "1234567", "label": "Four"}""")),
                 null,
-                null);
+                null,
+                PropertyValidationContext.Empty());
         Assert.AreEqual(2, result.Count());
     }
 }

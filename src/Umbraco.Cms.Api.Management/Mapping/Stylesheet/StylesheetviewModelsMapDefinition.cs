@@ -59,7 +59,7 @@ public class StylesheetViewModelsMapDefinition : IMapDefinition
     {
         target.Path = source.Path.SystemPathToVirtualPath();
         target.Name = source.Name;
-        target.Parent = source.ParentPath.IsNullOrEmpty()
+        target.Parent = string.IsNullOrEmpty(source.ParentPath)
             ? null
             : new FileSystemFolderModel
             {

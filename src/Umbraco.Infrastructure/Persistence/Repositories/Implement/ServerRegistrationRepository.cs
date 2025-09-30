@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerRegistration>,
+internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, IServerRegistration>,
     IServerRegistrationRepository
 {
     public ServerRegistrationRepository(IScopeAccessor scopeAccessor, ILogger<ServerRegistrationRepository> logger)
@@ -23,14 +23,15 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
 
     public void DeactiveStaleServers(TimeSpan staleTimeout)
     {
-        DateTime timeoutDate = DateTime.Now.Subtract(staleTimeout);
+        DateTime timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);
 
-        Database.Update<ServerRegistrationDto>(
-            "SET isActive=0, isSchedulingPublisher=0 WHERE lastNotifiedDate < @timeoutDate", new
-            {
-                /*timeoutDate =*/
-                timeoutDate,
-            });
+        Sql<ISqlContext> sql = Sql()
+            .Update<ServerRegistrationDto>(c => c
+                .Set(x => x.IsActive, false)
+                .Set(x => x.IsSchedulingPublisher, false))
+            .Where<ServerRegistrationDto>(x => x.DateAccessed < timeoutDate);
+        Database.Execute(sql);
+
         ClearCache();
     }
 
@@ -83,7 +84,7 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> { "DELETE FROM umbracoServer WHERE id = @id" };
+        var list = new List<string> { $"DELETE FROM {QuoteTableName("umbracoServer")} WHERE id = @id" };
         return list;
     }
 

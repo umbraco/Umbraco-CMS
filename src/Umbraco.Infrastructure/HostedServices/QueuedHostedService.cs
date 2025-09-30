@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.HostedServices;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 
@@ -39,18 +40,26 @@ public class QueuedHostedService : BackgroundService
         {
             Func<CancellationToken, Task>? workItem = await TaskQueue.DequeueAsync(stoppingToken);
 
+            if (workItem is null)
+            {
+                continue;
+            }
+
             try
             {
-                if (workItem is not null)
+                Task task;
+                using (ExecutionContext.SuppressFlow())
                 {
-                    await workItem(stoppingToken);
+                    task = Task.Run(async () => await workItem(stoppingToken), stoppingToken);
                 }
+
+                await task;
             }
             catch (Exception ex)
             {
                 _logger.LogError(
                     ex,
-                    "Error occurred executing {WorkItem}.", nameof(workItem));
+                    "Error occurred executing workItem.");
             }
         }
     }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -9,7 +10,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 public sealed class DecimalValidator : IValueValidator
 {
     /// <inheritdoc />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
     {
         if (value == null || value.ToString() == string.Empty)
         {

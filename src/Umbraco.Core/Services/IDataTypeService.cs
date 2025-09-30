@@ -10,22 +10,20 @@ namespace Umbraco.Cms.Core.Services;
 public interface IDataTypeService : IService
 {
     /// <summary>
-    ///     Returns a dictionary of content type <see cref="Udi" />s and the property type aliases that use a
-    ///     <see cref="IDataType" />
+    ///     Gets a paged result of items which are in relation with the current data type.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [Obsolete("Please use GetReferencesAsync. Will be deleted in V15.")]
-    IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
-
-    IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id) => throw new NotImplementedException();
-
-    /// <summary>
-    ///     Returns a dictionary of content type <see cref="Udi" />s and the property type aliases that use a <see cref="IDataType" />
-    /// </summary>
-    /// <param name="id">The guid Id of the <see cref="IDataType" /></param>
-    /// <returns></returns>
-    Task<Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus>> GetReferencesAsync(Guid id);
+    /// <param name="key">The identifier of the data type to retrieve relations for.</param>
+    /// <param name="skip">The amount of items to skip</param>
+    /// <param name="take">The amount of items to take.</param>
+    /// <returns>A paged result of <see cref="RelationItemModel" /> objects.</returns>
+    /// <remarks>
+    /// Note that the model and method signature here aligns with with how we handle retrieval of concrete Umbraco
+    /// relations based on documents, media and members in <see cref="ITrackedReferencesService"/>.
+    /// The intention is that we align data type relations with these so they can be handled polymorphically at the management API
+    /// and backoffice UI level.
+    /// </remarks>
+    Task<PagedModel<RelationItemModel>> GetPagedRelationsAsync(Guid key, int skip, int take)
+        => Task.FromResult(new PagedModel<RelationItemModel>());
 
     [Obsolete("Please use IDataTypeContainerService for all data type container operations. Will be removed in V15.")]
     Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name,
@@ -75,16 +73,6 @@ public interface IDataTypeService : IService
     /// </returns>
     [Obsolete("Please use GetAsync. Will be removed in V15.")]
     IDataType? GetDataType(int id);
-
-    /// <summary>
-    ///     Gets a <see cref="IDataType" /> by its unique guid Id
-    /// </summary>
-    /// <param name="id">Unique guid Id of the DataType</param>
-    /// <returns>
-    ///     <see cref="IDataType" />
-    /// </returns>
-    [Obsolete("Please use GetAsync. Will be removed in V15.")]
-    IDataType? GetDataType(Guid id);
 
     /// <summary>
     ///     Gets an <see cref="IDataType" /> by its Name
@@ -196,7 +184,7 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="propertyEditorAlias">Alias of the property editor</param>
     /// <returns>Collection of <see cref="IDataType" /> configured for the property editor</returns>
-    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias);
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias) => Task.FromResult(GetByEditorAlias(propertyEditorAlias));
 
     /// <summary>
     ///     Gets all <see cref="IDataType" /> for a given editor UI alias
@@ -240,4 +228,11 @@ public interface IDataTypeService : IService
     /// <param name="dataType">The data type whose configuration to validate.</param>
     /// <returns>One or more <see cref="ValidationResult"/> if the configuration data is invalid, an empty collection otherwise.</returns>
     IEnumerable<ValidationResult> ValidateConfigurationData(IDataType dataType);
+
+    /// <summary>
+    ///     Gets all <see cref="IDataType" /> for a set of property editors
+    /// </summary>
+    /// <param name="propertyEditorAlias">Aliases of the property editors</param>
+    /// <returns>Collection of <see cref="IDataType" /> configured for the property editors</returns>
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias) => Task.FromResult(propertyEditorAlias.SelectMany(x=>GetByEditorAlias(x)));
 }

@@ -197,7 +197,6 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     ///     Returns the "src" property from the json structure if the value is formatted correctly
     /// </summary>
     /// <param name="propVal"></param>
-    /// <param name="deserializedValue">The deserialized <see cref="JObject" /> value</param>
     /// <param name="relative">Should the path returned be the application relative path</param>
     /// <returns></returns>
     private string? GetFileSrcFromPropertyValue(object? propVal, bool relative = true)
@@ -291,7 +290,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     }
 
     // for efficient value deserialization, we don't want to deserialize more than we need to (we don't need crops, focal point etc.)
-    private class LightWeightImageCropperValue
+    private sealed class LightWeightImageCropperValue
     {
         public string? Src { get; set; } = string.Empty;
     }

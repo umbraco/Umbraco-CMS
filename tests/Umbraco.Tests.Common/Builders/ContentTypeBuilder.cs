@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -16,7 +14,7 @@ public class ContentTypeBuilder
         IWithPropertyTypeIdsIncrementingFrom,
         IBuildPropertyTypes
 {
-    private readonly List<ContentTypeSortBuilder> _allowedContentTypeBuilders = new();
+    private readonly List<ContentTypeSortBuilder<ContentTypeBuilder>> _allowedContentTypeBuilders = new();
     private readonly List<PropertyTypeBuilder<ContentTypeBuilder>> _noGroupPropertyTypeBuilders = new();
     private readonly List<PropertyGroupBuilder<ContentTypeBuilder>> _propertyGroupBuilders = new();
     private readonly List<TemplateBuilder> _templateBuilders = new();
@@ -88,9 +86,9 @@ public class ContentTypeBuilder
         return builder;
     }
 
-    public ContentTypeSortBuilder AddAllowedContentType()
+    public ContentTypeSortBuilder<ContentTypeBuilder> AddAllowedContentType()
     {
-        var builder = new ContentTypeSortBuilder(this);
+        var builder = new ContentTypeSortBuilder<ContentTypeBuilder>(this);
         _allowedContentTypeBuilders.Add(builder);
         return builder;
     }
@@ -125,6 +123,7 @@ public class ContentTypeBuilder
         contentType.Trashed = GetTrashed();
         contentType.ListView = GetListView();
         contentType.IsElement = _isElement ?? false;
+        contentType.AllowedAsRoot = GetAllowedAtRoot();
         contentType.HistoryCleanup = new HistoryCleanup();
 
         contentType.Variations = contentVariation;

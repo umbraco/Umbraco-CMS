@@ -53,6 +53,7 @@ public class ContentBuilder
     private int? _sortOrder;
     private bool? _trashed;
     private DateTime? _updateDate;
+    private bool? _blueprint;
     private int? _versionId;
 
     DateTime? IWithCreateDateBuilder.CreateDate
@@ -145,6 +146,13 @@ public class ContentBuilder
         set => _updateDate = value;
     }
 
+    public ContentBuilder WithBlueprint(bool blueprint)
+    {
+        _blueprint = blueprint;
+
+        return this;
+    }
+
     public ContentBuilder WithVersionId(int versionId)
     {
         _versionId = versionId;
@@ -177,10 +185,7 @@ public class ContentBuilder
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            if (_cultureNames.TryGetValue(culture, out _))
-            {
-                _cultureNames.Remove(culture);
-            }
+            _cultureNames.Remove(culture);
         }
         else
         {
@@ -217,11 +222,12 @@ public class ContentBuilder
     {
         var id = _id ?? 0;
         var versionId = _versionId ?? 0;
+        var blueprint = _blueprint ?? false;
         var key = _key ?? Guid.NewGuid();
         var parentId = _parentId ?? -1;
         var parent = _parent;
-        var createDate = _createDate ?? DateTime.Now;
-        var updateDate = _updateDate ?? DateTime.Now;
+        var createDate = _createDate ?? DateTime.UtcNow;
+        var updateDate = _updateDate ?? DateTime.UtcNow;
         var name = _name ?? Guid.NewGuid().ToString();
         var creatorId = _creatorId ?? 0;
         var level = _level ?? 1;
@@ -253,6 +259,7 @@ public class ContentBuilder
 
         content.Id = id;
         content.VersionId = versionId;
+        content.Blueprint = blueprint;
         content.Key = key;
         content.CreateDate = createDate;
         content.UpdateDate = updateDate;

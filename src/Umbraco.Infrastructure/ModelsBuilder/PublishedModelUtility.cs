@@ -28,21 +28,21 @@ public static class PublishedModelUtility
     // var contentType = PublishedContentType.Get(itemType, alias);
     //    // etc...
     // }
-    public static IPublishedContentType? GetModelContentType(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+    public static IPublishedContentType GetModelContentType(
+        IPublishedContentTypeCache contentTypeCache,
         PublishedItemType itemType,
         string alias)
     {
-        IPublishedSnapshot publishedSnapshot = publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
         switch (itemType)
         {
             case PublishedItemType.Content:
+                return contentTypeCache.Get(PublishedItemType.Content, alias);
             case PublishedItemType.Element:
-                return publishedSnapshot.Content?.GetContentType(alias);
+                return contentTypeCache.Get(PublishedItemType.Element, alias);
             case PublishedItemType.Media:
-                return publishedSnapshot.Media?.GetContentType(alias);
+                return contentTypeCache.Get(PublishedItemType.Media, alias);
             case PublishedItemType.Member:
-                return publishedSnapshot.Members?.GetContentType(alias);
+                return contentTypeCache.Get(PublishedItemType.Member, alias);
             default:
                 throw new ArgumentOutOfRangeException(nameof(itemType));
         }

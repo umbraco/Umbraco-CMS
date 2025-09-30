@@ -111,6 +111,12 @@ public sealed class UriUtility
         if (path != "/")
         {
             path = path.TrimEnd(Constants.CharArrays.ForwardSlash);
+
+            // perform fallback to root if the path was all slashes (i.e. https://some.where//////)
+            if (path == string.Empty)
+            {
+                path = "/";
+            }
         }
 
         return uri.Rewrite(path);
@@ -138,7 +144,7 @@ public sealed class UriUtility
         var idxOfScheme = relativeUrl.IndexOf(@"://", StringComparison.Ordinal);
         if (idxOfScheme != -1)
         {
-            var idxOfQM = relativeUrl.IndexOf('?');
+            var idxOfQM = relativeUrl.IndexOf('?', StringComparison.Ordinal);
             if (idxOfQM == -1 || idxOfQM > idxOfScheme)
             {
                 return relativeUrl;
@@ -220,7 +226,7 @@ public sealed class UriUtility
             throw new ArgumentNullException(nameof(absolutePath));
         }
 
-        if (!absolutePath.StartsWith("/"))
+        if (!absolutePath.StartsWith("/", StringComparison.Ordinal))
         {
             throw new FormatException("The absolutePath specified does not start with a '/'");
         }
