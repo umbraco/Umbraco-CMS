@@ -5,3 +5,8 @@ export interface UmbEntityDataItemModel extends UmbEntityModel {
 	name: string;
 	icon: string;
 }
+
+export interface UmbEntityDataTreeItemModel extends UmbEntityDataItemModel {
+	parent: UmbEntityModel;
+	hasChildren: boolean;
+}
