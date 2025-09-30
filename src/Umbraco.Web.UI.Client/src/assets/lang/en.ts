@@ -2605,7 +2605,7 @@ export default {
 			'The content of this block will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		confirmDeleteBlockGroupTitle: 'Delete group?',
 		confirmDeleteBlockGroupMessage:
-			'Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?',
+			'Are you sure you want to delete group <strong>%0%</strong>?',
 		confirmDeleteBlockGroupNotice:
 			'The content of these Blocks will still be present, editing of this content will no longer be available and will be shown as unsupported content.',
 		blockConfigurationOverlayTitle: "Configuration of '%0%'",
