@@ -8,6 +8,7 @@ const tipTapUiAlias = 'Umb.PropertyEditorUi.Tiptap';
 const extensionsDefaultValue = [
   "Umb.Tiptap.RichTextEssentials",
   "Umb.Tiptap.Anchor",
+  "Umb.Tiptap.Block",
   "Umb.Tiptap.Blockquote",
   "Umb.Tiptap.Bold",
   "Umb.Tiptap.BulletList",
@@ -35,8 +36,7 @@ const extensionsDefaultValue = [
   "Umb.Tiptap.TextDirection",
   "Umb.Tiptap.TextIndent",
   "Umb.Tiptap.TrailingNode",
-  "Umb.Tiptap.Underline",
-  "Umb.Tiptap.WordCount"
+  "Umb.Tiptap.Underline"
 ];
 
 const toolbarDefaultValue = [

@@ -23,6 +23,7 @@ public class PropertyTypeBuilderTests
         const string testName = "Test";
         const int testSortOrder = 9;
         const int testDataTypeId = 5;
+        var testDataTypeKey = Guid.NewGuid();
         var testCreateDate = DateTime.UtcNow.AddHours(-1);
         var testUpdateDate = DateTime.UtcNow;
         const string testDescription = "testing";
@@ -43,6 +44,7 @@ public class PropertyTypeBuilderTests
             .WithName(testName)
             .WithSortOrder(testSortOrder)
             .WithDataTypeId(testDataTypeId)
+            .WithDataTypeKey(testDataTypeKey)
             .WithCreateDate(testCreateDate)
             .WithUpdateDate(testUpdateDate)
             .WithDescription(testDescription)
@@ -60,6 +62,7 @@ public class PropertyTypeBuilderTests
         Assert.AreEqual(testName, propertyType.Name);
         Assert.AreEqual(testSortOrder, propertyType.SortOrder);
         Assert.AreEqual(testDataTypeId, propertyType.DataTypeId);
+        Assert.AreEqual(testDataTypeKey, propertyType.DataTypeKey);
         Assert.AreEqual(testCreateDate, propertyType.CreateDate);
         Assert.AreEqual(testUpdateDate, propertyType.UpdateDate);
         Assert.AreEqual(testDescription, propertyType.Description);
