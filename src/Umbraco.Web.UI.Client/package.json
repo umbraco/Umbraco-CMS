@@ -128,6 +128,7 @@
 		"./external/dompurify": "./dist-cms/external/dompurify/index.js",
 		"./external/heximal-expressions": "./dist-cms/external/heximal-expressions/index.js",
 		"./external/lit": "./dist-cms/external/lit/index.js",
+		"./external/luxon": "./dist-cms/external/luxon/index.js",
 		"./external/marked": "./dist-cms/external/marked/index.js",
 		"./external/monaco-editor": "./dist-cms/external/monaco-editor/index.js",
 		"./external/openid": "./dist-cms/external/openid/index.js",

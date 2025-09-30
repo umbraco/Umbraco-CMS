@@ -6,10 +6,12 @@ import { manifest as orderDirection } from './order-direction/manifests.js';
 import { manifest as overlaySize } from './overlay-size/manifests.js';
 import { manifest as select } from './select/manifests.js';
 import { manifest as valueType } from './value-type/manifests.js';
+import { manifest as timeZonePicker } from './time-zone-picker/manifests.js';
 import { manifests as checkboxListManifests } from './checkbox-list/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as colorPickerManifests } from './color-picker/manifests.js';
 import { manifests as datePickerManifests } from './date-picker/manifests.js';
+import { manifests as dateTimeManifests } from './date-time/manifests.js';
 import { manifests as dropdownManifests } from './dropdown/manifests.js';
 import { manifests as eyeDropperManifests } from './eye-dropper/manifests.js';
 import { manifests as iconPickerManifests } from './icon-picker/manifests.js';
@@ -29,6 +31,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...collectionManifests,
 	...colorPickerManifests,
 	...datePickerManifests,
+	...dateTimeManifests,
 	...dropdownManifests,
 	...eyeDropperManifests,
 	...iconPickerManifests,
@@ -50,4 +53,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 	overlaySize,
 	select,
 	valueType,
+	timeZonePicker,
 ];
