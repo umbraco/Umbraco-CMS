@@ -1,5 +1,5 @@
 import type { UmbEntityDataItemModel } from '../types.js';
-import { UmbEntityDataPickerInputContext } from './Input-entity-data.context.js';
+import { UmbEntityDataPickerInputContext } from './input-entity-data.context.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -85,9 +85,6 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	@property({ type: Object, attribute: false })
-	public filter: (item: UmbEntityDataItemModel) => boolean = () => true;
-
 	@property({ type: Array })
 	public set selection(uniques: Array<string>) {
 		this.#pickerInputContext.setSelection(uniques);
@@ -130,7 +127,6 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 	private _items: Array<UmbEntityDataItemModel> = [];
 
 	#pickerInputContext = new UmbEntityDataPickerInputContext(this);
-	#type: 'collection' | 'tree';
 
 	constructor() {
 		super();
@@ -163,13 +159,6 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 		return undefined;
 	}
 
-	#openPicker() {
-		this.#pickerInputContext.openPicker({
-			filter: this.filter,
-			multiple: this.max > 1 ? true : false,
-		});
-	}
-
 	#onRemove(item: UmbEntityDataItemModel) {
 		this.#pickerInputContext.requestRemoveItem(item.unique);
 	}
@@ -184,7 +173,7 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				@click=${this.#openPicker}
+				@click=${() => this.#pickerInputContext.openPicker()}
 				label="${this.localize.term('general_choose')}"></uui-button>
 		`;
 	}
