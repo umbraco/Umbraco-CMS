@@ -30,6 +30,7 @@ namespace Umbraco.Cms
             private readonly ILogger<CacheInstructionService> _logger;
             private readonly ILastSyncedManager _lastSyncedManager;
             private readonly IProfilingLogger _profilingLogger;
+            private readonly Lock _syncLock = new();
 
             [Obsolete("Use the overload that requires ILastSyncedManager. Scheduled for removal in V18.")]
             public CacheInstructionService(
@@ -164,21 +165,23 @@ namespace Umbraco.Cms
                 CancellationToken cancellationToken,
                 string localIdentity)
             {
-                // TODO: Add Locking
-                using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
-                using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+                lock (_syncLock)
                 {
-                    var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
-                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
-
-                    if (numberOfInstructionsProcessed > 0)
+                    using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
+                    using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                     {
-                        _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
-                        _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
-                    }
+                        var lastId = _lastSyncedManager.GetLastSyncedExternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
-                    scope.Complete();
-                    return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                        if (numberOfInstructionsProcessed > 0)
+                        {
+                            _lastSyncedManager.SaveLastSyncedExternalAsync(lastId).GetAwaiter().GetResult();
+                            _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                        }
+
+                        scope.Complete();
+                        return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                    }
                 }
             }
 
@@ -188,20 +191,22 @@ namespace Umbraco.Cms
                 CancellationToken cancellationToken,
                 string localIdentity)
             {
-                // TODO: Add Locking
-                using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
-                using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+                lock (_syncLock)
                 {
-                    var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
-                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
-
-                    if (numberOfInstructionsProcessed > 0)
+                    using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
+                    using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                     {
-                        _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
-                    }
+                        var lastId = _lastSyncedManager.GetLastSyncedInternalAsync().GetAwaiter().GetResult() ?? 0;
+                        var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
-                    scope.Complete();
-                    return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                        if (numberOfInstructionsProcessed > 0)
+                        {
+                            _lastSyncedManager.SaveLastSyncedInternalAsync(lastId).GetAwaiter().GetResult();
+                        }
+
+                        scope.Complete();
+                        return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                    }
                 }
             }
 
