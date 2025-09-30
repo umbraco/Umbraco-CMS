@@ -30,7 +30,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'pickerPropertyEditorTreeDataSource',
 		alias: 'Umb.PickerPropertyEditorTreeDataSource.Media',
 		name: 'Media Picker Tree Data Source',
-		api: () => import('./test-document-picker-data-source.js'),
+		api: () => import('./test-media-picker-data-source.js'),
 		meta: {
 			label: 'Media',
 			icon: 'icon-document-image',
@@ -41,7 +41,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'pickerPropertyEditorCollectionDataSource',
 		alias: 'Umb.PickerPropertyEditorCollectionDataSource.Language',
 		name: 'Language Picker Collection Data Source',
-		api: () => import('./test-webhook-picker-data-source.js'),
+		api: () => import('./test-language-picker-data-source.js'),
 		meta: {
 			label: 'Languages',
 			icon: 'icon-globe',
