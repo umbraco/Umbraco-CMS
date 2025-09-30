@@ -133,6 +133,7 @@ export class UmbPickerInputContext<
 	#removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
+		this.#itemManager.removeStatus(unique);
 		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 }
