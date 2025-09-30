@@ -129,6 +129,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         _lastSyncedManager = lastSyncedManager;
 
         globalSettings.OnChange(x => GlobalSettings = x);
+        // TODO: Use IMachineInfoFactory instead
         using (var process = Process.GetCurrentProcess())
         {
             // See notes on _localIdentity
