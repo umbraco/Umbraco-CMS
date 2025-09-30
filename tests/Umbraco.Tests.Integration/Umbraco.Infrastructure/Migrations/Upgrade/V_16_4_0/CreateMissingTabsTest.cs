@@ -85,7 +85,6 @@ internal sealed class CreateMissingTabsTest : UmbracoIntegrationTest
         var propertyType2 = new PropertyTypeBuilder()
             .WithAlias("text3")
             .WithName("Text 3")
-            .WithPropertyGroupId(headerGroupId)
             .Build();
         composedContentType.AddPropertyType(propertyType2, "content/homeContent", "Home Content");
 
@@ -99,12 +98,14 @@ internal sealed class CreateMissingTabsTest : UmbracoIntegrationTest
             .From<PropertyTypeGroupDto>()
             .WhereIn<PropertyTypeGroupDto>(x => x.ContentTypeNodeId, new[] { baseContentType.Id, composedContentType.Id });
         var groups = await scope.Database.FetchAsync<PropertyTypeGroupDto>(groupsSql); // <-- this doesn't seem correct, we have 3 groups, but from the issue description would expect 5
+        Assert.AreEqual(5, groups.Count);
 
         Sql<ISqlContext> typesSql = scope.Database.SqlContext.Sql()
             .Select<PropertyTypeDto>()
             .From<PropertyTypeDto>()
             .WhereIn<PropertyTypeDto>(x => x.ContentTypeId, new[] { baseContentType.Id, composedContentType.Id });
         var types = await scope.Database.FetchAsync<PropertyTypeDto>(typesSql);
+        Assert.AreEqual(3, types.Count);
         scope.Complete();
 
         // TODO: Delete one of the group records so we get to the 13 state.
