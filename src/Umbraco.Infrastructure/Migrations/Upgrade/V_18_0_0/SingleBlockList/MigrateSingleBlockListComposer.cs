@@ -13,5 +13,6 @@ public class MigrateSingleBlockListComposer : IComposer
         builder.Services.AddSingleton<ITypedSingleBlockListProcessor, SingleBlockListBlockGridProcessor>();
         builder.Services.AddSingleton<ITypedSingleBlockListProcessor, SingleBlockListRteProcessor>();
         builder.Services.AddSingleton<SingleBlockListProcessor>();
+        builder.Services.AddSingleton<SingleBlockListConfigurationCache>();
     }
 }

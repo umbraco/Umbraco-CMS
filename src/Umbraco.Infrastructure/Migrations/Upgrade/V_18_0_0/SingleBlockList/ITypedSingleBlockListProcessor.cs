@@ -12,7 +12,6 @@ public interface ITypedSingleBlockListProcessor
     /// <summary>
     /// object?: the editorValue being processed
     /// Func<object?, bool>: the function that will be called when nested content is detected
-    /// Func<BlockListValue, SingleBlockValue>: the function that will do the migration
     /// </summary>
-    public Func<object?, Func<object?, bool>, Func<BlockListValue, SingleBlockValue>, bool> Process { get; }
+    public Func<object?, Func<object?, bool>, Func<BlockListValue,object>, bool> Process { get; }
 }

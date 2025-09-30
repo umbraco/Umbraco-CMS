@@ -13,12 +13,12 @@ public class SingleBlockListRteProcessor : ITypedSingleBlockListProcessor
         "Umbraco.TinyMCE", Constants.PropertyEditors.Aliases.RichText
     ];
 
-    public Func<object?, Func<object?, bool>, Func<BlockListValue, SingleBlockValue>, bool> Process => ProcessRichText;
+    public Func<object?, Func<object?, bool>,Func<BlockListValue,object>, bool> Process => ProcessRichText;
 
     public bool ProcessRichText(
         object? value,
         Func<object?, bool> processNested,
-        Func<BlockListValue, SingleBlockValue> processValue)
+        Func<BlockListValue, object> processOuterValue)
     {
         if (value is not RichTextEditorValue richTextValue)
         {

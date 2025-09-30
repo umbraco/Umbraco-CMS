@@ -7,11 +7,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList
 public class SingleBlockListProcessor
 {
     private readonly IEnumerable<ITypedSingleBlockListProcessor> _processors;
+    private readonly SingleBlockListConfigurationCache _singleBlockListConfigurationCache;
 
     public SingleBlockListProcessor(
-        IEnumerable<ITypedSingleBlockListProcessor> processors)
+        IEnumerable<ITypedSingleBlockListProcessor> processors,
+        SingleBlockListConfigurationCache singleBlockListConfigurationCache)
     {
         _processors = processors;
+        _singleBlockListConfigurationCache = singleBlockListConfigurationCache;
     }
 
     public IEnumerable<string> GetSupportedPropertyEditorAliases() =>
@@ -25,9 +28,9 @@ public class SingleBlockListProcessor
         return processor is not null && processor.Process.Invoke(editorValue, ProcessToEditorValue, ConvertBlockListToSingleBlock);
     }
 
-    private SingleBlockValue ConvertBlockListToSingleBlock(BlockListValue blockListValue)
+    public BlockValue ConvertBlockListToSingleBlock(BlockListValue blockListValue)
     {
-        var blockListLayoutItem = blockListValue.Layout[Constants.PropertyEditors.Aliases.SingleBlock].First();
+        IBlockLayoutItem blockListLayoutItem = blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].First();
 
         var singleBlockLayoutItem = new SingleBlockLayoutItem();
         singleBlockLayoutItem.ContentKey = blockListLayoutItem.ContentKey;
