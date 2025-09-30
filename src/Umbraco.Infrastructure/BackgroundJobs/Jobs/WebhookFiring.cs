@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
-public class WebhookFiring : IRecurringBackgroundJob
+public class WebhookFiring : IDistributedBackgroundJob
 {
     private readonly ILogger<WebhookFiring> _logger;
     private readonly IWebhookRequestService _webhookRequestService;
