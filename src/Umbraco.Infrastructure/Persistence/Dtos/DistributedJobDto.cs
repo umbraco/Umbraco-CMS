@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("key", AutoIncrement = false)]
 [ExplicitColumns]
-public class DistributedJobDto
+internal sealed class DistributedJobDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DistributedJob;
 
