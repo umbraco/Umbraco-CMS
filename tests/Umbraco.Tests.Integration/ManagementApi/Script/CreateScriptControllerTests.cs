@@ -47,7 +47,7 @@ public class CreateScriptControllerTests : ManagementApiUserGroupTestBase<Create
         CreateScriptRequestModel createScriptRequestModel = new()
         {
             Name = Guid.NewGuid() + ".js",
-            Content = "empty"
+            Content = "empty",
         };
 
         return await Client.PostAsync(Url, JsonContent.Create(createScriptRequestModel));

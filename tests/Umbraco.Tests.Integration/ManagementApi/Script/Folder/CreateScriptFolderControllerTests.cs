@@ -46,7 +46,7 @@ public class CreateScriptFolderControllerTests : ManagementApiUserGroupTestBase<
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreateScriptFolderRequestModel createScriptFolderRequestModel = new() { Name = Guid.NewGuid().ToString()};
+        CreateScriptFolderRequestModel createScriptFolderRequestModel = new() { Name = Guid.NewGuid().ToString() };
 
         return await Client.PostAsync(Url, JsonContent.Create(createScriptFolderRequestModel));
     }

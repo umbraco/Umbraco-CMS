@@ -15,15 +15,16 @@ public class ByKeyMediaControllerTests : ManagementApiUserGroupTestBase<ByKeyMed
 
     private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
 
-
     private Guid _mediaKey;
 
     [SetUp]
     public async Task SetUp()
     {
-        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0,100);
+        // Media Folder Types
+        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0, 100);
         var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
 
+        // Media Folder
         MediaCreateModel mediaCreateModel = new() { InvariantName = "MediaTest", ContentTypeKey = folderMediaType.Key };
         var response = await MediaEditingService.CreateAsync(mediaCreateModel, Constants.Security.SuperUserKey);
         _mediaKey = response.Result.Content.Key;

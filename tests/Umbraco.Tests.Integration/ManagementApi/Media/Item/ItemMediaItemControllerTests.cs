@@ -20,9 +20,11 @@ public class ItemMediaItemControllerTests : ManagementApiUserGroupTestBase<ItemM
     [SetUp]
     public async Task SetUp()
     {
-        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0,100);
+        // Media Folder Type
+        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0, 100);
         var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
 
+        // Media Folder
         MediaCreateModel mediaCreateModel = new() { InvariantName = "MediaTest", ContentTypeKey = folderMediaType.Key };
         var response = await MediaEditingService.CreateAsync(mediaCreateModel, Constants.Security.SuperUserKey);
         _mediaKey = response.Result.Content.Key;

@@ -15,9 +15,8 @@ public class AllDictionaryControllerTests : ManagementApiUserGroupTestBase<AllDi
     [SetUp]
     public async Task Setup()
     {
-        var response = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
-
-        await DictionaryItemService.CreateAsync(response, Constants.Security.SuperUserKey);
+        var dictionaryItem = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
+        await DictionaryItemService.CreateAsync(dictionaryItem, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<AllDictionaryController, object>> MethodSelector =>

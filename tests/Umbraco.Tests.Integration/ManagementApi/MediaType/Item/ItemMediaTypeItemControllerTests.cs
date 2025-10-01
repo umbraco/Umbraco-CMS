@@ -11,7 +11,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.MediaType.Item;
 
 public class ItemMediaTypeItemControllerTests : ManagementApiUserGroupTestBase<ItemMediaTypeItemController>
 {
-
     private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
 
     private Guid _mediaTypeKey;
@@ -19,10 +18,11 @@ public class ItemMediaTypeItemControllerTests : ManagementApiUserGroupTestBase<I
     [SetUp]
     public async Task SetUp()
     {
-        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0,100);
+        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0, 100);
         var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
         _mediaTypeKey = folderMediaType.Key;
     }
+
     protected override Expression<Func<ItemMediaTypeItemController, object>> MethodSelector =>
         x => x.Item(CancellationToken.None, new HashSet<Guid> { _mediaTypeKey });
 

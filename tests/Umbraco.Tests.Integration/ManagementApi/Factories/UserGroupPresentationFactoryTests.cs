@@ -23,8 +23,11 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Factories;
 public class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
 {
     public IUserGroupPresentationFactory UserGroupPresentationFactory => GetRequiredService<IUserGroupPresentationFactory>();
+
     public IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+
     public ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     public IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();
 
     public IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();

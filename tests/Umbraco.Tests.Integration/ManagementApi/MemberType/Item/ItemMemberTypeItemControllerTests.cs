@@ -17,12 +17,7 @@ public class ItemMemberTypeItemControllerTests : ManagementApiUserGroupTestBase<
     [SetUp]
     public async Task SetUp()
     {
-        var memberTypeModel = new MemberTypeCreateModel()
-        {
-            Alias = Guid.NewGuid().ToString(),
-            Name = "Test Member Type",
-        };
-
+        var memberTypeModel = new MemberTypeCreateModel() { Alias = Guid.NewGuid().ToString(), Name = "Test Member Type", };
         var memberTypeResponse = await MemberTypeEditingService.CreateAsync(memberTypeModel, Constants.Security.SuperUserKey);
         _memberTypeKey = memberTypeResponse.Result.Key;
     }

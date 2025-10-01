@@ -42,7 +42,7 @@ public class CreateMediaTypeControllerTests : ManagementApiUserGroupTestBase<Cre
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreateMediaTypeRequestModel createMediaTypeRequest = new() { Name = "Test", Alias = "test", Icon = "icon-picture", AllowedAsRoot= true, Id = Guid.NewGuid() };
+        CreateMediaTypeRequestModel createMediaTypeRequest = new() { Name = "Test", Alias = "test", Icon = "icon-picture", AllowedAsRoot = true, Id = Guid.NewGuid() };
 
         return await Client.PostAsync(Url, JsonContent.Create(createMediaTypeRequest));
     }

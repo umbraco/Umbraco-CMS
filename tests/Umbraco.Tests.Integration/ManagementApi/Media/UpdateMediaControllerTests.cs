@@ -11,27 +11,26 @@ using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Media;
 
-[TestFixture]
 public class UpdateMediaControllerTests : ManagementApiUserGroupTestBase<UpdateMediaController>
 {
     private IMediaEditingService MediaEditingService => GetRequiredService<IMediaEditingService>();
 
     private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
 
-
     private Guid _mediaKey;
 
     [SetUp]
     public async Task SetUp()
     {
-        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0,100);
+        // Media Folder Type
+        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0, 100);
         var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
 
+        // Media Folder
         MediaCreateModel mediaCreateModel = new() { InvariantName = "MediaTest", ContentTypeKey = folderMediaType.Key };
         var response = await MediaEditingService.CreateAsync(mediaCreateModel, Constants.Security.SuperUserKey);
         _mediaKey = response.Result.Content.Key;
     }
-
 
     protected override Expression<Func<UpdateMediaController, object>> MethodSelector => x => x.Update(CancellationToken.None, _mediaKey, null);
 
@@ -67,10 +66,13 @@ public class UpdateMediaControllerTests : ManagementApiUserGroupTestBase<UpdateM
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        UpdateMediaRequestModel updateMediaModel = new() { Variants = new MediaVariantRequestModel[]
+        UpdateMediaRequestModel updateMediaModel = new()
         {
-            new() { Culture = null, Segment = null, Name = "NewName", },
-        },};
+            Variants = new MediaVariantRequestModel[]
+            {
+                new() { Culture = null, Segment = null, Name = "NewName", },
+            },
+        };
 
         return await Client.PutAsync(Url, JsonContent.Create(updateMediaModel));
     }

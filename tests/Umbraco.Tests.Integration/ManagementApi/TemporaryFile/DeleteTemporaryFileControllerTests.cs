@@ -7,18 +7,17 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.TemporaryFile;
 
-[TestFixture]
 public class DeleteTemporaryFileControllerTests : ManagementApiUserGroupTestBase<DeleteTemporaryFileController>
 {
-    private ITemporaryFileService _temporaryFileService;
+    private ITemporaryFileService TemporaryFileService => GetRequiredService<ITemporaryFileService>();
+
     private Guid _key;
 
     [SetUp]
     public async Task Setup()
     {
-        _temporaryFileService = GetRequiredService<ITemporaryFileService>();
         _key = Guid.NewGuid();
-        await _temporaryFileService.CreateAsync(new CreateTemporaryFileModel { Key = _key, FileName = "File.png" });
+        await TemporaryFileService.CreateAsync(new CreateTemporaryFileModel { Key = _key, FileName = "File.png" });
     }
 
     protected override Expression<Func<DeleteTemporaryFileController, object>> MethodSelector =>

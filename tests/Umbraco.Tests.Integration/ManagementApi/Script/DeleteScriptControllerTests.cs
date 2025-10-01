@@ -13,14 +13,15 @@ public class DeleteScriptControllerTests : ManagementApiUserGroupTestBase<Delete
     private IScriptService ScriptService => GetRequiredService<IScriptService>();
 
     private string _scriptPath;
+
     [SetUp]
     public async Task SetUp()
     {
         var model = new ScriptCreateModel() { Name = Guid.NewGuid() + ".js" };
-        var response =await ScriptService.CreateAsync(model, Constants.Security.SuperUserKey);
+        var response = await ScriptService.CreateAsync(model, Constants.Security.SuperUserKey);
         _scriptPath = response.Result.Path;
-
     }
+
     protected override Expression<Func<DeleteScriptController, object>> MethodSelector =>
         x => x.Delete(CancellationToken.None, _scriptPath);
 

@@ -10,7 +10,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.DocumentType.Root;
 
 public class RootDocumentTypeTreeControllerTests : ManagementApiUserGroupTestBase<RootDocumentTypeTreeController>
 {
-
     protected override Expression<Func<RootDocumentTypeTreeController, object>> MethodSelector =>
         x => x.Root(CancellationToken.None, 0, 100, false);
 

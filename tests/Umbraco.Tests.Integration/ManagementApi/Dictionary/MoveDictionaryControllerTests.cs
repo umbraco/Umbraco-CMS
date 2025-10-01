@@ -21,14 +21,14 @@ public class MoveDictionaryControllerTests : ManagementApiUserGroupTestBase<Move
     [SetUp]
     public async Task Setup()
     {
-        var originalResponse = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
-        var targetResponse = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
+        var originalDictionaryItem = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
+        var targetDictionaryItem = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
 
-        _originalId = originalResponse.Key;
-        _targetId = targetResponse.Key;
+        _originalId = originalDictionaryItem.Key;
+        _targetId = targetDictionaryItem.Key;
 
-        await DictionaryItemService.CreateAsync(originalResponse, Constants.Security.SuperUserKey);
-        await DictionaryItemService.CreateAsync(targetResponse, Constants.Security.SuperUserKey);
+        await DictionaryItemService.CreateAsync(originalDictionaryItem, Constants.Security.SuperUserKey);
+        await DictionaryItemService.CreateAsync(targetDictionaryItem, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<MoveDictionaryController, object>> MethodSelector =>

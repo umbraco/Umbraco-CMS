@@ -51,7 +51,7 @@ public class SetupInstallControllerTests : ManagementApiUserGroupTestBase<SetupI
                 Name = "Tester", Email = "Test@emails.test", Password = "123457890"
             },
             Database = new DatabaseInstallRequestModel { Id = Guid.NewGuid(), ProviderName = "TestProviderName" },
-            TelemetryLevel = TelemetryLevel.Basic
+            TelemetryLevel = TelemetryLevel.Basic,
         };
         return await Client.PostAsync(Url, JsonContent.Create(installRequestModel));
     }

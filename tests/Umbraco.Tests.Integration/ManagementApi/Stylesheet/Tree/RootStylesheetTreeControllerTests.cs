@@ -15,9 +15,9 @@ public class RootStylesheetTreeControllerTests : ManagementApiUserGroupTestBase<
     [SetUp]
     public async Task SetUp()
     {
+        // Stylesheet Folder
         var model = new StylesheetFolderCreateModel { Name = Guid.NewGuid().ToString() };
         await StylesheetFolderService.CreateAsync(model);
-
     }
 
     protected override Expression<Func<RootStylesheetTreeController, object>> MethodSelector =>

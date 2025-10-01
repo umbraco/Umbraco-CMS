@@ -19,11 +19,11 @@ public class UpdateDictionaryControllerTests : ManagementApiUserGroupTestBase<Up
     [SetUp]
     public async Task Setup()
     {
-        var response = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
+        var dictionaryItem = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
 
-        _dictionaryKey = response.Key;
+        _dictionaryKey = dictionaryItem.Key;
 
-        await DictionaryItemService.CreateAsync(response, Constants.Security.SuperUserKey);
+        await DictionaryItemService.CreateAsync(dictionaryItem, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<UpdateDictionaryController, object>> MethodSelector => x => x.Update(CancellationToken.None, _dictionaryKey, null);
@@ -61,7 +61,7 @@ public class UpdateDictionaryControllerTests : ManagementApiUserGroupTestBase<Up
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
         UpdateDictionaryItemRequestModel updateDictionaryItemRequestModel =
-            new() { Name = Guid.NewGuid().ToString(), Translations = { } };
+            new() { Name = Guid.NewGuid().ToString(), };
         return await Client.PutAsync(Url, JsonContent.Create(updateDictionaryItemRequestModel));
     }
 }

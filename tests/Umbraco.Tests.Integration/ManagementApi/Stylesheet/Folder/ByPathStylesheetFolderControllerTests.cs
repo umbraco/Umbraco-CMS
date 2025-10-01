@@ -19,10 +19,9 @@ public class ByPathStylesheetFolderControllerTests : ManagementApiUserGroupTestB
     [SetUp]
     public async Task SetUp()
     {
-        var model = new StylesheetFolderCreateModel { Name = Guid.NewGuid().ToString()};
-        var response =await StylesheetFolderService.CreateAsync(model);
+        var model = new StylesheetFolderCreateModel { Name = Guid.NewGuid().ToString() };
+        var response = await StylesheetFolderService.CreateAsync(model);
         _stylesheetFolderPath = response.Result.Path;
-
     }
 
     protected override Expression<Func<ByPathStylesheetFolderController, object>> MethodSelector =>

@@ -13,8 +13,6 @@ public class BackOfficeControllerTests : ManagementApiUserGroupTestBase<BackOffi
     protected override Expression<Func<BackOfficeController, object>> MethodSelector =>
         x => x.Login(CancellationToken.None, null);
 
-    // Look into a better solution, this is a workaround.
-    // We need to update the UserEmail to match the user that is being tested. We are defining the groupName in ManagementApiUserGroupTestBase, the reason for this is to avoid creating a new schemaPerTest and only doing it each fixture.
     // Admin
     [Test]
     public override async Task As_Admin_I_Have_Specified_Access()

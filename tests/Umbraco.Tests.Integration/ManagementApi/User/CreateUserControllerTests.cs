@@ -42,9 +42,10 @@ public class CreateUserControllerTests : ManagementApiUserGroupTestBase<CreateUs
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
+        var stringKey = Guid.NewGuid();
         CreateUserRequestModel createUserRequestModel = new()
         {
-            Email = "testemail@mail.com", UserName = "testUser", Name = "testName", UserGroupIds = null
+            Email = stringKey + "@test.com", UserName = stringKey + "@test.com", Name = "testName", UserGroupIds = null,
         };
         return await Client.PostAsync(Url, JsonContent.Create(createUserRequestModel));
     }

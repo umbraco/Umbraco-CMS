@@ -1,19 +1,35 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.UserGroup;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.UserGroup;
 
 public class UpdateUserGroupControllerTests : ManagementApiUserGroupTestBase<UpdateUserGroupController>
 {
-    protected override Expression<Func<UpdateUserGroupController, object>> MethodSelector => x => x.Update(CancellationToken.None, Guid.Empty, null);
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+
+    private Guid _userGroupKey;
+
+    [SetUp]
+    public async Task SetUp()
+    {
+        var userGroupModel = UserGroupBuilder.CreateUserGroup();
+        var userGroup = await UserGroupService.CreateAsync(userGroupModel, Constants.Security.SuperUserKey);
+        _userGroupKey = userGroup.Result.Key;
+    }
+
+    protected override Expression<Func<UpdateUserGroupController, object>> MethodSelector => x => x.Update(CancellationToken.None, _userGroupKey, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -51,7 +67,7 @@ public class UpdateUserGroupControllerTests : ManagementApiUserGroupTestBase<Upd
             HasAccessToAllLanguages = true,
             Languages = [],
             Sections = ["Umb.Section.Content"],
-            Permissions = new HashSet<IPermissionPresentationModel> { }
+            Permissions = new HashSet<IPermissionPresentationModel> { },
         };
 
         return await Client.PutAsync(Url, JsonContent.Create(updateUserGroupRequest));

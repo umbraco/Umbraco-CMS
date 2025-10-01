@@ -23,10 +23,12 @@ public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<Crea
     [SetUp]
     public async Task Setup()
     {
+        // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         _templateKey = template.Key;
 
+        // Content Type
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);

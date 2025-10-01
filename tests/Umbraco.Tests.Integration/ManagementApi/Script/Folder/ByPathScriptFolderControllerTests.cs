@@ -12,14 +12,15 @@ public class ByPathScriptFolderControllerTests : ManagementApiUserGroupTestBase<
     private IScriptFolderService ScriptFolderService => GetRequiredService<IScriptFolderService>();
 
     private string _scriptFolderPath;
+
     [SetUp]
     public async Task SetUp()
     {
         var model = new ScriptFolderCreateModel() { Name = Guid.NewGuid().ToString() };
-        var response =await ScriptFolderService.CreateAsync(model);
+        var response = await ScriptFolderService.CreateAsync(model);
         _scriptFolderPath = response.Result.Path;
-
     }
+
     protected override Expression<Func<ByPathScriptFolderController, object>> MethodSelector =>
         x => x.ByPath(CancellationToken.None, _scriptFolderPath);
 

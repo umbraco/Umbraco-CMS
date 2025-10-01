@@ -44,7 +44,7 @@ public class CreateStylesheetControllerTests : ManagementApiUserGroupTestBase<Cr
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreateStylesheetRequestModel createStylesheetRequestModel = new() { Name = Guid.NewGuid() +".css", Content = "test content"};
+        CreateStylesheetRequestModel createStylesheetRequestModel = new() { Name = Guid.NewGuid() + ".css", Content = "test content" };
 
         return await Client.PostAsync(Url, JsonContent.Create(createStylesheetRequestModel));
     }

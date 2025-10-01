@@ -15,14 +15,15 @@ public class ByPathPartialViewFolderControllerTests : ManagementApiUserGroupTest
     private IPartialViewFolderService PartialViewFolderService => GetRequiredService<IPartialViewFolderService>();
 
     private string _partialViewFolderPath;
+
     [SetUp]
     public async Task SetUp()
     {
         var model = new PartialViewFolderCreateModel { Name = Guid.NewGuid().ToString() };
-        var response =await PartialViewFolderService.CreateAsync(model);
+        var response = await PartialViewFolderService.CreateAsync(model);
         _partialViewFolderPath = response.Result.Path;
-
     }
+
     protected override Expression<Func<ByPathPartialViewFolderController, object>> MethodSelector =>
         x => x.ByPath(CancellationToken.None, _partialViewFolderPath);
 

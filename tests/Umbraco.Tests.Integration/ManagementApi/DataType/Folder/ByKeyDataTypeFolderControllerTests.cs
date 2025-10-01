@@ -7,7 +7,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Folder;
 
-[TestFixture]
 public class ByKeyDataTypeFolderControllerTests : ManagementApiUserGroupTestBase<ByKeyDataTypeFolderController>
 {
     private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();

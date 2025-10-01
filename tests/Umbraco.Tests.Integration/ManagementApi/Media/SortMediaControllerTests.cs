@@ -24,10 +24,11 @@ public class SortMediaControllerTests : ManagementApiUserGroupTestBase<SortMedia
     [SetUp]
     public async Task SetUp()
     {
+        // Media Folder Type
         var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0,100);
         var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
 
-        // ParentFolder
+        // Media ParentFolder
         MediaCreateModel parentCreateModel = new()
         {
             InvariantName = "MediaTest", ContentTypeKey = folderMediaType.Key, ParentKey = Constants.System.RootKey
@@ -35,7 +36,7 @@ public class SortMediaControllerTests : ManagementApiUserGroupTestBase<SortMedia
         var responseParent = await MediaEditingService.CreateAsync(parentCreateModel, Constants.Security.SuperUserKey);
         _parentFolderKey = responseParent.Result.Content.Key;
 
-        // ChildFolder
+        // Media ChildFolder
         MediaCreateModel childCreateModel = new()
         {
             InvariantName = "MediaFolder", ContentTypeKey = folderMediaType.Key, ParentKey = _parentFolderKey
@@ -80,7 +81,8 @@ public class SortMediaControllerTests : ManagementApiUserGroupTestBase<SortMedia
     {
         SortingRequestModel sortingRequestModel = new()
         {
-            Parent = new ReferenceByIdModel(_parentFolderKey), Sorting = new[] { new ItemSortingRequestModel { Id = _childFolderKey, SortOrder = 0 } },
+            Parent = new ReferenceByIdModel(_parentFolderKey),
+            Sorting = new[] { new ItemSortingRequestModel { Id = _childFolderKey, SortOrder = 0 } },
         };
         return await Client.PutAsync(Url, JsonContent.Create(sortingRequestModel));
     }

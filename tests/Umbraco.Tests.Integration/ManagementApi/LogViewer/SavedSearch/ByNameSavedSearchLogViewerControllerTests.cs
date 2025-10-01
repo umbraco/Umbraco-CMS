@@ -15,6 +15,7 @@ public class ByNameSavedSearchLogViewerControllerTests : ManagementApiUserGroupT
     {
         await LogViewerService.AddSavedLogQueryAsync("Find All", "SELECT * FROM LogEntries");
     }
+
     protected override Expression<Func<ByNameSavedSearchLogViewerController, object>> MethodSelector => x => x.ByName(CancellationToken.None, "Find All");
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()

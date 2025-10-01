@@ -47,7 +47,7 @@ public class
         ChangePasswordCurrentUserRequestModel changePasswordCurrentUserRequestModel = new()
         {
             OldPassword = "OldPassword",
-            NewPassword = "NewPassword"
+            NewPassword = "NewPassword",
         };
         return await Client.PostAsync(Url, JsonContent.Create(changePasswordCurrentUserRequestModel));
     }

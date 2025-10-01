@@ -12,7 +12,6 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 
-[TestFixture]
 public class UpdateDocumentControllerTests : ManagementApiUserGroupTestBase<UpdateDocumentController>
 {
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
@@ -27,14 +26,17 @@ public class UpdateDocumentControllerTests : ManagementApiUserGroupTestBase<Upda
     [SetUp]
     public async Task Setup()
     {
-        var oldTemplate = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
-        var oldTemplateResponse = await TemplateService.CreateAsync(oldTemplate, Constants.Security.SuperUserKey);
-        _templateKey = oldTemplateResponse.Result.Key;
+        // Template
+        var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
+        var templateResponse = await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        _templateKey = templateResponse.Result.Key;
 
-        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: oldTemplate.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
+        // Content Type
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
+        // Content
         var createModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,

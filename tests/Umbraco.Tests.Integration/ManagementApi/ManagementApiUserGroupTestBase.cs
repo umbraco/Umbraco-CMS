@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 
-[TestFixture]
 public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     where T : ManagementApiControllerBase
 {

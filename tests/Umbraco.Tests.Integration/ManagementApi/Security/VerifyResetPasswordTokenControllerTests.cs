@@ -44,7 +44,7 @@ public class VerifyResetPasswordTokenControllerTests : ManagementApiUserGroupTes
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        VerifyResetPasswordTokenRequestModel verifyResetPasswordTokenRequestModel = new() { User = new ReferenceByIdModel(Guid.NewGuid()) , ResetCode = "test" };
+        VerifyResetPasswordTokenRequestModel verifyResetPasswordTokenRequestModel = new() { User = new ReferenceByIdModel(Guid.NewGuid()), ResetCode = "test" };
 
         return await Client.PostAsync(Url, JsonContent.Create(verifyResetPasswordTokenRequestModel));
     }

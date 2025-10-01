@@ -35,14 +35,16 @@ public class UpdatePublicAccessDocumentControllerTests : ManagementApiUserGroupT
     [SetUp]
     public async Task Setup()
     {
+        // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
+        // ContentType
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        // Create default page
+        // Default page
         var createDefaultPageModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
@@ -53,7 +55,7 @@ public class UpdatePublicAccessDocumentControllerTests : ManagementApiUserGroupT
         var responseDefaultPage = await ContentEditingService.CreateAsync(createDefaultPageModel, Constants.Security.SuperUserKey);
         _contentDefaultPageKey = responseDefaultPage.Result.Content.Key;
 
-        // Create login page
+        // Login page
         var createLoginPageModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
@@ -64,7 +66,7 @@ public class UpdatePublicAccessDocumentControllerTests : ManagementApiUserGroupT
         var responseLoginPage = await ContentEditingService.CreateAsync(createLoginPageModel, Constants.Security.SuperUserKey);
         _contentLoginPageKey = responseLoginPage.Result.Content.Key;
 
-        // Create error page
+        // Error page
         var createErrorPageModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
@@ -75,7 +77,7 @@ public class UpdatePublicAccessDocumentControllerTests : ManagementApiUserGroupT
         var responseErrorPage = await ContentEditingService.CreateAsync(createErrorPageModel, Constants.Security.SuperUserKey);
         _contentErrorPageKey = responseErrorPage.Result.Content.Key;
 
-        // Create new error page
+        // New error page
         var createNewErrorPageModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
@@ -86,13 +88,13 @@ public class UpdatePublicAccessDocumentControllerTests : ManagementApiUserGroupT
         var responseNewErrorPage = await ContentEditingService.CreateAsync(createNewErrorPageModel, Constants.Security.SuperUserKey);
         _newContentErrorPageKey = responseNewErrorPage.Result.Content.Key;
 
-        // Member setup
+        // Member
         var memberType = MemberTypeBuilder.CreateSimpleMemberType();
         await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member = MemberService.CreateMember("test", "test@test.com", "T. Est", memberType.Alias);
         MemberService.Save(member);
 
-        // Create Public Access
+        // Public Access
         PublicAccessEntrySlim publicAccessEntry = new()
         {
             ContentId = _contentDefaultPageKey,

@@ -21,6 +21,7 @@ public class DeletePartialViewControllerTests : ManagementApiUserGroupTestBase<D
         var response = await PartialViewService.CreateAsync(model, Constants.Security.SuperUserKey);
         _partialViewPath = response.Result.Path;
     }
+
     protected override Expression<Func<DeletePartialViewController, object>> MethodSelector =>
         x => x.Delete(CancellationToken.None, _partialViewPath);
 

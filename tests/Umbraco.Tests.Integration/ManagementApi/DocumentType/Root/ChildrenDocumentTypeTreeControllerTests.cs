@@ -15,20 +15,20 @@ public class ChildrenDocumentTypeTreeControllerTests : ManagementApiUserGroupTes
 
     private IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
 
-    private Guid _documentFolderKey;
-    private Guid _documentTypeKey;
+    private Guid _contentFolderKey;
+    private Guid _contentTypeKey;
 
     [SetUp]
     public async Task Setup()
     {
-        _documentFolderKey = Guid.NewGuid();
-        await ContentTypeContainerService.CreateAsync(_documentFolderKey,"Folder", null, Constants.Security.SuperUserKey);
-        _documentTypeKey = Guid.NewGuid();
-        await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _documentTypeKey, Name = "Test", Alias = "test",  ContainerKey = _documentFolderKey}, Constants.Security.SuperUserKey);
+        _contentFolderKey = Guid.NewGuid();
+        await ContentTypeContainerService.CreateAsync(_contentFolderKey,"Folder", null, Constants.Security.SuperUserKey);
+        _contentTypeKey = Guid.NewGuid();
+        await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _contentTypeKey, Name = "Test", Alias = "test",  ContainerKey = _contentFolderKey}, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<ChildrenDocumentTypeTreeController, object>> MethodSelector =>
-        x => x.Children(CancellationToken.None, _documentFolderKey, 0, 100, false);
+        x => x.Children(CancellationToken.None, _contentFolderKey, 0, 100, false);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

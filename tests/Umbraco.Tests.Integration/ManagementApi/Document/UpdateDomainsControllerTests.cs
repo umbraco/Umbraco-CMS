@@ -32,13 +32,16 @@ public class UpdateDomainsControllerTests : ManagementApiUserGroupTestBase<Updat
     [SetUp]
     public async Task Setup()
     {
+        // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
+        // Content Type
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
+        // Content
         var createModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
@@ -49,6 +52,7 @@ public class UpdateDomainsControllerTests : ManagementApiUserGroupTestBase<Updat
         var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         _documentKey = response.Result.Content.Key;
 
+        // Publish
         var contentSchedule = new ContentScheduleCollection();
         var cultureAndSchedule = new CultureAndScheduleModel
         {
@@ -56,8 +60,10 @@ public class UpdateDomainsControllerTests : ManagementApiUserGroupTestBase<Updat
         };
         await ContentPublishingService.PublishAsync(_documentKey, cultureAndSchedule, Constants.Security.SuperUserKey);
 
+        // Language
         await LanguageService.CreateAsync(new Core.Models.Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
 
+        // Domain
         var domainsUpdateModel = new DomainsUpdateModel
         {
             DefaultIsoCode = "en-US",

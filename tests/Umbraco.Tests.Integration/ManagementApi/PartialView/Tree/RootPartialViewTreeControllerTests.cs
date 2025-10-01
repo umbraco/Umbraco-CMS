@@ -1,11 +1,24 @@
 using System.Linq.Expressions;
 using System.Net;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.PartialView.Tree;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.PartialView.Tree;
 
 public class RootPartialViewTreeControllerTests : ManagementApiUserGroupTestBase<RootPartialViewTreeController>
 {
+    private IPartialViewService PartialViewService => GetRequiredService<IPartialViewService>();
+
+    [SetUp]
+    public async Task SetUp()
+    {
+        var model = new PartialViewCreateModel { Name = Guid.NewGuid() + ".cshtml" };
+        await PartialViewService.CreateAsync(model, Constants.Security.SuperUserKey);
+    }
+
     protected override Expression<Func<RootPartialViewTreeController, object>> MethodSelector =>
         x => x.Root(CancellationToken.None, 0, 100);
 

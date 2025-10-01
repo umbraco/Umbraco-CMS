@@ -24,15 +24,16 @@ public class MoveMediaControllerTests : ManagementApiUserGroupTestBase<MoveMedia
     [SetUp]
     public async Task SetUp()
     {
-        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0,100);
+        // Media Folder Type
+        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0, 100);
         var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
 
-        // MoveFolder
+        // Media MoveFolder
         MediaCreateModel moveCreateModel = new() { InvariantName = "MediaTest", ContentTypeKey = folderMediaType.Key, ParentKey = Constants.System.RootKey};
         var responseMove = await MediaEditingService.CreateAsync(moveCreateModel, Constants.Security.SuperUserKey);
         _moveFolderKey = responseMove.Result.Content.Key;
 
-        // TargetFolder
+        // Media TargetFolder
         MediaCreateModel targetCreateModel = new() { InvariantName = "MediaFolder", ContentTypeKey = folderMediaType.Key,  ParentKey = Constants.System.RootKey };
         var responseTarget = await MediaEditingService.CreateAsync(targetCreateModel, Constants.Security.SuperUserKey);
         _targetFolderKey = responseTarget.Result.Content.Key;

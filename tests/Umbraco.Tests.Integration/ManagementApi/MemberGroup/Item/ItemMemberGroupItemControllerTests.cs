@@ -15,17 +15,14 @@ public class ItemMemberGroupItemControllerTests : ManagementApiUserGroupTestBase
     [SetUp]
     public async Task SetUp()
     {
-        var memberGroup = new Core.Models.MemberGroup
-        {
-            Name = "Test Member Group"
-        };
-
+        var memberGroup = new Core.Models.MemberGroup { Name = "Test Member Group" };
         MemberGroupService.Save(memberGroup);
         _memberGroupKey = memberGroup.Key;
     }
 
     protected override Expression<Func<ItemMemberGroupItemController, object>> MethodSelector =>
         x => x.Item(CancellationToken.None, new HashSet<Guid> { _memberGroupKey });
+
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.OK

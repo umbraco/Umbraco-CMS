@@ -21,10 +21,12 @@ public class CreateMediaControllerTests : ManagementApiUserGroupTestBase<CreateM
     [SetUp]
     public async Task SetUp()
     {
-        var mediaTypes =await MediaTypeEditingService.GetFolderMediaTypes(0,100);
+        // Media Folder Type
+        var mediaTypes =await MediaTypeEditingService.GetFolderMediaTypes(0, 100);
         var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
         _folderMediaTypeKey = folderMediaType.Key;
     }
+
     protected override Expression<Func<CreateMediaController, object>> MethodSelector =>
         x => x.Create(CancellationToken.None, null);
 

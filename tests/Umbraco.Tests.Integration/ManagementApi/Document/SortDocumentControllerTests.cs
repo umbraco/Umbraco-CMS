@@ -22,21 +22,23 @@ public class SortDocumentControllerTests : ManagementApiUserGroupTestBase<SortDo
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private Guid _targetKey;
+    private Guid _contentKey;
 
     [SetUp]
     public async Task Setup()
     {
+        // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
+        // Content Type
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        // Target
-        var parentCreateModel = new ContentCreateModel
+        // Content
+        var createModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
             TemplateKey = template.Key,
@@ -44,18 +46,8 @@ public class SortDocumentControllerTests : ManagementApiUserGroupTestBase<SortDo
             InvariantName = Guid.NewGuid().ToString(),
         };
 
-        var responseParent = await ContentEditingService.CreateAsync(parentCreateModel, Constants.Security.SuperUserKey);
-        _targetKey = responseParent.Result.Content.Key;
-
-        // Original
-        var childCreateModel = new ContentCreateModel
-        {
-            ContentTypeKey = contentType.Key,
-            TemplateKey = template.Key,
-            ParentKey = Constants.System.RootKey,
-            InvariantName = Guid.NewGuid().ToString(),
-        };
-        await ContentEditingService.CreateAsync(childCreateModel, Constants.Security.SuperUserKey);
+        var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        _contentKey = response.Result.Content.Key;
     }
 
     protected override Expression<Func<SortDocumentController, object>> MethodSelector =>
@@ -95,7 +87,7 @@ public class SortDocumentControllerTests : ManagementApiUserGroupTestBase<SortDo
     {
         SortingRequestModel sortingRequestModel = new()
         {
-            Parent = null, Sorting = new[] { new ItemSortingRequestModel { Id = _targetKey, SortOrder = 0 } },
+            Parent = null, Sorting = new[] { new ItemSortingRequestModel { Id = _contentKey, SortOrder = 0 } },
         };
 
         return await Client.PutAsync(Url, JsonContent.Create(sortingRequestModel));

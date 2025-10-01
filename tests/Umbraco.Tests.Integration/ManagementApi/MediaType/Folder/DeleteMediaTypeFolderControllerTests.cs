@@ -12,17 +12,17 @@ public class DeleteMediaTypeFolderControllerTests : ManagementApiUserGroupTestBa
 {
     private IMediaTypeContainerService MediaTypeContainerService => GetRequiredService<IMediaTypeContainerService>();
 
-    private Guid _mediaTypeContainerKey;
+    private Guid _mediaTypeFolderKey;
 
     [SetUp]
     public async Task SetUp()
     {
-        _mediaTypeContainerKey = Guid.NewGuid();
-        await MediaTypeContainerService.CreateAsync(_mediaTypeContainerKey, "TestFolder", Constants.System.RootKey , Constants.Security.SuperUserKey);
+        _mediaTypeFolderKey = Guid.NewGuid();
+        await MediaTypeContainerService.CreateAsync(_mediaTypeFolderKey, "TestFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<DeleteMediaTypeFolderController, object>> MethodSelector =>
-        x => x.Delete(CancellationToken.None, _mediaTypeContainerKey);
+        x => x.Delete(CancellationToken.None, _mediaTypeFolderKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

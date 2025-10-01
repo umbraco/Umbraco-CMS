@@ -17,16 +17,14 @@ public class ChildrenDictionaryTreeControllerTests : ManagementApiUserGroupTestB
     [SetUp]
     public async Task Setup()
     {
-        var responseParent = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
+        // Parent dictionary
+        var dictionaryParentItem = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
+        _parentDictionaryKey = dictionaryParentItem.Key;
+        await DictionaryItemService.CreateAsync(dictionaryParentItem, Constants.Security.SuperUserKey);
 
-        _parentDictionaryKey = responseParent.Key;
-
-        await DictionaryItemService.CreateAsync(responseParent, Constants.Security.SuperUserKey);
-
-        var responseChild = new DictionaryItem(_parentDictionaryKey, Guid.NewGuid().ToString());
-
-        await DictionaryItemService.CreateAsync(responseChild, Constants.Security.SuperUserKey);
-
+        // Child dictionary
+        var dictionaryChildItem = new DictionaryItem(_parentDictionaryKey, Guid.NewGuid().ToString());
+        await DictionaryItemService.CreateAsync(dictionaryChildItem, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<ChildrenDictionaryTreeController, object>> MethodSelector =>

@@ -13,14 +13,15 @@ public class ByPathStylesheetControllerTests : ManagementApiUserGroupTestBase<By
     private IStylesheetService StylesheetService => GetRequiredService<IStylesheetService>();
 
     private string _stylesheetPath;
+
     [SetUp]
     public async Task SetUp()
     {
         var model = new StylesheetCreateModel { Name = Guid.NewGuid() + ".css" };
-        var response =await StylesheetService.CreateAsync(model, Constants.Security.SuperUserKey);
+        var response = await StylesheetService.CreateAsync(model, Constants.Security.SuperUserKey);
         _stylesheetPath = response.Result.Path;
-
     }
+
     protected override Expression<Func<ByPathStylesheetController, object>> MethodSelector =>
         x => x.ByPath(CancellationToken.None, _stylesheetPath);
 

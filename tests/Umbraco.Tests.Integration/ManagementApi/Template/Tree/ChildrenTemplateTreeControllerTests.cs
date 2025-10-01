@@ -17,20 +17,19 @@ public class ChildrenTemplateTreeControllerTests : ManagementApiUserGroupTestBas
     [SetUp]
     public async Task SetUp()
     {
+        // Parent Template
         var parentTemplate = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         parentTemplate.IsMasterTemplate = true;
         var responseParent = await TemplateService.CreateAsync(parentTemplate, Constants.Security.SuperUserKey);
         _parentTemplateKey = responseParent.Result.Key;
 
+        // Child Template
         var childTemplate = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         childTemplate.MasterTemplateAlias = parentTemplate.Alias;
         await TemplateService.CreateAsync(childTemplate, Constants.Security.SuperUserKey);
-
-
-
     }
 
-    protected override Expression<Func<ChildrenTemplateTreeController, object>> MethodSelector => x => x.Children(CancellationToken.None, Guid.Empty, 0, 100);
+    protected override Expression<Func<ChildrenTemplateTreeController, object>> MethodSelector => x => x.Children(CancellationToken.None, _parentTemplateKey, 0, 100);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

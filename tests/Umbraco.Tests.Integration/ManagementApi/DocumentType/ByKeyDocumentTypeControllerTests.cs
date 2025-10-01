@@ -19,7 +19,7 @@ public class ByKeyDocumentTypeControllerTests : ManagementApiUserGroupTestBase<B
     public async Task Setup()
     {
         _key = Guid.NewGuid();
-        await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key, Name = "Test", Alias = "test" }, Constants.Security.SuperUserKey);
+        await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key, Name = Guid.NewGuid().ToString(), Alias = Guid.NewGuid().ToString() }, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<ByKeyDocumentTypeController, object>> MethodSelector =>

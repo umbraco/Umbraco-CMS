@@ -25,10 +25,11 @@ public class CopyDataTypeControllerTests : ManagementApiUserGroupTestBase<CopyDa
     [SetUp]
     public async Task Setup()
     {
-        var responseFolder = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "TestFolder",
-            Constants.System.RootKey, Constants.Security.SuperUserKey);
+        // Folder
+        var responseFolder = await DataTypeContainerService.CreateAsync(Guid.NewGuid(), "TestFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
         _folderKey = responseFolder.Result.Key;
 
+        // Datatype
         var dataType = new DataTypeBuilder()
             .WithId(0)
             .WithName("Custom list view")

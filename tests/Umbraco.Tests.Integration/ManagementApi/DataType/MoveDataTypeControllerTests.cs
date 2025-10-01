@@ -13,7 +13,6 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
 public class MoveDataTypeControllerTests : ManagementApiUserGroupTestBase<MoveDataTypeController>
 {
     private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();

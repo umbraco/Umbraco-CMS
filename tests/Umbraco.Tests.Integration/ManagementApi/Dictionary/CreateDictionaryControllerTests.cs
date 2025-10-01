@@ -44,8 +44,7 @@ public class CreateDictionaryControllerTests : ManagementApiUserGroupTestBase<Cr
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
         CreateDictionaryItemRequestModel createDictionaryItemRequestModel =
-            new() { Id = Guid.NewGuid(), Parent = null, Name = Guid.NewGuid().ToString(), Translations = { } };
-
+            new() { Id = Guid.NewGuid(), Parent = null, Name = Guid.NewGuid().ToString() };
         return await Client.PostAsync(Url, JsonContent.Create(createDictionaryItemRequestModel));
     }
 }

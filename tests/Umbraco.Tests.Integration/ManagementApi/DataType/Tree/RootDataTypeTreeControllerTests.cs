@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Tree;
 
 public class RootDataTypeTreeControllerTests : ManagementApiUserGroupTestBase<RootDataTypeTreeController>
 {
-
     protected override Expression<Func<RootDataTypeTreeController, object>> MethodSelector =>
         x => x.Root(CancellationToken.None, 0, 100, false);
 

@@ -46,7 +46,7 @@ public class CreatePartialViewFolderControllerTests : ManagementApiUserGroupTest
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreatePartialViewFolderRequestModel createPartialViewFolderRequestModel = new() { Name = Guid.NewGuid().ToString()};
+        CreatePartialViewFolderRequestModel createPartialViewFolderRequestModel = new() { Name = Guid.NewGuid().ToString() };
 
         return await Client.PostAsync(Url, JsonContent.Create(createPartialViewFolderRequestModel));
     }

@@ -11,17 +11,17 @@ public class ByKeyMediaTypeFolderControllerTests : ManagementApiUserGroupTestBas
 {
     private IMediaTypeContainerService MediaTypeContainerService => GetRequiredService<IMediaTypeContainerService>();
 
-    private Guid _mediaTypeContainerKey;
+    private Guid _mediaTypeFolderKey;
 
     [SetUp]
     public async Task SetUp()
     {
-        _mediaTypeContainerKey = Guid.NewGuid();
-        await MediaTypeContainerService.CreateAsync(_mediaTypeContainerKey, "TestFolder", Constants.System.RootKey , Constants.Security.SuperUserKey);
+        _mediaTypeFolderKey = Guid.NewGuid();
+        await MediaTypeContainerService.CreateAsync(_mediaTypeFolderKey, "TestFolder", Constants.System.RootKey, Constants.Security.SuperUserKey);
     }
 
 
-    protected override Expression<Func<ByKeyMediaTypeFolderController, object>> MethodSelector => x => x.ByKey(CancellationToken.None, _mediaTypeContainerKey);
+    protected override Expression<Func<ByKeyMediaTypeFolderController, object>> MethodSelector => x => x.ByKey(CancellationToken.None, _mediaTypeFolderKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

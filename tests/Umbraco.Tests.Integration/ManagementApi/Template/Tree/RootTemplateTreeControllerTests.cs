@@ -12,7 +12,6 @@ public class RootTemplateTreeControllerTests : ManagementApiUserGroupTestBase<Ro
 {
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
-
     [SetUp]
     public async Task SetUp()
     {

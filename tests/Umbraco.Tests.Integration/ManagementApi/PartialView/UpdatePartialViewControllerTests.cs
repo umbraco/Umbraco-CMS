@@ -59,7 +59,7 @@ public class UpdatePartialViewControllerTests : ManagementApiUserGroupTestBase<U
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        UpdatePartialViewRequestModel updatePartialViewRequestModel = new() { Content = "NewContent"};
+        UpdatePartialViewRequestModel updatePartialViewRequestModel = new() { Content = "NewContent" };
 
         return await Client.PutAsync(Url, JsonContent.Create(updatePartialViewRequestModel));
     }

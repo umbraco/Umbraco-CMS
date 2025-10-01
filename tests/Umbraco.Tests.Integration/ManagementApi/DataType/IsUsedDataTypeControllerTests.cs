@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
 public class IsUsedDataTypeControllerTests : ManagementApiUserGroupTestBase<IsUsedDataTypeController>
 {
-
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     private Guid _dataTypeKey;

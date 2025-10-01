@@ -28,13 +28,16 @@ public class UpdateNotificationsControllerTests : ManagementApiUserGroupTestBase
     [SetUp]
     public async Task Setup()
     {
+        // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
+        // Content Type
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
+        // Content
         var createModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
@@ -45,8 +48,10 @@ public class UpdateNotificationsControllerTests : ManagementApiUserGroupTestBase
         var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         _contentKey = response.Result.Content.Key;
 
+        // User
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
 
+        // Notification
         NotificationService.CreateNotification(user, contentType, "X");
     }
 

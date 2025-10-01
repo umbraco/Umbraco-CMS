@@ -59,7 +59,7 @@ public class CreateUserGroupControllerTests : ManagementApiUserGroupTestBase<Cre
             HasAccessToAllLanguages = true,
             Languages = [],
             Sections = ["Umb.Section.Content"],
-            Permissions = new HashSet<IPermissionPresentationModel> { }
+            Permissions = new HashSet<IPermissionPresentationModel> { },
         };
 
         return await Client.PostAsync(Url, JsonContent.Create(createUserGroupRequest));

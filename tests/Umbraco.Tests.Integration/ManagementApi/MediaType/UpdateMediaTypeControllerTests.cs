@@ -10,10 +10,10 @@ using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.MediaType;
 
-[TestFixture]
 public class UpdateMediaTypeControllerTests : ManagementApiUserGroupTestBase<UpdateMediaTypeController>
 {
-    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService >();
+    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
+
     private Guid _mediaTypeKey;
 
     [SetUp]

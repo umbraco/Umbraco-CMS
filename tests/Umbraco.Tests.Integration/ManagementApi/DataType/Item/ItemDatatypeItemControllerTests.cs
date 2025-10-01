@@ -28,7 +28,6 @@ public class ItemDatatypeItemControllerTests : ManagementApiUserGroupTestBase<It
                 .Done()
             .Build();
         var response = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
-
         _dataTypeKey = response.Result.Key;
     }
 

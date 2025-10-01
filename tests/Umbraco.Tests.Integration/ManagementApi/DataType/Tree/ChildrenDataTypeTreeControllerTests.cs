@@ -16,17 +16,18 @@ public class ChildrenDataTypeTreeControllerTests : ManagementApiUserGroupTestBas
 
     private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
 
-    private Guid _dataTypeContainerKey;
+    private Guid _dataTypeFolderKey;
 
     [SetUp]
     public async Task Setup()
     {
-        _dataTypeContainerKey = Guid.NewGuid();
-        await DataTypeContainerService.CreateAsync(_dataTypeContainerKey, "Folder", Constants.System.RootKey, Constants.Security.SuperUserKey);
+        // Folder
+        _dataTypeFolderKey = Guid.NewGuid();
+        await DataTypeContainerService.CreateAsync(_dataTypeFolderKey, Guid.NewGuid().ToString(), Constants.System.RootKey, Constants.Security.SuperUserKey);
+        var createdFolder = await DataTypeContainerService.GetAsync(_dataTypeFolderKey);
+        var folderId = createdFolder.Id;
 
-        var savedContainer = await DataTypeContainerService.GetAsync(_dataTypeContainerKey);
-        var containerId = savedContainer?.Id ?? Constants.System.Root;
-
+        // Datatype
         var dataType = new DataTypeBuilder()
             .WithId(0)
             .WithName("Custom list view")
@@ -34,14 +35,13 @@ public class ChildrenDataTypeTreeControllerTests : ManagementApiUserGroupTestBas
             .AddEditor()
                 .WithAlias(Constants.PropertyEditors.Aliases.ListView)
                 .Done()
-            .WithParentId(containerId)
+            .WithParentId(folderId)
             .Build();
-
         await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<ChildrenDataTypeTreeController, object>> MethodSelector =>
-        x => x.Children(CancellationToken.None, _dataTypeContainerKey, 0, 100, false);
+        x => x.Children(CancellationToken.None, _dataTypeFolderKey, 0, 100, false);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

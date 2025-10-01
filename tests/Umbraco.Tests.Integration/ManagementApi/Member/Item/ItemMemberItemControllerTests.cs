@@ -19,18 +19,18 @@ public class ItemMemberItemControllerTests : ManagementApiUserGroupTestBase<Item
 
     private Guid _memberKey;
 
-
     [SetUp]
     public async Task SetUp()
     {
+        // Member Type
         var memberTypeModel = new MemberTypeCreateModel() { Alias = Guid.NewGuid().ToString(), Name = "Test Member" };
         var memberTypeResponse = await MemberTypeEditingService.CreateAsync(memberTypeModel, Constants.Security.SuperUserKey);
 
+        // Member
         var member = MemberService.CreateMember(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), memberTypeResponse.Result.Alias);
         MemberService.Save(member);
         _memberKey = member.Key;
     }
-
 
     protected override Expression<Func<ItemMemberItemController, object>> MethodSelector =>
         x => x.Item(CancellationToken.None, new HashSet<Guid> { _memberKey });

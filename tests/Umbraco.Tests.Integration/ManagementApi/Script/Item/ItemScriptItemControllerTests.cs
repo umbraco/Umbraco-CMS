@@ -12,14 +12,15 @@ public class ItemScriptItemControllerTests : ManagementApiUserGroupTestBase<Item
     private IScriptFolderService ScriptFolderService => GetRequiredService<IScriptFolderService>();
 
     private string _scriptFolderPath;
+
     [SetUp]
     public async Task SetUp()
     {
         var model = new ScriptFolderCreateModel() { Name = Guid.NewGuid().ToString() };
-        var response =await ScriptFolderService.CreateAsync(model);
+        var response = await ScriptFolderService.CreateAsync(model);
         _scriptFolderPath = response.Result.Path;
-
     }
+
     protected override Expression<Func<ItemScriptItemController, object>> MethodSelector =>
         x => x.Item(CancellationToken.None, new HashSet<string> { _scriptFolderPath });
 

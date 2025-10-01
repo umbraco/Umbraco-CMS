@@ -14,17 +14,17 @@ public class UpdateMediaTypeFolderControllerTests : ManagementApiUserGroupTestBa
 {
     private IMediaTypeContainerService MediaTypeContainerService => GetRequiredService<IMediaTypeContainerService>();
 
-    private Guid _mediaTypeContainerKey;
+    private Guid _mediaTypeFolderKey;
 
     [SetUp]
     public async Task SetUp()
     {
-        _mediaTypeContainerKey = Guid.NewGuid();
-        await MediaTypeContainerService.CreateAsync(_mediaTypeContainerKey, "TestFolder", Constants.System.RootKey , Constants.Security.SuperUserKey);
+        _mediaTypeFolderKey = Guid.NewGuid();
+        await MediaTypeContainerService.CreateAsync(_mediaTypeFolderKey, "TestFolder", Constants.System.RootKey , Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<UpdateMediaTypeFolderController, object>> MethodSelector =>
-        x => x.Update(CancellationToken.None, _mediaTypeContainerKey, null);
+        x => x.Update(CancellationToken.None, _mediaTypeFolderKey, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

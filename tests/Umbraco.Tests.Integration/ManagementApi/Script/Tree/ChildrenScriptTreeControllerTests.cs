@@ -16,18 +16,19 @@ public class ChildrenScriptTreeControllerTests : ManagementApiUserGroupTestBase<
 
     private IScriptService ScriptService => GetRequiredService<IScriptService>();
 
-
     private string _scriptFolderPath;
+
     [SetUp]
     public async Task SetUp()
     {
+        // Script Folder
         var folderModel = new ScriptFolderCreateModel() { Name = Guid.NewGuid().ToString() };
-        var responseFolder =await ScriptFolderService.CreateAsync(folderModel);
+        var responseFolder = await ScriptFolderService.CreateAsync(folderModel);
         _scriptFolderPath = responseFolder.Result.Path;
 
-        var model = new ScriptCreateModel() { Name = Guid.NewGuid() + ".js", ParentPath = _scriptFolderPath};
-        var response =await ScriptService.CreateAsync(model, Constants.Security.SuperUserKey);
-
+        // Script
+        var model = new ScriptCreateModel() { Name = Guid.NewGuid() + ".js", ParentPath = _scriptFolderPath };
+        await ScriptService.CreateAsync(model, Constants.Security.SuperUserKey);
     }
 
     protected override Expression<Func<ChildrenScriptTreeController, object>> MethodSelector =>

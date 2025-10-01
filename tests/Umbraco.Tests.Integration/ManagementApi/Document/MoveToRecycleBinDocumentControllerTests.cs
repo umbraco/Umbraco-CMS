@@ -9,7 +9,6 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 
-[TestFixture]
 public class MoveToRecycleBinDocumentControllerTests : ManagementApiUserGroupTestBase<MoveToRecycleBinDocumentController>
 {
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
@@ -23,13 +22,16 @@ public class MoveToRecycleBinDocumentControllerTests : ManagementApiUserGroupTes
     [SetUp]
     public async Task Setup()
     {
+        // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
+        // Content Type
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
+        // Content
         var createModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,

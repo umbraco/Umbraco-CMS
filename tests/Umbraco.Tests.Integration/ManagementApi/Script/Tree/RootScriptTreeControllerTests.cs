@@ -11,15 +11,13 @@ public class RootScriptTreeControllerTests : ManagementApiUserGroupTestBase<Root
 {
     private IScriptFolderService ScriptFolderService => GetRequiredService<IScriptFolderService>();
 
-    private string _scriptFolderPath;
     [SetUp]
     public async Task SetUp()
     {
         var model = new ScriptFolderCreateModel() { Name = Guid.NewGuid().ToString() };
-        var response =await ScriptFolderService.CreateAsync(model);
-        _scriptFolderPath = response.Result.Path;
-
+        await ScriptFolderService.CreateAsync(model);
     }
+
     protected override Expression<Func<RootScriptTreeController, object>> MethodSelector =>
         x => x.Root(CancellationToken.None, 0, 100);
 

@@ -10,17 +10,19 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.MediaType.Tree;
 
 public class ChildrenMediaTypeTreeControllerTests : ManagementApiUserGroupTestBase<ChildrenMediaTypeTreeController>
 {
-    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService >();
+    private IMediaTypeEditingService MediaTypeEditingService => GetRequiredService<IMediaTypeEditingService>();
 
     private Guid _parentKey;
 
     [SetUp]
     public async Task SetUp()
     {
+        // Parent Media Type
         var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0, 100);
         var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
         _parentKey = folderMediaType.Key;
 
+        // Child Media Type
         MediaTypeCreateModel mediaTypeCreateModel = new() { Name = Guid.NewGuid().ToString(), Alias = Guid.NewGuid().ToString(), Key = Guid.NewGuid(), ContainerKey = _parentKey };
         await MediaTypeEditingService.CreateAsync(mediaTypeCreateModel, Constants.Security.SuperUserKey);
     }

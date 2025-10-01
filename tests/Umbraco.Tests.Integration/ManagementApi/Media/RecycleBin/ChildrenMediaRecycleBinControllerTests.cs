@@ -20,13 +20,16 @@ public class ChildrenMediaRecycleBinControllerTests : ManagementApiUserGroupTest
     [SetUp]
     public async Task SetUp()
     {
-        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0,100);
+        // Media Folder Type
+        var mediaTypes = await MediaTypeEditingService.GetFolderMediaTypes(0, 100);
         var folderMediaType = mediaTypes.Items.FirstOrDefault(x => x.Name.Contains("Folder", StringComparison.OrdinalIgnoreCase));
 
+        // Parent Media Folder
         MediaCreateModel parentCreateModel = new() { InvariantName = "MediaTest", ContentTypeKey = folderMediaType.Key, ParentKey = Constants.System.RootKey};
         var responseParent = await MediaEditingService.CreateAsync(parentCreateModel, Constants.Security.SuperUserKey);
         _parentKey = responseParent.Result.Content.Key;
 
+        // Child Media Folder
         MediaCreateModel childCreateModel = new() { InvariantName = "MediaTest", ContentTypeKey = folderMediaType.Key, ParentKey = _parentKey};
         await MediaEditingService.CreateAsync(childCreateModel, Constants.Security.SuperUserKey);
 

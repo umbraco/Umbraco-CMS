@@ -13,7 +13,6 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 
-[TestFixture]
 public class MoveDocumentControllerTests : ManagementApiUserGroupTestBase<MoveDocumentController>
 {
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
@@ -22,47 +21,47 @@ public class MoveDocumentControllerTests : ManagementApiUserGroupTestBase<MoveDo
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private Guid _targetKey;
-    private Guid _originalId;
+    private Guid _targetContentKey;
+    private Guid _moveContentKey;
 
     [SetUp]
     public async Task Setup()
     {
+        // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
+        // Content Type
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id, name: Guid.NewGuid().ToString(), alias: Guid.NewGuid().ToString());
         contentType.AllowedAsRoot = true;
         contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        // Target
-        var parentCreateModel = new ContentCreateModel
+        // Target Content
+        var targetCreateModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
             InvariantName = Guid.NewGuid().ToString(),
         };
-        var responseParent = await ContentEditingService.CreateAsync(parentCreateModel, Constants.Security.SuperUserKey);
-        _targetKey = responseParent.Result.Content.Key;
+        var responseTarget = await ContentEditingService.CreateAsync(targetCreateModel, Constants.Security.SuperUserKey);
+        _targetContentKey = responseTarget.Result.Content.Key;
 
-        // Original
-        var childCreateModel = new ContentCreateModel
+        // Move Content
+        var moveCreateModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
             TemplateKey = template.Key,
             ParentKey = Constants.System.RootKey,
             InvariantName = Guid.NewGuid().ToString(),
         };
-        var responseChild = await ContentEditingService.CreateAsync(childCreateModel, Constants.Security.SuperUserKey);
-        _originalId = responseChild.Result.Content.Key;
-
-        await ContentEditingService.MoveToRecycleBinAsync(_originalId, Constants.Security.SuperUserKey);
+        var responseMove = await ContentEditingService.CreateAsync(moveCreateModel, Constants.Security.SuperUserKey);
+        _moveContentKey = responseMove.Result.Content.Key;
     }
 
     protected override Expression<Func<MoveDocumentController, object>> MethodSelector =>
-        x => x.Move(CancellationToken.None, _originalId, null);
+        x => x.Move(CancellationToken.None, _moveContentKey, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
@@ -96,7 +95,7 @@ public class MoveDocumentControllerTests : ManagementApiUserGroupTestBase<MoveDo
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        MoveDocumentRequestModel moveDocumentRequestModel = new() { Target = new ReferenceByIdModel(_targetKey), };
+        MoveDocumentRequestModel moveDocumentRequestModel = new() { Target = new ReferenceByIdModel(_targetContentKey), };
 
         return await Client.PutAsync(Url, JsonContent.Create(moveDocumentRequestModel));
     }

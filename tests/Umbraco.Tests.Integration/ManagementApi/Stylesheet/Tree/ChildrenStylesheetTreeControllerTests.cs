@@ -13,6 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Stylesheet.Tree;
 public class ChildrenStylesheetTreeControllerTests : ManagementApiUserGroupTestBase<ChildrenStylesheetTreeController>
 {
     private IStylesheetFolderService StylesheetFolderService => GetRequiredService<IStylesheetFolderService>();
+
     private IStylesheetService StylesheetService => GetRequiredService<IStylesheetService>();
 
     private string _stylesheetFolderPath;
@@ -20,13 +21,14 @@ public class ChildrenStylesheetTreeControllerTests : ManagementApiUserGroupTestB
     [SetUp]
     public async Task SetUp()
     {
-        var model = new StylesheetFolderCreateModel { Name = Guid.NewGuid().ToString()};
-        var response =await StylesheetFolderService.CreateAsync(model);
+        // Stylesheet Folder
+        var model = new StylesheetFolderCreateModel { Name = Guid.NewGuid().ToString() };
+        var response = await StylesheetFolderService.CreateAsync(model);
         _stylesheetFolderPath = response.Result.Path;
 
+        // Stylesheet
         var modelStylesheet = new StylesheetCreateModel { Name = Guid.NewGuid() + ".css" };
         await StylesheetService.CreateAsync(modelStylesheet, Constants.Security.SuperUserKey);
-
     }
 
     protected override Expression<Func<ChildrenStylesheetTreeController, object>> MethodSelector =>

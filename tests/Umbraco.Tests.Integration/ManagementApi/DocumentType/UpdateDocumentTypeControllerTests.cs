@@ -58,7 +58,7 @@ public class UpdateDocumentTypeControllerTests : ManagementApiUserGroupTestBase<
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        UpdateDocumentTypeRequestModel updateDocumentRequestModel = new() { Name = "NewNameTest" };
+        UpdateDocumentTypeRequestModel updateDocumentRequestModel = new() { Name = Guid.NewGuid().ToString(), Alias = Guid.NewGuid().ToString(), Icon = Guid.NewGuid().ToString() };
 
         return await Client.PutAsync(Url, JsonContent.Create(updateDocumentRequestModel));
     }
