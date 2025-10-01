@@ -250,7 +250,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         foreach (IConfigurationProvider provider in configurationRoot.Providers)
         {
             if (provider is JsonConfigurationProvider jsonConfigurationProvider &&
-                (environment is null || provider.Source.Path.EndsWith($"appsettings.{environment}.json")) &&
+                (environment is null || jsonConfigurationProvider.Source.Path.EndsWith($"appsettings.{environment}.json")) &&
                 (requiredKey is null || provider.TryGet(requiredKey, out _)))
             {
                 return jsonConfigurationProvider;
