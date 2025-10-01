@@ -1,6 +1,6 @@
 import type { IRouterSlot, Params } from '../router-slot/index.js';
 import { UMB_ROUTE_PATH_ADDENDUM_CONTEXT } from '../contexts/route-path-addendum.context-token.js';
-import { UMB_ROUTE_CONTEXT } from '../route/route.context.js';
+import { UMB_ROUTE_CONTEXT } from '../route/route.context-token.js';
 import { encodeFolderName } from '../encode-folder-name.function.js';
 import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
 import type {
@@ -15,6 +15,7 @@ import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoff
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
@@ -333,6 +334,7 @@ export class UmbModalRouteRegistrationController<
 		modalManagerContext: UmbModalManagerContext,
 		params: Params,
 		routeHandler: UmbModalRouteHandler,
+		routeContextToken: UmbContextToken<any>,
 	) {
 		// If already open, don't do anything:
 		if (this.active) return;
@@ -344,6 +346,7 @@ export class UmbModalRouteRegistrationController<
 				...modalData,
 				router,
 				routeHandler,
+				routeContextToken,
 			} as UmbModalContextClassArgs<UmbModalToken<UmbModalTokenData, UmbModalTokenValue>>;
 			args.modal!.key = this.#key;
 

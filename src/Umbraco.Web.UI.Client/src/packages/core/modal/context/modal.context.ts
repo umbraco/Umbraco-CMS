@@ -11,6 +11,7 @@ import { UmbViewController } from '@umbraco-cms/backoffice/view';
 import type { ElementLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/router';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -27,6 +28,7 @@ export type UmbModalContextClassArgs<
 	value?: ModalAliasTypeAsToken['VALUE'];
 	modal?: UmbModalConfig;
 	routeHandler?: UmbModalRouteHandler;
+	routeContextToken?: UmbContextToken<any>;
 };
 
 // TODO: consider splitting this into two separate handlers
@@ -57,6 +59,7 @@ export class UmbModalContext<
 	public readonly router: IRouterSlot | null = null;
 	public readonly alias: string | UmbModalToken<ModalData, ModalValue>;
 	public readonly routeHandler?: UmbModalRouteHandler;
+	public readonly routeContextToken?: UmbContextToken<any>;
 
 	#value;
 	public readonly value;
@@ -76,6 +79,7 @@ export class UmbModalContext<
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
 		this.routeHandler = args.routeHandler;
+		this.routeContextToken = args.routeContextToken;
 
 		this.view = new UmbViewController(this, modalAlias.toString());
 
