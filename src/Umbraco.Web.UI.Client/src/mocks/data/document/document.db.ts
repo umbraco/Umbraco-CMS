@@ -123,7 +123,6 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 				flags: [],
 			};
 		}),
-		urls: [],
 		flags: [],
 	};
 };
@@ -134,7 +133,6 @@ const detailResponseMapper = (model: UmbMockDocumentModel): DocumentResponseMode
 		id: model.id,
 		isTrashed: model.isTrashed,
 		template: model.template,
-		urls: model.urls,
 		values: model.values,
 		variants: model.variants,
 		flags: model.flags,
