@@ -160,7 +160,7 @@ internal sealed class ExamineExternalIndexSearcherTest : IExamineExternalIndexSe
         // then nodeName will be matched normally with wildcards
         // the rest will be normal without wildcards
 
-        var allLanguages = (await _languageService.GetAllAsync()).Select(x => x.IsoCode.ToLowerInvariant()).ToList();
+        var allLanguages = (await _languageService.GetAllIsoCodesAsync()).Select(x => x.ToLowerInvariant()).ToList();
 
         // the chars [*-_] in the query will mess everything up so let's remove those
         // However we cannot just remove - and _  since these signify a space, so we instead replace them with that.

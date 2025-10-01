@@ -29,6 +29,14 @@ internal sealed class LanguageServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Get_All_Language_Iso_Codes()
+    {
+        var isoCodes = await LanguageService.GetAllIsoCodesAsync();
+        Assert.That(isoCodes.Count(), Is.EqualTo(3));
+        Assert.AreEqual("da-DK,en-GB,en-US", string.Join(",", isoCodes.OrderBy(x => x)));
+    }
+
+    [Test]
     public async Task Can_GetLanguageByIsoCode()
     {
         var danish = await LanguageService.GetAsync("da-DK");

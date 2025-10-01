@@ -69,6 +69,15 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         }
     }
 
+    /// <inheritdoc />
+    public Task<IEnumerable<string>> GetAllIsoCodesAsync()
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return Task.FromResult(_languageRepository.GetAllIsoCodes());
+        }
+    }
+
     public Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
