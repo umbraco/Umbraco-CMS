@@ -162,7 +162,7 @@ export class UmbDocumentItemDataResolver<
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getCreateDate(): Promise<Date> {
-		return (await this.observe(this.createDate).asPromise()) || '';
+		return (await this.observe(this.createDate).asPromise()) || undefined;
 	}
 
 	/**
@@ -171,7 +171,7 @@ export class UmbDocumentItemDataResolver<
 	 * @memberof UmbDocumentItemDataResolver
 	 */
 	async getUpdateDate(): Promise<Date> {
-		return (await this.observe(this.updateDate).asPromise()) || '';
+		return (await this.observe(this.updateDate).asPromise()) || undefined;
 	}
 
 	#setVariantAwareValues() {
