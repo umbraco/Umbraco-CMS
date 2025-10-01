@@ -68,9 +68,9 @@ public static class AppCacheExtensions
 
         // If we've retrieved the specific string that represents null in the cache, return it only if we are requesting it (via a typed request for a string).
         // Otherwise consider it a null value.
-        if (result == (object)Cms.Core.Constants.Cache.NullRepresentationInCache)
+        if (RetrievedNullRepresentationInCache(result))
         {
-            return typeof(T) == typeof(string) ? (T)result : default;
+            return RequestedNullRepresentationInCache<T>() ? (T)result : default;
         }
 
         return result.TryConvertTo<T>().Result;
