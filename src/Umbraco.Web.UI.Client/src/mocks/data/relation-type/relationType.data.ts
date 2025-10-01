@@ -22,7 +22,7 @@ export const data: Array<UmbMockRelationTypeModel> = [
 			id: 'parent1',
 			name: 'Parent Object 1',
 		},
-		signs: [],
+		flags: [],
 	},
 	{
 		name: 'Relation Type 2 (unidirectional, not deletable)',
@@ -31,7 +31,7 @@ export const data: Array<UmbMockRelationTypeModel> = [
 		isBidirectional: false,
 		isDependency: false,
 		isDeletable: false,
-		signs: [],
+		flags: [],
 	},
 	{
 		name: 'Relation Type 3 (bidirectional, deletable)',
@@ -40,6 +40,6 @@ export const data: Array<UmbMockRelationTypeModel> = [
 		isBidirectional: true,
 		isDependency: false,
 		isDeletable: true,
-		signs: [],
+		flags: [],
 	},
 ];
