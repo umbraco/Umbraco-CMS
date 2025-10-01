@@ -25,6 +25,7 @@ for (const userGroup of userGroups) {
 
     // Act
     await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
+    await umbracoUi.currentUserProfile.isErrorNotificationVisible(false);
     await umbracoUi.currentUserProfile.clickChangePasswordButton();
     await umbracoUi.currentUserProfile.changePassword(userPassword, newPassword);
 
