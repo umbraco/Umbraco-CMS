@@ -24,7 +24,6 @@ export const UmbLink = Link.extend({
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
 			...this.parent?.(),
-			protocols: [],
 			HTMLAttributes: {
 				target: '',
 				'data-router-slot': 'disabled',
