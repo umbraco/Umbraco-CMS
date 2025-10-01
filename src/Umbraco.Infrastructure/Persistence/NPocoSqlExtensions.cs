@@ -442,6 +442,26 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
+        /// Appends a GROUP BY clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="tableAlias">A table alias.</param>
+        /// <param name="fields">Expression specifying the fields.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> GroupBy<TDto>(
+            this Sql<ISqlContext> sql,
+            string tableAlias,
+            params Expression<Func<TDto, object?>>[] fields)
+        {
+            ISqlSyntaxProvider sqlSyntax = sql.SqlContext.SqlSyntax;
+            var columns = fields.Length == 0
+                ? sql.GetColumns<TDto>(withAlias: false)
+                : fields.Select(x => sqlSyntax.GetFieldName(x, tableAlias)).ToArray();
+            return sql.GroupBy(columns);
+        }
+
+        /// <summary>
         /// Appends more ORDER BY or GROUP BY fields to the Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
@@ -596,7 +616,8 @@ namespace Umbraco.Extensions
                 join += " " + sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
             }
 
-            return sql.LeftJoin(join);
+            sql.Append("LEFT JOIN " + join, nestedSelect.Arguments);
+            return new Sql<ISqlContext>.SqlJoinClause<ISqlContext>(sql);
         }
 
         /// <summary>
@@ -903,6 +924,29 @@ namespace Umbraco.Extensions
             }
 
             var columns = sql.GetColumns(columnExpressions: fields);
+            sql.Append("SELECT DISTINCT " + string.Join(", ", columns));
+            return sql;
+        }
+
+        /// <summary>
+        /// Creates a SELECT DISTINCT Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="tableAlias">A table alias.</param>
+        /// <param name="fields">Expressions indicating the columns to select.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are selected.</para>
+        /// </remarks>
+        public static Sql<ISqlContext> SelectDistinct<TDto>(this Sql<ISqlContext> sql, string tableAlias, params Expression<Func<TDto, object?>>[] fields)
+        {
+            if (sql == null)
+            {
+                throw new ArgumentNullException(nameof(sql));
+            }
+
+            var columns = sql.GetColumns(tableAlias: tableAlias, columnExpressions: fields);
             sql.Append("SELECT DISTINCT " + string.Join(", ", columns));
             return sql;
         }
