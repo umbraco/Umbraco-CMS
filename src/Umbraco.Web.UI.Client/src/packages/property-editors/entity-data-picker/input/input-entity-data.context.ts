@@ -29,6 +29,7 @@ import {
 	type UmbTreePickerModalData,
 	type UmbTreePickerModalValue,
 } from '@umbraco-cms/backoffice/tree';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 type ManifestDataSourceType =
 	| ManifestPickerPropertyEditorTreeDataSource
@@ -41,6 +42,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 	public readonly statuses = this.#itemManager.statuses;
 
 	#dataSourceAlias?: string;
+	#dataSourceConfig?: UmbPropertyEditorConfigCollection;
 	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestDataSourceType>;
 
 	#pickerModalToken?: UmbModalToken<UmbPickerModalData<UmbEntityDataItemModel>, UmbPickerModalValue>;
@@ -69,13 +71,41 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 	}
 	private _min = 0;
 
-	setDataSourceAlias(value: string | undefined) {
-		this.#dataSourceAlias = value;
-		this.#createDataSourceApi(value);
+	/**
+	 * Sets the data source alias for the input context.
+	 * @param {(string | undefined)} alias
+	 * @memberof UmbEntityDataPickerInputContext
+	 */
+	setDataSourceAlias(alias: string | undefined) {
+		this.#dataSourceAlias = alias;
+		this.#createDataSourceApi(alias);
 	}
 
+	/**
+	 * Gets the data source alias for the input context.
+	 * @returns {(string | undefined)} The data source alias.
+	 * @memberof UmbEntityDataPickerInputContext
+	 */
 	getDataSourceAlias(): string | undefined {
 		return this.#dataSourceAlias;
+	}
+
+	/**
+	 * Sets the data source config for the input context.
+	 * @param {(UmbPropertyEditorConfigCollection | undefined)} config The data source config.
+	 * @memberof UmbEntityDataPickerInputContext
+	 */
+	setDataSourceConfig(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.#dataSourceConfig = config;
+	}
+
+	/**
+	 * Gets the data source config for the input context.
+	 * @returns {(UmbPropertyEditorConfigCollection | undefined)} The data source config.
+	 * @memberof UmbEntityDataPickerInputContext
+	 */
+	getDataSourceConfig(): UmbPropertyEditorConfigCollection | undefined {
+		return this.#dataSourceConfig;
 	}
 
 	getSelection() {

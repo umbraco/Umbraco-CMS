@@ -48,8 +48,13 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	@state()
 	private _maxMessage = '';
 
+	@state()
+	private _config?: UmbPropertyEditorConfigCollection;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
+
+		this._config = config;
 
 		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
 		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
@@ -73,7 +78,14 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	}
 
 	override render() {
-		return html`<umb-input-entity-data .dataSourceAlias="${this.dataSourceAlias}"></umb-input-entity-data>`;
+		return html`<umb-input-entity-data
+			.dataSourceAlias="${this.dataSourceAlias}"
+			.config=${this._config}
+			.min=${this._min}
+			.min-message=${this._minMessage}
+			.max=${this._max}
+			.max-message=${this._maxMessage}
+			?readonly=${this.readonly}></umb-input-entity-data>`;
 	}
 }
 

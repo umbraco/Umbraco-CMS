@@ -6,6 +6,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-input-entity-data')
 export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -25,18 +26,18 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 		},
 	});
 
-	/**
-	 * This is a minimum amount of selected items in this input.
-	 * @type {number}
-	 * @attr
-	 * @default
-	 */
-	@property({ type: String, attribute: 'data-source-alias' })
 	public set dataSourceAlias(value: string | undefined) {
 		this.#pickerInputContext.setDataSourceAlias(value);
 	}
 	public get dataSourceAlias(): string | undefined {
 		return this.#pickerInputContext.getDataSourceAlias();
+	}
+
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.#pickerInputContext.setDataSourceConfig(config);
+	}
+	public get config(): UmbPropertyEditorConfigCollection | undefined {
+		return this.#pickerInputContext.getDataSourceConfig();
 	}
 
 	/**
