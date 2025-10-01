@@ -296,7 +296,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 						const segmentsForCulture = segments.map((segment) => {
 							return {
-								variant: variants.find((x) => x.culture === language.unique && x.segment === segment.unique),
+								variant: variants.find(
+									(x) => x.culture === language.unique && (x.segment === segment.alias || x.segment === null),
+								),
 								language,
 								segmentInfo: segment,
 								culture: language.unique,
