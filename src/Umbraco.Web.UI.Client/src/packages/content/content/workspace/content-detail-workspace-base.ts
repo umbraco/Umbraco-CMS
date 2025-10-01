@@ -31,7 +31,6 @@ import {
 	UmbPropertyValuePresetVariantBuilderController,
 	UmbVariantPropertyGuardManager,
 } from '@umbraco-cms/backoffice/property';
-import { UmbSegmentCollectionRepository } from '@umbraco-cms/backoffice/segment';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
@@ -55,7 +54,8 @@ import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbrac
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import type { UmbSegmentCollectionItemModel } from '@umbraco-cms/backoffice/segment';
+import { UmbDocumentSegmentRepository } from '@umbraco-cms/backoffice/document';
+import type { UmbDocumentSegmentModel } from '@umbraco-cms/backoffice/document';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -155,8 +155,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public readonly languages = this.#languages.asObservable();
 
-	#segmentRepository = new UmbSegmentCollectionRepository(this);
-	#segments = new UmbArrayState<UmbSegmentCollectionItemModel>([], (x) => x.unique);
+	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
+	#segments = new UmbArrayState<UmbDocumentSegmentModel>([], (x) => x.alias);
 	protected readonly _segments = this.#segments.asObservable();
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -271,12 +271,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 					const segmentsForInvariantCulture = segments.map((segment) => {
 						return {
-							variant: variants.find((x) => x.culture === null && x.segment === segment.unique),
+							variant: variants.find((x) => x.culture === null && x.segment === segment.alias),
 							language: languages.find((x) => x.isDefault),
 							segmentInfo: segment,
 							culture: null,
-							segment: segment.unique,
-							unique: new UmbVariantId(null, segment.unique).toString(),
+							segment: segment.alias,
+							unique: new UmbVariantId(null, segment.alias).toString(),
 						} as VariantOptionModelType;
 					});
 
@@ -302,8 +302,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 								language,
 								segmentInfo: segment,
 								culture: language.unique,
-								segment: segment.unique,
-								unique: new UmbVariantId(language.unique, segment.unique).toString(),
+								segment: segment.alias,
+								unique: new UmbVariantId(language.unique, segment.alias).toString(),
 							} as VariantOptionModelType;
 						});
 
@@ -368,6 +368,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			(varies) => {
 				this._data.setVariesBySegment(varies);
 				this.#variesBySegment = varies;
+				if (varies) {
+					this.#loadSegments();
+				}
 			},
 			null,
 		);
@@ -380,7 +383,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.loadLanguages();
-		this.#loadSegments();
 	}
 
 	public async loadLanguages() {
@@ -390,8 +392,21 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	async #loadSegments() {
-		const { data } = await this.#segmentRepository.requestCollection({});
-		this.#segments.setValue(data?.items ?? []);
+		this.observe(
+			this.unique,
+			async (unique) => {
+				if (!unique) {
+					this.#segments.setValue([]);
+					return;
+				}
+				const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
+					skip: 0,
+					take: 9999,
+				});
+				this.#segments.setValue(data?.items ?? []);
+			},
+			'_loadSegmentsUnique',
+		);
 	}
 
 	protected override async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
