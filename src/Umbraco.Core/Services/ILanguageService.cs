@@ -38,12 +38,6 @@ public interface ILanguageService
     Task<IEnumerable<ILanguage>> GetAllAsync();
 
     /// <summary>
-    ///     Gets all languages with the given ISO codes.
-    /// </summary>
-    /// <returns>An enumerable list of <see cref="ILanguage" /> objects</returns>
-    Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes);
-
-    /// <summary>
     ///     Updates an existing <see cref="ILanguage" /> object.
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to update</param>
