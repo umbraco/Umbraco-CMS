@@ -1465,7 +1465,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function syncContent() {
 
-        const content = args.editor.getContent();
+        //get the content from tinyMCE and replace Non-breaking space character to HTML Entity
+        const content = args.editor.getContent().replace('\u00A0', '&nbsp;');
 
         if (getPropertyValue() === content) {
           return;
