@@ -91,7 +91,7 @@ export const detailHandlers = [
 					? undefined
 					: document.variants.filter((v) => v.segment === alias).map((v) => v.culture!);
 
-				let availableSegmentOptions: string[] | null | undefined = whichCulturesHaveThisSegment ?? undefined;
+				let availableSegmentOptions: string[] | null = whichCulturesHaveThisSegment ?? null;
 
 				if (whichCulturesHaveThisSegment) {
 					const hasNull = whichCulturesHaveThisSegment.some((c) => c === null);
