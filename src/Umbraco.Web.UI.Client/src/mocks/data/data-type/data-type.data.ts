@@ -1272,7 +1272,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
-		signs: [],
+		flags: [],
 		values: [],
 	},
 	{
@@ -1285,7 +1285,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
-		signs: [],
+		flags: [],
 		values: [],
 	},
 	{
@@ -1298,7 +1298,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
-		signs: [],
+		flags: [],
 		values: [],
 	},
 	{
@@ -1311,7 +1311,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,
-		signs: [],
+		flags: [],
 		values: [
 			{
 				alias: 'timeZones',
