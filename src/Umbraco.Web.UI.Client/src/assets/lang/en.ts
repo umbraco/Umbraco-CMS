@@ -2845,8 +2845,12 @@ export default {
 		detailsTitle: 'Additional details',
 		detailsDescription:
 			"To resolve this you should either restore the property editor, change the property to use a supported data type or remove the property if it's no longer needed.",
+		uiTitle: 'The configured property editor UI could not be found.',
+		uiDetailsDescription:
+			'This property editor UI is missing. Ensure your custom UI is registered correctly and the alias matches your configuration. For implementation details, see the <a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">documentation</a>.',
 		detailsDataType: 'Data type',
 		detailsPropertyEditor: 'Property editor',
+		detailsPropertyEditorUi: 'Property editor UI',
 		detailsData: 'Data',
 		detailsHide: 'Hide details',
 		detailsShow: 'Show details',

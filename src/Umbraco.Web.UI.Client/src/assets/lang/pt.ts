@@ -2839,10 +2839,18 @@ export default {
 		detailsTitle: 'Detalhes adicionais',
 		detailsDescription:
 			'Para resolver o problema, deverá ou restaurar o editor de propriedades, ou alterar a propriedade para usar um tipo de dados compatível ou remover a propriedade se ela não for mais necessária.',
+		uiTitle: 'A interface do editor de propriedades configurada não foi encontrada.',
+		uiDetailsDescription:
+			'Para obter detalhes adicionais sobre a configuração de uma interface de editor de propriedades, consulte a <a href="https://docs.umbraco.com/umbraco-cms/customizing/property-editors/composition/property-editor-ui" target="_blank" rel="noopener">documentação</a>.',
 		detailsDataType: 'Tipo de dados',
 		detailsPropertyEditor: 'Editor de propriedades',
+		detailsPropertyEditorUi: 'Interface do editor de propriedades',
 		detailsData: 'Dados',
 		detailsHide: 'Esconder detalhes',
 		detailsShow: 'Mostrar detalhes',
+		dataTypeMissingEditor: 'Editor de propriedades não encontrado',
+		dataTypeMissingEditorMessage: 'Este editor de propriedades não foi encontrado.',
+		dataTypeMissingEditorUi: 'Interface do editor de propriedades não encontrada',
+		dataTypeMissingEditorUiMessage: 'Esta interface do editor de propriedades não foi encontrada.',
 	},
 } as UmbLocalizationDictionary;
