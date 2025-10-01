@@ -11,12 +11,12 @@ const rootImageName = 'RootImage';
 const rootArticleName = 'RootArticle';
 const rootAudioName = 'RootAudio';
 const rootSVGName = 'RootSVG';
-const rootCustomMediaName = 'TestCustomMedia'
+const rootCustomMediaName = 'TestCustomMedia';
 const fileName = 'TestFile';
 const videoName = 'TestVideo';
 const imageSizeNamePrefix = 'Test Image Size';
 const rootImageSizeNamePrefix = 'Root Test Image Size';
-const specialCharacterImageName = ', . ! ? # $ % & * @ é ü ă đ 漢字'
+const specialCharacterImageName = ', . ! ? # $ % & * @ é ü ă đ 漢字';
 let rootImageId = '';
 // Media Type
 const customMediaTypeName = 'CustomMediaType';
@@ -133,7 +133,7 @@ test('can fetch a media item in a folder in a folder by its ID', async ({umbraco
   await umbracoApi.media.ensureNameNotExists(fileName);  
 });
 
-test('can fetch an custom media item by its ID', async ({umbracoApi}) => {
+test('can fetch a custom media item by its ID', async ({umbracoApi}) => {
   // Arrange
   // Create custom media item at root level
   const mediaId = await umbracoApi.media.createDefaultMediaWithTextstring(rootCustomMediaName, customMediaTypeName, textStringValue, textStringDataType);
@@ -163,7 +163,7 @@ test('returns 404 when fetching a non-existent media item', async ({umbracoApi})
   expect(mediaItem.status()).toBe(404);
 });
 
-test('can fetch an media item by its path', async ({umbracoApi}) => {
+test('can fetch a media item by its path', async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Article';
   // Create a article file item at root level
@@ -184,7 +184,7 @@ test('can fetch an media item by its path', async ({umbracoApi}) => {
 
 // Skip this because it will return 404 error if the path includes # or ?
 // Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20024
-test.skip('can fetch an media item by its path with special character', async ({umbracoApi}) => {
+test.skip('can fetch a media item by its path with special characters', async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Image';
   // Create an image item at root level and its name has special characters
