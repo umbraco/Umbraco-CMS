@@ -40,7 +40,7 @@ public interface ILanguageService
     /// <summary>
     ///     Gets all available language ISO culture codes.
     /// </summary>
-    /// <returns>An enumerable list of <see cref="ILanguage" /> objects.</returns>
+    /// <returns>An enumerable list of ISO code strings.</returns>
     async Task<IEnumerable<string>> GetAllIsoCodesAsync() => (await GetAllAsync()).Select(x => x.IsoCode);
 
     /// <summary>
