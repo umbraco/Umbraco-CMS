@@ -269,7 +269,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 						unique: new UmbVariantId().toString(),
 					} as VariantOptionModelType;
 
-					const segmentsForInvariantCulture = segments.map((segment) => {
+					const availableSegments = segments.filter((s) => !s.cultures);
+					const segmentsForInvariantCulture = availableSegments.map((segment) => {
 						return {
 							variant: variants.find((x) => x.culture === null && x.segment === segment.alias),
 							language: languages.find((x) => x.isDefault),
@@ -294,11 +295,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 							unique: new UmbVariantId(language.unique).toString(),
 						} as VariantOptionModelType;
 
-						const segmentsForCulture = segments.map((segment) => {
+						const availableSegments = segments.filter(
+							(s) => typeof s.cultures === 'undefined' || (s.cultures !== null && s.cultures.includes(language.unique)),
+						);
+						const segmentsForCulture = availableSegments.map((segment) => {
 							return {
-								variant: variants.find(
-									(x) => x.culture === language.unique && (x.segment === segment.alias || x.segment === null),
-								),
+								variant: variants.find((x) => x.culture === language.unique && x.segment === segment.alias),
 								language,
 								segmentInfo: segment,
 								culture: language.unique,
