@@ -8,8 +8,8 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 export class UmbPropertyEditorUIMissingUiElement extends UmbPropertyEditorUIMissingBaseElement {
 	constructor() {
 		super();
-		this._titleKey = 'missingEditor_uiTitle';
-		this._detailsDescriptionKey = 'missingEditor_uiDetailsDescription';
+		this._titleKey = 'missingEditor_missingUiTitle';
+		this._detailsDescriptionKey = 'missingEditor_missingUiDetailsDescription';
 		this._displayPropertyEditorUi = true;
 	}
 }
