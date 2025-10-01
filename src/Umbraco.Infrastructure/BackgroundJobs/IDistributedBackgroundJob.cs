@@ -5,6 +5,11 @@ public interface IDistributedBackgroundJob
     static readonly TimeSpan DefaultDelay = System.TimeSpan.FromMinutes(3);
 
     /// <summary>
+    /// Name of the job
+    /// </summary>
+    string Name { get; }
+
+    /// <summary>
     /// Timespan representing how often the task should recur.
     /// </summary>
     TimeSpan Period { get; }

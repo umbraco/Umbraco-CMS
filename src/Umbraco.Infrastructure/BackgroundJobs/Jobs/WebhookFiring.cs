@@ -21,6 +21,7 @@ public class WebhookFiring : IDistributedBackgroundJob
     private readonly IHttpClientFactory _httpClientFactory;
     private WebhookSettings _webhookSettings;
 
+    public string Name { get; } = "Webhook Firing";
     public TimeSpan Period => _webhookSettings.Period;
 
     public TimeSpan Delay { get; } = TimeSpan.FromSeconds(20);

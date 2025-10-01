@@ -23,4 +23,7 @@ internal sealed class DistributedJobDto
     [Column("lastRun")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTimeOffset LastRun { get; set; }
+
+    [Column("period")]
+    public long Period { get; set; }
 }

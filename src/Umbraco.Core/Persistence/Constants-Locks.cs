@@ -90,5 +90,10 @@ public static partial class Constants
         ///     All document URLs.
         /// </summary>
         public const int DocumentUrls = -345;
+
+        /// <summary>
+        ///     All distributed jobs.
+        /// </summary>
+        public const int DistributedJobs = -346;
     }
 }
