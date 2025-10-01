@@ -64,14 +64,12 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	#changeIcon(e: InputEvent | KeyboardEvent, iconName: string) {
-		if (
-			(e.type == 'click' && iconName === this._currentIcon) ||
-			(e.type == 'keyup' && (e as KeyboardEvent).key == 'Enter')
-		) {
-			this.modalContext?.updateValue({ icon: '' });
-		} else if (e.type == 'click' || (e.type == 'keyup' && (e as KeyboardEvent).key == 'Enter')) {
-			this.modalContext?.updateValue({ icon: iconName });
-		}
+		const isActivate = e.type === 'click' || (e.type === 'keyup' && (e as KeyboardEvent).key === 'Enter');
+		if (!isActivate) return;
+
+		const nextIcon = this._currentIcon === iconName ? '' : iconName;
+
+		this.modalContext?.updateValue({ icon: nextIcon });
 	}
 
 	#onColorChange(e: UUIColorSwatchesEvent) {
@@ -220,7 +218,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				border-radius: var(--uui-border-radius);
 				font-size: 16px; /* specific for icons */
 			}
-			#icons uui-button:focus,
+			#icons uui-button:focus-visible,
 			#icons uui-button:hover,
 			#icons uui-button.selected {
 				outline: 2px solid var(--uui-color-selected);
