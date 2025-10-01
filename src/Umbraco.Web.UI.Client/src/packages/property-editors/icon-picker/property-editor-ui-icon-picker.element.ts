@@ -62,13 +62,14 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 				compact
 				label=${this.localize.term('defaultdialogs_selectIcon')}
 				look="outline"
-				@click=${this._openModal}
-				>${this._value === ''
-					? html` <uui-icon name="icon-checkbox-dotted" style="opacity: 0.35;"></uui-icon>`
-					: nothing}
-				${this._color
-					? html` <uui-icon name="${this._icon}" style="color:var(${extractUmbColorVariable(this._color)})"></uui-icon>`
-					: html` <uui-icon name="${this._icon}"></uui-icon>`}
+				@click=${this._openModal}>
+				${!this._icon
+					? html` <uui-icon name="icon-block" style="opacity:.45"> </uui-icon> `
+					: this._color
+						? html`
+								<uui-icon name="${this._icon}" style="color:var(${extractUmbColorVariable(this._color)})"> </uui-icon>
+							`
+						: html` <uui-icon name="${this._icon}"></uui-icon> `}
 			</uui-button>
 		`;
 	}

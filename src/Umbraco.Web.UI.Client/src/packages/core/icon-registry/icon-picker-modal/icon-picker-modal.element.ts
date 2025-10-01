@@ -84,15 +84,14 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	override render() {
 		// TODO: Missing localization in general. [NL]
-		console.log('CURRENT ICON:', this._currentIcon);
 		return html`
-			<umb-body-layout headline="Select Icon">
+			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectIcon')}>
 				<div id="container">
 					${this.renderSearch()}
 					<hr />
 					<uui-color-swatches
 						.value=${this._currentColor}
-						label="Color switcher for icons"
+						label=${this.localize.term('defaultdialogs_colorSwitcher')}
 						@change=${this.#onColorChange}>
 						${
 							// TODO: Missing localization for the color aliases. [NL]
@@ -112,8 +111,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					<uui-scroll-container id="icons">
 						<uui-button
 							class=${!this._currentIcon ? 'selected' : ''}
-							label="No icon"
-							title="No icon"
+							label=${this.localize.term('defaultdialogs_noIcon')}
+							title=${this.localize.term('defaultdialogs_noIcon')}
 							@click=${this.#clearIcon}
 							@keyup=${(e: KeyboardEvent) => {
 								if (e.key === 'Enter' || e.key === ' ') this.#clearIcon();
