@@ -866,7 +866,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		icon: 'icon-document',
 		allowedAsRoot: true,
 		variesByCulture: true,
-		variesBySegment: false,
+		variesBySegment: true,
 		isElement: false,
 		hasChildren: false,
 		parent: null,

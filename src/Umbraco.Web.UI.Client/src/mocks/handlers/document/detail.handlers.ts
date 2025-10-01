@@ -5,6 +5,7 @@ import { UMB_SLUG } from './slug.js';
 import type {
 	CreateDocumentRequestModel,
 	DefaultReferenceResponseModel,
+	GetDocumentByIdAvailableSegmentOptionsResponse,
 	GetDocumentByIdReferencedDescendantsResponse,
 	PagedIReferenceResponseModel,
 	UpdateDocumentRequestModel,
@@ -71,6 +72,31 @@ export const detailHandlers = [
 		};
 
 		return res(ctx.status(200), ctx.json(ReferencedDescendantsResponse));
+	}),
+
+	rest.get(umbracoPath(`${UMB_SLUG}/:id/available-segment-options`), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return res(ctx.status(400));
+		const document = umbDocumentMockDb.detail.read(id);
+		if (!document) return res(ctx.status(404));
+
+		const availableSegments = document.variants.filter((v) => !!v.segment).map((v) => v.segment!) ?? [];
+
+		const response: GetDocumentByIdAvailableSegmentOptionsResponse = {
+			total: availableSegments.length,
+			items: availableSegments.map((alias) => {
+				const whichCulturesHaveThisSegment: string[] = document.variants
+					.filter((v) => v.segment === alias && !!v.culture)
+					.map((v) => v.culture!);
+				return {
+					alias,
+					name: `Segment: ${alias}`,
+					cultures: whichCulturesHaveThisSegment.length ? whichCulturesHaveThisSegment : null,
+				};
+			}),
+		};
+
+		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.put(umbracoPath(`${UMB_SLUG}/:id/validate`, 'v1.1'), (_req, res, ctx) => {
