@@ -33,7 +33,7 @@ internal sealed partial class UserServiceCrudTests
         Assert.IsTrue(creationResult.Success);
         var createdUser = creationResult.Result.CreatedUser;
 
-        createdUser!.LastLoginDate = DateTime.Now;
+        createdUser!.LastLoginDate = DateTime.UtcNow;
         userService.Save(createdUser);
 
         var result = await userService.DeleteAsync(Constants.Security.SuperUserKey, createdUser.Key);

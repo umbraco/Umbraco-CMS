@@ -14,58 +14,6 @@ namespace Umbraco.Extensions;
 
 public static class UrlProviderExtensions
 {
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static async Task<IEnumerable<UrlInfo>> GetContentUrlsAsync(
-        this IContent content,
-        IPublishedRouter publishedRouter,
-        IUmbracoContext umbracoContext,
-        ILanguageService languageService,
-        ILocalizedTextService textService,
-        IContentService contentService,
-        IVariationContextAccessor variationContextAccessor,
-        ILogger<IContent> logger,
-        UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider)
-        => await content.GetContentUrlsAsync(
-            publishedRouter,
-            umbracoContext,
-            languageService,
-            textService,
-            contentService,
-            variationContextAccessor,
-            logger,
-            uriUtility,
-            publishedUrlProvider,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
-
-    [Obsolete("Use the overload with IPublishedStatusFilteringService, scheduled for removal in v17")]
-    public static async Task<IEnumerable<UrlInfo>> GetContentUrlsAsync(
-        this IContent content,
-        IPublishedRouter publishedRouter,
-        IUmbracoContext umbracoContext,
-        ILanguageService languageService,
-        ILocalizedTextService textService,
-        IContentService contentService,
-        IVariationContextAccessor variationContextAccessor,
-        ILogger<IContent> logger,
-        UriUtility uriUtility,
-        IPublishedUrlProvider publishedUrlProvider,
-        IPublishedContentCache contentCache,
-        IDocumentNavigationQueryService navigationQueryService)
-        => await content.GetContentUrlsAsync(
-            publishedRouter,
-            umbracoContext,
-            languageService,
-            textService,
-            contentService,
-            variationContextAccessor,
-            logger,
-            uriUtility,
-            publishedUrlProvider,
-            navigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
-
     /// <summary>
     ///     Gets the URLs of the content item.
     /// </summary>

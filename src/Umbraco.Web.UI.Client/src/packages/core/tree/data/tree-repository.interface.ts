@@ -4,13 +4,13 @@ import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import type {
-	UmbPagedModel,
-	UmbRepositoryResponse,
-	UmbRepositoryResponseWithAsObservable,
-} from '@umbraco-cms/backoffice/repository';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type {
+	UmbRepositoryResponse,
+	UmbRepositoryResponseWithAsObservable,
+	UmbTargetPagedModel,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * Interface for a tree repository.
@@ -39,7 +39,7 @@ export interface UmbTreeRepository<
 	 */
 	requestTreeRootItems: (
 		args: TreeRootItemsRequestArgsType,
-	) => Promise<UmbRepositoryResponseWithAsObservable<UmbPagedModel<TreeItemType>, TreeItemType[]>>;
+	) => Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, TreeItemType[]>>;
 
 	/**
 	 * Requests the children of the given parent item.
@@ -48,7 +48,7 @@ export interface UmbTreeRepository<
 	 */
 	requestTreeItemsOf: (
 		args: TreeChildrenOfRequestArgsType,
-	) => Promise<UmbRepositoryResponseWithAsObservable<UmbPagedModel<TreeItemType>, TreeItemType[]>>;
+	) => Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, TreeItemType[]>>;
 
 	/**
 	 * Requests the ancestors of the given item.

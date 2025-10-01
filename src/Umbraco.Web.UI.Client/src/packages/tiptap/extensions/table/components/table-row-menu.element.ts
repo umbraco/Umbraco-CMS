@@ -1,6 +1,7 @@
+import type { Editor } from '../../../externals.js';
+import type { UmbTiptapBubbleMenuElement } from '../../bubble-menu/bubble-menu.tiptap-extension.js';
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { Editor, UmbTiptapBubbleMenuElement } from '@umbraco-cms/backoffice/external/tiptap';
 
 /** @deprecated No longer used internally. This will be removed in Umbraco 17. [LK] */
 @customElement('umb-tiptap-table-row-menu')

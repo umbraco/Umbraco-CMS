@@ -135,17 +135,6 @@ namespace Umbraco.Cms
                 }
             }
 
-            /// <inheritdoc />
-            [Obsolete("Use the non-obsolete overload. Scheduled for removal in V17.")]
-            public ProcessInstructionsResult ProcessInstructions(
-                CacheRefresherCollection cacheRefreshers,
-                ServerRole serverRole,
-                CancellationToken cancellationToken,
-                string localIdentity,
-                DateTime lastPruned,
-                int lastId) =>
-                ProcessInstructions(cacheRefreshers, cancellationToken, localIdentity, lastId);
-
             private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity)
                 => new(
                     0,

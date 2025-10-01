@@ -32,9 +32,7 @@ public class NewDefaultUrlProvider : IUrlProvider
     private RequestHandlerSettings _requestSettings;
     private readonly ILanguageService _languageService;
 
-    // TODO (V17): When removing the obsolete constructors, remove the unused localizationService parameter from the constructor (we can't do it now
-    // because it is used in the obsolete constructors and leads to an ambigious constructor error).
-    // See also if we can make GetUrlFromRoute asynchronous and avoid the GetAwaiter().GetResult() in when using ILanguageService.
+    // TODO See if we can make GetUrlFromRoute asynchronous and avoid the GetAwaiter().GetResult() in when using ILanguageService.
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NewDefaultUrlProvider"/> class.
@@ -45,11 +43,6 @@ public class NewDefaultUrlProvider : IUrlProvider
         ISiteDomainMapper siteDomainMapper,
         IUmbracoContextAccessor umbracoContextAccessor,
         UriUtility uriUtility,
-#pragma warning disable CS0618 // Type or member is obsolete
-#pragma warning disable IDE0060 // Remove unused parameter
-        ILocalizationService localizationService,
-#pragma warning restore IDE0060 // Remove unused parameter
-#pragma warning restore CS0618 // Type or member is obsolete
         IPublishedContentCache publishedContentCache,
         IDomainCache domainCache,
         IIdKeyMap idKeyMap,
@@ -72,72 +65,6 @@ public class NewDefaultUrlProvider : IUrlProvider
         _languageService = languageService;
 
         requestSettings.OnChange(x => _requestSettings = x);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NewDefaultUrlProvider"/> class.
-    /// </summary>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public NewDefaultUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        ILogger<DefaultUrlProvider> logger,
-        ISiteDomainMapper siteDomainMapper,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        UriUtility uriUtility,
-        ILocalizationService localizationService,
-        IPublishedContentCache publishedContentCache,
-        IDomainCache domainCache,
-        IIdKeyMap idKeyMap,
-        IDocumentUrlService documentUrlService,
-        IDocumentNavigationQueryService navigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
-        : this(
-            requestSettings,
-            logger,
-            siteDomainMapper,
-            umbracoContextAccessor,
-            uriUtility,
-            localizationService,
-            publishedContentCache,
-            domainCache,
-            idKeyMap,
-            documentUrlService,
-            navigationQueryService,
-            publishedContentStatusFilteringService,
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NewDefaultUrlProvider"/> class.
-    /// </summary>
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in V17.")]
-    public NewDefaultUrlProvider(
-        IOptionsMonitor<RequestHandlerSettings> requestSettings,
-        ILogger<DefaultUrlProvider> logger,
-        ISiteDomainMapper siteDomainMapper,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        UriUtility uriUtility,
-        ILocalizationService localizationService,
-        IPublishedContentCache publishedContentCache,
-        IDomainCache domainCache,
-        IIdKeyMap idKeyMap,
-        IDocumentUrlService documentUrlService,
-        IDocumentNavigationQueryService navigationQueryService)
-        : this(
-            requestSettings,
-            logger,
-            siteDomainMapper,
-            umbracoContextAccessor,
-            uriUtility,
-            localizationService,
-            publishedContentCache,
-            domainCache,
-            idKeyMap,
-            documentUrlService,
-            navigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>())
-    {
     }
 
     /// <summary>

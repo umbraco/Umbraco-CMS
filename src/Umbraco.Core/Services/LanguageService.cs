@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class LanguageService : RepositoryService, ILanguageService
 {
     private readonly ILanguageRepository _languageRepository;
-    private readonly IAuditRepository _auditRepository;
+    private readonly IAuditService _auditService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IIsoCodeValidator _isoCodeValidator;
 
@@ -22,13 +22,13 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         ILanguageRepository languageRepository,
-        IAuditRepository auditRepository,
+        IAuditService auditService,
         IUserIdKeyResolver userIdKeyResolver,
         IIsoCodeValidator isoCodeValidator)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _languageRepository = languageRepository;
-        _auditRepository = auditRepository;
+        _auditService = auditService;
         _userIdKeyResolver = userIdKeyResolver;
         _isoCodeValidator = isoCodeValidator;
     }
@@ -96,8 +96,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
 
         if (language.UpdateDate == default)
         {
-            // TODO (V17): To align with updates of system dates, this needs to change to DateTime.UtcNow.
-            language.UpdateDate = DateTime.Now;
+            language.UpdateDate = DateTime.UtcNow;
         }
 
         return await SaveAsync(
@@ -181,8 +180,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             scope.Notifications.Publish(
                 new LanguageDeletedNotification(language, eventMessages).WithStateFrom(deletingLanguageNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(AuditType.Delete, "Delete Language", currentUserId, language.Id, UmbracoObjectTypes.Language.GetName());
+            await AuditAsync(AuditType.Delete, "Delete Language", userKey, language.Id, UmbracoObjectTypes.Language.GetName());
             scope.Complete();
             return Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language);
         }
@@ -234,16 +232,20 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             scope.Notifications.Publish(
                 new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
-            Audit(auditType, auditMessage, currentUserId, language.Id, UmbracoObjectTypes.Language.GetName());
+            await AuditAsync(auditType, auditMessage, userKey, language.Id, UmbracoObjectTypes.Language.GetName());
 
             scope.Complete();
             return Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language);
         }
     }
 
-    private void Audit(AuditType type, string message, int userId, int objectId, string? entityType) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, message));
+    private async Task AuditAsync(AuditType type, string message, Guid userKey, int objectId, string? entityType) =>
+        await _auditService.AddAsync(
+            type,
+            userKey,
+            objectId,
+            entityType,
+            message);
 
     private bool HasInvalidFallbackLanguage(ILanguage language)
     {

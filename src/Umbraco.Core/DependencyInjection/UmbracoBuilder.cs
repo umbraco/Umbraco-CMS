@@ -336,7 +336,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<ILoggerFactory>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<IExternalLoginWithKeyRepository>()));
+                factory.GetRequiredService<IExternalLoginWithKeyRepository>(),
+                factory.GetRequiredService<IUserRepository>()));
             Services.AddUnique<ILogViewerService, LogViewerService>();
             Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(

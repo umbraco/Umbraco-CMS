@@ -61,6 +61,9 @@
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Map" />
+    <PackageReference Include="System.Linq.Async">
+      <ExcludeAssets>compile</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

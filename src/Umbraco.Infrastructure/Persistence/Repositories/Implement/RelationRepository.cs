@@ -1,3 +1,4 @@
+
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -7,7 +8,6 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -173,9 +173,9 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
     public void DeleteByParent(int parentId, params string[] relationTypeAliases)
     {
         // HACK: SQLite - hard to replace this without provider specific repositories/another ORM.
-        if (Database.DatabaseType.IsSqlite())
+        if (Database.DatabaseType.IsSqlServer() is false)
         {
-            Sql<ISqlContext>? query = Sql().Append(@"delete from umbracoRelation");
+            Sql<ISqlContext>? query = Sql().Append($"DELETE FROM {QuoteTableName("umbracoRelation")}");
 
             Sql<ISqlContext> subQuery = Sql().Select<RelationDto>(x => x.Id)
                 .From<RelationDto>()
@@ -198,10 +198,10 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
                 SqlTemplate template = SqlContext.Templates.Get(
                     Constants.SqlTemplates.RelationRepository.DeleteByParentIn,
                     tsql => Sql().Delete<RelationDto>()
-                        .From<RelationDto>()
-                        .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                        .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId"))
-                        .WhereIn<RelationTypeDto>(x => x.Alias, SqlTemplate.ArgIn<string>("relationTypeAliases")));
+                            .From<RelationDto>()
+                            .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                            .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId"))
+                            .WhereIn<RelationTypeDto>(x => x.Alias, SqlTemplate.ArgIn<string>("relationTypeAliases")));
 
                 Sql<ISqlContext> sql = template.Sql(parentId, relationTypeAliases);
 
@@ -212,9 +212,9 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
                 SqlTemplate template = SqlContext.Templates.Get(
                     Constants.SqlTemplates.RelationRepository.DeleteByParentAll,
                     tsql => Sql().Delete<RelationDto>()
-                        .From<RelationDto>()
-                        .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                        .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId")));
+                            .From<RelationDto>()
+                            .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                            .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId")));
 
                 Sql<ISqlContext> sql = template.Sql(parentId);
 
@@ -336,7 +336,7 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         Sql<ISqlContext> sql = GetBaseQuery(false);
         sql.Where(GetBaseWhereClause(), new { id });
 
-        RelationDto? dto = Database.Fetch<RelationDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+        RelationDto? dto = Database.FirstOrDefault<RelationDto>(sql);
         if (dto == null)
         {
             return null;
@@ -417,11 +417,13 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         return sql;
     }
 
-    protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Relation}.id = @id";
+    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Relation)}.id = @id";
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> { "DELETE FROM umbracoRelation WHERE id = @id" };
+        var list = new List<string> {
+            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE id = @id"
+        };
         return list;
     }
 
