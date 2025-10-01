@@ -8,12 +8,12 @@ import { UmbMemberItemRepository, UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/ba
 
 @customElement('ufm-content-name')
 export class UmbUfmContentNameElement extends UmbUfmElementBase {
-	@property()
-	alias?: string;
-
 	#documentRepository?: UmbDocumentItemRepository;
 	#mediaRepository?: UmbMediaItemRepository;
 	#memberRepository?: UmbMemberItemRepository;
+
+	@property()
+	alias?: string;
 
 	constructor() {
 		super();
@@ -62,6 +62,7 @@ export class UmbUfmContentNameElement extends UmbUfmElementBase {
 			const repository = this.#getRepository(entityType);
 			if (repository) {
 				const { data } = await repository.requestItems(uniques);
+
 				if (Array.isArray(data) && data.length > 0) {
 					// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
 					return data.map((item) => item.variants[0].name).join(', ');

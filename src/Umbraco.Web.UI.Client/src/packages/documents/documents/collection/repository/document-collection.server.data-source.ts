@@ -36,8 +36,6 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 		if (data) {
 			const items = data.items.map((item: DocumentCollectionResponseModel) => {
 				const model: UmbDocumentCollectionItemModel = {
-					// TODO: [v17] Review this, as needed to reintroduce the `name` field on `UmbDocumentCollectionItemModel` (due to the `UmbDocumentItemDataResolver`). [LK]
-					name: '',
 					ancestors: item.ancestors.map((ancestor) => {
 						return {
 							unique: ancestor.id,
@@ -52,7 +50,12 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					sortOrder: item.sortOrder,
 					updater: item.updater,
 					values: item.values.map((item) => {
-						return { alias: item.alias, value: item.value as string };
+						return {
+							alias: item.alias,
+							culture: item.culture ?? undefined,
+							segment: item.segment ?? undefined,
+							value: item.value as string,
+						};
 					}),
 					documentType: {
 						unique: item.documentType.id,

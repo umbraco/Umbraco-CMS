@@ -1,16 +1,14 @@
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
-import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
-import { getPropertyValueByAlias } from '../index.js';
-import { css, customElement, html, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
+import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
-import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 
 import '@umbraco-cms/backoffice/ufm';
+import './document-grid-collection-card.element.js';
 
 @customElement('umb-document-grid-collection-view')
 export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
@@ -99,69 +97,19 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbDocumentCollectionItemModel) {
-		// TODO: [v17] Review usage of `item.variants[0].name` as this needs to be implemented properly! [LK]
 		return html`
-			<uui-card-content-node
-				.name=${item.variants[0].name}
+			<umb-document-grid-collection-card
+				class="document-grid-item"
+				href=${this.#getEditUrl(item)}
+				.item=${item}
+				.columns=${this._userDefinedProperties}
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
-				href=${this.#getEditUrl(item)}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>
-				${this.#renderState(item)} ${this.#renderProperties(item)}
-			</uui-card-content-node>
-		`;
-	}
-
-	#getStateTagConfig(state: string): { color: UUIInterfaceColor; label: string } {
-		switch (state) {
-			case 'Published':
-				return { color: 'positive', label: this.localize.term('content_published') };
-			case 'PublishedPendingChanges':
-				return { color: 'warning', label: this.localize.term('content_publishedPendingChanges') };
-			case 'Draft':
-				return { color: 'default', label: this.localize.term('content_unpublished') };
-			case 'NotCreated':
-				return { color: 'danger', label: this.localize.term('content_notCreated') };
-			default:
-				return { color: 'danger', label: fromCamelCase(state) };
-		}
-	}
-
-	#renderState(item: UmbDocumentCollectionItemModel) {
-		// TODO: [v17] Review usage of `item.variants[0].state` as this needs to be implemented properly! [LK]
-		const state = item.variants[0].state;
-		if (!state) return;
-		const tagConfig = this.#getStateTagConfig(state);
-		return html`<uui-tag slot="tag" color=${tagConfig.color} look="secondary">${tagConfig.label}</uui-tag>`;
-	}
-
-	#renderProperties(item: UmbDocumentCollectionItemModel) {
-		if (!this._userDefinedProperties) return;
-		return html`
-			<ul>
-				${repeat(
-					this._userDefinedProperties,
-					(column) => column.alias,
-					(column) => this.#renderProperty(item, column),
-				)}
-			</ul>
-		`;
-	}
-
-	#renderProperty(item: UmbDocumentCollectionItemModel, column: UmbCollectionColumnConfiguration) {
-		const value = getPropertyValueByAlias(item, column.alias);
-		return html`
-			<li>
-				<span>${this.localize.string(column.header)}:</span>
-				${when(
-					column.nameTemplate,
-					() => html`<umb-ufm-render inline .markdown=${column.nameTemplate} .value=${{ value }}></umb-ufm-render>`,
-					() => html`${value}`,
-				)}
-			</li>
+			</umb-document-grid-collection-card>
 		`;
 	}
 
@@ -173,31 +121,15 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				flex-direction: column;
 			}
 
-			.container {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-
 			#document-grid {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 				gap: var(--uui-size-space-4);
 			}
 
-			uui-card-content-node {
+			.document-grid-item {
 				width: 100%;
-				height: 180px;
-			}
-
-			ul {
-				list-style: none;
-				padding-inline-start: 0px;
-				margin: 0;
-			}
-
-			ul > li > span {
-				font-weight: 700;
+				min-height: 180px;
 			}
 		`,
 	];

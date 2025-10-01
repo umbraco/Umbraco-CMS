@@ -38,8 +38,6 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 
 const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 	return {
-		// TODO: [v17] Review this, as needed to reintroduce the `name` field on `UmbDocumentCollectionItemModel` (due to the `UmbDocumentItemDataResolver`). [LK]
-		name: '',
 		documentType: {
 			collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
 			icon: item.documentType.icon,
@@ -56,6 +54,9 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 				culture: variant.culture || null,
 				name: variant.name,
 				state: variant.state,
+				// TODO: [v17] Implement dates when available in the API. [LK]
+				//createDate: new Date(variant.createDate),
+				//updateDate: new Date(variant.updateDate),
 			};
 		}),
 	};
