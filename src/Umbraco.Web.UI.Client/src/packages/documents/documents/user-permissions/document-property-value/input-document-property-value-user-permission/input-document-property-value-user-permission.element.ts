@@ -144,7 +144,7 @@ export class UmbInputDocumentPropertyValueUserPermissionElement extends UUIFormC
 
 			this.dispatchEvent(new UmbChangeEvent());
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 

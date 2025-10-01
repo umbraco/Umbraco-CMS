@@ -66,15 +66,10 @@ export class UmbServerModelValidatorContext extends UmbContextBase implements Um
 		}
 
 		this.#isValid = error ? false : true;
-		if (this.#isValid) {
-			//// Send data to context for translation:
-			//this.#context?.setTranslationData(undefined); // TODO: [v17] `setTranslationData` was deprecated/removed, what should replace this call? [LK]
-		} else {
+		if (!this.#isValid) {
 			if (!this.#context) {
 				throw new Error('No context available for translation.');
 			}
-			//// Send data to context for translation:
-			//this.#context.setTranslationData(data); // TODO: [v17] `setTranslationData` was deprecated/removed, what should replace this call? [LK]
 
 			let messages: Array<UmbValidationMessage> = [];
 

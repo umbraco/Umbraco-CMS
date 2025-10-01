@@ -6,12 +6,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-document-entity-actions-table-column-view')
 export class UmbDocumentEntityActionsTableColumnViewElement extends UmbLitElement {
 	@property({ attribute: false })
-	public get value(): UmbDocumentCollectionItemModel | undefined {
-		return this._value;
-	}
 	public set value(value: UmbDocumentCollectionItemModel | undefined) {
 		this._value = value;
 		this.#ancestorContext.setAncestors(this._value?.ancestors ?? []);
+	}
+	public get value(): UmbDocumentCollectionItemModel | undefined {
+		return this._value;
 	}
 
 	private _value?: UmbDocumentCollectionItemModel | undefined;

@@ -1,7 +1,6 @@
 import { getPropertyValueByAlias } from '../index.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbDocumentCollectionItemModel } from '../../types.js';
-import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.context-token.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
@@ -63,7 +62,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	#collectionContext?: UmbDocumentCollectionContext;
+	#collectionContext?: typeof UMB_DOCUMENT_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
 		super();
