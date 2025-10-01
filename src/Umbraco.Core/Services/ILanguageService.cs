@@ -38,12 +38,6 @@ public interface ILanguageService
     Task<IEnumerable<ILanguage>> GetAllAsync();
 
     /// <summary>
-    ///     Gets all available language ISO culture codes.
-    /// </summary>
-    /// <returns>An enumerable list of <see cref="ILanguage" /> objects.</returns>
-    async Task<IEnumerable<string>> GetAllIsoCodesAsync() => (await GetAllAsync()).Select(x => x.IsoCode);
-
-    /// <summary>
     ///     Gets all languages with the given ISO codes.
     /// </summary>
     /// <returns>An enumerable list of <see cref="ILanguage" /> objects</returns>

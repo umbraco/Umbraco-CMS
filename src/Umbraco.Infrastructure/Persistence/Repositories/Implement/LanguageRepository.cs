@@ -91,17 +91,6 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         return null;
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<string> GetAllIsoCodes()
-    {
-        var fields = new Expression<Func<LanguageDto, object?>>[]
-        {
-            x => x.IsoCode,
-        };
-        Sql<ISqlContext> sql = GetBaseQuery(false, fields);
-        return Database.Fetch<string>(sql);
-    }
-
     // multi implementation of GetIsoCodeById
     public string[] GetIsoCodesByIds(ICollection<int> ids, bool throwOnNotFound = true)
     {
@@ -240,17 +229,13 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
 
     #region Overrides of EntityRepositoryBase<int,Language>
 
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount) => GetBaseQuery(isCount, []);
-
-    private Sql<ISqlContext> GetBaseQuery(bool isCount, params Expression<Func<LanguageDto, object?>>[] fields)
+    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
     {
         Sql<ISqlContext> sql = Sql();
 
         sql = isCount
             ? sql.SelectCount()
-            : fields.Length > 0
-                ? sql.Select<LanguageDto>(fields)
-                : sql.Select<LanguageDto>();
+            : sql.Select<LanguageDto>();
 
         sql.From<LanguageDto>();
 

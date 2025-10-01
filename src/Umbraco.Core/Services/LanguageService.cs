@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -66,15 +65,6 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return Task.FromResult(_languageRepository.GetMany());
-        }
-    }
-
-    /// <inheritdoc />
-    public Task<IEnumerable<string>> GetAllIsoCodesAsync()
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return Task.FromResult(_languageRepository.GetAllIsoCodes());
         }
     }
 
