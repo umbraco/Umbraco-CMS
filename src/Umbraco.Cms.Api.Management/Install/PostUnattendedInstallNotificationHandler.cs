@@ -12,27 +12,31 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Install;
 
-public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler<UnattendedInstallNotification>
+public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandler<UnattendedInstallNotification>
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IOptions<UnattendedSettings> _unattendedSettings;
     private readonly IUserService _userService;
+    private readonly IMetricsConsentService _metricsConsentService;
 
-    public CreateUnattendedUserNotificationHandler(IOptions<UnattendedSettings> unattendedSettings, IUserService userService, IServiceScopeFactory serviceScopeFactory)
+    public PostUnattendedInstallNotificationHandler(IOptions<UnattendedSettings> unattendedSettings, IUserService userService, IServiceScopeFactory serviceScopeFactory, IMetricsConsentService metricsConsentService)
     {
         _unattendedSettings = unattendedSettings;
         _userService = userService;
         _serviceScopeFactory = serviceScopeFactory;
+        _metricsConsentService = metricsConsentService;
     }
 
     /// <summary>
-    ///     Listening for when the UnattendedInstallNotification fired after a sucessfulk
+    ///     Listening for when the UnattendedInstallNotification fired after a successful unattended install
+    ///     This creates the user and sets the telemetry level based on the 'Unattended' settings.
     /// </summary>
     /// <param name="notification"></param>
     /// <param name="cancellationToken"></param>
     public async Task HandleAsync(UnattendedInstallNotification notification, CancellationToken cancellationToken)
     {
         UnattendedSettings? unattendedSettings = _unattendedSettings.Value;
+
         // Ensure we have the setting enabled (Sanity check)
         // In theory this should always be true as the event only fired when a sucessfull
         if (_unattendedSettings.Value.InstallUnattended == false)
@@ -83,7 +87,7 @@ public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler
                 $"No user found in membership provider with id of {Constants.Security.SuperUserIdAsString}.");
         }
 
-        //To change the password here we actually need to reset it since we don't have an old one to use to change
+        // To change the password here we actually need to reset it since we don't have an old one to use to change
         var resetToken = await backOfficeUserManager.GeneratePasswordResetTokenAsync(membershipUser);
         if (string.IsNullOrWhiteSpace(resetToken))
         {
@@ -98,5 +102,7 @@ public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler
             throw new InvalidOperationException("Could not reset password: " +
                                                 string.Join(", ", resetResult.Errors.ToErrorMessage()));
         }
+
+        await _metricsConsentService.SetConsentLevelAsync(unattendedSettings.UnattendedTelemetryLevel);
     }
 }

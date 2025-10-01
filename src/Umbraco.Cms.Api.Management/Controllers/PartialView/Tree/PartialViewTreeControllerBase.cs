@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
@@ -25,7 +25,7 @@ public class PartialViewTreeControllerBase : FileSystemTreeControllerBase
 
     // FileSystem is required therefore, we can't remove it without some wizadry. When obsoletion is due, remove this.
     [ActivatorUtilitiesConstructor]
-    [Obsolete("Scheduled for removal in Umbraco 19")]
+    [Obsolete("Scheduled for removal in Umbraco 18.")]
     public PartialViewTreeControllerBase(IPartialViewTreeService partialViewTreeService, FileSystems fileSystems)
         : base(partialViewTreeService)
     {
@@ -34,12 +34,12 @@ public class PartialViewTreeControllerBase : FileSystemTreeControllerBase
                      throw new ArgumentException("Missing scripts file system", nameof(fileSystems));
     }
 
-    [Obsolete("Please use the other constructor. Scheduled to be removed in Umbraco 19")]
+    [Obsolete("Please use the other constructor. Scheduled to be removed in Umbraco 18.")]
     public PartialViewTreeControllerBase(FileSystems fileSystems)
         : this(StaticServiceProvider.Instance.GetRequiredService<IPartialViewTreeService>())
         => FileSystem = fileSystems.PartialViewsFileSystem ??
                         throw new ArgumentException("Missing scripts file system", nameof(fileSystems));
 
-    [Obsolete("Included in the service class. Scheduled to be removed in Umbraco 19")]
+    [Obsolete("Included in the service class. Scheduled to be removed in Umbraco 18.")]
     protected override IFileSystem FileSystem { get; }
 }

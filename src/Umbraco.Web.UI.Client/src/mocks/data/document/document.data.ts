@@ -620,6 +620,34 @@ export const data: Array<UmbMockDocumentModel> = [
 				segment: null,
 				value: undefined,
 			},
+			{
+				editorAlias: 'Umbraco.DateOnly',
+				alias: 'dateOnly',
+				culture: null,
+				segment: null,
+				value: { date: '2025-09-19' },
+			},
+			{
+				editorAlias: 'Umbraco.TimeOnly',
+				alias: 'timeOnly',
+				culture: null,
+				segment: null,
+				value: { date: '16:30:00' },
+			},
+			{
+				editorAlias: 'Umbraco.DateTimeUnspecified',
+				alias: 'dateTimeUnspecified',
+				culture: null,
+				segment: null,
+				value: { date: '2025-09-19T16:30:00' },
+			},
+			{
+				editorAlias: 'Umbraco.DateTimeWithTimeZone',
+				alias: 'dateTimeWithTimeZone',
+				culture: null,
+				segment: null,
+				value: { date: '2025-09-19T16:30:00+02:00', timeZone: 'Europe/Copenhagen' },
+			},
 		],
 		variants: [
 			{

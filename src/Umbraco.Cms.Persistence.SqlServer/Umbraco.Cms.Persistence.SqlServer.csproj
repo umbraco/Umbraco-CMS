@@ -7,7 +7,7 @@
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:
-      [SA1405] Debug assret message text
+      [SA1405] Debug assert message text
       [SA1121] resolve hiding inherited members
       [SA1117] remove async or make method synchronous
       [IDE1006] fix naming rule violation
