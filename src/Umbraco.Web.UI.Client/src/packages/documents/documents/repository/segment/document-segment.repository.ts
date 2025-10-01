@@ -27,7 +27,7 @@ export class UmbDocumentSegmentRepository extends UmbRepositoryBase {
 			const items = data.items.map((item) => {
 				const model: UmbDocumentSegmentModel = {
 					alias: item.alias,
-					name: item.alias,
+					name: item.name,
 					cultures: item.cultures,
 				};
 
