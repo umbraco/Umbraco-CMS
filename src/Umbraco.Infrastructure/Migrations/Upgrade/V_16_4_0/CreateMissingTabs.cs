@@ -1,5 +1,5 @@
+using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
@@ -16,14 +16,18 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_16_4_0;
 [Obsolete("Remove in Umbraco 18.")]
 public class CreateMissingTabs : AsyncMigrationBase
 {
-    public CreateMissingTabs(IMigrationContext context)
-        : base(context)
-    {
-    }
+    private readonly ILogger<CreateMissingTabs> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateMissingTabs"/> class.
+    /// </summary>
+    public CreateMissingTabs(IMigrationContext context, ILogger<CreateMissingTabs> logger)
+        : base(context) => _logger = logger;
+
+    /// <inheritdoc/>
     protected override async Task MigrateAsync()
     {
-        await ExecuteMigration(Database);
+        await ExecuteMigration(Database, _logger);
         Context.Complete();
     }
 
@@ -33,7 +37,7 @@ public class CreateMissingTabs : AsyncMigrationBase
     /// <remarks>
     /// Extracted into an internal static method to support integration testing.
     /// </remarks>
-    internal static async Task ExecuteMigration(IUmbracoDatabase database)
+    internal static async Task ExecuteMigration(IUmbracoDatabase database, ILogger logger)
     {
         // 1. Find all property groups (type 0) and extract their tab alias (the part before the first '/').
         //    This helps identify which groups are referencing tabs.
@@ -102,6 +106,10 @@ public class CreateMissingTabs : AsyncMigrationBase
                 SortOrder = missingTabWithDetails.SortOrder,
             });
         await database.InsertBatchAsync(newTabs);
+
+        logger.LogInformation(
+            "Created {MissingTabCount} tab records to migrate property group information for content types derived from compositions.",
+            missingTabsWithDetails.Count);
     }
 
     private static string GetTabAliasQuery(DatabaseType databaseType, string columnName) =>
