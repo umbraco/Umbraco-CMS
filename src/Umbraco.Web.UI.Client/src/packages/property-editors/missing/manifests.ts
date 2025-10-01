@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Missing',
 			propertyEditorSchemaAlias: undefined, // By setting it to undefined, this editor won't appear in the property editor UI picker modal.
-			icon: 'icon-ordered-list',
+			icon: 'icon-circle-dotted',
 			group: '',
 			supportsReadOnly: true,
 		},

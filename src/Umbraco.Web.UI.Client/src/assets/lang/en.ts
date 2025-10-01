@@ -2850,6 +2850,10 @@ export default {
 		detailsData: 'Data',
 		detailsHide: 'Hide details',
 		detailsShow: 'Show details',
+		dataTypeMissingEditor: 'Property Editor not found',
+		dataTypeMissingEditorMessage: 'This property editor could not be found.',
+		dataTypeMissingEditorUi: 'Property Editor UI not found',
+		dataTypeMissingEditorUiMessage: 'This property editor UI could not be found.',
 	},
 	uiCulture: {
 		ar: 'العربية',
