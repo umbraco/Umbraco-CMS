@@ -1,4 +1,4 @@
-import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context-token.js';
 import { css, customElement, html, nothing, property, ref } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
