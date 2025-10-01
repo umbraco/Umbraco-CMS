@@ -85,13 +85,25 @@ export const detailHandlers = [
 		const response: GetDocumentByIdAvailableSegmentOptionsResponse = {
 			total: availableSegments.length,
 			items: availableSegments.map((alias) => {
-				const whichCulturesHaveThisSegment: string[] = document.variants
-					.filter((v) => v.segment === alias && !!v.culture)
-					.map((v) => v.culture!);
+				// If the segment is generic (i.e. not tied to any culture) we show the segment on all cultures
+				const isGeneric = alias.includes('generic');
+				const whichCulturesHaveThisSegment: string[] | undefined = isGeneric
+					? undefined
+					: document.variants.filter((v) => v.segment === alias).map((v) => v.culture!);
+
+				let availableSegmentOptions: string[] | null | undefined = whichCulturesHaveThisSegment ?? undefined;
+
+				if (whichCulturesHaveThisSegment) {
+					const hasNull = whichCulturesHaveThisSegment.some((c) => c === null);
+					if (hasNull) {
+						availableSegmentOptions = null;
+					}
+				}
+
 				return {
 					alias,
 					name: `Segment: ${alias}`,
-					cultures: whichCulturesHaveThisSegment.length ? whichCulturesHaveThisSegment : null,
+					cultures: availableSegmentOptions,
 				};
 			}),
 		};
