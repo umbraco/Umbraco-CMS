@@ -36,7 +36,12 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	private _color = '';
 
 	private async _openModal() {
-		const data = await umbOpenModal(this, UMB_ICON_PICKER_MODAL).catch(() => undefined);
+		const data = await umbOpenModal(this, UMB_ICON_PICKER_MODAL, {
+			value: {
+				icon: this._icon,
+				color: this._color,
+			},
+		}).catch(() => undefined);
 		if (!data) return;
 
 		if (data.color) {
