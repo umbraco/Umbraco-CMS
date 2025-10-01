@@ -14,7 +14,7 @@ public class CreateStylesheetControllerTests : ManagementApiUserGroupTestBase<Cr
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -44,7 +44,7 @@ public class CreateStylesheetControllerTests : ManagementApiUserGroupTestBase<Cr
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreateStylesheetRequestModel createStylesheetRequestModel = new() { Name = "TestCreatedStylesheet.css", Content = "test content", Parent = new FileSystemFolderModel() { Path = "test" } };
+        CreateStylesheetRequestModel createStylesheetRequestModel = new() { Name = Guid.NewGuid() +".css", Content = "test content"};
 
         return await Client.PostAsync(Url, JsonContent.Create(createStylesheetRequestModel));
     }

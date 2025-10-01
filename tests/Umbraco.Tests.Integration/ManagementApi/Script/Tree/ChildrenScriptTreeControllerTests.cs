@@ -1,13 +1,37 @@
 using System.Linq.Expressions;
 using System.Net;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Script.Tree;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.FileSystem;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.FileSystem;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Script.Tree;
 
 public class ChildrenScriptTreeControllerTests : ManagementApiUserGroupTestBase<ChildrenScriptTreeController>
 {
+    private IScriptFolderService ScriptFolderService => GetRequiredService<IScriptFolderService>();
+
+    private IScriptService ScriptService => GetRequiredService<IScriptService>();
+
+
+    private string _scriptFolderPath;
+    [SetUp]
+    public async Task SetUp()
+    {
+        var folderModel = new ScriptFolderCreateModel() { Name = Guid.NewGuid().ToString() };
+        var responseFolder =await ScriptFolderService.CreateAsync(folderModel);
+        _scriptFolderPath = responseFolder.Result.Path;
+
+        var model = new ScriptCreateModel() { Name = Guid.NewGuid() + ".js", ParentPath = _scriptFolderPath};
+        var response =await ScriptService.CreateAsync(model, Constants.Security.SuperUserKey);
+
+    }
+
     protected override Expression<Func<ChildrenScriptTreeController, object>> MethodSelector =>
-        x => x.Children(CancellationToken.None, "TestParentFolder", 0, 100);
+        x => x.Children(CancellationToken.None, _scriptFolderPath, 0, 100);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {

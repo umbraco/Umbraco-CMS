@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Api.Management.ViewModels.Script.Folder;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Script.Folder;
 
@@ -15,7 +16,7 @@ public class CreateScriptFolderControllerTests : ManagementApiUserGroupTestBase<
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -45,7 +46,7 @@ public class CreateScriptFolderControllerTests : ManagementApiUserGroupTestBase<
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreateScriptFolderRequestModel createScriptFolderRequestModel = new() { Name = "TestCreateScriptFolder", Parent = new FileSystemFolderModel() { Path = "test" } };
+        CreateScriptFolderRequestModel createScriptFolderRequestModel = new() { Name = Guid.NewGuid().ToString()};
 
         return await Client.PostAsync(Url, JsonContent.Create(createScriptFolderRequestModel));
     }

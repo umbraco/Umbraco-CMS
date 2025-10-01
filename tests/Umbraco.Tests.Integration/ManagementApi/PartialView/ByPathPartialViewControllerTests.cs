@@ -23,11 +23,11 @@ public class ByPathPartialViewControllerTests : ManagementApiUserGroupTestBase<B
     }
 
     protected override Expression<Func<ByPathPartialViewController, object>> MethodSelector =>
-        x => x.ByPath(CancellationToken.None, "TestPartialViewByKey.cshtml");
+        x => x.ByPath(CancellationToken.None, _partialViewPath);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()

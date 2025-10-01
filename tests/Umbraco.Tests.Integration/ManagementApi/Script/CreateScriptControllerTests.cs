@@ -14,7 +14,7 @@ public class CreateScriptControllerTests : ManagementApiUserGroupTestBase<Create
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -44,7 +44,11 @@ public class CreateScriptControllerTests : ManagementApiUserGroupTestBase<Create
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreateScriptRequestModel createScriptRequestModel = new() { Name = "testCreateScript.js", Content = "TestContent", Parent = new FileSystemFolderModel() { Path = "test" } };
+        CreateScriptRequestModel createScriptRequestModel = new()
+        {
+            Name = Guid.NewGuid() + ".js",
+            Content = "empty"
+        };
 
         return await Client.PostAsync(Url, JsonContent.Create(createScriptRequestModel));
     }

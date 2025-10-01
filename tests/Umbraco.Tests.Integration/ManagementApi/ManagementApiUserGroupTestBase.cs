@@ -50,8 +50,7 @@ public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
     public virtual async Task As_Admin_I_Have_Specified_Access()
     {
         var response = await AuthorizedRequest(Constants.Security.AdminGroupKey, "Admin");
-        Assert.AreEqual(AdminUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode,
-            await response.Content.ReadAsStringAsync());
+        Assert.AreEqual(AdminUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
     // Editor

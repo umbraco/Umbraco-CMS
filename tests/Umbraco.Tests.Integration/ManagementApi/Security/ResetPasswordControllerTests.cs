@@ -8,8 +8,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Security;
 
 public class ResetPasswordControllerTests : ManagementApiUserGroupTestBase<ResetPasswordController>
 {
-    protected override Expression<Func<ResetPasswordController, object>> MethodSelector =>
-        x => x.RequestPasswordReset(CancellationToken.None, null);
+    protected override Expression<Func<ResetPasswordController, object>> MethodSelector => x => x.RequestPasswordReset(CancellationToken.None, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
@@ -43,7 +42,7 @@ public class ResetPasswordControllerTests : ManagementApiUserGroupTestBase<Reset
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        ResetPasswordRequestModel resetPasswordRequestModel = new() { Email = "testResetPassword@umbraco.com" };
+        ResetPasswordRequestModel resetPasswordRequestModel = new() { Email = UserEmail };
 
         return await Client.PostAsync(Url, JsonContent.Create(resetPasswordRequestModel));
     }
