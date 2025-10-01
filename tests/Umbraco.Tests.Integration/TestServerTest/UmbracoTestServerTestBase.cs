@@ -79,48 +79,61 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         [SetUp]
         public virtual void Setup()
         {
-            var cacheKey = $"{TestOptions.Database}_{TestOptions.Boot}";
-
-            if (!_factoryCache.TryGetValue(cacheKey, out var cachedFactory))
+            // Don't cache factory if using NewSchemaPerTest
+            if (TestOptions.Database == UmbracoTestOptions.Database.NewSchemaPerTest ||
+                TestOptions.Database == UmbracoTestOptions.Database.NewEmptyPerTest)
             {
-                /*
-                 * It's worth noting that our usage of WebApplicationFactory is non-standard,
-                 * the intent is that your Startup.ConfigureServices is called just like
-                 * when the app starts up, then replacements are registered in this class with
-                 * builder.ConfigureServices (builder.ConfigureTestServices has hung around from before the
-                 * generic host switchover).
-                 *
-                 * This is currently a pain to refactor towards due to UmbracoBuilder+TypeFinder+TypeLoader setup but
-                 * we should get there one day.
-                 *
-                 * However we need to separate the testing framework we provide for downstream projects from our own tests.
-                 * We cannot use the Umbraco.Web.UI startup yet as that is not available downstream.
-                 *
-                 * See https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests
-                 */
-                cachedFactory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder)
-                    .WithWebHostBuilder(builder =>
-                    {
-                        builder.UseContentRoot(Assembly.GetExecutingAssembly().GetRootDirectorySafe());
-                        builder.ConfigureTestServices(services =>
-                        {
-                            services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
-                            CustomTestAuthSetup(services);
-                        });
-                    });
-                _factoryCache[cacheKey] = cachedFactory;
+                // Create a new factory for each test when using per-test database
+                Factory = CreateNewFactory();
             }
+            else
+            {
+                // Use cached factory for per-fixture database options
+                var cacheKey = $"{TestOptions.Database}_{TestOptions.Boot}";
 
-            Factory = cachedFactory;
+                if (!_factoryCache.TryGetValue(cacheKey, out var cachedFactory))
+                {
+                    cachedFactory = CreateNewFactory();
+                    _factoryCache[cacheKey] = cachedFactory;
+                }
+
+                Factory = cachedFactory;
+            }
 
             Client = Factory.CreateClient(new WebApplicationFactoryClientOptions
             {
-                AllowAutoRedirect = false, BaseAddress = new Uri("https://localhost/"),
+                AllowAutoRedirect = false,
+                BaseAddress = new Uri("https://localhost/"),
             });
         }
 
+        private WebApplicationFactory<UmbracoTestServerTestBase> CreateNewFactory()
+        {
+            return new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder)
+                .WithWebHostBuilder(builder =>
+                {
+                    builder.UseContentRoot(Assembly.GetExecutingAssembly().GetRootDirectorySafe());
+                    builder.ConfigureTestServices(services =>
+                    {
+                        services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
+                        CustomTestAuthSetup(services);
+                    });
+                });
+        }
+
         [TearDown]
-        public void TearDownClient() => Client?.Dispose();
+        public void TearDownClient()
+        {
+            Client?.Dispose();
+
+            // Dispose the factory if using per-test database
+            if (TestOptions.Database == UmbracoTestOptions.Database.NewSchemaPerTest ||
+                TestOptions.Database == UmbracoTestOptions.Database.NewEmptyPerTest)
+            {
+                Factory?.Dispose();
+                Factory = null;
+            }
+        }
 
         [OneTimeTearDown]
         public static async Task CleanupFactories()
