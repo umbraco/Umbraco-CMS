@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Text;
+using System.Text.Json;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
@@ -92,10 +93,15 @@ internal class PackageManifestReader : IPackageManifestReader
                     packageManifests.Add(packageManifest);
                 }
             }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException(
+                    $"The package manifest file {fileInfo.PhysicalPath} could not be parsed as it does not contain valid JSON. Please see the inner exception for details.", ex);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to load package manifest file: {FileName}", fileInfo.Name);
-                throw;
+                throw new InvalidOperationException(
+                    $"The package manifest file {fileInfo.PhysicalPath} could not be parsed due to an unexpected error. Please see the inner exception for details.", ex);
             }
         }
 
