@@ -1,4 +1,4 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
@@ -42,9 +42,12 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 				color: this._color,
 			},
 		}).catch(() => undefined);
+
 		if (!data) return;
 
-		if (data.color) {
+		if (!data.icon) {
+			this.value = '';
+		} else if (data.color) {
 			this.value = `${data.icon} color-${data.color}`;
 		} else {
 			this.value = data.icon as string;
@@ -59,7 +62,10 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 				compact
 				label=${this.localize.term('defaultdialogs_selectIcon')}
 				look="outline"
-				@click=${this._openModal}>
+				@click=${this._openModal}
+				>${this._value === ''
+					? html` <uui-icon name="icon-checkbox-dotted" style="opacity: 0.35;"></uui-icon>`
+					: nothing}
 				${this._color
 					? html` <uui-icon name="${this._icon}" style="color:var(${extractUmbColorVariable(this._color)})"></uui-icon>`
 					: html` <uui-icon name="${this._icon}"></uui-icon>`}

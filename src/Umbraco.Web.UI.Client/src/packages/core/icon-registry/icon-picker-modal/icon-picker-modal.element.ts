@@ -64,7 +64,12 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	#changeIcon(e: InputEvent | KeyboardEvent, iconName: string) {
-		if (e.type == 'click' || (e.type == 'keyup' && (e as KeyboardEvent).key == 'Enter')) {
+		if (
+			(e.type == 'click' && iconName === this._currentIcon) ||
+			(e.type == 'keyup' && (e as KeyboardEvent).key == 'Enter')
+		) {
+			this.modalContext?.updateValue({ icon: '' });
+		} else if (e.type == 'click' || (e.type == 'keyup' && (e as KeyboardEvent).key == 'Enter')) {
 			this.modalContext?.updateValue({ icon: iconName });
 		}
 	}
@@ -75,8 +80,13 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		this._currentColor = colorAlias;
 	}
 
+	#clearIcon = () => {
+		this.modalContext?.updateValue({ icon: '' });
+	};
+
 	override render() {
 		// TODO: Missing localization in general. [NL]
+		console.log('CURRENT ICON:', this._currentIcon);
 		return html`
 			<umb-body-layout headline="Select Icon">
 				<div id="container">
@@ -101,7 +111,18 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						}
 					</uui-color-swatches>
 					<hr />
-					<uui-scroll-container id="icons">${this.renderIcons()}</uui-scroll-container>
+					<uui-scroll-container id="icons">
+						<uui-button
+							class=${!this._currentIcon ? 'selected' : ''}
+							label="No icon"
+							title="No icon"
+							@click=${this.#clearIcon}
+							@keyup=${(e: KeyboardEvent) => {
+								if (e.key === 'Enter' || e.key === ' ') this.#clearIcon();
+							}}>
+							<uui-icon name="icon-block" style="opacity:.35"></uui-icon> </uui-button
+						>${this.renderIcons()}</uui-scroll-container
+					>
 				</div>
 				<uui-button
 					slot="actions"
