@@ -1,4 +1,5 @@
 import type { UmbItemRepository } from './item/index.js';
+import type { UmbRepositoryItemsStatus } from './types.js';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -7,7 +8,6 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbRepositoryItemsStatus } from './types.js';
 
 const ObserveRepositoryAlias = Symbol();
 
@@ -122,6 +122,11 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 
 	itemByUnique(unique: string) {
 		return this.#items.asObservablePart((items) => items.find((item) => this.#getUnique(item) === unique));
+	}
+
+	removeStatus(unique: string) {
+		const newStatuses = this.#statuses.getValue().filter((status) => status.unique !== unique);
+		this.#statuses.setValue(newStatuses);
 	}
 
 	async getItemByUnique(unique: string) {

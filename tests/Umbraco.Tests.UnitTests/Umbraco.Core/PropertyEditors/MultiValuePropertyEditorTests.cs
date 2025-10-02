@@ -128,6 +128,7 @@ public class MultiValuePropertyEditorTests
         Assert.AreEqual("Item 3", result.Items[2]);
     }
 
+    [TestCase("", true, "")]
     [TestCase("Red", true, "")]
     [TestCase("Yellow", false, "notOneOfOptions")]
     [TestCase("Red,Green", true, "")]

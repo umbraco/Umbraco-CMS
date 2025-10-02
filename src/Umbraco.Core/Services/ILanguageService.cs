@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -32,9 +32,9 @@ public interface ILanguageService
     Task<string> GetDefaultIsoCodeAsync();
 
     /// <summary>
-    ///     Gets all available languages
+    ///     Gets all available languages.
     /// </summary>
-    /// <returns>An enumerable list of <see cref="ILanguage" /> objects</returns>
+    /// <returns>An enumerable list of <see cref="ILanguage" /> objects.</returns>
     Task<IEnumerable<ILanguage>> GetAllAsync();
 
     /// <summary>
@@ -44,29 +44,29 @@ public interface ILanguageService
     Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes);
 
     /// <summary>
-    ///     Updates an existing <see cref="ILanguage" /> object
+    ///     Updates an existing <see cref="ILanguage" /> object.
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to update</param>
     /// <param name="userKey">Key of the user saving the language</param>
     Task<Attempt<ILanguage, LanguageOperationStatus>> UpdateAsync(ILanguage language, Guid userKey);
 
     /// <summary>
-    ///     Creates a new <see cref="ILanguage" /> object
+    ///     Creates a new <see cref="ILanguage" /> object.
     /// </summary>
-    /// <param name="language"><see cref="ILanguage" /> to create</param>
-    /// <param name="userKey">Key of the user creating the language</param>
+    /// <param name="language"><see cref="ILanguage" /> to create.</param>
+    /// <param name="userKey">Key of the user creating the language.</param>
     Task<Attempt<ILanguage, LanguageOperationStatus>> CreateAsync(ILanguage language, Guid userKey);
 
     /// <summary>
-    ///     Deletes a <see cref="ILanguage" /> by removing it and its usages from the db
+    ///     Deletes a <see cref="ILanguage" /> by removing it and its usages from the database.
     /// </summary>
-    /// <param name="isoCode">The ISO code of the <see cref="ILanguage" /> to delete</param>
-    /// <param name="userKey">Key of the user deleting the language</param>
+    /// <param name="isoCode">The ISO code of the <see cref="ILanguage" /> to delete.</param>
+    /// <param name="userKey">Key of the user deleting the language.</param>
     Task<Attempt<ILanguage?, LanguageOperationStatus>> DeleteAsync(string isoCode, Guid userKey);
 
 
     /// <summary>
-    /// Retrieves the isoCodes of configured languages by their Ids
+    /// Retrieves the ISO codes of configured languages by their Ids.
     /// </summary>
     /// <param name="ids">The ids of the configured <see cref="ILanguage" />s</param>
     /// <returns>The ISO codes of the <see cref="ILanguage" />s</returns>
