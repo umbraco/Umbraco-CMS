@@ -172,7 +172,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		if (!this._supportsDataSource) return nothing;
 
 		return html`
-			<umb-property-layout label="Data Source" description="Some description">
+			<umb-property-layout label="Data Source">
 				<umb-input-property-editor-data-source
 					.value=${this._propertyEditorDataSourceAlias || ''}
 					slot="editor"
