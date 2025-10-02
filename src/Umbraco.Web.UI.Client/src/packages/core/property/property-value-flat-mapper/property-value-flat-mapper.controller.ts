@@ -53,7 +53,6 @@ export class UmbPropertyValueFlatMapperController extends UmbControllerBase {
 
 		if (api.processValues) {
 			let mappedValues: Array<ReturnType> = [];
-			// TODO: can we extract this method, to avoid it being recreated again and again [NL]
 			await api.processValues(incomingProperty, async (properties) => {
 				// Transform the values:
 				for (const property of properties) {
