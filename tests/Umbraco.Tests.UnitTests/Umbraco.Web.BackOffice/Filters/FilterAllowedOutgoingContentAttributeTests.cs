@@ -1,13 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
@@ -36,7 +35,8 @@ public class FilterAllowedOutgoingContentAttributeTests
             Mock.Of<IUserService>(),
             Mock.Of<IEntityService>(),
             AppCaches.Disabled,
-            Mock.Of<IBackOfficeSecurityAccessor>());
+            Mock.Of<IBackOfficeSecurityAccessor>(),
+            Mock.Of<IEventAggregator>());
 
         var result = att.GetValueFromResponse(new ObjectResult(expected));
 
@@ -56,7 +56,8 @@ public class FilterAllowedOutgoingContentAttributeTests
             Mock.Of<IUserService>(),
             Mock.Of<IEntityService>(),
             AppCaches.Disabled,
-            Mock.Of<IBackOfficeSecurityAccessor>());
+            Mock.Of<IBackOfficeSecurityAccessor>(),
+            Mock.Of<IEventAggregator>());
 
         var result = att.GetValueFromResponse(new ObjectResult(container));
 
@@ -76,7 +77,8 @@ public class FilterAllowedOutgoingContentAttributeTests
             Mock.Of<IUserService>(),
             Mock.Of<IEntityService>(),
             AppCaches.Disabled,
-            Mock.Of<IBackOfficeSecurityAccessor>());
+            Mock.Of<IBackOfficeSecurityAccessor>(),
+            Mock.Of<IEventAggregator>());
 
         var actual = att.GetValueFromResponse(new ObjectResult(container));
 
@@ -102,7 +104,8 @@ public class FilterAllowedOutgoingContentAttributeTests
             userService,
             entityService,
             AppCaches.Disabled,
-            Mock.Of<IBackOfficeSecurityAccessor>());
+            Mock.Of<IBackOfficeSecurityAccessor>(),
+            Mock.Of<IEventAggregator>());
 
         var path = string.Empty;
         for (var i = 0; i < 10; i++)
@@ -154,7 +157,9 @@ public class FilterAllowedOutgoingContentAttributeTests
             userService,
             Mock.Of<IEntityService>(),
             AppCaches.Disabled,
-            Mock.Of<IBackOfficeSecurityAccessor>());
+            Mock.Of<IBackOfficeSecurityAccessor>(),
+            Mock.Of<IEventAggregator>());
+
         att.FilterBasedOnPermissions(list, user);
 
         Assert.AreEqual(3, list.Count);

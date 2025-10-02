@@ -319,7 +319,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.ExpireDate = GetScheduledDate(source, ContentScheduleAction.Expire, context);
     }
 
-    // Umbraco.Code.MapAll -Alias
+    // Umbraco.Code.MapAll -Alias -BulkActionsAllowed
     private void Map(IContent source, ContentItemBasic<ContentPropertyBasic> target, MapperContext context)
     {
         target.ContentTypeId = source.ContentType.Id;
