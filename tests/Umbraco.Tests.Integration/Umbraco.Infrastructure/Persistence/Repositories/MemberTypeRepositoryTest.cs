@@ -27,7 +27,7 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     {
         var commonRepository = GetRequiredService<IContentTypeCommonRepository>();
         var languageRepository = GetRequiredService<ILanguageRepository>();
-        return new MemberTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap);
+        return new MemberTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
     }
 
     [Test]

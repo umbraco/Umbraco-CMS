@@ -17,8 +17,14 @@ internal sealed class KeyValueRepository : EntityRepositoryBase<string, IKeyValu
     public KeyValueRepository(
         IScopeAccessor scopeAccessor,
         ILogger<KeyValueRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, AppCaches.NoCache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            AppCaches.NoCache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

@@ -19,8 +19,14 @@ internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, Public
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<PublicAccessRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

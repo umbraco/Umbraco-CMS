@@ -36,6 +36,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     private readonly IScopeAccessor _scopeAccessor;
     private readonly IJsonSerializer _serializer;
     private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
+    private readonly ICacheSyncService _cacheSyncService;
     private readonly ITagRepository _tagRepository;
     private readonly ITemplateRepository _templateRepository;
     private PermissionRepository<IContent>? _permissionRepository;
@@ -56,7 +57,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             appCaches,
@@ -68,7 +70,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             dataValueReferenceFactories,
             dataTypeService,
             eventAggregator,
-            repositoryCacheVersionService)
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _contentTypeRepository =
             contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
@@ -76,6 +79,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
         _serializer = serializer;
         _repositoryCacheVersionService = repositoryCacheVersionService;
+        _cacheSyncService = cacheSyncService;
         _appCaches = appCaches;
         _loggerFactory = loggerFactory;
         _scopeAccessor = scopeAccessor;
@@ -84,7 +88,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             scopeAccessor,
             appCaches,
             loggerFactory.CreateLogger<ContentByGuidReadRepository>(),
-            repositoryCacheVersionService);
+            repositoryCacheVersionService,
+            cacheSyncService);
     }
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
@@ -120,7 +125,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             dataTypeService,
             serializer,
             eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 
@@ -137,7 +143,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                                                                            _scopeAccessor,
                                                                            _appCaches,
                                                                            _loggerFactory.CreateLogger<PermissionRepository<IContent>>(),
-                                                                           _repositoryCacheVersionService);
+                                                                           _repositoryCacheVersionService,
+                                                                           _cacheSyncService);
 
     /// <inheritdoc />
     public ContentScheduleCollection GetContentSchedule(int contentId)
@@ -1598,8 +1605,14 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             IScopeAccessor scopeAccessor,
             AppCaches cache,
             ILogger<ContentByGuidReadRepository> logger,
-            IRepositoryCacheVersionService repositoryCacheVersionService)
-            : base(scopeAccessor, cache, logger, repositoryCacheVersionService) =>
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
+            : base(
+                scopeAccessor,
+                cache,
+                logger,
+                repositoryCacheVersionService,
+                cacheSyncService) =>
             _outerRepo = outerRepo;
 
         protected override IContent? PerformGet(Guid id)

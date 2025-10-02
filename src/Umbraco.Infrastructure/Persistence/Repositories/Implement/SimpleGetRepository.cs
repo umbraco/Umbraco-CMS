@@ -22,8 +22,14 @@ internal abstract class SimpleGetRepository<TId, TEntity, TDto> : EntityReposito
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<SimpleGetRepository<TId, TEntity, TDto>> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

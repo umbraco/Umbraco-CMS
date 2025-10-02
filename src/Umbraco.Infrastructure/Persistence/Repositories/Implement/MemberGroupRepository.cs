@@ -24,8 +24,14 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
         AppCaches cache,
         ILogger<MemberGroupRepository> logger,
         IEventMessagesFactory eventMessagesFactory,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService) =>
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService) =>
         _eventMessagesFactory = eventMessagesFactory;
 
     protected Guid NodeObjectTypeId => Constants.ObjectTypes.MemberGroup;

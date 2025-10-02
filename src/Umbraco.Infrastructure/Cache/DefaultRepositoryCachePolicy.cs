@@ -30,8 +30,9 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,
         RepositoryCachePolicyOptions options,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(cache, scopeAccessor, repositoryCacheVersionService) =>
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
 
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
@@ -43,7 +44,8 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             cache,
             scopeAccessor,
             options,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 

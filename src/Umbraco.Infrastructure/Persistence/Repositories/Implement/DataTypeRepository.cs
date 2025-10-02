@@ -37,12 +37,14 @@ internal sealed class DataTypeRepository : EntityRepositoryBase<int, IDataType>,
         ILogger<DataTypeRepository> logger,
         ILoggerFactory loggerFactory,
         IConfigurationEditorJsonSerializer serializer,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             cache,
             logger,
-            repositoryCacheVersionService
+            repositoryCacheVersionService,
+            cacheSyncService
             )
     {
         _editors = editors;

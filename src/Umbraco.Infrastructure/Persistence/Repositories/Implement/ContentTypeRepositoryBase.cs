@@ -39,8 +39,14 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        IIdKeyMap idKeyMap)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IIdKeyMap idKeyMap,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _shortStringHelper = shortStringHelper;
         CommonRepository = commonRepository;

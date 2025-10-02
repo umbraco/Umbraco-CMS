@@ -17,8 +17,14 @@ internal sealed class ServerRegistrationRepository : EntityRepositoryBase<int, I
     public ServerRegistrationRepository(
         IScopeAccessor scopeAccessor,
         ILogger<ServerRegistrationRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, AppCaches.NoCache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            AppCaches.NoCache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

@@ -12,13 +12,15 @@ internal sealed class MediaTypeContainerRepository : EntityContainerRepository, 
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<MediaTypeContainerRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             cache,
             logger,
             Constants.ObjectTypes.MediaTypeContainer,
-            repositoryCacheVersionService)
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 }

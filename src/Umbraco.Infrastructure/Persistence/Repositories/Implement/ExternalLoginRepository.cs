@@ -20,8 +20,14 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<ExternalLoginRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger,  repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
     /// <summary>

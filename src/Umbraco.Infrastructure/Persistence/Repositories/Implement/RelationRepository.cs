@@ -31,8 +31,14 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         ILogger<RelationRepository> logger,
         IRelationTypeRepository relationTypeRepository,
         IEntityRepositoryExtended entityRepository,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, AppCaches.NoCache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            AppCaches.NoCache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _relationTypeRepository = relationTypeRepository;
         _entityRepository = entityRepository;

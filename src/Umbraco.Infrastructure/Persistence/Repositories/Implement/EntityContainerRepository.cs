@@ -21,8 +21,14 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         AppCaches cache,
         ILogger<EntityContainerRepository> logger,
         Guid containerObjectType,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         Guid[] allowedContainers =
         {

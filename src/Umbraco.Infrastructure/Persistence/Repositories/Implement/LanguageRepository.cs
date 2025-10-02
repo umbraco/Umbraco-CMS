@@ -28,8 +28,14 @@ internal sealed class LanguageRepository : EntityRepositoryBase<int, ILanguage>,
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<LanguageRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger,  repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

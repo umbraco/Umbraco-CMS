@@ -19,8 +19,14 @@ internal sealed class DomainRepository : EntityRepositoryBase<int, IDomain>, IDo
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<DomainRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     { }
 
     public IDomain? GetByName(string domainName)

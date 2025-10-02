@@ -1,4 +1,6 @@
 ﻿using System.Runtime.Versioning;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -11,12 +13,14 @@ public class MemberRepositoryUsernameCachePolicy : DefaultRepositoryCachePolicy<
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,
         RepositoryCachePolicyOptions options,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : base(
             cache,
             scopeAccessor,
             options,
-            repositoryCacheVersionService)
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 
@@ -25,7 +29,12 @@ public class MemberRepositoryUsernameCachePolicy : DefaultRepositoryCachePolicy<
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,
         RepositoryCachePolicyOptions options)
-        : base(cache, scopeAccessor, options)
+        : this(
+            cache,
+            scopeAccessor,
+            options,
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 

@@ -71,8 +71,14 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        IEnumerable<IPermissionMapper> permissionMappers)
-        : base(scopeAccessor, appCaches, logger, repositoryCacheVersionService)
+        IEnumerable<IPermissionMapper> permissionMappers,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            appCaches,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));

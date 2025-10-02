@@ -27,7 +27,8 @@ internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             cache,
@@ -36,7 +37,8 @@ internal sealed class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType
             languageRepository,
             shortStringHelper,
             repositoryCacheVersionService,
-            idKeyMap)
+            idKeyMap,
+            cacheSyncService)
     {
     }
 

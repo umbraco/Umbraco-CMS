@@ -18,8 +18,14 @@ internal sealed class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoF
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<TwoFactorLoginRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

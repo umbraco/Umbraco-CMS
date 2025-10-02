@@ -18,8 +18,15 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<LogViewerQueryRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService
+            )
     {
     }
 

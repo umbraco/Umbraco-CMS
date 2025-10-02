@@ -37,8 +37,14 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         IShortStringHelper shortStringHelper,
         IViewHelper viewHelper,
         IOptionsMonitor<RuntimeSettings> runtimeSettings,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _shortStringHelper = shortStringHelper;
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;

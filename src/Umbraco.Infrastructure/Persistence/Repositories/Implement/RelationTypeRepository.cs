@@ -23,8 +23,14 @@ internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelati
         IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<RelationTypeRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, cache, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            cache,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

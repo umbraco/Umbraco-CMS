@@ -90,7 +90,8 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 ShortStringHelper,
                 Mock.Of<IViewHelper>(),
                 runtimeSettingsMock.Object,
-                Mock.Of<IRepositoryCacheVersionService>());
+                Mock.Of<IRepositoryCacheVersionService>(),
+                Mock.Of<ICacheSyncService>());
             var repository = ContentTypeRepository;
             Template[] templates =
             {

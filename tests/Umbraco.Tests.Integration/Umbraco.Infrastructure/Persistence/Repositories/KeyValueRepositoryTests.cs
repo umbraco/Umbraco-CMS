@@ -66,5 +66,5 @@ internal sealed class KeyValueRepositoryTests : UmbracoIntegrationTest
     }
 
     private IKeyValueRepository CreateRepository(ICoreScopeProvider provider) =>
-        new KeyValueRepository((IScopeAccessor)provider, LoggerFactory.CreateLogger<KeyValueRepository>(),  Mock.Of<IRepositoryCacheVersionService>());
+        new KeyValueRepository((IScopeAccessor)provider, LoggerFactory.CreateLogger<KeyValueRepository>(),  Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 }

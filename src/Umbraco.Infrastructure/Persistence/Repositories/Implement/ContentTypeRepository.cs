@@ -28,7 +28,8 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
         ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        ICacheSyncService cacheSyncService)
         : base(
             scopeAccessor,
             cache,
@@ -37,7 +38,8 @@ internal sealed class ContentTypeRepository : ContentTypeRepositoryBase<IContent
             languageRepository,
             shortStringHelper,
             repositoryCacheVersionService,
-            idKeyMap)
+            idKeyMap,
+            cacheSyncService)
     {
     }
 

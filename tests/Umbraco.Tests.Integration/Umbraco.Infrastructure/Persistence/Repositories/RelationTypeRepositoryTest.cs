@@ -24,7 +24,7 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
     public void SetUp() => CreateTestData();
 
     private RelationTypeRepository CreateRepository(ICoreScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>());
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     [Test]
     public void Can_Perform_Add_On_RelationTypeRepository()
@@ -241,7 +241,7 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
         ICoreScopeProvider provider = ScopeProvider;
         using (var scope = provider.CreateCoreScope())
         {
-            var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>());
+            var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
             repository.Save(relateContent); // Id 2
             repository.Save(relateContentType); // Id 3

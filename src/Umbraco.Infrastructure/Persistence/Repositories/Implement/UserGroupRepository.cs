@@ -38,8 +38,14 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         ILoggerFactory loggerFactory,
         IShortStringHelper shortStringHelper,
         IEnumerable<IPermissionMapper> permissionMappers,
-        IRepositoryCacheVersionService repositoryCacheVersionService)
-        : base(scopeAccessor, appCaches, logger, repositoryCacheVersionService)
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : base(
+            scopeAccessor,
+            appCaches,
+            logger,
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
         _shortStringHelper = shortStringHelper;
         _userGroupWithUsersRepository = new UserGroupWithUsersRepository(
@@ -47,12 +53,14 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             scopeAccessor,
             appCaches,
             loggerFactory.CreateLogger<UserGroupWithUsersRepository>(),
-            repositoryCacheVersionService);
+            repositoryCacheVersionService,
+            cacheSyncService);
         _permissionRepository = new PermissionRepository<IContent>(
             scopeAccessor,
             appCaches,
             loggerFactory.CreateLogger<PermissionRepository<IContent>>(),
-            repositoryCacheVersionService);
+            repositoryCacheVersionService,
+            cacheSyncService);
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
@@ -71,7 +79,8 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             loggerFactory,
             shortStringHelper,
             permissionMappers,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
+            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
     {
     }
 
@@ -241,12 +250,14 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             IScopeAccessor scopeAccessor,
             AppCaches cache,
             ILogger<UserGroupWithUsersRepository> logger,
-            IRepositoryCacheVersionService repositoryCacheVersionService)
+            IRepositoryCacheVersionService repositoryCacheVersionService,
+            ICacheSyncService cacheSyncService)
             : base(
                 scopeAccessor,
                 cache,
                 logger,
-                repositoryCacheVersionService) =>
+                repositoryCacheVersionService,
+                cacheSyncService) =>
             _userGroupRepo = userGroupRepo;
 
         protected override void PersistNewItem(UserGroupWithUsers entity)
