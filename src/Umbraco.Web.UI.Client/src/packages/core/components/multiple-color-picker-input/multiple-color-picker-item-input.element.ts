@@ -167,7 +167,12 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 								value=${this._valueHex}
 								@click=${this.#onColorClick}></uui-color-swatch>
 						</uui-input>
-						<input aria-hidden="${true}" type="color" id="color" value=${this.value} @change=${this.#onColorChange} />
+						<input
+							type="color"
+							id="color"
+							value=${this._valueHex}
+							aria-hidden="${true}"
+							@change=${this.#onColorChange} />
 					</div>
 					${when(
 						this.showLabels,
