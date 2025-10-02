@@ -3,7 +3,7 @@
     <Title>Umbraco CMS - Persistence - SQLite</Title>
     <Description>Adds support for SQLite to Umbraco CMS.</Description>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <!--
       TODO: Fix and remove overrides:
@@ -11,7 +11,6 @@
     -->
     <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0114</WarningsNotAsErrors>
   </PropertyGroup>
-  
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" />
   </ItemGroup>

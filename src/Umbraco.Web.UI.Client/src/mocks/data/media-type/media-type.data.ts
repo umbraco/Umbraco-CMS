@@ -21,7 +21,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		description: 'Media type 1 description',
 		alias: 'mediaType1',
 		icon: 'icon-picture',
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '19',
@@ -112,7 +112,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		description: 'Media type 2 description',
 		alias: 'mediaType2',
 		icon: 'icon-audio-lines',
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '19',
@@ -163,7 +163,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		description: 'Media type 3 description',
 		alias: 'mediaType3',
 		icon: 'icon-origami',
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '19',
@@ -214,7 +214,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		description: 'Media type 4 description',
 		alias: 'mediaType4',
 		icon: 'icon-video',
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '19',
@@ -265,7 +265,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		description: 'Media type 5 description',
 		alias: 'mediaType5',
 		icon: 'icon-document',
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '19',
@@ -316,7 +316,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		description: 'Clicking on this results in a 403 Forbidden error',
 		alias: 'forbidden',
 		icon: 'icon-document',
-		signs: [],
+		flags: [],
 		properties: [
 			{
 				id: '19',

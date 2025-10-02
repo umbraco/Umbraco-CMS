@@ -71,7 +71,7 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 		// Keep current data in sync with the owner content type - This is used for the discard changes feature
 		this.observe(this.structure.ownerContentType, (data) => this._data.setCurrent(data), null);
-		this.observe(this.name, (name) => this.view.setBrowserTitle(name), null);
+		this.observe(this.name, (name) => this.view.setTitle(name), null);
 		// TODO: sometimes the browserTitle for a parent view is set later than the child is updating. We need to fix this as well enable a parent browser title to be updating on the go. [NL]
 	}
 

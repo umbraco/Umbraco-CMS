@@ -310,6 +310,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					${this.#renderVariantTags()}
 					${this.property.appearance?.labelOnTop == true
 						? html`<uui-tag look="default">
+								<uui-icon name="icon-stretch-horizontal"></uui-icon>
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
 							</uui-tag>`
 						: nothing}
@@ -348,7 +349,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		) {
 			return html`
 				<uui-tag look="default">
-					<uui-icon name="icon-shared-value"></uui-icon> ${this.localize.term(
+					<uui-icon name="icon-trending-up-down"></uui-icon> ${this.localize.term(
 						'contentTypeEditor_cultureAndVariantInvariantLabel',
 					)}
 				</uui-tag>
@@ -357,13 +358,17 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 		if (this.ownerVariesByCulture && !this.property.variesByCulture) {
 			return html`<uui-tag look="default">
-				<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureInvariantLabel')}
+				<uui-icon name="icon-trending-up-down"></uui-icon> ${this.localize.term(
+					'contentTypeEditor_cultureInvariantLabel',
+				)}
 			</uui-tag>`;
 		}
 
 		if (this.ownerVariesBySegment && !this.property.variesBySegment) {
 			return html`<uui-tag look="default">
-				<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_segmentInvariantLabel')}
+				<uui-icon name="icon-trending-up-down"></uui-icon> ${this.localize.term(
+					'contentTypeEditor_segmentInvariantLabel',
+				)}
 			</uui-tag>`;
 		}
 
