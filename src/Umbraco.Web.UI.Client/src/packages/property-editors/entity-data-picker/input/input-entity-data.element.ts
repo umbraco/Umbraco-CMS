@@ -1,4 +1,4 @@
-import type { UmbEntityDataItemModel } from '../types.js';
+import type { UmbEntityDataPickerItemModel } from '../picker-item/types.js';
 import { UmbEntityDataPickerInputContext } from './input-entity-data.context.js';
 import { css, html, customElement, property, state, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -125,7 +125,7 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 	#readonly = false;
 
 	@state()
-	private _items: Array<UmbEntityDataItemModel> = [];
+	private _items: Array<UmbEntityDataPickerItemModel> = [];
 
 	#pickerInputContext = new UmbEntityDataPickerInputContext(this);
 
@@ -160,7 +160,7 @@ export class UmbInputEntityDataElement extends UUIFormControlMixin(UmbLitElement
 		return undefined;
 	}
 
-	#onRemove(item: UmbEntityDataItemModel) {
+	#onRemove(item: UmbEntityDataPickerItemModel) {
 		this.#pickerInputContext.requestRemoveItem(item.unique);
 	}
 

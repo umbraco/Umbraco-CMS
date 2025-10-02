@@ -1,9 +1,5 @@
 import type { UmbEntityDataPickerDataSourceApiContext } from './entity-data-picker-data-source.context.js';
-import type {
-	UmbPickerPropertyEditorCollectionDataSource,
-	UmbPickerPropertyEditorDataSource,
-	UmbPickerPropertyEditorTreeDataSource,
-} from '@umbraco-cms/backoffice/data-type';
+import type { UmbPickerPropertyEditorDataSource } from '@umbraco-cms/backoffice/data-type';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 const contextAlias = 'UmbEntityDataPickerDataSourceApiContext';

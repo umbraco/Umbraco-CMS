@@ -1,7 +1,6 @@
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export type * from './picker-collection/picker-property-editor-collection-data-source.extension.js';
-export type * from './picker-tree/picker-property-editor-tree-data-source.extension.js';
+export type * from './property-data-source.extension.js';
 
 export interface UmbPropertyEditorDataSource extends UmbApi {
 	setConfig(config: any): void;

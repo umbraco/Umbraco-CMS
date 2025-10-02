@@ -1,10 +1,7 @@
 import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../types.js';
 import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_DATA_TYPE_ENTITY_TYPE } from '../constants.js';
 import type { UmbDataTypeDetailRepository } from '../repository/index.js';
-import type {
-	ManifestPickerPropertyEditorCollectionDataSource,
-	ManifestPickerPropertyEditorTreeDataSource,
-} from '../property-editor-data-source/types.js';
+import type { ManifestPropertyEditorDataSource } from '../property-editor-data-source/types.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import { UMB_DATA_TYPE_WORKSPACE_ALIAS } from './constants.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
@@ -233,9 +230,7 @@ export class UmbDataTypeWorkspaceContext
 			return;
 		}
 		this.observe(
-			umbExtensionsRegistry.byAlias<
-				ManifestPickerPropertyEditorCollectionDataSource | ManifestPickerPropertyEditorTreeDataSource
-			>(propertyEditorDataSourceAlias),
+			umbExtensionsRegistry.byAlias<ManifestPropertyEditorDataSource>(propertyEditorDataSourceAlias),
 			(manifest) => {
 				// Maps properties to have a weight, so they can be sorted, notice data source properties have a +2000 weight compared to schema properties.
 				this.#propertyEditorDataSourceSettingsProperties = (manifest?.meta.settings?.properties ?? []).map((x, i) => ({

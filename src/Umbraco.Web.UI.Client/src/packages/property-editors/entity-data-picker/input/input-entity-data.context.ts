@@ -2,7 +2,7 @@ import { UMB_ENTITY_DATA_PICKER_COLLECTION_MENU_ALIAS } from '../picker-collecti
 import { UMB_ENTITY_DATA_PICKER_TREE_ALIAS } from '../picker-tree/constants.js';
 import { UMB_ENTITY_DATA_PICKER_SEARCH_PROVIDER_ALIAS } from '../picker-search/constants.js';
 import { UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS } from '../constants.js';
-import type { UmbEntityDataItemModel } from '../picker-item/types.js';
+import type { UmbEntityDataPickerItemModel } from '../picker-item/types.js';
 import { UmbEntityDataPickerDataSourceApiContext } from './entity-data-picker-data-source.context.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
@@ -11,8 +11,7 @@ import {
 	type UmbCollectionItemPickerModalValue,
 } from '@umbraco-cms/backoffice/collection';
 import type {
-	ManifestPickerPropertyEditorCollectionDataSource,
-	ManifestPickerPropertyEditorTreeDataSource,
+	ManifestPropertyEditorDataSource,
 	UmbPickerPropertyEditorTreeDataSource,
 } from '@umbraco-cms/backoffice/data-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -33,12 +32,8 @@ import {
 } from '@umbraco-cms/backoffice/tree';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-type ManifestDataSourceType =
-	| ManifestPickerPropertyEditorTreeDataSource
-	| ManifestPickerPropertyEditorCollectionDataSource;
-
 export class UmbEntityDataPickerInputContext extends UmbControllerBase {
-	#itemManager = new UmbRepositoryItemsManager<UmbEntityDataItemModel>(
+	#itemManager = new UmbRepositoryItemsManager<UmbEntityDataPickerItemModel>(
 		this,
 		UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS,
 	);
@@ -47,9 +42,9 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 	public readonly statuses = this.#itemManager.statuses;
 
 	#dataSourceAlias?: string;
-	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestDataSourceType>;
+	#dataSourceApiInitializer?: UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>;
 
-	#pickerModalToken?: UmbModalToken<UmbPickerModalData<UmbEntityDataItemModel>, UmbPickerModalValue>;
+	#pickerModalToken?: UmbModalToken<UmbPickerModalData<UmbEntityDataPickerItemModel>, UmbPickerModalValue>;
 	#dataSourceApiContext = new UmbEntityDataPickerDataSourceApiContext(this);
 
 	/**
@@ -130,7 +125,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 			return;
 		}
 
-		const modalPresetData: UmbPickerModalData<UmbEntityDataItemModel> = {
+		const modalPresetData: UmbPickerModalData<UmbEntityDataPickerItemModel> = {
 			multiple: this._max === 1 ? false : true,
 		};
 
@@ -175,7 +170,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 			return;
 		}
 
-		this.#dataSourceApiInitializer = new UmbExtensionApiInitializer<ManifestDataSourceType>(
+		this.#dataSourceApiInitializer = new UmbExtensionApiInitializer<ManifestPropertyEditorDataSource>(
 			this,
 			umbExtensionsRegistry,
 			dataSourceAlias,
@@ -209,7 +204,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 		// TODO: can we find a better way to check if the api supports search?
 		const supportsSearch = typeof api.requestSearch === 'function';
 
-		return new UmbModalToken<UmbTreePickerModalData<UmbEntityDataItemModel>, UmbTreePickerModalValue>(
+		return new UmbModalToken<UmbTreePickerModalData<UmbEntityDataPickerItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
 			{
 				modal: {
@@ -233,7 +228,7 @@ export class UmbEntityDataPickerInputContext extends UmbControllerBase {
 		const supportsSearch = typeof api.requestSearch === 'function';
 
 		return new UmbModalToken<
-			UmbCollectionItemPickerModalData<UmbEntityDataItemModel>,
+			UmbCollectionItemPickerModalData<UmbEntityDataPickerItemModel>,
 			UmbCollectionItemPickerModalValue
 		>(UMB_COLLECTION_ITEM_PICKER_MODAL_ALIAS, {
 			modal: {

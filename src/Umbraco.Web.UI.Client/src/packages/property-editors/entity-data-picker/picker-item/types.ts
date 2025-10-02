@@ -1,6 +1,6 @@
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-export interface UmbEntityDataItemModel extends UmbEntityModel {
+export interface UmbEntityDataPickerItemModel extends UmbEntityModel {
 	unique: string;
 	name: string;
 	icon: string;
