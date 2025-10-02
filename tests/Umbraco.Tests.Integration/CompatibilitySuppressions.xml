@@ -108,13 +108,6 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Tests.Integration.TestServerTest.UmbracoTestServerTestBase.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)</Target>
-    <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
-    <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DocumentNavigationServiceTests.Bin_Structure_Can_Rebuild</Target>
     <Left>lib/net9.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net9.0/Umbraco.Tests.Integration.dll</Right>
