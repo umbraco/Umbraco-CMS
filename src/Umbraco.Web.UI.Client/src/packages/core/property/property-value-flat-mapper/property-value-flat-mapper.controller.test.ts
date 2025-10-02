@@ -65,20 +65,9 @@ describe('UmbPropertyValueFlatMapperController', () => {
 			};
 
 			umbExtensionsRegistry.register(manifestResolver);
-
-			const manifestResolverOnly: ManifestPropertyValueResolver = {
-				type: 'propertyValueResolver',
-				name: 'test-resolver-1',
-				alias: 'Umb.Test.Resolver.2',
-				api: TestPropertyValueResolver,
-				forEditorAlias: 'only-resolver-editor',
-			};
-
-			umbExtensionsRegistry.register(manifestResolverOnly);
 		});
 		afterEach(async () => {
 			umbExtensionsRegistry.unregister('Umb.Test.Resolver.1');
-			umbExtensionsRegistry.unregister('Umb.Test.Resolver.2');
 		});
 
 		it('mapper result is returned as an array', async () => {
@@ -86,7 +75,7 @@ describe('UmbPropertyValueFlatMapperController', () => {
 			const ctrl = new UmbPropertyValueFlatMapperController(ctrlHost);
 
 			const property = {
-				editorAlias: 'test-editor',
+				editorAlias: 'test-editor-with-no-mapper',
 				alias: 'test',
 				culture: null,
 				segment: null,
@@ -108,7 +97,7 @@ describe('UmbPropertyValueFlatMapperController', () => {
 			const ctrl = new UmbPropertyValueFlatMapperController(ctrlHost);
 
 			const property = {
-				editorAlias: 'only-resolver-editor',
+				editorAlias: 'test-editor',
 				alias: 'not-to-be-handled',
 				culture: null,
 				segment: null,
