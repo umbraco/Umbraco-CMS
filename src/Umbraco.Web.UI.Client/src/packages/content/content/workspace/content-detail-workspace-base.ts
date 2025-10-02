@@ -54,8 +54,7 @@ import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbrac
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { UmbDocumentSegmentRepository } from '@umbraco-cms/backoffice/document';
-import type { UmbDocumentSegmentModel } from '@umbraco-cms/backoffice/document';
+import type { UmbSegmentModel } from '@umbraco-cms/backoffice/segment';
 
 export interface UmbContentDetailWorkspaceContextArgs<
 	DetailModelType extends UmbContentDetailModel<VariantModelType>,
@@ -155,9 +154,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public readonly languages = this.#languages.asObservable();
 
-	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
-	#segments = new UmbArrayState<UmbDocumentSegmentModel>([], (x) => x.alias);
-	protected readonly _segments = this.#segments.asObservable();
+	protected readonly _segments = new UmbArrayState<UmbSegmentModel>([], (x) => x.alias);
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
@@ -225,7 +222,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.variantOptions = mergeObservables(
-			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments],
+			[this.variesByCulture, this.variesBySegment, this.variants, this.languages, this._segments.asObservable()],
 			([variesByCulture, variesBySegment, variants, languages, segments]) => {
 				if ((variesByCulture || variesBySegment) === undefined) {
 					return [];
@@ -369,7 +366,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				this._data.setVariesBySegment(varies);
 				this.#variesBySegment = varies;
 				if (varies) {
-					this.#loadSegments();
+					this.loadSegments();
+				} else {
+					this._segments.setValue([]);
 				}
 			},
 			null,
@@ -391,22 +390,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#languages.setValue(data?.items ?? []);
 	}
 
-	async #loadSegments() {
-		this.observe(
-			this.unique,
-			async (unique) => {
-				if (!unique) {
-					this.#segments.setValue([]);
-					return;
-				}
-				const { data } = await this.#documentSegmentRepository.getDocumentByIdSegmentOptions(unique, {
-					skip: 0,
-					take: 9999,
-				});
-				this.#segments.setValue(data?.items ?? []);
-			},
-			'_loadSegmentsUnique',
+	protected async loadSegments() {
+		console.warn(
+			`UmbContentDetailWorkspaceContextBase: Segments are not yet fully implemented for "${this.getEntityType()}" types.`,
 		);
+		this._segments.setValue([]);
 	}
 
 	protected override async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
