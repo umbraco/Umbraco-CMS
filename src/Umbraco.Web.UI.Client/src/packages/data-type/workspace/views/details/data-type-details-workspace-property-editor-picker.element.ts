@@ -10,6 +10,9 @@ import {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
+/**
+ * @internal should only be used in the data type workspace.
+ */
 @customElement('umb-data-type-details-workspace-property-editor-picker')
 export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbFormControlMixin<
 	undefined,
